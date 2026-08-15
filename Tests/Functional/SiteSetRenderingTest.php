@@ -42,7 +42,9 @@ final class SiteSetRenderingTest extends AbstractFunctionalTestCase
             // "additional" argument. That argument is silently dropped by
             // "sbuerk/typo3-site-based-test-trait": its merge takes $site
             // instead of $additional, and $configuration already is $site.
-            // @todo Move this back into "additional:" once the package is fixed.
+            // @todo Move this back into "additional:" once
+            //       https://github.com/sbuerk/typo3-site-based-test-trait/issues/25
+            //       is fixed and the constraint here requires that version.
             $this->buildSiteConfiguration(
                 rootPageId: 1,
                 base: 'https://theme.example.com/',

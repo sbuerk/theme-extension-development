@@ -128,9 +128,11 @@ the call identical across package majors.
 >
 > `$configuration` already **is** `$site`, so the merge is a no-op and anything
 > passed as `additional` never reaches the written site configuration. It fails
-> silently — the site is written, just without those keys.
+> silently — the site is written, just without those keys. Both package majors
+> are affected, and it is tracked as
+> [issue #25](https://github.com/sbuerk/typo3-site-based-test-trait/issues/25).
 >
-> Until the package is fixed, put such keys into the **`site`** array instead:
+> Until that is fixed, put such keys into the **`site`** array instead:
 >
 > ```php
 > $this->writeSiteConfiguration(
