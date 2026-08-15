@@ -1,6 +1,6 @@
 {
     "name": "sbuerk/theme-extension-development",
-    "description": "TYPO3 CMS extension theme_extension_development.",
+    "description": "TYPO3 frontend theme for development purposes: extension development, DDEV based test instances and acceptance tests.",
     "type": "typo3-cms-extension",
     "homepage": "https://github.com/sbuerk/theme-extension-development",
     "support": {
@@ -10,7 +10,13 @@
     "license": "GPL-2.0-or-later",
     "keywords": [
         "typo3",
-        "typo3-cms-extension"
+        "typo3-cms-extension",
+        "theme",
+        "frontend",
+        "development",
+        "testing",
+        "ddev",
+        "acceptance-tests"
     ],
     "authors": [
         {

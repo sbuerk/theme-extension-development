@@ -105,7 +105,7 @@ Extbase requires mutable properties and a no-argument constructor, because the
 data mapper assigns properties by reflection on an instance it creates without
 calling the constructor. So an Extbase model is neither `readonly` nor
 constructor-injected — but it is still a data object, and it still carries
-`#[Exclude]`. The skeleton's own
+`#[Exclude]`. This extension's own
 [`Greeting`](../../Tests/Functional/Fixtures/Extensions/example-fixture/Classes/Domain/Model/Greeting.php)
 model shows both.
 
@@ -128,7 +128,7 @@ Both are ignored by their identifier, as shown in the example above. **This is
 required and absolutely fine here**: it is the only way to combine the two rules
 this repository holds — a constructor kept free for extending classes, and a
 `readonly` hierarchy — and PHP itself still guarantees the immutability that
-`readonly` promises. The pattern is verified by the skeleton's own
+`readonly` promises. The pattern is verified by this extension's own
 [`AbstractExample`](../../Classes/Example/AbstractExample.php).
 
 Do **not** take this as a licence to silence PHPStan elsewhere. The ignores are

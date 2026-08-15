@@ -8,12 +8,27 @@ Installation
 
 The extension has to be installed like any other TYPO3 CMS extension.
 
+..  warning::
+
+    This is a development tool, not a production theme. It belongs in a
+    development or test instance, not in a live site — that applies to every
+    installation method described below.
+
 Composer mode
 =============
 
+Being a development tool, it usually belongs in ``require-dev`` — of the
+extension repository whose frontend is to be looked at, or of the test instance
+set up for it:
+
 ..  code-block:: bash
 
-    composer require sbuerk/theme-extension-development
+    composer require --dev sbuerk/theme-extension-development
+
+A TYPO3 extension required that way is installed and activated exactly like any
+other one, because ``typo3/cms-composer-installers`` makes no distinction
+between ``require`` and ``require-dev``. A deployment installing with
+``composer install --no-dev`` simply leaves it out, which is the point.
 
 ..  note::
 
@@ -22,7 +37,7 @@ Composer mode
 
     ..  code-block:: bash
 
-        composer require sbuerk/theme-extension-development:^1.0@dev
+        composer require --dev sbuerk/theme-extension-development:^1.0@dev
 
     This additionally requires ``minimum-stability`` to be set to ``dev``
     together with ``prefer-stable`` set to ``true`` in the root

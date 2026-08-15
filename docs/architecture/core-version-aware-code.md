@@ -76,7 +76,7 @@ dropped.
 See [`Classes/Example/`](../../Classes/Example),
 [`Core13/Example/`](../../Core13/Example) and
 [`Core14/Example/`](../../Core14/Example) for the complete example shipped with
-the skeleton.
+this extension.
 
 ## Configuration is the exception
 

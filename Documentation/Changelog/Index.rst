@@ -6,8 +6,8 @@
 Changelog
 =========
 
-Every notable change to the :guilabel:`Theme Extension Development` extension is
-documented here, grouped by version and change type.
+Every notable change to the :guilabel:`Frontend Theme for Extension Development`
+extension is documented here, grouped by version and change type.
 
 ..  toctree::
     :maxdepth: 1
