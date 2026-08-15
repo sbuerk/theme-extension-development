@@ -1,0 +1,19 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:comment>
+        "f:format.html" parses through "lib.parseFunc_RTE", which EXT:frontend
+        provides since v13.2 (#103485) - it does NOT come from
+        "fluid_styled_content", so rich text keeps working without it.
+    </f:comment>
+    <div class="content-element__body">
+        <f:format.html>{data.bodytext}</f:format.html>
+    </div>
+</f:section>
+
+</html>

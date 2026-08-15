@@ -41,11 +41,10 @@ in a frontend rather than only in a test assertion:
 ..  note::
 
     The theme is being built up. It renders a page once a site depends on its
-    site set — see :ref:`configuration` — but brings no content element
-    rendering of its own yet, and no backend layouts, so every page renders the
-    same template and a content element renders the TYPO3 notice that it has no
-    rendering definition. This chapter is extended along with the implemented
-    features.
+    site set — see :ref:`configuration` — together with the two content elements
+    that exist without :file:`fluid_styled_content`. It brings no backend
+    layouts yet, so every page renders the same template. This chapter is
+    extended along with the implemented features.
 
     Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
     base with :ref:`core version aware <introduction-core-version-aware>`

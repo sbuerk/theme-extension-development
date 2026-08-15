@@ -1,0 +1,8 @@
+"pages",,,,,,,,,
+,"uid","pid","sys_language_uid","l10n_parent","l10n_source","doktype","is_siteroot","title","slug"
+,1,0,0,0,0,1,1,"Theme root","/"
+"tt_content",,,,,,,,,
+,"uid","pid","sys_language_uid","l18n_parent","colPos","CType","header","header_layout","bodytext"
+,1,1,0,0,0,"header","A heading element",2,""
+,2,1,0,0,0,"text","A text element",3,"<p>The body text of the element.</p>"
+,3,1,0,0,0,"header","A hidden heading",100,""

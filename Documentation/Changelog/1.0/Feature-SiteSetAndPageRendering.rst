@@ -41,10 +41,8 @@ see :ref:`configuration`.
 
 ..  note::
 
-    Content elements are not rendered by the theme yet. The extension
-    deliberately does not depend on ``fluid_styled_content``, and its own
-    content element rendering follows in a later release. Until then a content
-    element renders the TYPO3 notice that it has no rendering definition.
+    Content element rendering is described in
+    :ref:`feature-content-element-rendering`.
 
     Every page currently renders the same template. Backend layout support
-    follows together with the content elements.
+    follows later.

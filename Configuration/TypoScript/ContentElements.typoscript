@@ -1,0 +1,29 @@
+# Content element rendering of the theme.
+#
+# The theme does not depend on "fluid_styled_content", so nothing renders a
+# content element unless it is defined here. Without a definition the core
+# renders its own notice that the element has no rendering definition - the
+# yellow box - which is what every element looked like before this file.
+#
+# EXT:frontend registers exactly two content types on its own, "header" and
+# "text" (v13 additionally has the legacy "list", removed in v14). Everything
+# else a TYPO3 installation usually offers - textmedia, image, bullets, table,
+# uploads, menus - is registered by "fluid_styled_content" and therefore does
+# not exist here. Those are content types this theme would have to bring
+# itself, together with their TCA.
+
+# The equivalent of "lib.contentElement" from "fluid_styled_content": the frame
+# every content element is rendered through. Consumers of this theme can
+# override the Fluid paths through the constants rather than this object.
+lib.contentElement = FLUIDTEMPLATE
+lib.contentElement {
+    templateRootPaths.10 = {$theme.templateRootPath}
+    partialRootPaths.10 = {$theme.partialRootPath}
+    layoutRootPaths.10 = {$theme.layoutRootPath}
+}
+
+tt_content.header =< lib.contentElement
+tt_content.header.templateName = ContentElements/Header
+
+tt_content.text =< lib.contentElement
+tt_content.text.templateName = ContentElements/Text

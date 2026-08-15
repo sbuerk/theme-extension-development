@@ -97,16 +97,58 @@ classes are.
 
 Content is rendered with `styles.content.get`, which comes from **EXT:frontend**,
 not from `fluid_styled_content` — the theme deliberately does not depend on that
-extension. Until the theme brings its own content element rendering, an element
-on a page renders the core notice that it has no rendering definition.
+extension.
+
+## Content elements without `fluid_styled_content`
+
+Without FSC there is no `lib.contentElement` and no `tt_content.<CType>` branch,
+so every element falls through to the core default, which renders a yellow box
+saying the element has no rendering definition.
+`Configuration/TypoScript/ContentElements.typoscript` provides both.
+
+**Only two content types exist to render.** EXT:frontend registers `header` and
+`text` and nothing else — verified by reading the `CType` items of its
+`tt_content` TCA on both versions:
+
+| Version | CTypes registered by EXT:frontend |
+|---------|-----------------------------------|
+| v13     | `header`, `text`, `list`          |
+| v14     | `header`, `text`                  |
+
+Everything a TYPO3 installation normally offers — textmedia, image, bullets,
+table, uploads, menus, html — belongs to `fluid_styled_content`. Those are not
+elements this theme has chosen not to render; they do not exist here at all, and
+bringing them means registering content types **and their TCA** in this
+extension.
+
+`list` is the legacy plugin type, deprecated in v13 (#105076) and removed in v14
+(#105377), so it is deliberately not rendered.
+
+What core still gives for free, and what the templates therefore rely on:
+
+- `lib.parseFunc` and `lib.parseFunc_RTE`, in EXT:frontend since v13.2 (#103485),
+  so `<f:format.html>` parses rich text without FSC
+- `styles.content.get`, the `tt_content = CASE` skeleton, `FilesProcessor` and
+  `GalleryProcessor`
+
+`header_layout` is honoured, including the value **100**, which the core TCA
+offers as "do not display". A theme ignoring it would render headings an editor
+had deliberately hidden.
+
+> [!NOTE]
+> Developer notes in a Fluid template belong in `<f:comment>`, not in an HTML
+> comment. Fluid strips the former and renders the latter into the response —
+> this was found the hard way, when a test asserting the absence of the core
+> error notice matched a template comment that merely *described* it.
 
 ## What the tests cover
 
-| Test                                    | Proves                                                      |
-|-----------------------------------------|-------------------------------------------------------------|
-| `SiteSetRenderingTest`                  | A page renders through the set, with **no** `sys_template`. |
-| `StaticTypoScriptFallbackRenderingTest` | A page renders through the static include, with no set.     |
-| `StaticTypoScriptIncludeTest`           | The static include is registered in the TCA at all.         |
+| Test                                    | Proves                                                                 |
+|-----------------------------------------|------------------------------------------------------------------------|
+| `SiteSetRenderingTest`                  | A page renders through the set, with **no** `sys_template`.            |
+| `StaticTypoScriptFallbackRenderingTest` | A page renders through the static include, with no set.                |
+| `StaticTypoScriptIncludeTest`           | The static include is registered in the TCA at all.                    |
+| `ContentElementRenderingTest`           | `header` and `text` render, and the core error notice does not appear. |
 
 The first two cover the two branches of the guard condition. Both were shown to
 fail: renaming the set breaks the first, inverting the condition breaks the

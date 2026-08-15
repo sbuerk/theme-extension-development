@@ -3,6 +3,8 @@
 # Read by the site set and by the classic static include alike - both point at
 # this file, see "Configuration/Sets/ThemeExtensionDevelopment/config.yaml".
 
+@import 'EXT:theme_extension_development/Configuration/TypoScript/ContentElements.typoscript'
+
 page = PAGE
 page {
     typeNum = 0

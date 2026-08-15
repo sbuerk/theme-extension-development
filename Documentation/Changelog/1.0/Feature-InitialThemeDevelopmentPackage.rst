@@ -18,9 +18,9 @@ based test instances and for acceptance tests.
 ..  important::
 
     The theme is being built up. This release renders a page - see
-    :ref:`feature-site-set-page-rendering` - but brings no content element
-    rendering of its own yet, so a content element on a page renders the TYPO3
-    notice that it has no rendering definition.
+    :ref:`feature-site-set-page-rendering` - and the content elements that exist
+    without ``fluid_styled_content`` - see
+    :ref:`feature-content-element-rendering`.
 
 ..  warning::
 
