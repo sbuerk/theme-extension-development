@@ -1,0 +1,59 @@
+# The demo page tree of the theme.
+#
+# Written into an instance with:
+#
+#   vendor/bin/typo3 theme:seed
+#
+# The uids are declared so a site configuration can reference them: the
+# committed site configurations of the development instances point at root page
+# 1, which is this file's "home".
+#
+# Structural keys are "identifier", "uid", "children" and "content". Everything
+# else is a field of the record and is written as-is.
+identifier: demo
+
+pages:
+  - identifier: home
+    uid: 1
+    title: 'Theme demo'
+    slug: '/'
+    is_siteroot: 1
+    doktype: 1
+    content:
+      - identifier: home-heading
+        CType: header
+        header: 'A frontend to look at'
+        header_layout: 1
+      - identifier: home-text
+        CType: text
+        header: 'What this is'
+        header_layout: 2
+        bodytext: |
+          <p>This page tree is seeded from a definition in the repository, so a
+          development instance can be rebuilt from nothing without clicking a
+          page tree together by hand.</p>
+    children:
+      - identifier: styles
+        uid: 2
+        title: 'Typography'
+        slug: '/typography'
+        doktype: 1
+        content:
+          - identifier: styles-heading
+            CType: header
+            header: 'Typography'
+            header_layout: 1
+          - identifier: styles-text
+            CType: text
+            header: 'Running text'
+            header_layout: 2
+            bodytext: |
+              <p>A paragraph of running text, so the theme has something to set
+              in its body font. It carries <strong>bold</strong> and
+              <em>emphasised</em> words and a <a href="/">link</a>, which are
+              the three inline cases a stylesheet has to answer for.</p>
+      - identifier: empty
+        uid: 3
+        title: 'Empty page'
+        slug: '/empty'
+        doktype: 1
