@@ -1,0 +1,14 @@
+// Entry point of the theme stylesheet.
+//
+// Compiled to "Resources/Public/Css/theme.css" by "runTests.sh -s buildCss".
+// The compiled file is committed, because both the composer dist archive and
+// the TER artifact are exports of committed content and neither runs a build.
+//
+// Partials are pulled in with "@use", never with "@import": "@import" is
+// deprecated since dart-sass 1.80.0 and is removed in dart-sass 3.0.
+//
+// @todo The style layer itself is deliberately minimal for now and is filled
+//       in once the design work starts.
+
+@use 'tokens';
+@use 'base';

@@ -1,0 +1,18 @@
+{
+    "name": "theme-extension-development",
+    "description": "Frontend asset build of the TYPO3 extension theme_extension_development.",
+    "license": "GPL-2.0-or-later",
+    "private": true,
+    "engines": {
+        "node": ">=20"
+    },
+    "devDependencies": {
+        "sass": "^1.102.0"
+    },
+    "scripts": {
+        "build": "sass --load-path=Resources/Private/Scss --style=compressed --no-source-map Resources/Private/Scss/theme.scss:Resources/Public/Css/theme.css",
+        "build:dev": "sass --load-path=Resources/Private/Scss --style=expanded --source-map --embed-sources Resources/Private/Scss/theme.scss:Resources/Public/Css/theme.css",
+        "build:verify": "sass --load-path=Resources/Private/Scss --style=compressed --no-source-map Resources/Private/Scss/theme.scss:.Build/css-verify/theme.css && diff -u Resources/Public/Css/theme.css .Build/css-verify/theme.css",
+        "watch": "npm run build:dev -- --watch"
+    }
+}

@@ -13,7 +13,8 @@ name: "CI"
 #   phpstan ─┤
 #   lint    ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
 #            │
-#   docs ────┘  (independent, for fast feedback on documentation changes)
+#   docs ────┤  (independent, for fast feedback on documentation changes)
+#   css  ────┘  (independent, neither PHP nor core version dependent)
 #
 # The DBMS matrix is the expensive part — 16 jobs, each starting a database
 # container — so it only runs once the same tests have passed on SQLite for both
@@ -271,6 +272,28 @@ jobs:
 
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
+
+  # Independent of PHP and of the core version: the stylesheet is compiled from
+  # SCSS and depends on neither, so this is a single job rather than a matrix
+  # dimension. It also needs no "composerUpdate", which is what makes it the
+  # cheapest job in the workflow.
+  css:
+    name: "css"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache npm downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/npm"
+          key: "npm-${{ hashFiles('package-lock.json') }}"
+          restore-keys: "npm-"
+
+      - name: "Ensure the committed CSS matches its SCSS sources"
+        run: "Build/Scripts/runTests.sh -b docker -s checkCssBuild"
 
   documentation:
     name: "documentation"
