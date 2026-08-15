@@ -17,10 +17,10 @@ based test instances and for acceptance tests.
 
 ..  important::
 
-    No theme assets ship in this release. The extension contains no templates,
-    no TypoScript and no site set, so installing it does not change what a
-    frontend renders. What this release delivers is the foundation the theme is
-    built on, and the theme is added along with the implemented features.
+    The theme is being built up. This release renders a page - see
+    :ref:`feature-site-set-page-rendering` - but brings no content element
+    rendering of its own yet, so a content element on a page renders the TYPO3
+    notice that it has no rendering definition.
 
 ..  warning::
 

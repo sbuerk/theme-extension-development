@@ -1,0 +1,5 @@
+# Classic static include of the theme constants, for installations that do not
+# use the site set. See "Static/setup.typoscript" for why the condition is here.
+[not ('sbuerk/theme-extension-development' in site('sets'))]
+    @import 'EXT:theme_extension_development/Configuration/TypoScript/constants.typoscript'
+[END]

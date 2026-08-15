@@ -10,8 +10,8 @@ building a site package for it first.
 - **License**: GPL-2.0-or-later
 
 > [!IMPORTANT]
-> **No theme assets ship yet** — the section below describes what this package
-> is for, not what it already does. See [Status](#status).
+> **The theme is not finished** — the section below describes what this package
+> is for; see [Status](#status) for what it already does.
 >
 > It is a development tool, not a production theme.
 
@@ -34,14 +34,20 @@ users and integrators, with the full scope warning.
 
 ## Status
 
-**The theme itself is not implemented yet.** The extension currently ships no
-templates, no TypoScript and no site set, so installing it does not change what
-a frontend renders.
+**The theme renders a page, and not much more yet.** A site enables it by
+depending on the site set `sbuerk/theme-extension-development`, which brings the
+TypoScript, a Fluid page rendering and the compiled stylesheet.
 
-What is in place is the foundation it is built on: TYPO3 v13 and v14 support
-from one code base, the core version aware wiring, and the container based test
-and quality gate harness. The public API is not stable yet and may change
-without a deprecation phase until the first stable release.
+Not there yet: the theme brings **no content element rendering** of its own — it
+deliberately does not depend on `fluid_styled_content` — so a content element
+renders the TYPO3 notice that it has no rendering definition. Backend layouts
+are missing too, so every page renders the same template.
+
+Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
+base, the core version aware wiring, the SCSS build, two development instances
+and the container based test and quality gate harness. The public API is not
+stable yet and may change without a deprecation phase until the first stable
+release.
 
 ## Compatibility
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2026-08-16T00:00:00Z" product-name="theme_extension_development">
+		<header/>
+		<body>
+			<trans-unit id="theme.title">
+				<source>Frontend Theme for Extension Development</source>
+			</trans-unit>
+			<trans-unit id="theme.footerNote">
+				<source>Rendered by the development theme.</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

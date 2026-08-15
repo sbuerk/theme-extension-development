@@ -1,0 +1,12 @@
+# The site set of the theme. A site enables the theme by depending on it:
+#
+#   dependencies:
+#     - sbuerk/theme-extension-development
+#
+# "typoscript" points at the shared TypoScript directory rather than at this
+# set directory, so the site set and the classic static include below
+# "Configuration/TypoScript/Static/" read the very same files. The trailing
+# slash is required: the core appends "setup.typoscript" to this path directly.
+name: sbuerk/theme-extension-development
+label: 'Theme Extension Development'
+typoscript: 'EXT:theme_extension_development/Configuration/TypoScript/'
