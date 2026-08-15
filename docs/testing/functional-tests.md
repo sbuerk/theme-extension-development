@@ -37,6 +37,34 @@ the old location. The wrapper places the mount one level higher for `18` and
 above, which is the mount point the image documents for that case — nothing to
 configure, but it explains why that one version is special cased.
 
+### Query the database through the QueryBuilder, in tests too
+
+A test that reads a table back must not do it with hand written SQL:
+
+```php
+// Passes on SQLite and MySQL, fails on PostgreSQL.
+->executeQuery('SELECT pid, CType, header FROM tt_content')
+```
+
+PostgreSQL folds an **unquoted identifier to lower case**, so this asks for a
+column `ctype`, which does not exist — `SQLSTATE[42703]: Undefined column`. The
+`QueryBuilder` quotes identifiers and the same query is then portable:
+
+```php
+$queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('tt_content');
+$queryBuilder->getRestrictions()->removeAll();
+$rows = $queryBuilder->select('pid', 'CType', 'header')->from('tt_content')
+    ->orderBy('sorting')->executeQuery()->fetchAllAssociative();
+```
+
+Removing the restrictions is deliberate where the subject is *what was written*
+rather than what is visible: the default restrictions hide deleted and hidden
+rows, and a test asserting that a record exists would otherwise silently assert
+that it is also visible.
+
+This is the concrete reason the rule below exists — the defect reached CI
+because the change had only been run against SQLite.
+
 ### When the database refuses the connection
 
 A run that reports many `Connection refused` errors, from

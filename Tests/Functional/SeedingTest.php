@@ -54,6 +54,36 @@ final class SeedingTest extends AbstractFunctionalTestCase
         return $seeder->seed($parser->parseFile(self::DEMO_SEED), $backendUser);
     }
 
+    /**
+     * Reads a table through the QueryBuilder rather than through hand written
+     * SQL, and without restrictions, so what is asserted is what the seeder
+     * actually wrote.
+     *
+     * The QueryBuilder quotes identifiers, which is not cosmetic here:
+     * PostgreSQL folds an unquoted identifier to lower case, so a literal
+     * "SELECT CType" asks for a column "ctype" that does not exist. SQLite and
+     * MySQL accept it, which is exactly how such a query passes locally and
+     * fails in CI.
+     *
+     * @param list<string> $columns
+     * @return list<array<string, mixed>>
+     */
+    private function queryTable(string $table, array $columns, string $orderBy): array
+    {
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable($table);
+        $queryBuilder->getRestrictions()->removeAll();
+
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $queryBuilder
+            ->select(...$columns)
+            ->from($table)
+            ->orderBy($orderBy)
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        return $rows;
+    }
+
     #[Test]
     public function seedWritesTheDeclaredUids(): void
     {
@@ -71,9 +101,7 @@ final class SeedingTest extends AbstractFunctionalTestCase
     {
         $this->seedDemo();
 
-        $rows = $this->getConnectionPool()->getConnectionForTable('pages')
-            ->executeQuery('SELECT uid, pid, title, slug FROM pages ORDER BY uid')
-            ->fetchAllAssociative();
+        $rows = $this->queryTable('pages', ['uid', 'pid', 'title', 'slug'], 'uid');
 
         $this->assertCount(3, $rows);
         $this->assertSame(0, (int)$rows[0]['pid']);
@@ -87,9 +115,7 @@ final class SeedingTest extends AbstractFunctionalTestCase
     {
         $this->seedDemo();
 
-        $slug = $this->getConnectionPool()->getConnectionForTable('pages')
-            ->executeQuery('SELECT slug FROM pages WHERE uid = 2')
-            ->fetchOne();
+        $slug = $this->queryTable('pages', ['uid', 'slug'], 'uid')[1]['slug'] ?? null;
 
         // Declared as "/typography" in the definition and kept by DataHandler,
         // which is what proves the slug field was evaluated at all.
@@ -101,9 +127,13 @@ final class SeedingTest extends AbstractFunctionalTestCase
     {
         $this->seedDemo();
 
-        $sorted = $this->getConnectionPool()->getConnectionForTable('pages')
-            ->executeQuery('SELECT uid FROM pages WHERE pid = 1 ORDER BY sorting')
-            ->fetchFirstColumn();
+        $sorted = array_column(
+            array_values(array_filter(
+                $this->queryTable('pages', ['uid', 'pid'], 'sorting'),
+                static fn(array $row): bool => (int)$row['pid'] === 1,
+            )),
+            'uid',
+        );
 
         // A new record goes to the top of its parent by default, so without the
         // negative pid convention this would come back as [3, 2].
@@ -115,9 +145,7 @@ final class SeedingTest extends AbstractFunctionalTestCase
     {
         $this->seedDemo();
 
-        $rows = $this->getConnectionPool()->getConnectionForTable('tt_content')
-            ->executeQuery('SELECT pid, CType, header FROM tt_content ORDER BY pid, sorting')
-            ->fetchAllAssociative();
+        $rows = $this->queryTable('tt_content', ['pid', 'CType', 'header'], 'sorting');
 
         $this->assertCount(4, $rows);
         $this->assertSame(1, (int)$rows[0]['pid']);
