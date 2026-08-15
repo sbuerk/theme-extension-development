@@ -37,6 +37,37 @@ the old location. The wrapper places the mount one level higher for `18` and
 above, which is the mount point the image documents for that case — nothing to
 configure, but it explains why that one version is special cased.
 
+### When the database refuses the connection
+
+A run that reports many `Connection refused` errors, from
+`Doctrine\DBAL\Exception\ConnectionException` down to `mysqli_sql_exception`,
+is almost never a defect in the code under test. It means the suite started
+before the database server was ready.
+
+The wrapper therefore waits for the server to **answer a query** — not for its
+TCP port to open, because the MySQL image runs a temporary server while it
+initialises its data directory, so an open port is not a ready server. The probe
+runs the vendor's own client out of the database image itself, which is the only
+client guaranteed to speak the protocol of the version under test.
+
+Two properties of that wait are worth knowing, because both were once wrong and
+produced exactly the failure above:
+
+- **The budget is 60 seconds.** `mysql:8.0` needs 12 to 13 seconds under docker
+  to initialise a fresh data directory, roughly twice as long as under podman,
+  and the workflows select docker. A 10 second budget put the functional MySQL
+  suites on a negative margin, so they failed at random.
+- **A timeout aborts the run.** It used to signal `SIGINT` to the process group,
+  but the `SIGINT` trap is only installed when `CI` is not `true` — so in CI the
+  abort did nothing, the run carried on and PHPUnit connected to a database that
+  was not listening. The readiness failure then arrived disguised as dozens of
+  test errors. It now cleans up and exits non-zero, naming the server and the
+  budget.
+
+So if a run does fail this way, read the first lines rather than the last: a
+message naming the server that did not answer means the database never came up,
+and the run stopped there.
+
 Remember to run both core versions, each after the matching `composerUpdate` —
 see [Dual core setup](../development/dual-core-setup.md).
 
