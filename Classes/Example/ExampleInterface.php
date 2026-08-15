@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SBUERK\ExtensionSkeleton\Example;
+namespace SBUERK\ThemeExtensionDevelopment\Example;
 
 /**
  * Example of a core version aware service contract.

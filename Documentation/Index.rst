@@ -2,15 +2,15 @@
 
 ..  _start:
 
-==================
-Extension Skeleton
-==================
+===========================
+Theme Extension Development
+===========================
 
 :Extension key:
-    extension_skeleton
+    theme_extension_development
 
 :Package name:
-    sbuerk/extension-skeleton
+    sbuerk/theme-extension-development
 
 :Version:
     |release|

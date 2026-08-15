@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SBUERK\ExtensionSkeleton\Tests\Functional\Core14\Example;
+namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional\Core14\Example;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use SBUERK\ExtensionSkeleton\Core14\Example\Example;
-use SBUERK\ExtensionSkeleton\Example\ExampleInterface;
-use SBUERK\ExtensionSkeleton\Tests\Functional\AbstractFunctionalTestCase;
+use SBUERK\ThemeExtensionDevelopment\Core14\Example\Example;
+use SBUERK\ThemeExtensionDevelopment\Example\ExampleInterface;
+use SBUERK\ThemeExtensionDevelopment\Tests\Functional\AbstractFunctionalTestCase;
 
 /**
  * Verifies the core version aware dependency injection wiring on TYPO3 v14.
@@ -30,7 +30,7 @@ final class ExampleTest extends AbstractFunctionalTestCase
     #[Test]
     public function implementationOfTheOtherCoreVersionIsNotRegistered(): void
     {
-        $otherImplementation = 'SBUERK\\ExtensionSkeleton\\Core13\\Example\\Example';
+        $otherImplementation = 'SBUERK\\ThemeExtensionDevelopment\\Core13\\Example\\Example';
 
         $this->assertFalse(
             $this->getContainer()->has($otherImplementation),

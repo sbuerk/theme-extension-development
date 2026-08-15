@@ -66,7 +66,7 @@ use SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase;
 abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
     protected array $testExtensionsToLoad = [
-        'sbuerk/extension-skeleton',
+        'sbuerk/theme-extension-development',
     ];
 }
 ```
@@ -87,7 +87,7 @@ itself has to be repeated:
 
 ```php
 protected array $testExtensionsToLoad = [
-    'sbuerk/extension-skeleton',
+    'sbuerk/theme-extension-development',
     'tests/example-fixture',
 ];
 ```

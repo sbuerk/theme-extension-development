@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SBUERK\ExtensionSkeleton;
+namespace SBUERK\ThemeExtensionDevelopment;
 
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
@@ -26,6 +26,6 @@ final readonly class Dummy
 {
     public function getExtensionKey(): string
     {
-        return 'extension_skeleton';
+        return 'theme_extension_development';
     }
 }
