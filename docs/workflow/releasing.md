@@ -65,7 +65,18 @@ so a release can safely be rehearsed. `git` and the GitHub CLI (`gh`) have to be
 available and authenticated for `--execute`.
 
 Pushing the tag triggers the [`publish`](../../.github/workflows/publish.yml)
-workflow, which builds the TER artifact and creates the GitHub release.
+workflow, which builds the TER artifact, creates the GitHub release and
+publishes the artifact to the TYPO3 Extension Repository.
+
+The TER step authenticates with the `TYPO3_API_TOKEN` repository secret and
+needs the extension key registered in the TER and owned by that token. It runs
+**after** the GitHub release, so an upload that fails — an expired token, a
+version already published — leaves the release and its artifact in place to
+retry against instead of losing both.
+
+The tag has to match the version in `ext_emconf.php`, which is what
+`setVersion.sh` keeps in sync: `tailor create-artefact` fails otherwise, on
+purpose, so a release cannot disagree with the extension metadata.
 
 ## Before releasing
 
