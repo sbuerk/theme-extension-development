@@ -1,13 +1,47 @@
 # TYPO3 extension `theme_extension_development`
 
-TYPO3 CMS extension skeleton supporting TYPO3 v13 and v14 within one code base,
-including core version aware class loading, the container based test and
-quality gate harness, the GitHub Actions workflows and the release tooling.
+A TYPO3 frontend theme for **development purposes**. Its job is to give a TYPO3
+installation a reasonable frontend to look at and to render against, without
+building a site package for it first.
 
 - **Package name**: `sbuerk/theme-extension-development`
 - **Extension key**: `theme_extension_development`
 - **Repository**: https://github.com/sbuerk/theme-extension-development
 - **License**: GPL-2.0-or-later
+
+> [!IMPORTANT]
+> **No theme assets ship yet** — the section below describes what this package
+> is for, not what it already does. See [Status](#status).
+>
+> It is a development tool, not a production theme.
+
+## What it is for
+
+The situations it is built for, where an extension has to be seen or exercised
+in a frontend rather than only in a test assertion:
+
+- **Extension development**, to click through what an extension actually
+  outputs instead of reading the rendered HTML in a test failure.
+- **DDEV based test instances** of an extension repository, where a throwaway
+  TYPO3 installation needs a frontend rendering pages, navigation and content
+  elements.
+- **Acceptance tests**, which need a stable and predictable frontend to drive a
+  browser against.
+- **Reproducing an issue** in a minimal installation before debugging it.
+
+→ [Introduction](Documentation/Introduction/Index.rst) states the same for
+users and integrators, with the full scope warning.
+
+## Status
+
+**The theme itself is not implemented yet.** The extension currently ships no
+templates, no TypoScript and no site set, so installing it does not change what
+a frontend renders.
+
+What is in place is the foundation it is built on: TYPO3 v13 and v14 support
+from one code base, the core version aware wiring, and the container based test
+and quality gate harness. The public API is not stable yet and may change
+without a deprecation phase until the first stable release.
 
 ## Compatibility
 
@@ -17,15 +51,19 @@ quality gate harness, the GitHub Actions workflows and the release tooling.
 
 ## Installation
 
+Being a development tool, it usually belongs in `require-dev` — of the extension
+repository whose frontend you want to look at, or of the test instance you set
+up for it:
+
 ```bash
-composer require sbuerk/theme-extension-development
+composer require --dev sbuerk/theme-extension-development
 ```
 
 As long as no stable version has been released, require the development version
 of the main branch explicitly:
 
 ```bash
-composer require sbuerk/theme-extension-development:^1.0@dev
+composer require --dev sbuerk/theme-extension-development:^1.0@dev
 ```
 
 This additionally requires `minimum-stability: "dev"` together with

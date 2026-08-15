@@ -2,9 +2,9 @@
 
 ..  _start:
 
-===========================
-Theme Extension Development
-===========================
+========================================
+Frontend Theme for Extension Development
+========================================
 
 :Extension key:
     theme_extension_development
@@ -30,13 +30,15 @@ Theme Extension Development
 
 ----
 
-TYPO3 CMS extension supporting TYPO3 v13 and v14 within one code base.
+TYPO3 frontend theme for development purposes: extension development, DDEV
+based test instances and acceptance tests.
 
 ..  note::
 
-    This extension is in an early development stage. The public API is not
-    stable yet and may change without a deprecation phase until the first
-    stable release.
+    This is a development tool, not a production theme. The theme itself is not
+    implemented yet — no templates, no TypoScript and no site set ship so far,
+    and the public API is not stable and may change without a deprecation phase
+    until the first stable release.
 
 ----
 
@@ -49,12 +51,12 @@ TYPO3 CMS extension supporting TYPO3 v13 and v14 within one code base.
 
     ..  card:: :ref:`Introduction <introduction>`
 
-        Learn what the extension provides and which TYPO3 and PHP versions
-        are supported.
+        Learn what the extension is for and which TYPO3 and PHP versions are
+        supported.
 
     ..  card:: :ref:`Installation <installation>`
 
-        Install the extension in your TYPO3 installation.
+        Install the extension in your development or test instance.
 
     ..  card:: :ref:`Changelog <changelog>`
 

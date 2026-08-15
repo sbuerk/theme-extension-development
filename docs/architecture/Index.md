@@ -1,7 +1,7 @@
 # Architecture
 
 How the code base is organised and which design rules apply to it. These are the
-rules the skeleton itself follows — the shipped `Example` classes exist to
+rules this extension itself follows — the shipped `Example` classes exist to
 demonstrate them and are meant to be deleted once real code arrives.
 
 | Page                                                  | Contents                                                                                                                                                |

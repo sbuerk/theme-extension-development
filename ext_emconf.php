@@ -1,10 +1,10 @@
 <?php
 
 $EM_CONF['theme_extension_development'] = [
-    'title' => 'Theme Extension Development',
-    'description' => 'TYPO3 CMS extension theme_extension_development.',
+    'title' => 'Frontend Theme for Extension Development',
+    'description' => 'TYPO3 frontend theme for development purposes: extension development, DDEV based test instances and acceptance tests.',
     'version' => '1.0.0',
-    'category' => 'misc',
+    'category' => 'fe',
     'state' => 'alpha',
     'author' => 'sbuerk',
     'author_email' => '',

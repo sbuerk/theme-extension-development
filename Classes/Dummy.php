@@ -7,7 +7,7 @@ namespace SBUERK\ThemeExtensionDevelopment;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 /**
- * Placeholder class of the initial extension skeleton.
+ * Placeholder class of the initial package setup.
  *
  * It exists so the quality gates, the dependency injection wiring and both
  * test suites have something to verify while the actual implementation is
