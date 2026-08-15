@@ -149,8 +149,8 @@ Signed-off-by: Firstname Lastname <mail@example.com>
 
 **This repository does not require it**, and TYPO3 Core does not use it either —
 Gerrit certifies changes through `Change-Id`. It is documented because the
-policy recommends it and because a repository created from this template may
-well want it. Add it if you do; its absence is not a review finding.
+policy recommends it. Add it if you want the certification on record; its
+absence is not a review finding.
 
 → [Agent instructions](../../AGENTS.md#ai-assisted-contributions)
 

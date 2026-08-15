@@ -12,9 +12,9 @@ handful of things that are easy to get wrong and expensive to discover later.
 
 ## Local additions and overrides
 
-A machine-local `AGENTS.local.md` may sit next to this file. It is git-ignored,
-never committed and **not** part of the template — a repository created from
-this one starts without it. `CLAUDE.local.md` is a symlink to it.
+A machine-local `AGENTS.local.md` may sit next to this file. It is git-ignored
+and never committed, so a fresh clone starts without it. `CLAUDE.local.md` is a
+symlink to it.
 
 **Read it if it is present.** It belongs to whoever works on this checkout, it
 may add to or override anything in this file, and where the two differ it takes
@@ -262,7 +262,6 @@ Build/Scripts/runTests.sh -t 13 -s composerValidate
 Build/Scripts/runTests.sh -t 13 -s checkBom
 Build/Scripts/runTests.sh -t 13 -s checkExceptionCodes
 Build/Scripts/runTests.sh -t 13 -s checkMarkdownTables
-Build/Scripts/runTests.sh -t 13 -s checkRepositoryInitialization
 Build/Scripts/runTests.sh -t 13 -s checkTestMethodsPrefix
 
 # Then the same for TYPO3 v14, starting with composerUpdate again.
@@ -305,10 +304,9 @@ Further:
   with. Do not remove it to save a download.
 
 A shell script below `Build/Scripts/` that a gate or a `-s` suite executes runs
-**inside the container images**, and those ship `git` but **no `jq`**.
-`initializeRepository.sh` and `setVersion.sh` therefore read and write
-`composer.json` with `php`, decoding into objects so an empty JSON object
-survives as `{}`, and encoding with
+**inside the container images**, and those ship **no `jq`**. `setVersion.sh`
+therefore reads and writes `composer.json` with `php`, decoding into objects so
+an empty JSON object survives as `{}`, and encoding with
 `JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE` plus a
 trailing newline — which is byte identical to `jq --indent 4`. Do not introduce
 a `jq` dependency in a new script; mirror those helpers instead.
@@ -363,20 +361,3 @@ Before reporting a change as complete:
       [disclosure](#ai-assisted-contributions), and credits no model as an
       author.
 - [ ] Anything left out is stated explicitly in the report.
-
-## This is a template repository
-
-It is the starting point for concrete extensions, so **generic beats specific**.
-When a choice is between something reusable and something tailored, prefer the
-reusable one — stripping out is easier than adding.
-
-Identifiers of the template (`sbuerk/theme-extension-development`, `theme_extension_development`,
-`SBUERK\ThemeExtensionDevelopment\`) are rewritten on initialization. Two consequences:
-
-- Third party package names and namespaces must survive that rewrite. The
-  mechanism is derived, not hardcoded, so it normally needs no attention — but
-  after adding a dependency, verify.
-- Fixture extension identifiers deliberately share no token with the template
-  identifiers. Keep new fixtures free of them.
-
-→ [Repository initialization](docs/workflow/repository-initialization.md)
