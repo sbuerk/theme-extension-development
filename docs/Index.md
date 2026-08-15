@@ -17,6 +17,7 @@ Documentation for people **using** the extension lives in
 | [Dual core setup](development/dual-core-setup.md)     | Running against TYPO3 v13 and v14, and the rule that avoids false positives. |
 | [Quality gates](development/quality-gates.md)         | Every gate and its configuration, PHPStan per core version, CI.              |
 | [Frontend assets](development/frontend-assets.md)     | The SCSS build, the node image, the `checkCssBuild` gate.                    |
+| [Development instances](development/instances.md)     | The two TYPO3 instances, the `theme` symlink, snapshot and restore.          |
 
 ## [Architecture](architecture/Index.md)
 

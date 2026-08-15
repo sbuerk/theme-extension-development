@@ -130,6 +130,7 @@ Nothing below `.agent/` is ever committed.
 | Topic                                               | Page                                                                    |
 |-----------------------------------------------------|-------------------------------------------------------------------------|
 | Development environment, container based tooling    | [Environment](docs/development/environment.md)                          |
+| **The two development instances, and `theme`**      | [Development instances](docs/development/instances.md)                  |
 | **Dual core setup — read this first**               | [Dual core setup](docs/development/dual-core-setup.md)                  |
 | The gates and what they check                       | [Quality gates](docs/development/quality-gates.md)                      |
 | Version differences split classes, not conditionals | [Core version aware code](docs/architecture/core-version-aware-code.md) |
@@ -291,6 +292,13 @@ Further:
 - Arguments for PHPUnit go after `--`:
   `-s functional -d sqlite -- --filter SomeTest`.
 - A **growing PHPStan baseline is a defect.** Fix the finding.
+- The development instances below `instance-core-13/` and `instance-core-14/`
+  are **not** driven by `runTests.sh`. They are installed with `ddev composer`
+  or from the host, and the two must not be mixed — the resulting `vendor/`
+  differs and does not travel. `theme` at the repository root is a symlink to
+  that root; never follow it when walking the tree, and never add it to a path a
+  tool descends into.
+  → [Development instances](docs/development/instances.md)
 - The wrapper notices that it has no terminal and drops the interactive
   container flags by itself, so calling it from a tool, a pipe or a hook needs
   no special handling — it is the same command a human types.

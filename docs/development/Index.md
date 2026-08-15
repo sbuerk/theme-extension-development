@@ -9,6 +9,7 @@ versions green.
 | [Dual core setup](dual-core-setup.md)     | Why the installed dependency set must match `-t`, how to verify a change against both core versions, test grouping.    |
 | [Quality gates](quality-gates.md)         | Every gate and its configuration, PHPStan per core version, the CI staging and why it runs the containers with docker. |
 | [Frontend assets](frontend-assets.md)     | The SCSS build, the node image, why the compiled CSS is committed, the `checkCssBuild` gate.                           |
+| [Development instances](instances.md)     | The two TYPO3 instances, the `theme` symlink, SQLite, snapshot and restore.                                            |
 
 ## Quick start
 

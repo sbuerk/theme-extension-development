@@ -745,7 +745,13 @@ case ${TEST_SUITE} in
         esac
         ;;
     lintPhp)
-        COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./.agent/\\*" ! -path "./node_modules/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
+        # "./theme" is the self referencing symlink the development instances
+        # resolve the extension through. "find" does not follow symlinks, so it
+        # never descends into it, but excluding it explicitly keeps that from
+        # depending on a default. The generated trees of the instances are
+        # excluded as well; their committed configuration below "config/" is
+        # deliberately still linted.
+        COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./.agent/\\*" ! -path "./.cache/\\*" ! -path "./var/\\*" ! -path "./node_modules/\\*" ! -path "./theme/\\*" ! -path "./instance-core-\\*/vendor/\\*" ! -path "./instance-core-\\*/public/\\*" ! -path "./instance-core-\\*/var/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
         ;;

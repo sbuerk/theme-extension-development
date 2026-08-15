@@ -12,6 +12,16 @@
 /GEMINI.md export-ignore
 /node_modules export-ignore
 
+# The development instances and everything they need. None of it belongs in a
+# distributed package - and "/theme" in particular is a symlink to the
+# repository root, which must never end up inside a composer dist archive or a
+# TER artifact.
+/theme export-ignore
+/instance-core-13 export-ignore
+/instance-core-14 export-ignore
+/packages-dev export-ignore
+/sqlite-databases export-ignore
+
 # "Resources/Private/Scss", "package.json" and "package-lock.json" are
 # deliberately NOT export-ignored: the SCSS sources ship, so the rebuild path
 # has to ship with them.

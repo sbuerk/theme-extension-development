@@ -12,9 +12,15 @@ FILES=`find . -type f \
     ! -path "./.Build/*" \
     ! -path "./.git/*" \
     ! -path "./.agent/*" \
+    ! -path "./.cache/*" \
+    ! -path "./var/*" \
     ! -path "./.php-cs-fixer.cache" \
     ! -path "./Documentation-GENERATED-temp/*" \
     ! -path "./node_modules/*" \
+    ! -path "./theme/*" \
+    ! -path "./instance-core-*/vendor/*" \
+    ! -path "./instance-core-*/public/*" \
+    ! -path "./instance-core-*/var/*" \
     -print0 | xargs -0 -n1 -P8 file {} | grep 'UTF-8 Unicode (with BOM)'`
 
 if [ -n "${FILES}" ]; then
