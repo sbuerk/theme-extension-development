@@ -10,6 +10,11 @@
 /AGENTS.md export-ignore
 /CLAUDE.md export-ignore
 /GEMINI.md export-ignore
+/node_modules export-ignore
+
+# "Resources/Private/Scss", "package.json" and "package-lock.json" are
+# deliberately NOT export-ignored: the SCSS sources ship, so the rebuild path
+# has to ship with them.
 
 # Enforce checkout with linux lf consistent over all platforms
 *.css text eol=lf
@@ -19,6 +24,7 @@
 *.md text eol=lf
 *.php text eol=lf
 *.rst text eol=lf
+*.scss text eol=lf
 *.sql text eol=lf
 *.svg text eol=lf
 *.tsconfig text eol=lf

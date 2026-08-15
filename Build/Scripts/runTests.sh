@@ -182,8 +182,10 @@ Usage: $0 [options] [file]
 Options:
     -s <...>
         Specifies which test suite to run
+            - buildCss: compile Resources/Private/Scss into Resources/Public/Css
             - cgl: test and fix all php files
             - checkBom: check UTF-8 files do not contain BOM
+            - checkCssBuild: check the committed CSS matches its SCSS sources
             - checkExceptionCodes: check for duplicate and missing exception codes
             - checkMarkdownTables: check markdown tables are formatted, "-- --fix" to format them
             - checkTestMethodsPrefix: check test methods do not start with "test"
@@ -197,12 +199,14 @@ Options:
             - composerValidate: "composer validate --strict" of the root composer.json
             - functional: PHP functional tests
             - lintPhp: PHP linting
+            - npm: "npm" with all remaining arguments dispatched
             - phpstan: phpstan analyze
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
             - renderDocumentation: render the extension documentation into Documentation-GENERATED-temp
             - setVersion: apply a version across the repository, "-- <version> <type>"
             - unit (default): PHP unit tests
             - unitRandom: PHP unit tests in random order, "-o <number>" to use a specific seed
+            - watchCss: compile the SCSS and re-compile it on every change
             - watchDocumentation: render the documentation and re-render it on every change,
               served on port 1337, a different port as first argument
 
@@ -490,6 +494,10 @@ fi
 
 IMAGE_PHP="ghcr.io/typo3/core-testing-$(echo "php${PHP_VERSION}" | sed -e 's/\.//'):latest"
 IMAGE_DOCS="ghcr.io/typo3-documentation/render-guides:latest"
+# The PHP testing images ship no node, so the frontend asset build uses the
+# TYPO3 node image instead. It is picked up by "-u" like every other image,
+# because that globs "ghcr.io/typo3/core-testing-*".
+IMAGE_NODEJS="ghcr.io/typo3/core-testing-nodejs24:latest"
 IMAGE_MARIADB="docker.io/mariadb:${DBMS_VERSION}"
 IMAGE_MYSQL="docker.io/mysql:${DBMS_VERSION}"
 IMAGE_POSTGRES="docker.io/postgres:${DBMS_VERSION}-alpine"
@@ -549,6 +557,11 @@ fi
 
 # Suite execution
 case ${TEST_SUITE} in
+    buildCss)
+        COMMAND="npm ci --no-audit --no-fund && npm run build"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name build-css-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
+        SUITE_EXIT_CODE=$?
+        ;;
     cgl)
         # Active dry-run for cgl needs not "-n" but specific options
         CSFIXER_DRYRUN=""
@@ -562,6 +575,16 @@ case ${TEST_SUITE} in
     checkBom)
         COMMAND="Build/Scripts/checkUtf8Bom.sh"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name check-bom-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
+        SUITE_EXIT_CODE=$?
+        ;;
+    checkCssBuild)
+        # Compiles into ".Build/css-verify/" and diffs the result against the
+        # committed stylesheet. Deliberately not the "git status" approach the
+        # core uses: that writes the git index, and git in the node image
+        # aborts with "detected dubious ownership" whenever the uid does not
+        # match - which is exactly the "-b docker" path CI runs on.
+        COMMAND="npm ci --no-audit --no-fund && npm run build:verify"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name check-css-build-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
         ;;
     checkExceptionCodes)
@@ -679,8 +702,13 @@ case ${TEST_SUITE} in
         esac
         ;;
     lintPhp)
-        COMMAND="find . -name \\*.php ! -path "./.Build/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
+        COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./.agent/\\*" ! -path "./node_modules/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
+        SUITE_EXIT_CODE=$?
+        ;;
+    npm)
+        COMMAND=(npm "$@")
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name npm-command-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} "${COMMAND[@]}"
         SUITE_EXIT_CODE=$?
         ;;
     phpstan)
@@ -717,6 +745,14 @@ case ${TEST_SUITE} in
         PHPUNIT_CONFIG_FILE="Build/phpunit/UnitTests.xml"
         COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-core-${CORE_VERSION} --order-by=random ${PHPUNIT_RANDOM} "$@")
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name unit-random-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${IMAGE_PHP} "${COMMAND[@]}"
+        SUITE_EXIT_CODE=$?
+        ;;
+    watchCss)
+        # A writing aid like "watchDocumentation", never a gate: it blocks until
+        # ctrl-c and writes the expanded, source mapped build, not the one that
+        # is committed. Run "buildCss" before committing.
+        COMMAND="npm ci --no-audit --no-fund && npm run watch"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name watch-css-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
         ;;
     watchDocumentation)

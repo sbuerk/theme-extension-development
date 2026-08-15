@@ -33,6 +33,9 @@ Build/Scripts/runTests.sh -s checkMarkdownTables
 
 # Ensure test methods do not start with "test".
 Build/Scripts/runTests.sh -s checkTestMethodsPrefix
+
+# Ensure the committed CSS matches its SCSS sources.
+Build/Scripts/runTests.sh -s checkCssBuild
 ```
 
 | Gate                     | Configuration                                                                                        | Core version dependent |
@@ -45,6 +48,7 @@ Build/Scripts/runTests.sh -s checkTestMethodsPrefix
 | `checkExceptionCodes`    | [`Build/Scripts/duplicateExceptionCodeCheck.sh`](../../Build/Scripts/duplicateExceptionCodeCheck.sh) | no                     |
 | `checkMarkdownTables`    | [`Build/Scripts/checkMarkdownTables.php`](../../Build/Scripts/checkMarkdownTables.php)               | no                     |
 | `checkTestMethodsPrefix` | [`Build/Scripts/testMethodPrefixChecker.php`](../../Build/Scripts/testMethodPrefixChecker.php)       | no                     |
+| `checkCssBuild`          | [`package.json`](../../package.json), see [Frontend assets](frontend-assets.md)                      | no                     |
 
 ## PHPStan
 

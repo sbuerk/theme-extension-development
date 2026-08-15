@@ -1,0 +1,31 @@
+// Design tokens.
+//
+// Declared as CSS custom properties rather than as Sass variables on purpose:
+// a custom property survives compilation, so an integrator can re-theme the
+// stylesheet from their own CSS without rebuilding the SCSS, and the browser
+// devtools show the token rather than the value it was compiled to. Sass
+// variables are used only where a value has to exist at compile time.
+
+:root {
+    // Typography.
+    --theme-font-family-base: system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+    --theme-font-family-mono: ui-monospace, 'SFMono-Regular', 'Consolas', monospace;
+    --theme-font-size-base: 1rem;
+    --theme-line-height-base: 1.5;
+
+    // Spacing scale.
+    --theme-spacing-xs: 0.25rem;
+    --theme-spacing-sm: 0.5rem;
+    --theme-spacing-md: 1rem;
+    --theme-spacing-lg: 2rem;
+    --theme-spacing-xl: 4rem;
+
+    // Colours.
+    --theme-color-text: #1a1a1a;
+    --theme-color-background: #ffffff;
+    --theme-color-accent: #0b57d0;
+    --theme-color-border: #d7d7d7;
+
+    // Layout.
+    --theme-content-max-width: 75rem;
+}

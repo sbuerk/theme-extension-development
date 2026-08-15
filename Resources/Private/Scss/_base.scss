@@ -1,0 +1,40 @@
+// Element baseline.
+//
+// Only what every page needs before any component exists. No reset library and
+// no framework: the extension is deliberately free of CSS dependencies, so
+// everything essential is written here.
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: var(--theme-color-background);
+    color: var(--theme-color-text);
+    font-family: var(--theme-font-family-base);
+    font-size: var(--theme-font-size-base);
+    line-height: var(--theme-line-height-base);
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    color: var(--theme-color-accent);
+}
+
+code,
+kbd,
+pre,
+samp {
+    font-family: var(--theme-font-family-mono);
+}

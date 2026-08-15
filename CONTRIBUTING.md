@@ -57,6 +57,7 @@ Build/Scripts/runTests.sh -s checkBom
 Build/Scripts/runTests.sh -s checkExceptionCodes
 Build/Scripts/runTests.sh -s checkMarkdownTables
 Build/Scripts/runTests.sh -s checkTestMethodsPrefix
+Build/Scripts/runTests.sh -s checkCssBuild   # committed CSS matches its SCSS
 ```
 
 PHPStan is configured per core version and has a baseline per core version. A

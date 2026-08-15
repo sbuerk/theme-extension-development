@@ -65,6 +65,10 @@ hosted runners, not of this repository.
 | `checkExceptionCodes`        | Duplicate or missing exception codes.                         |
 | `checkMarkdownTables`        | Markdown tables must be formatted, `-- --fix` formats them.   |
 | `checkTestMethodsPrefix`     | Test methods must not start with `test`.                      |
+| `buildCss`                   | Compile the SCSS into `Resources/Public/Css`.                 |
+| `checkCssBuild`              | The committed CSS must match its SCSS sources.                |
+| `watchCss`                   | Compile the SCSS, re-compiling on every change.               |
+| `npm`                        | `npm` with all remaining arguments dispatched.                |
 | `composer`                   | `composer` with all remaining arguments dispatched.           |
 | `composerInstall`            | `composer install`.                                           |
 | `composerUpdate`             | `composer update` for the core version given with `-t`.       |

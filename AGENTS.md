@@ -263,6 +263,7 @@ Build/Scripts/runTests.sh -t 13 -s checkBom
 Build/Scripts/runTests.sh -t 13 -s checkExceptionCodes
 Build/Scripts/runTests.sh -t 13 -s checkMarkdownTables
 Build/Scripts/runTests.sh -t 13 -s checkTestMethodsPrefix
+Build/Scripts/runTests.sh -t 13 -s checkCssBuild
 
 # Then the same for TYPO3 v14, starting with composerUpdate again.
 Build/Scripts/runTests.sh -t 14 -s composerUpdate
@@ -279,6 +280,12 @@ Further:
 - `-s renderDocumentation` when anything below `Documentation/` changed. Its
   sibling `-s watchDocumentation` serves the rendered documentation and blocks
   until ctrl-c — a writing aid for a human, never something to run as a gate.
+- `-s buildCss` after any change below `Resources/Private/Scss/`, and commit the
+  result: the compiled `Resources/Public/Css/theme.css` is committed, because
+  neither the composer dist archive nor the TER artifact runs a build.
+  `-s checkCssBuild` is the gate that holds it to that, and `-s watchCss` is the
+  writing aid that blocks until ctrl-c.
+  → [Frontend assets](docs/development/frontend-assets.md)
 - `-s functional -d mariadb -i 10.6` (also `mysql`, `postgres`) when a change
   touches queries, schema or TCA. SQLite alone is not enough there.
 - Arguments for PHPUnit go after `--`:
