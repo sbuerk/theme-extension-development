@@ -1,0 +1,14 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<div class="page">
+    <f:render partial="Page/Header" arguments="{_all}" />
+
+    <main class="page__main" id="content">
+        <f:render section="Main" />
+    </main>
+
+    <f:render partial="Page/Footer" arguments="{_all}" />
+</div>
+
+</html>

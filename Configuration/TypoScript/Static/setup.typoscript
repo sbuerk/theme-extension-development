@@ -1,0 +1,17 @@
+# Classic static include of the theme, for installations that do not use the
+# site set. It imports the very same file the set reads.
+#
+# The condition is what makes the two mechanisms safe to have side by side.
+# Site sets and sys_template records are processed by separate code paths with
+# no cross check, and the static include is appended AFTER the set. Without the
+# condition, a site that uses both would parse the theme twice, and the second
+# pass would silently overwrite every customisation made on top of the shipped
+# defaults - which presents as "my site setting does nothing", not as visible
+# duplication.
+#
+# "site('sets')" lists the sets a site declares itself, so a theme pulled in as
+# a transitive dependency of another set is not covered here. Enabling the theme
+# through its own set, which is the documented way, is.
+[not ('sbuerk/theme-extension-development' in site('sets'))]
+    @import 'EXT:theme_extension_development/Configuration/TypoScript/setup.typoscript'
+[END]

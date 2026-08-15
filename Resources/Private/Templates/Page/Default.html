@@ -1,0 +1,19 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <!--
+        The content of the normal column. "styles.content.get" is provided by
+        EXT:frontend, not by "fluid_styled_content", which this theme
+        deliberately does not depend on.
+
+        Until the theme brings its own content element rendering, an element
+        here renders the core notice that it has no rendering definition. That
+        is expected and is the next step.
+    -->
+    <f:cObject typoscriptObjectPath="styles.content.get" />
+</f:section>
+
+</html>

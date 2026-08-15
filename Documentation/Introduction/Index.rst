@@ -16,9 +16,8 @@ building a site package for it first.
 
 ..  important::
 
-    No theme assets ship yet. What this chapter describes is what the extension
-    is for, not what it already does — see the note at the end of this section
-    for what is in place today.
+    The theme is not finished. What this chapter describes is what the extension
+    is for; see the note at the end of this section for what it already does.
 
 The situations it is built for, where an extension has to be seen or exercised
 in a frontend rather than only in a test assertion:
@@ -41,15 +40,17 @@ in a frontend rather than only in a test assertion:
 
 ..  note::
 
-    The theme itself is not implemented yet: the extension currently ships no
-    templates, no TypoScript and no site set, so installing it does not change
-    what a frontend renders. This chapter is extended along with the
-    implemented features.
+    The theme is being built up. It renders a page once a site depends on its
+    site set — see :ref:`configuration` — but brings no content element
+    rendering of its own yet, and no backend layouts, so every page renders the
+    same template and a content element renders the TYPO3 notice that it has no
+    rendering definition. This chapter is extended along with the implemented
+    features.
 
-    What is in place is the foundation it is built on: TYPO3 v13 and v14
-    support from one code base with
-    :ref:`core version aware <introduction-core-version-aware>` classes, wired
-    by the dependency injection container of the running TYPO3 version.
+    Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
+    base with :ref:`core version aware <introduction-core-version-aware>`
+    classes, wired by the dependency injection container of the running TYPO3
+    version.
 
 ..  _introduction-core-version-aware:
 

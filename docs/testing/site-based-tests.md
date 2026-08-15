@@ -111,21 +111,38 @@ $this->writeSiteConfiguration(
 content element without a translation is **not** rendered from the default
 language, so a test asserting translated output cannot pass by accident.
 
-Site sets and other root level configuration go into the `additional` argument
-rather than into a `dependencies` argument, which keeps the call identical
-across package majors:
+Site sets and other root level configuration are meant to go into the
+`additional` argument rather than into a `dependencies` argument, which keeps
+the call identical across package majors.
 
-```php
-$this->writeSiteConfiguration(
-    identifier: 'acme',
-    site: [],
-    languages: [],
-    errorHandling: [],
-    additional: [
-        'dependencies' => ['my-vendor/site-set-identifier'],
-    ],
-);
-```
+> [!WARNING]
+> **`additional` is currently discarded.** In
+> `sbuerk/typo3-site-based-test-trait`, `writeSiteConfiguration()` merges `$site`
+> instead of `$additional`:
+>
+> ```php
+> if ($additional !== []) {
+>     ArrayUtility::mergeRecursiveWithOverrule($configuration, $site);
+> }
+> ```
+>
+> `$configuration` already **is** `$site`, so the merge is a no-op and anything
+> passed as `additional` never reaches the written site configuration. It fails
+> silently — the site is written, just without those keys.
+>
+> Until the package is fixed, put such keys into the **`site`** array instead:
+>
+> ```php
+> $this->writeSiteConfiguration(
+>     'acme',
+>     $this->buildSiteConfiguration(rootPageId: 1, base: 'https://acme.com/')
+>         + ['dependencies' => ['my-vendor/site-set-identifier']],
+>     [ /* languages */ ],
+> );
+> ```
+>
+> `Tests/Functional/SiteSetRenderingTest` does exactly that and carries a
+> `@todo` to move back once the package is fixed.
 
 ### 3. The page tree
 

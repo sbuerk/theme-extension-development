@@ -35,10 +35,10 @@ based test instances and acceptance tests.
 
 ..  note::
 
-    This is a development tool, not a production theme. The theme itself is not
-    implemented yet — no templates, no TypoScript and no site set ship so far,
-    and the public API is not stable and may change without a deprecation phase
-    until the first stable release.
+    This is a development tool, not a production theme. It renders a page, but
+    brings no content element rendering of its own yet, and the public API is
+    not stable and may change without a deprecation phase until the first stable
+    release.
 
 ----
 
@@ -58,6 +58,10 @@ based test instances and acceptance tests.
 
         Install the extension in your development or test instance.
 
+    ..  card:: :ref:`Configuration <configuration>`
+
+        Enable the theme for a site and override its templates.
+
     ..  card:: :ref:`Changelog <changelog>`
 
         Overview of the changes per released version.
@@ -69,4 +73,5 @@ based test instances and acceptance tests.
 
     Introduction/Index
     Installation/Index
+    Configuration/Index
     Changelog/Index

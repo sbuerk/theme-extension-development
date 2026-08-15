@@ -1,0 +1,17 @@
+# Constants of the theme.
+#
+# Read by the site set and by the classic static include alike - both point at
+# this file, see "Configuration/Sets/ThemeExtensionDevelopment/config.yaml".
+
+theme {
+    # Where the Fluid files are looked up. Override these to render your own
+    # templates instead of editing the ones shipped here.
+    templateRootPath = EXT:theme_extension_development/Resources/Private/Templates/
+    partialRootPath = EXT:theme_extension_development/Resources/Private/Partials/
+    layoutRootPath = EXT:theme_extension_development/Resources/Private/Layouts/
+
+    # The compiled stylesheet. It is built from the SCSS sources below
+    # "Resources/Private/Scss/" and committed - see
+    # "docs/development/frontend-assets.md".
+    stylesheet = EXT:theme_extension_development/Resources/Public/Css/theme.css
+}
