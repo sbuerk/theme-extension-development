@@ -1,0 +1,20 @@
+{
+    "name": "tests/dev-site",
+    "description": "Development only site package wiring the theme up for the development instances",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "version": "1.0.0-dev",
+    "require": {
+        "sbuerk/theme-extension-development": "@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "TESTS\\DevSite\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "tests_dev_site"
+        }
+    }
+}

@@ -1,0 +1,23 @@
+# Makes the repository root and the development site packages reachable under
+# the same relative paths inside the container as on the host.
+#
+# The project itself is mounted at "/var/www/html", so ".." inside the container
+# is "/var/www". The two mounts below recreate what the instance sees one level
+# up on the host:
+#
+#   ../theme         -> the repository root, i.e. the extension under development
+#   ../packages-dev  -> the development only site packages
+#
+# On the host "../theme" is the "theme" symlink in the repository root, which
+# points at that root. Inside the container it is the bind mount below. Both
+# resolve to the same thing, which is what lets one "composer.json" serve DDEV
+# and a plain host stack.
+#
+# The sources are resolved by DDEV relative to this ".ddev" directory, hence
+# "../..".
+services:
+  web:
+    volumes:
+      - "../../:/var/www/theme"
+      - "../../packages-dev:/var/www/packages-dev"
+      - "../../sqlite-databases:/var/www/sqlite-databases"
