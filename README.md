@@ -38,10 +38,14 @@ users and integrators, with the full scope warning.
 depending on the site set `sbuerk/theme-extension-development`, which brings the
 TypoScript, a Fluid page rendering and the compiled stylesheet.
 
-Not there yet: the theme brings **no content element rendering** of its own — it
-deliberately does not depend on `fluid_styled_content` — so a content element
-renders the TYPO3 notice that it has no rendering definition. Backend layouts
-are missing too, so every page renders the same template.
+It renders the two content elements that exist without `fluid_styled_content`,
+on which it deliberately does not depend: **Header** and **Text**. Everything
+else a TYPO3 installation usually offers — Text & Media, Images, Bullet List,
+Table — is registered by that extension rather than by the core, so those
+content types do not exist here yet and would have to be brought by the theme
+along with their TCA.
+
+Backend layouts are missing too, so every page renders the same template.
 
 Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
 base, the core version aware wiring, the SCSS build, two development instances

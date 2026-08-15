@@ -1,0 +1,24 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The header of a content element.
+
+    "header_layout" carries the heading level, and the value 100 means "do not
+    display" - the convention of the core TCA offered in the backend, so a theme
+    ignoring it would render headers an editor had hidden.
+</f:comment>
+<f:if condition="{data.header} && {data.header_layout} != 100">
+    <header class="content-element__header">
+        <f:switch expression="{data.header_layout}">
+            <f:case value="1"><h1 class="content-element__heading">{data.header}</h1></f:case>
+            <f:case value="2"><h2 class="content-element__heading">{data.header}</h2></f:case>
+            <f:case value="3"><h3 class="content-element__heading">{data.header}</h3></f:case>
+            <f:case value="4"><h4 class="content-element__heading">{data.header}</h4></f:case>
+            <f:case value="5"><h5 class="content-element__heading">{data.header}</h5></f:case>
+            <f:defaultCase><h2 class="content-element__heading">{data.header}</h2></f:defaultCase>
+        </f:switch>
+    </header>
+</f:if>
+
+</html>

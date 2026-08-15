@@ -57,9 +57,30 @@ The stylesheet itself is compiled from SCSS sources that ship with the
 extension, so it can also be rebuilt with different design tokens instead of
 being overridden.
 
+Content elements
+================
+
+The theme renders the content elements TYPO3 provides without
+:file:`fluid_styled_content`, on which it deliberately does not depend:
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Content element
+        -   Rendered
+    *   -   :guilabel:`Header`
+        -   yes, honouring the heading level and the "do not display" setting
+    *   -   :guilabel:`Text`
+        -   yes, including rich text
+
 ..  warning::
 
-    Content elements are not rendered by the theme yet. The extension
-    deliberately does not depend on :file:`fluid_styled_content`, and its own
-    content element rendering is still to come — until then a content element on
-    a page renders the TYPO3 notice that it has no rendering definition.
+    Those are the only two content elements that exist in an installation
+    without :file:`fluid_styled_content`. Everything a TYPO3 installation
+    usually offers — :guilabel:`Text & Media`, :guilabel:`Images`,
+    :guilabel:`Bullet List`, :guilabel:`Table`, :guilabel:`File Links` and the
+    menu elements — is registered by that extension, not by the TYPO3 core, and
+    is therefore not available here at all.
+
+    An element that has no rendering definition renders a TYPO3 notice saying
+    so, rather than nothing.
