@@ -1,8 +1,7 @@
 name: publish
 
 # Turns a version tag into a GitHub release with a TER upload artifact attached,
-# and — once enabled at the bottom of this file — publishes that artifact to the
-# TYPO3 Extension Repository.
+# and publishes that artifact to the TYPO3 Extension Repository.
 #
 # Triggered by pushing a tag. The tag has to be a bare "MAJOR.MINOR.PATCH"
 # without a "v" prefix, which is what "Build/Scripts/release.sh" creates, and it
@@ -13,10 +12,11 @@ name: publish
 # The extension key is read from "composer.json" at runtime rather than written
 # into this file, so this workflow does not become one more place carrying it.
 #
-# Requirements before the first release:
+# The TER publishing step needs both of these, and the release fails without
+# them:
 #
-#   - The repository secret "TYPO3_API_TOKEN" for the TER publishing step.
-#   - The extension key registered in the TER, owned by that token.
+#   - The repository secret "TYPO3_API_TOKEN", which tailor authenticates with.
+#   - The extension key registered in the TER and owned by that token.
 #
 # → "docs/workflow/releasing.md"
 
@@ -91,10 +91,9 @@ jobs:
             LICENSE
           fail_on_unmatched_files: true
 
-      # @todo Enable the TER publishing as soon as the extension is public and
-      #       its extension key is registered in the TER. The `TYPO3_API_TOKEN`
-      #       repository secret must be set up for it.
-      #- name: Publish to TER
-      #  run: |
-      #    php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ env.terReleaseNotes }}" ${{ env.version }} \
-      #      --artefact=tailor-version-artefact/${{ env.DETECTED_EXTENSION_KEY }}_${{ env.version }}.zip
+      # Runs after the GitHub release, so a failing TER upload leaves the
+      # release and its artifact in place to retry against.
+      - name: Publish to TER
+        run: |
+          php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ env.terReleaseNotes }}" ${{ env.version }} \
+            --artefact=tailor-version-artefact/${{ env.DETECTED_EXTENSION_KEY }}_${{ env.version }}.zip
