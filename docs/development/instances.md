@@ -115,7 +115,10 @@ database identically under DDEV and on a host stack.
 
 When a template exists at `sqlite-databases/core-1*.sqlite` it is copied into
 `var/sqlite/` on first start. Until one has been committed, the instance starts
-empty and is set up with `vendor/bin/typo3 setup`.
+empty: set it up with `vendor/bin/typo3 setup` and then fill it with
+`vendor/bin/typo3 theme:seed` — see [Seeding](seeding.md). The site
+configuration below `config/sites/demo/` is committed and points at the root
+page uid the seed definition declares.
 
 `config/system/additional/` is git-ignored and included automatically — the
 place for anything belonging to one machine rather than the repository, such as

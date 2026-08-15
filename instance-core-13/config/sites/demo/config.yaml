@@ -1,0 +1,23 @@
+# Site of the seeded demo page tree.
+#
+# "rootPageId" is 1 because the seed definition declares that uid - see
+# "Configuration/Seeds/Demo.yaml" of the theme. That is the whole reason a seed
+# may declare uids at all: without it this file could not be committed.
+#
+# The base is relative and carries no host name, so the instance is reachable
+# under its DDEV host name and under whatever a host stack serves it as.
+rootPageId: 1
+base: /
+websiteTitle: 'Theme demo, TYPO3 v13'
+dependencies:
+  - sbuerk/theme-extension-development
+languages:
+  -
+    title: English
+    enabled: true
+    languageId: 0
+    base: /
+    locale: en_US.UTF-8
+    navigationTitle: English
+    flag: us
+    websiteTitle: ''

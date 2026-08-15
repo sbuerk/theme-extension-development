@@ -10,6 +10,7 @@ versions green.
 | [Quality gates](quality-gates.md)         | Every gate and its configuration, PHPStan per core version, the CI staging and why it runs the containers with docker. |
 | [Frontend assets](frontend-assets.md)     | The SCSS build, the node image, why the compiled CSS is committed, the `checkCssBuild` gate.                           |
 | [Development instances](instances.md)     | The two TYPO3 instances, the `theme` symlink, SQLite, snapshot and restore.                                            |
+| [Seeding](seeding.md)                     | `theme:seed`, the definition format, and why it goes through DataHandler.                                              |
 
 ## Quick start
 
