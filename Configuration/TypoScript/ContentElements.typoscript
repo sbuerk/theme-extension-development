@@ -521,10 +521,35 @@ tt_content.menu_categorized_content {
             # select whose items are generated from the actual category fields
             # of the table. This is the same trust boundary the core's own
             # version relied on.
-            where.cObject = TEXT
+            # Assembled from three parts rather than interpolated in one
+            # string, only so the selected categories can carry an "ifEmpty".
+            #
+            # "selected_categories" declares "minitems = 1", but that is
+            # enforced by the backend form and not by DataHandler, so an
+            # element saved before a category was picked - or created by
+            # anything that does not go through the form - legitimately holds
+            # an empty value. Interpolated as it stands that produces
+            # "IN ()", which is a syntax error on MariaDB, MySQL and
+            # PostgreSQL; SQLite is the only one of the four that accepts it.
+            # The failure is not confined to the element either: the query
+            # throws, and the whole page returns a 500.
+            #
+            # "0" is never a category uid, so the subquery matches nothing and
+            # the element renders as an empty menu - which is what "no
+            # category selected" means.
+            where.cObject = COA
             where.cObject {
-                value = {#uid} IN (SELECT {#uid_foreign} FROM {#sys_category_record_mm} WHERE {#uid_local} IN ({field:selected_categories}) AND {#tablenames} = 'tt_content' AND {#fieldname} = '{field:category_field}')
-                insertData = 1
+                10 = TEXT
+                10.value = {#uid} IN (SELECT {#uid_foreign} FROM {#sys_category_record_mm} WHERE {#uid_local} IN (
+                10.insertData = 1
+
+                20 = TEXT
+                20.field = selected_categories
+                20.ifEmpty = 0
+
+                30 = TEXT
+                30.value = ) AND {#tablenames} = 'tt_content' AND {#fieldname} = '{field:category_field}')
+                30.insertData = 1
             }
 
             orderBy = tt_content.sorting

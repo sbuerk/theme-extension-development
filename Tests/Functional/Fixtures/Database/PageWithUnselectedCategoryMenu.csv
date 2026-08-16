@@ -1,0 +1,6 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,4,1,0,0,0,1,0,A page with an unselected category menu,/unselected
+tt_content,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,records,selected_categories,category_field
+,300,4,0,0,0,300,menu_categorized_content,A categorized content menu with nothing selected,3,,,,categories
