@@ -100,6 +100,115 @@ final class YamlSeedParserTest extends UnitTestCase
         $this->assertSame(['alternative' => 'Alt text', 'description' => 'Caption'], $references[1]->values);
     }
 
+    #[Test]
+    public function inlineChildrenAreKeyedByTheParentFieldAndCarryTheirOwnTable(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [[
+                'identifier' => 'home',
+                'content' => [[
+                    'identifier' => 'links',
+                    'CType' => 'theme_linklist',
+                    'inline' => [
+                        'tx_theme_list_items' => [
+                            ['identifier' => 'links-docs', 'table' => 'tx_theme_list_item', 'link_label' => 'Docs'],
+                            ['identifier' => 'links-media', 'table' => 'tx_theme_list_item', 'link_label' => 'Media'],
+                        ],
+                    ],
+                ]],
+            ]],
+        ]);
+
+        $parent = $definition->records[0]->children[0];
+        $children = $parent->inline['tx_theme_list_items'];
+
+        $this->assertSame(['tx_theme_list_items'], array_keys($parent->inline));
+        $this->assertCount(2, $children);
+        $this->assertSame('tx_theme_list_item', $children[0]->table);
+        $this->assertSame('links-docs', $children[0]->identifier);
+        $this->assertSame('links-media', $children[1]->identifier);
+        // "table" is structure on an inline child, so it is not written as a
+        // field of the record.
+        $this->assertSame(['link_label' => 'Docs'], $children[0]->values);
+        // ... and "inline" is not written as a field of the parent either.
+        $this->assertSame(['CType' => 'theme_linklist'], $parent->values);
+    }
+
+    #[Test]
+    public function aRecordMayCarryMoreThanOneInlineField(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [[
+                'identifier' => 'home',
+                'content' => [[
+                    'identifier' => 'element',
+                    'inline' => [
+                        'tx_theme_list_items' => [
+                            ['identifier' => 'first', 'table' => 'tx_theme_list_item'],
+                        ],
+                        'tx_theme_other_items' => [
+                            ['identifier' => 'second', 'table' => 'tx_theme_other_item'],
+                        ],
+                    ],
+                ]],
+            ]],
+        ]);
+
+        $inline = $definition->records[0]->children[0]->inline;
+
+        $this->assertSame(['tx_theme_list_items', 'tx_theme_other_items'], array_keys($inline));
+        $this->assertSame('tx_theme_list_item', $inline['tx_theme_list_items'][0]->table);
+        $this->assertSame('tx_theme_other_item', $inline['tx_theme_other_items'][0]->table);
+    }
+
+    #[Test]
+    public function anInlineChildTakesTheSameUidAndFilesAsAnyOtherRecord(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [[
+                'identifier' => 'home',
+                'content' => [[
+                    'identifier' => 'grid',
+                    'inline' => [
+                        'tx_theme_list_items' => [[
+                            'identifier' => 'grid-tile',
+                            'table' => 'tx_theme_list_item',
+                            'uid' => 42,
+                            'files' => ['image' => ['placeholder']],
+                        ]],
+                    ],
+                ]],
+            ]],
+        ]);
+
+        $child = $definition->records[0]->children[0]->inline['tx_theme_list_items'][0];
+
+        $this->assertSame(42, $child->uid);
+        $this->assertSame('placeholder', $child->files['image'][0]->identifier);
+    }
+
+    #[Test]
+    public function tableIsAFieldEverywhereButOnAnInlineChild(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [[
+                'identifier' => 'home',
+                'content' => [['identifier' => 'a-table', 'CType' => 'table', 'table_caption' => 'Prices', 'table' => 'nope']],
+            ]],
+        ]);
+
+        $record = $definition->records[0]->children[0];
+
+        // The table of a "content" record comes from the nesting, so a "table"
+        // key there is an ordinary field and has to survive as one.
+        $this->assertSame('tt_content', $record->table);
+        $this->assertSame(['CType' => 'table', 'table_caption' => 'Prices', 'table' => 'nope'], $record->values);
+    }
+
     /**
      * @return \Generator<string, array{definition: mixed, code: int}>
      */
@@ -171,6 +280,54 @@ final class YamlSeedParserTest extends UnitTestCase
                 ]],
             ],
             'code' => 1786924831,
+        ];
+        yield 'identifier carrying an underscore' => [
+            'definition' => ['identifier' => 'demo', 'pages' => [['identifier' => 'home_page']]],
+            'code' => 1786924833,
+        ];
+        yield 'identifier starting with a dash' => [
+            'definition' => ['identifier' => 'demo', 'pages' => [['identifier' => '-home']]],
+            'code' => 1786924833,
+        ];
+        yield 'inline not a map' => [
+            'definition' => ['identifier' => 'demo', 'pages' => [['identifier' => 'home', 'inline' => 'nope']]],
+            'code' => 1786924835,
+        ];
+        yield 'inline field name not a string' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [['identifier' => 'home', 'inline' => [7 => []]]],
+            ],
+            'code' => 1786924836,
+        ];
+        yield 'inline field not a list of records' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [['identifier' => 'home', 'inline' => ['tx_theme_list_items' => 'nope']]],
+            ],
+            'code' => 1786924837,
+        ];
+        yield 'inline child without table' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [[
+                    'identifier' => 'home',
+                    'inline' => ['tx_theme_list_items' => [['identifier' => 'child']]],
+                ]],
+            ],
+            'code' => 1786924834,
+        ];
+        yield 'duplicate identifier between an inline child and a page' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [[
+                    'identifier' => 'home',
+                    'inline' => [
+                        'tx_theme_list_items' => [['identifier' => 'home', 'table' => 'tx_theme_list_item']],
+                    ],
+                ]],
+            ],
+            'code' => 1786924808,
         ];
         yield 'file reference field value not scalar' => [
             'definition' => [

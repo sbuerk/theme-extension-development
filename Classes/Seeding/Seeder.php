@@ -112,7 +112,24 @@ final readonly class Seeder
                 );
             }
             $pid = $written[ltrim($reference['pid'], '-')] ?? $reference['pid'];
-            $placeholder = 'NEWsys_file_reference_' . ++$counter;
+            // No underscore in the placeholder, and this is not cosmetic.
+            // "DataHandler::processRemapStack()" reads a relation value that
+            // contains one as the "<table>_<uid>" form and splits it there
+            // (.Build/vendor/typo3/cms-core/Classes/DataHandling/DataHandler.php,
+            // around the "Replace relations to NEW...-IDs" comment), so
+            // "NEWsys_file_reference_1" is taken apart into a table
+            // "NEWsys_file_reference" and an id "1", neither of which resolves.
+            // The placeholder is then replaced by nothing.
+            //
+            // What that costs is invisible in the frontend, which is why it
+            // survived: "FileRepository::findByRelation()" queries by
+            // "uid_foreign"/"tablenames"/"fieldname" and never reads the
+            // parent's counter column, so the images still appear. It orders by
+            // "sorting_foreign" though, and that column is only written by
+            // "RelationHandler::writeForeignField()" - which never runs. Every
+            // seeded reference kept a "sorting_foreign" of 0, leaving the order
+            // of a multi file relation up to the database.
+            $placeholder = 'NEWsysfilereference-' . ++$counter;
             // The declared fields first and the structural ones on top:
             // "array_merge" lets the later value win, so a definition cannot
             // point a reference somewhere else by declaring "uid_foreign"
@@ -175,6 +192,9 @@ final readonly class Seeder
             }
             if ($record->children !== []) {
                 $uids = [...$uids, ...$this->collectWrittenUids($record->children, $dataHandler)];
+            }
+            foreach ($record->inline as $inlineChildren) {
+                $uids = [...$uids, ...$this->collectWrittenUids($inlineChildren, $dataHandler)];
             }
         }
 

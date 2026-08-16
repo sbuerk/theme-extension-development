@@ -31,6 +31,10 @@ final readonly class SeedRecord
      * @param list<SeedRecord> $children
      * @param array<string, list<SeedFileReference>> $files File references to
      *        create, as a map of field name to the references declared for it.
+     * @param array<string, list<SeedRecord>> $inline Inline children, as a map
+     *        of the parent field carrying the relation to the records declared
+     *        for it. Unlike `$children` these are not nested by `pid` but by a
+     *        relation, so the field name is what ties them to the parent.
      */
     public function __construct(
         public string $table,
@@ -39,6 +43,7 @@ final readonly class SeedRecord
         public ?int $uid = null,
         public array $children = [],
         public array $files = [],
+        public array $inline = [],
     ) {}
 
     /**
@@ -46,9 +51,21 @@ final readonly class SeedRecord
      * declared uid keeps a stable placeholder as well, because the uid is only
      * a *suggestion* to DataHandler and the placeholder is what the data map is
      * keyed by either way.
+     *
+     * **The placeholder carries no underscore, and that is not cosmetic.** A
+     * placeholder used as the value of a relation field goes through
+     * `DataHandler::processRemapStack()`, which reads a value containing an
+     * underscore as the `<table>_<uid>` form and splits it there
+     * (.Build/vendor/typo3/cms-core/Classes/DataHandling/DataHandler.php,
+     * around line 7169). `NEWtx_theme_list_item_docs` is then taken apart into
+     * the table `NEWtx_theme_list_item` and the id `docs`, neither of which
+     * resolves, and the relation is written as empty - with an empty error log,
+     * so nothing reports it. The table name therefore has its underscores
+     * removed and is joined to the identifier with a dash, and `YamlSeedParser`
+     * rejects an identifier that would reintroduce one.
      */
     public function placeholder(): string
     {
-        return 'NEW' . $this->table . '_' . $this->identifier;
+        return 'NEW' . str_replace('_', '', $this->table) . '-' . $this->identifier;
     }
 }

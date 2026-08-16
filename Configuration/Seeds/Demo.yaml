@@ -8,8 +8,11 @@
 # committed site configurations of the development instances point at root page
 # 1, which is this file's "home".
 #
-# Structural keys are "identifier", "uid", "children" and "content". Everything
-# else is a field of the record and is written as-is.
+# Structural keys are "identifier", "uid", "children", "content", "files" and
+# "inline" - plus "table" on an inline child, which is the only place a record
+# names its own table. Everything else is a field of the record and is written
+# as-is, which is why "backend_layout" and "nav_hide" below need no support in
+# the seeder at all.
 identifier: demo
 
 # Files are copied into a file storage before the records are written, so a
@@ -30,6 +33,14 @@ pages:
     slug: '/'
     is_siteroot: 1
     doktype: 1
+    # "backend_layout" is an ordinary field of the record and needs nothing
+    # from the seeder: everything that is not a structural key is written as
+    # declared. The identifiers are the ones registered in
+    # "Configuration/PageTsConfig/BackendLayouts".
+    #
+    # A site root is where the footer columns are conventionally edited, which
+    # is what the "start" layout offers over "content".
+    backend_layout: start
     # A file reference can be the bare identifier of a declared file, or a map
     # adding the fields an editor fills in on a file relation - they belong to
     # the reference, not to the file, so the same image can carry a different
@@ -58,6 +69,7 @@ pages:
         title: 'Typography'
         slug: '/typography'
         doktype: 1
+        backend_layout: content
         content:
           - identifier: styles-heading
             CType: header
@@ -77,6 +89,7 @@ pages:
         title: 'Media'
         slug: '/media'
         doktype: 1
+        backend_layout: content
         content:
           - identifier: media-heading
             CType: header
@@ -107,8 +120,825 @@ pages:
                 - identifier: placeholder-portrait
                   alternative: 'A placeholder graphic in portrait format'
                   description: 'Portrait'
+      # The one page that declares no "backend_layout" at all, and it stays
+      # that way on purpose: it is the only page in the tree that reaches the
+      # hard coded "default" fallback of "PageLayoutResolver", so that path has
+      # no other coverage. Asserted by "ShowcaseTreeTest".
       - identifier: empty
         uid: 4
         title: 'Empty page'
         slug: '/empty'
         doktype: 1
+
+      # The showcase branch. Its three children each demonstrate one family of
+      # content elements, and between them they carry every CType this theme
+      # renders - which "ShowcaseTreeTest" holds them to, by reading the
+      # TypoScript rather than a list kept in the test.
+      - identifier: elements
+        uid: 5
+        title: 'Elements'
+        slug: '/elements'
+        doktype: 1
+        backend_layout: content
+        content:
+          - identifier: elements-heading
+            CType: header
+            header: 'Elements'
+            header_layout: 1
+          - identifier: elements-text
+            CType: text
+            bodytext: |
+              <p>Three pages, one per family: the classic types
+              <em>EXT:frontend</em> registers without supplying a rendering,
+              the eleven menu types, and the ten this extension adds itself.
+              Every one of them appears exactly once, so a single branch of the
+              tree answers what the theme does with each.</p>
+        children:
+          - identifier: elements-core
+            uid: 6
+            title: 'Core elements'
+            slug: '/elements/core'
+            doktype: 1
+            # Read by the "menu_abstract" and "menu_related_pages" elements on
+            # page 7, which list the children of page 5 - this page among them.
+            # Without an abstract the item renders as a bare link, and without
+            # a shared keyword the related-pages menu comes back empty; both
+            # look like the element is broken rather than like the target page
+            # is missing a field.
+            abstract: 'Every classic content type EXT:frontend registers without supplying a rendering for it.'
+            keywords: 'content elements, core'
+            # "content_sidebar" rather than "content", and its sibling page 8
+            # deliberately does not use it: two pages under one parent
+            # rendering with and without the sub navigation is what proves the
+            # backend layout is resolved per page instead of inherited down
+            # the branch.
+            #
+            # Nothing is seeded into the sidebar column (colPos 1) and nothing
+            # needs to be: "Partials/Page/Sidebar.html" renders the sub
+            # navigation above the "sidebar" slot unconditionally, so the
+            # aside is populated on a page that puts all its content in
+            # "main".
+            backend_layout: content_sidebar
+            content:
+              # "header" - the whole element is a heading, nothing else.
+              #
+              # This is also the only "tt_content" record in the definition
+              # that declares a "uid", and it declares one solely because the
+              # "shortcut" element at the bottom of this page has to name it.
+              # "records" is a plain string column holding "tt_content_<uid>",
+              # so the target's uid has to be known while the definition is
+              # being written - a symbolic reference to another record is not
+              # something this format expresses. That in turn is why the
+              # seeder has to honour a declared uid rather than merely report
+              # whichever one DataHandler assigned.
+              #
+              # "header_layout" is the heading level: 1-5 are <h1>-<h5>, 0
+              # falls back to <h2>, and 100 means "do not display" - see
+              # "Partials/ContentElement/Header.html".
+              - identifier: core-header
+                uid: 601
+                CType: header
+                header: 'Core elements'
+                header_layout: 1
+
+              # "text" - "bodytext" through "f:format.html", which means
+              # "lib.parseFunc_RTE": links are rewritten by typolink and lines
+              # that are not already wrapped are wrapped in <p>.
+              #
+              # The markup available here is not free-form. This CType's
+              # "bodytext" is declared "enableRichtext", so DataHandler runs
+              # the RTE "db" transformation over it ON SAVE, and that drops
+              # every tag outside
+              # "RteHtmlParser::$defaultAllowedTagsList" (typo3/cms-core,
+              # Classes/Html/RteHtmlParser.php:57) - which has b, i, a, p,
+              # strong, em, ul, ol, li and so on, but no "code" and no "kbd".
+              # Seeding one is not an error and reports nothing; the tag is
+              # simply not in the row afterwards. The "html" element further
+              # down is the one place on this page where it survives, and its
+              # copy says so.
+              - identifier: core-text
+                CType: text
+                header: 'What this page is'
+                header_layout: 2
+                bodytext: |
+                  <p>Every classic content type this theme renders is on this
+                  page exactly once, so a single URL answers what each one
+                  looks like and which of its fields the theme actually reads.
+                  The copy of each element describes that element.</p>
+                  <p>The rendering is defined in
+                  <em>Configuration/TypoScript/ContentElements.typoscript</em>.
+                  This theme does not depend on <em>fluid_styled_content</em>,
+                  so a content type without a branch in that file would render
+                  the core's <strong>"no rendering definition"</strong> notice
+                  instead of anything at all.</p>
+
+              # "bullets" - "bodytext" is one item per line, split by the
+              # core's own "SplitProcessor" (delimiter LF,
+              # "removeEmptyEntries = 1", so the trailing newline of this
+              # block scalar does not become an empty item).
+              #
+              # "bullets_type" selects the list element: 0 = <ul>, 1 = <ol>,
+              # 2 = <dl>. 0 is also the TCA default; it is written out anyway
+              # so the value the copy below talks about is visible next to it.
+              - identifier: core-bullets
+                CType: bullets
+                header: 'Bullet list'
+                header_layout: 2
+                bullets_type: 0
+                bodytext: |
+                  One item per line, with no markup and no delimiter
+                  Each line is escaped on output, so a typed tag stays text
+                  bullets_type 1 renders the same lines as an ordered list
+                  bullets_type 2 renders them as a definition list of terms
+
+              # "table" - the element whose fields are least like their names.
+              #
+              # "bodytext" is delimiter separated text, one row per line, and
+              # "TableProcessor" (Classes/DataProcessing/TableProcessor.php)
+              # decodes it into header/body/footer rows before the template
+              # sees it. The three fields that control the decode all store
+              # CHARACTER CODES, not characters:
+              #
+              #   table_delimiter  the column separator, TCA default 124 = "|"
+              #                    (the other offered codes are 59, 44, 58, 9)
+              #   table_enclosure  the quoting character, 0 = none
+              #                    (the other offered codes are 39 and 34)
+              #
+              # 0 for "no enclosure" never reaches PHP as an empty string:
+              # "fgetcsv()" rejects that with a ValueError, so the processor
+              # passes chr(0) instead. That matters for the content here - with
+              # no real enclosure character, no cell below may contain the
+              # delimiter, which is why the first body row spells "124" out in
+              # words instead of showing the character.
+              #
+              # The remaining two are ordinary:
+              #
+              #   table_header_position  0 = none, 1 = first row is <thead>,
+              #                          2 = first cell of every row is a
+              #                              <th scope="row">
+              #   table_tfoot            1 = the last remaining row (after the
+              #                              header row was taken off) becomes
+              #                              <tfoot>
+              #
+              # "cols" and "table_class" exist in the core TCA of this element
+              # and are deliberately not set: the processor pads every row to
+              # the widest one by itself, and the template styles the table
+              # through ".theme-table" rather than a class from the record.
+              - identifier: core-table
+                CType: table
+                header: 'Table'
+                header_layout: 2
+                table_caption: 'The five table_* fields, and what this element sets them to'
+                table_delimiter: 124
+                table_enclosure: 0
+                table_header_position: 1
+                table_tfoot: 1
+                bodytext: |
+                  Field|What it stores|Value on this element
+                  table_delimiter|The character CODE of the column separator|124, a vertical bar
+                  table_enclosure|The character CODE of the quoting character, 0 for none|0
+                  table_header_position|0 none, 1 first row, 2 first column|1
+                  table_tfoot|Whether the last row becomes a table footer|1
+                  Decoded by|Classes/DataProcessing/TableProcessor.php|not by Table.html
+
+              # "textpic" - text plus the core "image" field, laid out by
+              # "GalleryProcessor" from "imageorient" and "imagecols".
+              #
+              # "imageorient" 17 is "in text, right"; the values are 0/1/2
+              # above, 8/9/10 below and 17/18 in text - the processor turns
+              # them into the vertical/horizontal position the gallery partial
+              # renders as modifier classes. Together with "imagecols: 1" this
+              # is deliberately the opposite of the "textmedia" element below,
+              # so the two are distinguishable on the page rather than looking
+              # like one element seeded twice.
+              - identifier: core-textpic
+                CType: textpic
+                header: 'Text & Images'
+                header_layout: 2
+                imageorient: 17
+                imagecols: 1
+                bodytext: |
+                  <p>Reads the <em>image</em> field, which the core TCA
+                  restricts to images. The gallery is placed by
+                  <em>imageorient</em> - 17 here, "in text, right" - and split
+                  into <em>imagecols</em> columns, both of them computed by
+                  the core's <strong>GalleryProcessor</strong> rather than by
+                  the template.</p>
+                files:
+                  image:
+                    - identifier: placeholder-portrait
+                      alternative: 'A placeholder graphic in portrait format'
+                      description: 'One column, beside the text'
+
+              # "textmedia" - identical to "textpic" except for the source
+              # field: "assets" allows every "common-media-type", not only
+              # images. Same two processors, and "GalleryProcessor" does not
+              # care which field the files came from.
+              #
+              # "imageorient" 8 is "below, centered", so this is also the one
+              # element on the page where the template puts the body text
+              # before the gallery in the DOM.
+              - identifier: core-textmedia
+                CType: textmedia
+                header: 'Text & Media'
+                header_layout: 2
+                imageorient: 8
+                imagecols: 2
+                bodytext: |
+                  <p>Reads the <em>assets</em> field instead of
+                  <em>image</em>, so a video or an audio file is allowed here
+                  where "Text &amp; Images" above would refuse it. With
+                  <em>imageorient</em> 8 the media sits below the text and
+                  centered, and <em>imagecols</em> 2 puts the two files side
+                  by side.</p>
+                files:
+                  assets:
+                    - identifier: placeholder
+                      alternative: 'A placeholder graphic in landscape format'
+                      description: 'Landscape'
+                    - identifier: placeholder-portrait
+                      alternative: 'A placeholder graphic in portrait format'
+                      description: 'Portrait'
+
+              # "image" - the same two processors as "textpic" without the
+              # body text. Kept minimal on purpose: the Media page (uid 3)
+              # already demonstrates the gallery settings, and this page only
+              # has to be complete, not to repeat them.
+              - identifier: core-image
+                CType: image
+                header: 'Images'
+                header_layout: 2
+                files:
+                  image:
+                    - identifier: placeholder
+                      alternative: 'A placeholder graphic in landscape format'
+                      description: 'The description of a file reference is rendered as the caption.'
+
+              # "uploads" - a file list, not a gallery.
+              #
+              # The fields "Uploads.html" actually reads are all set here:
+              #
+              #   uploads_type          0 = name only, 1 = name and file type
+              #                         icon, 2 = name and thumbnail. The
+              #                         component library has no file type
+              #                         icon, so 1 renders as 0; 2 renders a
+              #                         thumbnail only for files FAL
+              #                         classifies as an image, which an SVG
+              #                         is (image/* maps to FileType::IMAGE).
+              #   filelink_size         shows the byte count
+              #   uploads_description   shows the description of the file
+              #                         REFERENCE - which is why both
+              #                         references below carry one, and why
+              #                         they differ from the ones the same
+              #                         files carry elsewhere on this page.
+              #   filelink_sorting      "FilesProcessor" sorts natively, so
+              #                         this overrides the order the
+              #                         references are declared in - by name
+              #                         ascending, the portrait file first.
+              #                         That is the point of setting it.
+              #
+              # "target" is left at its default (empty): the template passes
+              # it straight into the link, and a demo page has no business
+              # forcing new windows.
+              #
+              # "file_collections" is the second source "FilesProcessor" is
+              # wired to and stays empty: a sys_file_collection is not
+              # something this seed format can express, and inventing a
+              # mechanism to demonstrate one field would be disproportionate.
+              - identifier: core-uploads
+                CType: uploads
+                header: 'File links'
+                header_layout: 2
+                uploads_type: 2
+                filelink_size: 1
+                uploads_description: 1
+                filelink_sorting: name
+                filelink_sorting_direction: asc
+                files:
+                  media:
+                    - identifier: placeholder
+                      title: 'Placeholder, landscape'
+                      description: 'Listed second, because the list is sorted by file name rather than by the order these references are declared in.'
+                    - identifier: placeholder-portrait
+                      title: 'Placeholder, portrait'
+                      description: 'Listed first for the same reason.'
+
+              # "html" - "bodytext" straight out, through "f:format.raw": no
+              # escaping, no parseFunc, no RTE. That is the entire element.
+              #
+              # Its "header" is not rendered - EXT:frontend relabels the field
+              # to "Name (not visible in frontend)" for this CType, the same
+              # way it does for "div" and "shortcut" - so the copy below has
+              # to carry its own heading, and it also introduces those two
+              # elements, which follow it and have no visible header either.
+              - identifier: core-html
+                CType: html
+                header: 'Plain HTML (name only, not rendered)'
+                bodytext: |
+                  <h2 class="theme-content-element__heading">Plain HTML</h2>
+                  <p>This paragraph, its heading and the class on that heading
+                  were written as raw markup in <code>bodytext</code> and
+                  reached the page untouched. Nothing was escaped and no rich
+                  text parsing ran, which is what separates this element from
+                  "Text" further up - the <code>code</code> tags in this
+                  sentence survive here and are stripped there, because that
+                  element's field is declared <em>enableRichtext</em> and this
+                  one's is not. Access to raw HTML is not restricted by
+                  anything in the frontend: the <code>CType</code> field
+                  carries <code>authMode = explicitAllow</code>, so a
+                  non-admin editor can only pick it if a backend group grants
+                  it explicitly.</p>
+                  <p>Two elements follow that have no visible header either.
+                  The horizontal rule below is the <strong>Divider</strong>
+                  element, which renders nothing but that rule. After it,
+                  <strong>Insert Records</strong> renders the page's own
+                  "Core elements" heading a second time - it is a reference to
+                  the first element on this page, not a copy of it.</p>
+
+              # "div" - a horizontal rule and nothing else. The core TCA gives
+              # this CType exactly one field besides "CType", and relabels it
+              # to "Name (not visible in frontend)", so the header below is
+              # there for the backend and the page module only.
+              - identifier: core-div
+                CType: div
+                header: 'Divider before the record reference'
+
+              # "shortcut" - renders other content elements in place.
+              #
+              # "records" is a "type: group" field limited to "tt_content"
+              # (EXT:frontend/Configuration/TCA/tt_content.php). Its value is
+              # a comma separated list, each entry in the form
+              # "<tablename>_<uid>": "RecordsContentObject" hands it to
+              # "RelationHandler", which reverses the string and splits it on
+              # the first "_" from the right, so the id is the part after the
+              # last underscore and everything before it is the table name.
+              # A bare uid works too - a single allowed table makes it fall
+              # back to that table - but the qualified form is what the
+              # backend writes and what makes the definition readable.
+              #
+              # It points at "core-header", the first element on this page,
+              # which is why that element declares a uid and nothing else on
+              # this page does.
+              #
+              # This is also the element that demonstrates the cycle break of
+              # PR #19: inside a shortcut, "tt_content.shortcut" is redefined
+              # to render nothing, so a shortcut reached through a shortcut
+              # produces no output. TYPO3 v13.4 has a recursion guard of its
+              # own ("recordRegister"), v14 has none, and this element renders
+              # identically on both because the theme does not rely on it.
+              - identifier: core-shortcut
+                CType: shortcut
+                header: 'Insert records (name only, not rendered)'
+                records: tt_content_601
+          # Page 7 of the demo tree - every "menu_*" content element the theme
+          # renders, each pointed at a different part of the seeded tree so the
+          # eleven are told apart by what they list rather than by their header
+          # alone.
+          #
+          # "backend_layout: content_sidebar" is deliberate and is asserted:
+          # page 8 is a sibling under the same parent and does *not* use it, so
+          # the pair prove the layout is resolved per page rather than
+          # inherited down the branch.
+          - identifier: elements-menu
+            uid: 7
+            title: 'Menu elements'
+            slug: '/elements/menu'
+            doktype: 1
+            backend_layout: content_sidebar
+            # Read by the "menu_abstract" element below, which lists the
+            # children of page 5 - this page among them. Without an abstract
+            # the item still renders, just as a bare link ("showAbstract" is
+            # guarded by "{item.data.abstract}" in
+            # "Partials/ContentElement/Menu.html"), and nothing says why.
+            abstract: 'The eleven menu content elements, each pointed at a different part of this page tree.'
+            # The keyword source of the "menu_related_pages" element below.
+            # "special = keywords" reads the keywords of the page selected in
+            # "pages" and matches every *other* page under the site root that
+            # shares one, so this page is the source and is itself excluded
+            # from the result.
+            keywords: 'content elements'
+            content:
+              - identifier: menu-heading
+                CType: header
+                header: 'Menu elements'
+                header_layout: 1
+
+              # "special = list" - "pages" names the pages to render, in the
+              # order they are listed; nothing is looked up by rootline
+              # position. Three top level pages, so the list is visibly a
+              # hand-picked selection rather than a branch of the tree.
+              - identifier: menu-pages
+                CType: menu_pages
+                header: 'menu_pages: a hand-picked list of pages'
+                header_layout: 2
+                pages: '2,3,4'
+
+              # "special = directory" - the *children* of the selected pages,
+              # not the pages themselves. Page 5 is the parent of this page, so
+              # this renders its three siblings.
+              - identifier: menu-subpages
+                CType: menu_subpages
+                header: 'menu_subpages: the children of one page'
+                header_layout: 2
+                pages: '5'
+
+              # "special = list" plus "levels = 2" - the selected page itself
+              # *and* one level of its own children. Same starting point as
+              # "menu_subpages" above, so the two side by side show what the
+              # second level adds.
+              - identifier: menu-section
+                CType: menu_section
+                header: 'menu_section: one page and its children'
+                header_layout: 2
+                pages: '5'
+
+              # "special = directory" plus "levels = 2" - the children of the
+              # selected page, each with their own children beneath them.
+              # Rooted at the home page, so the "Elements" branch appears with
+              # its three sub pages nested under it.
+              - identifier: menu-section-pages
+                CType: menu_section_pages
+                header: 'menu_section_pages: two levels below one page'
+                header_layout: 2
+                pages: '1'
+
+              # No source field at all: the TCA of this type has no "pages"
+              # (EXT:frontend,
+              # "Overrides/280-tt_content-content_type-menu_sitemap.php"), and
+              # the TypoScript sets no "special" either - it always starts at
+              # the site root and walks seven levels down.
+              - identifier: menu-sitemap
+                CType: menu_sitemap
+                header: 'menu_sitemap: the whole site from its root'
+                header_layout: 2
+
+              # The same seven-level walk as "menu_sitemap", rooted at the
+              # selected page instead of the site root. This tree is only three
+              # levels deep, so what it renders here is the same single level
+              # "menu_subpages" above renders - the depth has nothing further
+              # to reach, and that is a property of the demo tree, not of the
+              # element.
+              - identifier: menu-sitemap-pages
+                CType: menu_sitemap_pages
+                header: 'menu_sitemap_pages: a whole branch from one page'
+                header_layout: 2
+                pages: '5'
+
+              # "special = directory" again, with each item's own "abstract"
+              # shown beneath its link. Rooted at page 5, so the items are
+              # pages 6, 7 and 8 - each of which needs an "abstract" of its own
+              # for this element to show anything but bare links.
+              - identifier: menu-abstract
+                CType: menu_abstract
+                header: 'menu_abstract: children with their abstracts'
+                header_layout: 2
+                pages: '5'
+
+              # "special = updated" - the selected page and everything beneath
+              # it, sorted by "SYS_LASTCHANGED" descending. That column is 0 on
+              # a freshly seeded tree and is only written when a page is first
+              # rendered in the frontend
+              # (".Build/vendor/typo3/cms-frontend/Classes/Controller/
+              # TypoScriptFrontendController.php", "setSysLastChanged()"), so
+              # the links are all there from the start and the dates appear
+              # page by page as the tree is browsed. The theme sets no
+              # "maxAge", so nothing is filtered out by age.
+              - identifier: menu-recently-updated
+                CType: menu_recently_updated
+                header: 'menu_recently_updated: the tree by last change'
+                header_layout: 2
+                pages: '1'
+
+              # "special = keywords" - "pages" names the page whose keywords
+              # are the search term, not the pages to list. This page is that
+              # source (see "keywords" on the page above); the result is every
+              # other page under the site root sharing one of them.
+              - identifier: menu-related-pages
+                CType: menu_related_pages
+                header: 'menu_related_pages: pages sharing a keyword'
+                header_layout: 2
+                pages: '7'
+
+              # No category is selected, deliberately: the seed format
+              # expresses neither "sys_category" records nor the MM rows that
+              # relate them, so this element cannot be given a real selection
+              # here. An empty selection renders an empty menu, which is the
+              # correct rendering of "nothing selected".
+              #
+              # "selected_categories: 0" rather than leaving the field out.
+              # The sibling "menu_categorized_content" below *requires* the
+              # explicit 0 - see the comment there - and the pair are kept
+              # identical so neither reads as the special case.
+              - identifier: menu-categorized-pages
+                CType: menu_categorized_pages
+                header: 'menu_categorized_pages: pages by category'
+                header_layout: 2
+                selected_categories: 0
+                category_field: 'categories'
+
+              # Same deliberate gap as above: no category is selected, because
+              # the seed format cannot express "sys_category" or its MM
+              # relation, and an empty menu is the correct rendering of
+              # "nothing selected".
+              #
+              # "selected_categories: 0" rather than leaving the field empty,
+              # for two reasons that are both about honesty rather than
+              # necessity. It is the value DataHandler itself normalises an
+              # unresolvable selection to, so it is what the column would hold
+              # once anything real had touched it; and it keeps this element
+              # identical to its sibling above, so neither reads as a special
+              # case.
+              #
+              # It used to be load-bearing: the TypoScript interpolated the
+              # field straight into "uid_local IN (...)", and an empty value
+              # made that "IN ()" - accepted by SQLite, rejected as a syntax
+              # error by MariaDB, MySQL and PostgreSQL, taking the whole page
+              # down rather than just the element. That is now guarded where it
+              # belongs, in "ContentElements.typoscript", because an editor who
+              # saves the element before picking a category hits the same path
+              # and no seed value can help them.
+              - identifier: menu-categorized-content
+                CType: menu_categorized_content
+                header: 'menu_categorized_content: content by category'
+                header_layout: 2
+                selected_categories: 0
+                category_field: 'categories'
+          # Page 8 of the D3 table. Every content element this extension
+          # registers itself, so the ten "theme_*" CTypes can be looked at side
+          # by side rather than one fixture at a time.
+          #
+          # No "content_sidebar" here, unlike its two siblings 6 and 7: the
+          # layout is resolved per page, not inherited down the branch, and
+          # this page is what proves it.
+          - identifier: elements-theme
+            uid: 8
+            title: 'Theme elements'
+            slug: '/elements/theme'
+            doktype: 1
+            backend_layout: content
+            # As on page 6: the abstract and the keyword are read by the two
+            # menu elements on page 7, not by anything on this page.
+            abstract: 'The ten content elements this extension registers itself, from the hero down to the card grid.'
+            keywords: 'content elements, theme'
+            content:
+              # theme_hero - the full hero: heading, lead, media and one call
+              # to action. Its own template defaults an unset "header_layout"
+              # to h1 (Partials/ContentElement/Hero.html), which is right for a
+              # page whose hero is its top heading and wrong for a page
+              # carrying three of them, so the level is set explicitly here.
+              - identifier: theme-hero
+                CType: theme_hero
+                header: 'The full hero'
+                header_layout: 2
+                bodytext: |
+                  <p>The hero carries a heading, a lead paragraph, one media
+                  slot and a single call to action. It is the widest element
+                  the theme ships and is meant to open a page.</p>
+                tx_theme_link: 't3://page?uid=2'
+                tx_theme_link_label: 'Read the typography page'
+                # The empty string is a real item of the select, not a missing
+                # value: it is the default variant and renders the plain
+                # ".theme-button" with no modifier.
+                tx_theme_link_variant: ''
+                files:
+                  image:
+                    - identifier: placeholder
+                      alternative: 'A placeholder graphic in landscape format'
+                      title: 'The hero image'
+              # theme_hero_small - the same field set as theme_hero, rendered
+              # through the same partial with "compact: 1", so the difference
+              # between the two is only visible with both on one page.
+              - identifier: theme-hero-small
+                CType: theme_hero_small
+                header: 'The reduced hero'
+                header_layout: 2
+                bodytext: |
+                  <p>The same fields as the full hero, rendered compactly. The
+                  element above and this one differ in nothing an editor
+                  fills in - only in the variant that was chosen.</p>
+                tx_theme_link: 't3://page?uid=3'
+                tx_theme_link_label: 'Look at the media page'
+                tx_theme_link_variant: secondary
+                files:
+                  image:
+                    - identifier: placeholder
+                      alternative: 'A placeholder graphic in landscape format'
+                      title: 'The reduced hero image'
+              # theme_hero_text_only - no "image" field on the CType at all,
+              # so no "files" here either. The hero renders without its
+              # "theme-hero--media" modifier.
+              - identifier: theme-hero-text-only
+                CType: theme_hero_text_only
+                header: 'The hero without media'
+                header_layout: 2
+                bodytext: |
+                  <p>This variant has no image field in the backend form, so
+                  there is nothing to leave empty. What it demonstrates is the
+                  hero body on its own, full width.</p>
+                tx_theme_link: 't3://page?uid=1'
+                tx_theme_link_label: 'Back to the start page'
+                tx_theme_link_variant: ghost
+              # theme_teaser - a short block of text with a call to action and
+              # no media. Like theme_hero_text_only it has no "image" field,
+              # which is why the teaser partial renders without its
+              # "theme-teaser__media" part.
+              - identifier: theme-teaser
+                CType: theme_teaser
+                header: 'A teaser without media'
+                bodytext: |
+                  <p>A teaser is a secondary block: a heading, a couple of
+                  sentences and one link. Its heading defaults to h2 rather
+                  than the hero's h1.</p>
+                tx_theme_link: 't3://page?uid=4'
+                tx_theme_link_label: 'Open the empty page'
+                tx_theme_link_variant: secondary
+              # theme_media_teaser - the same teaser with an image beside the
+              # text. The link is an external URL rather than a page, because
+              # "tx_theme_link" is a TCA type=link field and holds whatever
+              # the link wizard encoded - a page, a file, a mail address or,
+              # as here, a plain URL.
+              - identifier: theme-media-teaser
+                CType: theme_media_teaser
+                header: 'A teaser beside an image'
+                bodytext: |
+                  <p>Text and a single image side by side. The image is one
+                  file reference; the theme deliberately wires no gallery
+                  processing here, because there is no grid to arrange.</p>
+                tx_theme_link: 'https://docs.typo3.org/'
+                tx_theme_link_label: 'Read the TYPO3 documentation'
+                tx_theme_link_variant: ghost
+                files:
+                  image:
+                    - identifier: placeholder
+                      alternative: 'A placeholder graphic in landscape format'
+                      title: 'The teaser image'
+              # theme_testimonial - a quotation with its attribution.
+              # "header" and "subheader" are relabelled on this CType to hold
+              # the attributed person's name and role, not a content heading.
+              #
+              # No media, and no "files" here: the element renders through
+              # ".theme-quote", which has no media slot, and the image field
+              # was removed from the CType rather than left inert. Do not add
+              # one back without giving the component a slot first.
+              - identifier: theme-testimonial
+                CType: theme_testimonial
+                header: 'Ada Lovelace'
+                subheader: 'Mathematician, 1843'
+                bodytext: |
+                  <p>The Analytical Engine weaves algebraic patterns just as
+                  the Jacquard loom weaves flowers and leaves.</p>
+              # theme_author - a person: portrait, name, role, a short bio and
+              # the person's own links. The name is the content element's
+              # heading and goes through the shared header partial; the role
+              # is "subheader" and sits inside the component.
+              - identifier: theme-author
+                CType: theme_author
+                header: 'Grace Hopper'
+                subheader: 'Compiler pioneer'
+                bodytext: |
+                  <p>Wrote the first compiler and spent the rest of her career
+                  arguing that a programming language should read like
+                  English.</p>
+                files:
+                  # The portrait, so the placeholder in portrait format is the
+                  # right one of the two: the component crops this box
+                  # differently from the landscape media slots above.
+                  image:
+                    - identifier: placeholder-portrait
+                      alternative: 'A placeholder portrait'
+                      title: 'The portrait of the author'
+                inline:
+                  # This relation is narrowed to the link palette on this
+                  # CType, so a child carries "link" and "link_label" and
+                  # nothing else - "header", "text" and "image" are not part
+                  # of the form here and would be dead data.
+                  tx_theme_list_items:
+                    - identifier: theme-author-link-profile
+                      table: tx_theme_list_item
+                      link: 't3://page?uid=1'
+                      link_label: 'Profile'
+                    - identifier: theme-author-link-mail
+                      table: tx_theme_list_item
+                      # TYPO3 link syntax, not an "href": an email address is
+                      # stored with its "mailto:" scheme.
+                      link: 'mailto:grace@example.org'
+                      link_label: 'Write an email'
+              # theme_linklist - a flat list of links. "header" is the list
+              # title here, not a content heading, which is why the CType
+              # offers the bare field rather than the headers palette.
+              - identifier: theme-linklist
+                CType: theme_linklist
+                header: 'Where to read more'
+                inline:
+                  tx_theme_list_items:
+                    - identifier: theme-linklist-typography
+                      table: tx_theme_list_item
+                      link: 't3://page?uid=2'
+                      link_label: 'Typography'
+                    - identifier: theme-linklist-media
+                      table: tx_theme_list_item
+                      link: 't3://page?uid=3'
+                      link_label: 'Media'
+                    - identifier: theme-linklist-empty
+                      table: tx_theme_list_item
+                      link: 't3://page?uid=4'
+                      link_label: 'Empty page'
+                    # No "link_label" on purpose: the label is optional, and a
+                    # row without one falls back to the resolved URL rather
+                    # than rendering an empty link. This entry is what shows
+                    # that fallback in the seeded tree.
+                    - identifier: theme-linklist-unlabelled
+                      table: tx_theme_list_item
+                      link: 'https://typo3.org/'
+              # theme_sociallinks - the same list, rendered as text labels
+              # rather than icons: the theme ships no icon assets, so
+              # "link_label" carries the platform name. The child "link" is
+              # restricted to url, email and telephone on this relation, so
+              # each of the three appears once below.
+              - identifier: theme-sociallinks
+                CType: theme_sociallinks
+                header: 'Elsewhere'
+                inline:
+                  tx_theme_list_items:
+                    - identifier: theme-sociallinks-web
+                      table: tx_theme_list_item
+                      link: 'https://typo3.org/'
+                      link_label: 'TYPO3 on the web'
+                    - identifier: theme-sociallinks-mail
+                      table: tx_theme_list_item
+                      link: 'mailto:hello@example.org'
+                      link_label: 'Send an email'
+                    - identifier: theme-sociallinks-phone
+                      table: tx_theme_list_item
+                      # "tel:" plus digits, "+", "," and ";" - anything else
+                      # is stripped when the link wizard encodes a number.
+                      link: 'tel:+4930123456'
+                      link_label: 'Call the office'
+              # theme_media_teaser_grid - several cards in a grid. "header"
+              # and "bodytext" are the lead-in above the grid; the cards
+              # themselves are the same child table, here with the full
+              # header/text/image/link set the other three relations narrow
+              # away.
+              - identifier: theme-media-teaser-grid
+                CType: theme_media_teaser_grid
+                header: 'Three cards in a grid'
+                bodytext: |
+                  <p>Every card is one row of the shared child table. The
+                  lead-in above is the element's own heading and body.</p>
+                inline:
+                  tx_theme_list_items:
+                    # The child's "text" is a plain text column, never
+                    # RTE-enabled, and is rendered through nl2br - so it holds
+                    # sentences and line breaks, never markup.
+                    - identifier: theme-grid-typography
+                      table: tx_theme_list_item
+                      header: 'Typography'
+                      text: 'Headings, running text and the inline cases a stylesheet has to answer for.'
+                      link: 't3://page?uid=2'
+                      link_label: 'Open the typography page'
+                      files:
+                        image:
+                          - identifier: placeholder
+                            alternative: 'A placeholder graphic in landscape format'
+                    - identifier: theme-grid-media
+                      table: tx_theme_list_item
+                      header: 'Media'
+                      text: 'A single image and a two column gallery, both driven by the fields of the element.'
+                      link: 't3://page?uid=3'
+                      link_label: 'Open the media page'
+                      files:
+                        image:
+                          - identifier: placeholder-portrait
+                            alternative: 'A placeholder graphic in portrait format'
+                    # No "link" on this one: unlike the other three relations,
+                    # the grid does not require it, and a card without a link
+                    # renders its title and text with no ".theme-card__link".
+                    # That shape is part of what this page demonstrates.
+                    - identifier: theme-grid-unlinked
+                      table: tx_theme_list_item
+                      header: 'A card without a link'
+                      text: |
+                        The link is optional on this relation only.
+                        A card without one is a plain block of text.
+                      files:
+                        image:
+                          - identifier: placeholder
+                            alternative: 'A placeholder graphic in landscape format'
+
+      # The styleguide. Not a showcase of content elements: the "styleguide"
+      # backend layout declares no usable content column at all, and
+      # "Templates/Page/Styleguide.html" renders the component library straight
+      # from Fluid, ignoring anything placed on the page.
+      #
+      # "nav_hide", never "hidden". A hidden page returns 404 in the frontend
+      # and is only reachable through a backend preview link carrying a valid
+      # hash, which defeats the point of seeding it - the page exists to be
+      # opened. "nav_hide" keeps it reachable by URL and out of every menu,
+      # which is what "not published" meant here.
+      - identifier: styleguide
+        uid: 9
+        title: 'Styleguide'
+        slug: '/styleguide'
+        doktype: 1
+        backend_layout: styleguide
+        nav_hide: 1
