@@ -1,0 +1,29 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The page-level placement decision for the breadcrumb trail, one step
+    removed from "Partials/Navigation/Breadcrumb.html" itself so that "where"
+    stays separate from "what". "Where" is answered twice over:
+
+    - Which templates call this partial at all. Only
+      "Templates/Page/Content.html" and "Templates/Page/ContentSidebar.html"
+      do - "Start.html" has no trail worth showing on a start page, and
+      "Default.html" is the bare layout the step 3 contract explicitly
+      excludes. "Default.html" is also the one template that already renders
+      "{pageTitle}" itself; a trail ending in the same title one line above
+      it would be redundant on the one layout that has no stage to separate
+      the two.
+    - Where inside "Main" it renders relative to the other content: ahead of
+      "Partials/Page/Stage.html", so the trail reads before whatever
+      editorial content - typically a ".theme-hero" - sits in the stage
+      slot, the conventional position for a breadcrumb.
+
+    No wrapper element of its own: "Navigation/Breadcrumb.html" already
+    guards its own emptiness and there is no documented wrapper class to
+    invent one for, the same reasoning "Partials/Page/Stage.html" gives for
+    not wrapping its own cObject call.
+</f:comment>
+<f:render partial="Navigation/Breadcrumb" arguments="{_all}" />
+
+</html>

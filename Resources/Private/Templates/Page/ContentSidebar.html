@@ -7,7 +7,13 @@
     step 2 contract's column layout table. The only template that defines the
     "Aside" section: "Layouts/Default.html" renders it with
     "f:render ... optional="1"", so this is also the only template that puts
-    ".theme-page__aside" on the page at all.
+    ".theme-page__aside" on the page at all - and, through
+    "Partials/Page/Sidebar.html", the only one that renders the sub
+    navigation.
+
+    "Partials/Page/Breadcrumb.html" is rendered ahead of
+    "Partials/Page/Stage.html" in "Main", the same placement
+    "Templates/Page/Content.html" uses - see that template's comment.
 </f:comment>
 <f:layout name="Default" />
 
@@ -16,6 +22,7 @@
 </f:section>
 
 <f:section name="Main">
+    <f:render partial="Page/Breadcrumb" arguments="{_all}" />
     <f:render partial="Page/Stage" arguments="{_all}" />
     <f:cObject typoscriptObjectPath="lib.content.main" />
 </f:section>

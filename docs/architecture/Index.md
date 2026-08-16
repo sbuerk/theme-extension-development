@@ -11,6 +11,7 @@ demonstrate them and are meant to be deleted once real code arrives.
 | [Class design](class-design.md)                       | `final readonly` and what it implies for hierarchies, method injection in abstract classes, data objects vs services, the two accepted PHPStan ignores. |
 | [TypoScript delivery](typoscript-delivery.md)         | The site set, the guarded static include fallback, why `addStaticFile()` sits in a TCA override, and page rendering with `FLUIDTEMPLATE`.               |
 | [Page rendering](page-rendering.md)                   | Why `FLUIDTEMPLATE` over `PAGEVIEW`, backend layout registration, template name resolution, content slots, the Fluid structure.                         |
+| [Navigation](navigation.md)                           | Main menu, sub navigation and breadcrumb, the fixed-rootline `leveluid:1` resolution, placement by backend layout, accessibility.                       |
 
 ## The short version
 

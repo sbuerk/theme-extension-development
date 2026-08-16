@@ -9,8 +9,15 @@
     see the comment there. Unconditional here on purpose: whether the aside
     exists at all is decided once, by which page template defines the
     section, not again per request by whether this slot happens to be empty.
+
+    "Partials/Navigation/Sub.html" renders above the "sidebar" cObject, per
+    the step 3 contract's placement table - the sub navigation belongs to
+    the "content_sidebar" layout only, exactly where this partial itself is
+    only ever rendered from. It carries its own empty guard, so it is
+    rendered unconditionally here the same way "lib.content.sidebar" is.
 </f:comment>
 <aside class="theme-page__aside">
+    <f:render partial="Navigation/Sub" arguments="{_all}" />
     <f:cObject typoscriptObjectPath="lib.content.sidebar" />
 </aside>
 

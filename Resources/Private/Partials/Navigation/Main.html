@@ -1,0 +1,91 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Main navigation, rendered from "Partials/Page/Header.html" on every page
+    template. Markup contract: docs/development/component-library.md#navigation,
+    styled by "components/_nav-main.scss" - do not add or rename a class here
+    without a rule there.
+
+    "mainMenu" comes from core "MenuProcessor", two levels deep
+    ("special = directory" plus "expandAll = 1" from the site root,
+    "includeSpacer = 0"). Both levels are rendered by one recursive
+    "Item" section rather than by nesting the list item/link/list markup
+    twice - the section calls itself for "item.children", so the same three
+    branches (spacer, current link, plain link) are written once and apply at
+    every depth the menu ever produces.
+
+    "id="nav-main"" lives on the top-level list here, outside the recursive
+    section, and nowhere else - it is what the toggle button's
+    "aria-controls" below points at, and the contract needs exactly one
+    element carrying it. The nested "--sub" list never repeats it.
+
+    --- Active vs. current -----------------------------------------------
+    "item.active" (an ancestor of the current page) and "item.current" (the
+    current page itself) are independent, per the SCSS header comment: a
+    top-level item can be "--active" while its own link is not
+    "[aria-current='page']" because the current page is one of its children.
+    The "--active" modifier is therefore only ever applied at the top level -
+    "isTopLevel" carries that down through the recursion instead of a level
+    number, since the only thing depth changes here is that one modifier.
+
+    --- Spacers -------------------------------------------------------------
+    "mainMenu" is built with "includeSpacer = 0", so none are expected in
+    practice, but "MenuProcessor" still sets "item.spacer" on every item
+    unconditionally, and a site package could change that TypoScript without
+    touching this partial. A spacer is not a link: it renders as a plain
+    span element carrying the same "__link" class for consistent spacing,
+    with no "href" and nothing to focus.
+
+    --- aria-current is omitted, never emitted empty ------------------------
+    The two link branches below exist because a whole attribute cannot be
+    switched on or off from inside an already-quoted attribute value without
+    breaking the source XML - one branch carries "aria-current='page'", the
+    other omits it entirely, matching the accessibility contract's "never a
+    modifier class instead" rule without ever emitting "aria-current=''".
+
+    Empty guard: no "mainMenu" means no nav element at all, not an empty one.
+</f:comment>
+
+<f:if condition="{mainMenu}">
+    <nav class="theme-nav-main" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.navMainLabel')}">
+        <button type="button" class="theme-nav-main__toggle" aria-expanded="false" aria-controls="nav-main">
+            <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.navMainToggle" />
+        </button>
+        <ul class="theme-nav-main__list" id="nav-main">
+            <f:for each="{mainMenu}" as="item">
+                <f:render section="Item" arguments="{item: item, isTopLevel: 1}" />
+            </f:for>
+        </ul>
+    </nav>
+</f:if>
+
+<f:section name="Item">
+    <li class="theme-nav-main__item{f:if(condition: '{isTopLevel} == 1 &amp;&amp; {item.active}', then: ' theme-nav-main__item--active')}">
+        <f:if condition="{item.spacer}">
+            <f:then>
+                <span class="theme-nav-main__link">{item.title}</span>
+            </f:then>
+            <f:else>
+                <f:if condition="{item.current}">
+                    <f:then>
+                        <a class="theme-nav-main__link" href="{item.link}" aria-current="page">{item.title}</a>
+                    </f:then>
+                    <f:else>
+                        <a class="theme-nav-main__link" href="{item.link}">{item.title}</a>
+                    </f:else>
+                </f:if>
+            </f:else>
+        </f:if>
+
+        <f:if condition="{item.children}">
+            <ul class="theme-nav-main__list theme-nav-main__list--sub">
+                <f:for each="{item.children}" as="childItem">
+                    <f:render section="Item" arguments="{item: childItem, isTopLevel: 0}" />
+                </f:for>
+            </ul>
+        </f:if>
+    </li>
+</f:section>
+
+</html>
