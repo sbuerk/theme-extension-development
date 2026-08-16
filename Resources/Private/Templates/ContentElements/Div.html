@@ -1,0 +1,23 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "div" is a horizontal rule. The core TCA gives it exactly one field besides
+    "CType" itself - "header" - and EXT:frontend's own language file overrides
+    that field's label to "Name (not visible in frontend)"
+    (locallang_ttc.xlf, "header.ALT.div_formlabel" /
+    "header.description.ALT"): it exists so an editor can find the record and
+    so a menu referencing it has something to show, not to be printed above the
+    rule. It is therefore not rendered here, and "Partials/ContentElement/Header"
+    is not used - there is nothing this element's header partial would add.
+
+    Nothing else is in scope: "div" carries no other field, so there is no
+    "Main" content beyond the rule itself.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <hr />
+</f:section>
+
+</html>

@@ -1,0 +1,44 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:comment>
+        "textmedia" is the same shape as "textpic", the only difference is the
+        source field: "assets" ("common-media-types", not restricted to images)
+        instead of "image" - see the core TCA in
+        ".Build/vendor/typo3/cms-frontend/Configuration/TCA/Overrides/230-tt_content-content_type-textmedia.php"
+        and "tt_content.textmedia" in "ContentElements.typoscript" for where that
+        field is wired into "FilesProcessor". "GalleryProcessor" does not care
+        which field the files came from.
+
+        "imageorient" resolves to a vertical position of "above", "below" or
+        "intext" and a horizontal one of "left", "center" or "right", already
+        computed by "GalleryProcessor" and read by the gallery partial into the
+        "theme-gallery--{vertical}"/"--{horizontal}" classes. "below" is the only
+        vertical value that changes the DOM order here: "above" and "intext" both
+        put the gallery first, which is also where a stylesheet has to find it to
+        float it beside the following text for "intext" - see
+        "components/_gallery.scss" for why the position modifiers are structural
+        only for now.
+    </f:comment>
+    <f:if condition="{gallery.position.vertical} == 'below'">
+        <f:then>
+            <div class="theme-content-element__body">
+                <f:format.html>{data.bodytext}</f:format.html>
+            </div>
+            <f:render partial="ContentElement/Gallery" arguments="{_all}" />
+        </f:then>
+        <f:else>
+            <f:render partial="ContentElement/Gallery" arguments="{_all}" />
+            <div class="theme-content-element__body">
+                <f:format.html>{data.bodytext}</f:format.html>
+            </div>
+        </f:else>
+    </f:if>
+</f:section>
+
+</html>

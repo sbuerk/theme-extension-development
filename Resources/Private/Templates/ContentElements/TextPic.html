@@ -1,0 +1,42 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:comment>
+        "textpic" is text plus the "image" field - the same shape "FilesProcessor"
+        and "GalleryProcessor" already give the image element, see the comment on
+        "tt_content.image" in "ContentElements.typoscript". This template only
+        adds the "bodytext" and decides where it sits relative to the gallery.
+
+        "imageorient" resolves to a vertical position of "above", "below" or
+        "intext" and a horizontal one of "left", "center" or "right" -
+        "GalleryProcessor" has already made that translation, and the gallery
+        partial reads it into the "theme-gallery--{vertical}"/"--{horizontal}"
+        classes. "below" is the only vertical value that changes the DOM order
+        here: "above" and "intext" both put the gallery first, which is also
+        where a stylesheet has to find it to float it beside the following text
+        for "intext" - this template does not attempt that float itself, see
+        "components/_gallery.scss" for why the position modifiers are structural
+        only for now.
+    </f:comment>
+    <f:if condition="{gallery.position.vertical} == 'below'">
+        <f:then>
+            <div class="theme-content-element__body">
+                <f:format.html>{data.bodytext}</f:format.html>
+            </div>
+            <f:render partial="ContentElement/Gallery" arguments="{_all}" />
+        </f:then>
+        <f:else>
+            <f:render partial="ContentElement/Gallery" arguments="{_all}" />
+            <div class="theme-content-element__body">
+                <f:format.html>{data.bodytext}</f:format.html>
+            </div>
+        </f:else>
+    </f:if>
+</f:section>
+
+</html>

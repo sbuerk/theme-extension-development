@@ -61,7 +61,7 @@
 </f:if>
 
 <f:section name="Item">
-    <li class="theme-nav-main__item{f:if(condition: '{isTopLevel} == 1 &amp;&amp; {item.active}', then: ' theme-nav-main__item--active')}">
+    <li class="theme-nav-main__item{f:if(condition: '{isTopLevel} == 1 && {item.active}', then: ' theme-nav-main__item--active')}">
         <f:if condition="{item.spacer}">
             <f:then>
                 <span class="theme-nav-main__link">{item.title}</span>

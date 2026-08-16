@@ -14,8 +14,13 @@
 # created in the backend of an installation using this theme, and every one that
 # has no branch below renders the notice.
 #
-# @todo Cover the remaining content types EXT:frontend registers. Rendering them
-#       needs no TCA of this extension's own, only a template and a branch here.
+# Covered here: header, text, image, textpic, textmedia, bullets, table,
+# uploads, shortcut, div and html - the whole classic set except the menus.
+#
+# @todo Cover the eleven "menu_*" content types. They are the last of the set
+#       EXT:frontend registers that still renders the notice, and they differ
+#       from everything above in needing a data processor configured per type
+#       rather than only a template.
 
 # The equivalent of "lib.contentElement" from "fluid_styled_content": the frame
 # every content element is rendered through. Consumers of this theme can
@@ -70,6 +75,197 @@ tt_content.image {
             # languages, forever.
             columnSpacing = 0
             as = gallery
+        }
+    }
+}
+
+# The "Bullet List" element. "bodytext" is one item per line, which is
+# exactly what the core's own "SplitProcessor" is for - see "Bullets.html"
+# for why no processor of this extension's own was needed here.
+tt_content.bullets =< lib.contentElement
+tt_content.bullets {
+    templateName = ContentElements/Bullets
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\SplitProcessor
+        10 {
+            fieldName = bodytext
+            removeEmptyEntries = 1
+            as = bullets
+        }
+    }
+}
+
+# The "Table" element. "bodytext" is delimited/enclosed text; the delimiter
+# and enclosure are TCA character CODES, and turning those into rows and
+# columns needs its own processor - see "TableProcessor" and "Table.html" for
+# why the core's "SplitProcessor" and "CommaSeparatedValueProcessor" were not
+# enough on their own.
+tt_content.table =< lib.contentElement
+tt_content.table {
+    templateName = ContentElements/Table
+
+    dataProcessing {
+        10 = SBUERK\ThemeExtensionDevelopment\DataProcessing\TableProcessor
+        10 {
+            as = table
+        }
+    }
+}
+
+# The "Text & Images" element. Same shape as "image" above - "FilesProcessor"
+# plus "GalleryProcessor" - except the files come from "image" alongside a
+# "bodytext" that the image element does not have. See
+# "Templates/ContentElements/TextPic.html" for how "imageorient" decides where
+# the gallery sits relative to the text.
+tt_content.textpic =< lib.contentElement
+tt_content.textpic {
+    templateName = ContentElements/TextPic
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = image
+            as = files
+        }
+
+        20 = TYPO3\CMS\Frontend\DataProcessing\GalleryProcessor
+        20 {
+            filesProcessedDataKey = files
+            mediaOrientation.field = imageorient
+            numberOfColumns.field = imagecols
+            equalMediaHeight.field = imageheight
+            equalMediaWidth.field = imagewidth
+            borderEnabled.field = imageborder
+            maxGalleryWidth = {$theme.media.maxGalleryWidth}
+            maxGalleryWidthInText = {$theme.media.maxGalleryWidthInText}
+            columnSpacing = 0
+            as = gallery
+        }
+    }
+}
+
+# The "Text & Media" element. Identical to "textpic" apart from the source
+# field: "assets" allows "common-media-types", not only images - see the core
+# TCA in
+# "Overrides/230-tt_content-content_type-textmedia.php". "GalleryProcessor"
+# does not care which field the files came from.
+tt_content.textmedia =< lib.contentElement
+tt_content.textmedia {
+    templateName = ContentElements/TextMedia
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = assets
+            as = files
+        }
+
+        20 = TYPO3\CMS\Frontend\DataProcessing\GalleryProcessor
+        20 {
+            filesProcessedDataKey = files
+            mediaOrientation.field = imageorient
+            numberOfColumns.field = imagecols
+            equalMediaHeight.field = imageheight
+            equalMediaWidth.field = imagewidth
+            borderEnabled.field = imageborder
+            maxGalleryWidth = {$theme.media.maxGalleryWidth}
+            maxGalleryWidthInText = {$theme.media.maxGalleryWidthInText}
+            columnSpacing = 0
+            as = gallery
+        }
+    }
+}
+
+# The "Uploads" element - a file list, not a gallery. "media" and
+# "file_collections" are both valid sources in the core TCA (see
+# "Overrides/245-tt_content-content_type-uploads.php"), so both are wired into
+# "FilesProcessor"; leaving "file_collections" out would make that field's tab
+# do nothing. "filelink_sorting"/"filelink_sorting_direction" order the merged
+# list - "FilesProcessor" does that natively, so it never becomes a Fluid
+# concern.
+tt_content.uploads =< lib.contentElement
+tt_content.uploads {
+    templateName = ContentElements/Uploads
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = media
+            collections.field = file_collections
+            sorting.field = filelink_sorting
+            sorting.direction.field = filelink_sorting_direction
+            as = files
+        }
+    }
+}
+
+# The "Divider" element. Core TCA gives it a "header" field only, and that
+# field's own label is overridden to "Name (not visible in frontend)" - see
+# the comment in "Templates/ContentElements/Div.html". Nothing here needs
+# rendering beyond the rule the template already draws.
+tt_content.div =< lib.contentElement
+tt_content.div.templateName = ContentElements/Div
+
+# The "Plain HTML" element. Renders "bodytext" unescaped - see the comment in
+# "Templates/ContentElements/Html.html" for why, and for what actually
+# restricts it to admin users (the "CType" field's "authMode = explicitAllow",
+# not anything specific to "html").
+tt_content.html =< lib.contentElement
+tt_content.html.templateName = ContentElements/Html
+
+# The "Insert Records" element. "records" holds one or more "tt_content_<uid>"
+# references, resolved here through the core's "RECORDS" cObject rather than
+# anything of this theme's own - see "Templates/ContentElements/Shortcut.html".
+#
+# "conf.tt_content =< tt_content" makes every referenced record render through
+# the very same CASE this file builds on (registered by EXT:frontend in its
+# "ext_localconf.php": "tt_content = CASE" / "key.field = CType") - the
+# referenced record renders exactly as it would on its own, including, if it
+# is itself a "shortcut", going through this branch again.
+#
+# Recursion guard, verified in source rather than assumed
+# (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php"):
+#   1. On TYPO3 v13.4 it does. "RecordsContentObject::render()" registers
+#      "table:uid" in "TypoScriptFrontendController::$recordRegister" before
+#      fetching, and skips any item already registered.
+#   2. On TYPO3 v14 it does not. "TypoScriptFrontendController" was removed
+#      entirely (Breaking #107831) and "$recordRegister" went with it - the
+#      string does not occur anywhere in the v14 source outside its own
+#      changelog. "RecordsContentObject::render()" on v14 renders every
+#      referenced record unconditionally, and the older "cObjectDepthCounter"
+#      that might have caught it was itself removed in v11.4, whose
+#      deprecation note says PHP's own nesting limit is the expected outcome.
+#      A shortcut pointing at itself therefore recurses until the process
+#      dies.
+#
+# So the cycle is broken here rather than left to the core, and it is broken
+# by construction rather than by a register: a shortcut reached *through* a
+# shortcut renders nothing. One level of indirection is followed, which is all
+# the element is for; a second is refused. That makes both the direct and the
+# indirect cycle impossible on both core versions, with no state to keep and
+# no version split - the difference is in what the core guarantees, not in
+# what this theme does.
+#
+# @todo Revisit if a later v14 patch level restores a recursion guard. The
+#       override below is harmless in that case, only redundant.
+tt_content.shortcut =< lib.contentElement
+tt_content.shortcut {
+    templateName = ContentElements/Shortcut
+
+    variables {
+        records = RECORDS
+        records {
+            tables = tt_content
+            source.field = records
+            conf.tt_content =< tt_content
+
+            # The cycle break. Inside a shortcut, the shortcut branch renders
+            # nothing at all, so no chain of references can return to its
+            # start. See the note above for why the core cannot be relied on
+            # for this on v14.
+            conf.tt_content.shortcut = TEXT
+            conf.tt_content.shortcut.value =
         }
     }
 }

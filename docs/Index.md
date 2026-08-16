@@ -35,6 +35,7 @@ Documentation for people **using** the extension lives in
 | [TypoScript delivery](architecture/typoscript-delivery.md)         | Site set, the guarded static include fallback, page rendering.                                      |
 | [Page rendering](architecture/page-rendering.md)                   | Backend layout registration, template name resolution, content slots, the Fluid structure.          |
 | [Navigation](architecture/navigation.md)                           | Main menu, sub navigation, breadcrumb, the fixed rootline position, placement, accessibility.       |
+| [Content elements](architecture/content-elements.md)               | Classic `CType` coverage, the `table` and `shortcut` decisions, escaping, a Fluid `&&` gotcha.      |
 
 ## [Testing](testing/Index.md)
 
