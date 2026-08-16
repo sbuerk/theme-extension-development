@@ -1,0 +1,55 @@
+# Stage banner, one full-width content column, a four-column footer and a
+# footer meta row - the same colPos numbers as "ContentSidebar.tsconfig" and
+# "Start.tsconfig", so content stays portable between all three (see the
+# column table in the step 2 contract).
+mod.web_layout.BackendLayouts.content {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.content.title
+    config.backend_layout {
+        colCount = 4
+        rowCount = 4
+        rows {
+            1.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.stage.name
+                identifier = stage
+                colPos = 2
+                colspan = 4
+            }
+            2.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+                identifier = main
+                colPos = 0
+                colspan = 4
+            }
+            3 {
+                columns {
+                    1 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footer1.name
+                        identifier = footer1
+                        colPos = 11
+                    }
+                    2 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footer2.name
+                        identifier = footer2
+                        colPos = 12
+                    }
+                    3 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footer3.name
+                        identifier = footer3
+                        colPos = 13
+                    }
+                    4 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footer4.name
+                        identifier = footer4
+                        colPos = 14
+                    }
+                }
+            }
+            4.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footermeta.name
+                identifier = footermeta
+                colPos = 10
+                colspan = 4
+            }
+        }
+    }
+}

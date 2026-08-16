@@ -1,0 +1,22 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "stage" content slot - colPos 2 in the step 2 contract's "Content
+    slots" table, rendered inside ".theme-page__main" ahead of "main" by
+    "Templates/Page/Content.html", "ContentSidebar.html" and "Start.html".
+    Not part of the page shell markup contract itself: unlike the aside, the
+    stage has no dedicated wrapper class in
+    docs/development/component-library.md, and none is invented here - an
+    editor typically places a ".theme-hero" element into this slot, which
+    brings its own outer element and spacing. A wrapper div around it would
+    be unstyled and would only exist to be styled later, which is exactly
+    what the aside comment in "Layouts/Default.html" argues against for an
+    empty element.
+
+    No emptiness check is needed here the way "Partials/Page/Footer.html"
+    needs one: there is no wrapper element to leave empty behind.
+</f:comment>
+<f:cObject typoscriptObjectPath="lib.content.stage" />
+
+</html>

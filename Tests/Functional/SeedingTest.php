@@ -348,7 +348,7 @@ final class SeedingTest extends AbstractFunctionalTestCase
             new InternalRequest('https://theme.example.com/typography'),
         )->getBody();
 
-        $this->assertStringContainsString('<h1 class="content-element__heading">Typography</h1>', $body);
+        $this->assertStringContainsString('<h1 class="theme-content-element__heading">Typography</h1>', $body);
         $this->assertStringContainsString('three inline cases', $body);
     }
 }

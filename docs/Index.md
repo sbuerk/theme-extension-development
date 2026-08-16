@@ -32,6 +32,7 @@ Documentation for people **using** the extension lives in
 | [Dependency injection](architecture/dependency-injection.md)       | Symfony DI attributes, stateless services, the rules that apply.                                    |
 | [Class design](architecture/class-design.md)                       | `final readonly`, method injection in abstract classes, data objects, the accepted PHPStan ignores. |
 | [TypoScript delivery](architecture/typoscript-delivery.md)         | Site set, the guarded static include fallback, page rendering.                                      |
+| [Page rendering](architecture/page-rendering.md)                   | Backend layout registration, template name resolution, content slots, the Fluid structure.          |
 
 ## [Testing](testing/Index.md)
 

@@ -1,0 +1,25 @@
+# Registers the theme's backend layouts.
+#
+# Page TSconfig, not a "backend_layout" database record and not a custom
+# DataProvider: TYPO3 auto-loads "Configuration/page.tsconfig" from every
+# package since v12.0 (#96614), so no registration call and no DB seeding is
+# needed, and it applies identically whether the theme is pulled in through
+# the site set or through the classic "sys_template" static include - the two
+# alternatives would each only work for one of those.
+#
+# One "@import" per layout file, so a site package can override a single
+# layout without touching the rest. "@import" of an exact file path (as
+# opposed to a "*" wildcard or a directory) includes exactly that file - see
+# "TYPO3\CMS\Core\TypoScript\IncludeTree\TreeFromLineStreamBuilder::processAtImport()".
+#
+# Every column carries an "identifier" as well as a "name" and a "colPos".
+# TYPO3 v14 raises a deprecation for a column without one
+# ("ContentAreaResolver::collectContentAreasRecursive()") and will throw in
+# v15; it is ignored on v13, so one spelling serves both. The identifiers are
+# the slot names the "lib.content.*" objects use, which is also what a later
+# move to PAGEVIEW would address a content area by.
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Default.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Content.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/ContentSidebar.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Start.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Styleguide.tsconfig'

@@ -1,0 +1,8 @@
+"pages",,,,,,,,,,,
+,"uid","pid","sys_language_uid","l10n_parent","l10n_source","doktype","is_siteroot","title","slug","backend_layout","backend_layout_next_level"
+,1,0,0,0,0,1,1,"Theme root","/","","pagets__content"
+,10,1,0,0,0,1,0,"Inherits from the root","/inherits","",""
+,11,1,0,0,0,1,0,"Declares its own","/own","pagets__content_sidebar",""
+,12,1,0,0,0,1,0,"Layout set to none","/none","-1",""
+,13,1,0,0,0,1,0,"Declares start","/start","pagets__start",""
+,20,10,0,0,0,1,0,"Two levels down","/inherits/deeper","",""

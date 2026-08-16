@@ -67,7 +67,7 @@ final class StaticTypoScriptFallbackRenderingTest extends AbstractFunctionalTest
         $body = (string)$response->getBody();
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('class="page__main"', $body);
+        $this->assertStringContainsString('class="theme-page__main"', $body);
         $this->assertStringContainsString('Theme root', $body);
     }
 

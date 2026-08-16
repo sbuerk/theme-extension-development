@@ -1,0 +1,58 @@
+# Structurally identical to "Content.tsconfig" - same colPos numbers, same
+# grid, no sidebar. The only difference is the title/identifier; a start page
+# placed at the site root is where the footer columns (colPos 11-14) and the
+# footer meta row (colPos 10) are conventionally edited once, since those
+# columns carry "slideMode = slide" in the frontend TypoScript and inherit
+# down the rootline from wherever they are first filled in - not something
+# the backend layout itself has to express.
+mod.web_layout.BackendLayouts.start {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.start.title
+    config.backend_layout {
+        colCount = 4
+        rowCount = 4
+        rows {
+            1.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.stage.name
+                identifier = stage
+                colPos = 2
+                colspan = 4
+            }
+            2.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+                identifier = main
+                colPos = 0
+                colspan = 4
+            }
+            3 {
+                columns {
+                    1 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footer1.name
+                        identifier = footer1
+                        colPos = 11
+                    }
+                    2 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footer2.name
+                        identifier = footer2
+                        colPos = 12
+                    }
+                    3 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footer3.name
+                        identifier = footer3
+                        colPos = 13
+                    }
+                    4 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footer4.name
+                        identifier = footer4
+                        colPos = 14
+                    }
+                }
+            }
+            4.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.footermeta.name
+                identifier = footermeta
+                colPos = 10
+                colspan = 4
+            }
+        }
+    }
+}

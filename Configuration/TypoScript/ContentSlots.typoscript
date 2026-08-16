@@ -1,0 +1,107 @@
+# Content column definitions of the theme.
+#
+# Read by the site set and by the classic static include alike - both point at
+# "setup.typoscript", which "@import"s this file. See that file for the
+# double-apply guard.
+#
+# One "CONTENT" object per slot under "lib.content.", rather than a single
+# object switched by a variable, so a site package can override exactly one
+# column - say "sidebar" - without repeating or touching the other five.
+# Column numbers mirror "EXT:theme_camino", so content is portable between the
+# two themes; see "docs/development/component-library.md" for the layout that
+# uses each slot.
+
+lib.content.main = CONTENT
+lib.content.main {
+    table = tt_content
+    select {
+        orderBy = sorting
+        # Quoted through the QueryBuilder rather than a bare "colPos=0": TCA
+        # backs "colPos" with an ANSI-reserved-adjacent identifier on some
+        # DBMS, and "{#field}" is how a CONTENT/select "where" is told to run
+        # through the QueryBuilder's field quoting instead of being
+        # concatenated verbatim.
+        where = {#colPos}=0
+    }
+}
+
+lib.content.sidebar = CONTENT
+lib.content.sidebar {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=1
+    }
+}
+
+lib.content.stage = CONTENT
+lib.content.stage {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=2
+    }
+}
+
+# The footer slots are edited once, on the site root page, and inherited by
+# every page below it - "select.slide = -1" is what makes that happen.
+#
+# A CONTENT object normally reads only the current page's colPos. "slide"
+# makes it walk the rootline instead: a positive number is a level count, and
+# "-1" means walk upward without a limit, stopping the moment a page has
+# content in that column (see ContentContentObject::render() - the loop
+# continues only "while ... $slide && $tmpValue === ''"). With nothing placed
+# on any page below the root, every page finds the root page's content, one
+# level up or fifty - which is exactly what camino's "slideMode = slide"
+# gets from EXT:fluid_styled_content's own "lib.contentElement" wiring,
+# reproduced here without depending on that extension.
+
+lib.content.footermeta = CONTENT
+lib.content.footermeta {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=10
+        slide = -1
+    }
+}
+
+lib.content.footer1 = CONTENT
+lib.content.footer1 {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=11
+        slide = -1
+    }
+}
+
+lib.content.footer2 = CONTENT
+lib.content.footer2 {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=12
+        slide = -1
+    }
+}
+
+lib.content.footer3 = CONTENT
+lib.content.footer3 {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=13
+        slide = -1
+    }
+}
+
+lib.content.footer4 = CONTENT
+lib.content.footer4 {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=14
+        slide = -1
+    }
+}

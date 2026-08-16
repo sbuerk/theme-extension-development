@@ -1,0 +1,19 @@
+# "default" is also the hard-coded fallback identifier
+# "PageLayoutResolver::getLayoutIdentifierForPage()" returns when neither a
+# page nor any of its ancestors has a "backend_layout"/"backend_layout_next_level"
+# set - so every page reaches this layout unless one of the others below is
+# picked explicitly, and it has to exist on its own, not just be selectable.
+#
+# One full-width column: the least a page can render and still be usable.
+mod.web_layout.BackendLayouts.default {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.default.title
+    config.backend_layout {
+        colCount = 1
+        rowCount = 1
+        rows.1.columns.1 {
+            name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+            identifier = main
+            colPos = 0
+        }
+    }
+}

@@ -1,0 +1,101 @@
+# Page rendering of the theme.
+#
+# Read by the site set and by the classic static include alike - both point at
+# "setup.typoscript", which "@import"s this file. See that file for the
+# double-apply guard.
+
+page = PAGE
+page {
+    typeNum = 0
+
+    10 = FLUIDTEMPLATE
+    10 {
+        # Derives the template file from the page's backend layout, so
+        # "Configuration/PageTsConfig/BackendLayouts/*.typoscript" is the only
+        # place a page's rendering is chosen - never a branch here.
+        templateName = TEXT
+        templateName {
+            # "data = pagelayout", never "field = backend_layout". The getter
+            # resolves through PageLayoutResolver, which falls back to the
+            # first ancestor's "backend_layout_next_level" when the page's own
+            # field is empty. Reading the field directly ignores that
+            # inheritance, and every sub-page of a configured parent would
+            # silently render the wrong template.
+            data = pagelayout
+            ifEmpty = default
+
+            # The PageTsConfig provider returns the identifier prefixed with
+            # "pagets__" (it also has to distinguish backend layouts that come
+            # from database records, prefixed "0_"). The prefix has to be
+            # stripped before it can be used as a file name.
+            replacement.10 {
+                search = #^.*__#
+                replace =
+                useRegExp = 1
+            }
+
+            # "PageLayoutResolver::getLayoutIdentifierForPage()" returns the
+            # literal, unprefixed string "none" - not empty, so "ifEmpty"
+            # above never sees it - when an editor picks TYPO3's own built-in
+            # "[None]" option in the page properties, which every page offers
+            # regardless of which layouts this theme registers. Left alone
+            # that resolves to a "Page/None.html" this theme never ships, and
+            # the request dies rather than degrading. Falling back to
+            # "default" here is the same choice "ifEmpty" already makes for a
+            # page with no layout at all.
+            replacement.20 {
+                search = #^none$#
+                replace = default
+                useRegExp = 1
+            }
+
+            # Maps the identifier to the file name: "content_sidebar" becomes
+            # "ContentSidebar", matching "Templates/Page/ContentSidebar.html".
+            case = uppercamelcase
+        }
+        templateName.wrap = Page/|
+
+        templateRootPaths.10 = {$theme.templateRootPath}
+        partialRootPaths.10 = {$theme.partialRootPath}
+        layoutRootPaths.10 = {$theme.layoutRootPath}
+
+        variables {
+            pageTitle = TEXT
+            pageTitle.data = page:title
+
+            # The resolved backend layout identifier, in the form the page
+            # TSconfig declares it - "content_sidebar", not "ContentSidebar".
+            #
+            # It repeats the resolution above rather than deriving from
+            # "templateName", because the two want different shapes and
+            # "templateName" has already been upper-camel-cased and prefixed
+            # by the time it could be reused. The duplication is deliberate
+            # and the two must be changed together; the alternative is a
+            # second stdWrap chain undoing the first one's work.
+            #
+            # It is rendered as an attribute on ".theme-page" so which layout
+            # a page resolved to is visible in the markup. That is a
+            # development affordance in the same spirit as the CType outline
+            # - inheritance through "backend_layout_next_level" is otherwise
+            # invisible in the frontend, and it is exactly the thing that goes
+            # wrong quietly.
+            pageLayout = TEXT
+            pageLayout {
+                data = pagelayout
+                ifEmpty = default
+                replacement.10 {
+                    search = #^.*__#
+                    replace =
+                    useRegExp = 1
+                }
+                replacement.20 {
+                    search = #^none$#
+                    replace = default
+                    useRegExp = 1
+                }
+            }
+        }
+    }
+
+    includeCSS.themeExtensionDevelopment = {$theme.stylesheet}
+}

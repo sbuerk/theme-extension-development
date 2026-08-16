@@ -91,7 +91,7 @@ final class SiteSetRenderingTest extends AbstractFunctionalTestCase
         $this->assertSame(200, $response->getStatusCode());
         // From "Resources/Private/Templates/Page/Default.html" through the
         // layout, so the whole Fluid chain resolved.
-        $this->assertStringContainsString('class="page__main"', $body);
+        $this->assertStringContainsString('class="theme-page__main"', $body);
         // The page title, assigned as a TypoScript variable.
         $this->assertStringContainsString($expectedContent, $body);
     }
@@ -113,7 +113,7 @@ final class SiteSetRenderingTest extends AbstractFunctionalTestCase
         $response = $this->executeFrontendSubRequest(new InternalRequest('https://theme.example.com/'));
         $body = (string)$response->getBody();
 
-        $this->assertStringContainsString('class="page__header"', $body);
+        $this->assertStringContainsString('class="theme-site-header"', $body);
         $this->assertStringContainsString('data-theme="theme_extension_development"', $body);
     }
 }

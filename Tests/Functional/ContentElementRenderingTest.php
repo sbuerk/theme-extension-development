@@ -79,7 +79,7 @@ final class ContentElementRenderingTest extends AbstractFunctionalTestCase
         $body = $this->renderRootPage();
 
         // "header_layout" 2 in the fixture.
-        $this->assertStringContainsString('<h2 class="content-element__heading">A heading element</h2>', $body);
+        $this->assertStringContainsString('<h2 class="theme-content-element__heading">A heading element</h2>', $body);
     }
 
     #[Test]
@@ -88,7 +88,7 @@ final class ContentElementRenderingTest extends AbstractFunctionalTestCase
         $body = $this->renderRootPage();
 
         // "header_layout" 3 in the fixture.
-        $this->assertStringContainsString('<h3 class="content-element__heading">A text element</h3>', $body);
+        $this->assertStringContainsString('<h3 class="theme-content-element__heading">A text element</h3>', $body);
         $this->assertStringContainsString('The body text of the element.', $body);
     }
 
@@ -98,8 +98,8 @@ final class ContentElementRenderingTest extends AbstractFunctionalTestCase
         $body = $this->renderRootPage();
 
         $this->assertStringContainsString('id="c1"', $body);
-        $this->assertStringContainsString('content-element--header', $body);
-        $this->assertStringContainsString('content-element--text', $body);
+        $this->assertStringContainsString('theme-content-element--header', $body);
+        $this->assertStringContainsString('theme-content-element--text', $body);
     }
 
     #[Test]

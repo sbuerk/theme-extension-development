@@ -1,10 +1,59 @@
 <html data-namespace-typo3-fluid="true"
       xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
 
-<footer class="page__footer">
-    <p class="page__footer-note" data-theme="theme_extension_development">
-        <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.footerNote" />
-    </p>
+<f:comment>
+    The site footer, sitewide chrome rendered unconditionally by
+    "Layouts/Default.html" for every page template. The four columns and the
+    meta row are each their own TypoScript object under "lib.content." (see
+    the step 2 contract's "Content slots" table) and each carries
+    "select.slide = -1" - the content lives on the site root and is inherited
+    by every page below it, independent of that page's own backend layout.
+
+    Each cObject is resolved once into a variable rather than called directly
+    inside an "f:if" condition and again inside its body: "f:cObject" runs a
+    TypoScript CONTENT object, and calling it twice would render it twice.
+    The variable also gives requirement 3 something to check the truthiness
+    of - an empty string is falsy in Fluid, so a column with nothing on the
+    site root (or between the current page and the root) does not get an
+    empty ".theme-site-footer__column" wrapper. An empty wrapper would still
+    be a cell in ".theme-site-footer__columns"'s auto-fit grid, which is
+    exactly the same defect this file's comment on the aside warns about.
+
+    "f:format.raw" is required on the way back out: "f:cObject" itself does
+    not escape its return value, but that only holds while its own node is
+    still in the syntax tree. Once the value has been captured into a plain
+    Fluid variable it is just a string again, and "{footer1}" without
+    "f:format.raw" would HTML-escape the markup CONTENT already rendered.
+</f:comment>
+<f:variable name="footer1" value="{f:cObject(typoscriptObjectPath: 'lib.content.footer1')}" />
+<f:variable name="footer2" value="{f:cObject(typoscriptObjectPath: 'lib.content.footer2')}" />
+<f:variable name="footer3" value="{f:cObject(typoscriptObjectPath: 'lib.content.footer3')}" />
+<f:variable name="footer4" value="{f:cObject(typoscriptObjectPath: 'lib.content.footer4')}" />
+<f:variable name="footermeta" value="{f:cObject(typoscriptObjectPath: 'lib.content.footermeta')}" />
+
+<footer class="theme-site-footer" data-theme="theme_extension_development">
+    <div class="theme-site-footer__inner">
+        <f:if condition="{footer1} || {footer2} || {footer3} || {footer4}">
+            <div class="theme-site-footer__columns">
+                <f:if condition="{footer1}">
+                    <div class="theme-site-footer__column">{footer1 -> f:format.raw()}</div>
+                </f:if>
+                <f:if condition="{footer2}">
+                    <div class="theme-site-footer__column">{footer2 -> f:format.raw()}</div>
+                </f:if>
+                <f:if condition="{footer3}">
+                    <div class="theme-site-footer__column">{footer3 -> f:format.raw()}</div>
+                </f:if>
+                <f:if condition="{footer4}">
+                    <div class="theme-site-footer__column">{footer4 -> f:format.raw()}</div>
+                </f:if>
+            </div>
+        </f:if>
+
+        <f:if condition="{footermeta}">
+            <div class="theme-site-footer__meta">{footermeta -> f:format.raw()}</div>
+        </f:if>
+    </div>
 </footer>
 
 </html>
