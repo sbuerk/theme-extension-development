@@ -1,0 +1,32 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Backend layout "styleguide" (Configuration/PageTsConfig/BackendLayouts) -
+    declares no content areas at all: it renders components directly and
+    ignores anything an editor places on the page. Step 7 fills this in with
+    the actual styleguide; this is only the placeholder that lets the
+    template resolve until then.
+
+    Deliberately no "f:cObject" call anywhere in this file - not even for
+    "main" - so no colPos content is ever pulled onto this layout, matching
+    the contract's "out of scope" note. The alert markup below is one of the
+    components from docs/development/component-library.md, used directly
+    rather than through a content element, which is exactly what the
+    finished styleguide page will keep doing at a larger scale.
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <h1><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.styleguideHeading" /></h1>
+
+    <div class="theme-alert theme-alert--info" role="status">
+        <div class="theme-alert__body">
+            <p class="theme-alert__text">
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.styleguideNotImplemented" />
+            </p>
+        </div>
+    </div>
+</f:section>
+
+</html>

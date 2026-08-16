@@ -9,6 +9,57 @@
 			<trans-unit id="theme.footerNote">
 				<source>Rendered by the development theme.</source>
 			</trans-unit>
+			<trans-unit id="theme.skipToContent">
+				<source>Skip to content</source>
+			</trans-unit>
+			<trans-unit id="theme.styleguideHeading">
+				<source>Styleguide</source>
+			</trans-unit>
+			<trans-unit id="theme.styleguideNotImplemented">
+				<source>The styleguide content is not implemented yet.</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.default.title">
+				<source>Default</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.content.title">
+				<source>Content page</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.contentSidebar.title">
+				<source>Content page with sidebar</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.start.title">
+				<source>Start page</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.styleguide.title">
+				<source>Styleguide</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.main.name">
+				<source>Main content</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.sidebar.name">
+				<source>Sidebar</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.stage.name">
+				<source>Stage</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.footermeta.name">
+				<source>Footer meta</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.footer1.name">
+				<source>Footer column 1</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.footer2.name">
+				<source>Footer column 2</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.footer3.name">
+				<source>Footer column 3</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.footer4.name">
+				<source>Footer column 4</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.unused.name">
+				<source>Unused (not rendered)</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

@@ -1,0 +1,23 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Backend layout "content_sidebar" (Configuration/PageTsConfig/BackendLayouts)
+    - "main" (colPos 0), "sidebar" (colPos 1) and "stage" (colPos 2), per the
+    step 2 contract's column layout table. The only template that defines the
+    "Aside" section: "Layouts/Default.html" renders it with
+    "f:render ... optional="1"", so this is also the only template that puts
+    ".theme-page__aside" on the page at all.
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Aside">
+    <f:render partial="Page/Sidebar" arguments="{_all}" />
+</f:section>
+
+<f:section name="Main">
+    <f:render partial="Page/Stage" arguments="{_all}" />
+    <f:cObject typoscriptObjectPath="lib.content.main" />
+</f:section>
+
+</html>

@@ -83,3 +83,18 @@
     display: flow-root;
     min-width: 0;
 }
+
+// Rendered only by the "default" page template, which has no stage slot for
+// editorial content to carry a heading - see the comment in
+// "Templates/Page/Default.html". The layouts that do have one leave the
+// heading to the content, so this rule intentionally has no counterpart there.
+.theme-page__title {
+    --theme-page-title-spacing: var(--theme-space-6, 1.875rem);
+
+    margin: 0 0 var(--theme-page-title-spacing);
+    font-size: var(--theme-font-size-2xl);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-heading);
+    text-wrap: balance;
+}

@@ -1,0 +1,33 @@
+# The styleguide page renders components directly from its own Fluid
+# template and ignores anything editors place on the page - per the contract
+# it has "no content areas". That cannot mean an empty "config.backend_layout"
+# though:
+#
+# - "PageTsBackendLayoutDataProvider::generateBackendLayoutFromTsConfig()"
+#   only registers a layout at all if "config.backend_layout." parses to a
+#   non-empty array; a genuinely empty block would drop the layout from the
+#   selector entirely, which is worse than a layout with an unused column.
+# - A "rows" key present but empty produces a "Grid" with zero "GridRow"s.
+#   "Partials/PageLayout/Grid.fluid.html" then renders a "<table>" with no
+#   rows at all - no "new content element" affordance anywhere, i.e. the page
+#   module becomes unusable for this layout, which is exactly the outcome the
+#   task asked to avoid.
+#
+# So this ships one column that is deliberately not part of the colPos
+# contract (0, 1, 2, 10-14 are all spoken for by the other layouts): colPos
+# 999 is not read by any "lib.content.*" TypoScript object, so anything an
+# editor drops here is stored but never rendered - inert, not broken. The
+# label says so explicitly rather than reusing "main", which would suggest
+# it behaves like the other layouts' main column.
+mod.web_layout.BackendLayouts.styleguide {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.styleguide.title
+    config.backend_layout {
+        colCount = 1
+        rowCount = 1
+        rows.1.columns.1 {
+            name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.unused.name
+            identifier = unused
+            colPos = 999
+        }
+    }
+}

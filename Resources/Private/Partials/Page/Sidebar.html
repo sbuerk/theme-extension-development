@@ -1,0 +1,17 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "sidebar" content slot - colPos 1 in the step 2 contract's "Content
+    slots" table. Rendered only from "Templates/Page/ContentSidebar.html"'s
+    "Aside" section, which is the mechanism "Layouts/Default.html" relies on
+    to keep ".theme-page__aside" out of every other page template's markup -
+    see the comment there. Unconditional here on purpose: whether the aside
+    exists at all is decided once, by which page template defines the
+    section, not again per request by whether this slot happens to be empty.
+</f:comment>
+<aside class="theme-page__aside">
+    <f:cObject typoscriptObjectPath="lib.content.sidebar" />
+</aside>
+
+</html>

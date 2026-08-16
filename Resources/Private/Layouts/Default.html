@@ -1,12 +1,42 @@
 <html data-namespace-typo3-fluid="true"
       xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
 
-<div class="page">
+<f:comment>
+    The page shell every "Templates/Page/*.html" renders through - registered
+    as the site's "PAGE" cObject, so TYPO3 wraps this output in the document's
+    own html/head/body and this file only needs to render what goes inside
+    the body element.
+
+    Markup contract: docs/development/component-library.md#layout. The skip
+    link precedes ".theme-page" as a sibling, not a descendant, and the
+    header/footer chrome is rendered through their own partials so either can
+    be overridden without touching this file.
+
+    ".theme-page__aside" is emitted only when the current page template
+    actually defines an "Aside" section - "Templates/Page/ContentSidebar.html"
+    does, through "Partials/Page/Sidebar.html"; every other template leaves it
+    undefined, and "f:render ... optional="1"" then renders nothing at all
+    rather than an empty element. This is one of the two ways the contract
+    allows for the conditional; a section was chosen over an "f:if" because
+    the aside is a whole unit of markup, not a value to branch on - the
+    layout does not need to know *why* a template has no sidebar, only
+    whether it defined one. "layout/_page.scss" switches to the two-column
+    grid with ":has(.theme-page__aside)", so an empty aside would otherwise
+    still produce an empty grid column.
+</f:comment>
+<a class="theme-skip-link" href="#content">
+    <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.skipToContent" />
+</a>
+<div class="theme-page" data-theme-page-layout="{pageLayout}">
     <f:render partial="Page/Header" arguments="{_all}" />
 
-    <main class="page__main" id="content">
-        <f:render section="Main" />
-    </main>
+    <div class="theme-page__body">
+        <f:render section="Aside" optional="1" />
+
+        <main class="theme-page__main" id="content">
+            <f:render section="Main" />
+        </main>
+    </div>
 
     <f:render partial="Page/Footer" arguments="{_all}" />
 </div>

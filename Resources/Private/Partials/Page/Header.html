@@ -1,9 +1,24 @@
 <html data-namespace-typo3-fluid="true"
       xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
 
-<header class="page__header">
-    <p class="page__site-title"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.title" /></p>
-    <h1 class="page__title">{pageTitle}</h1>
+<f:comment>
+    The site header, sitewide chrome rendered unconditionally by
+    "Layouts/Default.html" for every page template.
+
+    Markup contract: docs/development/component-library.md#layout. That
+    contract also documents ".theme-nav-main" inside the header and a
+    ".theme-site-header__actions" slot at the end of it - main navigation is
+    step 3 and the appearance/palette switcher that would live in "actions" is
+    step 4, both out of scope here. Until those land this partial renders the
+    brand link only, which is a strict subset of the contract markup rather
+    than a deviation from it.
+</f:comment>
+<header class="theme-site-header">
+    <div class="theme-site-header__inner">
+        <a class="theme-site-header__brand" href="/">
+            <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.title" />
+        </a>
+    </div>
 </header>
 
 </html>

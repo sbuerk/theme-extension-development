@@ -1,19 +1,33 @@
 <html data-namespace-typo3-fluid="true"
       xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
 
+<f:comment>
+    Backend layout "default" (Configuration/PageTsConfig/BackendLayouts) -
+    the "main" content slot only, colPos 0, per the step 2 contract's column
+    layout table. No "stage", no "sidebar": this template defines neither the
+    "Aside" section nor renders "Partials/Page/Stage.html", so
+    "Layouts/Default.html" emits no ".theme-page__aside" and there is nothing
+    above the main content.
+</f:comment>
 <f:layout name="Default" />
 
 <f:section name="Main">
     <f:comment>
-        The content of the normal column. "styles.content.get" is provided by
-        EXT:frontend, not by "fluid_styled_content", which this theme
-        deliberately does not depend on.
+        The only page template that renders the page title itself.
 
-        A note for developers belongs in "f:comment" and not in an HTML
-        comment: Fluid strips this one, while an HTML comment is rendered into
-        the response and ships to every visitor.
+        "default" is the bare layout: it has no "stage" slot, so nothing
+        editorial is guaranteed to carry a heading, and a page with no content
+        yet would otherwise render an empty main element with no indication of
+        which page it is. That case is common in a theme meant for extension
+        development.
+
+        The layouts that do have a stage deliberately leave the heading to the
+        content placed in it - emitting one here as well would give those pages
+        two first-level headings.
     </f:comment>
-    <f:cObject typoscriptObjectPath="styles.content.get" />
+    <h1 class="theme-page__title">{pageTitle}</h1>
+
+    <f:cObject typoscriptObjectPath="lib.content.main" />
 </f:section>
 
 </html>

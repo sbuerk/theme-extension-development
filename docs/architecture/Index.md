@@ -10,6 +10,7 @@ demonstrate them and are meant to be deleted once real code arrives.
 | [Dependency injection](dependency-injection.md)       | Symfony DI attributes instead of `Services.yaml`, stateless services, private by default, `#[AsAlias]`, non-shared services.                            |
 | [Class design](class-design.md)                       | `final readonly` and what it implies for hierarchies, method injection in abstract classes, data objects vs services, the two accepted PHPStan ignores. |
 | [TypoScript delivery](typoscript-delivery.md)         | The site set, the guarded static include fallback, why `addStaticFile()` sits in a TCA override, and page rendering with `FLUIDTEMPLATE`.               |
+| [Page rendering](page-rendering.md)                   | Why `FLUIDTEMPLATE` over `PAGEVIEW`, backend layout registration, template name resolution, content slots, the Fluid structure.                         |
 
 ## The short version
 
