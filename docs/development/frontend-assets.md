@@ -26,6 +26,26 @@ Build/Scripts/runTests.sh -s npm -- outdated
 | `Resources/Public/Css/theme.css` | The compiled stylesheet. **Committed** — see below.                   |
 | `package.json`                   | The single dependency `sass`, and the four build scripts.             |
 | `package-lock.json`              | Committed, so `npm ci` and the gate are reproducible.                 |
+| [`DESIGN.md`](../../DESIGN.md)   | The design token specification `_tokens.scss` implements.             |
+
+## Design tokens
+
+Every value in the stylesheet comes from a CSS custom property declared in
+`_tokens.scss`. A literal anywhere else is a token that has not been declared
+yet. [`DESIGN.md`](../../DESIGN.md) is the specification — what each token is,
+where its value came from, and the contrast ratios behind the palette.
+
+Two things about it are easy to break by accident:
+
+- **Both palettes have to ship.** `checkCssBuild` proves only that the committed
+  CSS matches the build; delete the dark palette and it stays green, because the
+  committed file still matches. `Tests/Unit/StylesheetTest` is what asserts the
+  light/dark contract, including that the dark palette is emitted for *both* the
+  `prefers-color-scheme` query and the `data-theme` override.
+- **`--theme-content-max-width` and `theme.media.maxGalleryWidth` are the same
+  number** — 1200px — because the second decides how wide images are processed
+  for the first. They are in different languages and nothing enforces the
+  coupling, so moving one means moving the other.
 
 ## The node image
 

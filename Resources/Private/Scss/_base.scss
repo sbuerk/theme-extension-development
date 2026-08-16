@@ -3,6 +3,9 @@
 // Only what every page needs before any component exists. No reset library and
 // no framework: the extension is deliberately free of CSS dependencies, so
 // everything essential is written here.
+//
+// Every value comes from a token - see "DESIGN.md". A literal in this file is
+// a token that has not been declared yet.
 
 *,
 *::before,
@@ -13,10 +16,54 @@
 body {
     margin: 0;
     background-color: var(--theme-color-background);
-    color: var(--theme-color-text);
-    font-family: var(--theme-font-family-base);
-    font-size: var(--theme-font-size-base);
+    color: var(--theme-color-text-primary);
+    font-family: var(--theme-font-family-sans);
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-regular);
     line-height: var(--theme-line-height-base);
+}
+
+// Headings share the design's positive tracking and its 800 weight; only the
+// third level steps down to medium, because 34 -> 24 -> 20 is a small enough
+// step that weight has to carry the distinction.
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0 0 var(--theme-space-3);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-heading);
+}
+
+h1 {
+    font-size: var(--theme-font-size-2xl);
+}
+
+h2 {
+    font-size: var(--theme-font-size-xl);
+    line-height: var(--theme-line-height-snug);
+}
+
+h3,
+h4,
+h5,
+h6 {
+    font-size: var(--theme-font-size-lg);
+    font-weight: var(--theme-font-weight-medium);
+    line-height: var(--theme-line-height-snug);
+}
+
+p,
+ul,
+ol,
+dl,
+blockquote,
+figure,
+table {
+    margin: 0 0 var(--theme-space-4);
 }
 
 img,
@@ -29,7 +76,32 @@ svg {
 }
 
 a {
-    color: var(--theme-color-accent);
+    color: var(--theme-color-primary);
+
+    &:hover,
+    &:focus {
+        color: var(--theme-color-primary-hover);
+    }
+}
+
+// A visible focus indicator is a requirement, not decoration - which is why it
+// is the one thing the flat design still carries a shadow token for.
+:focus-visible {
+    outline: var(--theme-border-width-strong) solid var(--theme-color-primary);
+    outline-offset: 2px;
+    box-shadow: var(--theme-focus-ring);
+}
+
+hr {
+    height: var(--theme-border-width);
+    margin: var(--theme-space-6) 0;
+    border: 0;
+    background-color: var(--theme-color-border);
+}
+
+small {
+    font-size: var(--theme-font-size-sm);
+    letter-spacing: var(--theme-letter-spacing-wide);
 }
 
 code,
@@ -37,4 +109,5 @@ kbd,
 pre,
 samp {
     font-family: var(--theme-font-family-mono);
+    font-size: var(--theme-font-size-mono);
 }

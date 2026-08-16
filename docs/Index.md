@@ -4,6 +4,9 @@ Technical documentation for developers working **on** this extension: how the
 code base is structured, which rules apply to it, how to run the tooling and how
 changes get released.
 
+[`DESIGN.md`](../DESIGN.md) is the design token specification the stylesheet
+implements.
+
 Documentation for people **using** the extension lives in
 [`Documentation/`](../Documentation) and is rendered to docs.typo3.org.
 [`README.md`](../README.md) is the short overview,
@@ -16,7 +19,7 @@ Documentation for people **using** the extension lives in
 | [Development environment](development/environment.md) | `runTests.sh`, container runtimes, suites and options.                       |
 | [Dual core setup](development/dual-core-setup.md)     | Running against TYPO3 v13 and v14, and the rule that avoids false positives. |
 | [Quality gates](development/quality-gates.md)         | Every gate and its configuration, PHPStan per core version, CI.              |
-| [Frontend assets](development/frontend-assets.md)     | The SCSS build, the node image, the `checkCssBuild` gate.                    |
+| [Frontend assets](development/frontend-assets.md)     | The SCSS build, the node image, the `checkCssBuild` gate, design tokens.     |
 | [Development instances](development/instances.md)     | The two TYPO3 instances, the `theme` symlink, snapshot and restore.          |
 | [Seeding](development/seeding.md)                     | `theme:seed`, the definition format, why it goes through DataHandler.        |
 
