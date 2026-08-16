@@ -57,4 +57,5 @@ Classic mode
 
 ..  _TER: https://extensions.typo3.org/extension/theme_extension_development
 
-The extension does not require any further configuration yet.
+Installing the extension does not render anything yet. The theme still has to
+be enabled for a site — see :ref:`configuration`.
