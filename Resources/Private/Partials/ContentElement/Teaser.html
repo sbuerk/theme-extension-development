@@ -1,0 +1,61 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Shared by theme_teaser (no "image" field at all - "files" is never part
+    of the arguments that CType's template passes down, see the identical
+    reasoning in Partials/ContentElement/Hero.html) and theme_media_teaser.
+
+    Markup contract: Resources/Private/Scss/components/_teaser.scss. The
+    "--reversed" modifier that file also ships is not used here: none of the
+    two CTypes' TCA offers a field to choose it from, so applying it would be
+    a fixed, uneditable choice rather than something the SCSS's own modifier
+    is for.
+
+    The call-to-action renders through ".theme-button"
+    (Partials/ContentElement/LinkButton), not this component's own
+    ".theme-teaser__link" text-link style: the step-5c contract (point 3) is
+    explicit that the "theme_link" palette renders as a button, and that
+    applies to every content element carrying the palette, this one included.
+    ".theme-teaser__link" stays exactly as shipped, for whatever markup
+    outside this extension's own content elements already uses it.
+
+    The heading level follows "header_layout" the same way
+    Partials/ContentElement/Hero.html does, defaulting to h2 rather than
+    Hero's h1 - a teaser is a secondary block on a page, not its own top
+    heading, which is also what "_teaser.scss"'s own markup contract
+    illustrates.
+</f:comment>
+<article class="theme-teaser">
+    <f:if condition="{files.0}">
+        <div class="theme-teaser__media">
+            <f:image image="{files.0}" loading="lazy" />
+        </div>
+    </f:if>
+    <div class="theme-teaser__body">
+        <f:if condition="{data.header} && {data.header_layout} != 100">
+            <f:switch expression="{data.header_layout}">
+                <f:case value="1"><h1 class="theme-teaser__title">{data.header}</h1></f:case>
+                <f:case value="2"><h2 class="theme-teaser__title">{data.header}</h2></f:case>
+                <f:case value="3"><h3 class="theme-teaser__title">{data.header}</h3></f:case>
+                <f:case value="4"><h4 class="theme-teaser__title">{data.header}</h4></f:case>
+                <f:case value="5"><h5 class="theme-teaser__title">{data.header}</h5></f:case>
+                <f:defaultCase><h2 class="theme-teaser__title">{data.header}</h2></f:defaultCase>
+            </f:switch>
+        </f:if>
+        <f:if condition="{data.bodytext}">
+            <f:comment>
+                A "div", not the "p" the markup contract illustrates - same
+                reasoning as ".theme-hero__lead" in
+                Partials/ContentElement/Hero.html: "f:format.html" already
+                wraps parsed "bodytext" in its own "p" tags.
+            </f:comment>
+            <div class="theme-teaser__text">
+                <f:format.html>{data.bodytext}</f:format.html>
+            </div>
+        </f:if>
+        <f:render partial="ContentElement/LinkButton" arguments="{data: data}" />
+    </div>
+</article>
+
+</html>

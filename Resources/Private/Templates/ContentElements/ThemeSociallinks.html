@@ -1,0 +1,32 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_sociallinks" - the same list of links as "theme_linklist"
+    ("ThemeLinklist.html"), rendered through the identical
+    ".theme-content-menu"/"ContentElement/LinkList" pair rather than a
+    component of its own - the two CTypes only differ in the child table's
+    "link" restriction ("allowedTypes" in
+    "Configuration/TCA/Overrides/tt_content_theme_sociallinks.php") and the
+    "aria-label" below, not in shape.
+
+    This theme ships no icon assets and no icon component (see the step-5c
+    contract and the comment above the CType's own TCA registration) - every
+    entry renders as a text label, "link_label" standing in for what would
+    otherwise be a platform icon ("Mastodon", "LinkedIn", ...). Recorded here
+    as the gap it is: an icon-driven variant is not something this template
+    approximates with a Unicode glyph or similar, it is simply not rendered.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.sociallinksLabel')}">
+            <f:render partial="ContentElement/LinkList" arguments="{items: listItems}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

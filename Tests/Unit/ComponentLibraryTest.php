@@ -42,6 +42,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'accordion' => '.theme-accordion',
             'alert' => '.theme-alert',
             'appearance switcher' => '.theme-appearance-switcher',
+            'author' => '.theme-author',
             'badge' => '.theme-badge',
             'breadcrumb' => '.theme-breadcrumb',
             'button' => '.theme-button',

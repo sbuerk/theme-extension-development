@@ -632,3 +632,260 @@ tt_content.menu_related_pages {
         alternativeSortingField = title
     }
 }
+
+# The theme's own content elements ("theme_author", "theme_linklist",
+# "theme_sociallinks", "theme_media_teaser_grid") - TCA of this extension's
+# own rather than the core set above, registered in
+# "Configuration/TCA/Overrides/tt_content_theme_*.php". See
+# ".agent/plans/phase-f/step-5c-contract.md" for the naming and schema
+# decisions this section relies on.
+#
+# All four read "tx_theme_list_items", the shared inline (IRRE) child table
+# "tx_theme_list_item" (see "Configuration/TCA/tx_theme_list_item.php" and
+# the comment on "tt_content.tx_theme_list_items" in
+# "Configuration/TCA/Overrides/tt_content.php"). There is no core data
+# processor for a generic database relation the way "FilesProcessor" is for
+# FAL - that class is FAL-specific by construction, it only ever wraps
+# "FileCollector", which only resolves "sys_file_reference" rows
+# (".Build/vendor/typo3/cms-frontend/Classes/DataProcessing/
+# FilesProcessor.php"). "DatabaseQueryProcessor" is what is left, and reading
+# it confirms it is enough on its own
+# (".Build/vendor/typo3/cms-frontend/Classes/DataProcessing/
+# DatabaseQueryProcessor.php" and "ContentObjectRenderer::getRecords()"/
+# "getQueryConstraints()" alongside it): the relation is stored as ordinary
+# rows carrying "uid_foreign"/"tablename"/"fieldname" back to the parent -
+# the same three columns "foreign_field"/"foreign_table_field"/
+# "foreign_match_fields" tell DataHandler to write on the way in - so
+# selecting on that triple is exactly what an IRRE relation already is, no
+# different from selecting any other table by a foreign key. The query gets
+# the child table's soft delete, its "hidden" enable column, workspace
+# overlay and language overlay for free from the same TCA "ctrl" any other
+# "DatabaseQueryProcessor" call reads - "tt_content.menu_categorized_content"
+# above is the only other place in this file already relying on that.
+#
+# "pidInList" is bound to the parent record's own "pid"
+# ("pidInList.data = field:pid") rather than left to its default ("this",
+# the *current page* - see "getQuery()" in the class read above): an IRRE
+# child is written with the same "pid" as its parent by DataHandler, so this
+# is the precise match rather than an assumption the two happen to coincide -
+# "this" would be wrong the moment a shortcut or a "RECORDS" call like
+# "tt_content.menu_categorized_content" itself renders the parent record on
+# a page other than the one it lives on.
+#
+# The "where" condition is built with "TEXT"/"insertData" rather than plain
+# "where = ...", the same pattern "tt_content.menu_categorized_content"
+# above already uses for an interpolated condition - see that block's own
+# comment for why: the one interpolated value, "{field:uid}", is the current
+# record's own integer primary key, not editor input, so no further
+# escaping concern applies. The other two comparisons are fixed literals.
+tt_content.theme_author =< lib.contentElement
+tt_content.theme_author {
+    templateName = ContentElements/ThemeAuthor
+
+    dataProcessing {
+        # The portrait - the same core "image" field "tt_content.image"/
+        # "tt_content.textpic"/"tt_content.textmedia" already resolve above,
+        # reused here rather than a field of this extension's own.
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = image
+            as = files
+        }
+
+        # The person's own profile/contact links - "tx_theme_list_items"
+        # narrowed by "overrideChildTca" to the "theme_link" palette only
+        # (see "Configuration/TCA/Overrides/tt_content_theme_author.php").
+        20 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
+        20 {
+            table = tx_theme_list_item
+            pidInList.data = field:pid
+
+            where.cObject = TEXT
+            where.cObject {
+                value = uid_foreign = {field:uid} AND tablename = 'tt_content' AND fieldname = 'tx_theme_list_items'
+                insertData = 1
+            }
+
+            orderBy = sorting_foreign
+            as = listItems
+        }
+    }
+}
+
+# A list of links. See the section comment above for how "listItems" is
+# resolved.
+tt_content.theme_linklist =< lib.contentElement
+tt_content.theme_linklist {
+    templateName = ContentElements/ThemeLinklist
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
+        10 {
+            table = tx_theme_list_item
+            pidInList.data = field:pid
+
+            where.cObject = TEXT
+            where.cObject {
+                value = uid_foreign = {field:uid} AND tablename = 'tt_content' AND fieldname = 'tx_theme_list_items'
+                insertData = 1
+            }
+
+            orderBy = sorting_foreign
+            as = listItems
+        }
+    }
+}
+
+# The same list of links as "theme_linklist" above, rendered as text labels
+# rather than icons - this theme ships neither icon assets nor an icon
+# component, see "Resources/Private/Templates/ContentElements/
+# ThemeSociallinks.html". The child table's "link" restriction
+# ("allowedTypes") is the only difference the TCA makes between the two; the
+# resolution here is identical.
+tt_content.theme_sociallinks =< lib.contentElement
+tt_content.theme_sociallinks {
+    templateName = ContentElements/ThemeSociallinks
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
+        10 {
+            table = tx_theme_list_item
+            pidInList.data = field:pid
+
+            where.cObject = TEXT
+            where.cObject {
+                value = uid_foreign = {field:uid} AND tablename = 'tt_content' AND fieldname = 'tx_theme_list_items'
+                insertData = 1
+            }
+
+            orderBy = sorting_foreign
+            as = listItems
+        }
+    }
+}
+
+# Several media teasers in a grid. "tx_theme_list_items" is narrowed by
+# "overrideChildTca" to "header"/"text"/"image"/the "theme_link" palette
+# (see "Configuration/TCA/Overrides/tt_content_theme_media_teaser_grid.php"),
+# so each row's own "image" is resolved through a nested "FilesProcessor" -
+# the same nesting "DatabaseQueryProcessor"'s own class documentation shows,
+# read and confirmed against "ContentDataProcessor::process()"
+# (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/
+# ContentDataProcessor.php"): the processor configuration passed to it is
+# exactly this "10." block, "dataProcessing." included, once per row.
+tt_content.theme_media_teaser_grid =< lib.contentElement
+tt_content.theme_media_teaser_grid {
+    templateName = ContentElements/ThemeMediaTeaserGrid
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
+        10 {
+            table = tx_theme_list_item
+            pidInList.data = field:pid
+
+            where.cObject = TEXT
+            where.cObject {
+                value = uid_foreign = {field:uid} AND tablename = 'tt_content' AND fieldname = 'tx_theme_list_items'
+                insertData = 1
+            }
+
+            orderBy = sorting_foreign
+            as = listItems
+
+            dataProcessing {
+                10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+                10 {
+                    references.fieldName = image
+                    as = files
+                }
+            }
+        }
+    }
+}
+
+# The theme's own content elements (step-5c contract,
+# .agent/plans/phase-f/step-5c-contract.md), six of ten - theme_author,
+# theme_linklist, theme_sociallinks and theme_media_teaser_grid are wired
+# elsewhere. Unlike the classic set above, the TCA for these lives in this
+# extension's own "Configuration/TCA/Overrides/tt_content_theme_*.php" and
+# "Configuration/TCA/tx_theme_list_item.php", not EXT:frontend.
+#
+# "image" is core's own "tt_content.image" column, reused as-is on every
+# CType below that has it. It is resolved with "FilesProcessor" exactly like
+# "tt_content.image" further up - "GalleryProcessor" is deliberately left out
+# for all of them. Two independent reasons, either one sufficient on its own:
+#
+#   1. None of these components lay out a grid of images. Hero, teaser and
+#      media-teaser each show exactly one image in a fixed-shape box
+#      ("theme-hero__media"/"theme-teaser__media", "object-fit: cover") - the
+#      row/column/width/height computation "GalleryProcessor" exists for has
+#      nothing to arrange.
+#   2. Every showitem below that carries "image" puts it alone on its own
+#      "Images" tab - "imageorient", "imagecols", "imageheight", "imagewidth"
+#      and "imageborder" are not part of the form. "GalleryProcessor" reads
+#      every one of those through a ".field" binding
+#      (Configuration/TypoScript/ContentElements.typoscript, "tt_content.image"
+#      above), so wiring it here would bind to columns an editor can never
+#      set, and the processor would decide the layout from whatever those
+#      columns' plain database defaults happen to be - not from editor intent.
+#
+# The templates therefore read "files.0" directly - the first (and, given the
+# form above, in practice only) file reference - rather than a "gallery"
+# structure. theme_hero_text_only, theme_teaser and theme_testimonial are
+# deliberately left out of this dataProcessing: none of the three has an
+# "image" field at all.
+tt_content.theme_hero =< lib.contentElement
+tt_content.theme_hero {
+    templateName = ContentElements/ThemeHero
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = image
+            as = files
+        }
+    }
+}
+
+tt_content.theme_hero_small =< lib.contentElement
+tt_content.theme_hero_small {
+    templateName = ContentElements/ThemeHeroSmall
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = image
+            as = files
+        }
+    }
+}
+
+# No "image" field on this CType's TCA at all - see the comment on
+# "tt_content.theme_hero" above for why no dataProcessing is wired here
+# either.
+tt_content.theme_hero_text_only =< lib.contentElement
+tt_content.theme_hero_text_only.templateName = ContentElements/ThemeHeroTextOnly
+
+# No "image" field on this CType's TCA at all - same reasoning as
+# "tt_content.theme_hero_text_only" above.
+tt_content.theme_teaser =< lib.contentElement
+tt_content.theme_teaser.templateName = ContentElements/ThemeTeaser
+
+tt_content.theme_media_teaser =< lib.contentElement
+tt_content.theme_media_teaser {
+    templateName = ContentElements/ThemeMediaTeaser
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = image
+            as = files
+        }
+    }
+}
+
+# No dataProcessing: this element has no media. See the comment in
+# "Templates/ContentElements/ThemeTestimonial.html" for why the field it once
+# had was removed rather than left inert.
+tt_content.theme_testimonial =< lib.contentElement
+tt_content.theme_testimonial.templateName = ContentElements/ThemeTestimonial

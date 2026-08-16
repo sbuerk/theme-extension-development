@@ -1,0 +1,47 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "theme_link" palette (tx_theme_link + tx_theme_link_label +
+    tx_theme_link_variant, Configuration/TCA/Overrides/tt_content.php),
+    rendered as a ".theme-button" (Resources/Private/Scss/components/_button.scss).
+    Shared by the three hero variants, theme_teaser and theme_media_teaser -
+    theme_testimonial does not carry this palette at all, see its own
+    template.
+
+    "tx_theme_link" is a TCA type=link field. Its stored value is already a
+    stdWrap.typolink parameter string (the page/file/url/email/record syntax
+    TYPO3\CMS\Core\LinkHandling\LinkService writes), which is exactly what
+    "f:link.typolink"'s "parameter" argument expects
+    (.Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/Link/TypolinkViewHelper.php,
+    "$this->arguments['parameter']" fed straight into "TypoLinkCodecService").
+    That ViewHelper renders through "ContentObjectRenderer::typoLink()" rather
+    than building a tag itself, which is also why it is explicitly named as an
+    exception to TYPO3 v14's Fluid 5 change to null-handling on tag-based
+    ViewHelpers (.Build/vendor/typo3/cms-core/Documentation/Changelog/14.0/
+    Breaking-108148-StrictTypesInFluidViewHelpers.rst: "f:link.*>, except for
+    <f:link.typolink>, which uses TypoScript internally") - behaviour verified
+    identical on v13.4 and v14.3, nothing here needs a version split.
+
+    "tx_theme_link_variant" only ever holds '', 'secondary' or 'ghost' - read
+    from the "items" of "tx_theme_link_variant" in
+    Configuration/TCA/Overrides/tt_content.php, not assumed. The switch below
+    covers exactly those values and no more, matching the two modifiers
+    "_button.scss" actually ships ("--secondary", "--ghost"); the empty
+    default case renders the plain ".theme-button".
+</f:comment>
+<f:if condition="{data.tx_theme_link}">
+    <f:switch expression="{data.tx_theme_link_variant}">
+        <f:case value="secondary"><f:variable name="themeButtonClass" value="theme-button theme-button--secondary" /></f:case>
+        <f:case value="ghost"><f:variable name="themeButtonClass" value="theme-button theme-button--ghost" /></f:case>
+        <f:defaultCase><f:variable name="themeButtonClass" value="theme-button" /></f:defaultCase>
+    </f:switch>
+    <f:link.typolink parameter="{data.tx_theme_link}" class="{themeButtonClass}">
+        <f:if condition="{data.tx_theme_link_label}">
+            <f:then>{data.tx_theme_link_label}</f:then>
+            <f:else>{data.tx_theme_link}</f:else>
+        </f:if>
+    </f:link.typolink>
+</f:if>
+
+</html>

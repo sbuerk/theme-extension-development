@@ -1,0 +1,16 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    No "files" argument: this CType has no "image" field at all (see
+    Configuration/TCA/Overrides/tt_content_theme_hero_text_only.php), so
+    ContentElements.typoscript wires no FilesProcessor for it - see the
+    comment there and in Partials/ContentElement/Hero.html.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Hero" arguments="{data: data, compact: 0}" />
+</f:section>
+
+</html>

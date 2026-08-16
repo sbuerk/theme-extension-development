@@ -27,6 +27,7 @@ against, and the rename was cheap while only one template depended on it.
 | Accordion               | `.theme-accordion`           | `components/_accordion.scss`           |
 | Alert                   | `.theme-alert`               | `components/_alert.scss`               |
 | Appearance switcher     | `.theme-appearance-switcher` | `components/_appearance-switcher.scss` |
+| Author                  | `.theme-author`              | `components/_author.scss`              |
 | Badge                   | `.theme-badge`               | `components/_badge.scss`               |
 | Breadcrumb              | `.theme-breadcrumb`          | `components/_breadcrumb.scss`          |
 | Button                  | `.theme-button`              | `components/_button.scss`              |
@@ -53,7 +54,7 @@ against, and the rename was cheap while only one template depended on it.
 `__ellipsis` are styled, current-page state comes from `[aria-current="page"]`
 rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
-asserts every one of the twenty-four selectors above is actually compiled into
+asserts every one of the twenty-five selectors above is actually compiled into
 `Resources/Public/Css/theme.css`. The appearance switcher is covered twice over,
 because its swatches duplicate colour that lives in `abstracts/_palettes.scss` —
 see [Appearance switching](appearance-switching.md#what-the-tests-guard).
@@ -156,6 +157,24 @@ touch:
     <div class="theme-alert__body">
         <p class="theme-alert__title">…</p>
         <p class="theme-alert__text">…</p>
+    </div>
+</div>
+```
+
+Author — a person: portrait, name, role and links. The name is not part of
+this markup at all: it is the content element's own heading, rendered through
+the shared header partial every content element uses, so `.theme-author`
+sits below it and only covers the portrait, the role line and the bio. The
+links reuse `.theme-content-menu` above rather than a list of this
+component's own:
+
+```html
+<div class="theme-author">
+    <div class="theme-author__portrait"><img …></div>
+    <div class="theme-author__body">
+        <p class="theme-author__role">…</p>
+        <div class="theme-author__bio">…</div>
+        <nav class="theme-content-menu" aria-label="…">…</nav>
     </div>
 </div>
 ```

@@ -138,6 +138,15 @@
 			<trans-unit id="theme.menuCategorizedContentLabel">
 				<source>Categorized content</source>
 			</trans-unit>
+			<trans-unit id="theme.linklistLabel">
+				<source>Links</source>
+			</trans-unit>
+			<trans-unit id="theme.sociallinksLabel">
+				<source>Social links</source>
+			</trans-unit>
+			<trans-unit id="theme.authorLinksLabel">
+				<source>Links</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
