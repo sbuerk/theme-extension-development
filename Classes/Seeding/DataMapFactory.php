@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SBUERK\ThemeExtensionDevelopment\Seeding;
 
+use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
+
 /**
  * Turns a seed definition into the data map DataHandler consumes.
  *
@@ -34,28 +36,43 @@ namespace SBUERK\ThemeExtensionDevelopment\Seeding;
 final readonly class DataMapFactory
 {
     /**
+     * @param array<string, int> $fileUids The sys_file uid of each seeded file,
+     *        keyed by its seed identifier.
      * @return array{
      *     dataMap: array<string, array<string, array<string, scalar|null>>>,
-     *     suggestedUids: array<string, int>
+     *     suggestedUids: array<string, int>,
+     *     references: list<array{parent: string, table: string, field: string, file: int, pid: string}>
      * }
      */
-    public function createFromDefinition(SeedDefinition $definition, int $rootPageId = 0): array
-    {
+    public function createFromDefinition(
+        SeedDefinition $definition,
+        int $rootPageId = 0,
+        array $fileUids = [],
+    ): array {
         $dataMap = [];
         $suggestedUids = [];
+        $references = [];
 
-        $this->collect($definition->records, (string)$rootPageId, $dataMap, $suggestedUids);
+        $this->collect($definition->records, (string)$rootPageId, $dataMap, $suggestedUids, $fileUids, $references);
 
-        return ['dataMap' => $dataMap, 'suggestedUids' => $suggestedUids];
+        return ['dataMap' => $dataMap, 'suggestedUids' => $suggestedUids, 'references' => $references];
     }
 
     /**
      * @param list<SeedRecord> $records
      * @param array<string, array<string, array<string, scalar|null>>> $dataMap
      * @param array<string, int> $suggestedUids
+     * @param array<string, int> $fileUids
+     * @param list<array{parent: string, table: string, field: string, file: int, pid: string}> $references
      */
-    private function collect(array $records, string $parentId, array &$dataMap, array &$suggestedUids): void
-    {
+    private function collect(
+        array $records,
+        string $parentId,
+        array &$dataMap,
+        array &$suggestedUids,
+        array $fileUids,
+        array &$references,
+    ): void {
         /** @var array<string, string> $previousIdPerTable */
         $previousIdPerTable = [];
 
@@ -73,6 +90,31 @@ final readonly class DataMapFactory
             // for a hidden record by declaring "hidden: 1" itself.
             $values += ['hidden' => 0];
 
+            foreach ($record->files as $field => $fileIdentifiers) {
+                foreach ($fileIdentifiers as $fileIdentifier) {
+                    if (!isset($fileUids[$fileIdentifier])) {
+                        throw new SeedingException(
+                            sprintf(
+                                'The record "%s" references the file "%s", which the definition does not declare.',
+                                $record->identifier,
+                                $fileIdentifier,
+                            ),
+                            1786924828,
+                        );
+                    }
+                    $references[] = [
+                        'parent' => $placeholder,
+                        'table' => $record->table,
+                        'field' => $field,
+                        'file' => $fileUids[$fileIdentifier],
+                        // The parent of this level, never the record's own pid:
+                        // that one may be the negative "insert after" hint,
+                        // which is a sorting instruction and not a page.
+                        'pid' => $parentId,
+                    ];
+                }
+            }
+
             $dataMap[$record->table][$placeholder] = $values;
 
             if ($record->uid !== null) {
@@ -82,7 +124,7 @@ final readonly class DataMapFactory
             $previousIdPerTable[$record->table] = $placeholder;
 
             if ($record->children !== []) {
-                $this->collect($record->children, $placeholder, $dataMap, $suggestedUids);
+                $this->collect($record->children, $placeholder, $dataMap, $suggestedUids, $fileUids, $references);
             }
         }
     }

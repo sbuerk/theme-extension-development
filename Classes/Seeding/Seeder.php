@@ -26,6 +26,7 @@ final readonly class Seeder
 {
     public function __construct(
         private DataMapFactory $dataMapFactory,
+        private FileSeeder $fileSeeder,
     ) {}
 
     /**
@@ -47,7 +48,11 @@ final readonly class Seeder
             );
         }
 
-        $map = $this->dataMapFactory->createFromDefinition($definition, $rootPageId);
+        // Files first: a record referencing one needs its sys_file uid before
+        // the data map can be built.
+        $fileUids = $this->fileSeeder->seed($definition->files);
+
+        $map = $this->dataMapFactory->createFromDefinition($definition, $rootPageId, $fileUids);
         if ($map['dataMap'] === []) {
             throw new SeedingException(
                 sprintf('The seed definition "%s" contains no records.', $definition->identifier),
@@ -59,7 +64,78 @@ final readonly class Seeder
         $dataHandler->suggestedInsertUids = $map['suggestedUids'];
         $dataHandler->start($map['dataMap'], [], $backendUser);
         $dataHandler->process_datamap();
+        $this->assertNoErrors($dataHandler, $definition);
 
+        $written = $dataHandler->substNEWwithIDs;
+        $this->attachFileReferences($map['references'], $written, $backendUser, $definition);
+
+        return $this->collectWrittenUids($definition->records, $dataHandler);
+    }
+
+    /**
+     * Attaches the file references in a second pass.
+     *
+     * A reference carries the uid of the record it belongs to in "uid_foreign",
+     * and that is a plain integer column rather than a relation DataHandler
+     * resolves - a "NEW..." placeholder written there stays unresolved and the
+     * reference ends up pointing at record 0. The records therefore have to
+     * exist before their references can be written, which is what makes this a
+     * second pass rather than more entries in the same data map.
+     *
+     * @param list<array{parent: string, table: string, field: string, file: int, pid: string}> $references
+     * @param array<string, int|string> $written Placeholder to written uid.
+     */
+    private function attachFileReferences(
+        array $references,
+        array $written,
+        BackendUserAuthentication $backendUser,
+        SeedDefinition $definition,
+    ): void {
+        if ($references === []) {
+            return;
+        }
+
+        $dataMap = [];
+        $counter = 0;
+        /** @var array<string, list<string>> $perRecord */
+        $perRecord = [];
+
+        foreach ($references as $reference) {
+            $parentUid = $written[$reference['parent']] ?? null;
+            if ($parentUid === null) {
+                throw new SeedingException(
+                    sprintf(
+                        'The record "%s" was not written, so its file reference cannot be attached.',
+                        $reference['parent'],
+                    ),
+                    1786924829,
+                );
+            }
+            $pid = $written[ltrim($reference['pid'], '-')] ?? $reference['pid'];
+            $placeholder = 'NEWsys_file_reference_' . ++$counter;
+            $dataMap['sys_file_reference'][$placeholder] = [
+                'uid_local' => $reference['file'],
+                'uid_foreign' => (int)$parentUid,
+                'tablenames' => $reference['table'],
+                'fieldname' => $reference['field'],
+                'pid' => (int)$pid,
+            ];
+            $perRecord[$reference['table'] . ':' . $parentUid . ':' . $reference['field']][] = $placeholder;
+        }
+
+        foreach ($perRecord as $key => $placeholders) {
+            [$table, $uid, $field] = explode(':', $key, 3);
+            $dataMap[$table][$uid][$field] = implode(',', $placeholders);
+        }
+
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start($dataMap, [], $backendUser);
+        $dataHandler->process_datamap();
+        $this->assertNoErrors($dataHandler, $definition);
+    }
+
+    private function assertNoErrors(DataHandler $dataHandler, SeedDefinition $definition): void
+    {
         if ($dataHandler->errorLog !== []) {
             throw new SeedingException(
                 sprintf(
@@ -70,8 +146,6 @@ final readonly class Seeder
                 1786924816,
             );
         }
-
-        return $this->collectWrittenUids($definition->records, $dataHandler);
     }
 
     /**

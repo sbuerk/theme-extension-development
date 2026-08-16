@@ -58,5 +58,21 @@ core rather than reimplemented.
     that is not empty: a definition declaring uids collides with existing
     records rather than adding to them.
 
-    Files are not covered. A definition cannot reference an image, because
-    ``sys_file`` and FAL references are outside what the seeding writes.
+    A definition can also copy files into a file storage and reference them
+    from a record:
+
+    ..  code-block:: yaml
+
+        files:
+          - identifier: placeholder
+            source: 'EXT:my_package/Configuration/Seeds/Files/placeholder.svg'
+            folder: 'theme-demo'
+
+        pages:
+          - identifier: home
+            files:
+              media:
+                - placeholder
+
+    File metadata is not written: the alternative text and title of a file or
+    of the reference itself are outside what the seeding covers.

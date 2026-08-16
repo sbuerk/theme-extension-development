@@ -48,12 +48,13 @@ final readonly class YamlSeedParser
     private const CHILDREN = 'children';
     private const IDENTIFIER = 'identifier';
     private const UID = 'uid';
+    private const FILES = 'files';
 
     /**
      * Keys that describe the shape of the definition rather than a field of the
      * record they appear on.
      */
-    private const STRUCTURAL_KEYS = [self::IDENTIFIER, self::UID, self::CHILDREN, self::CONTENT];
+    private const STRUCTURAL_KEYS = [self::IDENTIFIER, self::UID, self::CHILDREN, self::CONTENT, self::FILES];
 
     public function parseFile(string $fileName): SeedDefinition
     {
@@ -105,8 +106,117 @@ final readonly class YamlSeedParser
         }
 
         $seen = [];
+        $files = $this->parseFiles($definition[self::FILES] ?? [], $source);
 
-        return new SeedDefinition($identifier, $this->parseRecords($pages, 'pages', $source, $seen));
+        return new SeedDefinition(
+            $identifier,
+            $this->parseRecords($pages, 'pages', $source, $seen),
+            $files,
+        );
+    }
+
+    /**
+     * @param mixed $files
+     * @return list<SeedFile>
+     */
+    private function parseFiles(mixed $files, string $source): array
+    {
+        if (!is_array($files)) {
+            throw new SeedingException(
+                sprintf('The "files" of the seed definition "%s" are not a list.', $source),
+                1786924819,
+            );
+        }
+
+        $parsed = [];
+        $seen = [];
+        foreach ($files as $file) {
+            if (!is_array($file)) {
+                throw new SeedingException(
+                    sprintf('A file of the seed definition "%s" is not a map.', $source),
+                    1786924820,
+                );
+            }
+            $identifier = $file[self::IDENTIFIER] ?? null;
+            if (!is_string($identifier) || $identifier === '') {
+                throw new SeedingException(
+                    sprintf('A file of the seed definition "%s" has no "identifier".', $source),
+                    1786924821,
+                );
+            }
+            if (isset($seen[$identifier])) {
+                throw new SeedingException(
+                    sprintf('The file identifier "%s" is used more than once in "%s".', $identifier, $source),
+                    1786924822,
+                );
+            }
+            $seen[$identifier] = true;
+
+            $sourcePath = $file['source'] ?? null;
+            if (!is_string($sourcePath) || $sourcePath === '') {
+                throw new SeedingException(
+                    sprintf('The file "%s" in "%s" has no "source".', $identifier, $source),
+                    1786924823,
+                );
+            }
+
+            $folder = $file['folder'] ?? '/';
+            $name = $file['name'] ?? null;
+            $storage = $file['storage'] ?? null;
+
+            $parsed[] = new SeedFile(
+                $identifier,
+                $sourcePath,
+                is_string($folder) ? $folder : '/',
+                is_string($name) ? $name : null,
+                is_int($storage) ? $storage : null,
+            );
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * @return array<string, list<string>>
+     */
+    private function parseFileReferences(mixed $files, string $recordIdentifier, string $source): array
+    {
+        if ($files === [] || $files === null) {
+            return [];
+        }
+        if (!is_array($files)) {
+            throw new SeedingException(
+                sprintf('The "files" of "%s" in "%s" are not a map of field to file identifiers.', $recordIdentifier, $source),
+                1786924824,
+            );
+        }
+
+        $references = [];
+        foreach ($files as $field => $identifiers) {
+            if (!is_string($field) || $field === '') {
+                throw new SeedingException(
+                    sprintf('A file field of "%s" in "%s" is not a field name.', $recordIdentifier, $source),
+                    1786924825,
+                );
+            }
+            if (!is_array($identifiers)) {
+                throw new SeedingException(
+                    sprintf('The file field "%s" of "%s" in "%s" is not a list.', $field, $recordIdentifier, $source),
+                    1786924826,
+                );
+            }
+            foreach ($identifiers as $fileIdentifier) {
+                if (!is_string($fileIdentifier) || $fileIdentifier === '') {
+                    throw new SeedingException(
+                        sprintf('A file reference of "%s" in "%s" is not an identifier.', $recordIdentifier, $source),
+                        1786924827,
+                    );
+                }
+                $references[$field][] = $fileIdentifier;
+            }
+        }
+
+        return $references;
     }
 
     /**
@@ -205,7 +315,14 @@ final readonly class YamlSeedParser
                 $values[$key] = $value;
             }
 
-            $parsed[] = new SeedRecord($table, $identifier, $values, $uid, $children);
+            $parsed[] = new SeedRecord(
+                $table,
+                $identifier,
+                $values,
+                $uid,
+                $children,
+                $this->parseFileReferences($record[self::FILES] ?? [], $identifier, $source),
+            );
         }
 
         return $parsed;

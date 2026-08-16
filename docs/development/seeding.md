@@ -50,6 +50,61 @@ pages:
   *suggested* uid.
 - `children` nests pages, `content` nests `tt_content` records below the page
   carrying them.
+- `files` on a record creates file references, as a map of field name to file
+  identifiers.
+
+## Files
+
+Files are copied into a file storage before any record is written, so a record
+can reference them:
+
+```yaml
+files:
+  - identifier: placeholder
+    source: 'EXT:my_package/Configuration/Seeds/Files/placeholder.svg'
+    folder: 'theme-demo'     # optional, storage root by default
+    # name: 'other-name.svg' # optional, the source name by default
+    # storage: 2             # optional, the default storage otherwise
+
+pages:
+  - identifier: home
+    title: 'Home'
+    files:
+      media:                 # any FAL field of the record
+        - placeholder
+```
+
+Without `fluid_styled_content` the FAL fields available are `pages.media` and
+`tt_content.image`, `assets` and `media` — all of them from EXT:frontend.
+
+The copy goes through the storage API, not through the filesystem: a file copied
+into `fileadmin/` with `cp` exists on disk and does not exist for TYPO3, so
+nothing can reference it. Three details of that API are handled here and are
+each easy to get wrong:
+
+- **`addFile()` moves by default.** Its `removeOriginal` argument defaults to
+  `true`, which would delete the source out of the repository. It is passed as
+  `false`.
+- **The conflict mode is the native enum.** TYPO3 v13 still carries the older
+  `Resource\DuplicationBehavior` class alongside `Resource\Enum\DuplicationBehavior`,
+  and passing the old one triggers a deprecation (#101151) that this test suite
+  turns into a failure. The enum exists in v13.4 and v14 alike, so this needs no
+  version split.
+- **A storage evaluates backend user file mounts.** Seeding runs on the command
+  line into a folder no user has a mount for, so the check is suspended for the
+  duration of the copy and restored afterwards.
+
+### Why references need a second pass
+
+A `sys_file_reference` carries the uid of the record it belongs to in
+`uid_foreign`, and that is a plain integer column rather than a relation
+DataHandler resolves. A `NEW...` placeholder written there stays unresolved and
+the reference silently points at record 0.
+
+So the records are written first, their real uids are read back from
+`substNEWwithIDs`, and the references are attached in a second DataHandler pass.
+That is also why a file reference cannot simply be another entry in the same
+data map.
 
 ## Why it goes through DataHandler
 
@@ -92,10 +147,9 @@ for a definition known not to overlap.
 
 ## What it does not do
 
-- **No files.** `sys_file` and FAL references are not covered, so a definition
-  cannot reference an image. This is the same gap the reference setup of
-  `fgtclb/academic-extensions` has, where the committed SQLite templates point
-  at `fileadmin/` images that are neither committed nor snapshotted.
+- **No file metadata.** A file is copied and referenced; its `sys_file_metadata`
+  (alternative text, title) is not written, and neither are the `title` and
+  `alternative` fields of the reference itself.
 - **No site configuration.** Sites are committed files under
   `instance-core-*/config/sites/`, which is why the seed declares uids rather
   than the seeder writing sites.
@@ -108,12 +162,13 @@ for a definition known not to overlap.
 depends on nothing else in this extension, so it can be extracted into a package
 of its own once it earns that.
 
-| Class                          | Does                                                     |
-|--------------------------------|----------------------------------------------------------|
-| `YamlSeedParser`               | Reads a definition into value objects, and validates it. |
-| `DataMapFactory`               | Turns a definition into the DataHandler data map.        |
-| `Seeder`                       | Runs DataHandler and reports the written uids.           |
-| `SeedDefinition`, `SeedRecord` | The value objects. Data, not services.                   |
+| Class                                      | Does                                                             |
+|--------------------------------------------|------------------------------------------------------------------|
+| `YamlSeedParser`                           | Reads a definition into value objects, and validates it.         |
+| `FileSeeder`                               | Copies the files into a storage and returns their sys_file uids. |
+| `DataMapFactory`                           | Turns a definition into the DataHandler data map.                |
+| `Seeder`                                   | Runs DataHandler, attaches the references, reports the uids.     |
+| `SeedDefinition`, `SeedRecord`, `SeedFile` | The value objects. Data, not services.                           |
 
 `Classes/Command/SeedCommand.php` is the CLI surface and stays behind when the
 engine is extracted.
