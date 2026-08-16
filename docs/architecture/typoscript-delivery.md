@@ -138,10 +138,16 @@ extension gives it a branch. They are elements without rendering, not elements
 that do not exist.
 
 `list` is the legacy plugin type, deprecated in v13 (#105076) and removed in v14
-(#105377), so it is deliberately not rendered.
+(#105377). It is rendered too, not skipped: any third-party Extbase plugin still
+registered the old way on v13.4 needs a `tt_content.list` object to render
+through, the same way `configurePlugin()`'s default `CType` registration needs
+`Generic.html` — see
+[Content elements](content-elements.md#extbase-plugins-and-tt_contentlist) for
+both, and for why declaring `tt_content.list` needs no version condition even
+though the CType it renders is gone on v14.
 
-Rendered so far: `header`, `text` and `image`. The rest carry a `@todo` in
-`ContentElements.typoscript`; none of them needs TCA of this extension's own.
+Every classic CType `EXT:frontend` registers is now covered — see
+[Content elements](content-elements.md) for the full table.
 
 The `image` element is rendered through two core data processors, both in
 EXT:frontend: `FilesProcessor` resolves the references of the `image` field and

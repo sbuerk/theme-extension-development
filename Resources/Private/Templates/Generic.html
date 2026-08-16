@@ -1,0 +1,49 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The one template shared by every Extbase plugin registered through
+    "ExtensionUtility::configurePlugin()", whatever CType it ends up as -
+    "templateName = Generic" is a fixed string that method writes itself
+    (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php",
+    read on both installed core versions), so a third-party extension cannot
+    be handed a template of its own the way "tt_content.header"/
+    "tt_content.image" in "ContentElements.typoscript" are. That fixed string
+    is also why this file sits at the *root* of "templateRootPath" rather than
+    below "ContentElements/" alongside every other template here: a copy
+    placed under "ContentElements/" was tried first and fails with
+    "InvalidTemplateResourceException", found by running it.
+
+    What differs per plugin is not the template but the TypoScript path: each
+    plugin's own "configurePlugin()" call places its "EXTBASEPLUGIN" cObject
+    at "tt_content.<pluginSignature>.20", right beside "templateName", in the
+    very same branch this template is rendered from - reproduced verbatim in
+    the comment above "tt_content.list" in "ContentElements.typoscript".
+    "{data.CType}" already carries that signature: it *is* the plugin
+    signature for a plugin registered this way
+    ("ExtensionUtility::registerPlugin()" adds it as the "CType" select item's
+    own value, read alongside "configurePlugin()"), so the path below is built
+    from it rather than fixed, and resolves to a different "20" per plugin
+    without this template ever knowing which plugin it is rendering.
+
+    Verified as an actual "f:cObject" call against a real plugin registration,
+    not only by reading "CObjectViewHelper::render()" - it resolves the whole
+    "typoscriptObjectPath" argument from the root of the merged setup array,
+    not relative to the cObject this template is itself being rendered from,
+    which is exactly why the path has to spell out "tt_content" and the CType
+    rather than reading "20" alone.
+
+    "tt_content.list" further down that file is not a plugin's own branch, but
+    reuses this same template for the identical reason: "list" is itself a
+    CType, so "{data.CType}" resolves to "tt_content.list.20" there instead -
+    the CASE keyed on "list_type" that section declares, in place of a single
+    "EXTBASEPLUGIN".
+</f:comment>
+
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:cObject typoscriptObjectPath="tt_content.{data.CType}.20" />
+</f:section>
+
+</html>

@@ -22,6 +22,13 @@
 # "tt_content.menu_categorized_pages" for why); the remaining nine are all
 # "MenuProcessor" with a different "special" - see the comment above
 # "tt_content.menu_pages", further down, for how that set is put together.
+#
+# Also covered, but not part of that EXT:frontend-registered set: "list" and
+# every Extbase plugin CType a third-party extension registers through
+# "ExtensionUtility::configurePlugin()" - see the section comment above
+# "tt_content.list", right after "lib.contentElement" below, for why those
+# need this theme too and why "list" alone gets a branch of its own here
+# rather than being left to whatever registered it.
 
 # The equivalent of "lib.contentElement" from "fluid_styled_content": the frame
 # every content element is rendered through. Consumers of this theme can
@@ -31,6 +38,93 @@ lib.contentElement {
     templateRootPaths.10 = {$theme.templateRootPath}
     partialRootPaths.10 = {$theme.partialRootPath}
     layoutRootPaths.10 = {$theme.layoutRootPath}
+}
+
+# Extbase plugins, and the "list" CType historical plugins still use.
+#
+# "ExtensionUtility::configurePlugin()"
+# (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php",
+# read on both installed core versions) emits "=< lib.contentElement" /
+# "templateName = Generic" for every plugin registered as its own CType,
+# unconditionally - v14.3.6 emits it even though nothing in a vanilla v14 core
+# defines "lib.contentElement" any more (a "grep -r 'lib.contentElement ='"
+# across the whole installed v14 vendor tree returns nothing outside this
+# extension). This theme is therefore what makes a third-party Extbase plugin
+# render at all, not an optional convenience: without a "Generic" template
+# every such plugin falls through to the core's own "no rendering definition"
+# notice, indistinguishable to an editor from a broken content element.
+# "Templates/Generic.html" is that template - at the *root* of
+# "templateRootPath", not below "ContentElements/" the way every other
+# template in this file is: "templateName = Generic" is the literal string
+# "configurePlugin()" writes, never "ContentElements/Generic", and a copy
+# placed under "ContentElements/" was tried first and fails with
+# "TYPO3Fluid\Fluid\View\Exception\InvalidTemplateResourceException" - found
+# by running it, not guessed. Its own header comment explains how it reads
+# back the per-plugin "20" cObject this method writes beside "templateName" -
+# "Tests/Functional/Fixtures/Extensions/plugin-fixture" is the fixture that
+# proves it, registering a plugin with no rendering definition of its own for
+# exactly that reason.
+#
+# "list" is the one plugin CType this theme has to supply itself. It is still
+# in EXT:frontend's own v13.4 TCA ("Configuration/TCA/tt_content.php",
+# "types.list", the "CType" select's own "value => 'list'" - verified) as the
+# historical, pre-CType way of registering a plugin, and
+# "fluid_styled_content" is what rendered it - not a dependency here, and its
+# own "Resources/Private/Templates/List.html" plus the "tt_content.list"
+# TypoScript object were removed outright in v14.0 (Breaking #105377,
+# "DeprecatedFunctionalityRemoved": "The following content element
+# definitions have been removed: tt_content.list"). "configurePlugin()" still
+# writes straight into it on v13.4 whenever its fifth argument is omitted or
+# "list_type" ("TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN",
+# deprecated in 13.4 by #105076 and gone on v14, where the same call throws):
+# "tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN". For that assignment
+# to do anything, "tt_content.list.20" has to already be a CASE keyed on
+# "list_type" - exactly what "fluid_styled_content" supplied and no longer
+# does - so it is declared here, in this theme's own house style, which lets
+# the very same "Generic.html" render it: a "list" record's own "CType" is
+# "list", so "{data.CType}" in that template resolves to "tt_content.list.20",
+# the CASE itself, the same way it resolves to a single "EXTBASEPLUGIN" for
+# every other plugin's own branch above.
+#
+# Declared unconditionally, not behind a "[not (...)]" version condition -
+# deliberate, not an oversight: on v14 nothing can ever reach this branch at
+# all, verified directly rather than inferred from the changelog alone. With
+# v14.3.6 installed, "grep -n \"'list'\\|list_type\"
+# .Build/vendor/typo3/cms-frontend/Configuration/TCA/tt_content.php" returns
+# nothing at all - no "types.list" entry, no "CType" select item, no
+# "subtype_value_field" - and the changelog explains why so completely that
+# nothing short of it could be reached anyway: the "list_type" *database
+# column itself* was dropped ("The following database table fields have been
+# removed: tt_content.list_type", Breaking #105377), so even the CASE's own
+# "key.field = list_type" reads a column that does not exist. A CType no
+# installation can offer an editor, keyed on a column the schema no longer
+# has, is exactly as inert as never declaring this object, and it stays
+# exactly as useful as "tt_content.header" below it for as long as an
+# installation is still running v13.4. No "@todo" is attached for the same
+# reason none of the "@todo"s elsewhere in this file name a version condition
+# to remove: nothing here becomes *wrong* on v14, only unreachable - the same
+# relationship every classic CType below already has to a v14 installation
+# that never creates one of its records either.
+tt_content.list =< lib.contentElement
+tt_content.list {
+    templateName = Generic
+
+    20 = CASE
+    20 {
+        key.field = list_type
+
+        # No plugin of this theme's own registers under "list_type" - every
+        # branch a CASE like this one ever gets comes from a third-party
+        # extension's own "configurePlugin()" call, in that extension's own
+        # "ext_localconf.php", the same way the single "20" under each
+        # plugin's own "tt_content.<pluginSignature>" above is never written
+        # here either. An unmatched "list_type" - no plugin selected yet, the
+        # state every freshly created "list" record starts in - renders
+        # nothing rather than falling through to a "default" this theme would
+        # have to invent content for.
+        default = TEXT
+        default.value =
+    }
 }
 
 tt_content.header =< lib.contentElement
