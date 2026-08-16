@@ -133,13 +133,22 @@ bindOptionGroup('theme-palette', 'palette', 'theme-palette', null);
  * guaranteed to need a working one. The element lookup still guards against
  * its absence: cheap, and it means a template change here fails quietly
  * instead of throwing partway through this file.
+ *
+ * **Every** toggle is bound, not the first one. The collapse rule in
+ * `_nav-main.scss` matches any ".theme-nav-main" whose own toggle is not
+ * expanded, so a second navigation on the page - the styleguide's specimen,
+ * a site package repeating the menu in its footer - would be collapsed below
+ * the breakpoint by a control that was never wired up, with nothing on the
+ * page able to open it again. Binding one and styling all of them is the kind
+ * of mismatch that only shows on a narrow viewport of a page nobody tested.
  */
 function bindMainMenuToggle() {
-    const toggle = document.querySelector('.theme-nav-main__toggle');
-    if (!toggle) {
-        return;
-    }
+    document.querySelectorAll('.theme-nav-main__toggle').forEach(bindOneMainMenuToggle);
+}
 
+function bindOneMainMenuToggle(toggle) {
+    // Scoped to the navigation this particular toggle sits in, so two menus on
+    // one page cannot close each other.
     const nav = toggle.closest('.theme-nav-main');
     if (!nav) {
         return;
