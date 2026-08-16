@@ -1,0 +1,65 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The gallery of a content element, as "GalleryProcessor" computed it: rows,
+    columns, a position, and a width and a height for every media element.
+
+    The processor has already decided the column count from "imagecols", so the
+    stylesheet must not impose one of its own - the editor's "Number of columns"
+    would stop meaning anything. The count is exposed as a data attribute for
+    CSS that wants to react to it.
+
+    The width and height are rendered as attributes rather than left to CSS.
+    They are what lets the browser reserve the box before the image has loaded,
+    which is the difference between a page that settles and a page that jumps.
+</f:comment>
+<f:if condition="{gallery.count.files}">
+    <div class="gallery gallery--{gallery.position.vertical} gallery--{gallery.position.horizontal}"
+         data-gallery-columns="{gallery.count.columns}">
+        <f:for each="{gallery.rows}" as="row">
+            <div class="gallery__row">
+                <f:for each="{row.columns}" as="column">
+                    <figure class="gallery__item">
+                        <f:if condition="{data.image_zoom}">
+                            <f:then>
+                                <f:comment>
+                                    "image_zoom" is the core TCA field an editor
+                                    ticks to make an image enlargeable. It is
+                                    answered with a plain link to the original
+                                    file: a lightbox is JavaScript, and this
+                                    extension ships none.
+                                </f:comment>
+                                <a class="gallery__zoom" href="{f:uri.image(image: column.media)}">
+                                    <f:render section="Media" arguments="{column: column}" />
+                                </a>
+                            </f:then>
+                            <f:else>
+                                <f:render section="Media" arguments="{column: column}" />
+                            </f:else>
+                        </f:if>
+                        <f:if condition="{column.media.description}">
+                            <figcaption class="gallery__caption">{column.media.description}</figcaption>
+                        </f:if>
+                    </figure>
+                </f:for>
+            </div>
+        </f:for>
+    </div>
+</f:if>
+
+<f:section name="Media">
+    <f:comment>
+        "alt" and "title" are not passed: the view helper takes them from the
+        "alternative" and "title" properties of the file reference by itself,
+        and passing an empty string would suppress that fallback rather than
+        fill it in.
+    </f:comment>
+    <f:image class="gallery__image"
+             image="{column.media}"
+             width="{column.dimensions.width}"
+             height="{column.dimensions.height}"
+             loading="lazy" />
+</f:section>
+
+</html>

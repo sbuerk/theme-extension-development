@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480" role="img" aria-label="Placeholder, portrait">
+  <rect width="270" height="480" fill="#f2eee7"></rect>
+  <rect x="16" y="16" width="238" height="448" fill="none" stroke="#0b57d0" stroke-width="2" stroke-dasharray="8 6"></rect>
+  <circle cx="135" cy="150" r="40" fill="#0b57d0" opacity="0.25"></circle>
+  <path d="M40 400l70-90 50 60 40-45 30 75z" fill="#0b57d0" opacity="0.45"></path>
+  <text x="135" y="450" font-family="system-ui, sans-serif" font-size="18" fill="#1a1a1a" text-anchor="middle">portrait</text>
+</svg>

@@ -12,8 +12,7 @@ Description
 The theme renders content elements itself, without depending on
 ``fluid_styled_content``.
 
-Two content elements are rendered, and they are the only two that exist in an
-installation without that extension:
+Two content elements are rendered:
 
 ..  list-table::
     :header-rows: 1
@@ -31,14 +30,14 @@ links to a content element keep working.
 
 ..  warning::
 
-    :guilabel:`Text & Media`, :guilabel:`Images`, :guilabel:`Bullet List`,
-    :guilabel:`Table`, :guilabel:`File Links` and the menu elements are
-    registered by ``fluid_styled_content``, not by the TYPO3 core. In an
-    installation without that extension they do not exist as content types at
-    all, so they are not merely unstyled here - they cannot be created.
+    :guilabel:`Text & Media`, :guilabel:`Bullet List`, :guilabel:`Table`,
+    :guilabel:`File Links` and the menu elements can be created in the backend -
+    their TCA comes from EXT:frontend, not from ``fluid_styled_content`` - but
+    they have no rendering definition here yet and therefore render the TYPO3
+    notice saying so.
 
-    Bringing them means registering the content types and their TCA in this
-    extension, which is a separate step.
+    :guilabel:`Images` is rendered, see
+    :ref:`feature-image-content-element-rendering`.
 
 Overriding the templates
 ========================

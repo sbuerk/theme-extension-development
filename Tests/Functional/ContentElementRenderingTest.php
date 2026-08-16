@@ -17,9 +17,10 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * assertion here guards against - it is the difference between "rendered" and
  * "rendered an error box".
  *
- * EXT:frontend registers only `header` and `text` on its own, so those are the
- * two elements covered. Anything else is a content type this theme would have
- * to register itself.
+ * Covered here are `header` and `text`, the two elements whose TCA lives in
+ * `EXT:frontend/Configuration/TCA/tt_content.php` itself. The `image` element
+ * has its own test; the rest of the classic set is registered by EXT:frontend
+ * too, in its TCA overrides, and still waits for a template.
  */
 final class ContentElementRenderingTest extends AbstractFunctionalTestCase
 {

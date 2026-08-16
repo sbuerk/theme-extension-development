@@ -14,4 +14,16 @@ theme {
     # "Resources/Private/Scss/" and committed - see
     # "docs/development/frontend-assets.md".
     stylesheet = EXT:theme_extension_development/Resources/Public/Css/theme.css
+
+    media {
+        # The width in pixels the image gallery is computed for. No image is
+        # processed wider than this, so it should match the width the layout
+        # gives the content column - 1200px is the 75rem of
+        # "--theme-content-max-width".
+        maxGalleryWidth = 1200
+
+        # The same, for an element positioned beside the text rather than above
+        # or below it.
+        maxGalleryWidthInText = 420
+    }
 }

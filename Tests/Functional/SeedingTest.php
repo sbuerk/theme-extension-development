@@ -110,7 +110,8 @@ final class SeedingTest extends AbstractFunctionalTestCase
         // page 1, so this is a promise the seed definition has to keep.
         $this->assertSame(1, $uids['home']);
         $this->assertSame(2, $uids['styles']);
-        $this->assertSame(3, $uids['empty']);
+        $this->assertSame(3, $uids['media']);
+        $this->assertSame(4, $uids['empty']);
     }
 
     #[Test]
@@ -120,11 +121,12 @@ final class SeedingTest extends AbstractFunctionalTestCase
 
         $rows = $this->queryTable('pages', ['uid', 'pid', 'title', 'slug'], 'uid');
 
-        $this->assertCount(3, $rows);
+        $this->assertCount(4, $rows);
         $this->assertSame(0, (int)$rows[0]['pid']);
-        // Both sub pages hang below the root page, not below each other.
+        // All sub pages hang below the root page, not below each other.
         $this->assertSame(1, (int)$rows[1]['pid']);
         $this->assertSame(1, (int)$rows[2]['pid']);
+        $this->assertSame(1, (int)$rows[3]['pid']);
     }
 
     #[Test]
@@ -153,8 +155,8 @@ final class SeedingTest extends AbstractFunctionalTestCase
         );
 
         // A new record goes to the top of its parent by default, so without the
-        // negative pid convention this would come back as [3, 2].
-        $this->assertSame([2, 3], array_map('intval', $sorted));
+        // negative pid convention this would come back as [4, 3, 2].
+        $this->assertSame([2, 3, 4], array_map('intval', $sorted));
     }
 
     #[Test]
@@ -164,7 +166,7 @@ final class SeedingTest extends AbstractFunctionalTestCase
 
         $rows = $this->queryTable('tt_content', ['pid', 'CType', 'header'], 'sorting');
 
-        $this->assertCount(4, $rows);
+        $this->assertCount(7, $rows);
         $this->assertSame(1, (int)$rows[0]['pid']);
         $this->assertSame('header', $rows[0]['CType']);
         $this->assertSame('A frontend to look at', $rows[0]['header']);
@@ -177,10 +179,12 @@ final class SeedingTest extends AbstractFunctionalTestCase
 
         $files = $this->queryTable('sys_file', ['uid', 'identifier', 'name'], 'uid');
 
-        $this->assertCount(1, $files);
+        $this->assertCount(2, $files);
         $this->assertSame('/theme-demo/placeholder.svg', $files[0]['identifier']);
+        $this->assertSame('/theme-demo/placeholder-portrait.svg', $files[1]['identifier']);
         // Copied, not moved: the source has to survive in the repository.
         $this->assertFileExists(dirname(__DIR__, 2) . '/Configuration/Seeds/Files/placeholder.svg');
+        $this->assertFileExists(dirname(__DIR__, 2) . '/Configuration/Seeds/Files/placeholder-portrait.svg');
     }
 
     #[Test]
@@ -194,11 +198,19 @@ final class SeedingTest extends AbstractFunctionalTestCase
             'uid',
         );
 
-        $this->assertCount(1, $references);
+        // One on the root page, one on the single image element and two on the
+        // gallery element.
+        $this->assertCount(4, $references);
         $this->assertSame('pages', $references[0]['tablenames']);
         $this->assertSame('media', $references[0]['fieldname']);
         // The root page of the demo definition.
         $this->assertSame(1, (int)$references[0]['uid_foreign']);
+
+        // A content element reference names the field of "tt_content" it was
+        // declared under, which is what the "FilesProcessor" of the rendering
+        // looks the images up by.
+        $this->assertSame('tt_content', $references[1]['tablenames']);
+        $this->assertSame('image', $references[1]['fieldname']);
     }
 
     #[Test]

@@ -106,23 +106,50 @@ so every element falls through to the core default, which renders a yellow box
 saying the element has no rendering definition.
 `Configuration/TypoScript/ContentElements.typoscript` provides both.
 
-**Only two content types exist to render.** EXT:frontend registers `header` and
-`text` and nothing else — verified by reading the `CType` items of its
-`tt_content` TCA on both versions:
+**What FSC supplies is the rendering, not the TCA.** This is the single most
+misleading thing about developing a theme without that extension, and it is
+worth stating precisely, because the obvious way of checking it gives the wrong
+answer.
 
-| Version | CTypes registered by EXT:frontend |
-|---------|-----------------------------------|
-| v13     | `header`, `text`, `list`          |
-| v14     | `header`, `text`                  |
+Reading `EXT:frontend/Configuration/TCA/tt_content.php` shows a `types` array of
+`1`, `header`, `text` — and on v13 additionally `list` — which reads like the
+complete list of content types. It is not. The same extension ships **22 files**
+in `Configuration/TCA/Overrides/`, among them
+`225-tt_content-content_type-image.php` and
+`230-tt_content-content_type-textmedia.php`, each calling
+`ExtensionManagementUtility::addRecordType()`. Verified against `v13.4.0`,
+`v13.4.34` and `v14.3.6`; the set is identical, the only difference being the
+tab label short form v14 introduced (#107789).
 
-Everything a TYPO3 installation normally offers — textmedia, image, bullets,
-table, uploads, menus, html — belongs to `fluid_styled_content`. Those are not
-elements this theme has chosen not to render; they do not exist here at all, and
-bringing them means registering content types **and their TCA** in this
-extension.
+`fluid_styled_content`'s own `Configuration/TCA/Overrides/` holds exactly one
+file, `sys_template.php`, which registers its static include. **It contributes no
+content type TCA at all.**
+
+|                                                       | Registered by          |
+|-------------------------------------------------------|------------------------|
+| The `CType` items, their fields, palettes and icons   | EXT:frontend           |
+| The `tt_content.<CType>` TypoScript that renders them | `fluid_styled_content` |
+
+The consequence is the opposite of what it looks like from the outside: every
+classic content element — Text & Media, Images, Bullet List, Table, File Links,
+the menus, `html`, `div`, `shortcut` — **can be created in the backend of an
+installation using this theme**, and each one renders the core notice until this
+extension gives it a branch. They are elements without rendering, not elements
+that do not exist.
 
 `list` is the legacy plugin type, deprecated in v13 (#105076) and removed in v14
 (#105377), so it is deliberately not rendered.
+
+Rendered so far: `header`, `text` and `image`. The rest carry a `@todo` in
+`ContentElements.typoscript`; none of them needs TCA of this extension's own.
+
+The `image` element is rendered through two core data processors, both in
+EXT:frontend: `FilesProcessor` resolves the references of the `image` field and
+`GalleryProcessor` turns `imagecols`, `imageorient`, `imagewidth`, `imageheight`
+and `imageborder` into rows, columns and a computed width and height per image.
+Iterating the files in Fluid instead would render the images correctly and
+ignore every one of those backend fields — which is why the functional test
+asserts the column count rather than the presence of an `<img>`.
 
 What core still gives for free, and what the templates therefore rely on:
 
@@ -149,10 +176,18 @@ had deliberately hidden.
 | `StaticTypoScriptFallbackRenderingTest` | A page renders through the static include, with no set.                |
 | `StaticTypoScriptIncludeTest`           | The static include is registered in the TCA at all.                    |
 | `ContentElementRenderingTest`           | `header` and `text` render, and the core error notice does not appear. |
+| `ImageElementRenderingTest`             | The `image` element renders, and its backend fields reach the output.  |
 
 The first two cover the two branches of the guard condition. Both were shown to
 fail: renaming the set breaks the first, inverting the condition breaks the
 second.
+
+`ImageElementRenderingTest` was shown to fail twice, in the two ways that
+matter: removing the `tt_content.image` branch turns all eight tests red, and
+replacing `numberOfColumns.field = imagecols` with a fixed `1` turns exactly the
+two column assertions red while the images still render. The second break is the
+point of the test — it is the failure a template iterating the files directly
+would produce, and it is invisible in a screenshot.
 
 ## See also
 

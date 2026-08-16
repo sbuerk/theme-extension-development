@@ -36,9 +36,10 @@ based test instances and acceptance tests.
 ..  note::
 
     This is a development tool, not a production theme. It renders a page and
-    the two content elements that exist without :file:`fluid_styled_content`,
-    and the public API is not stable and may change without a deprecation phase
-    until the first stable release.
+    the :guilabel:`Header`, :guilabel:`Text` and :guilabel:`Images` content
+    elements without depending on :file:`fluid_styled_content`, and the public
+    API is not stable and may change without a deprecation phase until the first
+    stable release.
 
 ----
 

@@ -57,11 +57,32 @@ The stylesheet itself is compiled from SCSS sources that ship with the
 extension, so it can also be rebuilt with different design tokens instead of
 being overridden.
 
+Image width
+===========
+
+The :guilabel:`Images` element scales its images to the width the layout gives
+the content column. That width is a constant, because nothing in TypoScript can
+read it out of the stylesheet:
+
+..  code-block:: typoscript
+
+    theme.media {
+        # The width in pixels the gallery is computed for.
+        maxGalleryWidth = 1200
+
+        # The same, for an element positioned beside the text.
+        maxGalleryWidthInText = 420
+    }
+
+Set it too low and images are processed smaller than they are displayed, which
+shows. Set it far too high and every image is processed at a size no visitor
+ever sees.
+
 Content elements
 ================
 
-The theme renders the content elements TYPO3 provides without
-:file:`fluid_styled_content`, on which it deliberately does not depend:
+The theme brings its own content element rendering, so that it does not depend
+on :file:`fluid_styled_content`:
 
 ..  list-table::
     :header-rows: 1
@@ -72,15 +93,17 @@ The theme renders the content elements TYPO3 provides without
         -   yes, honouring the heading level and the "do not display" setting
     *   -   :guilabel:`Text`
         -   yes, including rich text
+    *   -   :guilabel:`Images`
+        -   yes, honouring the column count, the position, the fixed
+            dimensions and the click-enlarge setting
 
 ..  warning::
 
-    Those are the only two content elements that exist in an installation
-    without :file:`fluid_styled_content`. Everything a TYPO3 installation
-    usually offers — :guilabel:`Text & Media`, :guilabel:`Images`,
-    :guilabel:`Bullet List`, :guilabel:`Table`, :guilabel:`File Links` and the
-    menu elements — is registered by that extension, not by the TYPO3 core, and
-    is therefore not available here at all.
+    The remaining classic content elements — :guilabel:`Text & Media`,
+    :guilabel:`Bullet List`, :guilabel:`Table`, :guilabel:`File Links`, the menu
+    elements and :guilabel:`HTML` — **can be created** in the backend. Their TCA
+    comes from EXT:frontend and not from :file:`fluid_styled_content`, which
+    contributes only the rendering.
 
-    An element that has no rendering definition renders a TYPO3 notice saying
-    so, rather than nothing.
+    They have no rendering definition here yet, and an element without one
+    renders a TYPO3 notice saying so, rather than nothing.

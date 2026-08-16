@@ -1,0 +1,57 @@
+// The gallery of the image content element.
+//
+// "GalleryProcessor" has already decided how many columns a row holds and how
+// wide each image is, so this layer only lays the row out. It deliberately sets
+// no column count of its own: that is the editor's "Number of columns" field,
+// and a stylesheet overruling it would turn the field into a decoration.
+//
+// @todo The position modifiers and the border the "imageborder" field asks for
+//       are structural only. They get their real values with the design work.
+
+.gallery {
+    margin: 0 0 var(--theme-spacing-lg);
+}
+
+.gallery__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--theme-spacing-md);
+
+    & + & {
+        margin-top: var(--theme-spacing-md);
+    }
+}
+
+.gallery--center .gallery__row {
+    justify-content: center;
+}
+
+.gallery--right .gallery__row {
+    justify-content: flex-end;
+}
+
+.gallery--left .gallery__row {
+    justify-content: flex-start;
+}
+
+.gallery__item {
+    // "min-width: 0" keeps a flex item from refusing to shrink below the
+    // intrinsic width of its image, which is what makes a wide image break the
+    // row instead of scaling down with it.
+    min-width: 0;
+    margin: 0;
+}
+
+.gallery__zoom {
+    display: block;
+}
+
+.gallery__image {
+    height: auto;
+}
+
+.gallery__caption {
+    margin-top: var(--theme-spacing-xs);
+    font-size: 0.875rem;
+}
