@@ -20,6 +20,7 @@ Documentation for people **using** the extension lives in
 | [Dual core setup](development/dual-core-setup.md)     | Running against TYPO3 v13 and v14, and the rule that avoids false positives. |
 | [Quality gates](development/quality-gates.md)         | Every gate and its configuration, PHPStan per core version, CI.              |
 | [Frontend assets](development/frontend-assets.md)     | The SCSS build, the node image, the `checkCssBuild` gate, design tokens.     |
+| [Component library](development/component-library.md) | Every component's markup contract, the two switches, what the tests guard.   |
 | [Development instances](development/instances.md)     | The two TYPO3 instances, the `theme` symlink, snapshot and restore.          |
 | [Seeding](development/seeding.md)                     | `theme:seed`, the definition format, why it goes through DataHandler.        |
 

@@ -1,0 +1,222 @@
+// Main navigation.
+//
+// Markup contract, from "MenuProcessor" two levels deep:
+//
+//     <nav class="theme-nav-main" aria-label="Main">
+//         <button class="theme-nav-main__toggle" aria-expanded="false" aria-controls="nav-main">…</button>
+//         <ul class="theme-nav-main__list" id="nav-main">
+//             <li class="theme-nav-main__item theme-nav-main__item--active">
+//                 <a class="theme-nav-main__link" href="…" aria-current="page">…</a>
+//                 <ul class="theme-nav-main__list theme-nav-main__list--sub">…</ul>
+//             </li>
+//         </ul>
+//     </nav>
+//
+// "--active" marks an ancestor of the current page - the top-level item whose
+// submenu contains it, not necessarily the current page itself. The link that
+// *is* the current page carries "[aria-current='page']" instead, and the two
+// are independent: a top item can be "--active" while its own link is not
+// "[aria-current='page']".
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- The breakpoint --------------------------------------------------------
+//
+// "bp.$md" is 48rem (768px), and this component is where that number was
+// decided: it is the point at which two levels of this menu stop fitting a
+// single row without wrapping. Every other component that stacks uses the same
+// one because none of them wanted a different one, not because it was imposed.
+//
+// It is a Sass variable rather than a custom property because a media query
+// condition is evaluated before the cascade - see "abstracts/_breakpoints.scss".
+//
+// --- State lives in the ARIA attribute --------------------------------------
+//
+// The open state of the collapsed menu is read off "[aria-expanded='true']" on
+// the toggle button via ":has()" on the nav, not a JS-authored class: the
+// attribute a screen reader announces and the attribute CSS renders from are
+// the same attribute, so the two cannot drift apart.
+//
+// --- Collapsing is an enhancement, not the default --------------------------
+//
+// A plain "<button>" carries no native disclosure behaviour the way "<details>"
+// does, so the toggle only works once a script flips its attribute. Making the
+// collapsed state the default would therefore hide the entire menu on a narrow
+// viewport whenever that script has not run - a broken page, not a degraded
+// one.
+//
+// So the default is the *open* layout: the list is always laid out, stacked
+// below the breakpoint and in a row above it, and it needs no script at all.
+// Collapsing is switched on by a "data-js" attribute that the theme's script
+// sets on the root element as its first act. Without JavaScript the toggle is
+// never shown and the menu is simply always expanded.
+//
+// This is why the collapse rule is written as a negation - "not disclosed"
+// hides - rather than as a positive "disclosed shows". The undecorated state
+// has to be the usable one.
+//
+// The chosen structural variant (DESIGN.md: "Frame") is applied twice here -
+// the nav itself sits in a box like every other component, and the current
+// item is filled solid inside it.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-nav-main {
+    --theme-nav-main-background: var(--theme-color-surface, #f4f6fa);
+    --theme-nav-main-border-color: var(--theme-color-border, #d6dce6);
+    --theme-nav-main-radius: var(--theme-radius-sm, 5px);
+    --theme-nav-main-gap: var(--theme-space-2, 0.625rem);
+    --theme-nav-main-padding: var(--theme-space-2, 0.625rem);
+    --theme-nav-main-link-color: var(--theme-color-text-primary, #14181f);
+    --theme-nav-main-link-color-hover: var(--theme-color-primary, #0b57d0);
+    --theme-nav-main-current-background: var(--theme-color-primary, #0b57d0);
+    --theme-nav-main-current-foreground: var(--theme-color-on-primary, #ffffff);
+    --theme-nav-main-sub-background: var(--theme-color-surface-raised, #ffffff);
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--theme-nav-main-gap);
+    padding: var(--theme-nav-main-padding);
+    background-color: var(--theme-nav-main-background);
+    border: var(--theme-border-width) solid var(--theme-nav-main-border-color);
+    border-radius: var(--theme-nav-main-radius);
+}
+
+// Never shown unless a script is there to operate it, and never above the
+// breakpoint, where there is nothing left to disclose.
+.theme-nav-main__toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--theme-tap-target-min);
+    min-width: var(--theme-tap-target-min);
+    padding: var(--theme-space-2) var(--theme-space-3);
+    border: var(--theme-border-width) solid var(--theme-nav-main-border-color);
+    border-radius: var(--theme-nav-main-radius);
+    background-color: transparent;
+    color: var(--theme-nav-main-link-color);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    cursor: pointer;
+
+    [data-js] & {
+        display: inline-flex;
+    }
+
+    @media (min-width: bp.$md) {
+        display: none;
+
+        [data-js] & {
+            display: none;
+        }
+    }
+}
+
+// Shared reset for both levels, and the open layout is the default: stacked.
+.theme-nav-main__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+// The top level only. The ">" combinator matters: without it this would also
+// match the nested "&--sub" list and fight its rules below.
+.theme-nav-main > .theme-nav-main__list {
+    width: 100%;
+
+    @media (min-width: bp.$md) {
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+    }
+}
+
+// Collapsing, as an enhancement. Both conditions have to hold: a script has
+// announced itself on the root, and the viewport is narrow enough for the row
+// layout not to apply. The selector hides what is *not* disclosed, so the
+// state the page starts in - and stays in without JavaScript - is the usable
+// one.
+@media (max-width: bp.$md-max) {
+    [data-js] .theme-nav-main:not(:has(.theme-nav-main__toggle[aria-expanded='true'])) > .theme-nav-main__list {
+        display: none;
+    }
+}
+
+// The anchor for the "&--sub" list's absolute position on wide viewports.
+.theme-nav-main__item {
+    position: relative;
+}
+
+.theme-nav-main__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--theme-tap-target-min);
+    padding: var(--theme-space-2) var(--theme-space-3);
+    border-radius: var(--theme-nav-main-radius);
+    color: var(--theme-nav-main-link-color);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-tight);
+    text-decoration: none;
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        color: var(--theme-nav-main-link-color-hover);
+    }
+}
+
+// The current page, and the ancestor item that leads to it, take the same
+// fill: both answer "where am I", and a reader should not have to tell a
+// trail marker from the destination.
+.theme-nav-main__link[aria-current='page'],
+.theme-nav-main__item--active > .theme-nav-main__link {
+    background-color: var(--theme-nav-main-current-background);
+    color: var(--theme-nav-main-current-foreground);
+
+    &:hover {
+        color: var(--theme-nav-main-current-foreground);
+    }
+}
+
+// Second level. Inline in the collapsed layout, because there is no hover to
+// disclose it with on a touch screen and it has to be reachable some other
+// way; a floating panel, revealed on hover or focus, once there is room for
+// one.
+.theme-nav-main__list--sub {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-1);
+    margin-block: var(--theme-space-1) 0;
+    padding-inline-start: var(--theme-space-4);
+
+    @media (min-width: bp.$md) {
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block-start: 100%;
+        z-index: var(--theme-z-sticky);
+        display: none;
+        flex-direction: column;
+        margin-block-start: 0;
+        padding: var(--theme-space-2);
+        background-color: var(--theme-nav-main-sub-background);
+        border: var(--theme-border-width) solid var(--theme-nav-main-border-color);
+        border-radius: var(--theme-nav-main-radius);
+    }
+}
+
+// ":focus-within" rather than only ":focus" on the link, so tabbing into the
+// panel does not close the very thing being tabbed through.
+@media (min-width: bp.$md) {
+    .theme-nav-main__item:hover > .theme-nav-main__list--sub,
+    .theme-nav-main__item:focus-within > .theme-nav-main__list--sub {
+        display: flex;
+    }
+}

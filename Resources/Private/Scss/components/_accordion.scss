@@ -1,0 +1,108 @@
+// Accordion.
+//
+// Markup contract:
+//
+//     <div class="theme-accordion">
+//         <details class="theme-accordion__item" name="faq">
+//             <summary class="theme-accordion__summary">…</summary>
+//             <div class="theme-accordion__panel">…</div>
+//         </details>
+//     </div>
+//
+// Built on native "details"/"summary" and nothing else. A shared "name" on
+// every "details" in the group is what makes them mutually exclusive - the
+// browser closes the others when one opens - which is the one behaviour a
+// hand-rolled accordion usually reaches for JavaScript to get. Toggle state,
+// keyboard handling and the accessible expanded/collapsed semantics all come
+// from the element for free. This file only draws the marker.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- Reduced motion ---------------------------------------------------
+//
+// The chevron below carries a "transition". No "@media (prefers-reduced-
+// motion: reduce)" query is added here on purpose: "base/_reset.scss"
+// already collapses every "transition-duration" to 1ms globally, so a
+// second, component-local query would be redundant at best and could drift
+// from the reset at worst.
+
+.theme-accordion {
+    --theme-accordion-border-color: var(--theme-color-border, #d6dce6);
+    --theme-accordion-marker-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-accordion-marker-size: var(--theme-space-2, 0.625rem);
+    --theme-accordion-summary-padding-block: var(--theme-space-3, 0.9375rem);
+    --theme-accordion-summary-padding-inline: var(--theme-space-2, 0.625rem);
+    --theme-accordion-panel-padding-inline: var(--theme-space-2, 0.625rem);
+    --theme-accordion-panel-padding-block-end: var(--theme-space-4, 1.25rem);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.theme-accordion__item {
+    border-block-end: var(--theme-border-width, 1px) solid var(--theme-accordion-border-color);
+
+    &:first-child {
+        border-block-start: var(--theme-border-width, 1px) solid var(--theme-accordion-border-color);
+    }
+}
+
+.theme-accordion__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--theme-space-3, 0.9375rem);
+
+    // The tap target floor applies to the whole disclosure control, not just
+    // the chevron, which is why it sits here rather than on the marker.
+    min-height: var(--theme-tap-target-min);
+    padding: var(--theme-accordion-summary-padding-block) var(--theme-accordion-summary-padding-inline);
+
+    color: var(--theme-color-text-primary);
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-medium);
+    line-height: var(--theme-line-height-snug);
+
+    // "summary" is already a button in the accessibility tree; it does not
+    // get one in the browser's default cursor without this.
+    cursor: pointer;
+
+    // Firefox and Chromium honour "list-style"; older WebKit needs the
+    // pseudo-element hidden separately. Between the two, the native marker
+    // is gone everywhere the chevron below has to replace it.
+    list-style: none;
+
+    &::-webkit-details-marker {
+        display: none;
+    }
+
+    &::after {
+        content: '';
+        flex-shrink: 0;
+
+        width: var(--theme-accordion-marker-size);
+        height: var(--theme-accordion-marker-size);
+
+        // Two visible sides of a square, rotated 45deg, read as a chevron -
+        // no icon asset needed for a shape this simple.
+        border-inline-end: var(--theme-border-width-strong, 2px) solid var(--theme-accordion-marker-color);
+        border-block-end: var(--theme-border-width-strong, 2px) solid var(--theme-accordion-marker-color);
+        transform: rotate(45deg);
+        transition: transform var(--theme-duration-base, 200ms) var(--theme-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+    }
+}
+
+// A further 180deg turns the same corner into one pointing the other way,
+// so opening the item is what flips the chevron - no separate open/closed
+// glyph to keep in sync with the "[open]" attribute.
+.theme-accordion__item[open] > .theme-accordion__summary::after {
+    transform: rotate(225deg);
+}
+
+.theme-accordion__panel {
+    padding: 0 var(--theme-accordion-panel-padding-inline) var(--theme-accordion-panel-padding-block-end);
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+    line-height: var(--theme-line-height-base);
+}

@@ -1,0 +1,101 @@
+// Site header.
+//
+// Markup contract:
+//
+//     <header class="theme-site-header">
+//         <div class="theme-site-header__inner">
+//             <a class="theme-site-header__brand" href="/">…</a>
+//             <nav class="theme-nav-main">…</nav>
+//             <div class="theme-site-header__actions">…</div>
+//         </div>
+//     </header>
+//
+// Add ".theme-site-header--sticky" to pin the header to the top of the
+// viewport; the modifier is opt-in rather than the default because a sticky
+// header steals viewport height on every scroll position, which is not
+// wanted on every page that uses this frame.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+@use '../abstracts/mixins' as mixins;
+
+.theme-site-header {
+    --theme-site-header-background: var(--theme-color-background, #ffffff);
+    --theme-site-header-border-color: var(--theme-color-border, #d6dce6);
+    --theme-site-header-gap: var(--theme-space-4, 1.25rem);
+    --theme-site-header-padding-block: var(--theme-space-3, 0.9375rem);
+
+    // Bottom hairline only: the header is a band, not a card, so it does not
+    // also get a top or side border.
+    border-block-end: var(--theme-border-width) solid var(--theme-site-header-border-color);
+    background-color: var(--theme-site-header-background);
+}
+
+// Sticky is a modifier on the outer element, not on "__inner": the border and
+// background have to travel with it, and "position: sticky" on the inner
+// element alone would leave both behind as the page scrolls past.
+.theme-site-header--sticky {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--theme-z-sticky);
+}
+
+.theme-site-header__inner {
+    @include mixins.content-container;
+
+    display: flex;
+    align-items: center;
+    gap: var(--theme-site-header-gap);
+    min-height: var(--theme-tap-target-min);
+    padding-block: var(--theme-site-header-padding-block);
+}
+
+.theme-site-header__brand {
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-lg, 1.25rem);
+    font-weight: var(--theme-font-weight-bold, 800);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    text-decoration: none;
+
+    &:hover {
+        color: var(--theme-color-primary, #0b57d0);
+    }
+}
+
+// "margin-inline-start: auto" on the nav is the whole mechanism for "pushed
+// to the end": it consumes the row's free space in front of the nav, which
+// carries the actions slot along with it since that slot simply follows in
+// source order. No separate spacer element, and no change needed if the
+// actions slot is empty or omitted.
+.theme-nav-main {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-space-4, 1.25rem);
+    margin-inline-start: auto;
+
+    ul {
+        display: flex;
+        align-items: center;
+        gap: inherit;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    a {
+        color: var(--theme-color-text-primary, #14181f);
+        font-weight: var(--theme-font-weight-medium, 500);
+        text-decoration: none;
+
+        &:hover {
+            color: var(--theme-color-primary, #0b57d0);
+        }
+    }
+}
+
+.theme-site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-space-3, 0.9375rem);
+}

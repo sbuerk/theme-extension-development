@@ -1,0 +1,57 @@
+// Skip link.
+//
+// Markup contract:
+//
+//     <a class="theme-skip-link" href="#content">Skip to content</a>
+//
+// The first focusable element on the page, and normally invisible: it is a
+// bypass for keyboard and screen reader users past repeated navigation, and
+// pinned on screen the moment it receives visible focus.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback, and "abstracts/_mixins.scss" for why
+// "visually-hidden" clips rather than removes - "display: none" or a zero
+// size would also drop the link from the accessibility tree, which defeats
+// the point of a skip link entirely.
+//
+// ":focus-visible" rather than ":focus", so a mouse click does not flash the
+// link into view for a sighted pointer user who was never going to tab
+// through it.
+
+@use '../abstracts/mixins' as mixins;
+
+.theme-skip-link {
+    --theme-skip-link-background: var(--theme-color-primary, #0b57d0);
+    --theme-skip-link-foreground: var(--theme-color-on-primary, #ffffff);
+    --theme-skip-link-padding-block: var(--theme-space-2, 0.625rem);
+    --theme-skip-link-padding-inline: var(--theme-space-4, 1.25rem);
+    --theme-skip-link-radius: var(--theme-radius-sm, 5px);
+
+    @include mixins.visually-hidden;
+
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+
+    // Every property the mixin clips the link with is undone here: nothing
+    // below is a new declaration, it is the mixin's own list read backwards.
+    &:focus-visible {
+        position: fixed;
+        inset-block-start: var(--theme-space-2);
+        inset-inline-start: var(--theme-space-2);
+        z-index: var(--theme-z-sticky);
+        display: inline-flex;
+        align-items: center;
+        width: auto;
+        height: auto;
+        min-height: var(--theme-tap-target-min);
+        margin: 0;
+        padding: var(--theme-skip-link-padding-block) var(--theme-skip-link-padding-inline);
+        overflow: visible;
+        clip-path: none;
+        white-space: normal;
+        border-radius: var(--theme-skip-link-radius);
+        background-color: var(--theme-skip-link-background);
+        color: var(--theme-skip-link-foreground);
+        text-decoration: none;
+    }
+}

@@ -97,7 +97,7 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         $body = $this->renderRootPage();
 
         // One, two, one and none: the fourth element references no file at all.
-        $this->assertSame(4, substr_count($body, '<figure class="gallery__item">'));
+        $this->assertSame(4, substr_count($body, '<figure class="theme-gallery__item">'));
     }
 
     #[Test]
@@ -122,8 +122,8 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         $body = $this->renderRootPage();
 
         // "imagecols" is 2 on the second element and unset on the others.
-        $this->assertSame(1, substr_count($body, 'data-gallery-columns="2"'));
-        $this->assertSame(2, substr_count($body, 'data-gallery-columns="1"'));
+        $this->assertSame(1, substr_count($body, 'data-theme-gallery-columns="2"'));
+        $this->assertSame(2, substr_count($body, 'data-theme-gallery-columns="1"'));
     }
 
     #[Test]
@@ -133,7 +133,7 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
 
         // Three galleries, three rows: the two column element puts both of its
         // images into the same row rather than into one row each.
-        $this->assertSame(3, substr_count($body, '<div class="gallery__row">'));
+        $this->assertSame(3, substr_count($body, '<div class="theme-gallery__row">'));
     }
 
     #[Test]
@@ -144,7 +144,7 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         // The element itself is rendered - its heading proves it - but it
         // contributes no empty gallery markup.
         $this->assertStringContainsString('An element without an image', $body);
-        $this->assertSame(3, substr_count($body, '<div class="gallery '));
+        $this->assertSame(3, substr_count($body, '<div class="theme-gallery '));
     }
 
     #[Test]
@@ -153,9 +153,9 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         $body = $this->renderRootPage();
 
         // Set on the third element only.
-        $this->assertSame(1, substr_count($body, '<a class="gallery__zoom"'));
+        $this->assertSame(1, substr_count($body, '<a class="theme-gallery__zoom"'));
         $this->assertMatchesRegularExpression(
-            '#<a class="gallery__zoom" href="[^"]+/placeholder\.svg">#',
+            '#<a class="theme-gallery__zoom" href="[^"]+/placeholder\.svg">#',
             $body,
         );
     }
@@ -170,7 +170,7 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
 
         $this->assertStringContainsString('alt="A placeholder image"', $body);
         $this->assertStringContainsString(
-            '<figcaption class="gallery__caption">The caption of the image</figcaption>',
+            '<figcaption class="theme-gallery__caption">The caption of the image</figcaption>',
             $body,
         );
     }

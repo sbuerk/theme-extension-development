@@ -1,0 +1,113 @@
+// Card.
+//
+// Markup contract:
+//
+//     <article class="theme-card">
+//         <div class="theme-card__media"><img …></div>
+//         <div class="theme-card__body">
+//             <h3 class="theme-card__title">…</h3>
+//             <p class="theme-card__text">…</p>
+//             <a class="theme-card__link" href="…">…</a>
+//         </div>
+//     </article>
+//
+// A grid of them:
+//
+//     <div class="theme-card-grid">…</div>
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-card {
+    --theme-card-background: var(--theme-color-surface, #f4f6fa);
+    --theme-card-border-color: var(--theme-color-border, #d6dce6);
+    --theme-card-radius: var(--theme-radius-sm, 5px);
+    --theme-card-padding: var(--theme-space-4, 1.25rem);
+    --theme-card-gap: var(--theme-space-2, 0.625rem);
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    background-color: var(--theme-card-background);
+    border: var(--theme-border-width) solid var(--theme-card-border-color);
+    border-radius: var(--theme-card-radius);
+}
+
+// Bleeds to the card edge: the padding lives on the body, not on the card, so
+// an image can sit flush without a negative margin.
+.theme-card__media {
+    img,
+    picture,
+    video {
+        width: 100%;
+        object-fit: cover;
+    }
+}
+
+.theme-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--theme-card-gap);
+    padding: var(--theme-card-padding);
+}
+
+.theme-card__title {
+    margin: 0;
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-snug);
+}
+
+.theme-card__text {
+    margin: 0;
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+}
+
+// Pushed to the bottom so a row of cards with unequal text still lines its
+// links up.
+.theme-card__link {
+    margin-top: auto;
+    color: var(--theme-color-primary);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+
+    &:hover {
+        color: var(--theme-color-primary-hover);
+    }
+}
+
+// The whole card becomes the target, without nesting interactive elements:
+// the link keeps the accessible name and the pseudo element does the hit area.
+.theme-card--linked {
+    position: relative;
+
+    .theme-card__link::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+    }
+
+    &:has(.theme-card__link:hover) {
+        border-color: var(--theme-color-border-strong);
+    }
+}
+
+// Auto-fit rather than a fixed column count: the grid answers the space it is
+// given, which is what makes it work in a narrow content column and in a full
+// width band without a modifier for each.
+.theme-card-grid {
+    --theme-card-grid-min: 14rem;
+
+    display: grid;
+    gap: var(--theme-space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--theme-card-grid-min), 100%), 1fr));
+}
+
+.theme-card-grid--wide {
+    --theme-card-grid-min: 20rem;
+}

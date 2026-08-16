@@ -1,0 +1,106 @@
+// Table.
+//
+// Markup contract:
+//
+//     <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="…">
+//         <table class="theme-table">
+//             <caption class="theme-table__caption">…</caption>
+//             <thead>…</thead><tbody>…</tbody>
+//         </table>
+//     </div>
+//
+// Helper: "theme-table__cell--numeric" on a "<td>"/"<th>" that holds a number.
+// "<thead>"/"<tbody>"/"<th>"/"<td>" are styled through plain element selectors
+// scoped under "theme-table", not through a BEM class each - the markup
+// contract does not name one, and adding classes the contract does not ask
+// for would make this file diverge from what it documents.
+//
+// --- Why "tabindex=0" + "role=region" + "aria-label" on the wrapper --------
+//
+// "theme-table-wrapper" scrolls horizontally so the page body never has to:
+// see the "overflow-x" rule below. A container that scrolls but is not itself
+// focusable is unreachable by keyboard - a mouse or touch user can drag it,
+// a keyboard user has no way to move focus into it at all, because "overflow"
+// alone does not add a tab stop. "tabindex=0" on the wrapper (never on the
+// "<table>", which has no scrolling box of its own) gives it exactly one stop
+// in the tab sequence, and once focused, arrow keys and Page Up/Down scroll it
+// natively - no script required. "role=region" plus "aria-label" then turn
+// that stop into a named landmark instead of an unlabelled one: without the
+// label a screen reader announces only "region" when focus lands there, which
+// tells a keyboard user nothing about why. This is the W3C APG's
+// scrollable-region-focusable pattern, applied here in markup - this file only
+// styles what the markup already declares.
+//
+// Structural variant: Frame, the same box "_card.scss"/"_hero.scss"/
+// "_teaser.scss" use, applied to the wrapper. The wrapper's own fill is
+// "--theme-color-background", not "--theme-color-surface": the header row is
+// required to sit on "--theme-color-surface" (see below), and if the wrapper
+// used the same tint the header would stop reading as a distinct row.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-table-wrapper {
+    --theme-table-wrapper-background: var(--theme-color-background, #ffffff);
+    --theme-table-wrapper-border-color: var(--theme-color-border, #d6dce6);
+    --theme-table-wrapper-radius: var(--theme-radius-sm, 5px);
+
+    overflow-x: auto;
+
+    background-color: var(--theme-table-wrapper-background);
+    border: var(--theme-border-width) solid var(--theme-table-wrapper-border-color);
+    border-radius: var(--theme-table-wrapper-radius);
+}
+
+.theme-table__caption {
+    padding: var(--theme-space-3, 0.9375rem) var(--theme-space-4, 1.25rem);
+    color: var(--theme-color-text-secondary, #4a5567);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    text-align: start;
+    caption-side: top;
+}
+
+.theme-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+
+    thead {
+        // The one place this file is told a colour by name rather than
+        // choosing one: "--theme-color-surface" on the header row is a design
+        // requirement, not a default this file picked.
+        background-color: var(--theme-color-surface, #f4f6fa);
+
+        th {
+            padding: var(--theme-space-3, 0.9375rem) var(--theme-space-4, 1.25rem);
+            border-bottom: var(--theme-border-width-strong, 2px) solid var(--theme-color-border-strong, #828d9f);
+            font-weight: var(--theme-font-weight-bold, 800);
+            letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+            text-align: start;
+        }
+    }
+
+    tbody {
+        // Zebra striping. "nth-child(even)" rather than a class, so the
+        // markup contract stays exactly the four elements listed above and
+        // striping keeps working for a row inserted or removed at runtime.
+        tr:nth-child(even) {
+            background-color: var(--theme-color-surface, #f4f6fa);
+        }
+
+        th,
+        td {
+            padding: var(--theme-space-3, 0.9375rem) var(--theme-space-4, 1.25rem);
+            border-bottom: var(--theme-border-width, 1px) solid var(--theme-color-border, #d6dce6);
+            text-align: start;
+        }
+    }
+}
+
+// A number reads best aligned on its ones place and set in figures of equal
+// width, so a column of them lines up - text does neither by default.
+.theme-table__cell--numeric {
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+}

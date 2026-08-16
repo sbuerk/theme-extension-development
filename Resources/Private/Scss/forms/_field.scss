@@ -1,0 +1,82 @@
+// Field wrapper, label, hint and required marker.
+//
+// Markup contract (the full form - see "_controls.scss" for why all three
+// "forms/" partials repeat it):
+//
+//     <form class="theme-form">
+//         <div class="theme-form-summary theme-form-summary--error" role="alert" tabindex="-1">
+//             <p class="theme-form-summary__title">…</p>
+//             <ul class="theme-form-summary__list"><li><a href="#f-mail">…</a></li></ul>
+//         </div>
+//
+//         <div class="theme-field theme-field--invalid">
+//             <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required">*</span></label>
+//             <input class="theme-input" id="f-mail" type="email" aria-invalid="true" aria-describedby="f-mail-error f-mail-hint">
+//             <p class="theme-field__error" id="f-mail-error">…</p>
+//             <p class="theme-field__hint" id="f-mail-hint">…</p>
+//         </div>
+//
+//         <fieldset class="theme-fieldset">
+//             <legend class="theme-fieldset__legend">…</legend>
+//             <label class="theme-check"><input type="checkbox"> …</label>
+//         </fieldset>
+//     </form>
+//
+// This file owns the field's own layout and its static text pieces: label,
+// hint, required marker and the vertical rhythm of the form around it. The
+// control itself is "_controls.scss"; the error/success repaint of both is
+// "_validation.scss".
+
+.theme-form {
+    display: grid;
+    // One step looser than the "hr" rule in "base/_elements.scss"
+    // (space-6): a horizontal rule separates unrelated sections, a field
+    // gap separates rows of the same form and can afford to sit tighter.
+    gap: var(--theme-space-5, 1.5625rem);
+}
+
+.theme-field {
+    --theme-field-gap: var(--theme-space-1, 0.3125rem);
+
+    display: grid;
+    // Row order is source order: label, control, error, hint - exactly the
+    // markup contract above. Nothing here reorders it, so the visual order
+    // and the reading order the "aria-describedby" list assumes stay the
+    // same order.
+    gap: var(--theme-field-gap);
+}
+
+.theme-field__label {
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+}
+
+// The glyph is a sighted-user affordance only. The control's own "required"
+// attribute is what a screen reader announces, so the markup gives this span
+// "aria-hidden='true'" and the colour below is free to be the only signal.
+.theme-field__required {
+    color: var(--theme-color-danger, #b3261e);
+}
+
+.theme-field__hint {
+    margin: 0;
+    color: var(--theme-color-text-muted, #616b80);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+}
+
+// Label and control side by side - for a field that reads as a short row
+// (a single checkbox-sized control, a compact filter) rather than a stacked
+// block. Hint still spans the full width underneath rather than squeezing
+// into the narrow label column.
+.theme-field--inline {
+    grid-template-columns: max-content 1fr;
+    align-items: center;
+    column-gap: var(--theme-space-3, 0.9375rem);
+    row-gap: var(--theme-field-gap);
+
+    .theme-field__hint {
+        grid-column: 1 / -1;
+    }
+}

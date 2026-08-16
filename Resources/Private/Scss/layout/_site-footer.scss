@@ -1,0 +1,84 @@
+// Site footer.
+//
+// Markup contract:
+//
+//     <footer class="theme-site-footer">
+//         <div class="theme-site-footer__inner">
+//             <div class="theme-site-footer__columns">
+//                 <div class="theme-site-footer__column">…</div>
+//             </div>
+//             <div class="theme-site-footer__meta">…</div>
+//         </div>
+//     </footer>
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+@use '../abstracts/mixins' as mixins;
+
+.theme-site-footer {
+    --theme-site-footer-background: var(--theme-color-surface, #f4f6fa);
+    --theme-site-footer-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-site-footer-border-color: var(--theme-color-border, #d6dce6);
+    --theme-site-footer-padding-block: var(--theme-space-8, 3.75rem);
+
+    background-color: var(--theme-site-footer-background);
+    color: var(--theme-site-footer-color);
+}
+
+.theme-site-footer__inner {
+    @include mixins.content-container;
+
+    padding-block: var(--theme-site-footer-padding-block);
+}
+
+// Auto-fit rather than a fixed column count, same reasoning as
+// ".theme-card-grid" in "components/_card.scss": the footer sits at full
+// page width, so the column count should answer the space it is given
+// instead of being told a breakpoint-specific number.
+.theme-site-footer__columns {
+    --theme-site-footer-column-min: 11rem;
+
+    display: grid;
+    gap: var(--theme-space-6, 1.875rem);
+    grid-template-columns: repeat(auto-fit, minmax(var(--theme-site-footer-column-min), 1fr));
+}
+
+.theme-site-footer__column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-2, 0.625rem);
+
+    a {
+        color: inherit;
+        text-decoration: none;
+
+        &:hover {
+            color: var(--theme-color-primary, #0b57d0);
+        }
+    }
+}
+
+// Separated from the columns by a hairline rather than by spacing alone, so
+// the boundary between "content" and "legal/meta" reads even when a column
+// is short enough that spacing alone would not make it obvious.
+.theme-site-footer__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--theme-space-2, 0.625rem) var(--theme-space-4, 1.25rem);
+    margin-block-start: var(--theme-space-6, 1.875rem);
+    padding-block-start: var(--theme-space-4, 1.25rem);
+    border-block-start: var(--theme-border-width) solid var(--theme-site-footer-border-color);
+
+    color: var(--theme-color-text-muted, #616b80);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+
+    a {
+        color: inherit;
+        text-decoration: none;
+
+        &:hover {
+            color: var(--theme-color-primary, #0b57d0);
+        }
+    }
+}

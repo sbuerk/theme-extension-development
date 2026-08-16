@@ -1,0 +1,106 @@
+// Sub navigation - the current section, not the whole site.
+//
+// Markup contract, from "MenuProcessor" two levels deep:
+//
+//     <nav class="theme-nav-sub" aria-label="Section">
+//         <p class="theme-nav-sub__heading">…</p>
+//         <ul class="theme-nav-sub__list">
+//             <li class="theme-nav-sub__item"><a class="theme-nav-sub__link" href="…" aria-current="page">…</a>
+//                 <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">…</ul>
+//             </li>
+//         </ul>
+//     </nav>
+//
+// Vertical and always expanded: unlike "_nav-main.scss" this is a fixed,
+// left-hand block, not a bar that has to collapse behind a toggle, so there is
+// no breakpoint and no disclosure state to read here at all.
+//
+// No "--active" modifier. "_nav-main.scss" needs one because its current page
+// can be nested two levels under a top item that is not itself current.
+// "nav-sub" is scoped to a single section, so "[aria-current='page']" alone
+// is enough to mark it wherever it sits - see "components/_nav-main.scss" for
+// the case that does need the ancestor modifier.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback. The container box repeats the "Frame"
+// treatment from "_nav-main.scss" - every component sits in one, per
+// DESIGN.md.
+
+.theme-nav-sub {
+    --theme-nav-sub-background: var(--theme-color-surface, #f4f6fa);
+    --theme-nav-sub-border-color: var(--theme-color-border, #d6dce6);
+    --theme-nav-sub-radius: var(--theme-radius-sm, 5px);
+    --theme-nav-sub-padding: var(--theme-space-4, 1.25rem);
+    --theme-nav-sub-link-color: var(--theme-color-text-primary, #14181f);
+    --theme-nav-sub-link-color-hover: var(--theme-color-primary, #0b57d0);
+    --theme-nav-sub-current-background: var(--theme-color-primary, #0b57d0);
+    --theme-nav-sub-current-foreground: var(--theme-color-on-primary, #ffffff);
+
+    display: flex;
+    flex-direction: column;
+    padding: var(--theme-nav-sub-padding);
+    background-color: var(--theme-nav-sub-background);
+    border: var(--theme-border-width) solid var(--theme-nav-sub-border-color);
+    border-radius: var(--theme-nav-sub-radius);
+}
+
+// A label, not a heading level: the section title above this block already
+// carries the real heading, and duplicating it here as an "<hN>" would give
+// the page two headings with the same text one after another.
+.theme-nav-sub__heading {
+    margin: 0 0 var(--theme-space-3);
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-tight);
+}
+
+.theme-nav-sub__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+// Indented rather than given its own background: the indent alone says
+// "inside the item above", and a second fill would compete with the current
+// item's own fill below.
+.theme-nav-sub__list--level-2 {
+    margin-block-start: var(--theme-space-1);
+    padding-inline-start: var(--theme-space-4);
+}
+
+.theme-nav-sub__link {
+    display: flex;
+    align-items: center;
+    min-height: var(--theme-tap-target-min);
+    padding: var(--theme-space-2) var(--theme-space-3);
+    border-radius: var(--theme-nav-sub-radius);
+    color: var(--theme-nav-sub-link-color);
+    font-size: var(--theme-font-size-sm);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-tight);
+    text-decoration: none;
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        color: var(--theme-nav-sub-link-color-hover);
+    }
+
+    // Same fill as the current item in "_nav-main.scss" - one visual answer
+    // to "where am I" across both navigations.
+    &[aria-current='page'] {
+        background-color: var(--theme-nav-sub-current-background);
+        color: var(--theme-nav-sub-current-foreground);
+        font-weight: var(--theme-font-weight-medium);
+
+        &:hover {
+            color: var(--theme-nav-sub-current-foreground);
+        }
+    }
+}

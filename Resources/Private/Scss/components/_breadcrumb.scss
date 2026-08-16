@@ -1,0 +1,78 @@
+// Breadcrumb.
+//
+// Markup contract:
+//
+//     <nav class="theme-breadcrumb" aria-label="Breadcrumb">
+//         <ol class="theme-breadcrumb__list">
+//             <li class="theme-breadcrumb__item"><a class="theme-breadcrumb__link" href="…">…</a></li>
+//             <li class="theme-breadcrumb__item" aria-current="page">…</li>
+//         </ol>
+//     </nav>
+//
+// An "<ol>" because the trail is ordered - root first, current page last -
+// and that order is part of its meaning, not just its layout.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- The separator is not read out ------------------------------------------
+//
+// The "/" is generated content on a "::before", and generated content is not
+// part of an element's accessible name or description: browsers do not add it
+// to the accessibility tree at all, in either the ARIA or the HTML-AAM
+// mapping. No "aria-hidden" is needed to keep it out of a screen reader's way
+// - there is nothing there to hide.
+
+.theme-breadcrumb {
+    --theme-breadcrumb-gap: var(--theme-space-2, 0.625rem);
+    --theme-breadcrumb-separator-color: var(--theme-color-text-muted, #616b80);
+    --theme-breadcrumb-link-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-breadcrumb-link-color-hover: var(--theme-color-primary, #0b57d0);
+    --theme-breadcrumb-current-color: var(--theme-color-text-muted, #616b80);
+}
+
+.theme-breadcrumb__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--theme-breadcrumb-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+// A flex container itself, so gap also separates the "::before" separator
+// from the link/text that follows it - not just the items from each other.
+.theme-breadcrumb__item {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-breadcrumb-gap);
+    font-size: var(--theme-font-size-sm);
+
+    &:not(:first-child)::before {
+        content: '/';
+        color: var(--theme-breadcrumb-separator-color);
+    }
+}
+
+// The trail's destination, muted rather than emphasised: it is where the
+// reader already is, which is the opposite of where a breadcrumb points.
+.theme-breadcrumb__item:last-child {
+    color: var(--theme-breadcrumb-current-color);
+}
+
+// A tap target on an inline trail reads oddly at a glance, but the rule is
+// unconditional: whatever the visual footprint, the hit area does not shrink
+// below it.
+.theme-breadcrumb__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--theme-tap-target-min);
+    color: var(--theme-breadcrumb-link-color);
+    text-decoration: none;
+    transition: color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        color: var(--theme-breadcrumb-link-color-hover);
+    }
+}

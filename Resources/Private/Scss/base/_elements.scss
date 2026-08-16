@@ -1,0 +1,481 @@
+// Element baseline.
+//
+// Styling for every HTML element a TYPO3 editor or the RTE can emit. Content
+// coming out of "bodytext" is markup the theme did not choose and cannot add
+// a class to, so it has to look right from the tag alone.
+//
+// "base/_reset.scss" already covers box-sizing, the body, replaced-element
+// display, form-control font inheritance, focus-visible and reduced motion;
+// none of that is repeated here.
+//
+// Element selectors read global tokens directly, with no per-component token
+// layer of their own - that pattern exists in "components/" so a component can
+// be re-themed or ported into a shadow root on its own; a bare "<p>" carries
+// neither concern, so a second custom-property layer here would be indirection
+// with nothing behind it. See "components/_button.scss" for the full case.
+
+// --- Headings ----------------------------------------------------------
+
+// DESIGN.md's role table: Heading 1 and 2 are weight 800, Heading 3 steps down
+// to 500 - the size step from 34 to 24 to 20px is small enough that weight has
+// to carry the distinction alone. Tracking is +0.05em on every heading, the
+// one place this design tracks out rather than in.
+//
+// "text-wrap: balance" only takes effect for the handful of lines a browser
+// still applies it to, but costs nothing where it does not, and stops a
+// wrapped heading from leaving a two-word orphan on its own line.
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0 0 var(--theme-space-3);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-heading);
+    text-wrap: balance;
+}
+
+h1 {
+    font-size: var(--theme-font-size-2xl);
+}
+
+h2 {
+    font-size: var(--theme-font-size-xl);
+    line-height: var(--theme-line-height-snug);
+}
+
+// H4-H6 have no role of their own in DESIGN.md's table. Rather than invent a
+// step the reference was never measured against, they hold at the H3 size and
+// weight: the RTE lets an editor nest past H3, and the result still has to be
+// legible rather than shrink further on a scale nothing backs.
+h3,
+h4,
+h5,
+h6 {
+    font-size: var(--theme-font-size-lg);
+    font-weight: var(--theme-font-weight-medium);
+    line-height: var(--theme-line-height-snug);
+}
+
+// --- Prose blocks --------------------------------------------------------
+
+// Body is the one role in DESIGN.md with zero tracking. Stated as a token
+// rather than left to the initial value, so a paragraph nested inside a
+// tracked ancestor - "letter-spacing" is inherited - cannot pick the tracking
+// up by accident.
+p {
+    margin: 0 0 var(--theme-space-4);
+    letter-spacing: var(--theme-letter-spacing-none);
+}
+
+hr {
+    height: var(--theme-border-width);
+    margin: var(--theme-space-6) 0;
+    border: 0;
+    background-color: var(--theme-color-border);
+}
+
+address {
+    margin: 0 0 var(--theme-space-4);
+    color: var(--theme-color-text-secondary);
+
+    // The UA default is italic. Contact information is not emphasis, and it
+    // reads better upright next to "cite", which actually is italic.
+    font-style: normal;
+}
+
+// --- Lists ---------------------------------------------------------------
+
+ul,
+ol {
+    margin: 0 0 var(--theme-space-4);
+    padding-inline-start: var(--theme-space-7);
+}
+
+li {
+    margin-bottom: var(--theme-space-1);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+// A nested list sits inside an "li", which already carries that item's own
+// bottom margin - repeating the list's margin here would double the gap
+// before the first nested item.
+li > ul,
+li > ol {
+    margin-top: var(--theme-space-1);
+    margin-bottom: 0;
+}
+
+dl {
+    margin: 0 0 var(--theme-space-4);
+}
+
+dt {
+    font-weight: var(--theme-font-weight-bold);
+
+    &:not(:first-child) {
+        margin-top: var(--theme-space-2);
+    }
+}
+
+// Indented by the same amount as a list item, so a definition list and a
+// bullet list read as the same kind of thing when they sit next to each other.
+dd {
+    margin: 0 0 var(--theme-space-2);
+    margin-inline-start: var(--theme-space-7);
+    color: var(--theme-color-text-secondary);
+}
+
+// --- Quoting and figures --------------------------------------------------
+
+blockquote {
+    margin: 0 0 var(--theme-space-4);
+    padding-inline-start: var(--theme-space-4);
+    border-inline-start: var(--theme-border-width-strong) solid var(--theme-color-border-strong);
+    color: var(--theme-color-text-secondary);
+}
+
+figure {
+    margin: 0 0 var(--theme-space-4);
+}
+
+figcaption {
+    margin-top: var(--theme-space-2);
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+}
+
+// --- Links -----------------------------------------------------------------
+
+a {
+    color: var(--theme-color-primary);
+    transition: color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        color: var(--theme-color-primary-hover);
+    }
+}
+
+// A link that wraps only an image carries no text to underline or recolour,
+// so the hover state has to say "clickable" a different way: the image dims
+// instead. Reusing the disabled opacity rather than inventing a second one -
+// dimming borrows the same "this isn't at full strength right now" reading.
+a:has(img) {
+    text-decoration: none;
+
+    &:hover img {
+        opacity: var(--theme-opacity-disabled);
+    }
+}
+
+// --- Tables ----------------------------------------------------------------
+//
+// "border-collapse" is what lets a "tr" border and a "th"/"td" border sit on
+// the same line without doubling - no cell needs its own top border as a
+// result, only the boundaries below "thead" and above "tfoot" do.
+
+table {
+    width: 100%;
+    margin: 0 0 var(--theme-space-4);
+    border-collapse: collapse;
+}
+
+caption {
+    margin-bottom: var(--theme-space-2);
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+
+    // The UA default centres a caption above the table; every other block in
+    // this baseline starts at the inline edge, and a caption is no different.
+    text-align: left;
+}
+
+th,
+td {
+    padding: var(--theme-space-2) var(--theme-space-3);
+    text-align: left;
+
+    // The UA default is "middle", which reads oddly the moment a cell wraps
+    // to a second line - "top" keeps every row's first line level.
+    vertical-align: top;
+}
+
+thead th {
+    border-bottom: var(--theme-border-width-strong) solid var(--theme-color-border-strong);
+    font-weight: var(--theme-font-weight-bold);
+}
+
+tbody tr {
+    border-bottom: var(--theme-border-width) solid var(--theme-color-border);
+
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+tfoot {
+    border-top: var(--theme-border-width-strong) solid var(--theme-color-border-strong);
+    color: var(--theme-color-text-secondary);
+}
+
+// --- Inline text semantics -------------------------------------------------
+
+strong {
+    font-weight: var(--theme-font-weight-bold);
+}
+
+em {
+    font-style: italic;
+}
+
+// Maps to the Caption role in DESIGN.md's table. No other de-emphasised role
+// in this baseline - "figcaption", "cite", "dd" - sits in primary ink, and a
+// plain caption would be the odd one out if it did.
+small {
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-xs);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+}
+
+mark {
+    padding-inline: var(--theme-space-1);
+    border-radius: var(--theme-radius-sm);
+    background-color: var(--theme-color-warning-surface);
+    color: var(--theme-color-text-primary);
+}
+
+// "del"/"ins" read as a revision diff. The strike-through and the underline
+// already carry the meaning without colour, so the accent and the surface
+// tint are reinforcement for a sighted reader, not the only signal.
+del {
+    background-color: var(--theme-color-danger-surface);
+    color: var(--theme-color-danger);
+    text-decoration: line-through;
+}
+
+ins {
+    background-color: var(--theme-color-success-surface);
+    color: var(--theme-color-success);
+    text-decoration: underline;
+}
+
+// @todo No token expresses a type-relative vertical offset - the space scale
+//       is rem-based and would not track a "sub"/"sup" that has its own,
+//       smaller font size. "-0.25em"/"-0.5em" are the standard fix for the UA
+//       default inflating the line box around the very element it shrinks;
+//       flag here rather than invent a "--theme-space-baseline-shift" token
+//       for a value that is inherently type-relative, not on the 5px grid.
+sub,
+sup {
+    position: relative;
+    font-size: var(--theme-font-size-xs);
+    vertical-align: baseline;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+sup {
+    top: -0.5em;
+}
+
+// A dotted underline rather than a border: a border reads as a box around the
+// word, which is what a table cell or a badge already means in this baseline.
+// The dotted underline is the convention every reader already recognises as
+// "there is more here."
+abbr[title] {
+    text-decoration: underline dotted;
+    cursor: help;
+}
+
+cite {
+    color: var(--theme-color-text-secondary);
+    font-style: italic;
+}
+
+// "quotes" is set explicitly because the UA default set differs by browser
+// and by the document's declared language - two nested "q" elements should
+// not render one style of mark in one engine and another in the next.
+q {
+    quotes: '“' '”' '‘' '’';
+
+    &::before {
+        content: open-quote;
+    }
+
+    &::after {
+        content: close-quote;
+    }
+}
+
+// Tabular figures keep a column of dated items lining up; proportional
+// figures would not.
+time {
+    color: var(--theme-color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+var {
+    font-style: italic;
+}
+
+kbd {
+    padding-inline: var(--theme-space-1);
+    border: var(--theme-border-width) solid var(--theme-color-border-strong);
+    border-radius: var(--theme-radius-sm);
+    background-color: var(--theme-color-surface-raised);
+    font-family: var(--theme-font-family-mono);
+    font-size: var(--theme-font-size-mono);
+    line-height: var(--theme-line-height-mono);
+}
+
+samp {
+    color: var(--theme-color-text-secondary);
+    font-family: var(--theme-font-family-mono);
+    font-size: var(--theme-font-size-mono);
+    line-height: var(--theme-line-height-mono);
+}
+
+code {
+    padding-inline: var(--theme-space-1);
+    border-radius: var(--theme-radius-sm);
+    background-color: var(--theme-color-surface);
+    font-family: var(--theme-font-family-mono);
+    font-size: var(--theme-font-size-mono);
+    line-height: var(--theme-line-height-mono);
+}
+
+// A code block is data, not prose: letting it wrap would silently reindent or
+// reflow it, which changes what it says. It scrolls its own overflow instead
+// of forcing the page wider or the text to reformat.
+pre {
+    margin: 0 0 var(--theme-space-4);
+    padding: var(--theme-space-3);
+    overflow-x: auto;
+    border: var(--theme-border-width) solid var(--theme-color-border);
+    border-radius: var(--theme-radius-sm);
+    background-color: var(--theme-color-surface);
+    font-family: var(--theme-font-family-mono);
+    font-size: var(--theme-font-size-mono);
+    line-height: var(--theme-line-height-mono);
+
+    // Reset the inline treatment: a "code" inside "pre" is the block's own
+    // text, not a highlighted term within it.
+    code {
+        padding-inline: 0;
+        border-radius: 0;
+        background-color: transparent;
+    }
+}
+
+// --- Disclosure and progress -----------------------------------------------
+
+details {
+    margin: 0 0 var(--theme-space-4);
+    padding: var(--theme-space-3);
+    border: var(--theme-border-width) solid var(--theme-color-border);
+    border-radius: var(--theme-radius-sm);
+
+    &[open] summary {
+        margin-bottom: var(--theme-space-2);
+    }
+}
+
+// The native marker is left in place rather than replaced with a
+// background-image chevron - it already communicates open/closed state and
+// needs no icon token this file does not have. "min-height" gives the row
+// itself a floor without touching the marker's own size.
+summary {
+    display: flex;
+    align-items: center;
+    min-height: var(--theme-tap-target-min);
+    font-weight: var(--theme-font-weight-medium);
+    cursor: pointer;
+
+    &::marker {
+        color: var(--theme-color-text-secondary);
+    }
+}
+
+progress {
+    display: block;
+    width: 100%;
+    height: var(--theme-space-2);
+    border: 0;
+    border-radius: var(--theme-radius-full);
+    background-color: var(--theme-color-border);
+    accent-color: var(--theme-color-primary);
+
+    // "accent-color" only reaches the filled portion. Chromium renders the
+    // track as its own sub-element rather than the element's own background,
+    // so the track colour has to be repeated there to have any effect at all.
+    &::-webkit-progress-bar {
+        border-radius: var(--theme-radius-full);
+        background-color: var(--theme-color-border);
+    }
+}
+
+meter {
+    display: block;
+    width: 100%;
+    height: var(--theme-space-2);
+    accent-color: var(--theme-color-primary);
+}
+
+// --- Dialog ------------------------------------------------------------
+
+dialog {
+    max-width: var(--theme-content-max-width);
+    margin: auto;
+    padding: var(--theme-space-5);
+
+    // Only reached when the dialog is opened via the "open" attribute rather
+    // than ".showModal()": a modal dialog is promoted to the top layer, where
+    // stacking context and "z-index" no longer apply, but the RTE has no way
+    // to guarantee which one an integrator's script calls.
+    z-index: var(--theme-z-modal);
+
+    border: var(--theme-border-width) solid var(--theme-color-border);
+    border-radius: var(--theme-radius-md);
+    background-color: var(--theme-color-surface-raised);
+    color: var(--theme-color-text-primary);
+
+    &::backdrop {
+        background-color: var(--theme-color-overlay);
+    }
+}
+
+// --- Embedded media ------------------------------------------------------
+//
+// Display, "max-width" and, for "img"/"video", "height: auto" are already set
+// in "base/_reset.scss" for every replaced element, "iframe" and "audio"
+// included - only the block rhythm and the UA chrome are added here.
+
+iframe,
+audio,
+video {
+    margin: 0 0 var(--theme-space-4);
+}
+
+// The UA default draws a 2px inset border around a frameless "iframe".
+iframe {
+    border: 0;
+}
+
+audio {
+    width: 100%;
+}
+
+// --- Selection ---------------------------------------------------------
+
+::selection {
+    background-color: var(--theme-color-primary);
+    color: var(--theme-color-on-primary);
+}
