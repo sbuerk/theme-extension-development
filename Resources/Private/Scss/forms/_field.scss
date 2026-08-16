@@ -10,7 +10,7 @@
 //         </div>
 //
 //         <div class="theme-field theme-field--invalid">
-//             <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required">*</span></label>
+//             <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required" aria-hidden="true">*</span></label>
 //             <input class="theme-input" id="f-mail" type="email" aria-invalid="true" aria-describedby="f-mail-error f-mail-hint">
 //             <p class="theme-field__error" id="f-mail-error">…</p>
 //             <p class="theme-field__hint" id="f-mail-hint">…</p>
