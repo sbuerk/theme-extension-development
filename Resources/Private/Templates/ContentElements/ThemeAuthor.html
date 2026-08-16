@@ -1,0 +1,61 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_author" - a person: portrait, name, role and links. "header"
+    (the name) goes through the shared "ContentElement/Header" the same as
+    every other element - it is a required field
+    ("Configuration/TCA/Overrides/tt_content_theme_author.php") rendered
+    through the full "headers" palette, so the usual "header_layout" switch
+    applies unchanged. The name is therefore not part of ".theme-author"'s
+    own markup: it is the content element's heading, sitting above the
+    component rather than inside it - see
+    "Resources/Private/Scss/components/_author.scss" for what the component
+    covers instead.
+
+    "files.0" is the portrait: "image" is the core "tt_content" file field
+    (the same one "ContentElements.typoscript" already resolves for "image"/
+    "textpic"/"textmedia" via "FilesProcessor"), reused here rather than a
+    field of this extension's own. A record with no portrait renders no
+    ".theme-author__portrait" at all rather than an empty box.
+
+    "listItems" is "tx_theme_list_items" - here the person's own profile/
+    contact links, restricted by "overrideChildTca" to "link"/"link_label"
+    only (no "header"/"text"/"image" on this relation, see the TCA file) -
+    resolved the same way "theme_linklist" resolves it
+    (see "Configuration/TypoScript/ContentElements.typoscript") and rendered
+    through the identical ".theme-content-menu"/"ContentElement/LinkList"
+    pair rather than a link-list markup of this component's own.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <div class="theme-author">
+        <f:if condition="{files.0}">
+            <div class="theme-author__portrait">
+                <f:image image="{files.0}" loading="lazy" />
+            </div>
+        </f:if>
+        <div class="theme-author__body">
+            <f:if condition="{data.subheader}">
+                <p class="theme-author__role">{data.subheader}</p>
+            </f:if>
+
+            <f:if condition="{data.bodytext}">
+                <div class="theme-author__bio">
+                    <f:format.html>{data.bodytext}</f:format.html>
+                </div>
+            </f:if>
+
+            <f:if condition="{listItems}">
+                <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.authorLinksLabel')}">
+                    <f:render partial="ContentElement/LinkList" arguments="{items: listItems}" />
+                </nav>
+            </f:if>
+        </div>
+    </div>
+</f:section>
+
+</html>

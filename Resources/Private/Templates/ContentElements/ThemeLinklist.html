@@ -1,0 +1,32 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_linklist" - a list of links. "header" goes through the shared
+    "ContentElement/Header" the same as every other element, even though the
+    TCA leaves it as a bare field rather than the "headers" palette (see
+    "Configuration/TCA/Overrides/tt_content_theme_linklist.php") -
+    "header_layout" therefore never appears on this CType's own form and
+    keeps its TCA default ('0'), which is exactly the value that partial's
+    own switch already renders as a plain heading. Nothing extra was needed
+    here to get that.
+
+    The list itself is ".theme-content-menu", not a component of its own -
+    see "Partials/ContentElement/LinkList.html" for the reasoning. "listItems"
+    is "tx_theme_list_items" resolved by
+    "TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor" - see
+    "Configuration/TypoScript/ContentElements.typoscript".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.linklistLabel')}">
+            <f:render partial="ContentElement/LinkList" arguments="{items: listItems}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

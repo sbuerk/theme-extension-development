@@ -569,6 +569,225 @@ core itself never does this: across every `.html` template shipped in the
 core packages installed here, `&&` inside a `condition="…"` attribute
 appears raw in 24 places and escaped in none.
 
+## The theme's own content elements
+
+Everything above registers no TCA of its own — `EXT:frontend` already made
+every classic type and every `menu_*` type creatable, and this theme only
+supplied a rendering. The ten types below are different: their TCA is this
+extension's own, in
+[`Configuration/TCA/Overrides/tt_content_theme_*.php`](../../Configuration/TCA/Overrides/)
+and [`Configuration/TCA/tx_theme_list_item.php`](../../Configuration/TCA/tx_theme_list_item.php),
+registered in a separate wizard group ("Theme") so an editor can tell them
+apart from the core set at a glance. `Tests/Functional/ThemeContentElementRenderingTest.php`
+guards them the same way `CoreContentElementRenderingTest.php` guards the
+classic set, plus assertions specific to what only this half of the file has
+to get right: an inline relation that resolves to nothing renders a correct,
+empty wrapper — indistinguishable from "the editor added no entries" — and a
+`link` field read as a plain URL still looks correct until someone clicks it.
+
+| `CType`                   | Is                                       | Renders through                                         |
+|---------------------------|------------------------------------------|---------------------------------------------------------|
+| `theme_hero`              | Full hero: heading, text, media, actions | `.theme-hero` (`Partials/ContentElement/Hero.html`)     |
+| `theme_hero_small`        | The same, reduced                        | `.theme-hero--compact`, same partial                    |
+| `theme_hero_text_only`    | The same, no media                       | `.theme-hero` with no `--media`, same partial           |
+| `theme_teaser`            | Text teaser, no media                    | `.theme-teaser` (`Partials/ContentElement/Teaser.html`) |
+| `theme_media_teaser`      | Text beside a single image               | `.theme-teaser` with media, same partial                |
+| `theme_media_teaser_grid` | Several media teasers in a grid          | `.theme-card-grid` of `.theme-card` items               |
+| `theme_testimonial`       | A quotation with an attribution          | `.theme-quote`                                          |
+| `theme_author`            | A person: portrait, name, role, links    | `.theme-author` + `.theme-content-menu`                 |
+| `theme_linklist`          | A list of links                          | `.theme-content-menu`                                   |
+| `theme_sociallinks`       | The same, labelled instead of iconed     | `.theme-content-menu`                                   |
+
+`theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
+partial and differ only in a `compact` argument and in whether an `image`
+field exists on the CType at all; `theme_teaser` and `theme_media_teaser`
+share the sibling partial the same way. Both are documented in full above the
+markup in `Partials/ContentElement/Hero.html` and `Teaser.html` — this table
+only records which component backs which `CType`, not the shared-partial
+reasoning already written there.
+
+### Naming: `theme_*`, `tx_theme_*`, `tx_theme_list_item`
+
+CTypes are prefixed `theme_`, columns `tx_theme_`, and the shared inline child
+table is `tx_theme_list_item` — short rather than the full extension key
+(`themeextensiondevelopment_hero` is unusable in a `showitem` string and in
+TypoScript), following [camino](https://github.com/TYPO3-CMS/theme_camino)'s
+own `camino_` precedent for the identical reason. The collision risk this
+accepts is real — another extension is free to also prefix its own fields
+`theme_` — and it is accepted deliberately, the same way camino accepts it for
+its own prefix, rather than overlooked.
+
+### No `ext_tables.sql`: the schema derives from TCA
+
+This extension ships no `ext_tables.sql` anywhere below `Configuration/` — the
+whole schema for `tx_theme_list_item` and the four `tx_theme_*` columns added
+to `tt_content` comes from `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()`
+reading the TCA at compare-schema time, on both v13.4 and v14.3.
+
+One column needed more than "add a `type=input` field and let it happen",
+because `DefaultTcaSchema` does not treat every part of an inline relation the
+same way. Reading `enrichSingleTableFieldsFromTcaColumns()`
+(`.Build/vendor/typo3/cms-core/Classes/Database/Schema/DefaultTcaSchema.php`):
+a `type=inline` parent column with `foreign_field` and `foreign_table_field`
+set — `tx_theme_list_items` in
+[`Configuration/TCA/Overrides/tt_content.php`](../../Configuration/TCA/Overrides/tt_content.php) —
+gets both of those child columns auto-created if the child TCA does not
+already declare them (lines 835–860 there: an explicit
+"add definition … if it is not defined" step for exactly those two keys).
+`foreign_match_fields` is not part of that special case at all — a search of
+the same method turns up nothing for it — so a field used *only* as a
+`foreign_match_fields` target does not get a column for free. `fieldname` on
+`tx_theme_list_item` is therefore declared as a real, persisted `type=input`
+column
+([`Configuration/TCA/tx_theme_list_item.php`](../../Configuration/TCA/tx_theme_list_item.php)),
+the same way core's own `sys_file_reference` declares its own `fieldname`
+column with the identical reasoning in that file's own comment — copied here
+because it is the evidence for what a `foreign_match_fields`-only field needs,
+not a convention assumed from the field's name.
+
+### `type=link` fields are not URLs
+
+`tx_theme_link` (the call-to-action link shared by the hero and teaser
+variants) and the child table's own `link` column are both TCA `type=link`.
+Their stored value is a `stdWrap.typolink` parameter string — the page, file,
+URL, email or record syntax `TYPO3\CMS\Core\LinkHandling\LinkService` writes,
+never a bare URL — so every template that reads one renders it through
+`f:link.typolink` or `f:uri.typolink`
+(`Partials/ContentElement/LinkButton.html`, `LinkList.html`), never as a plain
+`href`. `Tests/Functional/ThemeContentElementRenderingTest.php::aLinkFieldIsResolvedToARealUrl`
+exists specifically because getting this wrong still renders a page that looks
+correct: the anchor carries `t3://page?uid=1` verbatim and nothing about the
+markup looks broken until the link is followed.
+
+TYPO3 v14's Fluid 5 change to null-handling on tag-based ViewHelpers
+(`Breaking-108148-StrictTypesInFluidViewHelpers.rst`) names `f:link.typolink`
+as an explicit exception — it renders through `ContentObjectRenderer::typoLink()`
+rather than building a tag itself — so no version split was needed for either
+partial to keep working on both v13.4 and v14.3.
+
+### Inline children: `DatabaseQueryProcessor`, and its `item.data.*` trap
+
+No core data processor resolves a generic database relation the way
+`FilesProcessor` resolves FAL: that class is FAL-specific by construction, it
+only ever wraps `FileCollector`, which only ever resolves `sys_file_reference`
+rows. `tx_theme_list_items` is an ordinary inline relation, not FAL, so
+`theme_author`, `theme_linklist`, `theme_sociallinks` and
+`theme_media_teaser_grid` all resolve it with
+`TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor` instead, selecting
+on the same `uid_foreign`/`tablename`/`fieldname` triple DataHandler wrote on
+the way in (see the section comment above `tt_content.theme_author` in
+[`Configuration/TypoScript/ContentElements.typoscript`](../../Configuration/TypoScript/ContentElements.typoscript)).
+
+`DatabaseQueryProcessor` wraps every row as `['data' => $row]`, the same shape
+it already uses for `tt_content.menu_categorized_content` above. Every
+template that reads `listItems` therefore reads `item.data.link`,
+`item.data.header`, `item.data.text` — never `item.link`, which resolves to
+nothing through Fluid's ordinary missing-variable handling and renders an
+**empty list with no error**, not a broken one. That is not a hypothetical
+here either: it is the same class of defect `menu_categorized_content` warns
+about above, and it happened during this element set's own development before
+`ThemeContentElementRenderingTest.php` caught it.
+
+### `GalleryProcessor` is deliberately not used
+
+`theme_hero`, `theme_hero_small`, `theme_media_teaser` and `theme_author` all
+resolve their `image` field with `FilesProcessor` alone — no
+`GalleryProcessor` afterwards, unlike `tt_content.image`/`textpic`/`textmedia`
+further up this page. Two independent reasons, either sufficient on its own:
+
+1. None of these components lay out a grid of images. Each shows exactly one
+   image in a fixed-shape box (`.theme-hero__media`, `.theme-teaser__media`,
+   `.theme-author__portrait`, all `object-fit: cover`) — there is nothing for
+   the row/column/width/height computation `GalleryProcessor` exists for to
+   arrange.
+2. Every showitem that carries `image` puts it alone on its own "Images" tab —
+   `imageorient`, `imagecols`, `imageheight`, `imagewidth` and `imageborder`
+   are not part of the form (compare
+   [`tt_content_theme_hero.php`](../../Configuration/TCA/Overrides/tt_content_theme_hero.php)
+   with the core's own `tt_content.image` TCA). `GalleryProcessor` reads every
+   one of those through a `.field` binding, so wiring it here would bind to
+   columns an editor can never set, deciding the layout from a plain database
+   default rather than editor intent.
+
+The templates read `files.0` directly instead — the first, and in practice
+only, file reference.
+
+### Link lists reuse `.theme-content-menu`; only the author needed a new component
+
+`theme_linklist` and `theme_sociallinks` render their resolved `listItems`
+through the shared `Partials/ContentElement/LinkList.html`, wrapped in
+`.theme-content-menu` — the same component every `menu_*` content element
+already uses, not a list component of its own. Structurally the two shapes are
+identical: authored content in the content column, a flat list of links, no
+navigation-chrome semantics to drag in. A purpose-built list component here
+would only duplicate the list/link styling `.theme-content-menu` already
+provides. `theme_author`'s own profile/contact links reuse the identical pair
+for the same reason — see the header comment of
+[`ThemeAuthor.html`](../../Resources/Private/Templates/ContentElements/ThemeAuthor.html).
+
+`.theme-author` is the one genuinely new component this element set needed:
+an author/person block — portrait, role line, bio — has no existing
+equivalent. It deliberately does not render the person's own name: `header`
+goes through the shared header partial like every other content element, so
+the name is the content element's heading, sitting above `.theme-author`
+rather than inside it (`Resources/Private/Scss/components/_author.scss`).
+
+### Gaps, stated as gaps
+
+- **No icons at all.** This theme ships no icon assets and no icon component
+  — unlike camino, which ships both an icon set and a `link_icon` field.
+  `theme_sociallinks` therefore renders the same text-label list as
+  `theme_linklist`; `link_label` stands in for what would otherwise be a
+  platform icon ("Mastodon", "LinkedIn", …), not a Unicode glyph or any other
+  approximation of one.
+- **`.theme-hero__eyebrow` has CSS but no TCA field behind it.** The class is
+  part of `_hero.scss`'s own markup contract (and the reference markup in
+  [Component library](../development/component-library.md#content)), but none
+  of the three hero CTypes' TCA offers an "eyebrow" field — only `header`,
+  `bodytext` and the `theme_link` palette. Omitted rather than invented.
+
+### A field was removed: `theme_testimonial` lost its `image`
+
+`theme_testimonial`'s TCA
+([`tt_content_theme_testimonial.php`](../../Configuration/TCA/Overrides/tt_content_theme_testimonial.php))
+originally exposed the core `image` field on its own "Images" tab, the same
+way `theme_hero` and `theme_author` do. `.theme-quote` has no media slot in
+its markup contract, though, so a filled-in `image` would never have appeared
+— an editor attaches a portrait, the page looks finished, and the work is
+silently gone. The field was dropped from the showitem rather than left
+inert: the current showitem is `bodytext, --palette--;;headers` only, with no
+`image` and no "Images" `--div--`, and `ContentElements.typoscript` wires no
+`FilesProcessor` for `theme_testimonial` either. (The header comments in
+`ThemeTestimonial.html` and above `tt_content.theme_testimonial` in the
+TypoScript still describe the field as present-but-unrendered — that prose
+predates the removal and is stale; the TCA itself is the current state and no
+longer offers the field to an editor at all.)
+
+### The wizard group, and what an unresolved icon identifier does
+
+Every one of the ten types carries a `label`, a `description` and an `icon` on
+its `addRecordType()`/`addTcaSelectItemGroup()` call, all under one wizard
+group ("Theme",
+`tt_content.group.theme` in `locallang_tca.xlf`, inserted `before:default`).
+No page TSconfig registers any of this: since TYPO3 v13
+(`Feature-102834-Auto-registrationOfNewContentElementWizardViaTCA.rst`, on
+disk for both installed core versions), the "new content element" wizard is
+generated from exactly those TCA keys, which replaced the former
+`mod.wizards.newContentElement.wizardItems.<group>` TSconfig step this theme
+therefore never needed to write.
+
+The core requires an icon identifier, and none of this theme's own is
+invented — all eight reused identifiers (`content-header`,
+`content-text-teaser`, `content-beside-text-img-left`, `content-card-group`,
+`content-quote`, `content-user`, `content-bullets`, `content-listgroup`) are
+verified present in the core's own icon registry
+(`.Build/vendor/typo3/cms-core/Resources/Public/Icons/T3Icons/icons.json`),
+not shipped as image files of this extension's own. An identifier that is
+*not* registered does not fail quietly: `IconRegistry::getIconConfigurationByIdentifier()`
+throws (`Exception`, code `1437425804`, "Icon with identifier … is not
+registered") the moment something tries to resolve it — there is no silent
+fallback icon to lean on if a future addition typos one.
+
 ## See also
 
 - [Page rendering](page-rendering.md)

@@ -1,0 +1,66 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Shared list rendering for every content element that resolves its own
+    "tx_theme_list_items" inline relation into a plain list of links -
+    "theme_linklist", "theme_sociallinks" and the profile/contact links of
+    "theme_author". Reuses ".theme-content-menu"
+    (see "docs/development/component-library.md#content") rather than a
+    component of its own: structurally this is exactly the same shape as the
+    "menu_*" family already rendered through it - authored content in the
+    content column, a flat list of links, no navigation-chrome semantics to
+    drag in - so a purpose-built list component would only duplicate its
+    list/link styling. Only the "<nav>" wrapper and its "aria-label" are the
+    calling template's own, the same split "ContentElement/Menu" uses for
+    "menu_*".
+
+    Each item is one row of "tx_theme_list_item" as resolved by
+    "TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor" - see
+    "Configuration/TypoScript/ContentElements.typoscript" for how the
+    relation itself is queried. Every entry is "['data' => $row]", not the
+    row itself - "DatabaseQueryProcessor" wraps each record that way so a
+    nested "dataProcessing" has somewhere to add to (see the identical note
+    in "Partials/ContentElement/../Templates/ContentElements/
+    MenuCategorizedContent.html", which reads the same processor's output).
+    So the fields below are "item.data.link"/"item.data.link_label", never
+    "item.link" - the latter resolves to nothing and would silently render no
+    rows at all rather than failing.
+
+    "link" is TCA type=link, rendered through "f:link.typolink", not as a
+    plain "href": a TCA type=link value is stdWrap.typolink syntax - it may
+    be a page, file, email or telephone reference exactly as the link wizard
+    encoded it, not a bare URL string
+    (".Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/Link/
+    TypolinkViewHelper.php").
+
+    A row without a usable "link" renders nothing rather than an empty
+    "<li>": "link" is required on every relation that reaches this partial
+    (see the "overrideChildTca" of "tt_content_theme_linklist.php",
+    "tt_content_theme_sociallinks.php" and "tt_content_theme_author.php"), so
+    an empty value here means a record still mid-edit, not a shape this
+    partial has to design for.
+
+    "link_label" is not required, so a row without one falls back to the
+    resolved URL itself via "f:uri.typolink" - visible and honest about where
+    the link goes, rather than an empty or generic label.
+</f:comment>
+
+<f:if condition="{items}">
+    <ul class="theme-content-menu__list">
+        <f:for each="{items}" as="item">
+            <f:if condition="{item.data.link}">
+                <li class="theme-content-menu__item">
+                    <f:link.typolink parameter="{item.data.link}" class="theme-content-menu__link">
+                        <f:if condition="{item.data.link_label}">
+                            <f:then>{item.data.link_label}</f:then>
+                            <f:else><f:uri.typolink parameter="{item.data.link}" /></f:else>
+                        </f:if>
+                    </f:link.typolink>
+                </li>
+            </f:if>
+        </f:for>
+    </ul>
+</f:if>
+
+</html>

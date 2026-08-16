@@ -1,0 +1,72 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Shared by theme_hero, theme_hero_small and theme_hero_text_only - the
+    three variants of the step-5c contract differ only in the "compact"
+    argument (theme_hero_small passes 1) and in whether "files" resolves to
+    anything: theme_hero_text_only has no "image" field at all (see its TCA),
+    so ContentElements.typoscript wires no FilesProcessor for it and "files"
+    is simply never part of the arguments that CType's template passes down -
+    "{files.0}" then resolves to null through Fluid's ordinary missing-variable
+    handling, the same way "{data.tx_theme_link}" already does everywhere else
+    in this extension for an unset field.
+
+    Markup contract: Resources/Private/Scss/components/_hero.scss. No
+    "theme-hero__eyebrow" is rendered - the class exists in that file's CSS,
+    but none of the three CTypes' TCA backs it with an "eyebrow" field, only
+    "header"/"bodytext" and the "theme_link" palette. Omitted rather than
+    invented.
+
+    The heading level follows "header_layout" the same way
+    Partials/ContentElement/Header.html does for every other content element
+    (case values "1".."5" map onto h1..h5, "header_layout == 100" hides the
+    header entirely) - the only difference is the default (header_layout "0"),
+    which falls back to h1 here rather than Header.html's h2: a hero is
+    ordinarily a page's own top heading, which is also what "_hero.scss"'s own
+    markup contract illustrates. The stylesheet only ever selects by class
+    ("theme-hero__title"), never by tag, so this changes nothing about how the
+    title looks, only what a screen reader or the outline algorithm sees -
+    which is why Header.html itself is not reused here instead of switching
+    independently: its own default is the wrong default for this component.
+</f:comment>
+<section class="theme-hero{f:if(condition: files.0, then: ' theme-hero--media')}{f:if(condition: compact, then: ' theme-hero--compact')}">
+    <f:if condition="{files.0}">
+        <div class="theme-hero__media">
+            <f:image image="{files.0}" />
+        </div>
+    </f:if>
+    <div class="theme-hero__body">
+        <f:if condition="{data.header} && {data.header_layout} != 100">
+            <f:switch expression="{data.header_layout}">
+                <f:case value="1"><h1 class="theme-hero__title">{data.header}</h1></f:case>
+                <f:case value="2"><h2 class="theme-hero__title">{data.header}</h2></f:case>
+                <f:case value="3"><h3 class="theme-hero__title">{data.header}</h3></f:case>
+                <f:case value="4"><h4 class="theme-hero__title">{data.header}</h4></f:case>
+                <f:case value="5"><h5 class="theme-hero__title">{data.header}</h5></f:case>
+                <f:defaultCase><h1 class="theme-hero__title">{data.header}</h1></f:defaultCase>
+            </f:switch>
+        </f:if>
+        <f:if condition="{data.bodytext}">
+            <f:comment>
+                A "div", not the "p" the markup contract in "_hero.scss"
+                illustrates: "f:format.html" parses "bodytext" through
+                "lib.parseFunc_RTE", which already wraps multi-line text in
+                its own "p" tags - see Templates/ContentElements/Text.html for
+                the same reasoning. Nesting those inside a literal "p" here
+                would be invalid HTML; ".theme-hero__lead" is selected by
+                class, not by tag, so a "div" is styled identically.
+            </f:comment>
+            <div class="theme-hero__lead">
+                <f:format.html>{data.bodytext}</f:format.html>
+            </div>
+        </f:if>
+        <f:if condition="{data.tx_theme_link}">
+            <div class="theme-hero__actions">
+                <f:render partial="ContentElement/LinkButton" arguments="{data: data}" />
+            </div>
+        </f:if>
+    </div>
+</section>
+
+</html>

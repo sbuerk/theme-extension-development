@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2026-08-16T00:00:00Z" product-name="theme_extension_development">
+		<header/>
+		<body>
+			<!-- tt_content: wizard group -->
+			<trans-unit id="tt_content.group.theme">
+				<source>Theme</source>
+			</trans-unit>
+
+			<!-- tt_content: shared columns -->
+			<trans-unit id="tt_content.tx_theme_link">
+				<source>Link</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_link_label">
+				<source>Link label</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_link_variant">
+				<source>Link style</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_link_variant.I.default">
+				<source>Primary</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_link_variant.I.secondary">
+				<source>Secondary</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_link_variant.I.ghost">
+				<source>Ghost</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items">
+				<source>List items</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.appearance.newRecordLinkTitle">
+				<source>Add item</source>
+			</trans-unit>
+			<trans-unit id="tt_content.palette.theme_link">
+				<source>Link</source>
+			</trans-unit>
+
+			<!-- tt_content: tab dividers used by more than one CType file -->
+			<trans-unit id="tt_content.tab.teasers">
+				<source>Teasers</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.links">
+				<source>Links</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_hero -->
+			<trans-unit id="tt_content.CType.theme_hero.label">
+				<source>Hero</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_hero.description">
+				<source>Full hero: heading, text, media and call-to-action links.</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_hero_small -->
+			<trans-unit id="tt_content.CType.theme_hero_small.label">
+				<source>Hero, small</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_hero_small.description">
+				<source>A reduced hero for secondary pages.</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_hero_text_only -->
+			<trans-unit id="tt_content.CType.theme_hero_text_only.label">
+				<source>Hero, text only</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_hero_text_only.description">
+				<source>A hero without media: text and actions only.</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_teaser -->
+			<trans-unit id="tt_content.CType.theme_teaser.label">
+				<source>Teaser</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_teaser.description">
+				<source>A short text teaser without media.</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_media_teaser -->
+			<trans-unit id="tt_content.CType.theme_media_teaser.label">
+				<source>Media teaser</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_media_teaser.description">
+				<source>Text placed beside a single image.</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_media_teaser_grid -->
+			<trans-unit id="tt_content.CType.theme_media_teaser_grid.label">
+				<source>Media teaser grid</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_media_teaser_grid.description">
+				<source>Several media teasers arranged in a grid.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_media_teaser_grid.label">
+				<source>Teasers</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_testimonial -->
+			<trans-unit id="tt_content.CType.theme_testimonial.label">
+				<source>Testimonial</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_testimonial.description">
+				<source>A quotation with its attribution.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.header.types.theme_testimonial.label">
+				<source>Attributed name</source>
+			</trans-unit>
+			<trans-unit id="tt_content.subheader.types.theme_testimonial.label">
+				<source>Attributed role</source>
+			</trans-unit>
+			<trans-unit id="tt_content.bodytext.types.theme_testimonial.label">
+				<source>Quotation</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_author -->
+			<trans-unit id="tt_content.CType.theme_author.label">
+				<source>Author</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_author.description">
+				<source>A person: portrait, name, role and links.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.header.types.theme_author.label">
+				<source>Name</source>
+			</trans-unit>
+			<trans-unit id="tt_content.subheader.types.theme_author.label">
+				<source>Role</source>
+			</trans-unit>
+			<trans-unit id="tt_content.bodytext.types.theme_author.label">
+				<source>Biography</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_author.label">
+				<source>Links</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_linklist -->
+			<trans-unit id="tt_content.CType.theme_linklist.label">
+				<source>Link list</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_linklist.description">
+				<source>A list of links.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.header.types.theme_linklist.label">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_linklist.label">
+				<source>Links</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_sociallinks -->
+			<trans-unit id="tt_content.CType.theme_sociallinks.label">
+				<source>Social links</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_sociallinks.description">
+				<source>A list of links, labelled instead of rendered as icons.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.header.types.theme_sociallinks.label">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_sociallinks.label">
+				<source>Social links</source>
+			</trans-unit>
+
+			<!-- tx_theme_list_item -->
+			<trans-unit id="tx_theme_list_item">
+				<source>Theme: List item</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.header">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.text">
+				<source>Text</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.image">
+				<source>Image</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.link">
+				<source>Link</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.link_label">
+				<source>Link label</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.palette.theme_link">
+				<source>Link</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

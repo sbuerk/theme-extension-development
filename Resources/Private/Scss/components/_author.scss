@@ -1,0 +1,77 @@
+// Author.
+//
+// Markup contract:
+//
+//     <div class="theme-author">
+//         <div class="theme-author__portrait"><img …></div>
+//         <div class="theme-author__body">
+//             <p class="theme-author__role">…</p>
+//             <div class="theme-author__bio">…</div>
+//             <nav class="theme-content-menu" aria-label="…">…</nav>
+//         </div>
+//     </div>
+//
+// A person: portrait, name, role and links. "theme_author" - the only
+// content element that needs it, see
+// "Configuration/TCA/Overrides/tt_content_theme_author.php" - renders the
+// record's own "header" through the shared "Partials/ContentElement/Header"
+// the same as every other content element, so the name itself is not part of
+// this component's markup: it is the content element's heading, sitting
+// above ".theme-author" rather than inside it. What this component owns is
+// everything that heading does not cover - the portrait, the role line and
+// the bio - laid out beside each other rather than stacked.
+//
+// The profile/contact links are ".theme-content-menu", not a list of this
+// component's own - see "Partials/ContentElement/LinkList.html" for why a
+// second link-list component would only duplicate the one that already
+// exists for "theme_linklist" and "theme_sociallinks".
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-author {
+    --theme-author-gap: var(--theme-space-4, 1.25rem);
+    --theme-author-portrait-size: 6.25rem;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--theme-author-gap);
+}
+
+// A fixed, circular box rather than "object-fit" alone on an unconstrained
+// image: the portrait has to hold its shape next to a body of unpredictable
+// length, the same reasoning "theme-card__media" bleeds an image to its
+// container for a different layout need.
+.theme-author__portrait {
+    flex: 0 0 auto;
+    width: var(--theme-author-portrait-size);
+
+    img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: var(--theme-radius-full, 9999px);
+    }
+}
+
+.theme-author__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--theme-space-2, 0.625rem);
+    min-width: 12rem;
+}
+
+.theme-author__role {
+    margin: 0;
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+}
+
+.theme-author__bio {
+    color: var(--theme-color-text-secondary);
+}
