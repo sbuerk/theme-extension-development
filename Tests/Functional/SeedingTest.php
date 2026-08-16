@@ -7,10 +7,13 @@ namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\ThemeExtensionDevelopment\Seeding\DataMapFactory;
 use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
+use SBUERK\ThemeExtensionDevelopment\Seeding\FileSeeder;
 use SBUERK\ThemeExtensionDevelopment\Seeding\Seeder;
 use SBUERK\ThemeExtensionDevelopment\Seeding\YamlSeedParser;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
@@ -40,6 +43,22 @@ final class SeedingTest extends AbstractFunctionalTestCase
         parent::setUp();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/AdminBackendUser.csv');
+        // A functional instance has no file storage: the testing framework
+        // creates the fileadmin folders but no sys_file_storage record, which
+        // a real instance gets from "typo3 setup". Created through the API
+        // rather than from a fixture, so the flexform driver configuration and
+        // the capability flags are the core's business and not a hand written
+        // record that is wrong in a way nothing reports.
+        GeneralUtility::makeInstance(StorageRepository::class)
+            ->createLocalStorage('fileadmin', 'fileadmin/', 'relative', 'Seeding test storage', true);
+    }
+
+    private function createSeeder(): Seeder
+    {
+        return new Seeder(
+            new DataMapFactory(),
+            new FileSeeder(GeneralUtility::makeInstance(StorageRepository::class)),
+        );
     }
 
     /**
@@ -48,10 +67,8 @@ final class SeedingTest extends AbstractFunctionalTestCase
     private function seedDemo(): array
     {
         $backendUser = $this->setUpBackendUser(1);
-        $parser = new YamlSeedParser();
-        $seeder = new Seeder(new DataMapFactory());
 
-        return $seeder->seed($parser->parseFile(self::DEMO_SEED), $backendUser);
+        return $this->createSeeder()->seed((new YamlSeedParser())->parseFile(self::DEMO_SEED), $backendUser);
     }
 
     /**
@@ -154,6 +171,53 @@ final class SeedingTest extends AbstractFunctionalTestCase
     }
 
     #[Test]
+    public function filesAreCopiedIntoTheStorageAndIndexed(): void
+    {
+        $this->seedDemo();
+
+        $files = $this->queryTable('sys_file', ['uid', 'identifier', 'name'], 'uid');
+
+        $this->assertCount(1, $files);
+        $this->assertSame('/theme-demo/placeholder.svg', $files[0]['identifier']);
+        // Copied, not moved: the source has to survive in the repository.
+        $this->assertFileExists(dirname(__DIR__, 2) . '/Configuration/Seeds/Files/placeholder.svg');
+    }
+
+    #[Test]
+    public function fileReferencesArePointedAtTheRecordThatDeclaresThem(): void
+    {
+        $this->seedDemo();
+
+        $references = $this->queryTable(
+            'sys_file_reference',
+            ['uid_local', 'uid_foreign', 'tablenames', 'fieldname'],
+            'uid',
+        );
+
+        $this->assertCount(1, $references);
+        $this->assertSame('pages', $references[0]['tablenames']);
+        $this->assertSame('media', $references[0]['fieldname']);
+        // The root page of the demo definition.
+        $this->assertSame(1, (int)$references[0]['uid_foreign']);
+    }
+
+    #[Test]
+    public function referencingAnUndeclaredFileIsRejected(): void
+    {
+        $this->expectException(SeedingException::class);
+        $this->expectExceptionCode(1786924828);
+
+        $definition = (new YamlSeedParser())->parse([
+            'identifier' => 'broken',
+            'pages' => [
+                ['identifier' => 'home', 'files' => ['media' => ['nope']]],
+            ],
+        ]);
+
+        (new DataMapFactory())->createFromDefinition($definition);
+    }
+
+    #[Test]
     public function seedingRefusesWithoutAnAdminUser(): void
     {
         $backendUser = new BackendUserAuthentication();
@@ -162,8 +226,7 @@ final class SeedingTest extends AbstractFunctionalTestCase
         $this->expectException(SeedingException::class);
         $this->expectExceptionCode(1786924814);
 
-        (new Seeder(new DataMapFactory()))
-            ->seed((new YamlSeedParser())->parseFile(self::DEMO_SEED), $backendUser);
+        $this->createSeeder()->seed((new YamlSeedParser())->parseFile(self::DEMO_SEED), $backendUser);
     }
 
     #[Test]

@@ -19,9 +19,12 @@ final readonly class SeedDefinition
 {
     /**
      * @param list<SeedRecord> $records
+     * @param list<SeedFile> $files Files copied into a storage before the
+     *        records are written, so records can reference them.
      */
     public function __construct(
         public string $identifier,
         public array $records,
+        public array $files = [],
     ) {}
 }

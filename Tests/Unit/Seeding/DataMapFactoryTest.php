@@ -6,6 +6,7 @@ namespace SBUERK\ThemeExtensionDevelopment\Tests\Unit\Seeding;
 
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\ThemeExtensionDevelopment\Seeding\DataMapFactory;
+use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
 use SBUERK\ThemeExtensionDevelopment\Seeding\SeedDefinition;
 use SBUERK\ThemeExtensionDevelopment\Seeding\SeedRecord;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
@@ -121,6 +122,37 @@ final class DataMapFactoryTest extends UnitTestCase
         $map = $this->subject->createFromDefinition($definition, 7)['dataMap'];
 
         $this->assertSame('7', $map['pages']['NEWpages_home']['pid']);
+    }
+
+    #[Test]
+    public function fileReferencesAreReturnedForASecondPassRatherThanPutInTheDataMap(): void
+    {
+        $definition = new SeedDefinition('demo', [
+            new SeedRecord('pages', 'home', ['title' => 'Home'], 1, [], ['media' => ['hero']]),
+        ]);
+
+        $result = $this->subject->createFromDefinition($definition, 0, ['hero' => 7]);
+
+        // "uid_foreign" is a plain integer column, so a reference cannot be
+        // written in the same pass as the record it points at.
+        $this->assertArrayNotHasKey('sys_file_reference', $result['dataMap']);
+        $this->assertSame(
+            [['parent' => 'NEWpages_home', 'table' => 'pages', 'field' => 'media', 'file' => 7, 'pid' => '0']],
+            $result['references'],
+        );
+    }
+
+    #[Test]
+    public function referencingAFileTheDefinitionDoesNotDeclareIsRejected(): void
+    {
+        $definition = new SeedDefinition('demo', [
+            new SeedRecord('pages', 'home', [], null, [], ['media' => ['missing']]),
+        ]);
+
+        $this->expectException(SeedingException::class);
+        $this->expectExceptionCode(1786924828);
+
+        $this->subject->createFromDefinition($definition);
     }
 
     #[Test]

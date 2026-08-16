@@ -12,6 +12,14 @@
 # else is a field of the record and is written as-is.
 identifier: demo
 
+# Files are copied into a file storage before the records are written, so a
+# record can reference them. The source is resolved with "EXT:" and is copied,
+# never moved - the file stays in the repository.
+files:
+  - identifier: placeholder
+    source: 'EXT:theme_extension_development/Configuration/Seeds/Files/placeholder.svg'
+    folder: 'theme-demo'
+
 pages:
   - identifier: home
     uid: 1
@@ -19,6 +27,9 @@ pages:
     slug: '/'
     is_siteroot: 1
     doktype: 1
+    files:
+      media:
+        - placeholder
     content:
       - identifier: home-heading
         CType: header
