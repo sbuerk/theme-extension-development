@@ -1,0 +1,126 @@
+# Appearance: light / dark / auto, the palette, and the content-element
+# outline switch - plus the script that operates them.
+#
+# Read by the site set and by the classic static include alike - both point at
+# "setup.typoscript", which "@import"s this file. See that file for the
+# double-apply guard.
+#
+# Background: ".agent/plans/phase-f/step-4-contract.md",
+# "docs/development/component-library.md", "abstracts/_tokens.scss",
+# "abstracts/_palettes.scss".
+
+# --- Server-rendered attributes ----------------------------------------
+#
+# "config.htmlTag.attributes.*" is the only mechanism that can carry these:
+# "RequestHandler::generateHtmlTag()" iterates that array and writes every
+# value *raw* onto the tag - there is no stdWrap applied to it - so a constant
+# is the only thing that can go here, never a cObject. Verified identical on
+# both core versions: same method, same behaviour, in
+# ".Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php" (v13.4,
+# line 833) and "instance-core-14/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php"
+# (v14.3, line 829).
+
+config.htmlTag.attributes.data-palette = {$theme.appearance.palette}
+config.htmlTag.attributes.data-theme-content-outline = {$theme.appearance.contentOutline}
+
+# "data-theme" is conditional rather than a plain assignment, because "auto"
+# is the *absence* of the attribute, not a value for it: no selector in
+# "_tokens.scss" matches "data-theme=\"auto\"", and emitting it would look
+# like a deliberate choice while doing nothing.
+#
+# Constants are substituted into setup conditions before they are evaluated -
+# "IncludeTreeSetupConditionConstantSubstitutionVisitor", byte-identical
+# between the two core versions - so this reads "theme.appearance.default" the
+# same way the unconditional attributes above do.
+["{$theme.appearance.default}" != "auto"]
+    config.htmlTag.attributes.data-theme = {$theme.appearance.default}
+[END]
+
+# --- The no-flash script -------------------------------------------------
+#
+# Inline, in the document head, before first paint - through "page.headerData"
+# rather than "f:asset.script": the asset collector is free to move a script
+# to the end of the body, and a stored dark appearance would then paint light
+# first, which is the exact flash this script exists to prevent.
+#
+# It does two things, in this order and no other:
+#
+#   1. sets "data-js" on the root, unconditionally and first. This is what
+#      switches the main navigation from "always expanded" to "collapsible"
+#      (see "components/_nav-main.scss") and reveals the appearance switcher,
+#      and it has to survive everything below throwing - a page with a broken
+#      "localStorage" read must still get a working collapsible navigation
+#      and a hidden (not inert-looking) switcher, not an inert one.
+#   2. reads the stored appearance and palette from "localStorage" and applies
+#      them, each wrapped in its own "try"/"catch": "localStorage" throws
+#      rather than returning null in Safari's private mode and when cookies
+#      are blocked, and an uncaught throw here would abort the script before
+#      step 1 ran if it came first - which is exactly why it does not.
+#
+# "Resources/Public/JavaScript/theme.js" is what operates the switcher and the
+# menu toggle from here on; this script only prepares the root for it.
+page.headerData.10 = TEXT
+page.headerData.10 {
+    value (
+        <script>
+        (function () {
+            var root = document.documentElement;
+
+            // First act, unconditionally: nothing below may run before this,
+            // and nothing below may prevent it from having run.
+            root.setAttribute('data-js', '');
+
+            try {
+                var appearance = window.localStorage.getItem('theme-appearance');
+                if (appearance === 'light' || appearance === 'dark') {
+                    root.setAttribute('data-theme', appearance);
+                } else if (appearance === 'auto') {
+                    // "auto" removes the attribute, it is never its value -
+                    // see the condition above this script.
+                    root.removeAttribute('data-theme');
+                }
+                // Anything else, including nothing stored: the server-rendered
+                // default from "theme.appearance.default" stands.
+            } catch (e) {
+                // Storage threw. Same outcome: the server-rendered default
+                // stands, and "data-js" above is already set.
+            }
+
+            try {
+                var palette = window.localStorage.getItem('theme-palette');
+                if (palette) {
+                    root.setAttribute('data-palette', palette);
+                }
+            } catch (e) {
+                // The server-rendered "theme.appearance.palette" stands.
+            }
+        })();
+        </script>
+    )
+}
+
+# --- The module script -----------------------------------------------------
+#
+# "page.includeJSFooter" with ".type = module" is what produces
+# `<script type="module" src="...">` on both core versions - verified against:
+#
+#   - "RequestHandler::processJavaScriptAndCss()", the "includeJSFooter."
+#     branch: identical in name, shape and the "addJsFooterFile($file, $type, ...)"
+#     call it makes, in both
+#     ".Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php"
+#     (v13.4) and
+#     "instance-core-14/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php"
+#     (v14.3);
+#   - "PageRenderer::renderJavaScriptFiles()", which writes "type" onto the
+#     tag as a literal attribute whenever it is non-empty, unchanged in that
+#     respect between ".Build/vendor/typo3/cms-core/Classes/Page/PageRenderer.php"
+#     (v13.4, line 1726) and
+#     "instance-core-14/vendor/typo3/cms-core/Classes/Page/PageRenderer.php"
+#     (v14.3, line 1574).
+#
+# The footer, not the head, because this script only wires up event listeners
+# on elements that already exist by the time it can matter - it never has to
+# run before paint the way the inline script above does. A module needs no
+# "defer": `type="module"` already defers it by specification.
+page.includeJSFooter.theme = EXT:theme_extension_development/Resources/Public/JavaScript/theme.js
+page.includeJSFooter.theme.type = module
