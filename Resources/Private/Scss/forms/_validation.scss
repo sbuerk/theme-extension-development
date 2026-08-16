@@ -10,7 +10,7 @@
 //         </div>
 //
 //         <div class="theme-field theme-field--invalid">
-//             <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required">*</span></label>
+//             <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required" aria-hidden="true">*</span></label>
 //             <input class="theme-input" id="f-mail" type="email" aria-invalid="true" aria-describedby="f-mail-error f-mail-hint">
 //             <p class="theme-field__error" id="f-mail-error">…</p>
 //             <p class="theme-field__hint" id="f-mail-hint">…</p>
@@ -154,6 +154,21 @@
             text-decoration: none;
         }
     }
+}
+
+// The error case, spelled out rather than left to the base rule.
+//
+// The base already carries the danger palette, so this modifier changes
+// nothing - which is exactly why it needs to exist. It is in the markup
+// contract above and in the documentation, so it is what a site package copies
+// and what the styleguide renders; a class in a published contract that
+// matches no rule at all is indistinguishable from one that was dropped by
+// accident. Naming it also keeps the pair symmetric: "--error" and "--success"
+// re-point the same two tokens, and a future "--warning" has an obvious shape
+// to follow instead of having to guess whether the default is load bearing.
+.theme-form-summary--error {
+    --theme-form-summary-background: var(--theme-color-danger-surface, #fbeae9);
+    --theme-form-summary-border-color: var(--theme-color-danger, #b3261e);
 }
 
 .theme-form-summary--success {

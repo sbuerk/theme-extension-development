@@ -2,13 +2,21 @@
 //
 // Markup contract:
 //
-//     <div class="theme-alert theme-alert--warning" role="status">
+//     <div class="theme-alert theme-alert--warning" role="alert">
 //         <span class="theme-alert__icon" aria-hidden="true">…</span>
 //         <div class="theme-alert__body">
 //             <p class="theme-alert__title">…</p>
 //             <p class="theme-alert__text">…</p>
 //         </div>
 //     </div>
+//
+// The "role" is a markup concern this file does not style, but it is not the
+// same for all four severities and the contract should not suggest otherwise:
+// "--info" and "--success" take "role='status'", a polite live region that
+// waits for a pause before announcing; "--warning" and "--danger" take
+// "role='alert'", which interrupts. Copying one role onto all four is how an
+// assertive message ends up announced politely, or a decorative one interrupts
+// whatever the reader was listening to.
 //
 // Modifiers: --info (the default, and the appearance of the bare class),
 // --success, --warning, --danger. "role" is fixed by the contract above and is
