@@ -45,31 +45,33 @@ in a frontend rather than only in a test assertion:
     :file:`EXT:frontend` registers, the eleven menu elements, ten elements of
     its own, and third-party Extbase plugins, none of which requires
     :file:`fluid_styled_content` — that extension is not a dependency here, and
-    on TYPO3 v14 it is not installed at all. It ships five backend layouts, a
-    main menu, a section menu and a breadcrumb, and a light/dark appearance
-    switch. A seeded ``/styleguide`` page renders the whole component library
-    on one page, so the theme can be looked at without building content for it
-    first — see :ref:`feature-styleguide`. This chapter is extended along with
-    the implemented features.
+    the development and test instances do not install it. It ships five backend
+    layouts, a main menu, a section menu and a breadcrumb, and a light/dark
+    appearance switch. A seeded ``/styleguide`` page renders the whole component
+    library on one page, so the theme can be looked at without building content
+    for it first — see :ref:`feature-styleguide`. This chapter is extended along
+    with the implemented features.
 
-    Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
-    base with :ref:`core version aware <introduction-core-version-aware>`
-    classes, wired by the dependency injection container of the running TYPO3
-    version.
+    Underneath that sits the foundation: TYPO3 v13 support from one code base
+    with :ref:`core version aware <introduction-core-version-aware>` classes,
+    wired by the dependency injection container of the running TYPO3 version.
 
 ..  _introduction-core-version-aware:
 
 Core version aware implementations
 ==================================
 
-Code that has to differ between the supported TYPO3 versions lives below
-:file:`Core13/` and :file:`Core14/` in the repository root. Shared code —
-interfaces, abstract base classes and everything working on both core
-versions — lives in :file:`Classes/`.
+Code that has to differ between TYPO3 versions lives in one directory per
+supported major version in the repository root — this branch supports TYPO3
+v13, so there is exactly one, :file:`Core13/`. Shared code — interfaces,
+abstract base classes and everything that does not depend on a core version —
+lives in :file:`Classes/`.
 
 Only the directory matching the running TYPO3 version is registered in the
 dependency injection container, so a service asking for an interface always
-receives the implementation matching the current core version.
+receives the implementation matching the current core version. The mechanism
+does not depend on how many versions are supported at a time: a version is
+added or dropped with its directory, and the shared code stays untouched.
 
 Compatibility
 =============
@@ -81,9 +83,9 @@ Compatibility
         -   Extension
         -   TYPO3
         -   PHP
-    *   -   main
+    *   -   1
         -   1.x
-        -   v13 / v14
+        -   v13
         -   8.2 - 8.5
 
 Contributing

@@ -34,8 +34,10 @@ dependencies:
   - sbuerk/theme-extension-development
 ```
 
-Both `typoscript` and `optionalDependencies` exist in TYPO3 v13.4 and v14 alike —
-verified against `SetDefinition` in both — so the set needs no version split.
+Both `typoscript` and `optionalDependencies` are properties of `SetDefinition`
+itself (`.Build/vendor/typo3/cms-core/Classes/Site/Set/SetDefinition.php`, lines
+34 and 37) — verified there rather than taken from the documentation — so the
+set is plain configuration with no version aware code behind it.
 
 ## Why the static include is guarded
 
@@ -60,8 +62,8 @@ active:
 [END]
 ```
 
-`site('sets')` resolves through `Site::getSets()` and behaves identically on v13
-and v14, so this is common code rather than a version split.
+`site('sets')` resolves through `Site::getSets()`, so the guard is a TypoScript
+condition with no version aware code behind it.
 
 One limit worth knowing: `site('sets')` lists the sets a site declares
 **itself**. A theme pulled in as a transitive dependency of another set is not
@@ -75,25 +77,26 @@ Enabling the theme through its own set — the documented way — is covered.
 guarded by `is_array()` on that column. Called from `ext_localconf.php`, where
 the TCA does not exist yet, it therefore does **nothing at all** — silently.
 
-It belongs in `Configuration/TCA/Overrides/sys_template.php`. It is not
-deprecated in v14, and `ext_tables.php` — the historical location — is
-deprecated as of 14.3 (#109438) and must not be used.
+It belongs in `Configuration/TCA/Overrides/sys_template.php`, which TYPO3 loads
+once the TCA exists. `ext_tables.php` is the historical location and is not used
+here: it is loaded on every request in both frontend and backend, and TCA
+overrides are the file type TYPO3 caches and loads for exactly this purpose.
 
 `Tests/Functional/StaticTypoScriptIncludeTest` asserts the registration, because
 "registered" and "silently absent" are otherwise indistinguishable.
 
 ## Page rendering
 
-`page.10` is a `FLUIDTEMPLATE`, not a `PAGEVIEW`. `FLUIDTEMPLATE` behaves
-identically on v13 and v14 and keeps full control over `templateRootPaths`,
-`partialRootPaths` and `layoutRootPaths`, so the page rendering layer needs no
-`Core13/`/`Core14/` split.
+`page.10` is a `FLUIDTEMPLATE`, not a `PAGEVIEW`. `FLUIDTEMPLATE` keeps full
+control over `templateRootPaths`, `partialRootPaths` and `layoutRootPaths`, and
+the page rendering layer therefore needs no `Core<major>/` split.
 
 `PAGEVIEW` is the newer object and its content area API is genuinely nicer — but
 `contentAs`, `f:render.contentArea`, `f:render.record` and `f:page.headerData`
-are **v14 only**, and a split in the template layer is the most awkward kind:
-Fluid files live in `Resources/` and cannot be selected by the container the way
-classes are.
+**do not exist on v13.4**, verified against the installed
+`.Build/vendor/typo3/cms-fluid`. A split in the template layer would also be the
+most awkward kind: Fluid files live in `Resources/` and cannot be selected by
+the container the way classes are.
 
 Content is rendered with `styles.content.get`, which comes from **EXT:frontend**,
 not from `fluid_styled_content` — the theme deliberately does not depend on that
@@ -112,14 +115,13 @@ worth stating precisely, because the obvious way of checking it gives the wrong
 answer.
 
 Reading `EXT:frontend/Configuration/TCA/tt_content.php` shows a `types` array of
-`1`, `header`, `text` — and on v13 additionally `list` — which reads like the
-complete list of content types. It is not. The same extension ships **22 files**
-in `Configuration/TCA/Overrides/`, among them
+`1`, `header`, `text` and `list`, which reads like the complete list of content
+types. It is not. The same extension ships **22 files** in
+`Configuration/TCA/Overrides/`, among them
 `225-tt_content-content_type-image.php` and
 `230-tt_content-content_type-textmedia.php`, each calling
-`ExtensionManagementUtility::addRecordType()`. Verified against `v13.4.0`,
-`v13.4.34` and `v14.3.6`; the set is identical, the only difference being the
-tab label short form v14 introduced (#107789).
+`ExtensionManagementUtility::addRecordType()`. Verified against `v13.4.0` and
+`v13.4.34`; the set is identical across the patch levels.
 
 `fluid_styled_content`'s own `Configuration/TCA/Overrides/` holds exactly one
 file, `sys_template.php`, which registers its static include. **It contributes no
@@ -137,14 +139,13 @@ installation using this theme**, and each one renders the core notice until this
 extension gives it a branch. They are elements without rendering, not elements
 that do not exist.
 
-`list` is the legacy plugin type, deprecated in v13 (#105076) and removed in v14
-(#105377). It is rendered too, not skipped: any third-party Extbase plugin still
-registered the old way on v13.4 needs a `tt_content.list` object to render
+`list` is the legacy plugin type, deprecated in v13 (#105076) but still present
+in the v13.4 TCA. It is rendered too, not skipped: any third-party Extbase
+plugin still registered the old way needs a `tt_content.list` object to render
 through, the same way `configurePlugin()`'s default `CType` registration needs
 `Generic.html` — see
 [Content elements](content-elements.md#extbase-plugins-and-tt_contentlist) for
-both, and for why declaring `tt_content.list` needs no version condition even
-though the CType it renders is gone on v14.
+both.
 
 Every classic CType `EXT:frontend` registers is now covered — see
 [Content elements](content-elements.md) for the full table.

@@ -20,8 +20,8 @@ Build/Scripts/runTests.sh -s unit -- --filter DummyTest
 `unitRandom` exists to catch tests that depend on execution order. When it fails,
 the output contains the seed; replay it with `-o <seed>` to reproduce.
 
-Remember to run both core versions, each after the matching `composerUpdate` —
-see [Dual core setup](../development/dual-core-setup.md).
+Remember to run every supported core version, each after its own
+`composerUpdate` — see [Core version setup](../development/dual-core-setup.md).
 
 ## Conventions
 
@@ -59,24 +59,24 @@ see [Dual core setup](../development/dual-core-setup.md).
 
 ## Core version aware unit tests
 
-Tests for classes below `Core13/` and `Core14/` mirror that layout in
-`Tests/Unit/Core13/` and `Tests/Unit/Core14/`, and carry the group of the core
-version they must **not** run on:
+Tests for classes below a `Core<major>/` directory mirror that layout in
+`Tests/Unit/Core<major>/` — `Tests/Unit/Core13/` today — and carry the group of
+every core version they must **not** run on:
 
 ```php
-#[Group('not-core-14')]
+#[Group('not-core-<version>')]
 final class ExampleTest extends UnitTestCase
 {
 }
 ```
 
-See [Dual core setup](../development/dual-core-setup.md#test-grouping).
+With one supported version there is nothing to exclude, so no test carries a
+group. See [Core version setup](../development/dual-core-setup.md#test-grouping).
 
-The same grouping is what makes
-[`Tests/Unit/VersionCompatTest`](../../Tests/Unit/VersionCompatTest.php) work:
-it asserts that a run with `-t 13` really is v13 and one with `-t 14` really is
-v14, so a stale `.Build/` cannot produce a green suite that proved nothing. That
-test is **never removed** —
+[`Tests/Unit/VersionCompatTest`](../../Tests/Unit/VersionCompatTest.php) is the
+guard underneath all of it: it asserts that a run with `-t 13` really is v13, so
+a stale `.Build/` cannot produce a green suite that proved nothing. That test is
+**never removed** —
 see [the two tests that must never be dropped](Index.md#the-two-tests-that-must-never-be-dropped).
 
 ## Testing classes with injected dependencies

@@ -82,9 +82,9 @@ Four consequences worth knowing:
   risky. The unit suite has no such instance and keeps it enabled.
 - **A skipped test is not a failure.** Skipping is the mechanism the core
   version split relies on (`--exclude-group not-core-<version>`), so failing on
-  skipped tests would break the dual core setup. Use groups, not
+  skipped tests would break the core version setup. Use groups, not
   `markTestSkipped()`, to exclude a test from a core version — see
-  [Dual core setup](../development/dual-core-setup.md#test-grouping).
+  [Core version setup](../development/dual-core-setup.md#test-grouping).
 
 `failOnAllIssues` would cover most of the table with a single attribute, but it
 implies `failOnSkipped`, so the flags are listed individually instead.

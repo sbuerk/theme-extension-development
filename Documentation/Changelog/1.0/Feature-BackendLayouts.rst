@@ -77,12 +77,12 @@ Impact
     :typoscript:`FLUIDTEMPLATE` is used rather than :typoscript:`PAGEVIEW`,
     deliberately. :typoscript:`PAGEVIEW` exists since v13.1
     (:issue:`103504`), but the content area layer it is normally used with -
-    :php:`ContentAreaCollection` and :html:`<f:render.contentArea>` - arrived in
-    v14.2 (:issue:`104974`) and does not exist on v13.4 at all, so templates
-    written against it do not compile there. :typoscript:`FLUIDTEMPLATE` is not
-    deprecated on either version; the v14.2 changelog calls
-    :typoscript:`PAGEVIEW` "a powerful alternative", explicitly not a
-    replacement.
+    :php:`ContentAreaCollection` and :html:`<f:render.contentArea>` - does
+    not exist on v13.4 at all, so templates written against it do not compile
+    here. :typoscript:`FLUIDTEMPLATE` is not deprecated on v13.4 either: the
+    changelog introducing :typoscript:`PAGEVIEW` presents it as the option
+    with "fewer configuration options" for the conventional case and
+    deprecates nothing.
 
 The template is resolved with :typoscript:`data = pagelayout`, **not**
 :typoscript:`field = backend_layout`. The getter resolves through
@@ -104,9 +104,10 @@ Two edges of that inheritance are worth knowing, and both are covered by
     exception.
 
 Every column declares an :typoscript:`identifier` as well as a
-:typoscript:`name` and a :typoscript:`colPos`. TYPO3 v14 raises a deprecation
-for a column without one and will throw in v15; v13 ignores it, so one spelling
-serves both versions.
+:typoscript:`name` and a :typoscript:`colPos`. TYPO3 v13.2 added the property
+(:issue:`103894`) as a speaking name for the numeric :typoscript:`colPos`, and
+the core's own record based page content rendering keys on it. It is optional
+on v13.4, and declaring it anyway costs nothing and keeps the layouts complete.
 
 ..  note::
 

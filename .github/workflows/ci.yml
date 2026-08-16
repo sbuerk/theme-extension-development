@@ -4,8 +4,9 @@ name: "CI"
 # functional tests against every supported DBMS, and the rendered documentation.
 #
 # One workflow rather than one per core version. The core version is a matrix
-# dimension, which keeps a single place to add v15 later and makes the
-# dependencies between the stages expressible — they cannot cross workflows.
+# dimension, which keeps a single place to add a further supported version and
+# makes the dependencies between the stages expressible — they cannot cross
+# workflows.
 #
 # Staging, cheapest and most likely to fail first:
 #
@@ -16,10 +17,10 @@ name: "CI"
 #   docs ────┤  (independent, for fast feedback on documentation changes)
 #   css  ────┘  (independent, neither PHP nor core version dependent)
 #
-# The DBMS matrix is the expensive part — 16 jobs, each starting a database
-# container — so it only runs once the same tests have passed on SQLite for both
-# core versions and both edge PHP versions. A failure that is not DBMS specific
-# is then reported by 4 jobs instead of 20.
+# The DBMS matrix is the expensive part — 8 jobs, each starting a database
+# container — so it only runs once the same tests have passed on SQLite for every
+# supported core version and both edge PHP versions. A failure that is not DBMS
+# specific is then reported by 2 jobs instead of 10.
 #
 # Supported versions are declared in the matrices below. There are three PHP
 # sets, and they have to be changed together:
@@ -124,10 +125,11 @@ jobs:
       fail-fast: false
       matrix:
         # The only gate configured per core version: each configuration analyses
-        # its own "Core13/" or "Core14/" sources against the core installed for
-        # it. Running it for one version would miss half the code.
+        # the "Core<major>/" sources of its own version against the core
+        # installed for it. Every supported version needs an entry here - the
+        # sources of a version left out are not analysed at all.
         php-version: [ "8.2" ]
-        typo3: [ "13", "14" ]
+        typo3: [ "13" ]
     steps:
 
       - name: "Checkout"
@@ -155,7 +157,7 @@ jobs:
       fail-fast: false
       matrix:
         php-version: [ "8.2", "8.3", "8.4", "8.5" ]
-        typo3: [ "13", "14" ]
+        typo3: [ "13" ]
     steps:
 
       - name: "Checkout"
@@ -184,7 +186,7 @@ jobs:
       fail-fast: false
       matrix:
         php-version: [ "8.2", "8.5" ]
-        typo3: [ "13", "14" ]
+        typo3: [ "13" ]
     steps:
 
       - name: "Checkout"
@@ -216,7 +218,7 @@ jobs:
       fail-fast: false
       matrix:
         php-version: [ "8.2", "8.5" ]
-        typo3: [ "13", "14" ]
+        typo3: [ "13" ]
     steps:
 
       - name: "Checkout"
@@ -241,13 +243,13 @@ jobs:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-22.04
     # Only after the same tests passed on SQLite for every core and edge PHP
-    # version. A defect that is not DBMS specific never reaches these 16 jobs.
+    # version. A defect that is not DBMS specific never reaches these 8 jobs.
     needs: [ "functional-sqlite" ]
     strategy:
       fail-fast: false
       matrix:
         php-version: [ "8.2", "8.5" ]
-        typo3: [ "13", "14" ]
+        typo3: [ "13" ]
         dbms:
           - { name: "mysql", version: "8.0" }
           - { name: "mariadb", version: "10.4" }

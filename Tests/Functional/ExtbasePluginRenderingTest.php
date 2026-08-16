@@ -14,10 +14,10 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * This is the least visible load-bearing thing in the extension.
  * `ExtensionUtility::configurePlugin()` emits
  * `tt_content.<signature> =< lib.contentElement` for every plugin ever
- * registered, and `lib.contentElement` came from `fluid_styled_content` - which
- * is not a dependency here and, on TYPO3 v14, is not installed at all. Nothing
- * in vanilla v14 defines it. So on a v14 instance using this theme, the theme's
- * own definition is the only reason any Extbase plugin renders.
+ * registered, unconditionally, and `lib.contentElement` comes from
+ * `fluid_styled_content` - which is not a dependency here and is therefore not
+ * installed. In an installation like that, this theme's own definition is the
+ * only reason any Extbase plugin renders at all.
  *
  * The fixture extension deliberately ships **no TypoScript of its own**. It
  * registers the plugin and nothing else, so if this passes, it passed because

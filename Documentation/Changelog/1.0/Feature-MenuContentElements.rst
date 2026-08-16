@@ -49,16 +49,16 @@ uncovered by :ref:`feature-core-content-elements`:
 
 No TCA of this extension's own is added for any of them, the same as every
 other element :ref:`feature-core-content-elements` covered: all eleven were
-already creatable in the backend before this change, on TYPO3 v13.4 and v14
-alike, and only rendered TYPO3's own "no rendering definition" notice.
+already creatable in the backend before this change, on TYPO3 v13.4, and
+only rendered TYPO3's own "no rendering definition" notice.
 
 Nine on ``MenuProcessor``, two on a category query
 ====================================================
 
-Nine of the eleven are the core's :php:`MenuProcessor`, unchanged between
-v13.4 and v14.3, configured with a different ``special`` per type -
-``list``, ``directory``, ``updated`` or ``keywords`` - and, for two of them,
-one extra level. :guilabel:`Abstracts` and :guilabel:`Recently updated
+Nine of the eleven are the core's :php:`MenuProcessor`, configured with a
+different ``special`` per type - ``list``, ``directory``, ``updated`` or
+``keywords`` - and, for two of them, one extra level.
+:guilabel:`Abstracts` and :guilabel:`Recently updated
 pages` needed no data processor beyond that: :php:`MenuProcessor` already
 JSON-encodes the whole page row onto every menu item, so the abstract text
 and the last-changed timestamp were already there for the reading.
@@ -76,10 +76,10 @@ are built on two different mechanisms on purpose, not by accident:
   through :typoscript:`RECORDS` would render every matched content element
   in full, nested inside this one - the wrong shape for a menu, and exposed
   to the same reference-cycle risk documented for :guilabel:`Insert Records`
-  in :ref:`feature-core-content-elements`, which TYPO3 v14 does not guard at
-  all. Rendering the matched rows as links instead means nothing can nest,
-  so the cycle cannot form in the first place - no structural break was
-  needed here the way one was added for :guilabel:`Insert Records`.
+  in :ref:`feature-core-content-elements`. Rendering the matched rows as
+  links instead means nothing can nest, so the cycle cannot form in the
+  first place - no structural break was needed here the way one was added
+  for :guilabel:`Insert Records`.
 
 ..  note::
 

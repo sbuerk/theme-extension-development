@@ -13,8 +13,8 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * Renders the classic content types `EXT:frontend` registers but supplies no
  * rendering for.
  *
- * `fluid_styled_content` is not a dependency of this theme, and on TYPO3 v14 it
- * is not even installed. What it would have supplied is the *rendering*, never
+ * `fluid_styled_content` is not a dependency of this theme, so it is not
+ * installed here. What it would have supplied is the *rendering*, never
  * the TCA: every one of these types can be created in the backend of an
  * installation using this theme whether or not anything renders it. Without a
  * definition the core prints its own notice instead, so a type nobody covered
@@ -135,7 +135,7 @@ final class CoreContentElementRenderingTest extends AbstractFunctionalTestCase
      * `sys_category_record_mm`, because `RECORDS` would render each match as a
      * whole content element nested inside this one - the wrong shape for a
      * menu, and it would inherit the recursion exposure the shortcut element
-     * documents, which TYPO3 v14 no longer guards at all.
+     * documents and has to close for itself.
      *
      * The fixture puts one page and one content element in a category and
      * points both elements at it. Without that, the pair render a correct
@@ -278,20 +278,51 @@ final class CoreContentElementRenderingTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * The theme's own cycle break, pinned by what only it can produce.
+     *
+     * Inside a shortcut, the `shortcut` branch of the content element `CASE`
+     * is overridden to render nothing. The fixture therefore holds a chain
+     * rather than a cycle: uid 84 references uid 80, which references the
+     * bullet list. Nothing about that chain is circular, so a core register
+     * tracking already-rendered records would happily render all three levels
+     * and the bullet list would appear a third time.
+     *
+     * It appears twice - in its own place and through uid 80 - because the
+     * second level renders nothing at all.
+     *
+     * This is the distinguishing observation, and it is why the test exists
+     * beside `aCircularShortcutDoesNotTakeTheRequestDown`: that one passes
+     * whether or not this theme breaks the cycle, because the core's own
+     * `RecordsContentObject` register (`$recordRegister`, v13.4) already keeps
+     * a *cycle* from taking the request down. Verified by removing
+     * `conf.tt_content.shortcut` from the rendering definition and watching it
+     * stay green. This test goes red there instead.
+     */
+    #[Test]
+    public function aShortcutInsideAShortcutRendersNothing(): void
+    {
+        $this->assertSame(
+            2,
+            substr_count($this->render(), 'First item'),
+            'A shortcut nested in a shortcut rendered its target instead of nothing.',
+        );
+    }
+
+    /**
      * The fixture contains a shortcut pointing at itself and a pair pointing
      * at each other. Rendering the page at all is the assertion.
      *
-     * This is not hypothetical on TYPO3 v14. The guard that made it safe lived
-     * on `TypoScriptFrontendController::$recordRegister`, and v14 removed that
-     * class outright (#107831); `RecordsContentObject::render()` there renders
-     * every reference unconditionally, and the older `cObjectDepthCounter` was
-     * dropped back in v11.4 with a note that PHP's own nesting limit is the
-     * expected outcome. So on v14 an editor pointing a shortcut at itself took
-     * the request down until this theme broke the cycle itself.
-     *
      * The break is structural: inside a shortcut, the shortcut branch renders
      * nothing, so no chain of references can return to its start. That needs
-     * no per-request state and behaves the same on both core versions.
+     * no per-request state, and it is a property of this theme's own rendering
+     * definition rather than of whatever the `RECORDS` cObject underneath
+     * keeps track of - see the long comment above `tt_content.shortcut` in
+     * `Configuration/TypoScript/ContentElements.typoscript`.
+     *
+     * What this test pins is the outcome rather than the mechanism: a cycle an
+     * editor can author in the backend leaves the request standing, and it
+     * leaves no "no rendering definition" notice on the page. This is the only
+     * place that statement is checked against a real request.
      */
     #[Test]
     public function aCircularShortcutDoesNotTakeTheRequestDown(): void

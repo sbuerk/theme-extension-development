@@ -13,11 +13,11 @@ element reaches `lib.contentElement` at all — this page does not repeat the
 `EXT:frontend` registers the whole classic set of content types itself, in
 `Configuration/TCA/Overrides/2xx-tt_content-content_type-*.php` — image,
 textmedia, bullets, table, uploads, the eleven `menu_*` types, shortcut, div
-and html — on TYPO3 v13.4 **and** v14 alike. On v14, `fluid_styled_content` is
-not even installed; it was never a dependency of this theme on either version.
-What that extension supplies, when present, is the *rendering* — a
-`lib.contentElement` TypoScript object and one template per `CType` — never
-the TCA.
+and html — verified against the installed v13.4 core.
+`fluid_styled_content` was never a dependency of this theme and is not
+installed here at all. What that extension supplies, when present, is the
+*rendering* — a `lib.contentElement` TypoScript object and one template per
+`CType` — never the TCA.
 
 The consequence: every one of those types can be created in the backend of an
 installation using this theme, whether or not anything renders it. A `CType`
@@ -124,8 +124,8 @@ selects the list shape:
 For the definition list, **every line becomes a standalone `<dt>`**, never a
 `<dt>`/`<dd>` pair. `bodytext` for `bullets` carries no second field and no
 documented delimiter convention for splitting a term from its description,
-and no `fluid_styled_content` reference rendering ships with either core
-version installed here to defer to. Inventing an ad-hoc in-line delimiter the
+and no `fluid_styled_content` reference rendering is installed here to defer
+to. Inventing an ad-hoc in-line delimiter the
 editor was never told about would be worse than leaving `<dd>` out entirely,
 so the template does exactly that.
 
@@ -194,7 +194,7 @@ instead: a single byte `fgetcsv()` accepts without complaint, and one an
 editor typing into the backend's textarea will not produce, so it behaves as
 "no enclosure" in practice while never throwing.
 
-## `shortcut`: recursion, and a guard that is version-dependent
+## `shortcut`: recursion, broken structurally rather than by a register
 
 `records` holds one or more `tt_content_<uid>` references (the TCA `group`
 field allows only `tt_content`). The TypoScript branch resolves them through
@@ -211,6 +211,11 @@ tt_content.shortcut {
             tables = tt_content
             source.field = records
             conf.tt_content =< tt_content
+
+            # The cycle break: inside a shortcut, the shortcut branch
+            # renders nothing at all.
+            conf.tt_content.shortcut = TEXT
+            conf.tt_content.shortcut.value =
         }
     }
 }
@@ -220,70 +225,61 @@ tt_content.shortcut {
 **exactly as it would on its own**: it copies the whole `tt_content` `CASE`
 object this file builds (registered by `EXT:frontend` in its
 `ext_localconf.php`, keyed on `CType`) as the render definition for each
-fetched record, so a referenced `shortcut` goes through this same branch
+fetched record, so a referenced `shortcut` would go through this same branch
 again — recursion is possible by construction, not an edge case bolted on
 afterwards.
 
-**On TYPO3 v13.4**, that recursion is guarded by the core, and the guard was
-verified in source rather than assumed, against
-`RecordsContentObject::render()` while v13.4.34 was the installed core
-(`instance-core-13/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php`):
+The last two lines are what stops it. Inside a shortcut's own `RECORDS` call,
+the copied `CASE` object's `shortcut` branch is replaced by an empty `TEXT`
+object, so a shortcut reached *through* a shortcut renders nothing. One level
+of indirection is followed — which is all the element is for — and a second is
+refused. Both the direct cycle (A references A) and the indirect one (A
+references B references A) are impossible by construction, with no state kept
+anywhere. `conf.tt_content` is copied fresh per invocation, so the override is
+local to this element's own rendering and never leaks into how another
+element's `RECORDS` call resolves the same branch.
+
+### Why not leave it to the core
+
+The core has a guard of its own, and it works. Verified in source against the
+installed v13.4.34 core
+(`.Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php`):
 
 1. Before fetching anything, `render()` reads the record currently being
    rendered off `TypoScriptFrontendController::$currentRecord` and registers
    it in `TypoScriptFrontendController::$recordRegister`, keyed `table:uid`,
    incrementing a counter (lines 59–67). The outer `CONTENT` cObject that
-   dispatches a page's content columns (`ContentContentObject::render()`)
-   registers the same way, so a shortcut's own record is already registered
-   by the time its own `RECORDS` call runs at all.
+   dispatches a page's content columns (`ContentContentObject::render()`,
+   lines 47–55) registers the same way, so a shortcut's own record is already
+   registered by the time its own `RECORDS` call runs at all.
 2. Before rendering each fetched item, the loop checks whether that item's
    own `table:uid` key is already registered (lines 111–114); if it is, the
    item is skipped — no `cObjGetSingle()` call, nothing appended to the
-   output for it. A shortcut referencing itself therefore does not loop and
-   is not silently dropped as "no output" for the whole element: that one
-   reference among others produces nothing, while every other reference in
-   the same `records` field still renders normally. The counter is
-   decremented again once rendering finishes (lines 138–141).
+   output for it. The counter is decremented again once rendering finishes
+   (lines 138–141).
 3. `$recordRegister` lives on the frontend controller, not on the `RECORDS`
-   call, so it survives an **indirect** cycle too: shortcut A referencing
-   shortcut B referencing A back registers `tt_content:A` while rendering A,
-   sets `$currentRecord` to `tt_content:B` before registering it in turn
-   (line 120), and by the time B's own reference back to A is reached,
-   `tt_content:A` is still registered — A has not finished rendering yet —
-   so that reference is skipped the same way a direct self-reference is.
+   call, so it catches an **indirect** cycle too: rendering A registers
+   `tt_content:A`, sets `$currentRecord` to `tt_content:B` before registering
+   it in turn (line 120), and by the time B's own reference back to A is
+   reached, `tt_content:A` is still registered — A has not finished rendering
+   yet — so that reference is skipped the same way a direct self-reference is.
 
-No guard of this extension's own is added on that basis: the core's already
-covers both the direct and the indirect case — **on v13.4**.
+That is a guarantee of one core version's frontend controller, held in
+request-scoped state on a class this theme has no contract with. The
+structural break above is a property of **this theme**: it holds wherever the
+theme runs, it is visible in the TypoScript that causes it rather than in
+someone else's `protected` array, and it needs no state at all. Where the core
+guard is present the two agree — a self-reference produces no output for that
+one reference while every other reference in the same `records` field still
+renders — so nothing is lost by not depending on it.
 
-> [!IMPORTANT]
-> **Discrepancy found against the contract this page was written from.**
-> The guard above does not exist on TYPO3 v14. `TypoScriptFrontendController`
-> — and `$recordRegister` with it — was fully removed in v14.0
-> (`Breaking-107831-RemovedTypoScriptFrontendController.rst`: "All remaining
-> properties have been removed … making the class a readonly internal
-> service used by the TYPO3 Core only"). Verified directly: with v14.3.6
-> installed (`.Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php`
-> and `ContentContentObject.php`), neither class references
-> `recordRegister`, `currentRecord`, or any replacement recursion tracking —
-> a `grep -r recordRegister` across the entire installed v14 core and
-> frontend package tree returns nothing. There is also no fallback: the
-> older `TypoScriptFrontendController->cObjectDepthCounter` guard against
-> content-object recursion was itself removed back in v11.4
-> (`Deprecation-94957`), on the stated basis that "PHP will now stop with a
-> fatal PHP nesting level error at some point, instead [of] TYPO3 frontend
-> rendering silently stopping" — which is the actual behaviour a
-> self-referencing or cyclic `shortcut` should be expected to hit on v14: an
-> uncontrolled recursion ending in a PHP fatal error, not a silently skipped
-> reference.
->
-> `Tests/Functional/CoreContentElementRenderingTest.php` does not exercise
-> this: its one shortcut fixture (`tt_content` uid 80) references a
-> non-recursive record (uid 10, the bullet list), so the gap is untested on
-> both core versions. No guard of this extension's own has been added here
-> either — that would be new behaviour beyond what step 5a asked for — but
-> anyone relying on "the core already guards recursive shortcuts" should
-> read that as **v13.4 only** until this is re-verified or a test is added
-> that would catch it on v14.
+The two differ in one respect worth naming: the core guard skips a record that
+is *anywhere* up the current render stack, while the break here refuses the
+`shortcut` branch specifically. A cycle that leaves the branch — a shortcut
+reached through some other content type that references the shortcut back — is
+not closed by this theme; it is closed by the core guard where that exists.
+`Tests/Functional/CoreContentElementRenderingTest.php::aCircularShortcutDoesNotTakeTheRequestDown`
+covers the theme's own break, not the core's.
 
 ## The eleven `menu_*` types
 
@@ -388,12 +384,11 @@ used instead, because `RECORDS` would render each match as a **whole content
 element nested inside this one**: the wrong shape for a menu — a menu of
 content should be a list of links, not a stack of embedded content elements —
 and it would inherit the exact recursion exposure documented above for
-`shortcut`, which TYPO3 v14 no longer guards at all. A categorized-content
-element can match itself by category, or match another one that matches it
-back, and rendering rows as links rather than whole elements means nothing
-can nest and the cycle cannot form in the first place; no structural break
-like the one added for `shortcut` was needed here because the rendering
-shape itself rules the cycle out.
+`shortcut`. A categorized-content element can match itself by category, or
+match another one that matches it back, and rendering rows as links rather
+than whole elements means nothing can nest and the cycle cannot form in the
+first place; no structural break like the one applied to `shortcut` was
+needed here because the rendering shape itself rules the cycle out.
 
 `fluid_styled_content` expressed the same selection as a **join** plus a
 `GROUP BY uid` to collapse the duplicate rows a join produces when a record
@@ -622,7 +617,7 @@ its own prefix, rather than overlooked.
 This extension ships no `ext_tables.sql` anywhere below `Configuration/` — the
 whole schema for `tx_theme_list_item` and the four `tx_theme_*` columns added
 to `tt_content` comes from `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()`
-reading the TCA at compare-schema time, on both v13.4 and v14.3.
+reading the TCA at compare-schema time.
 
 One column needed more than "add a `type=input` field and let it happen",
 because `DefaultTcaSchema` does not treat every part of an inline relation the
@@ -658,12 +653,6 @@ never a bare URL — so every template that reads one renders it through
 exists specifically because getting this wrong still renders a page that looks
 correct: the anchor carries `t3://page?uid=1` verbatim and nothing about the
 markup looks broken until the link is followed.
-
-TYPO3 v14's Fluid 5 change to null-handling on tag-based ViewHelpers
-(`Breaking-108148-StrictTypesInFluidViewHelpers.rst`) names `f:link.typolink`
-as an explicit exception — it renders through `ContentObjectRenderer::typoLink()`
-rather than building a tag itself — so no version split was needed for either
-partial to keep working on both v13.4 and v14.3.
 
 ### Inline children: `DatabaseQueryProcessor`, and its `item.data.*` trap
 
@@ -771,7 +760,7 @@ group ("Theme",
 `tt_content.group.theme` in `locallang_tca.xlf`, inserted `before:default`).
 No page TSconfig registers any of this: since TYPO3 v13
 (`Feature-102834-Auto-registrationOfNewContentElementWizardViaTCA.rst`, on
-disk for both installed core versions), the "new content element" wizard is
+disk in the installed core), the "new content element" wizard is
 generated from exactly those TCA keys, which replaced the former
 `mod.wizards.newContentElement.wizardItems.<group>` TSconfig step this theme
 therefore never needed to write.
@@ -794,11 +783,10 @@ Everything above is a `CType` this theme's own TypoScript branch is written
 for by name. An Extbase plugin registered through
 `TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin()` is different:
 the method generates its own TypoScript, and it does so whether or not
-`fluid_styled_content` is installed. Read on both installed core versions
+`fluid_styled_content` is installed. Read in the installed core
 (`.Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php`), it
-emits, verbatim, for a plugin registered with the `CType` type — the only
-type v14.3 accepts, and the only one that does not log a deprecation on
-v13.4 either:
+emits, verbatim, for a plugin registered with the `CType` type — the only type
+that does not log a deprecation on v13.4:
 
 ```typoscript
 tt_content.<pluginSignature> =< lib.contentElement
@@ -812,9 +800,9 @@ tt_content.<pluginSignature> {
 }
 ```
 
-`=< lib.contentElement` is generated unconditionally, on a v14.3.6 core where
-nothing outside this theme defines that object at all — grepping the whole
-installed v14 vendor tree for `lib.contentElement =` returns nothing. This
+`=< lib.contentElement` is generated unconditionally, while nothing outside
+this theme defines that object at all — grepping the whole installed v13.4.34
+vendor tree for `lib.contentElement =` returns nothing. This
 theme is therefore not an optional convenience for a third-party plugin, it is
 the only thing that makes one render: without a `Generic` template the plugin
 falls through to the same core "no rendering definition" notice as any
@@ -836,8 +824,8 @@ same branch, at a path built from the current record rather than fixed —
 `tt_content.{data.CType}.20` — because `CType` *is* the plugin signature for a
 plugin registered this way (`ExtensionUtility::registerPlugin()` adds that
 exact string as the `CType` select item's value). Confirmed to actually
-resolve with a throwaway functional test against a fixture plugin, on both
-core versions, before being deleted again — `f:cObject`'s own
+resolve with a throwaway functional test against a fixture plugin before being
+deleted again — `f:cObject`'s own
 `typoscriptObjectPath` resolves from the root of the merged setup array, not
 relative to the branch it is rendered from, which is why the path spells out
 `tt_content` rather than reading `20` alone.
@@ -863,10 +851,7 @@ tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN
 ```
 
 `fluid_styled_content` supplied `tt_content.list` itself, as a `CASE` object
-keyed on `list_type` — not a dependency here — and removed it outright in
-v14.0 along with the `list` CType and its own `List.html` template (Breaking
-#105377, `DeprecatedFunctionalityRemoved`: *"The following content element
-definitions have been removed: `tt_content.list`"*). Without that `CASE`
+keyed on `list_type` — and it is not a dependency here. Without that `CASE`
 object, the assignment above has nothing to add a branch to, and a `list`
 element renders the core notice on v13.4 the same as every other uncovered
 type.
@@ -877,25 +862,18 @@ render it too: a `list` record's own `CType` is `list`, so
 `{data.CType}.20` resolves to `tt_content.list.20`, the `CASE` itself, in
 place of a single plugin's `EXTBASEPLUGIN`.
 
-It is declared **unconditionally**, not behind a `[not (...)]` version
-condition — verified rather than assumed to be harmless on v14, not merely
-argued from the changelog. With v14.3.6 installed,
+It is declared **unconditionally**, with no `[...]` condition around it: every
+supported core version still carries the `list` CType, so there is no
+difference to resolve and nothing to guard. Verified rather than assumed —
 `grep -n "'list'\|list_type" .Build/vendor/typo3/cms-frontend/Configuration/TCA/tt_content.php`
-returns nothing at all: no `types.list`, no `CType` select item, no
-`subtype_value_field`. The changelog explains why so completely that nothing
-could reach this branch regardless — the `list_type` **database column
-itself** was dropped (`Breaking-105377`: *"The following database table
-fields have been removed: `tt_content.list_type`"*), so even the `CASE`'s own
-`key.field = list_type` names a column the schema no longer has. A `CType` no
-v14 installation can offer an editor, keyed on a column that does not exist,
-is exactly as inert as never declaring the object at all — and it stays
-useful for as long as an installation is still on v13.4. This is the
-documented exception to splitting version differences into `Core13`/`Core14`
-classes (TypoScript is configuration, see
-[Core version aware code](core-version-aware-code.md#configuration-is-the-exception))
-applied in its simplest form: the difference needs no condition at all, only
-evidence that leaving it unconditional does not do anything on the newer
-version.
+against the installed v13.4.34 core returns `types.list`, the `CType` select
+item and `subtype_value_field = list_type`, all present.
+
+Deprecated is not the same as gone. #105076 asks plugin authors to register
+with the `CType` type instead — which the fixture plugins in this repository
+do — but records authored the old way still exist in real installations, and
+this branch is what renders them instead of leaving the core notice on the
+page. It costs one `=< lib.contentElement` and no version aware code at all.
 
 ## See also
 

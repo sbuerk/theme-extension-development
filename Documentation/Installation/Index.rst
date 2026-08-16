@@ -33,7 +33,7 @@ between ``require`` and ``require-dev``. A deployment installing with
 ..  note::
 
     As long as no stable version has been released, the development version of
-    the main branch has to be required explicitly:
+    the ``1`` branch has to be required explicitly:
 
     ..  code-block:: bash
 

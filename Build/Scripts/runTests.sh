@@ -315,10 +315,16 @@ Options:
             - 17    maintained until 2029-11-08
             - 18    maintained until 2030-11-14
 
-    -t <13|14>
+    -t <13>
         Specifies the TYPO3 CORE Version to be used
             - 13: (default) use TYPO3 v13
-            - 14: use TYPO3 v14
+        Exactly one core version is supported at the moment, so the option has a
+        single accepted value. It stays in place because everything downstream is
+        derived from it - the "typo3/minimal" requirement of composerUpdate, the
+        "Build/phpstan/Core<version>/" configuration and the
+        "--exclude-group not-core-<version>" of the test suites. A further
+        supported version is added by extending the accepted values, not by
+        reintroducing the mechanism.
         Note that the dependencies must be installed for the selected core
         version first, which is done by the composerUpdate suite:
             ./Build/Scripts/runTests.sh -t 13 -s composerUpdate
@@ -443,7 +449,7 @@ while getopts "a:b:s:d:i:p:t:xy:o:nhu" OPT; do
             ;;
         t)
             CORE_VERSION=${OPTARG}
-            if ! [[ ${CORE_VERSION} =~ ^(13|14)$ ]]; then
+            if ! [[ ${CORE_VERSION} =~ ^(13)$ ]]; then
                 INVALID_OPTIONS+=("t ${OPTARG}")
             fi
             ;;

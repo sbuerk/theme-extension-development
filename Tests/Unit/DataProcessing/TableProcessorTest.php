@@ -20,17 +20,14 @@ final class TableProcessorTest extends UnitTestCase
     }
 
     /**
-     * "ContentObjectRenderer" gained a fully DI-wired constructor in TYPO3
-     * v14 (26 arguments, none optional) - verified against the class
-     * installed here, "ContentObjectRenderer::__construct()" took no
-     * required arguments at all on v13.4. "TableProcessor::process()" never
-     * touches any of those services - it only reads "$cObj->data" and calls
-     * "stdWrapValue()"/"checkIf()" in the branch that only runs when a
-     * "processorConfiguration" carries a trailing ".", which these tests
-     * never pass - so building the object through reflection, without
-     * calling its constructor, is sufficient on both core versions and
-     * avoids wiring up 26 unrelated services for a test that never uses
-     * them.
+     * Built through reflection rather than with "new", deliberately:
+     * "TableProcessor::process()" never touches anything
+     * "ContentObjectRenderer" is constructed with. It only reads
+     * "$cObj->data" and calls "stdWrapValue()"/"checkIf()" in the branch that
+     * runs when a "processorConfiguration" carries a trailing ".", which these
+     * tests never pass. Skipping the constructor therefore keeps this test
+     * independent of whatever that constructor requires, and it makes visible
+     * that nothing the constructor would set up is part of what is under test.
      */
     private function newContentObjectRenderer(): ContentObjectRenderer
     {

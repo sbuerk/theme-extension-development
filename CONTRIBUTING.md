@@ -41,12 +41,12 @@ Build/Scripts/runTests.sh -h
 > than selected reports false positives.
 
 → [Development environment](docs/development/environment.md) ·
-[Dual core setup](docs/development/dual-core-setup.md)
+[Core version setup](docs/development/dual-core-setup.md)
 
 ## Quality gates
 
-The same gates run locally and in the GitHub Actions workflows for TYPO3 v13
-and v14:
+The same gates run locally and in the GitHub Actions workflows, for every
+supported TYPO3 version:
 
 ```bash
 Build/Scripts/runTests.sh -s cgl          # coding guidelines, "-n" to check only
@@ -95,13 +95,14 @@ frontend sub-requests available everywhere.
 
 ## Code rules
 
-The extension supports TYPO3 v13 and v14 from one code base. The rules that make
-that work:
+The extension serves every supported TYPO3 version — v13 today — from one code
+base. The rules that make that work:
 
 - **Version differences split classes, they do not add conditionals.**
-  `Classes/` holds everything working on all supported versions; `Core13/` and
-  `Core14/` hold one implementation each, and only the matching directory is
-  registered in the dependency injection container.
+  `Classes/` holds everything working on all supported versions; one
+  `Core<major>/` directory per version holds its implementations, and only the
+  directory matching the running core is registered in the dependency injection
+  container.
   → [Core version aware code](docs/architecture/core-version-aware-code.md)
 - **Services are stateless and wired with Symfony DI attributes on the class** —
   not with `Services.yaml`, not with service definitions in
@@ -139,8 +140,8 @@ characters. An issue reference is not required, but must be verified when used.
 
 Before opening a pull request, run every gate from
 [Quality gates](#quality-gates), both test suites, and `renderDocumentation`
-when anything below `Documentation/` changed — for **both** core versions
-(`-t 13` and `-t 14`, each after the matching `composerUpdate`).
+when anything below `Documentation/` changed — for **every** supported core
+version, each after its own `composerUpdate`.
 
 Add another DBMS (`-d mariadb -i 10.6`, `mysql`, `postgres`) when the change
 touches queries, schema or TCA.

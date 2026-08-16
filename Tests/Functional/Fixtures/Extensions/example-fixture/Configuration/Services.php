@@ -13,8 +13,8 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
  * classes themselves, not here.
  *
  * The fixture extension is not core version aware, so — unlike
- * `Configuration/Services.php` of the extension itself — there is no `Core13/`
- * and `Core14/` split to resolve.
+ * `Configuration/Services.php` of the extension itself — there is no
+ * `Core<major>/` directory to resolve against the running core version.
  */
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();

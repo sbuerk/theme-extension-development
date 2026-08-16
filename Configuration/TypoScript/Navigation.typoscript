@@ -5,10 +5,9 @@
 # double-apply guard.
 #
 # All three are "TYPO3\CMS\Frontend\DataProcessing\MenuProcessor" - stock
-# core, unchanged on v13.4 and v14.3 (no changelog entry for it in either
-# series, verified by its absence under
-# ".Build/vendor/typo3/cms-core/Documentation/Changelog/13.*/" and "/14.*/").
-# No custom PHP.
+# core, unchanged across the whole v13 series (no changelog entry names it,
+# verified by its absence under
+# ".Build/vendor/typo3/cms-core/Documentation/Changelog/13.*/"). No custom PHP.
 #
 # Each processor is written directly onto "page.10.dataProcessing", the
 # FLUIDTEMPLATE object "Page.typoscript" defines, rather than being built as a

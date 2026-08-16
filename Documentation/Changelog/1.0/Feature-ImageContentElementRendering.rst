@@ -14,8 +14,8 @@ theme.
 
 No TCA is added for it. The element is registered by **EXT:frontend**, in
 :file:`Configuration/TCA/Overrides/225-tt_content-content_type-image.php`, on
-TYPO3 v13.4 and v14 alike - what ``fluid_styled_content`` contributes for it is
-the rendering, and that is what this theme now brings itself.
+TYPO3 v13.4 - what ``fluid_styled_content`` contributes for it is the
+rendering, and that is what this theme now brings itself.
 
 The backend fields of the element decide the layout, and all of them are
 honoured:

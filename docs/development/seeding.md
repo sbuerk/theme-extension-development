@@ -236,8 +236,7 @@ each easy to get wrong:
 - **The conflict mode is the native enum.** TYPO3 v13 still carries the older
   `Resource\DuplicationBehavior` class alongside `Resource\Enum\DuplicationBehavior`,
   and passing the old one triggers a deprecation (#101151) that this test suite
-  turns into a failure. The enum exists in v13.4 and v14 alike, so this needs no
-  version split.
+  turns into a failure.
 - **A storage evaluates backend user file mounts.** Seeding runs on the command
   line into a folder no user has a mount for, so the check is suspended for the
   duration of the copy and restored afterwards.
@@ -285,8 +284,8 @@ hidden record by declaring `hidden: 1` itself.
 ## Why a seed may declare uids
 
 So a site configuration can be committed. `instance-core-13/config/sites/demo/`
-and its v14 counterpart reference `rootPageId: 1`, which only works because the
-definition declares that uid. Without it the root page would get whatever the
+references `rootPageId: 1`, which only works because the definition declares
+that uid. Without it the root page would get whatever the
 database assigned and the site configuration could not be written in advance.
 
 That is also why the command refuses to run into a non-empty page tree: a

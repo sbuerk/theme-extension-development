@@ -483,9 +483,9 @@ pages:
               # This is also the element that demonstrates the cycle break of
               # PR #19: inside a shortcut, "tt_content.shortcut" is redefined
               # to render nothing, so a shortcut reached through a shortcut
-              # produces no output. TYPO3 v13.4 has a recursion guard of its
-              # own ("recordRegister"), v14 has none, and this element renders
-              # identically on both because the theme does not rely on it.
+              # produces no output. The core carries a recursion guard of its
+              # own ("recordRegister"), but this element does not depend on it -
+              # the theme's own definition is what closes the cycle.
               - identifier: core-shortcut
                 CType: shortcut
                 header: 'Insert records (name only, not rendered)'

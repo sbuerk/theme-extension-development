@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional\Core13\Example;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\ThemeExtensionDevelopment\Core13\Example\Example;
 use SBUERK\ThemeExtensionDevelopment\Example\ExampleInterface;
@@ -13,29 +12,20 @@ use SBUERK\ThemeExtensionDevelopment\Tests\Functional\AbstractFunctionalTestCase
 /**
  * Verifies the core version aware dependency injection wiring on TYPO3 v13.
  *
- * Core version aware tests live below `Tests/Functional/Core13/` and are put
- * into the `not-core-14` group, so they are skipped when the test suite runs
- * against another core version — `Build/Scripts/runTests.sh` passes
- * `--exclude-group not-core-<version>` for the selected core version.
+ * Core version aware tests live below `Tests/Functional/Core13/`, mirroring the
+ * `Core13/` source directory they cover.
+ *
+ * They carry no PHPUnit group: `Build/Scripts/runTests.sh` passes
+ * `--exclude-group not-core-<version>` so a test can be kept out of a run
+ * against a core version it does not apply to, and with a single supported
+ * version there is no such run to exclude it from.
  */
-#[Group('not-core-14')]
 final class ExampleTest extends AbstractFunctionalTestCase
 {
     #[Test]
     public function interfaceIsAliasedToCoreVersionAwareImplementation(): void
     {
         $this->assertInstanceOf(Example::class, $this->get(ExampleInterface::class));
-    }
-
-    #[Test]
-    public function implementationOfTheOtherCoreVersionIsNotRegistered(): void
-    {
-        $otherImplementation = 'SBUERK\\ThemeExtensionDevelopment\\Core14\\Example\\Example';
-
-        $this->assertFalse(
-            $this->getContainer()->has($otherImplementation),
-            sprintf('"%s" is not registered in the dependency injection container.', $otherImplementation),
-        );
     }
 
     #[Test]

@@ -152,11 +152,15 @@ it.
 `deleted`, the language fields and the workspace fields from the TCA, so
 declaring them by hand is redundant and drifts.
 
-The TCA also carries the one core version switch of the fixture — `searchFields`
-exists on v13 and was removed on v14. Configuration cannot use the `Core13/` and
-`Core14/` split, so it is applied to the array before returning it; see
+The TCA is the place a core version difference in *configuration* would be
+resolved if there were one. Configuration files cannot use the `Core<major>/`
+split at all — TYPO3 loads them from a fixed path — so a difference is applied
+to the finished array before it is returned, with a `@todo` naming the condition
+under which it goes away; see
 [Core version aware code](../architecture/core-version-aware-code.md#configuration-is-the-exception).
-A fixture extension is held to the same rules as the extension itself here.
+With a single supported core version there is no such difference, and the TCA
+here is unconditional. A fixture extension is held to the same rules as the
+extension itself.
 
 The [`composer.json`](../../Tests/Functional/Fixtures/Extensions/example-fixture/composer.json)
 is what turns the directory into a package the plugin can find. It needs a name,
@@ -196,9 +200,9 @@ implementation pattern as the extension:
 final readonly class DummyService implements DummyServiceInterface
 ```
 
-A fixture extension is **not** core version aware. There is no `Core13/` and
-`Core14/` split — if a fixture needs to behave differently per core version,
-that belongs in the test, not in the fixture.
+A fixture extension is **not** core version aware. There is no `Core<major>/`
+split — if a fixture needs to behave differently per core version, that belongs
+in the test, not in the fixture.
 
 ## What the test proves
 

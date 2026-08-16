@@ -96,14 +96,14 @@ often states that the removed option is still required on the older version.
 
 > [!IMPORTANT]
 > The changelogs reach only as far as the **installed** core version: with
-> TYPO3 v13 installed the newest directory is `13.4.x` and there is no `14.0/`
-> to read. A package does ship the changelogs of all earlier versions, so
-> installing the highest supported version — v14 — puts both v13 and v14
-> changelogs on disk at once.
+> TYPO3 v13 installed the newest directory is `13.4.x`. A package does ship the
+> changelogs of all earlier versions, so the highest supported version always
+> carries the complete set. Anything newer than that cannot be verified from
+> this checkout — say so rather than asserting it.
 >
-> Looking something up is not running a gate. Read with v14 installed, then
-> `composerUpdate` back to the version you are working on before running
-> anything — see [Dual core setup](../development/dual-core-setup.md).
+> Looking something up is not running a gate. `composerUpdate` back to the
+> version you are working on before running anything — see
+> [Core version setup](../development/dual-core-setup.md).
 
 The rendered version is at
 <https://docs.typo3.org/c/typo3/cms-core/main/en-us/Index.html>. See

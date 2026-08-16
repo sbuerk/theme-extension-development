@@ -16,12 +16,9 @@
     (.Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/Link/TypolinkViewHelper.php,
     "$this->arguments['parameter']" fed straight into "TypoLinkCodecService").
     That ViewHelper renders through "ContentObjectRenderer::typoLink()" rather
-    than building a tag itself, which is also why it is explicitly named as an
-    exception to TYPO3 v14's Fluid 5 change to null-handling on tag-based
-    ViewHelpers (.Build/vendor/typo3/cms-core/Documentation/Changelog/14.0/
-    Breaking-108148-StrictTypesInFluidViewHelpers.rst: "f:link.*>, except for
-    <f:link.typolink>, which uses TypoScript internally") - behaviour verified
-    identical on v13.4 and v14.3, nothing here needs a version split.
+    than assembling a tag itself, so the whole stored parameter string is
+    handed to TypoScript and nothing about the link syntax is re-implemented
+    here.
 
     "tx_theme_link_variant" only ever holds '', 'secondary' or 'ghost' - read
     from the "items" of "tx_theme_link_variant" in

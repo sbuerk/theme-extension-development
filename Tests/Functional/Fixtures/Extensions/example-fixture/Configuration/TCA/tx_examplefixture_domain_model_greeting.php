@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use TYPO3\CMS\Core\Information\Typo3Version;
-
 /**
  * TCA of the greeting table of the fixture extension.
  *
@@ -17,12 +15,8 @@ use TYPO3\CMS\Core\Information\Typo3Version;
  * The table is deliberately both language aware and version aware: it declares
  * the language fields, so records can be translated and are overlaid on
  * retrieval, and "versioningWS", so workspace overlays apply as well.
- *
- * TCA is configuration, not code, so a core version difference cannot be
- * resolved by the "Core13/" and "Core14/" split used for classes. It is applied
- * to the array before returning it instead, see the bottom of this file.
  */
-$tcaConfiguration = [
+return [
     'ctrl' => [
         'title' => 'Example fixture greeting',
         'label' => 'title',
@@ -34,6 +28,14 @@ $tcaConfiguration = [
         'transOrigPointerField' => 'l10n_parent',
         'transOrigDiffSourceField' => 'l10n_diffsource',
         'translationSource' => 'l10n_source',
+        // Narrows the backend record list and the live search to these two
+        // fields. Without the option the core widens the search to every
+        // searchable field of the schema — see the empty-list branch of
+        // \TYPO3\CMS\Core\Schema\SearchableSchemaFieldsCollector::getFields(),
+        // which both \TYPO3\CMS\Backend\RecordList\DatabaseRecordList and
+        // \TYPO3\CMS\Backend\Search\LiveSearch\DatabaseRecordProvider call
+        // without a field list of their own.
+        'searchFields' => 'title,message',
     ],
     'columns' => [
         'sys_language_uid' => [
@@ -87,16 +89,3 @@ $tcaConfiguration = [
         ],
     ],
 ];
-
-// The 'searchFields' ctrl option was removed in TYPO3 v14 (Breaking #106972).
-// There, all fields of suitable types are searchable by default and the option
-// is migrated away at runtime with a deprecation; per-field opt-out is the new
-// 'searchable' field configuration. TYPO3 v13 still evaluates 'searchFields'
-// and searches nothing without it, so the explicit list is kept there and only
-// there.
-// @todo Remove once TYPO3 v13 support is dropped.
-if ((new Typo3Version())->getMajorVersion() < 14) {
-    $tcaConfiguration['ctrl']['searchFields'] = 'title,message';
-}
-
-return $tcaConfiguration;

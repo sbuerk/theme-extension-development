@@ -14,21 +14,19 @@ either.
 `PAGEVIEW` exists since TYPO3 v13.1
 (`Feature-103504-NewContentObjectPageView.rst`), so age is not the reason.
 The reason is the layer normally used with it: `ContentAreaCollection`,
-`{content.main.records}` and the `f:render.contentArea` /
-`f:render.record` ViewHelpers landed only in **v14.2**
-(`Feature-104974-ContentAreaRelatedInformationInTheFrontend.rst`). A template
-written against that API does not compile on v13.4 — the ViewHelpers do not
-exist there. `PAGEVIEW` itself would run, but nothing sane to render content
-areas with is available at v13.4.
+`{content.main.records}` and the `f:render.contentArea` / `f:render.record`
+ViewHelpers do not exist on v13.4 at all. Verified rather than recalled —
+`.Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/` ships neither ViewHelper
+in the installed v13.4.34 core. `PAGEVIEW` itself would run; there is simply
+nothing to render content areas with beside it.
 
-`FLUIDTEMPLATE` is not deprecated on either version, and the v14.2 changelog
-entry does not present `PAGEVIEW` as its replacement — it describes it as "a
-powerful alternative to the `FLUIDTEMPLATE` cObject, allowing a full page to
-be rendered with less configuration." Less configuration is not on offer here:
-a v12/v13 downgrade branch of this extension is planned, and `PAGEVIEW`
-would have to be abandoned for it anyway. Building on `FLUIDTEMPLATE` now
-means the page rendering layer needs no `Core13/`/`Core14/` split and nothing
-has to be unwound later — see
+`FLUIDTEMPLATE` is not deprecated, and the changelog entry introducing
+`PAGEVIEW` does not present it as a replacement either — it describes it as
+"mainly intended for rendering a full page in the TYPO3 frontend with fewer
+configuration options over the generic `FLUIDTEMPLATE` cObject". Fewer
+configuration options is not what this theme needs: it keeps full control over
+`templateRootPaths` and the content slots. Building on `FLUIDTEMPLATE` also
+means the page rendering layer needs no `Core<major>/` split — see
 [Core version aware code](core-version-aware-code.md) for why a split in
 `Resources/` specifically would be the most awkward kind, Fluid files not
 being selectable by the container the way classes are.
@@ -41,8 +39,12 @@ imports one file per layout from
 [`Configuration/PageTsConfig/BackendLayouts/`](../../Configuration/PageTsConfig/BackendLayouts).
 TYPO3 auto-loads `Configuration/page.tsconfig` from every package since v12.0
 (`Feature-96614-AutomaticInclusionOfPageTsConfigOfExtensions.rst`) — no
-registration call, no DB seeding, and (verified against the v14.3 loader,
-`TsConfigTreeBuilder::184`) still true on the newer version.
+registration call and no DB seeding. Verified in the installed v13.4.34 core
+rather than taken from the changelog:
+`TsConfigTreeBuilder::getPagesTsConfigTree()` walks the active packages and
+picks up `Configuration/page.tsconfig` from each
+(`.Build/vendor/typo3/cms-core/Classes/TypoScript/IncludeTree/TsConfigTreeBuilder.php`,
+lines 176–177).
 
 That beats both alternatives available for registering a backend layout:
 
@@ -142,7 +144,7 @@ Four things about it are load-bearing:
   error. The getter itself is nothing new: it has existed since 7.5 (#69602),
   and the only change since is v13.0 (#102715), which moved where it reads
   the page record from, not what it returns. Verified present and unchanged
-  in that respect on both v13.4 and v14.3.
+  in that respect in the installed v13.4.34 core.
 - **The `pagets__` prefix is stripped.** `replacement.10` removes it with a
   regular expression. The PageTsConfig provider prefixes every identifier it
   returns with `pagets__` — it also has to distinguish layouts that come from
@@ -229,22 +231,23 @@ This reproduces what `EXT:theme_camino` gets for the same columns from
 `fluid_styled_content`, so there is no `lib.contentElement` to configure a
 slide mode on.
 
-## Column identifiers are mandatory
+## Every column carries an identifier
 
 Every column in every `*.tsconfig` file under
 `Configuration/PageTsConfig/BackendLayouts/` carries an `identifier` in
-addition to `name` and `colPos`. On TYPO3 v14,
-`ContentAreaResolver::collectContentAreasRecursive()` raises a deprecation
-for a column without one, and the deprecation is scheduled to become a thrown
-exception in v15. On v13 the same column configuration is accepted without
-comment — the check does not exist yet. One spelling with `identifier`
-present therefore serves both core versions; there is nothing to split.
+addition to `name` and `colPos`. Nothing forces that on v13.4 — a column
+without one is accepted silently — but it is not decoration either: the
+backend page module reads it. `GridColumn` takes the key off the column
+definition and exposes it as `identifierCleaned`
+(`.Build/vendor/typo3/cms-backend/Classes/View/BackendLayout/Grid/GridColumn.php`,
+lines 72 and 138–141), and
+`Resources/Private/Partials/PageLayout/Grid/Column.html` renders it as a
+`t3-grid-cell-<identifier>` class on the grid cell. A column without an
+identifier loses that styling hook, and nothing reports it.
 
-This was not designed in from a changelog reading — it was found by the
-strict test suite doing what [the strictness
-policy](../testing/phpunit-configuration.md#strictness-policy) is for: a
-deprecation notice fails the functional suite outright rather than being
-logged and ignored, which is what surfaced the missing identifiers here.
+`colPos` cannot stand in for it: it is the number a content element is stored
+against, shared across every layout, while the identifier names *this*
+column in *this* layout. Spelling both out costs one line per column.
 
 ## The Fluid structure
 

@@ -47,10 +47,9 @@ per menu type rather than only a template.
 
 No TCA of this extension's own is added for any of them. Every one of these
 elements was already creatable in the backend before this change - their TCA
-comes from ``EXT:frontend``, on TYPO3 v13.4 and v14 alike, and
-``fluid_styled_content`` is not a dependency of this theme on either version
-- so what changes is only that they now render instead of TYPO3's own "no
-rendering definition" notice.
+comes from ``EXT:frontend`` on TYPO3 v13.4, and ``fluid_styled_content`` is
+not a dependency of this theme - so what changes is only that they now render
+instead of TYPO3's own "no rendering definition" notice.
 
 Two elements needed a decision
 ===============================
@@ -84,20 +83,24 @@ through the very same object this theme builds for every content element,
 including, if it is itself an :guilabel:`Insert Records` element, going
 through this same branch again.
 
-..  warning::
+..  note::
 
-    Whether that recursion is guarded depends on the TYPO3 version. On
-    v13.4, the core's own :php:`TypoScriptFrontendController->recordRegister`
-    skips a record that is already being rendered - a self-reference or an
-    indirect cycle is caught, and the offending reference alone is silently
-    dropped, not the rest of the element. On v14, that guard is gone:
-    :php:`TypoScriptFrontendController` (and the property with it) was
-    removed entirely in v14.0. No guard of this extension's own was added,
-    which means a self-referencing or cyclically referencing
-    :guilabel:`Insert Records` element is unguarded on v14 and will recurse
-    until PHP's own nesting limit ends the request with a fatal error. See
-    :file:`docs/architecture/content-elements.md` for the verification
-    against both installed core versions.
+    That recursion is broken by this theme rather than left to the core.
+    TYPO3 v13.4 does bring a guard of its own -
+    :php:`TypoScriptFrontendController->recordRegister` skips a record that
+    is already being rendered, so a self-reference or an indirect cycle is
+    caught and the offending reference alone is silently dropped, not the
+    rest of the element - but the theme does not depend on it. Inside an
+    :guilabel:`Insert Records` element, the ``shortcut`` branch of the
+    content element :typoscript:`CASE` is overridden to render nothing at
+    all, so no chain of references can return to where it started.
+
+    That break is structural: it keeps no per-request state, it is a
+    property of this theme rather than of the core version it runs on, and
+    :file:`Tests/Functional/CoreContentElementRenderingTest.php` renders a
+    self-referencing element and a mutually referencing pair to prove it.
+    See :file:`docs/architecture/content-elements.md` for the verification
+    against the installed core.
 
 Escaping
 ========
@@ -128,4 +131,4 @@ with every other template through the Fluid path constants under
 :file:`docs/architecture/content-elements.md` in the developer documentation
 for the full coverage table, the
 ``bullets_type``/``table_*``/``uploads_type`` field-by-field reasoning, and
-the recursion finding above.
+the cycle break described above.

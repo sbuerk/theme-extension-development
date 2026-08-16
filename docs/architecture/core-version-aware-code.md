@@ -1,9 +1,13 @@
 # Core version aware code
 
-The extension supports more than one TYPO3 major version from a single code
-base. Code that cannot be written for all of them at once is **core version
-aware**: it exists once per supported core version, and only the variant
-matching the running TYPO3 version is used.
+The extension is built to serve more than one TYPO3 major version from a single
+code base. Code that cannot be written for all of them at once is **core version
+aware**: it exists once per supported core version, and only the variant matching
+the running TYPO3 version is used.
+
+That structure does not depend on how many versions there happen to be. One
+`Core<major>/` directory exists per supported core version, and today there is
+exactly one of them.
 
 ## Where the code lives
 
@@ -11,18 +15,16 @@ matching the running TYPO3 version is used.
 |------------|-------------------------------------------------------------------------------------------------------------------------|
 | `Classes/` | Everything working on **all** supported core versions: interfaces, abstract base classes, version independent services. |
 | `Core13/`  | Implementations for TYPO3 v13 only.                                                                                     |
-| `Core14/`  | Implementations for TYPO3 v14 only.                                                                                     |
 
-`Core13/` and `Core14/` are separate PSR-4 roots in the repository root, not
-subdirectories of `Classes/`, and are registered in `composer.json` with the
-core version as the third namespace part:
+`Core13/` is a separate PSR-4 root in the repository root, not a subdirectory of
+`Classes/`, and is registered in `composer.json` with the core version as the
+third namespace part — one entry per supported core version:
 
 ```json
 "autoload": {
     "psr-4": {
         "SBUERK\\ThemeExtensionDevelopment\\": "Classes/",
-        "SBUERK\\ThemeExtensionDevelopment\\Core13\\": "Core13/",
-        "SBUERK\\ThemeExtensionDevelopment\\Core14\\": "Core14/"
+        "SBUERK\\ThemeExtensionDevelopment\\Core13\\": "Core13/"
     }
 }
 ```
@@ -48,7 +50,8 @@ if (is_dir($coreAwareDirectory)) {
 ```
 
 Because of that, a class below `Core13/` may freely use API that only exists in
-TYPO3 v13 — it is never instantiated when running on v14.
+TYPO3 v13 — it is never registered, and therefore never instantiated, when the
+running core is a different major.
 
 This is deliberately the *only* mechanism used for version differences. Do not
 write conditional code (`if ($coreMajorVersion === 13) { … }`) in shared classes
@@ -62,9 +65,9 @@ dropped.
 2. Put shared behaviour into an **abstract base class** in `Classes/`. Abstract
    classes use method injection, see
    [Class design](class-design.md#abstract-classes-must-not-use-constructor-injection).
-3. Implement it once per core version in `Core13/` and `Core14/`, each
-   registering itself as the default implementation of the interface with
-   `#[AsAlias]`:
+3. Implement it once per core version, in that version's `Core<major>/`
+   directory — `Core13/` today — each registering itself as the default
+   implementation of the interface with `#[AsAlias]`:
 
    ```php
    #[AsAlias(id: ExampleInterface::class, public: true)]
@@ -73,37 +76,21 @@ dropped.
    }
    ```
 
-See [`Classes/Example/`](../../Classes/Example),
-[`Core13/Example/`](../../Core13/Example) and
-[`Core14/Example/`](../../Core14/Example) for the complete example shipped with
+See [`Classes/Example/`](../../Classes/Example) and
+[`Core13/Example/`](../../Core13/Example) for the complete example shipped with
 this extension.
 
 ## Configuration is the exception
 
-The `Core13/` and `Core14/` split works for classes, because the container picks
-one of them. Configuration files — TCA, TypoScript, `ext_localconf.php` — are
-loaded by TYPO3 from a fixed path and cannot be split that way. A version
-difference there is resolved **in the file**, by building the array and adjusting
-it before returning:
+The `Core<major>/` split works for classes, because the container picks one of
+them. Configuration files — TCA, TypoScript, `ext_localconf.php` — are loaded by
+TYPO3 from a fixed path and cannot be split that way. A version difference there
+is resolved **in the file**, by building the array and adjusting the finished
+result before returning it.
 
-```php
-$tcaConfiguration = [
-    'ctrl' => [ /* … */ ],
-    'columns' => [ /* … */ ],
-];
+Three things make that acceptable where a conditional in a class would not be:
 
-// The 'searchFields' ctrl option was removed in TYPO3 v14 (Breaking #106972).
-// @todo Remove once TYPO3 v13 support is dropped.
-if ((new Typo3Version())->getMajorVersion() < 14) {
-    $tcaConfiguration['ctrl']['searchFields'] = 'title,message';
-}
-
-return $tcaConfiguration;
-```
-
-Three things make this acceptable where a conditional in a class would not be:
-
-- The difference is **at the end of the file**, applied to the finished array,
+- The difference sits **at the end of the file**, applied to the finished array,
   not scattered through it. The configuration stays readable as one thing.
 - It carries a `@todo` naming the condition under which it goes away. A version
   switch without an exit condition becomes permanent.
@@ -111,49 +98,59 @@ Three things make this acceptable where a conditional in a class would not be:
   changelogs ship with `typo3/cms-core` in `Documentation/Changelog/` — verify
   against them rather than from memory.
 
-Dropping the option instead of guarding it is not the same thing: v14 removed it
-and warns when it is present, but v13 still evaluates it and searches *nothing*
-without it. Removing it silently changes behaviour on v13.
+Two further rules follow from experience rather than from the mechanism:
 
-The complete example is
-[`Configuration/TCA/tx_examplefixture_domain_model_greeting.php`](../../Tests/Functional/Fixtures/Extensions/example-fixture/Configuration/TCA/tx_examplefixture_domain_model_greeting.php)
-of the [fixture extension](../testing/fixture-extensions.md), and
-[`ext_localconf.php`](../../Tests/Functional/Fixtures/Extensions/example-fixture/ext_localconf.php)
-next to it shows the better outcome where one exists: passing
-`PLUGIN_TYPE_CONTENT_ELEMENT` explicitly is valid on both versions, so no switch
-is needed at all. Look for that first.
+- **Guarding an option is not the same as dropping it.** If one version ignores
+  a key and another evaluates it, removing the key changes behaviour on the
+  second one, silently and without an error anywhere. Guard, do not delete.
+- **Look for the spelling that is correct everywhere first.** Where one call is
+  valid on every supported version, that beats any switch —
+  [`ext_localconf.php`](../../Tests/Functional/Fixtures/Extensions/example-fixture/ext_localconf.php)
+  of the [fixture extension](../testing/fixture-extensions.md) passes
+  `PLUGIN_TYPE_CONTENT_ELEMENT` explicitly for exactly that reason, and so needs
+  no version switch at all.
+
+> [!NOTE]
+> There is currently **no worked example of a version conditional in the
+> repository**. With a single supported core version there is no difference to
+> resolve, so the last one — a `searchFields` guard in the fixture extension's
+> TCA — was made unconditional rather than left standing as decoration. The rule
+> is documented here because it applies the moment a second version is
+> supported, not because something in the tree demonstrates it today.
 
 ## Tooling and tests
 
-- **PHPStan** is configured per core version. Each configuration analyses only
-  its own core version aware sources — `Build/phpstan/Core13/phpstan.neon` lists
-  `Classes`, `Configuration`, `Core13` and `Tests`, and excludes
-  `Tests/*/Core14/*`. Analysing the sources of the other core version would
-  report false positives about API that does not exist there. See
+- **PHPStan** is configured per core version, one directory below
+  `Build/phpstan/` each. A configuration analyses only its own core version aware
+  sources — `Build/phpstan/Core13/phpstan.neon` lists `Classes`, `Configuration`,
+  `Core13` and `Tests` — because a directory written for a different core version
+  uses API that does not exist here and would report nothing but false positives.
+  A second supported version gets its own configuration beside this one rather
+  than a widened path list in it. See
   [Quality gates](../development/quality-gates.md).
-- **Tests** mirror the same layout: `Tests/Unit/Core13/`, `Tests/Unit/Core14/`,
-  `Tests/Functional/Core13/` and `Tests/Functional/Core14/`. Every core version
-  aware test class carries the PHPUnit group of the core versions it must
-  **not** run on:
+- **Tests** mirror the same layout: `Tests/Unit/Core13/` and
+  `Tests/Functional/Core13/`, one such directory per supported core version. A
+  core version aware test class carries the PHPUnit group of the core versions it
+  must **not** run on:
 
   ```php
-  #[Group('not-core-14')]
+  #[Group('not-core-<version>')]
   final class ExampleTest extends UnitTestCase
   {
   }
   ```
 
-  `Build/Scripts/runTests.sh` passes `--exclude-group not-core-<version>` for
-  the selected core version, so those tests are skipped automatically on the
-  other one.
-- Both core versions must be verified before opening a pull request, each after
-  the matching `composerUpdate` — see
-  [Dual core setup](../development/dual-core-setup.md) and
+  `Build/Scripts/runTests.sh` passes `--exclude-group not-core-<version>` for the
+  selected core version, so those tests are skipped automatically elsewhere. With
+  one supported version there is nothing to exclude and no test carries a group.
+- Every supported core version must be verified before opening a pull request,
+  each after its own `composerUpdate` — see
+  [Core version setup](../development/dual-core-setup.md) and
   [Pull requests](../workflow/pull-requests.md).
 
 ## See also
 
 - [Dependency injection](dependency-injection.md)
 - [Class design](class-design.md)
-- [Dual core setup](../development/dual-core-setup.md)
+- [Core version setup](../development/dual-core-setup.md)
 - [Functional tests](../testing/functional-tests.md)

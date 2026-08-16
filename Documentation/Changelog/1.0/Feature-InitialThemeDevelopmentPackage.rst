@@ -31,15 +31,15 @@ based test instances and for acceptance tests.
 
 What this release provides:
 
-*   TYPO3 v13 and v14 support on PHP 8.2 up to 8.5, with core version aware
-    implementations below :file:`Core13/` and :file:`Core14/`.
+*   TYPO3 v13 support on PHP 8.2 up to 8.5, with core version aware
+    implementations below :file:`Core13/`.
 *   Dependency injection wiring through :file:`Configuration/Services.php`,
     with services configured by Symfony dependency injection attributes on the
     classes themselves.
 *   Container based tooling through :file:`Build/Scripts/runTests.sh` covering
     linting, coding guidelines, static analysis, unit and functional tests and
     documentation rendering.
-*   GitHub Actions workflows running these gates for TYPO3 v13 and v14 on pull
+*   GitHub Actions workflows running these gates for TYPO3 v13 on pull
     requests.
 *   A functional test setup ready to build on: strict PHPUnit configuration,
     an example fixture extension loaded by its composer package name, site

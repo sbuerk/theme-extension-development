@@ -10,14 +10,12 @@ defined('TYPO3') or die();
 // Registers the controller action and the TypoScript rendering definition of
 // the plugin's content element.
 //
-// The plugin type is passed explicitly as "CType" - the only value
-// "configurePlugin()" accepts on TYPO3 v14 (anything else throws) and the only
-// one that does not trigger a deprecation on v13.4 either (the fifth argument
-// omitted, or "list_type", logs "Plugin subtype \"list_type\" has been
-// deprecated..." there). Read on both installed core versions before this
-// file was written
-// (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php") -
-// one registration serves both, no version split needed.
+// The plugin type is passed explicitly as "CType" - the only value that does
+// not trigger a deprecation on v13.4 (the fifth argument omitted, or
+// "list_type", logs "Plugin subtype \"list_type\" has been deprecated...",
+// #105076, which this test suite turns into a failure). Read in the installed
+// core before this file was written
+// (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php").
 //
 // Unlike "tests/example-fixture"'s "Configuration/TypoScript/setup.typoscript",
 // nothing here overrides what "configurePlugin()" generates

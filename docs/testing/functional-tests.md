@@ -96,8 +96,8 @@ So if a run does fail this way, read the first lines rather than the last: a
 message naming the server that did not answer means the database never came up,
 and the run stopped there.
 
-Remember to run both core versions, each after the matching `composerUpdate` —
-see [Dual core setup](../development/dual-core-setup.md).
+Remember to run every supported core version, each after its own
+`composerUpdate` — see [Core version setup](../development/dual-core-setup.md).
 
 ## The test that proves the instance boots
 
@@ -106,7 +106,7 @@ asserts little and is worth a lot: it cannot reach its assertions without
 booting a complete TYPO3 instance with this extension installed, which compiles
 the dependency injection container, executes the extension bootstrap, loads and
 migrates the TCA and derives the database schema. An unresolvable service
-argument or a TCA structure the other core version has migrated away fails
+argument or a TCA structure the installed core has migrated away fails
 there rather than in whichever feature test touches it first.
 
 It is **never removed** —
@@ -169,12 +169,12 @@ Additionally:
 
 ## Core version aware functional tests
 
-Mirroring the source layout, they live in `Tests/Functional/Core13/` and
-`Tests/Functional/Core14/` and carry the group of the core version they must
-**not** run on:
+Mirroring the source layout, they live in `Tests/Functional/Core<major>/` —
+`Tests/Functional/Core13/` today — and carry the group of every core version
+they must **not** run on:
 
 ```php
-#[Group('not-core-14')]
+#[Group('not-core-<version>')]
 final class ExampleTest extends AbstractFunctionalTestCase
 {
     #[Test]
@@ -185,7 +185,8 @@ final class ExampleTest extends AbstractFunctionalTestCase
 }
 ```
 
-See [Dual core setup](../development/dual-core-setup.md#test-grouping).
+With one supported version there is nothing to exclude, so no test carries a
+group. See [Core version setup](../development/dual-core-setup.md#test-grouping).
 
 ## Strictness
 

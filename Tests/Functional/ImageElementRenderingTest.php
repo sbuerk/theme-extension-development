@@ -19,8 +19,8 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  *
  * The element itself is registered in TCA by **EXT:frontend**, not by
  * `fluid_styled_content` and not by this extension: EXT:frontend ships
- * `Configuration/TCA/Overrides/225-tt_content-content_type-image.php` on v13.4
- * and v14 alike, while the FSC TCA folder holds nothing but a
+ * `Configuration/TCA/Overrides/225-tt_content-content_type-image.php` on v13.4,
+ * while the FSC TCA folder holds nothing but a
  * `sys_template.php`. What FSC supplies, and what this theme therefore has to
  * bring itself, is the rendering.
  *

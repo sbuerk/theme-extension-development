@@ -27,10 +27,11 @@ return static function (
         __DIR__ . '/../Classes/*',
     );
 
-    // Core version aware classes: `Core13/` on TYPO3 v13, `Core14/` on TYPO3
-    // v14. Both directories are autoloaded by composer, but only the one
-    // matching the running core version is registered as services, so an
-    // implementation may safely use API that exists in its core version only.
+    // Core version aware classes: one `Core<major>/` directory per supported
+    // core version, `Core13/` on TYPO3 v13. Every such directory is autoloaded
+    // by composer, but only the one matching the running core version is
+    // registered as services, so an implementation may safely use API that
+    // exists in its core version only.
     $coreMajorVersion = (new Typo3Version())->getMajorVersion();
     $coreAwareDirectory = sprintf('%s/../Core%d', __DIR__, $coreMajorVersion);
     if (is_dir($coreAwareDirectory)) {

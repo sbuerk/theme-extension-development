@@ -193,8 +193,8 @@ Content elements
 ================
 
 The theme brings its own content element rendering and does **not** depend on
-:file:`fluid_styled_content` — that extension is not required here, and on
-TYPO3 v14 it is not installed at all. What that covers:
+:file:`fluid_styled_content` — that extension is not required here, and the
+development and test instances do not install it. What that covers:
 
 *   Every classic content element :file:`EXT:frontend` registers, including
     :guilabel:`Text & Media`, :guilabel:`Bullet List`, :guilabel:`Table`,

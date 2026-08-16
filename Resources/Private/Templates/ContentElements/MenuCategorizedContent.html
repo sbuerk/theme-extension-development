@@ -15,9 +15,10 @@
 
     The short version: "RECORDS" would render each match as a full content
     element inside this one, which is the wrong shape for a menu and inherits
-    the recursion exposure documented above the shortcut element - on TYPO3 v14
-    the core has no guard for it at all. Rendering rows as links means nothing
-    can nest and the cycle cannot form in the first place.
+    the recursion exposure documented above the shortcut element, where the
+    theme closes the cycle itself rather than leaning on the core's register.
+    Rendering rows as links means nothing can nest and the cycle cannot form in
+    the first place.
 
     Each entry is ["data" => $row], not the row itself - "DatabaseQueryProcessor"
     wraps every record that way so a nested "dataProcessing" has somewhere to

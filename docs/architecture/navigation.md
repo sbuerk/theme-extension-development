@@ -11,8 +11,8 @@ processor, configured three different ways, in
 | `breadcrumb` | `special = rootline`                      | —      |
 
 All three are `TYPO3\CMS\Frontend\DataProcessing\MenuProcessor`, stock core,
-unchanged on v13.4 and v14.3 — there is no changelog entry for it in either
-series. No custom PHP. This page is the detail behind the navigation partials;
+unchanged across the v13 series — there is no changelog entry for it in
+`13.*/`. No custom PHP. This page is the detail behind the navigation partials;
 [Page rendering](page-rendering.md) covers the Fluid structure they are
 rendered into, and [Component library](../development/component-library.md)
 covers the markup contract and CSS each one has to satisfy — read that page
