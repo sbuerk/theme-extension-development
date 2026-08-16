@@ -50,8 +50,8 @@ pages:
   *suggested* uid.
 - `children` nests pages, `content` nests `tt_content` records below the page
   carrying them.
-- `files` on a record creates file references, as a map of field name to file
-  identifiers.
+- `files` on a record creates file references, as a map of field name to the
+  references declared for it.
 
 ## Files
 
@@ -73,6 +73,32 @@ pages:
       media:                 # any FAL field of the record
         - placeholder
 ```
+
+A reference is either the bare identifier of a declared file, as above, or a map
+naming that identifier alongside the fields of the `sys_file_reference` record —
+the alternative text, title, description and link an editor fills in on a file
+relation:
+
+```yaml
+    files:
+      image:
+        - placeholder                            # short form, no fields
+        - identifier: placeholder-portrait       # long form
+          alternative: 'A placeholder graphic'
+          title: 'Placeholder'
+          description: 'Rendered as the caption'
+```
+
+Those fields live on the **reference**, not on the file, which is what lets the
+same image carry a different alternative text in two places. `identifier` is the
+only structural key; everything else is written to the reference as it stands,
+and a field the TCA of `sys_file_reference` does not know is dropped by
+DataHandler without a word.
+
+The columns the seeder owns — `uid_local`, `uid_foreign`, `tablenames`,
+`fieldname` and `pid` — always win over a declared value, so a definition cannot
+detach a reference from the record carrying it. This is the same rule a record's
+own `pid` follows.
 
 The FAL fields available are `pages.media` and `tt_content.image`, `assets` and
 `media` — all of them from EXT:frontend, so none of them depends on
@@ -149,9 +175,11 @@ for a definition known not to overlap.
 
 ## What it does not do
 
-- **No file metadata.** A file is copied and referenced; its `sys_file_metadata`
-  (alternative text, title) is not written, and neither are the `title` and
-  `alternative` fields of the reference itself.
+- **No file metadata.** The fields of a *reference* are written; the
+  `sys_file_metadata` of the file itself — the alternative text and title that
+  apply wherever the file is used — is not. That is deliberate rather than
+  missing: an alternative text describes what the image means *in this place*,
+  which is a property of the reference.
 - **No site configuration.** Sites are committed files under
   `instance-core-*/config/sites/`, which is why the seed declares uids rather
   than the seeder writing sites.

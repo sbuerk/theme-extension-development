@@ -71,6 +71,35 @@ final class YamlSeedParserTest extends UnitTestCase
         $this->assertNull($definition->records[0]->uid);
     }
 
+    #[Test]
+    public function aFileReferenceIsEitherAnIdentifierOrAMapCarryingItsFields(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [
+                [
+                    'identifier' => 'home',
+                    'files' => [
+                        'media' => [
+                            'plain',
+                            ['identifier' => 'annotated', 'alternative' => 'Alt text', 'description' => 'Caption'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $references = $definition->records[0]->files['media'];
+
+        $this->assertSame('plain', $references[0]->identifier);
+        // The short form declares no fields rather than empty ones, so nothing
+        // it does not mention is written to the reference at all.
+        $this->assertSame([], $references[0]->values);
+
+        $this->assertSame('annotated', $references[1]->identifier);
+        $this->assertSame(['alternative' => 'Alt text', 'description' => 'Caption'], $references[1]->values);
+    }
+
     /**
      * @return \Generator<string, array{definition: mixed, code: int}>
      */
@@ -118,6 +147,40 @@ final class YamlSeedParserTest extends UnitTestCase
                 'pages' => [['identifier' => 'home', 'title' => ['nope']]],
             ],
             'code' => 1786924813,
+        ];
+        yield 'file reference neither identifier nor map' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [['identifier' => 'home', 'files' => ['media' => [17]]]],
+            ],
+            'code' => 1786924827,
+        ];
+        yield 'file reference map without identifier' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [['identifier' => 'home', 'files' => ['media' => [['alternative' => 'Alt']]]]],
+            ],
+            'code' => 1786924830,
+        ];
+        yield 'file reference field name not a string' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [[
+                    'identifier' => 'home',
+                    'files' => ['media' => [['identifier' => 'hero', 7 => 'nope']]],
+                ]],
+            ],
+            'code' => 1786924831,
+        ];
+        yield 'file reference field value not scalar' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [[
+                    'identifier' => 'home',
+                    'files' => ['media' => [['identifier' => 'hero', 'alternative' => ['nope']]]],
+                ]],
+            ],
+            'code' => 1786924832,
         ];
     }
 

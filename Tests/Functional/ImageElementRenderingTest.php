@@ -85,20 +85,6 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         )->getBody();
     }
 
-    /**
-     * The seeder writes the reference itself but no metadata on it, so the
-     * fields an editor fills in on a file reference are set here directly.
-     */
-    private function setReferenceMetadata(int $uid, string $alternative, string $description): void
-    {
-        $connection = $this->getConnectionPool()->getConnectionForTable('sys_file_reference');
-        $connection->update(
-            'sys_file_reference',
-            ['alternative' => $alternative, 'description' => $description],
-            ['uid' => $uid],
-        );
-    }
-
     #[Test]
     public function imageElementIsRenderedRatherThanTheCoreNotice(): void
     {
@@ -177,8 +163,9 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
     #[Test]
     public function alternativeAndDescriptionOfTheReferenceReachTheOutput(): void
     {
-        $this->setReferenceMetadata(1, 'A placeholder image', 'The caption of the image');
-
+        // Both are declared on the reference in the seed definition, so this
+        // asserts the whole chain: the definition writes them onto the
+        // "sys_file_reference" record and the template reads them back off it.
         $body = $this->renderRootPage();
 
         $this->assertStringContainsString('alt="A placeholder image"', $body);

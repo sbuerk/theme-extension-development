@@ -177,7 +177,22 @@ final readonly class YamlSeedParser
     }
 
     /**
-     * @return array<string, list<string>>
+     * The file references of one record, as a map of field name to the
+     * references declared for it.
+     *
+     * A reference is either the bare identifier of a seeded file, or a map
+     * naming that identifier alongside the fields of the `sys_file_reference`
+     * record - the alternative text, title, description and link an editor
+     * fills in on a file relation:
+     *
+     *     files:
+     *       image:
+     *         - placeholder
+     *         - identifier: portrait
+     *           alternative: 'A portrait placeholder'
+     *           description: 'Shown as the caption'
+     *
+     * @return array<string, list<SeedFileReference>>
      */
     private function parseFileReferences(mixed $files, string $recordIdentifier, string $source): array
     {
@@ -205,18 +220,67 @@ final readonly class YamlSeedParser
                     1786924826,
                 );
             }
-            foreach ($identifiers as $fileIdentifier) {
-                if (!is_string($fileIdentifier) || $fileIdentifier === '') {
-                    throw new SeedingException(
-                        sprintf('A file reference of "%s" in "%s" is not an identifier.', $recordIdentifier, $source),
-                        1786924827,
-                    );
-                }
-                $references[$field][] = $fileIdentifier;
+            foreach ($identifiers as $reference) {
+                $references[$field][] = $this->parseFileReference($reference, $recordIdentifier, $source);
             }
         }
 
         return $references;
+    }
+
+    private function parseFileReference(mixed $reference, string $recordIdentifier, string $source): SeedFileReference
+    {
+        if (!is_array($reference)) {
+            if (!is_string($reference) || $reference === '') {
+                throw new SeedingException(
+                    sprintf('A file reference of "%s" in "%s" is not an identifier.', $recordIdentifier, $source),
+                    1786924827,
+                );
+            }
+
+            return new SeedFileReference($reference);
+        }
+
+        $identifier = $reference[self::IDENTIFIER] ?? null;
+        if (!is_string($identifier) || $identifier === '') {
+            throw new SeedingException(
+                sprintf('A file reference of "%s" in "%s" has no "identifier".', $recordIdentifier, $source),
+                1786924830,
+            );
+        }
+
+        $values = [];
+        foreach ($reference as $key => $value) {
+            if ($key === self::IDENTIFIER) {
+                continue;
+            }
+            if (!is_string($key)) {
+                throw new SeedingException(
+                    sprintf(
+                        'A field name of the file reference "%s" of "%s" in "%s" is not a string.',
+                        $identifier,
+                        $recordIdentifier,
+                        $source,
+                    ),
+                    1786924831,
+                );
+            }
+            if ($value !== null && !is_scalar($value)) {
+                throw new SeedingException(
+                    sprintf(
+                        'The field "%s" of the file reference "%s" of "%s" in "%s" is not a scalar value.',
+                        $key,
+                        $identifier,
+                        $recordIdentifier,
+                        $source,
+                    ),
+                    1786924832,
+                );
+            }
+            $values[$key] = $value;
+        }
+
+        return new SeedFileReference($identifier, $values);
     }
 
     /**

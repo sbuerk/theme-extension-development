@@ -26,9 +26,13 @@ pages:
         CType: image
         header: 'A single image'
         header_layout: 2
+        # The long form of a file reference: the fields of the reference record
+        # itself, which is where the alternative text and the caption live.
         files:
           image:
-            - landscape
+            - identifier: landscape
+              alternative: 'A placeholder image'
+              description: 'The caption of the image'
       - identifier: gallery
         CType: image
         header: 'Two images in two columns'

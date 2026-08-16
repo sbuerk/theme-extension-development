@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use SBUERK\ThemeExtensionDevelopment\Seeding\DataMapFactory;
 use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
 use SBUERK\ThemeExtensionDevelopment\Seeding\SeedDefinition;
+use SBUERK\ThemeExtensionDevelopment\Seeding\SeedFileReference;
 use SBUERK\ThemeExtensionDevelopment\Seeding\SeedRecord;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
@@ -128,7 +129,9 @@ final class DataMapFactoryTest extends UnitTestCase
     public function fileReferencesAreReturnedForASecondPassRatherThanPutInTheDataMap(): void
     {
         $definition = new SeedDefinition('demo', [
-            new SeedRecord('pages', 'home', ['title' => 'Home'], 1, [], ['media' => ['hero']]),
+            new SeedRecord('pages', 'home', ['title' => 'Home'], 1, [], [
+                'media' => [new SeedFileReference('hero')],
+            ]),
         ]);
 
         $result = $this->subject->createFromDefinition($definition, 0, ['hero' => 7]);
@@ -137,16 +140,39 @@ final class DataMapFactoryTest extends UnitTestCase
         // written in the same pass as the record it points at.
         $this->assertArrayNotHasKey('sys_file_reference', $result['dataMap']);
         $this->assertSame(
-            [['parent' => 'NEWpages_home', 'table' => 'pages', 'field' => 'media', 'file' => 7, 'pid' => '0']],
+            [[
+                'parent' => 'NEWpages_home',
+                'table' => 'pages',
+                'field' => 'media',
+                'file' => 7,
+                'pid' => '0',
+                'values' => [],
+            ]],
             $result['references'],
         );
+    }
+
+    #[Test]
+    public function theFieldsOfAReferenceAreCarriedIntoTheSecondPass(): void
+    {
+        $definition = new SeedDefinition('demo', [
+            new SeedRecord('pages', 'home', [], 1, [], [
+                'media' => [new SeedFileReference('hero', ['alternative' => 'A hero image'])],
+            ]),
+        ]);
+
+        $result = $this->subject->createFromDefinition($definition, 0, ['hero' => 7]);
+
+        $this->assertSame(['alternative' => 'A hero image'], $result['references'][0]['values']);
     }
 
     #[Test]
     public function referencingAFileTheDefinitionDoesNotDeclareIsRejected(): void
     {
         $definition = new SeedDefinition('demo', [
-            new SeedRecord('pages', 'home', [], null, [], ['media' => ['missing']]),
+            new SeedRecord('pages', 'home', [], null, [], [
+                'media' => [new SeedFileReference('missing')],
+            ]),
         ]);
 
         $this->expectException(SeedingException::class);

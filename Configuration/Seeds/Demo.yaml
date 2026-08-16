@@ -30,9 +30,15 @@ pages:
     slug: '/'
     is_siteroot: 1
     doktype: 1
+    # A file reference can be the bare identifier of a declared file, or a map
+    # adding the fields an editor fills in on a file relation - they belong to
+    # the reference, not to the file, so the same image can carry a different
+    # alternative text in two places.
     files:
       media:
-        - placeholder
+        - identifier: placeholder
+          alternative: 'A placeholder graphic'
+          title: 'Placeholder'
     content:
       - identifier: home-heading
         CType: header
@@ -82,7 +88,9 @@ pages:
             header_layout: 2
             files:
               image:
-                - placeholder
+                - identifier: placeholder
+                  alternative: 'A placeholder graphic in landscape format'
+                  description: 'The description of a file reference is rendered as the caption.'
           - identifier: media-gallery
             CType: image
             header: 'Two images, two columns'
@@ -93,8 +101,12 @@ pages:
             imagecols: 2
             files:
               image:
-                - placeholder
-                - placeholder-portrait
+                - identifier: placeholder
+                  alternative: 'A placeholder graphic in landscape format'
+                  description: 'Landscape'
+                - identifier: placeholder-portrait
+                  alternative: 'A placeholder graphic in portrait format'
+                  description: 'Portrait'
       - identifier: empty
         uid: 4
         title: 'Empty page'
