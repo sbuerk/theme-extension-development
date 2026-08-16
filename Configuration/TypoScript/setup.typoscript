@@ -6,3 +6,4 @@
 @import 'EXT:theme_extension_development/Configuration/TypoScript/ContentElements.typoscript'
 @import 'EXT:theme_extension_development/Configuration/TypoScript/ContentSlots.typoscript'
 @import 'EXT:theme_extension_development/Configuration/TypoScript/Page.typoscript'
+@import 'EXT:theme_extension_development/Configuration/TypoScript/Navigation.typoscript'

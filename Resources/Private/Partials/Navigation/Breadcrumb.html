@@ -1,0 +1,59 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Breadcrumb trail. Rendered from "Partials/Page/Breadcrumb.html", which
+    decides on which templates it appears at all. Markup contract:
+    docs/development/component-library.md#navigation, styled by
+    "components/_breadcrumb.scss". An ordered list because the trail's order
+    - root first, current page last - is part of its meaning.
+
+    "breadcrumb" comes from core "MenuProcessor" with "special = rootline"
+    and "special.range = 0|-1", so it is already flat - no children to
+    recurse into, unlike the main and sub navigations.
+
+    The current page - "item.current" - is the last item in that rootline
+    and is rendered as plain text directly inside its list item, carrying
+    "aria-current='page'" on the list item itself rather than on a link, per
+    the accessibility contract: the destination of a breadcrumb is not
+    somewhere it still points to. The "/" separator between items is a
+    "::before" pseudo-element in the SCSS, generated content that is never
+    part of the accessible name - nothing is added here to draw it.
+
+    A spacer this early in the rootline is not expected in practice, but
+    "MenuProcessor" sets "item.spacer" unconditionally, so it is still
+    handled the same way "Partials/Navigation/Main.html" handles it: plain
+    text, no link.
+
+    Empty guard: no "breadcrumb" means no nav element at all, not an empty one.
+</f:comment>
+
+<f:if condition="{breadcrumb}">
+    <nav class="theme-breadcrumb" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.breadcrumbLabel')}">
+        <ol class="theme-breadcrumb__list">
+            <f:for each="{breadcrumb}" as="item">
+                <f:if condition="{item.current}">
+                    <f:then>
+                        <li class="theme-breadcrumb__item" aria-current="page">{item.title}</li>
+                    </f:then>
+                    <f:else>
+                        <f:if condition="{item.spacer}">
+                            <f:then>
+                                <li class="theme-breadcrumb__item">
+                                    <span class="theme-breadcrumb__link">{item.title}</span>
+                                </li>
+                            </f:then>
+                            <f:else>
+                                <li class="theme-breadcrumb__item">
+                                    <a class="theme-breadcrumb__link" href="{item.link}">{item.title}</a>
+                                </li>
+                            </f:else>
+                        </f:if>
+                    </f:else>
+                </f:if>
+            </f:for>
+        </ol>
+    </nav>
+</f:if>
+
+</html>

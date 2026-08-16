@@ -8,6 +8,11 @@
     "Aside" section, so "Layouts/Default.html" emits no
     ".theme-page__aside" and the body stays single-column.
 
+    "Partials/Page/Breadcrumb.html" is rendered ahead of
+    "Partials/Page/Stage.html" - the step 3 contract renders the breadcrumb
+    on this layout, and this is one of the two templates that decide to call
+    it; "Templates/Page/Start.html" deliberately does not.
+
     "Partials/Page/Stage.html" is rendered ahead of the main content slot,
     inside ".theme-page__main" - there is no separate stage region in the
     shell's own markup contract, see that partial's comment.
@@ -15,6 +20,7 @@
 <f:layout name="Default" />
 
 <f:section name="Main">
+    <f:render partial="Page/Breadcrumb" arguments="{_all}" />
     <f:render partial="Page/Stage" arguments="{_all}" />
     <f:cObject typoscriptObjectPath="lib.content.main" />
 </f:section>

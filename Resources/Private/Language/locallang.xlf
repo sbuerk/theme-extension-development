@@ -12,6 +12,21 @@
 			<trans-unit id="theme.skipToContent">
 				<source>Skip to content</source>
 			</trans-unit>
+			<trans-unit id="theme.navMainLabel">
+				<source>Main</source>
+			</trans-unit>
+			<trans-unit id="theme.navMainToggle">
+				<source>Menu</source>
+			</trans-unit>
+			<trans-unit id="theme.navSubLabel">
+				<source>Section</source>
+			</trans-unit>
+			<trans-unit id="theme.navSubHeading">
+				<source>In this section</source>
+			</trans-unit>
+			<trans-unit id="theme.breadcrumbLabel">
+				<source>Breadcrumb</source>
+			</trans-unit>
 			<trans-unit id="theme.styleguideHeading">
 				<source>Styleguide</source>
 			</trans-unit>

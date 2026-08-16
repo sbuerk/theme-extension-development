@@ -1,0 +1,139 @@
+# Navigation of the theme: main menu, section (sidebar) menu, breadcrumb.
+#
+# Read by the site set and by the classic static include alike - both point at
+# "setup.typoscript", which "@import"s this file. See that file for the
+# double-apply guard.
+#
+# All three are "TYPO3\CMS\Frontend\DataProcessing\MenuProcessor" - stock
+# core, unchanged on v13.4 and v14.3 (no changelog entry for it in either
+# series, verified by its absence under
+# ".Build/vendor/typo3/cms-core/Documentation/Changelog/13.*/" and "/14.*/").
+# No custom PHP.
+#
+# Each processor is written directly onto "page.10.dataProcessing", the
+# FLUIDTEMPLATE object "Page.typoscript" defines, rather than being built as a
+# standalone "lib." object and copied in: "dataProcessing" is only ever read
+# from the numeric array TYPO3 finds at "page.10.dataProcessing" at render
+# time, so a separately defined "lib.navigation.mainMenu" object would still
+# have to be copied onto that array with "=<" before it did anything, which is
+# an extra indirection this buys nothing. Because assigning "page.10 =
+# FLUIDTEMPLATE" and setting a dotted property under "page.10." write to two
+# different keys of the TypoScript array, the order between "Page.typoscript"
+# and this file in "setup.typoscript" is not what makes this safe - both
+# already touch the same "page.10." array regardless of import order. Import
+# order is chosen for readability alone: this file extends an object
+# "Page.typoscript" already declared.
+#
+# One numbered key per navigation is what satisfies the actual requirement -
+# a site package must be able to replace exactly one of the three without
+# touching the others. "page.10.dataProcessing.20 >" unsets only "subMenu";
+# ".10" and ".30" are untouched. A single processor definition switched by a
+# variable would not offer that - removing one navigation would mean editing
+# the shared block.
+page.10.dataProcessing {
+    # Top level of the site plus the level below it. "expandAll = 1" is
+    # MenuProcessor's own class default (see "$menuDefaults" in
+    # "MenuProcessor.php") - stated explicitly here anyway, the same way
+    # "EXT:theme_camino" states it for its main menu, because "the second
+    # level is always in the markup" is a decision worth reading, not a
+    # default worth hiding. Without it, HMENU only populates "children" for
+    # the branch that contains the current page, and the recursive
+    # "f:section" the main navigation partial uses would render an empty
+    # second level for every other top-level item.
+    #
+    # "includeSpacer = 0" (already the class default) keeps TYPO3's
+    # "Spacer" pseudo-doktype - a pagetree grouping aid with no frontend
+    # rendering of its own - out of the menu entirely, rather than emitting
+    # an item a template would then have to know to skip.
+    10 = TYPO3\CMS\Frontend\DataProcessing\MenuProcessor
+    10 {
+        as = mainMenu
+        levels = 2
+        expandAll = 1
+        includeSpacer = 0
+    }
+
+    # The section the current page belongs to - the children of the
+    # first-level page above it - not the children of the current page
+    # itself. "special = directory" without a value defaults to the
+    # *current* page's own uid (see "AbstractMenuContentObject::start()",
+    # ".Build/vendor/typo3/cms-frontend/Classes/ContentObject/Menu/AbstractMenuContentObject.php:296-299",
+    # and again in "prepareMenuItemsForDirectoryMenu()" at line 642) - using
+    # that default would list a third-level page's own children, which is
+    # empty for a leaf page, and the sidebar would go blank exactly where a
+    # reader needs it most. "entryLevel" has the same problem from the other
+    # direction: it is relative to the current page's *depth*, so the same
+    # "entryLevel" value would resolve to a different ancestor on a
+    # second-level and a third-level page - it answers "how far up", not
+    # "which page", and the section root is a fixed page, not a fixed depth.
+    #
+    # "special.value.data = leveluid:1" resolves the fixed page instead:
+    # "leveluid" reads "ContentObjectRenderer::getData()"
+    # (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/ContentObjectRenderer.php:3955-3958"),
+    # which indexes the *local* rootline - root page first, current page
+    # last, confirmed in "RootlineUtility::generateRootlineCache()"
+    # (".Build/vendor/typo3/cms-core/Classes/Utility/RootlineUtility.php:444-454":
+    # the current page is appended last while walking up from it, and the
+    # subsequent "krsort()" reorders iteration only, not the keys the array
+    # is indexed by) - so index "0" is the site root and index "1" is
+    # already the first page below it, on every page regardless of depth:
+    #
+    #   - first-level page (the section root itself): local rootline is
+    #     "[0 => root, 1 => this page]", "leveluid:1" resolves to this
+    #     page's own uid - "special = directory" then lists its own
+    #     children, which is exactly the section's contents.
+    #   - second-level page: local rootline is
+    #     "[0 => root, 1 => section root, 2 => this page]", "leveluid:1"
+    #     is unchanged - still the section root two levels up.
+    #   - third-level page: local rootline gains one more entry, "leveluid:1"
+    #     is unchanged again - the section root does not move, only the
+    #     rootline grows underneath it. This is the case the contract calls
+    #     out: the sidebar keeps showing the same section here as on the
+    #     page above it.
+    #
+    # On the site root itself the local rootline has only index "0", so
+    # "leveluid:1" resolves to nothing ("ContentObjectRenderer::rootLineValue()"
+    # returns "" for a missing key) and "special = directory" falls back to
+    # the current page's own children - the site root's top-level pages.
+    # Harmless: this navigation is only rendered on the "content_sidebar"
+    # backend layout (see the contract), and nothing requires the site root
+    # itself to use that layout.
+    #
+    # "levels = 2" and "expandAll = 1" for the same reason as the main menu:
+    # "_nav-sub.scss" documents this block as "vertical and always expanded"
+    # with no breakpoint and no disclosure state at all, so every section
+    # item's children have to be present in the payload unconditionally, not
+    # populated only for the branch containing the current page.
+    20 = TYPO3\CMS\Frontend\DataProcessing\MenuProcessor
+    20 {
+        as = subMenu
+        special = directory
+        special.value.data = leveluid:1
+        levels = 2
+        expandAll = 1
+        includeSpacer = 0
+    }
+
+    # "special = rootline" is a native HMENU special, unrelated to
+    # "special = directory" above - one item per page in the current
+    # rootline. "special.range = 0|-1" is read directly by
+    # "AbstractMenuContentObject::prepareMenuItemsForRootlineMenu()"
+    # (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/Menu/AbstractMenuContentObject.php:917-961"):
+    # both bounds go through the same "getKey()" that resolves "leveluid"
+    # above, so "0" is the site root and "-1" is "count($rootline) - 1", the
+    # current page - confirmed by "getKey()" itself
+    # (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/ContentObjectRenderer.php:4317-4329":
+    # a negative key counts back from the end of the array). The loop that
+    # follows walks the rootline in ascending index order, so the emitted
+    # array is root first, current page last, matching the contract
+    # verbatim. MenuProcessor still computes "current = 1" for that last
+    # item the same way it does for any other special mode - whether its
+    # link is rendered as an anchor is a template decision, not a
+    # TypoScript one.
+    30 = TYPO3\CMS\Frontend\DataProcessing\MenuProcessor
+    30 {
+        as = breadcrumb
+        special = rootline
+        special.range = 0|-1
+    }
+}

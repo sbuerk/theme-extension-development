@@ -1,0 +1,10 @@
+"pages",,,,,,,,,,,,
+,"uid","pid","sys_language_uid","l10n_parent","l10n_source","doktype","is_siteroot","title","slug","backend_layout","backend_layout_next_level","nav_hide"
+,1,0,0,0,0,1,1,"Theme root","/","","pagets__content_sidebar",0
+,10,1,0,0,0,1,0,"First section","/first","","",0
+,11,1,0,0,0,1,0,"Second section","/second","","",0
+,12,1,0,0,0,1,0,"Hidden from the menu","/quiet","","",1
+,100,10,0,0,0,1,0,"A page in the first section","/first/a","","",0
+,101,10,0,0,0,1,0,"Another page in the first section","/first/b","","",0
+,1000,100,0,0,0,1,0,"Three levels down","/first/a/deep","","",0
+,200,11,0,0,0,1,0,"A page in the second section","/second/a","","",0

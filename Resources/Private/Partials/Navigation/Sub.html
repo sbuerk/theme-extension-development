@@ -1,0 +1,72 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Sub navigation - the current section, not the whole site. Rendered from
+    "Partials/Page/Sidebar.html", above the "sidebar" content slot, only on
+    the "content_sidebar" backend layout. Markup contract:
+    docs/development/component-library.md#navigation, styled by
+    "components/_nav-sub.scss".
+
+    "subMenu" comes from core "MenuProcessor", two levels deep, resolved
+    against the current page's first-level ancestor rather than the current
+    page itself - see the step 3 contract for why - so the sidebar keeps
+    showing the section on a third-level page instead of emptying out.
+
+    Both levels are rendered by one recursive "Item" section, the same
+    reasoning as "Partials/Navigation/Main.html": one set of
+    spacer/current/plain branches, called again for "item.children" instead
+    of being written out twice. Unlike the main navigation there is no
+    "--active" modifier to gate by depth (see the SCSS header comment -
+    "[aria-current='page']" alone is enough wherever it sits in a
+    section-scoped list), so the recursive call needs no extra argument
+    beyond the item itself.
+
+    Spacers and the "aria-current" omission follow the same reasoning as
+    "Partials/Navigation/Main.html" - see that file's comment.
+
+    Empty guard: no "subMenu" means no nav element at all, not an empty one.
+</f:comment>
+
+<f:if condition="{subMenu}">
+    <nav class="theme-nav-sub" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.navSubLabel')}">
+        <p class="theme-nav-sub__heading">
+            <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.navSubHeading" />
+        </p>
+        <ul class="theme-nav-sub__list">
+            <f:for each="{subMenu}" as="item">
+                <f:render section="Item" arguments="{item: item}" />
+            </f:for>
+        </ul>
+    </nav>
+</f:if>
+
+<f:section name="Item">
+    <li class="theme-nav-sub__item">
+        <f:if condition="{item.spacer}">
+            <f:then>
+                <span class="theme-nav-sub__link">{item.title}</span>
+            </f:then>
+            <f:else>
+                <f:if condition="{item.current}">
+                    <f:then>
+                        <a class="theme-nav-sub__link" href="{item.link}" aria-current="page">{item.title}</a>
+                    </f:then>
+                    <f:else>
+                        <a class="theme-nav-sub__link" href="{item.link}">{item.title}</a>
+                    </f:else>
+                </f:if>
+            </f:else>
+        </f:if>
+
+        <f:if condition="{item.children}">
+            <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">
+                <f:for each="{item.children}" as="childItem">
+                    <f:render section="Item" arguments="{item: childItem}" />
+                </f:for>
+            </ul>
+        </f:if>
+    </li>
+</f:section>
+
+</html>

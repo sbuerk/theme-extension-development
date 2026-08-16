@@ -6,18 +6,20 @@
     "Layouts/Default.html" for every page template.
 
     Markup contract: docs/development/component-library.md#layout. That
-    contract also documents ".theme-nav-main" inside the header and a
-    ".theme-site-header__actions" slot at the end of it - main navigation is
-    step 3 and the appearance/palette switcher that would live in "actions" is
-    step 4, both out of scope here. Until those land this partial renders the
-    brand link only, which is a strict subset of the contract markup rather
-    than a deviation from it.
+    contract also documents a ".theme-site-header__actions" slot at the end
+    of the header - the appearance/palette switcher that would live there is
+    step 4, still out of scope here. Main navigation is this step:
+    "Partials/Navigation/Main.html" renders ".theme-nav-main" itself,
+    including its own empty guard, so it is rendered unconditionally here
+    the same way the brand link is - the partial decides whether anything
+    actually appears.
 </f:comment>
 <header class="theme-site-header">
     <div class="theme-site-header__inner">
         <a class="theme-site-header__brand" href="/">
             <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.title" />
         </a>
+        <f:render partial="Navigation/Main" arguments="{_all}" />
     </div>
 </header>
 
