@@ -1,0 +1,339 @@
+<section class="theme-styleguide__section" id="tokens">
+<f:comment>
+    Section D5 of the step 7b contract: the token section.
+
+    Every swatch, type sample and spacing bar below reads its value through
+    "var()" in a "style" attribute. That is the one place on this page where an
+    inline style is correct - the value being demonstrated *is* the token, and
+    a class per token would mean a stylesheet rule per token in
+    "layout/_styleguide.scss" that carries no information the attribute does
+    not already carry.
+
+    The colour groups and their order follow
+    "Resources/Private/Scss/abstracts/_tokens.scss" - neutrals (lines 84-95),
+    accents (100-105), semantic (113-134) - so a token added there has an
+    obvious place here. All 27 "--theme-color-*" tokens declared in that file
+    have a swatch; assertion 5 of the contract derives that list from the SCSS
+    rather than from a list here, so an omission fails a test rather than
+    passing review.
+
+    Specimen copy is literal English, per contract D3: it exists to be set in
+    a typeface, and there is nothing in it to translate.
+
+    Two things are deliberately *not* demonstrated here, because they have no
+    visual form on a static page: the motion tokens (a duration and an easing
+    curve, "_tokens.scss" 191-194) and the stacking tokens ("_tokens.scss"
+    182-189), which are only meaningful between two overlapping elements.
+</f:comment>
+    <h2 class="theme-styleguide__heading">Tokens</h2>
+
+    <p>
+        The design tokens are the theme's public API for a site package: every value in the
+        stylesheet comes from one of them, and a site can re-theme the extension by overriding a
+        handful of custom properties without rebuilding the SCSS. This section is also a live test
+        of the appearance and palette switchers in the page header — flip either one and every
+        swatch below has to move together, because a swatch that does not is a token that was
+        declared outside <code>light-dark()</code>.
+    </p>
+
+    <h3>Colour — neutrals</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Shared by every palette. A palette varies accents only, which is what keeps a palette
+            to a single block.
+        </p>
+        <div class="theme-styleguide__swatches">
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-background)"></div>
+                <span class="theme-styleguide__label">--theme-color-background</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-surface)"></div>
+                <span class="theme-styleguide__label">--theme-color-surface</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-surface-raised)"></div>
+                <span class="theme-styleguide__label">--theme-color-surface-raised</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-text-primary)"></div>
+                <span class="theme-styleguide__label">--theme-color-text-primary</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-text-secondary)"></div>
+                <span class="theme-styleguide__label">--theme-color-text-secondary</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-text-muted)"></div>
+                <span class="theme-styleguide__label">--theme-color-text-muted</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-border)"></div>
+                <span class="theme-styleguide__label">--theme-color-border</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-border-strong)"></div>
+                <span class="theme-styleguide__label">--theme-color-border-strong</span>
+            </div>
+        </div>
+    </div>
+
+    <h3>Colour — accents</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The only group a palette overrides. Switch the palette in the header and exactly these
+            six swatches change while the neutrals above stay where they are.
+        </p>
+        <div class="theme-styleguide__swatches">
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-primary)"></div>
+                <span class="theme-styleguide__label">--theme-color-primary</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-primary-hover)"></div>
+                <span class="theme-styleguide__label">--theme-color-primary-hover</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-on-primary)"></div>
+                <span class="theme-styleguide__label">--theme-color-on-primary</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-secondary)"></div>
+                <span class="theme-styleguide__label">--theme-color-secondary</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-secondary-hover)"></div>
+                <span class="theme-styleguide__label">--theme-color-secondary-hover</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-on-secondary)"></div>
+                <span class="theme-styleguide__label">--theme-color-on-secondary</span>
+            </div>
+        </div>
+    </div>
+
+    <h3>Colour — semantic</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Three tokens per meaning, because one colour cannot do all three jobs: the accent is a
+            text and border colour, <code>on-*</code> is the foreground for a solid fill of it, and
+            <code>*-surface</code> is the soft tint an alert or a badge sits on. The
+            <code>info</code> group aliases the primary accent rather than introducing a fifth hue,
+            so it follows the palette along with the accents above.
+        </p>
+        <div class="theme-styleguide__swatches">
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-success)"></div>
+                <span class="theme-styleguide__label">--theme-color-success</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-on-success)"></div>
+                <span class="theme-styleguide__label">--theme-color-on-success</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-success-surface)"></div>
+                <span class="theme-styleguide__label">--theme-color-success-surface</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-warning)"></div>
+                <span class="theme-styleguide__label">--theme-color-warning</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-on-warning)"></div>
+                <span class="theme-styleguide__label">--theme-color-on-warning</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-warning-surface)"></div>
+                <span class="theme-styleguide__label">--theme-color-warning-surface</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-danger)"></div>
+                <span class="theme-styleguide__label">--theme-color-danger</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-on-danger)"></div>
+                <span class="theme-styleguide__label">--theme-color-on-danger</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-danger-surface)"></div>
+                <span class="theme-styleguide__label">--theme-color-danger-surface</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-info)"></div>
+                <span class="theme-styleguide__label">--theme-color-info</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-on-info)"></div>
+                <span class="theme-styleguide__label">--theme-color-on-info</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-info-surface)"></div>
+                <span class="theme-styleguide__label">--theme-color-info-surface</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-overlay)"></div>
+                <span class="theme-styleguide__label">--theme-color-overlay</span>
+            </div>
+        </div>
+    </div>
+
+    <h3>Type scale</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Eight steps, and no single modular ratio behind them: the steps run 1.17, 1.14, 1.5,
+            1.42, 1.59, because the scale was measured rather than generated. The display size is a
+            <code>clamp()</code>, so it is the one line below that changes as the window is
+            resized.
+        </p>
+        <p style="font-size: var(--theme-font-size-xs)">Grumpy wizards make toxic brew for the evil queen.</p>
+        <span class="theme-styleguide__label">--theme-font-size-xs — 12px</span>
+
+        <p style="font-size: var(--theme-font-size-sm)">Grumpy wizards make toxic brew for the evil queen.</p>
+        <span class="theme-styleguide__label">--theme-font-size-sm — 14px</span>
+
+        <p style="font-size: var(--theme-font-size-md)">Grumpy wizards make toxic brew for the evil queen.</p>
+        <span class="theme-styleguide__label">--theme-font-size-md — 16px, the body size</span>
+
+        <p style="font-size: var(--theme-font-size-lg)">Grumpy wizards make toxic brew.</p>
+        <span class="theme-styleguide__label">--theme-font-size-lg — 20px, the one added step</span>
+
+        <p style="font-size: var(--theme-font-size-xl)">Grumpy wizards make toxic brew.</p>
+        <span class="theme-styleguide__label">--theme-font-size-xl — 24px</span>
+
+        <p style="font-size: var(--theme-font-size-2xl)">Grumpy wizards</p>
+        <span class="theme-styleguide__label">--theme-font-size-2xl — 34px</span>
+
+        <p style="font-size: var(--theme-font-size-display)">Grumpy wizards</p>
+        <span class="theme-styleguide__label">--theme-font-size-display — clamp, 34px to 54px</span>
+
+        <p style="font-family: var(--theme-font-family-mono); font-size: var(--theme-font-size-mono)">theme.color.primary = #0b57d0;</p>
+        <span class="theme-styleguide__label">--theme-font-size-mono — 15px</span>
+    </div>
+
+    <h3>Weight and family</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Three weights, with no 600 or 700 between them — a system font may synthesise 800 or
+            clamp it to its boldest weight. Neither family token loads a webfont: the extension
+            ships none and makes no external request, so both resolve to a system stack.
+        </p>
+        <p style="font-weight: var(--theme-font-weight-regular)">Regular — running text, and the weight of the body role.</p>
+        <span class="theme-styleguide__label">--theme-font-weight-regular — 400</span>
+
+        <p style="font-weight: var(--theme-font-weight-medium)">Medium — labels, controls and the third heading level.</p>
+        <span class="theme-styleguide__label">--theme-font-weight-medium — 500</span>
+
+        <p style="font-weight: var(--theme-font-weight-bold)">Bold — the display size and the first two heading levels.</p>
+        <span class="theme-styleguide__label">--theme-font-weight-bold — 800</span>
+
+        <p style="font-family: var(--theme-font-family-sans)">The sans stack carries everything except code.</p>
+        <span class="theme-styleguide__label">--theme-font-family-sans</span>
+
+        <p style="font-family: var(--theme-font-family-mono)">The mono stack carries code, keys and sample output.</p>
+        <span class="theme-styleguide__label">--theme-font-family-mono</span>
+    </div>
+
+    <h3>Spacing scale</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A 5px grid, measured from the auto-layout gaps of the reference design and expressed in
+            rem, so spacing grows when a reader enlarges the base font size. Step 0 is a real token
+            and draws nothing, which is the point of it.
+        </p>
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-0); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-0 — 0</span>
+
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-1); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-1 — 5px</span>
+
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-2); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-2 — 10px</span>
+
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-3); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-3 — 15px</span>
+
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-4); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-4 — 20px</span>
+
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-5); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-5 — 25px</span>
+
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-6); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-6 — 30px</span>
+
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-7); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-7 — 40px</span>
+
+        <div class="theme-styleguide__swatch" style="inline-size: var(--theme-space-8); block-size: var(--theme-space-2); background: var(--theme-color-primary)"></div>
+        <span class="theme-styleguide__label">--theme-space-8 — 60px, added for page level rhythm</span>
+    </div>
+
+    <h3>Radius</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The reference design has exactly two radii — 5px and a pill — so <code>md</code> is the
+            single extrapolation, kept on the 5px grid. In px rather than rem: a corner should not
+            grow with the root font size. The border below is
+            <code>--theme-border-width</code>, 1px, against
+            <code>--theme-border-width-strong</code> at 2px.
+        </p>
+        <div class="theme-styleguide__swatches">
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-surface-raised); border: var(--theme-border-width) solid var(--theme-color-border-strong); border-radius: var(--theme-radius-none)"></div>
+                <span class="theme-styleguide__label">--theme-radius-none — 0</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-surface-raised); border: var(--theme-border-width) solid var(--theme-color-border-strong); border-radius: var(--theme-radius-sm)"></div>
+                <span class="theme-styleguide__label">--theme-radius-sm — 5px, the system radius</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-surface-raised); border: var(--theme-border-width) solid var(--theme-color-border-strong); border-radius: var(--theme-radius-md)"></div>
+                <span class="theme-styleguide__label">--theme-radius-md — 10px</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-surface-raised); border: var(--theme-border-width-strong) solid var(--theme-color-border-strong); border-radius: var(--theme-radius-full)"></div>
+                <span class="theme-styleguide__label">--theme-radius-full — 9999px, a pill</span>
+            </div>
+        </div>
+    </div>
+
+    <h3>Shadow</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            There is nothing to show here, and that is the specimen: the design is flat and the
+            theme declares <strong>no elevation token at all</strong>. The reference design
+            contains zero visible effects, so adding one would be a design decision without a
+            source. A component separates itself with a surface fill and a hairline border, as
+            below. The single exception is the focus ring, which is a requirement rather than
+            decoration.
+        </p>
+        <div class="theme-styleguide__swatches">
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-surface-raised); border: var(--theme-border-width) solid var(--theme-color-border); border-radius: var(--theme-radius-sm)"></div>
+                <span class="theme-styleguide__label">no elevation token — fill and hairline instead</span>
+            </div>
+        </div>
+    </div>
+
+    <h3>Focus ring</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The ring is split in two because <code>light-dark()</code> takes colours and not
+            shadows: a colour token carries both appearances, and the composite is built around it
+            so a site package can still replace the whole ring in one declaration. A palette
+            overrides the colour half, so the ring follows the accent — switch the palette and both
+            boxes below move with it. What you see when tabbing through this page is the same
+            composite, applied through <code>:focus-visible</code>.
+        </p>
+        <div class="theme-styleguide__swatches">
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-focus-ring-color)"></div>
+                <span class="theme-styleguide__label">--theme-focus-ring-color</span>
+            </div>
+            <div>
+                <div class="theme-styleguide__swatch" style="background: var(--theme-color-surface-raised); border-radius: var(--theme-radius-sm); box-shadow: var(--theme-focus-ring)"></div>
+                <span class="theme-styleguide__label">--theme-focus-ring — 0 0 0 3px of it</span>
+            </div>
+        </div>
+    </div>
+</section>

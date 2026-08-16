@@ -1,0 +1,668 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section D1 - "forms". The specimens are literal markup copied
+    from the markup contract the three "Resources/Private/Scss/forms/" files
+    share in their header comments; nothing here is driven by a record, a
+    "f:cObject" call or a data processor.
+
+    Every form on this page carries "method=dialog" and every button is
+    "type=button". A form whose method is "dialog" and which has no ancestor
+    "dialog" element aborts submission in the HTML form-submission algorithm,
+    and a "type=button" button never submits in the first place - so the two
+    together mean neither a click nor implicit submission can navigate away
+    from the styleguide. There is deliberately no "action" attribute either,
+    which alone would only mean "submit to this URL".
+
+    Ids are all prefixed "sg-form-" so they cannot collide with the ids the
+    real page chrome occupies ("content" in "Layouts/Default.html",
+    "nav-main" in "Partials/Navigation/Main.html", "theme-appearance-label"
+    and "theme-palette-label" in "Partials/Page/AppearanceSwitcher.html").
+
+    The specimens are read from the SCSS, selector by selector, not from what
+    a form happens to need:
+
+      Resources/Private/Scss/forms/_controls.scss
+        47   .theme-input/.theme-textarea/.theme-select   the shared box
+        76   &:hover
+        83   &:disabled
+        94   .theme-input:read-only, .theme-textarea:read-only
+        100  ::placeholder
+        107  :placeholder-shown                            ellipsis, not a clip
+        112  .theme-textarea                               vertical resize only
+        122  .theme-select
+        123    &[multiple]
+        131    optgroup
+        137    option
+        142  .theme-input[type='color']
+        153    ::-webkit-color-swatch-wrapper
+        157    ::-webkit-color-swatch
+        161    ::-moz-color-swatch
+        168  .theme-input[type='range']
+        183    &:disabled
+        189  .theme-input[type='file']
+        200    ::file-selector-button
+        223    &:hover::file-selector-button
+        227    &:disabled
+        241  .theme-check
+        250    input[type='checkbox'], input[type='radio']
+        263    &:indeterminate                             not demonstrable, see below
+        267    &:disabled
+        272    &:has(input:disabled)
+        279  .theme-fieldset
+        288  .theme-fieldset__legend
+        299  output                                        no class, like "hr"
+
+      Resources/Private/Scss/forms/_field.scss
+        30   .theme-form
+        38   .theme-field
+        49   .theme-field__label
+        59   .theme-field__required
+        63   .theme-field__hint
+        73   .theme-field--inline
+        79     .theme-field__hint                          spans both columns
+
+      Resources/Private/Scss/forms/_validation.scss
+        45   .theme-field--invalid
+        55   .theme-field--valid
+        67   :user-invalid on input/textarea/select         the automatic one
+        75   .theme-field__error, .theme-field__success
+        85   .theme-field__error
+        91     &::before                                    the warning glyph
+        97   .theme-field__success
+        100    &::before                                    the check glyph
+        106  .theme-field--inline .theme-field__error
+        113  .theme-form-summary
+        132  .theme-form-summary__title
+        138  .theme-form-summary__list
+        148    a
+        153    a:hover
+        159  .theme-form-summary--success
+
+    Two things in that list are not shown on the page, and both are stated
+    here rather than left to be noticed:
+
+      - "_controls.scss:263" ":indeterminate" cannot be reached from markup.
+        It is an IDL property on HTMLInputElement with no content attribute
+        behind it, so only a script can set it, and this page carries none.
+      - ".theme-form-summary--error" appears in all three markup contracts
+        and in docs/development/component-library.md, but no rule anywhere
+        under "forms/" selects it: the base ".theme-form-summary"
+        (_validation.scss:113) already carries the danger palette, and only
+        "--success" (159) re-points it. The modifier is written here anyway,
+        because the contract is what a site package copies and a later
+        "--warning" variant would want the error case named rather than
+        implied.
+</f:comment>
+
+<section class="theme-styleguide__section" id="forms">
+    <h2 class="theme-styleguide__heading">Forms</h2>
+
+    <p>
+        The three files under <code>Resources/Private/Scss/forms/</code> style
+        one contract between them: <code>_controls.scss</code> the native
+        controls, <code>_field.scss</code> the label, hint, required marker and
+        vertical rhythm, and <code>_validation.scss</code> the error and success
+        repaint of both. No content element in this extension renders a form, so
+        this section is the only place the contract is exercised at all.
+    </p>
+
+    <h3>The field wrapper</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>.theme-field</code> is a grid whose row order is source order:
+            label, control, error, hint. Nothing reorders it, so the visual
+            order and the reading order that the <code>aria-describedby</code>
+            list assumes stay the same order. The asterisk in the label is a
+            sighted-user affordance and carries
+            <code>aria-hidden="true"</code>; what a screen reader announces is
+            the control's own <code>required</code> attribute.
+            <code>.theme-field--inline</code> puts label and control side by
+            side for a field that reads as a short row, and the hint still spans
+            the full width underneath.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-name">
+                    Full name <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <input class="theme-input"
+                       id="sg-form-name"
+                       name="sg-form-name"
+                       type="text"
+                       required="required"
+                       placeholder="Ada Lovelace"
+                       aria-describedby="sg-form-name-hint">
+                <p class="theme-field__hint" id="sg-form-name-hint">
+                    The hint is described text, not a label. It sits last in the
+                    source and last in the reading order.
+                </p>
+            </div>
+
+            <div class="theme-field theme-field--inline">
+                <label class="theme-field__label" for="sg-form-inline">Results per page</label>
+                <input class="theme-input"
+                       id="sg-form-inline"
+                       name="sg-form-inline"
+                       type="number"
+                       value="25"
+                       min="5"
+                       max="100"
+                       step="5"
+                       aria-describedby="sg-form-inline-hint">
+                <p class="theme-field__hint" id="sg-form-inline-hint">
+                    Between 5 and 100.
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <h3>One class for every input type that resolves to the same box</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>.theme-input</code> is the single class applied regardless of
+            <code>type</code>. Text, email, url, tel, number, password, search
+            and the whole date and time family resolve to the same box once
+            border, background, padding and font are normalised, so none of them
+            needs a selector of its own. The picker indicator of the date and
+            time controls tracks the palette by itself: <code>:root</code> is
+            given <code>color-scheme: light dark</code> in
+            <code>abstracts/_tokens.scss</code>, and that is what the native
+            icon reads &mdash; flip the appearance switcher in the header and the
+            picker glyphs follow without a rule touching them.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-text">Text</label>
+                <input class="theme-input" id="sg-form-text" name="sg-form-text" type="text" placeholder="Placeholder text, truncated with an ellipsis rather than clipped">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-email">Email</label>
+                <input class="theme-input" id="sg-form-email" name="sg-form-email" type="email" placeholder="ada@example.org">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-url">URL</label>
+                <input class="theme-input" id="sg-form-url" name="sg-form-url" type="url" placeholder="https://example.org">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-tel">Telephone</label>
+                <input class="theme-input" id="sg-form-tel" name="sg-form-tel" type="tel" placeholder="+49 30 000000">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-number">Number</label>
+                <input class="theme-input" id="sg-form-number" name="sg-form-number" type="number" value="42">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-password">Password</label>
+                <input class="theme-input" id="sg-form-password" name="sg-form-password" type="password" value="not-a-real-secret">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-search">Search</label>
+                <input class="theme-input" id="sg-form-search" name="sg-form-search" type="search" placeholder="Search the styleguide">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-date">Date</label>
+                <input class="theme-input" id="sg-form-date" name="sg-form-date" type="date" value="2026-08-16">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-time">Time</label>
+                <input class="theme-input" id="sg-form-time" name="sg-form-time" type="time" value="14:30">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-datetime">Date and time</label>
+                <input class="theme-input" id="sg-form-datetime" name="sg-form-datetime" type="datetime-local" value="2026-08-16T14:30">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-month">Month</label>
+                <input class="theme-input" id="sg-form-month" name="sg-form-month" type="month" value="2026-08">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-week">Week</label>
+                <input class="theme-input" id="sg-form-week" name="sg-form-week" type="week" value="2026-W34">
+            </div>
+        </form>
+    </div>
+
+    <h3>The three types that get an override of their own</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>color</code>, <code>range</code> and <code>file</code> render a
+            fundamentally different user-agent widget, so each gets an explicit
+            <code>[type='…']</code> rule. The colour swatch loses the inset
+            border the browser draws inside it, the range switches the shared
+            border and background off because a range is a track and not a box,
+            and the file control themes its
+            <code>::file-selector-button</code> with the secondary accent
+            &mdash; the primary fill stays reserved for the form's own submit
+            action, so a file picker next to it does not compete for attention
+            it has not earned. The bare <code>output</code> element next to the
+            range is styled without a class, the way <code>hr</code> and
+            <code>small</code> are.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <div class="theme-field theme-field--inline">
+                <label class="theme-field__label" for="sg-form-color">Accent colour</label>
+                <input class="theme-input" id="sg-form-color" name="sg-form-color" type="color" value="#0b57d0">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-range">Quantity</label>
+                <input class="theme-input"
+                       id="sg-form-range"
+                       name="sg-form-range"
+                       type="range"
+                       min="0"
+                       max="10"
+                       step="1"
+                       value="7"
+                       aria-describedby="sg-form-range-hint">
+                <p class="theme-field__hint" id="sg-form-range-hint">
+                    Current value: <output for="sg-form-range" name="sg-form-range-output">7</output>
+                </p>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-file">Attachment</label>
+                <input class="theme-input" id="sg-form-file" name="sg-form-file" type="file">
+            </div>
+        </form>
+    </div>
+
+    <h3>Select, multiple select and textarea</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            The select keeps the native arrow: replacing it needs an icon asset
+            and this library ships none, so only the box around the indicator is
+            themed. <code>optgroup</code> is set in the secondary text colour and
+            bold rather than the browser's italic. A
+            <code>select[multiple]</code> is made tall enough to show a handful
+            of options at once, so it is not mistaken for a single-row text
+            field. The textarea resizes vertically only &mdash; horizontal resize
+            would break the field grid it sits in.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-select">Department</label>
+                <select class="theme-select" id="sg-form-select" name="sg-form-select">
+                    <option value="">Please choose …</option>
+                    <optgroup label="Editorial">
+                        <option value="writing">Writing</option>
+                        <option value="proofing" selected="selected">Proofing</option>
+                    </optgroup>
+                    <optgroup label="Engineering">
+                        <option value="frontend">Frontend</option>
+                        <option value="backend">Backend</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-select-multiple">Topics</label>
+                <select class="theme-select"
+                        id="sg-form-select-multiple"
+                        name="sg-form-select-multiple"
+                        multiple="multiple"
+                        size="5"
+                        aria-describedby="sg-form-select-multiple-hint">
+                    <optgroup label="Frontend">
+                        <option value="scss" selected="selected">Design tokens</option>
+                        <option value="fluid">Fluid templates</option>
+                        <option value="a11y" selected="selected">Accessibility</option>
+                    </optgroup>
+                    <optgroup label="Backend">
+                        <option value="di">Dependency injection</option>
+                        <option value="tca">TCA</option>
+                    </optgroup>
+                </select>
+                <p class="theme-field__hint" id="sg-form-select-multiple-hint">
+                    Hold the platform's modifier key to select more than one entry.
+                </p>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-textarea">Message</label>
+                <textarea class="theme-textarea"
+                          id="sg-form-textarea"
+                          name="sg-form-textarea"
+                          rows="4"
+                          placeholder="Drag the bottom edge — the textarea resizes vertically only."></textarea>
+            </div>
+        </form>
+    </div>
+
+    <h3>Fieldset, checkbox and radio</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            Checkbox and radio keep their native widget and are coloured with
+            <code>accent-color</code>; the library does not hide the input and
+            draw a replacement, because that pattern exists mainly for browsers
+            this design does not have to support. The checked state therefore
+            needs no rule of its own. The indeterminate state does have one, in
+            the secondary text colour rather than the primary accent, because it
+            is a third state and not a variant of checked &mdash; it cannot be
+            shown here, since <code>indeterminate</code> is an IDL property with
+            no HTML attribute behind it and this page carries no script.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <fieldset class="theme-fieldset">
+                <legend class="theme-fieldset__legend">Notifications</legend>
+                <label class="theme-check">
+                    <input type="checkbox" id="sg-form-check-releases" name="sg-form-check-releases" checked="checked">
+                    Release announcements
+                </label>
+                <label class="theme-check">
+                    <input type="checkbox" id="sg-form-check-security" name="sg-form-check-security">
+                    Security advisories
+                </label>
+                <label class="theme-check">
+                    <input type="checkbox" id="sg-form-check-survey" name="sg-form-check-survey" disabled="disabled">
+                    Occasional surveys (currently unavailable)
+                </label>
+            </fieldset>
+
+            <fieldset class="theme-fieldset">
+                <legend class="theme-fieldset__legend">Preferred contact</legend>
+                <label class="theme-check">
+                    <input type="radio" id="sg-form-radio-email" name="sg-form-contact" value="email" checked="checked">
+                    By email
+                </label>
+                <label class="theme-check">
+                    <input type="radio" id="sg-form-radio-phone" name="sg-form-contact" value="phone">
+                    By telephone
+                </label>
+                <label class="theme-check">
+                    <input type="radio" id="sg-form-radio-post" name="sg-form-contact" value="post" disabled="disabled">
+                    By post (currently unavailable)
+                </label>
+            </fieldset>
+        </form>
+    </div>
+
+    <h3>Validation states</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>.theme-field--invalid</code> and
+            <code>.theme-field--valid</code> are the <strong>explicit</strong>
+            counterparts of <code>:user-invalid</code> &mdash; deliberately not
+            <code>:invalid</code>, which matches the moment a field fails
+            constraint validation, and for a required field that is the moment
+            the form loads. Every empty required field would paint itself red
+            before the reader had typed a single character.
+            <code>:user-invalid</code> only matches once the browser considers
+            the field dirty, after a blur or a submit attempt, and the two
+            modifier classes stay available for a form that drives its own
+            server-side or asynchronous validation instead of the native one.
+        </p>
+        <p>
+            No rule signals a state by colour alone. An invalid border also gets
+            thicker, and the error message is prefixed with a warning glyph that
+            is real content rather than a decorative background image, so both
+            survive greyscale printing and a colour vision deficiency.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <div class="theme-form-summary theme-form-summary--error" role="alert" tabindex="-1">
+                <p class="theme-form-summary__title">This form has 5 errors</p>
+                <ul class="theme-form-summary__list">
+                    <li><a href="#sg-form-mail">Enter an email address in the format name@example.org</a></li>
+                    <li><a href="#sg-form-postcode">Enter a postcode of five digits</a></li>
+                    <li><a href="#sg-form-message">Enter at least 20 characters</a></li>
+                    <li><a href="#sg-form-quantity">Enter a quantity of at least 1</a></li>
+                    <li><a href="#sg-form-terms">Confirm that you accept the terms</a></li>
+                </ul>
+            </div>
+
+            <div class="theme-field theme-field--invalid">
+                <label class="theme-field__label" for="sg-form-mail">
+                    Email <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <input class="theme-input"
+                       id="sg-form-mail"
+                       name="sg-form-mail"
+                       type="email"
+                       value="ada@example"
+                       required="required"
+                       aria-invalid="true"
+                       aria-describedby="sg-form-mail-error sg-form-mail-hint">
+                <p class="theme-field__error" id="sg-form-mail-error">
+                    Enter an email address in the format name@example.org
+                </p>
+                <p class="theme-field__hint" id="sg-form-mail-hint">
+                    Used once, to confirm the request. Nothing else is sent to it.
+                </p>
+            </div>
+
+            <div class="theme-field theme-field--invalid">
+                <label class="theme-field__label" for="sg-form-postcode">
+                    Postcode <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <input class="theme-input"
+                       id="sg-form-postcode"
+                       name="sg-form-postcode"
+                       type="text"
+                       value="1234"
+                       required="required"
+                       aria-invalid="true"
+                       aria-describedby="sg-form-postcode-error">
+                <p class="theme-field__error" id="sg-form-postcode-error">
+                    Enter a postcode of five digits
+                </p>
+            </div>
+
+            <div class="theme-field theme-field--invalid">
+                <label class="theme-field__label" for="sg-form-message">Message</label>
+                <textarea class="theme-textarea"
+                          id="sg-form-message"
+                          name="sg-form-message"
+                          rows="3"
+                          aria-invalid="true"
+                          aria-describedby="sg-form-message-error">Too short.</textarea>
+                <p class="theme-field__error" id="sg-form-message-error">
+                    Enter at least 20 characters
+                </p>
+            </div>
+
+            <div class="theme-field theme-field--inline theme-field--invalid">
+                <label class="theme-field__label" for="sg-form-quantity">Quantity</label>
+                <input class="theme-input"
+                       id="sg-form-quantity"
+                       name="sg-form-quantity"
+                       type="number"
+                       value="0"
+                       min="1"
+                       aria-invalid="true"
+                       aria-describedby="sg-form-quantity-error">
+                <p class="theme-field__error" id="sg-form-quantity-error">
+                    Enter a quantity of at least 1
+                </p>
+            </div>
+
+            <div class="theme-field theme-field--valid">
+                <label class="theme-field__label" for="sg-form-country">Country</label>
+                <select class="theme-select" id="sg-form-country" name="sg-form-country" aria-describedby="sg-form-country-success">
+                    <option value="at">Austria</option>
+                    <option value="de" selected="selected">Germany</option>
+                    <option value="ch">Switzerland</option>
+                </select>
+                <p class="theme-field__success" id="sg-form-country-success">
+                    Delivery is available to this country
+                </p>
+            </div>
+
+            <fieldset class="theme-fieldset">
+                <legend class="theme-fieldset__legend">Terms</legend>
+                <label class="theme-check">
+                    <input type="checkbox" id="sg-form-terms" name="sg-form-terms" required="required" aria-invalid="true">
+                    I accept the terms
+                </label>
+            </fieldset>
+
+            <div>
+                <button class="theme-button" type="button">Send request</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            The automatic counterpart, with no modifier class anywhere on it:
+            type something that is not an email address into the field below and
+            move focus away. <code>:user-invalid</code> matches at that point and
+            repaints the border, and it stays unpainted while the field is
+            merely empty.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-user-invalid">
+                    Email <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <input class="theme-input"
+                       id="sg-form-user-invalid"
+                       name="sg-form-user-invalid"
+                       type="email"
+                       required="required"
+                       placeholder="Type something that is not an address, then tab away"
+                       aria-describedby="sg-form-user-invalid-hint">
+                <p class="theme-field__hint" id="sg-form-user-invalid-hint">
+                    Empty on load and not painted red, which is the whole point.
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            The summary box in the success palette. The links carry no separate
+            hover colour: there is no <code>-hover</code> token for danger or
+            success the way there is for primary and secondary, so hover is
+            signalled by dropping the underline rather than by inventing one.
+        </p>
+
+        <div class="theme-form-summary theme-form-summary--success" role="status">
+            <p class="theme-form-summary__title">Your request was sent</p>
+            <ul class="theme-form-summary__list">
+                <li><a href="#forms">Back to the top of this section</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Disabled and read-only</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            Read-only is not disabled. A read-only value is still submitted and
+            the control is still focusable and selectable, only editing is
+            blocked, so it keeps full opacity and trades the editable background
+            for the tint a disabled surface would use. Disabled uses opacity
+            rather than a second background, matching
+            <code>.theme-button</code>, so one rule reads as "inactive"
+            everywhere in the library. <code>select</code> is excluded from the
+            read-only rule because the attribute does not exist on it.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-readonly">Customer number (read-only)</label>
+                <input class="theme-input" id="sg-form-readonly" name="sg-form-readonly" type="text" value="TX-2026-004711" readonly="readonly">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-readonly-textarea">Recorded answer (read-only)</label>
+                <textarea class="theme-textarea" id="sg-form-readonly-textarea" name="sg-form-readonly-textarea" rows="2" readonly="readonly">Still focusable, still selectable, still submitted — only editing is blocked.</textarea>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-disabled">Billing address (disabled)</label>
+                <input class="theme-input" id="sg-form-disabled" name="sg-form-disabled" type="text" value="Same as delivery address" disabled="disabled">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-disabled-select">Shipping method (disabled)</label>
+                <select class="theme-select" id="sg-form-disabled-select" name="sg-form-disabled-select" disabled="disabled">
+                    <option value="standard" selected="selected">Standard</option>
+                    <option value="express">Express</option>
+                </select>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-disabled-range">Quantity (disabled)</label>
+                <input class="theme-input" id="sg-form-disabled-range" name="sg-form-disabled-range" type="range" min="0" max="10" value="3" disabled="disabled">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-disabled-file">Attachment (disabled)</label>
+                <input class="theme-input" id="sg-form-disabled-file" name="sg-form-disabled-file" type="file" disabled="disabled">
+            </div>
+
+            <div>
+                <button class="theme-button" type="button" disabled="disabled">Send request</button>
+                <button class="theme-button theme-button--ghost" type="button">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <h3>Status and dialog elements</h3>
+    <p>
+        <code>progress</code>, <code>meter</code> and <code>dialog</code> are styled in
+        <code>base/_elements.scss</code> as bare elements, so they arrive through the
+        rich text editor without a class and without anything to opt into. They belong
+        to no component, which is why they sit at the end of the forms section rather
+        than in one — they are native controls with no wrapper of their own.
+    </p>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>progress</code> takes its fill from <code>accent-color</code>. Chromium
+            renders the track as a sub-element rather than as the element's own
+            background, so the track colour is repeated in
+            <code>::-webkit-progress-bar</code> — without that the bar is unstyled there
+            and correct everywhere else.
+        </p>
+        <progress value="0.6"></progress>
+
+        <p>
+            <code>meter</code> reports a measurement within a known range rather than
+            progress towards completion. The browser picks its own fill colour from the
+            value's position between <code>low</code>, <code>high</code> and
+            <code>optimum</code>, which is why only the accent is set here.
+        </p>
+        <meter value="8" min="0" max="10" low="3" high="7" optimum="9"></meter>
+
+        <p>
+            <code>dialog</code> is shown with the <code>open</code> attribute, which is
+            the only form the stylesheet can reach. A dialog opened with
+            <code>showModal()</code> is promoted to the top layer, where stacking
+            context and <code>z-index</code> no longer apply and
+            <code>::backdrop</code> takes over — the rule sets both so either route
+            lands somewhere deliberate.
+        </p>
+        <dialog open>
+            <p>An open dialog, rendered in flow rather than modally.</p>
+        </dialog>
+    </div>
+</section>
+
+</html>

@@ -1,0 +1,163 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section D1 "buttons": ".theme-button" with every modifier it
+    ships, the states it styles, and ".theme-badge" on both of its axes.
+
+    Every specimen below is literal markup taken from the markup contract in
+    the component's own SCSS header comment, per D2 - nothing here is driven
+    by a record, a "f:cObject" call or a data processor, and per D3 none of
+    the copy is translated.
+
+    The modifiers are read from the SCSS, not from the three the content
+    elements happen to use:
+
+      Resources/Private/Scss/components/_button.scss
+        27   .theme-button                 base, primary fill
+        66   &:hover                       re-points to the "-hover" tokens
+        74   &:disabled                    the control spelling
+        75   &[aria-disabled='true']       the link spelling
+        82   .theme-button--secondary      outlined, plus its own :hover rule
+        95   .theme-button--ghost          borderless, plus its own :hover rule
+        110  .theme-button--danger         destructive
+        116  .theme-button--small
+        126  .theme-button--large
+        134  .theme-button-group           the row wrapper
+
+      Resources/Private/Scss/components/_badge.scss
+        24   .theme-badge                  base, soft fill, info severity
+        52   .theme-badge--info
+        58   .theme-badge--success
+        64   .theme-badge--warning
+        70   .theme-badge--danger
+        79   .theme-badge--solid
+
+    ":focus-visible" is deliberately absent from "_button.scss": the ring is
+    declared once for every focusable element in Resources/Private/Scss/base/
+    _reset.scss:58, so a button that styled its own would be overriding a
+    global accessibility decision rather than implementing one.
+
+    The rows below are ".theme-button-group" (_button.scss:134) so that each
+    specimen sits next to the class that produced it - which demonstrates that
+    component as a side effect rather than needing a row of its own.
+</f:comment>
+<section class="theme-styleguide__section" id="buttons">
+    <h2 class="theme-styleguide__heading">Buttons</h2>
+
+    <h3>Variants</h3>
+    <div class="theme-styleguide__specimen">
+        <div class="theme-button-group">
+            <a class="theme-button" href="#">Book a demo</a>
+            <span class="theme-styleguide__label"><code>.theme-button</code> — the filled default. It marks the one action a view most wants taken, which is why a view should carry exactly one of them.</span>
+        </div>
+        <div class="theme-button-group">
+            <a class="theme-button theme-button--secondary" href="#">Compare editions</a>
+            <span class="theme-styleguide__label"><code>.theme-button--secondary</code> — the accent moves from the fill to the text and the border. For an alternative that has to stay clearly available without competing with the filled action next to it.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-button theme-button--ghost" type="button">Not now</button>
+            <span class="theme-styleguide__label"><code>.theme-button--ghost</code> — no border and no fill, drawn in the secondary text colour. For a tertiary action such as dismiss or cancel, sitting beside a real one.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-button theme-button--danger" type="button">Delete account</button>
+            <span class="theme-styleguide__label"><code>.theme-button--danger</code> — destructive. Deliberately the same shape as the default: the colour carries the warning, and a different shape would only make it harder to recognise as a button at all.</span>
+        </div>
+    </div>
+
+    <h3>Sizes</h3>
+    <div class="theme-styleguide__specimen">
+        <div class="theme-button-group">
+            <button class="theme-button theme-button--small" type="button">Add to list</button>
+            <span class="theme-styleguide__label"><code>.theme-button--small</code> — for dense surroundings: a card footer, a table row, a toolbar. Padding and font size shrink; the minimum tap target does not, so the visible box becomes smaller than the area that responds to a finger.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-button" type="button">Add to list</button>
+            <span class="theme-styleguide__label">No size modifier — the size everything else is measured against.</span>
+        </div>
+        <div class="theme-button-group">
+            <a class="theme-button theme-button--large" href="#">Start the trial</a>
+            <span class="theme-styleguide__label"><code>.theme-button--large</code> — for the call to action of a hero or a landing section, where the button is the point of the section rather than one control among several.</span>
+        </div>
+    </div>
+
+    <h3>States</h3>
+    <div class="theme-styleguide__specimen">
+        <p>Two of the four states a button has cannot be put into markup: no attribute freezes a pseudo-class. They are named here so that a reader knows they exist and can reach them, because a state nobody can see is a state nobody reviews.</p>
+        <div class="theme-button-group">
+            <button class="theme-button" type="button">Hover me</button>
+            <span class="theme-styleguide__label"><code>:hover</code> — point at this button. Background, border and text colour move to the component's own hover tokens; nothing about the box changes, so the button does not shift the layout under the pointer.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-button theme-button--secondary" type="button">Focus me</button>
+            <span class="theme-styleguide__label"><code>:focus-visible</code> — press Tab until focus lands here. The ring is not the button's own rule: it is declared once for every focusable element in the reset, as an outline plus the focus-ring shadow token, so it looks identical on a link, an input and a button.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-button" type="button" disabled>Publish</button>
+            <span class="theme-styleguide__label"><code>:disabled</code> — the control spelling. The button is dimmed to the disabled opacity, the cursor turns to "not allowed", and the browser stops both the click and the focus by itself.</span>
+        </div>
+        <div class="theme-button-group">
+            <a class="theme-button theme-button--danger" href="#" aria-disabled="true">Revoke access</a>
+            <span class="theme-styleguide__label"><code>[aria-disabled="true"]</code> — the link spelling, styled identically. A link has no <code>disabled</code> attribute, so this one is announced as disabled and looks disabled but still takes focus and still follows its target: the template that renders it has to withhold the target as well.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-button theme-button--ghost theme-button--small" type="button" disabled>Undo</button>
+            <span class="theme-styleguide__label">Disabled combines with every other modifier, because it changes opacity and cursor only and leaves the token layer alone.</span>
+        </div>
+    </div>
+
+    <h3>Link and control</h3>
+    <div class="theme-styleguide__specimen">
+        <p>The component is used for both an <code>&lt;a&gt;</code> and a <code>&lt;button&gt;</code>, and the two do not start out alike: a control arrives with a border, a background, a font of its own and a centred label from the browser, a link with none of those and an underline instead. Each pair below is the same class on both elements, so any difference left is a gap in the component.</p>
+        <div class="theme-button-group">
+            <a class="theme-button" href="#">Anchor</a>
+            <button class="theme-button" type="button">Button</button>
+            <span class="theme-styleguide__label"><code>.theme-button</code> on <code>&lt;a&gt;</code> and on <code>&lt;button&gt;</code>.</span>
+        </div>
+        <div class="theme-button-group">
+            <a class="theme-button theme-button--secondary" href="#">Anchor</a>
+            <button class="theme-button theme-button--secondary" type="button">Button</button>
+            <span class="theme-styleguide__label"><code>.theme-button--secondary</code> on both, where the border is the variant and a stray browser border would show immediately.</span>
+        </div>
+        <div class="theme-button-group">
+            <a class="theme-button theme-button--ghost" href="#">Anchor</a>
+            <button class="theme-button theme-button--ghost" type="button">Button</button>
+            <span class="theme-styleguide__label"><code>.theme-button--ghost</code> on both, the hardest of the three: with no fill and no border of its own, anything the browser supplies is the only thing visible.</span>
+        </div>
+    </div>
+
+    <h3>Button group</h3>
+    <div class="theme-styleguide__specimen">
+        <p><code>.theme-button-group</code> is the row itself. It wraps rather than overflowing, because these labels are translated and a German one is routinely half again as long as the English it was measured on.</p>
+        <div class="theme-button-group">
+            <a class="theme-button" href="#">Save and publish</a>
+            <button class="theme-button theme-button--secondary" type="button">Save as draft</button>
+            <button class="theme-button theme-button--ghost" type="button">Discard changes</button>
+        </div>
+    </div>
+
+    <h3>Badges</h3>
+    <div class="theme-styleguide__specimen">
+        <p>A badge is a status marker, not a control: it is never clickable and it never carries an action. It has two axes that are set independently — a severity, and a fill. The severity classes write only the raw accent and tint of the badge, <code>--solid</code> writes only the rendered background and foreground, so neither the order of the classes in the markup nor the order of the rules in the stylesheet changes the result.</p>
+        <p class="theme-styleguide__label">Soft fill — the default. A tinted background with the accent as text, quiet enough to sit inside a card title or a table cell without pulling the eye off the content.</p>
+        <div class="theme-button-group">
+            <span class="theme-badge">Draft</span>
+            <span class="theme-badge theme-badge--info">In review</span>
+            <span class="theme-badge theme-badge--success">Published</span>
+            <span class="theme-badge theme-badge--warning">Expires soon</span>
+            <span class="theme-badge theme-badge--danger">Rejected</span>
+        </div>
+        <p class="theme-styleguide__label">In order: <code>.theme-badge</code> on its own, then <code>--info</code>, <code>--success</code>, <code>--warning</code>, <code>--danger</code>. The first two are the same badge — info is the severity a badge has when none is named, and the class exists so a template can say so rather than rely on the default.</p>
+        <p class="theme-styleguide__label">Solid fill — <code>--solid</code> combined with a severity. The accent becomes the background and the text switches to the colour verified against it, which is a separate token and not the soft foreground inverted. For the one status in a list that has to be read before the others.</p>
+        <div class="theme-button-group">
+            <span class="theme-badge theme-badge--solid">Draft</span>
+            <span class="theme-badge theme-badge--solid theme-badge--info">In review</span>
+            <span class="theme-badge theme-badge--solid theme-badge--success">Published</span>
+            <span class="theme-badge theme-badge--solid theme-badge--warning">Expires soon</span>
+            <span class="theme-badge theme-badge--solid theme-badge--danger">Rejected</span>
+        </div>
+        <p class="theme-styleguide__label">The same five severities with <code>--solid</code> added, in the same order. Both rows are the whole grid: five severities across, two fills down, and no combination left out.</p>
+    </div>
+</section>
+
+</html>

@@ -1,0 +1,139 @@
+// Styleguide page furniture.
+//
+// Only the styleguide page uses this, and it holds nothing a component could
+// own: section rhythm, a frame that separates one example from the next, and
+// the swatch grid the token section is made of. It is deliberately *not*
+// composed out of ".theme-card" - a card is a content component with its own
+// visual decisions, and borrowing it as a section frame would mean every
+// change to the card reflows the styleguide.
+//
+// Markup contract:
+//
+//     <div class="theme-styleguide">
+//         <section class="theme-styleguide__section" id="tokens">
+//             <h2 class="theme-styleguide__heading">Tokens</h2>
+//             <ul class="theme-styleguide__swatches">
+//                 <li>
+//                     <span class="theme-styleguide__swatch" style="background-color: var(--theme-color-primary)"></span>
+//                     <span class="theme-styleguide__label">--theme-color-primary</span>
+//                 </li>
+//             </ul>
+//             <h3>Buttons</h3>
+//             <div class="theme-styleguide__specimen">…the specimen markup…</div>
+//             <div class="theme-styleguide__specimen">…another example…</div>
+//         </section>
+//     </div>
+//
+// A swatch carries the colour it demonstrates as an inline "style" attribute
+// reading the token through "var()". That is the one place an inline style is
+// right here: the value on show *is* the token, and a class per token would be
+// a stylesheet rule per token. Nothing below sets a swatch colour.
+//
+// The element wrapping a swatch and its label is not fixed by the contract -
+// "li" above, because the swatches are a list - so the cell is selected as a
+// direct child rather than by name.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-styleguide {
+    --theme-styleguide-section-gap: var(--theme-space-8, 3.75rem);
+    --theme-styleguide-section-scroll-margin: var(--theme-space-6, 1.875rem);
+    --theme-styleguide-heading-color: var(--theme-color-text-primary, #14181f);
+    --theme-styleguide-specimen-gap: var(--theme-space-4, 1.25rem);
+    --theme-styleguide-specimen-padding: var(--theme-space-5, 1.5625rem);
+    --theme-styleguide-specimen-background: var(--theme-color-surface-raised, #ffffff);
+    --theme-styleguide-specimen-border-color: var(--theme-color-border, #d6dce6);
+    --theme-styleguide-specimen-border-width: var(--theme-border-width, 1px);
+    --theme-styleguide-specimen-radius: var(--theme-radius-md, 10px);
+    --theme-styleguide-swatch-min-width: 9rem;
+    --theme-styleguide-swatch-height: 3.75rem;
+    --theme-styleguide-swatch-gap: var(--theme-space-3, 0.9375rem);
+    --theme-styleguide-swatch-label-gap: var(--theme-space-1, 0.3125rem);
+    --theme-styleguide-swatch-radius: var(--theme-radius-sm, 5px);
+    --theme-styleguide-swatch-border-width: var(--theme-border-width-strong, 2px);
+    --theme-styleguide-swatch-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-styleguide-label-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-styleguide-label-font-family: var(--theme-font-family-mono, ui-monospace, monospace);
+    --theme-styleguide-label-font-size: var(--theme-font-size-xs, 0.75rem);
+}
+
+.theme-styleguide__section {
+    // The page carries an index linking to "#id", and the browser scrolls the
+    // section's border edge flush against the viewport - which puts the
+    // heading against the very top of the screen, or under the header when
+    // ".theme-site-header--sticky" is in use. This is the offset that keeps it
+    // readable. It cannot account for the sticky header's height, because that
+    // height is content dependent and is not a token.
+    scroll-margin-block-start: var(--theme-styleguide-section-scroll-margin);
+
+    & + & {
+        margin-block-start: var(--theme-styleguide-section-gap);
+    }
+}
+
+// "h2" already carries its size and its margins from "base/_elements.scss";
+// what this adds is the colour, so a section heading keeps full contrast even
+// where the surrounding specimen copy is set in a secondary tone.
+.theme-styleguide__heading {
+    color: var(--theme-styleguide-heading-color);
+}
+
+// The frame that makes one example legibly *one* example. Its top margin is
+// the only spacing rule on the page furniture: adjacent margins collapse, so
+// the same declaration also spaces a specimen from the heading above it
+// without doubling that heading's own bottom margin.
+.theme-styleguide__specimen {
+    margin-block-start: var(--theme-styleguide-specimen-gap);
+    padding: var(--theme-styleguide-specimen-padding);
+    border: var(--theme-styleguide-specimen-border-width) solid var(--theme-styleguide-specimen-border-color);
+    border-radius: var(--theme-styleguide-specimen-radius);
+    background-color: var(--theme-styleguide-specimen-background);
+}
+
+// "auto-fill" rather than the "auto-fit" the card grid and the footer columns
+// use, and that is the opposite decision on purpose: those lay out content,
+// which should take the space it is given, while a swatch is a specimen whose
+// size carries no meaning. With "auto-fit" a section holding three swatches
+// would stretch each one across a third of the page.
+.theme-styleguide__swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--theme-styleguide-swatch-min-width), 1fr));
+    gap: var(--theme-styleguide-swatch-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    > * {
+        display: flex;
+        flex-direction: column;
+        gap: var(--theme-styleguide-swatch-label-gap);
+        min-width: 0;
+    }
+}
+
+// Size, shape and border only - the colour arrives from the markup.
+//
+// The border is what makes the grid usable at all: a swatch demonstrating
+// "--theme-color-background" is exactly the colour of the page behind it, so
+// without a border the one token a reader most wants to look at is the one
+// that renders as nothing. It is drawn in "--theme-color-border-strong", which
+// is the token that reaches 3:1 against the background in both appearances
+// (see "abstracts/_tokens.scss"), so the outline holds whatever the fill turns
+// out to be.
+.theme-styleguide__swatch {
+    display: block;
+    block-size: var(--theme-styleguide-swatch-height);
+    border: var(--theme-styleguide-swatch-border-width) solid var(--theme-styleguide-swatch-border-color);
+    border-radius: var(--theme-styleguide-swatch-radius);
+}
+
+// Token names are long, unspaced and set in mono so they can be copied by eye
+// into a site package. "anywhere" rather than a wider cell: the grid should
+// stay dense, and a name is still readable broken across two lines.
+.theme-styleguide__label {
+    color: var(--theme-styleguide-label-color);
+    font-family: var(--theme-styleguide-label-font-family);
+    font-size: var(--theme-styleguide-label-font-size);
+    overflow-wrap: anywhere;
+}

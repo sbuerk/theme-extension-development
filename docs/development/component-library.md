@@ -49,12 +49,13 @@ against, and the rename was cheap while only one template depended on it.
 | Page frame              | `.theme-page`                | `layout/_page.scss`                    |
 | Site header             | `.theme-site-header`         | `layout/_site-header.scss`             |
 | Site footer             | `.theme-site-footer`         | `layout/_site-footer.scss`             |
+| Styleguide page         | `.theme-styleguide`          | `layout/_styleguide.scss`              |
 
 `.theme-pagination` has no rule of its own — only `__list`, `__link` and
 `__ellipsis` are styled, current-page state comes from `[aria-current="page"]`
 rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
-asserts every one of the twenty-five selectors above is actually compiled into
+asserts every one of the twenty-six selectors above is actually compiled into
 `Resources/Public/Css/theme.css`. The appearance switcher is covered twice over,
 because its swatches duplicate colour that lives in `abstracts/_palettes.scss` —
 see [Appearance switching](appearance-switching.md#what-the-tests-guard).
@@ -148,11 +149,13 @@ Accordion, built on native `<details>`/`<summary>` — a shared `name` on every
 ```
 
 Alert. Modifiers `--info` (default), `--success`, `--warning`, `--danger`.
-`role` is fixed by the contract and is a markup concern this file does not
-touch:
+`role` is a markup concern the stylesheet does not touch, and it is **not the
+same for all four**: `--info` and `--success` take `role="status"`, a polite
+live region that waits for a pause; `--warning` and `--danger` take
+`role="alert"`, which interrupts:
 
 ```html
-<div class="theme-alert theme-alert--warning" role="status">
+<div class="theme-alert theme-alert--warning" role="alert">
     <span class="theme-alert__icon" aria-hidden="true">…</span>
     <div class="theme-alert__body">
         <p class="theme-alert__title">…</p>
@@ -187,7 +190,32 @@ Badge. Two independent axes — severity (`--info`, `--success`, `--warning`,
 <span class="theme-badge theme-badge--solid theme-badge--danger">…</span>
 ```
 
-Card, and a grid of them:
+Button. Variants `--secondary`, `--ghost` and `--danger`; sizes `--small` and
+`--large`. It is used both as an `<a>` and as a `<button>`, and the component
+normalises the difference between them, so either is correct wherever the other
+is. `--ghost` is the strict case — with no fill and no border of its own,
+anything a browser supplies is the only thing visible:
+
+```html
+<a class="theme-button" href="…">…</a>
+<button class="theme-button theme-button--secondary" type="button">…</button>
+<button class="theme-button theme-button--danger theme-button--small" type="button">…</button>
+```
+
+`:focus-visible` is deliberately **not** a rule of this component. The ring is
+global, in `base/_reset.scss`, so every focusable thing on the page carries the
+same one and a new component cannot forget it.
+
+`.theme-button-group` lays out a row of them with the standard gap and wraps
+rather than overflowing:
+
+```html
+<div class="theme-button-group">…</div>
+```
+
+Card. Modifier `--linked` for a card whose whole surface is the link target;
+the grid takes `--wide`, which lowers the column count so the same items get
+more room each:
 
 ```html
 <article class="theme-card">
@@ -238,11 +266,15 @@ only coincidentally both draw a list of links:
 </nav>
 ```
 
-Gallery of the image content element — unprefixed, see
-[the component reference](#component-reference):
+Gallery of the image content element. The wrapper always carries **two**
+position modifiers, not one: `GalleryProcessor` produces a vertical position
+(`above`, `intext`, `below`) and a horizontal one (`left`, `center`, `right`),
+and `Partials/ContentElement/Gallery.html` emits both. Only the horizontal
+three carry rules today — the vertical three are structural, and the `@todo` in
+`components/_gallery.scss` says so:
 
 ```html
-<div class="theme-gallery theme-gallery--center" data-theme-gallery-columns="2">
+<div class="theme-gallery theme-gallery--below theme-gallery--center" data-theme-gallery-columns="2">
     <div class="theme-gallery__row">
         <figure class="theme-gallery__item">
             <a class="theme-gallery__zoom" href="…"><img class="theme-gallery__image" …></a>
@@ -325,7 +357,7 @@ both:
     </div>
 
     <div class="theme-field theme-field--invalid">
-        <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required">*</span></label>
+        <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required" aria-hidden="true">*</span></label>
         <input class="theme-input" id="f-mail" type="email" aria-invalid="true" aria-describedby="f-mail-error f-mail-hint">
         <p class="theme-field__error" id="f-mail-error">…</p>
         <p class="theme-field__hint" id="f-mail-hint">…</p>

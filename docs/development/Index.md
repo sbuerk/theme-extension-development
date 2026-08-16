@@ -9,6 +9,8 @@ versions green.
 | [Dual core setup](dual-core-setup.md)           | Why the installed dependency set must match `-t`, how to verify a change against both core versions, test grouping.    |
 | [Quality gates](quality-gates.md)               | Every gate and its configuration, PHPStan per core version, the CI staging and why it runs the containers with docker. |
 | [Frontend assets](frontend-assets.md)           | The SCSS build, the node image, why the compiled CSS is committed, the `checkCssBuild` gate.                           |
+| [Component library](component-library.md)       | Every component's markup contract, the two switches that change behaviour, what the tests guard.                       |
+| [Styleguide page](styleguide.md)                | The page rendering the library straight from Fluid, why it ignores content elements, and what it is a live test of.    |
 | [Development instances](instances.md)           | The two TYPO3 instances, the `theme` symlink, SQLite, snapshot and restore.                                            |
 | [Seeding](seeding.md)                           | `theme:seed`, the definition format, inline relations, the demo tree, and why it goes through DataHandler.             |
 | [Appearance switching](appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher, and why there is no cookie.        |

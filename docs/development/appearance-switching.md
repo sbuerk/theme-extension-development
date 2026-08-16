@@ -183,6 +183,16 @@ inline head script already resolved server default vs. stored choice into
 that attribute, and re-deriving the same answer here would be a second,
 independent path to it that could in principle disagree.
 
+**Every** menu toggle is bound, not the first one. The collapse rule in
+`_nav-main.scss` matches any `.theme-nav-main` whose own toggle is not
+expanded, so a page carrying a second navigation — the
+[styleguide's](styleguide.md) navigation specimen, or a site package repeating
+the menu in its footer — would have been folded shut below the breakpoint by a
+control nothing had wired up, with no way left to open it. Binding one element
+while styling all of them is a mismatch that only shows on a narrow viewport of
+a page nobody tested, which is where it was found. Each toggle is bound scoped
+to the nav it sits in, so two menus on one page cannot close each other.
+
 ## Palette swatches carry literal colours
 
 ```scss

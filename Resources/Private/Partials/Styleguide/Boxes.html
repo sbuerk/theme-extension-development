@@ -1,0 +1,431 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section D1 "Boxes": the box shaped content components of the
+    library - card, teaser, hero, quote, alert, accordion, author - each with
+    every modifier its own SCSS file defines, not only the ones a content
+    element happens to use.
+
+    Every specimen is literal markup taken from the component's own SCSS header
+    comment, which is the authoritative contract. Nothing here is driven by a
+    record, a data processor or a TypoScript object (contract D2), and the copy
+    is literal English rather than a translated label (contract D3): a specimen
+    paragraph exists to be set in a typeface and describe the component it sits
+    in, and has no meaning to localise.
+
+    Three deliberate, documented departures from the header comments, each also
+    noted at the specimen it applies to:
+
+    1. Heading level. "_card.scss" illustrates its title as "h3",
+       "_teaser.scss" as "h2" and "_hero.scss" as "h1". Every specimen on this
+       page already sits below the page "h1", the section "h2" and the
+       component "h3", so those levels would restart the outline in the middle
+       of the page. The stylesheets select the titles by class and never by tag
+       - which is exactly why "Partials/ContentElement/Hero.html" can switch
+       h1..h5 on the same class from "header_layout" - so "h4" renders
+       identically and keeps the document outline intact.
+
+    2. The "role" on the alert. The contract illustrates "role=status" on a
+       "--warning" alert; the four severities do not all take the same role.
+       See the comment at that specimen.
+
+    3. Media. There is no image a Fluid partial can reference without a FAL
+       record, so the two variables below carry an inline SVG data URI. An
+       "img" element - not a styled placeholder box - because the rules under
+       "theme-card__media", "theme-teaser__media", "theme-hero__media" and
+       "theme-author__portrait" all select "img" (object-fit, the circular
+       portrait mask, the full bleed to the frame edge); a substitute element
+       would leave every one of them undemonstrated. Quotes inside the URI are
+       written "%27" rather than literally so the value is unambiguous whether
+       Fluid escapes it or not, and no byte of it leaves the page: the theme
+       must render with no network.
+
+       Its two colours are hard coded and do not follow the appearance
+       switcher. A data URI in an "img" is an isolated document and inherits
+       no custom property, so it could not - but it should not either: a
+       photograph an editor uploads does not repaint in dark mode either, and
+       a placeholder that did would demonstrate something the component never
+       does. The two values are the light-mode fallbacks of
+       "--theme-color-border" and "--theme-color-text-secondary", so the
+       stand-in reads as part of the palette in the appearance the theme
+       starts in.
+</f:comment>
+<section class="theme-styleguide__section" id="boxes">
+    <h2 class="theme-styleguide__heading">Boxes</h2>
+
+    <f:variable name="specimenMediaLandscape" value="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20160%2090%27%3E%3Crect%20width=%27160%27%20height=%2790%27%20fill=%27%23d6dce6%27/%3E%3Cpath%20d=%27M0%2090%2058%2038%2092%2066%20118%2044%20160%2090Z%27%20fill=%27%234a5567%27/%3E%3Ccircle%20cx=%2736%27%20cy=%2724%27%20r=%2711%27%20fill=%27%234a5567%27/%3E%3C/svg%3E" />
+    <f:variable name="specimenMediaSquare" value="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2080%2080%27%3E%3Crect%20width=%2780%27%20height=%2780%27%20fill=%27%23d6dce6%27/%3E%3Ccircle%20cx=%2740%27%20cy=%2731%27%20r=%2714%27%20fill=%27%234a5567%27/%3E%3Cpath%20d=%27M12%2080a28%2028%200%200%201%2056%200Z%27%20fill=%27%234a5567%27/%3E%3C/svg%3E" />
+
+    <h3>Card</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_card.scss. Modifiers
+            in that file: "--linked" on the card, "--wide" on the grid. Both
+            are below; the grid itself is the second half of the same file.
+        </f:comment>
+        <article class="theme-card">
+            <div class="theme-card__media">
+                <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the card media slot.">
+            </div>
+            <div class="theme-card__body">
+                <h4 class="theme-card__title">Card, the bare class</h4>
+                <p class="theme-card__text">A surface panel with a hairline border and an optional media slot. The padding sits on the body rather than on the card, so the image above bleeds to the frame edge without a negative margin.</p>
+                <a class="theme-card__link" href="#">Only the link is clickable here</a>
+            </div>
+        </article>
+
+        <article class="theme-card theme-card--linked">
+            <div class="theme-card__media">
+                <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the linked card.">
+            </div>
+            <div class="theme-card__body">
+                <h4 class="theme-card__title">Card, the modifier --linked</h4>
+                <p class="theme-card__text">The whole panel becomes the target: a pseudo element on the link is stretched over the card, so the link keeps the accessible name and no interactive element ends up nested inside another. Hovering anywhere on the card also strengthens its border.</p>
+                <a class="theme-card__link" href="#">The whole card is clickable here</a>
+            </div>
+        </article>
+
+        <div class="theme-card-grid">
+            <article class="theme-card">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the first grid card.">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Grid, auto-fit columns</h4>
+                    <p class="theme-card__text">The grid asks for a minimum column width and fits as many columns as the space allows, so the same markup works in a narrow content column and in a full width band.</p>
+                    <a class="theme-card__link" href="#">First of three</a>
+                </div>
+            </article>
+            <article class="theme-card">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the second grid card.">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Grid, aligned links</h4>
+                    <p class="theme-card__text">This card carries deliberately more text than its neighbours, which is what makes the alignment visible: the link is pushed to the bottom of the body, so a row of cards of unequal length still lines its links up on one baseline instead of leaving each one floating under its own paragraph.</p>
+                    <a class="theme-card__link" href="#">Second of three</a>
+                </div>
+            </article>
+            <article class="theme-card">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the third grid card.">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Grid, no modifier needed</h4>
+                    <p class="theme-card__text">Narrow the viewport and these three reflow to two columns and then to one, without a breakpoint of their own.</p>
+                    <a class="theme-card__link" href="#">Third of three</a>
+                </div>
+            </article>
+        </div>
+
+        <f:comment>
+            The same three items, in "--wide". The comparison is only honest
+            with an identical item count: "--wide" raises the minimum column
+            from 14rem to 20rem, so the grid below resolves to fewer columns
+            than the one above at the same container width. These three carry
+            no media, which is the card's other valid shape - the media slot is
+            optional, and a content element without an image renders no
+            "theme-card__media" at all rather than an empty box.
+        </f:comment>
+        <div class="theme-card-grid theme-card-grid--wide">
+            <article class="theme-card">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Wide grid, first item</h4>
+                    <p class="theme-card__text">Same three cards as above, same container, one modifier: the minimum column width rises from 14rem to 20rem and the row fits fewer of them.</p>
+                    <a class="theme-card__link" href="#">First of three</a>
+                </div>
+            </article>
+            <article class="theme-card">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Wide grid, second item</h4>
+                    <p class="theme-card__text">A card without a media slot is the component's other valid shape, and nothing about the body changes when the image is left out.</p>
+                    <a class="theme-card__link" href="#">Second of three</a>
+                </div>
+            </article>
+            <article class="theme-card">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Wide grid, third item</h4>
+                    <p class="theme-card__text">Use this variant where each item needs room for a longer summary than a 14rem column gives it.</p>
+                    <a class="theme-card__link" href="#">Third of three</a>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <h3>Teaser</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_teaser.scss. One
+            modifier, "--reversed". Both specimens keep the media before the
+            body in source order, which is the point that file makes at length:
+            "row-reverse" changes paint order only, so the reading and focus
+            order are identical in the two variants.
+
+            "theme-teaser__link" is the component's own text link. The theme's
+            content elements render their call to action as a ".theme-button"
+            instead (see Partials/ContentElement/Teaser.html), which is why
+            this class has no other demonstration anywhere.
+        </f:comment>
+        <article class="theme-teaser">
+            <div class="theme-teaser__media">
+                <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the teaser media slot.">
+            </div>
+            <div class="theme-teaser__body">
+                <h4 class="theme-teaser__title">Teaser, the bare class</h4>
+                <p class="theme-teaser__text">Media beside body from 48rem upwards, stacked below it. The media keeps 42% of the row and the body takes the rest, and the image is stretched to the full height of whichever of the two turns out taller.</p>
+                <a class="theme-teaser__link" href="#">The teaser's own text link</a>
+            </div>
+        </article>
+
+        <article class="theme-teaser theme-teaser--reversed">
+            <div class="theme-teaser__media">
+                <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the reversed teaser.">
+            </div>
+            <div class="theme-teaser__body">
+                <h4 class="theme-teaser__title">Teaser, the modifier --reversed</h4>
+                <p class="theme-teaser__text">The media moves to the trailing side once the row layout applies. The markup is unchanged - the media element still comes first in source - so a screen reader announces both variants in the same order, and the only focusable element in either one stays where it is.</p>
+                <a class="theme-teaser__link" href="#">Same source order as above</a>
+            </div>
+        </article>
+    </div>
+
+    <h3>Hero</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_hero.scss. Modifiers:
+            the default (text only), "--media", "--compact". The default
+            variant carries no "theme-hero__media" element at all; the base
+            rules lay its body out without a modifier of their own.
+
+            "theme-hero__eyebrow" appears here and nowhere else in the theme:
+            none of the three hero CTypes has a field to fill it from, so
+            Partials/ContentElement/Hero.html omits it rather than inventing
+            one. The class exists in the stylesheet, and this page is the only
+            place it can be seen.
+        </f:comment>
+        <section class="theme-hero">
+            <div class="theme-hero__body">
+                <p class="theme-hero__eyebrow">The eyebrow line</p>
+                <h4 class="theme-hero__title">Hero, the bare class</h4>
+                <p class="theme-hero__lead">Text only, and the widest type on the page: the title scales with the viewport, while this lead paragraph is held to the 68ch reading measure however wide the panel around it becomes.</p>
+                <div class="theme-hero__actions">
+                    <a class="theme-button" href="#">The primary action</a>
+                    <a class="theme-button theme-button--secondary" href="#">A second one, to show the gap</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="theme-hero theme-hero--media">
+            <div class="theme-hero__media">
+                <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the hero media slot.">
+            </div>
+            <div class="theme-hero__body">
+                <p class="theme-hero__eyebrow">With an image</p>
+                <h4 class="theme-hero__title">Hero, the modifier --media</h4>
+                <p class="theme-hero__lead">The image takes 45% of the row beside the text from 48rem upwards and stacks above it below that width. Only the wide case is stated in the stylesheet, because the base rules already stack.</p>
+                <div class="theme-hero__actions">
+                    <a class="theme-button" href="#">The primary action</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="theme-hero theme-hero--compact">
+            <div class="theme-hero__body">
+                <p class="theme-hero__eyebrow">Less air</p>
+                <h4 class="theme-hero__title">Hero, the modifier --compact</h4>
+                <p class="theme-hero__lead">The sub-page header: the same panel with less space above and below, and a title that no longer scales with the viewport. The modifier only repoints two custom properties, so it combines with --media rather than replacing it.</p>
+                <div class="theme-hero__actions">
+                    <a class="theme-button" href="#">The primary action</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <h3>Quote</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_quote.scss. No
+            modifiers in that file, and no media slot either - see the comment
+            in Templates/ContentElements/ThemeTestimonial.html for why the
+            image field was taken off that CType again rather than left to
+            collect portraits the component cannot show.
+
+            Two paragraphs on purpose: the stylesheet strips the trailing
+            margin of the last one so the quotation reads as a single block
+            against its attribution, and that rule is invisible with one.
+        </f:comment>
+        <figure class="theme-quote">
+            <blockquote class="theme-quote__text">
+                <p>A quotation is set apart by a rule on its leading edge and by weight, not by quotation marks the browser would have to guess the language of.</p>
+                <p>The gap between these two paragraphs is the component's own; the gap between the second one and the attribution below is not.</p>
+            </blockquote>
+            <figcaption class="theme-quote__attribution">
+                <span class="theme-quote__author">The attributed speaker</span>
+                <cite class="theme-quote__source">The publication it appeared in</cite>
+            </figcaption>
+        </figure>
+    </div>
+
+    <h3>Alert</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_alert.scss. Modifiers:
+            "--info" (also the appearance of the bare class), "--success",
+            "--warning", "--danger".
+
+            The "role" is fixed by that contract and is a markup concern the
+            stylesheet does not touch - which is exactly why it is decided here
+            and not copied uniformly off the illustration. The illustration in
+            the SCSS header shows "role=status" on a "--warning" alert; the
+            four severities do not share one role. "status" is a polite live
+            region and fits an informational or confirming message; "alert" is
+            an assertive one and is what a warning or an error needs, because
+            an assistive technology should interrupt for those two and not for
+            the other two. Info and success therefore take "status", warning
+            and danger take "alert". Nothing on this page is announced either
+            way - a live region speaks when its content changes, and these are
+            static - so what is demonstrated here is the markup an integrator
+            copies, not a behaviour.
+
+            The stylesheet is explicit that colour is not the only signal: the
+            icon slot carries a distinct glyph per severity, and that glyph is
+            what communicates it to a reader who cannot tell the four tints
+            apart. Four different inline SVGs, therefore, not one repeated.
+            They inherit "currentColor" from the slot, which the stylesheet
+            paints with the severity accent.
+        </f:comment>
+        <div class="theme-alert theme-alert--info" role="status">
+            <span class="theme-alert__icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <circle cx="8" cy="8" r="6.5"/>
+                    <path d="M8 7.25v4"/>
+                    <path d="M8 4.5v.5"/>
+                </svg>
+            </span>
+            <div class="theme-alert__body">
+                <p class="theme-alert__title">Info, and the bare class</p>
+                <p class="theme-alert__text">The neutral severity, and what ".theme-alert" looks like with no modifier at all. The modifier is listed in the stylesheet anyway, so a template can name it rather than rely on the default.</p>
+            </div>
+        </div>
+
+        <div class="theme-alert theme-alert--success" role="status">
+            <span class="theme-alert__icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="8" cy="8" r="6.5"/>
+                    <path d="m5 8.25 2.25 2.25L11 6"/>
+                </svg>
+            </span>
+            <div class="theme-alert__body">
+                <p class="theme-alert__title">Success</p>
+                <p class="theme-alert__text">Confirms that something finished. Polite like the info variant: it is worth reading, and worth nobody's attention being taken away from what they were doing.</p>
+            </div>
+        </div>
+
+        <div class="theme-alert theme-alert--warning" role="alert">
+            <span class="theme-alert__icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 2.25 14.5 13.5h-13Z"/>
+                    <path d="M8 6.5v3.25"/>
+                    <path d="M8 11.5v.5"/>
+                </svg>
+            </span>
+            <div class="theme-alert__body">
+                <p class="theme-alert__title">Warning</p>
+                <p class="theme-alert__text">Something needs attention before it becomes a problem. Note that the body text keeps the same colour in all four variants: it was contrast checked once against every tint, and re-deriving it per severity would reopen a check already settled.</p>
+            </div>
+        </div>
+
+        <div class="theme-alert theme-alert--danger" role="alert">
+            <span class="theme-alert__icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <circle cx="8" cy="8" r="6.5"/>
+                    <path d="m5.75 5.75 4.5 4.5m0-4.5-4.5 4.5"/>
+                </svg>
+            </span>
+            <div class="theme-alert__body">
+                <p class="theme-alert__title">Danger</p>
+                <p class="theme-alert__text">Something failed or is about to. The four variants differ in nothing but the tint, the leading border and the icon accent - which is why each of them carries its own glyph rather than one shared symbol.</p>
+            </div>
+        </div>
+    </div>
+
+    <h3>Accordion</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_accordion.scss. No
+            modifiers in that file; the one state it styles is "[open]", which
+            is why the first item below is open - it is the only way to see the
+            chevron flipped.
+
+            The shared "name" is the component's whole behaviour: the browser
+            closes the other items when one opens, which is what a hand-rolled
+            accordion normally reaches for JavaScript to do. The value has to
+            be unique on the rendered page, because two groups sharing a name
+            would close each other's items; "theme-styleguide-boxes-accordion"
+            names the page, the section and the component, so nothing the
+            chrome or another styleguide section renders can collide with it.
+        </f:comment>
+        <div class="theme-accordion">
+            <details class="theme-accordion__item" name="theme-styleguide-boxes-accordion" open>
+                <summary class="theme-accordion__summary">What makes these three mutually exclusive?</summary>
+                <div class="theme-accordion__panel">The shared "name" attribute on every "details" element in the group. Open either of the two below and this one closes on its own, with no script involved.</div>
+            </details>
+            <details class="theme-accordion__item" name="theme-styleguide-boxes-accordion">
+                <summary class="theme-accordion__summary">Where does the chevron come from?</summary>
+                <div class="theme-accordion__panel">From two borders of a square rotated 45 degrees - no icon asset for a shape this simple. Opening an item turns it a further 180 degrees, so there is no second glyph to keep in sync with the open state.</div>
+            </details>
+            <details class="theme-accordion__item" name="theme-styleguide-boxes-accordion">
+                <summary class="theme-accordion__summary">What does the stylesheet actually do here?</summary>
+                <div class="theme-accordion__panel">It draws the marker and gives the summary a tap target floor, and that is all. Toggle state, keyboard handling and the expanded/collapsed semantics an assistive technology reads all come from the element itself.</div>
+            </details>
+        </div>
+    </div>
+
+    <h3>Author</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_author.scss. No
+            modifiers in that file.
+
+            The person's name is deliberately outside ".theme-author": it is
+            the content element's own heading, rendered through the shared
+            Partials/ContentElement/Header the same as every other element, so
+            it sits above the component rather than inside it. The heading
+            below stands in for it, at the level this page's outline needs, so
+            that the relationship is visible rather than merely described.
+
+            The links are ".theme-content-menu", the component the three link
+            list CTypes already use - see Partials/ContentElement/LinkList.html
+            for why this component does not ship a link list of its own. The
+            "nav" is a landmark, so it is labelled as a specimen: the page
+            carries real navigation landmarks too, and two identically named
+            ones would be offered side by side in a screen reader's landmark
+            list.
+        </f:comment>
+        <h4>Jordan Keller</h4>
+        <div class="theme-author">
+            <div class="theme-author__portrait">
+                <img src="{specimenMediaSquare}" width="80" height="80" alt="Placeholder graphic standing in for the author portrait.">
+            </div>
+            <div class="theme-author__body">
+                <p class="theme-author__role">Design system maintainer</p>
+                <div class="theme-author__bio">
+                    <p>The portrait, the role line above and this bio are everything the component owns. The portrait holds a fixed circular box beside a body of unpredictable length instead of scaling with it, and the body reserves a minimum width so the two wrap rather than crush each other on a narrow screen.</p>
+                </div>
+                <nav class="theme-content-menu" aria-label="Specimen: author profile links">
+                    <ul class="theme-content-menu__list">
+                        <li class="theme-content-menu__item">
+                            <a class="theme-content-menu__link" href="#">A profile link, going nowhere</a>
+                        </li>
+                        <li class="theme-content-menu__item">
+                            <a class="theme-content-menu__link" href="#">A contact link, going nowhere</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+</html>

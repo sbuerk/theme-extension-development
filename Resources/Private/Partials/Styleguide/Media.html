@@ -1,0 +1,297 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section D1/"media" - ".theme-gallery" and
+    ".theme-content-element". Literal markup only: no record, no "f:cObject",
+    no data processor, per contract D2. Specimen copy is literal English, per
+    contract D3.
+
+    Markup contracts:
+    - "Resources/Private/Scss/components/_gallery.scss" (class list; the file
+      carries no markup block of its own, unlike "_content-element.scss")
+    - "Resources/Private/Scss/components/_content-element.scss", lines 3-7
+    and the two Fluid files that produce them,
+    "Partials/ContentElement/Gallery.html" and "Layouts/ContentElement.html".
+
+    --- The images ---------------------------------------------------------
+
+    Every image below is an inline SVG data URI, not a file and not a remote
+    URL. There is no image this partial could reference: a real gallery image
+    comes out of a "sys_file_reference" through "f:image", and a styleguide
+    specimen has no record - that is the whole point of contract D2. A remote
+    URL is out because the theme has to render with no network at all.
+
+    A styled placeholder box was the alternative and was rejected: it would
+    have to be a "div", and the contract puts ".theme-gallery__image" on an
+    "img" whose "width"/"height" attributes are what reserves the box before
+    the image loads. A specimen that swaps the element out stops demonstrating
+    the component. The data URI keeps the real "img", the real attributes and
+    the real intrinsic ratio, and costs one long attribute value.
+
+    --- Escaping -----------------------------------------------------------
+
+    Curly braces in specimen copy are written "&#123;" / "&#125;". Fluid's
+    parser splits on the literal "{" character (Core/Parser/Patterns.php,
+    "$SPLIT_PATTERN_SHORTHANDSYNTAX", line 109) and that pattern has no
+    backslash-escape branch, so prefixing an opening brace with a backslash
+    leaves it a brace and the term is still read as an object accessor, which
+    renders empty. The entity contains no brace character at all and is
+    decoded by the browser, not by Fluid.
+</f:comment>
+
+<section class="theme-styleguide__section" id="media">
+    <h2 class="theme-styleguide__heading">Media</h2>
+
+    <h3>Gallery, one column</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The gallery is what the image and text-with-media content elements
+            render. Core's GalleryProcessor has already decided the column
+            count and the width of every image, so the stylesheet lays the row
+            out and imposes no count of its own - the editor's "Number of
+            columns" field would otherwise stop meaning anything. The count
+            travels as the <code>data-theme-gallery-columns</code> attribute
+            for CSS that wants to react to it.
+        </p>
+        <p>
+            Both position modifiers are on the wrapper. The vertical one comes
+            from the same field as the horizontal one - "above", "intext" or
+            "below" - and is carried but not yet styled.
+        </p>
+        <div class="theme-gallery theme-gallery--above theme-gallery--center"
+             data-theme-gallery-columns="1">
+            <div class="theme-gallery__row">
+                <figure class="theme-gallery__item">
+                    <a class="theme-gallery__zoom" href="#">
+                        <img class="theme-gallery__image"
+                             src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                             alt="Placeholder landscape standing in for a processed image"
+                             width="592" height="370" loading="lazy" />
+                    </a>
+                    <figcaption class="theme-gallery__caption">
+                        A caption. It is rendered from the description of the
+                        file reference and is omitted entirely when that field
+                        is empty, rather than rendered as an empty element.
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </div>
+
+    <h3>Gallery, two columns, left</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Two rows of two. The row is a wrapping flex line, so a count that
+            does not divide the file count evenly leaves a short last row -
+            which is what the alignment modifier then acts on.
+        </p>
+        <div class="theme-gallery theme-gallery--above theme-gallery--left"
+             data-theme-gallery-columns="2">
+            <div class="theme-gallery__row">
+                <figure class="theme-gallery__item">
+                    <img class="theme-gallery__image"
+                         src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                         alt="Placeholder landscape standing in for a processed image"
+                         width="288" height="180" loading="lazy" />
+                    <figcaption class="theme-gallery__caption">First file.</figcaption>
+                </figure>
+                <figure class="theme-gallery__item">
+                    <img class="theme-gallery__image"
+                         src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23b9c6d8'/%3E%3Cpath%20d='M0%2010%205%205%2010%208%2016%203%2016%2010z'%20fill='%237e8ba1'/%3E%3Ccircle%20cx='3.2'%20cy='2.6'%20r='1.5'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                         alt="Placeholder landscape standing in for a processed image"
+                         width="288" height="180" loading="lazy" />
+                    <figcaption class="theme-gallery__caption">
+                        A caption is per file, not per row.
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="theme-gallery__row">
+                <figure class="theme-gallery__item">
+                    <img class="theme-gallery__image"
+                         src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23ccd6e4'/%3E%3Cpath%20d='M0%2010%204%206%208%207.5%2016%202%2016%2010z'%20fill='%2390a0b6'/%3E%3Ccircle%20cx='9.6'%20cy='2.2'%20r='1.2'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                         alt="Placeholder landscape standing in for a processed image"
+                         width="288" height="180" loading="lazy" />
+                </figure>
+                <figure class="theme-gallery__item">
+                    <img class="theme-gallery__image"
+                         src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c1cddd'/%3E%3Cpath%20d='M0%2010%207%203%2011%206%2016%204%2016%2010z'%20fill='%2386929f'/%3E%3C/svg%3E"
+                         alt="Placeholder landscape standing in for a processed image"
+                         width="288" height="180" loading="lazy" />
+                    <figcaption class="theme-gallery__caption">
+                        The third file carries no caption, this one does - the
+                        row stays aligned to the top of its items.
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </div>
+
+    <h3>Gallery, three columns, right, with zoom links</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The zoom wrapper is what the editor's "Enlarge on click" field
+            produces. It is a plain link to the original file: a lightbox is
+            JavaScript, and this extension ships none.
+        </p>
+        <div class="theme-gallery theme-gallery--below theme-gallery--right"
+             data-theme-gallery-columns="3">
+            <div class="theme-gallery__row">
+                <figure class="theme-gallery__item">
+                    <a class="theme-gallery__zoom" href="#">
+                        <img class="theme-gallery__image"
+                             src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                             alt="Placeholder landscape standing in for a processed image"
+                             width="188" height="118" loading="lazy" />
+                    </a>
+                    <figcaption class="theme-gallery__caption">Enlargeable.</figcaption>
+                </figure>
+                <figure class="theme-gallery__item">
+                    <a class="theme-gallery__zoom" href="#">
+                        <img class="theme-gallery__image"
+                             src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23b9c6d8'/%3E%3Cpath%20d='M0%2010%205%205%2010%208%2016%203%2016%2010z'%20fill='%237e8ba1'/%3E%3Ccircle%20cx='3.2'%20cy='2.6'%20r='1.5'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                             alt="Placeholder landscape standing in for a processed image"
+                             width="188" height="118" loading="lazy" />
+                    </a>
+                    <figcaption class="theme-gallery__caption">Enlargeable.</figcaption>
+                </figure>
+                <figure class="theme-gallery__item">
+                    <a class="theme-gallery__zoom" href="#">
+                        <img class="theme-gallery__image"
+                             src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23ccd6e4'/%3E%3Cpath%20d='M0%2010%204%206%208%207.5%2016%202%2016%2010z'%20fill='%2390a0b6'/%3E%3Ccircle%20cx='9.6'%20cy='2.2'%20r='1.2'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                             alt="Placeholder landscape standing in for a processed image"
+                             width="188" height="118" loading="lazy" />
+                    </a>
+                    <figcaption class="theme-gallery__caption">Enlargeable.</figcaption>
+                </figure>
+            </div>
+        </div>
+    </div>
+
+    <h3>Content element wrapper</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Every rendered content element goes through this wrapper. The
+            <code>--&#123;CType&#125;</code> modifier and the
+            <code>data-ctype</code> attribute both carry the CType: the
+            modifier is the styling hook, the attribute is what the dashed
+            frame prints as its label, through
+            <code>content: attr(data-ctype)</code>.
+        </p>
+        <p>
+            This is the affordance that made "Frame" the chosen structural
+            variant. The theme exists so other extensions can be developed
+            against it, and a visible element boundary is what turns "my
+            element renders wrong" into something you can see instead of
+            something you have to infer. It is a development and staging aid,
+            not a permanent part of a production page.
+        </p>
+        <p>
+            Two wrappers follow each other here, because the spacing between
+            content elements is read from the following element rather than
+            from its predecessor - a modifier on one element can then never
+            leak into its neighbour.
+        </p>
+        <div class="theme-content-element theme-content-element--text" id="c9001" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <p>
+                    A text element. The frame is drawn as an outline rather
+                    than a border, so switching it off never reflows the
+                    content beside it.
+                </p>
+            </div>
+        </div>
+        <div class="theme-content-element theme-content-element--textmedia" id="c9002" data-ctype="textmedia">
+            <div class="theme-content-element__inner">
+                <p>
+                    A text-with-media element. Its chip reads "textmedia"
+                    because that is the value of its <code>data-ctype</code>
+                    attribute, not because anything was written into the
+                    markup twice.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <h3>Content element wrapper, outline switched off</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The documented global switch is one attribute on the root
+            element: <code>&lt;html data-theme-content-outline="off"&gt;</code>.
+            The theme's own TypoScript sets it from a setting, so an
+            integrator normally never writes it by hand. It takes the CType
+            chip with it as well as the outline - a switch that removed only
+            the outline would leave a stray chip floating on a production
+            page.
+        </p>
+        <p>
+            A Fluid partial cannot set an attribute on <code>&lt;html&gt;</code>,
+            so the pair below sets it on a wrapping <code>div</code> instead.
+            That is not a simulation: the rule is written as a descendant
+            selector, so the attribute switches off every
+            <code>.theme-content-element</code> below whichever element carries
+            it. The root element is simply the ancestor that reaches all of
+            them at once. Set the attribute on a single column and only that
+            column loses its frames.
+        </p>
+        <p>
+            Left, unchanged; right, inside a wrapper carrying the attribute.
+        </p>
+        <div class="theme-content-element theme-content-element--header" id="c9003" data-ctype="header">
+            <div class="theme-content-element__inner">
+                <p>Outline on. This is the default, and the chip reads "header".</p>
+            </div>
+        </div>
+        <div data-theme-content-outline="off">
+            <div class="theme-content-element theme-content-element--header" id="c9004" data-ctype="header">
+                <div class="theme-content-element__inner">
+                    <p>
+                        Outline off. Identical markup on the element itself -
+                        the attribute is on the wrapper around it. No outline,
+                        and no chip either.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Content element wrapper, per-element modifiers</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--plain</code> is the per-element escape hatch, for the page
+            that wants the frame everywhere except around one embedded element
+            - a hero, or a plugin that brings its own visible chrome. Like the
+            global switch it removes the chip as well as the outline.
+        </p>
+        <div class="theme-content-element theme-content-element--html theme-content-element--plain" id="c9005" data-ctype="html">
+            <div class="theme-content-element__inner">
+                <p>No frame and no chip, on this element only.</p>
+            </div>
+        </div>
+        <p>
+            <code>--spaced-loose</code> and <code>--spaced-tight</code>
+            re-point the spacing token the base rule already reads, rather
+            than restating the property. The three elements below are the
+            default, the loose one and the tight one, in that order, so the
+            gap above each of the last two is the one its own modifier asked
+            for.
+        </p>
+        <div class="theme-content-element theme-content-element--text" id="c9006" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <p>Default spacing.</p>
+            </div>
+        </div>
+        <div class="theme-content-element theme-content-element--text theme-content-element--spaced-loose" id="c9007" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <p>Loose spacing above.</p>
+            </div>
+        </div>
+        <div class="theme-content-element theme-content-element--text theme-content-element--spaced-tight" id="c9008" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <p>Tight spacing above.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+</html>

@@ -1,0 +1,229 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section "navigation". Rendered from
+    "Templates/Page/Styleguide.html" together with the other six section
+    partials. Every specimen below is copied from the markup contract in the
+    component's own SCSS header comment - "components/_nav-main.scss",
+    "_nav-sub.scss", "_breadcrumb.scss", "_pagination.scss" and
+    "_content-menu.scss" - and is literal markup: no content element, no
+    "f:cObject", no data processor, and no translated copy.
+
+    --- Four of these are also real page chrome ------------------------------
+    ".theme-nav-main", ".theme-nav-sub" and ".theme-breadcrumb" are already on
+    this page as the site's own navigation, and ".theme-content-menu" is what
+    every "menu_*" content element renders. The specimens here are a second
+    instance of each, so two things have to differ from the chrome:
+
+    Landmark names. The chrome labels come from "locallang.xlf" through
+    "f:translate" - "Main" ("theme.navMainLabel"), "Section"
+    ("theme.navSubLabel"), "Breadcrumb" ("theme.breadcrumbLabel") and the
+    "theme.menu*Label" set. Every "<nav>" below therefore says "specimen" in
+    its "aria-label", so a screen reader user is not offered two navigation
+    landmarks with the same name.
+
+    Ids. "Partials/Navigation/Main.html" puts "id="nav-main"" on the real
+    top-level list, because it is what that nav's toggle points
+    "aria-controls" at. The specimen list uses
+    "id="theme-styleguide-nav-main"" instead - a duplicate id would silently
+    re-target the header's toggle at this list and is invisible in a visual
+    check. The other ids this page already carries are "content"
+    ("Layouts/Default.html"), "theme-appearance-label" and
+    "theme-palette-label" ("Partials/Page/AppearanceSwitcher.html"), and the
+    "c" plus uid of each content element ("Layouts/ContentElement.html");
+    none is reused here.
+
+    Every specimen link points at "#": these demonstrate markup and state,
+    they are not navigation.
+</f:comment>
+
+<section class="theme-styleguide__section" id="navigation">
+    <h2 class="theme-styleguide__heading">Navigation</h2>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Main navigation</h3>
+        <p>
+            Two levels deep. The ancestor modifier and the current-page attribute are
+            independent and are shown separately: “Products” is an ancestor of the
+            current page, so its item carries <code>theme-nav-main__item--active</code>
+            while its own link carries no <code>aria-current</code>; “Contact” is the
+            current page itself, so its link carries <code>aria-current="page"</code>
+            while its item carries no modifier. The nested list is the
+            <code>--sub</code> variant, inline below the breakpoint and a floating
+            panel above it.
+        </p>
+        <p>
+            The toggle is a working control, not a picture of one. It only becomes
+            visible below 48rem, and only once the theme's script has set
+            <code>data-js</code> on the root element — collapsing is an enhancement, so
+            the open layout is what a reader without JavaScript gets. Narrow the window
+            to reach it.
+        </p>
+        <p>
+            This specimen is the reason the script binds <em>every</em> toggle rather
+            than the first one it finds. The collapse rule matches any
+            <code>.theme-nav-main</code> whose own toggle is not expanded, so a second
+            navigation on a page — this one, or a menu a site package repeats in its
+            footer — would otherwise be folded shut below the breakpoint by a button
+            that was never wired up.
+        </p>
+        <nav class="theme-nav-main" aria-label="Main navigation specimen">
+            <button type="button" class="theme-nav-main__toggle" aria-expanded="false" aria-controls="theme-styleguide-nav-main">Menu</button>
+            <ul class="theme-nav-main__list" id="theme-styleguide-nav-main">
+                <li class="theme-nav-main__item">
+                    <a class="theme-nav-main__link" href="#">Home</a>
+                </li>
+                <li class="theme-nav-main__item theme-nav-main__item--active">
+                    <a class="theme-nav-main__link" href="#">Products</a>
+                    <ul class="theme-nav-main__list theme-nav-main__list--sub">
+                        <li class="theme-nav-main__item">
+                            <a class="theme-nav-main__link" href="#" aria-current="page">Analytics</a>
+                        </li>
+                        <li class="theme-nav-main__item">
+                            <a class="theme-nav-main__link" href="#">Reporting</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="theme-nav-main__item">
+                    <a class="theme-nav-main__link" href="#">Pricing</a>
+                </li>
+                <li class="theme-nav-main__item">
+                    <a class="theme-nav-main__link" href="#" aria-current="page">Contact</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Sub navigation</h3>
+        <p>
+            The current section rather than the whole site: vertical, always expanded,
+            no toggle and no breakpoint. There is no <code>--active</code> modifier
+            either — the list is scoped to one section, so
+            <code>aria-current="page"</code> alone marks the current page wherever it
+            sits, here on a second-level item. The heading is a
+            <code>&lt;p&gt;</code>, not an <code>&lt;hN&gt;</code>: the section title
+            above the block already carries the real heading.
+        </p>
+        <nav class="theme-nav-sub" aria-label="Section navigation specimen">
+            <p class="theme-nav-sub__heading">In this section</p>
+            <ul class="theme-nav-sub__list">
+                <li class="theme-nav-sub__item">
+                    <a class="theme-nav-sub__link" href="#">Overview</a>
+                </li>
+                <li class="theme-nav-sub__item">
+                    <a class="theme-nav-sub__link" href="#">Analytics</a>
+                    <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">
+                        <li class="theme-nav-sub__item">
+                            <a class="theme-nav-sub__link" href="#" aria-current="page">Reports</a>
+                        </li>
+                        <li class="theme-nav-sub__item">
+                            <a class="theme-nav-sub__link" href="#">Dashboards</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="theme-nav-sub__item">
+                    <a class="theme-nav-sub__link" href="#">Pricing</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Breadcrumb</h3>
+        <p>
+            An <code>&lt;ol&gt;</code>, because the trail is ordered — root first,
+            current page last — and that order is part of its meaning. The last item
+            is plain text carrying <code>aria-current="page"</code> on the list item
+            itself: a breadcrumb does not still point at the page the reader is on.
+            The <code>/</code> between items is generated content on a
+            <code>::before</code>, so it is never read out and needs no
+            <code>aria-hidden</code>.
+        </p>
+        <nav class="theme-breadcrumb" aria-label="Breadcrumb specimen">
+            <ol class="theme-breadcrumb__list">
+                <li class="theme-breadcrumb__item">
+                    <a class="theme-breadcrumb__link" href="#">Home</a>
+                </li>
+                <li class="theme-breadcrumb__item">
+                    <a class="theme-breadcrumb__link" href="#">Products</a>
+                </li>
+                <li class="theme-breadcrumb__item" aria-current="page">Analytics</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Pagination</h3>
+        <p>
+            No modifier classes anywhere: the current page is
+            <code>aria-current="page"</code> on the link, and the stylesheet targets
+            that attribute rather than a class, so the visual state and the accessible
+            state cannot disagree. The previous and next controls are labelled with
+            <code>aria-label</code> because their glyphs carry no accessible name, and
+            the gap in the sequence is a <code>__ellipsis</code> span — not a link,
+            but sized to match the squares it sits between.
+        </p>
+        <nav class="theme-pagination" aria-label="Pagination specimen">
+            <ul class="theme-pagination__list">
+                <li><a class="theme-pagination__link" href="#" aria-label="Previous">‹</a></li>
+                <li><a class="theme-pagination__link" href="#">1</a></li>
+                <li><a class="theme-pagination__link" href="#" aria-current="page">2</a></li>
+                <li><a class="theme-pagination__link" href="#">3</a></li>
+                <li><span class="theme-pagination__ellipsis">…</span></li>
+                <li><a class="theme-pagination__link" href="#">12</a></li>
+                <li><a class="theme-pagination__link" href="#" aria-label="Next">›</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Content menu</h3>
+        <p>
+            The shared component behind every <code>menu_*</code> content element: a
+            list of links, each optionally carrying a date
+            (<code>menu_recently_updated</code>) and an abstract
+            (<code>menu_abstract</code>), plus a nested <code>--sub</code> list for the
+            one element that is a tree rather than a flat list
+            (<code>menu_sitemap</code>). The first item below has both optional parts,
+            the second has neither — they are omitted from the markup entirely rather
+            than rendered empty, the same rule the navigation components follow for
+            <code>aria-current</code>. The nested list uses <code>--sub</code> at every
+            depth, not a name per level, because the recursion does not know in advance
+            how deep a sitemap goes. Current is marked by weight rather than a fill:
+            this list sits in the content column, where a solid bar the width of the
+            text measure would read as a callout.
+        </p>
+        <nav class="theme-content-menu" aria-label="Content menu specimen">
+            <ul class="theme-content-menu__list">
+                <li class="theme-content-menu__item">
+                    <a class="theme-content-menu__link" href="#">Release notes</a>
+                    <time class="theme-content-menu__date" datetime="2026-02-11">2026-02-11</time>
+                    <p class="theme-content-menu__abstract">Everything that changed in the last three releases, with the upgrade notes for each.</p>
+                </li>
+                <li class="theme-content-menu__item">
+                    <a class="theme-content-menu__link" href="#">Support</a>
+                </li>
+                <li class="theme-content-menu__item">
+                    <a class="theme-content-menu__link" href="#">Documentation</a>
+                    <ul class="theme-content-menu__list theme-content-menu__list--sub">
+                        <li class="theme-content-menu__item">
+                            <a class="theme-content-menu__link" href="#" aria-current="page">Installation</a>
+                        </li>
+                        <li class="theme-content-menu__item">
+                            <a class="theme-content-menu__link" href="#">Configuration</a>
+                            <ul class="theme-content-menu__list theme-content-menu__list--sub">
+                                <li class="theme-content-menu__item">
+                                    <a class="theme-content-menu__link" href="#">Site sets</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</section>
+
+</html>
