@@ -60,11 +60,47 @@ final class CoreContentElementRenderingTest extends AbstractFunctionalTestCase
         $this->setUpFrontendRootPage(1, [], [], false);
     }
 
-    private function render(): string
+    private function render(string $path = '/'): string
     {
         return (string)$this->executeFrontendSubRequest(
-            new InternalRequest('https://theme.example.com/'),
+            new InternalRequest('https://theme.example.com/' . ltrim($path, '/')),
         )->getBody();
+    }
+
+    /**
+     * `menu_categorized_content` selects through raw SQL, and the category list
+     * it interpolates can legitimately be empty.
+     *
+     * `selected_categories` declares `minitems = 1`, but that is enforced by the
+     * backend form rather than by DataHandler: an element saved before a
+     * category was picked holds an empty value, and interpolating it produced
+     * `IN ()`. SQLite accepts that. MariaDB, MySQL and PostgreSQL reject it as
+     * a syntax error, and because the query throws rather than returning
+     * nothing, the **whole page** returned a 500 - not just this element.
+     *
+     * The element is on a page of its own so the sweep above keeps rendering
+     * the fully configured one; both shapes have to work, and only one of them
+     * did.
+     *
+     * This test passes on SQLite whether or not the fix is in place. Run it
+     * against MariaDB to see it fail without the guard:
+     * `runTests.sh -t 13 -s functional -d mariadb -i 10.6 -- --filter aCategorizedContentMenu`
+     */
+    #[Test]
+    public function aCategorizedContentMenuWithNoCategorySelectedRendersEmptyRatherThanFailing(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/PageWithUnselectedCategoryMenu.csv');
+
+        $body = $this->render('/unselected');
+
+        // The page rendered at all, which is the half that used to throw.
+        $this->assertStringContainsString('A categorized content menu with nothing selected', $body);
+        $this->assertStringNotContainsString(self::NO_RENDERING_DEFINITION, $body);
+
+        // And it selected nothing rather than everything: the guard replaces an
+        // empty list with a uid no category has, so the menu is empty.
+        $menu = $this->contentElement($body, 'menu_categorized_content');
+        $this->assertStringNotContainsString('theme-content-menu__link', $menu);
     }
 
     #[Test]
