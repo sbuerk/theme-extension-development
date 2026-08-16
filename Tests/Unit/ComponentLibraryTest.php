@@ -41,6 +41,7 @@ final class ComponentLibraryTest extends UnitTestCase
         foreach ([
             'accordion' => '.theme-accordion',
             'alert' => '.theme-alert',
+            'appearance switcher' => '.theme-appearance-switcher',
             'badge' => '.theme-badge',
             'breadcrumb' => '.theme-breadcrumb',
             'button' => '.theme-button',
@@ -122,6 +123,46 @@ final class ComponentLibraryTest extends UnitTestCase
             'Switching the outline off has to remove the CType label as well.',
         );
         $this->assertStringContainsString('[data-theme-content-outline=off] .theme-content-element{', $css);
+    }
+
+    /**
+     * Every palette can be chosen, and every choice shows the right colour.
+     *
+     * The switcher's swatches cannot read a palette they are not inside -
+     * a custom property only ever holds the value of the selector that
+     * currently matches, and CSS cannot ask what it *would* resolve to under a
+     * different attribute. So each swatch carries its palette's primary colour
+     * as a literal, copied from "abstracts/_palettes.scss".
+     *
+     * That copy is the only duplicated colour in the stylesheet, and nothing in
+     * the language links the two: adding a palette leaves its swatch missing,
+     * and the button then renders with no colour at all rather than failing.
+     * This test is that link.
+     */
+    #[Test]
+    public function everyPaletteHasASwatchInTheSwitcher(): void
+    {
+        $scss = dirname(__DIR__, 2) . '/Resources/Private/Scss';
+
+        preg_match_all(
+            "/:root\[data-palette='([a-z]+)'\]/",
+            (string)file_get_contents($scss . '/abstracts/_palettes.scss'),
+            $palettes,
+        );
+        $this->assertNotEmpty($palettes[1], 'No alternate palette was found at all.');
+
+        // "neutral" is the default and lives in the token file rather than
+        // behind a selector, so it is never in the match above.
+        $expected = [...$palettes[1], 'neutral'];
+        sort($expected);
+
+        $switcher = (string)file_get_contents($scss . '/components/_appearance-switcher.scss');
+        preg_match_all('/\.theme-appearance__swatch--([a-z]+)/', $switcher, $swatches);
+
+        $actual = array_values(array_unique($swatches[1]));
+        sort($actual);
+
+        $this->assertSame($expected, $actual, 'A palette and its swatch have drifted apart.');
     }
 
     /**

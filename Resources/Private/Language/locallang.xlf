@@ -27,6 +27,36 @@
 			<trans-unit id="theme.breadcrumbLabel">
 				<source>Breadcrumb</source>
 			</trans-unit>
+			<trans-unit id="theme.appearanceLabel">
+				<source>Appearance</source>
+			</trans-unit>
+			<trans-unit id="theme.appearanceAuto">
+				<source>Auto</source>
+			</trans-unit>
+			<trans-unit id="theme.appearanceLight">
+				<source>Light</source>
+			</trans-unit>
+			<trans-unit id="theme.appearanceDark">
+				<source>Dark</source>
+			</trans-unit>
+			<trans-unit id="theme.paletteLabel">
+				<source>Palette</source>
+			</trans-unit>
+			<trans-unit id="theme.paletteNeutral">
+				<source>Neutral</source>
+			</trans-unit>
+			<trans-unit id="theme.paletteEmber">
+				<source>Ember</source>
+			</trans-unit>
+			<trans-unit id="theme.paletteOcean">
+				<source>Ocean</source>
+			</trans-unit>
+			<trans-unit id="theme.paletteMoss">
+				<source>Moss</source>
+			</trans-unit>
+			<trans-unit id="theme.paletteViolet">
+				<source>Violet</source>
+			</trans-unit>
 			<trans-unit id="theme.styleguideHeading">
 				<source>Styleguide</source>
 			</trans-unit>

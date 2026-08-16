@@ -1,0 +1,85 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The appearance/palette switcher, rendered from "Partials/Page/Header.html"
+    into ".theme-site-header__actions" on every page template. Markup
+    contract: docs/development/component-library.md, styled by
+    "components/_appearance-switcher.scss" - do not add or rename a class
+    here without a rule there.
+
+    --- Hidden until the script marker -------------------------------------
+    The whole control is hidden until "data-js" appears on the root, the same
+    gate "components/_nav-main.scss" uses for the navigation toggle: neither
+    group does anything without the module script that owns
+    "data-theme-appearance"/"data-theme-palette", so rendering the buttons
+    visible before that script has run would be a control that does nothing -
+    see the SCSS file for the rule and the longer reasoning.
+
+    --- Server-rendered "aria-pressed" --------------------------------------
+    Both groups below hardcode "aria-pressed" to the server default -
+    appearance "auto", palette "neutral", per the step 4 contract's
+    TypoScript constants. That is accurate for a first-time visitor with no
+    stored preference; it is stale for a returning visitor whose
+    "localStorage" holds a different choice, and it is the module script (out
+    of scope for this file) that corrects the attribute - together with
+    "data-theme"/"data-palette" on the root - once it runs. Fluid has no
+    access to "localStorage" at render time, so it cannot render anything
+    closer to the truth than the server default.
+
+    Two "role='group'" regions, each "aria-labelledby" pointing at its own
+    label element rather than a shared one, so the two groups read
+    independently to assistive technology. Every option button carries
+    "data-theme-appearance" or "data-theme-palette" - the exact attributes
+    the module script reads and writes - and clears the tap-target floor in
+    the SCSS.
+</f:comment>
+
+<div class="theme-appearance-switcher">
+    <div class="theme-appearance">
+        <span class="theme-appearance__label" id="theme-appearance-label">
+            <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.appearanceLabel" />
+        </span>
+        <div class="theme-appearance__options" role="group" aria-labelledby="theme-appearance-label">
+            <button class="theme-appearance__option" type="button" data-theme-appearance="auto" aria-pressed="true">
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.appearanceAuto" />
+            </button>
+            <button class="theme-appearance__option" type="button" data-theme-appearance="light" aria-pressed="false">
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.appearanceLight" />
+            </button>
+            <button class="theme-appearance__option" type="button" data-theme-appearance="dark" aria-pressed="false">
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.appearanceDark" />
+            </button>
+        </div>
+    </div>
+
+    <div class="theme-appearance">
+        <span class="theme-appearance__label" id="theme-palette-label">
+            <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.paletteLabel" />
+        </span>
+        <div class="theme-appearance__options" role="group" aria-labelledby="theme-palette-label">
+            <button class="theme-appearance__option" type="button" data-theme-palette="neutral" aria-pressed="true">
+                <span class="theme-appearance__swatch theme-appearance__swatch--neutral" aria-hidden="true"></span>
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.paletteNeutral" />
+            </button>
+            <button class="theme-appearance__option" type="button" data-theme-palette="ember" aria-pressed="false">
+                <span class="theme-appearance__swatch theme-appearance__swatch--ember" aria-hidden="true"></span>
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.paletteEmber" />
+            </button>
+            <button class="theme-appearance__option" type="button" data-theme-palette="ocean" aria-pressed="false">
+                <span class="theme-appearance__swatch theme-appearance__swatch--ocean" aria-hidden="true"></span>
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.paletteOcean" />
+            </button>
+            <button class="theme-appearance__option" type="button" data-theme-palette="moss" aria-pressed="false">
+                <span class="theme-appearance__swatch theme-appearance__swatch--moss" aria-hidden="true"></span>
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.paletteMoss" />
+            </button>
+            <button class="theme-appearance__option" type="button" data-theme-palette="violet" aria-pressed="false">
+                <span class="theme-appearance__swatch theme-appearance__swatch--violet" aria-hidden="true"></span>
+                <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.paletteViolet" />
+            </button>
+        </div>
+    </div>
+</div>
+
+</html>

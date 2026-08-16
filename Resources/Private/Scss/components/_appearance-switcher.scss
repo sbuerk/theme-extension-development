@@ -1,0 +1,194 @@
+// Appearance / palette switcher.
+//
+// Markup contract:
+//
+//     <div class="theme-appearance-switcher">
+//         <div class="theme-appearance">
+//             <span class="theme-appearance__label" id="theme-appearance-label">…</span>
+//             <div class="theme-appearance__options" role="group" aria-labelledby="theme-appearance-label">
+//                 <button class="theme-appearance__option" type="button" data-theme-appearance="auto" aria-pressed="true">…</button>
+//             </div>
+//         </div>
+//         <div class="theme-appearance">
+//             <span class="theme-appearance__label" id="theme-palette-label">…</span>
+//             <div class="theme-appearance__options" role="group" aria-labelledby="theme-palette-label">
+//                 <button class="theme-appearance__option" type="button" data-theme-palette="neutral" aria-pressed="true">
+//                     <span class="theme-appearance__swatch theme-appearance__swatch--neutral" aria-hidden="true"></span>…
+//                 </button>
+//             </div>
+//         </div>
+//     </div>
+//
+// One ".theme-appearance" block per group - both the appearance group and the
+// palette group are the same markup shape and the same class, distinguished
+// only by which data attribute their buttons carry and, for the palette
+// group, the swatch inside each button. There is no ".--palette" modifier:
+// nothing here needs to look different at the group level, only at the
+// button level, so a modifier that would carry no rule was left out rather
+// than added for symmetry. See "Partials/Page/AppearanceSwitcher.html".
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- Hidden until "data-js" -------------------------------------------------
+//
+// The whole control is hidden until a script has announced itself on the
+// root, exactly the gate "components/_nav-main.scss" writes for the
+// navigation toggle and for the same reason: nothing here does anything
+// without the module script - there is no native fallback the way a plain
+// link or a "<details>" element would give one - so showing the buttons
+// before the script has run would be a visible promise the page cannot keep.
+// The undecorated state is "not there at all", not "there but inert".
+//
+// --- Server-rendered "aria-pressed" -----------------------------------------
+//
+// The Fluid partial hardcodes "aria-pressed" to the server default -
+// appearance "auto", palette "neutral" - because that is genuinely the state
+// for a first-time visitor. It is wrong for a returning visitor whose
+// "localStorage" holds a different choice; the module script (out of scope
+// here) corrects both the attribute and the rendered "data-theme"/
+// "data-palette" on load, which is what makes the server-rendered value true
+// again for that visitor. This file styles off the attribute, not off a
+// class the script would have to keep in sync with it - the same reasoning
+// "_nav-main.scss" applies to "[aria-expanded]".
+//
+// --- The swatch colour: why it cannot be "var(--theme-color-primary)" ------
+//
+// A palette button's swatch has to show *that palette's* primary colour, not
+// the one currently active. But every palette lives entirely inside its own
+// "[data-palette='…']" selector in "abstracts/_palettes.scss" - the custom
+// property "--theme-color-primary" only ever holds *one* value at a time,
+// whichever selector last matched the root. There is no CSS mechanism for an
+// element outside that selector to read what "--theme-color-primary" would
+// resolve to *if* a different attribute were set; custom properties are not
+// enumerable across a hypothetical DOM state, only the actual one.
+//
+// The swatches therefore carry their own literal colours, one modifier per
+// palette, each a straight copy of that palette's "--theme-color-primary"
+// pair from "abstracts/_palettes.scss" (and, for "--neutral", from
+// "abstracts/_tokens.scss"). This is the one place in the component library
+// that does not read a colour through a token - flagged here because every
+// other rule in this file does, and because keeping the two files in step is
+// a manual obligation: a palette added to "_palettes.scss" needs a matching
+// swatch modifier added here, and neither file will tell you if that is
+// forgotten.
+
+.theme-appearance-switcher {
+    --theme-appearance-switcher-gap: var(--theme-space-4, 1.25rem);
+
+    // See "Hidden until 'data-js'" above.
+    display: none;
+    align-items: center;
+    gap: var(--theme-appearance-switcher-gap);
+
+    [data-js] & {
+        display: flex;
+    }
+}
+
+.theme-appearance {
+    --theme-appearance-label-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-appearance-gap: var(--theme-space-2, 0.625rem);
+    --theme-appearance-option-gap: var(--theme-space-1, 0.3125rem);
+
+    display: flex;
+    align-items: center;
+    gap: var(--theme-appearance-gap);
+}
+
+.theme-appearance__label {
+    color: var(--theme-appearance-label-color);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-medium, 500);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    white-space: nowrap;
+}
+
+.theme-appearance__options {
+    display: flex;
+    gap: var(--theme-appearance-option-gap);
+}
+
+.theme-appearance__option {
+    --theme-appearance-option-background: transparent;
+    --theme-appearance-option-background-hover: var(--theme-color-surface, #f4f6fa);
+    --theme-appearance-option-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-appearance-option-border-color: var(--theme-color-border, #d6dce6);
+    --theme-appearance-option-background-active: var(--theme-color-primary, #0b57d0);
+    --theme-appearance-option-foreground-active: var(--theme-color-on-primary, #ffffff);
+    --theme-appearance-option-radius: var(--theme-radius-sm, 5px);
+    --theme-appearance-option-padding-inline: var(--theme-space-3, 0.9375rem);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--theme-space-1, 0.3125rem);
+
+    // A floor for the pointer target, not a fixed height - see
+    // "components/_button.scss" for the same comment.
+    min-height: var(--theme-tap-target-min);
+    padding-inline: var(--theme-appearance-option-padding-inline);
+
+    border: var(--theme-border-width) solid var(--theme-appearance-option-border-color);
+    border-radius: var(--theme-appearance-option-radius);
+    background-color: var(--theme-appearance-option-background);
+    color: var(--theme-appearance-option-foreground);
+
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-medium, 500);
+    line-height: var(--theme-line-height-tight, 1.1);
+
+    cursor: pointer;
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard),
+        border-color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        background-color: var(--theme-appearance-option-background-hover);
+    }
+
+    // The active option, read off the attribute a screen reader announces
+    // rather than off a class the script would have to keep in sync with it -
+    // see "Server-rendered 'aria-pressed'" above.
+    &[aria-pressed='true'] {
+        background-color: var(--theme-appearance-option-background-active);
+        border-color: var(--theme-appearance-option-background-active);
+        color: var(--theme-appearance-option-foreground-active);
+    }
+}
+
+// The palette swatch. A plain circle, coloured by the modifier below - see
+// "The swatch colour" above for why the colour cannot be a shared token.
+.theme-appearance__swatch {
+    --theme-appearance-swatch-color: var(--theme-color-border, #d6dce6);
+
+    display: inline-block;
+    width: var(--theme-space-2, 0.625rem);
+    height: var(--theme-space-2, 0.625rem);
+    border-radius: var(--theme-radius-full, 9999px);
+    background-color: var(--theme-appearance-swatch-color);
+}
+
+// One modifier per palette, each a literal copy of that palette's
+// "--theme-color-primary" pair - the justified exception, see the header
+// comment. "--neutral" copies "abstracts/_tokens.scss"; the rest copy
+// "abstracts/_palettes.scss".
+.theme-appearance__swatch--neutral {
+    --theme-appearance-swatch-color: light-dark(#0b57d0, #82abff);
+}
+
+.theme-appearance__swatch--ember {
+    --theme-appearance-swatch-color: light-dark(#9a4212, #f0a882);
+}
+
+.theme-appearance__swatch--ocean {
+    --theme-appearance-swatch-color: light-dark(#00629a, #7cc4ee);
+}
+
+.theme-appearance__swatch--moss {
+    --theme-appearance-swatch-color: light-dark(#2f6a26, #8fd782);
+}
+
+.theme-appearance__swatch--violet {
+    --theme-appearance-swatch-color: light-dark(#6a3ba8, #c2a4f2);
+}

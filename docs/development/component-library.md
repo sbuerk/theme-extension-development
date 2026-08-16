@@ -22,37 +22,40 @@ against, and the rename was cheap while only one template depended on it.
 
 ## Component reference
 
-| Component               | Root class                | File                               |
-|-------------------------|---------------------------|------------------------------------|
-| Accordion               | `.theme-accordion`        | `components/_accordion.scss`       |
-| Alert                   | `.theme-alert`            | `components/_alert.scss`           |
-| Badge                   | `.theme-badge`            | `components/_badge.scss`           |
-| Breadcrumb              | `.theme-breadcrumb`       | `components/_breadcrumb.scss`      |
-| Button                  | `.theme-button`           | `components/_button.scss`          |
-| Card                    | `.theme-card`             | `components/_card.scss`            |
-| Content element wrapper | `.theme-content-element`  | `components/_content-element.scss` |
-| Gallery                 | `.theme-gallery`          | `components/_gallery.scss`         |
-| Hero                    | `.theme-hero`             | `components/_hero.scss`            |
-| Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`        |
-| Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`         |
-| Pagination              | `.theme-pagination__list` | `components/_pagination.scss`      |
-| Quote                   | `.theme-quote`            | `components/_quote.scss`           |
-| Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`       |
-| Table                   | `.theme-table-wrapper`    | `components/_table.scss`           |
-| Teaser                  | `.theme-teaser`           | `components/_teaser.scss`          |
-| Form controls           | `.theme-input`            | `forms/_controls.scss`             |
-| Form field wrapper      | `.theme-field`            | `forms/_field.scss`                |
-| Form validation         | `.theme-field--invalid`   | `forms/_validation.scss`           |
-| Page frame              | `.theme-page`             | `layout/_page.scss`                |
-| Site header             | `.theme-site-header`      | `layout/_site-header.scss`         |
-| Site footer             | `.theme-site-footer`      | `layout/_site-footer.scss`         |
+| Component               | Root class                   | File                                   |
+|-------------------------|------------------------------|----------------------------------------|
+| Accordion               | `.theme-accordion`           | `components/_accordion.scss`           |
+| Alert                   | `.theme-alert`               | `components/_alert.scss`               |
+| Appearance switcher     | `.theme-appearance-switcher` | `components/_appearance-switcher.scss` |
+| Badge                   | `.theme-badge`               | `components/_badge.scss`               |
+| Breadcrumb              | `.theme-breadcrumb`          | `components/_breadcrumb.scss`          |
+| Button                  | `.theme-button`              | `components/_button.scss`              |
+| Card                    | `.theme-card`                | `components/_card.scss`                |
+| Content element wrapper | `.theme-content-element`     | `components/_content-element.scss`     |
+| Gallery                 | `.theme-gallery`             | `components/_gallery.scss`             |
+| Hero                    | `.theme-hero`                | `components/_hero.scss`                |
+| Main navigation         | `.theme-nav-main`            | `components/_nav-main.scss`            |
+| Sub navigation          | `.theme-nav-sub`             | `components/_nav-sub.scss`             |
+| Pagination              | `.theme-pagination__list`    | `components/_pagination.scss`          |
+| Quote                   | `.theme-quote`               | `components/_quote.scss`               |
+| Skip link               | `.theme-skip-link`           | `components/_skip-link.scss`           |
+| Table                   | `.theme-table-wrapper`       | `components/_table.scss`               |
+| Teaser                  | `.theme-teaser`              | `components/_teaser.scss`              |
+| Form controls           | `.theme-input`               | `forms/_controls.scss`                 |
+| Form field wrapper      | `.theme-field`               | `forms/_field.scss`                    |
+| Form validation         | `.theme-field--invalid`      | `forms/_validation.scss`               |
+| Page frame              | `.theme-page`                | `layout/_page.scss`                    |
+| Site header             | `.theme-site-header`         | `layout/_site-header.scss`             |
+| Site footer             | `.theme-site-footer`         | `layout/_site-footer.scss`             |
 
 `.theme-pagination` has no rule of its own — only `__list`, `__link` and
 `__ellipsis` are styled, current-page state comes from `[aria-current="page"]`
 rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
-asserts every one of the twenty-two selectors above is actually compiled into
-`Resources/Public/Css/theme.css`.
+asserts every one of the twenty-three selectors above is actually compiled into
+`Resources/Public/Css/theme.css`. The appearance switcher is covered twice over,
+because its swatches duplicate colour that lives in `abstracts/_palettes.scss` —
+see [Appearance switching](appearance-switching.md#what-the-tests-guard).
 
 ## Markup contracts
 

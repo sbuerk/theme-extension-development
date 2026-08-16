@@ -5,14 +5,15 @@
     The site header, sitewide chrome rendered unconditionally by
     "Layouts/Default.html" for every page template.
 
-    Markup contract: docs/development/component-library.md#layout. That
-    contract also documents a ".theme-site-header__actions" slot at the end
-    of the header - the appearance/palette switcher that would live there is
-    step 4, still out of scope here. Main navigation is this step:
-    "Partials/Navigation/Main.html" renders ".theme-nav-main" itself,
-    including its own empty guard, so it is rendered unconditionally here
-    the same way the brand link is - the partial decides whether anything
-    actually appears.
+    Markup contract: docs/development/component-library.md#layout. Main
+    navigation: "Partials/Navigation/Main.html" renders ".theme-nav-main"
+    itself, including its own empty guard, so it is rendered unconditionally
+    here the same way the brand link is - the partial decides whether
+    anything actually appears. ".theme-site-header__actions" is the slot at
+    the end of the header the contract documents; it holds the
+    appearance/palette switcher, "Partials/Page/AppearanceSwitcher.html",
+    which is hidden by its own CSS until a script has run - see that
+    partial's header comment.
 </f:comment>
 <header class="theme-site-header">
     <div class="theme-site-header__inner">
@@ -20,6 +21,9 @@
             <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.title" />
         </a>
         <f:render partial="Navigation/Main" arguments="{_all}" />
+        <div class="theme-site-header__actions">
+            <f:render partial="Page/AppearanceSwitcher" arguments="{_all}" />
+        </div>
     </div>
 </header>
 

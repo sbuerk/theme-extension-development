@@ -26,4 +26,27 @@ theme {
         # or below it.
         maxGalleryWidthInText = 420
     }
+
+    appearance {
+        # The appearance rendered server side, before the no-flash script in
+        # "Appearance.typoscript" can override it from "localStorage". One of
+        # "auto", "light", "dark". "auto" means no "data-theme" attribute at
+        # all - the operating system decides, via "color-scheme" - see
+        # "abstracts/_tokens.scss".
+        default = auto
+
+        # The colour palette rendered into "data-palette". One of "neutral",
+        # "ember", "ocean", "moss", "violet" - see "abstracts/_palettes.scss".
+        # "neutral" has no "[data-palette='neutral']" rule of its own either -
+        # it is simply what "_tokens.scss" already declares - but unlike
+        # appearance's "auto" it is still rendered onto the tag: a palette has
+        # no "operating system decides" case that an omitted attribute would
+        # have to express.
+        palette = neutral
+
+        # Whether "components/_content-element.scss" draws the CType outline
+        # and label. One of "on", "off". A development/staging affordance -
+        # "off" for a production site package.
+        contentOutline = on
+    }
 }
