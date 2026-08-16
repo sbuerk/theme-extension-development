@@ -1,0 +1,52 @@
+# The page tree of "ImageElementRenderingTest".
+#
+# Seeded rather than imported from a CSV data set, because a rendered image
+# needs a file storage, an indexed "sys_file" and a "sys_file_reference"
+# pointing at the content element - three records whose uids a fixture would
+# have to guess. The seeding does exactly that, and is covered by its own test.
+identifier: image-element
+
+files:
+  - identifier: landscape
+    source: 'EXT:theme_extension_development/Configuration/Seeds/Files/placeholder.svg'
+    folder: 'test-images'
+  - identifier: portrait
+    source: 'EXT:theme_extension_development/Configuration/Seeds/Files/placeholder-portrait.svg'
+    folder: 'test-images'
+
+pages:
+  - identifier: home
+    uid: 1
+    title: 'Image elements'
+    slug: '/'
+    is_siteroot: 1
+    doktype: 1
+    content:
+      - identifier: single
+        CType: image
+        header: 'A single image'
+        header_layout: 2
+        files:
+          image:
+            - landscape
+      - identifier: gallery
+        CType: image
+        header: 'Two images in two columns'
+        header_layout: 2
+        imagecols: 2
+        files:
+          image:
+            - landscape
+            - portrait
+      - identifier: zoom
+        CType: image
+        header: 'Enlarge on click'
+        header_layout: 2
+        image_zoom: 1
+        files:
+          image:
+            - landscape
+      - identifier: without-image
+        CType: image
+        header: 'An element without an image'
+        header_layout: 2

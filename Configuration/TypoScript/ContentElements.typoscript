@@ -5,12 +5,17 @@
 # renders its own notice that the element has no rendering definition - the
 # yellow box - which is what every element looked like before this file.
 #
-# EXT:frontend registers exactly two content types on its own, "header" and
-# "text" (v13 additionally has the legacy "list", removed in v14). Everything
-# else a TYPO3 installation usually offers - textmedia, image, bullets, table,
-# uploads, menus - is registered by "fluid_styled_content" and therefore does
-# not exist here. Those are content types this theme would have to bring
-# itself, together with their TCA.
+# What FSC supplies is the *rendering*, not the TCA. EXT:frontend registers the
+# whole classic set of content types itself, in
+# "Configuration/TCA/Overrides/2xx-tt_content-content_type-*.php" - image,
+# textmedia, bullets, table, uploads, the menus, shortcut, div and html - on
+# v13.4 and v14 alike, and FSC's own "Configuration/TCA/Overrides/" holds
+# nothing but a "sys_template.php". Every one of those elements can therefore be
+# created in the backend of an installation using this theme, and every one that
+# has no branch below renders the notice.
+#
+# @todo Cover the remaining content types EXT:frontend registers. Rendering them
+#       needs no TCA of this extension's own, only a template and a branch here.
 
 # The equivalent of "lib.contentElement" from "fluid_styled_content": the frame
 # every content element is rendered through. Consumers of this theme can
@@ -27,3 +32,44 @@ tt_content.header.templateName = ContentElements/Header
 
 tt_content.text =< lib.contentElement
 tt_content.text.templateName = ContentElements/Text
+
+# The "Images" element. Its TCA - the "image" field, the gallery settings and
+# the media adjustments - comes from EXT:frontend, so this is rendering only.
+#
+# The two processors are what turn the backend fields into a layout:
+# "FilesProcessor" resolves the file references of the "image" field, and
+# "GalleryProcessor" arranges them into rows and columns and computes a width
+# and a height per image from "imagecols", "imageorient", "imagewidth",
+# "imageheight" and "imageborder". Iterating the files in Fluid directly would
+# render the images and silently ignore every one of those fields.
+tt_content.image =< lib.contentElement
+tt_content.image {
+    templateName = ContentElements/Image
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = image
+            as = files
+        }
+
+        20 = TYPO3\CMS\Frontend\DataProcessing\GalleryProcessor
+        20 {
+            filesProcessedDataKey = files
+            mediaOrientation.field = imageorient
+            numberOfColumns.field = imagecols
+            equalMediaHeight.field = imageheight
+            equalMediaWidth.field = imagewidth
+            borderEnabled.field = imageborder
+            maxGalleryWidth = {$theme.media.maxGalleryWidth}
+            maxGalleryWidthInText = {$theme.media.maxGalleryWidthInText}
+            # The gap between the columns is left out of the computation on
+            # purpose. The processor would subtract it from the gallery width,
+            # which only makes the computed image a few pixels narrower - while
+            # it would have to be kept in sync with the CSS gap by hand, in two
+            # languages, forever.
+            columnSpacing = 0
+            as = gallery
+        }
+    }
+}

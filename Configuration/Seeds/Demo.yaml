@@ -19,6 +19,9 @@ files:
   - identifier: placeholder
     source: 'EXT:theme_extension_development/Configuration/Seeds/Files/placeholder.svg'
     folder: 'theme-demo'
+  - identifier: placeholder-portrait
+    source: 'EXT:theme_extension_development/Configuration/Seeds/Files/placeholder-portrait.svg'
+    folder: 'theme-demo'
 
 pages:
   - identifier: home
@@ -63,8 +66,37 @@ pages:
               in its body font. It carries <strong>bold</strong> and
               <em>emphasised</em> words and a <a href="/">link</a>, which are
               the three inline cases a stylesheet has to answer for.</p>
-      - identifier: empty
+      - identifier: media
         uid: 3
+        title: 'Media'
+        slug: '/media'
+        doktype: 1
+        content:
+          - identifier: media-heading
+            CType: header
+            header: 'Media'
+            header_layout: 1
+          - identifier: media-single
+            CType: image
+            header: 'A single image'
+            header_layout: 2
+            files:
+              image:
+                - placeholder
+          - identifier: media-gallery
+            CType: image
+            header: 'Two images, two columns'
+            header_layout: 2
+            # The gallery layout is driven by the TCA fields of the element,
+            # not by the template: "imagecols" is what an editor changes in the
+            # backend to get a second column.
+            imagecols: 2
+            files:
+              image:
+                - placeholder
+                - placeholder-portrait
+      - identifier: empty
+        uid: 4
         title: 'Empty page'
         slug: '/empty'
         doktype: 1

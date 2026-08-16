@@ -74,8 +74,10 @@ pages:
         - placeholder
 ```
 
-Without `fluid_styled_content` the FAL fields available are `pages.media` and
-`tt_content.image`, `assets` and `media` — all of them from EXT:frontend.
+The FAL fields available are `pages.media` and `tt_content.image`, `assets` and
+`media` — all of them from EXT:frontend, so none of them depends on
+`fluid_styled_content`. Of those, `tt_content.image` is the one the theme
+renders, through the `image` content element.
 
 The copy goes through the storage API, not through the filesystem: a file copied
 into `fileadmin/` with `cp` exists on disk and does not exist for TYPO3, so
