@@ -1,0 +1,32 @@
+name: core12-theme-v1
+type: typo3
+docroot: public
+# 8.2, the same version "instance-core-13" runs on, although TYPO3 v12 is the
+# one core version of this branch that also supports PHP 8.1. An instance is
+# the place to look at the theme, not a test matrix - PHP 8.1 is covered where
+# it is actually asserted, by "runTests.sh -t 12 -p 8.1" and by the CI jobs
+# built from it. Keeping both instances on one PHP version also keeps the two
+# ".ddev/config.yaml" files diff-clean against each other.
+php_version: "8.2"
+webserver_type: nginx-fpm
+xdebug_enabled: false
+additional_hostnames: []
+additional_fqdns: []
+# The instance runs on SQLite, resolved by "config/system/additional.php". No
+# database container is started at all - the "database" block below only
+# satisfies DDEV's own schema, which requires it.
+database:
+    type: mariadb
+    version: "11.8"
+omit_containers: [db]
+use_dns_when_possible: true
+timezone: Europe/Berlin
+composer_version: "2"
+web_environment: []
+corepack_enable: false
+hooks:
+    post-start:
+        # Forward the host SSH agent first: "composer install" below may resolve
+        # packages from remotes that need it.
+        - exec-host: ddev auth ssh
+        - composer: install

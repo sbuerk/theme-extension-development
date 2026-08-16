@@ -6,6 +6,7 @@ use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder as CoreSystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Http\Application as CoreHttpApplication;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Package\UnitTestPackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -30,13 +31,20 @@ use TYPO3\TestingFramework\Core\Testbase;
  * phpunit before instantiating the test suites.
  *
  * Derived from the boilerplate shipped with typo3/testing-framework in
- * "Resources/Core/Build/UnitTestsBootstrap.php", baselined from version 9.6.1.
- * Re-check it against that file when the testing-framework is updated.
+ * "Resources/Core/Build/UnitTestsBootstrap.php", baselined from version 8.3.3 -
+ * the 8.x line is the one covering TYPO3 v12 and v13 alike. Re-check it against
+ * that file when the testing-framework is updated.
  *
  * Deliberate deviations from the boilerplate: fully qualified class names are
  * replaced by imports and the closure is typed, both to satisfy the coding
- * guidelines of this repository, and the branch for TYPO3 v12 is dropped
- * because this extension does not support that version.
+ * guidelines of this repository.
+ *
+ * The request type branch below is *not* a deviation and must be kept. TYPO3
+ * v13 consolidated the HTTP entry points into "TYPO3\CMS\Core\Http\Application";
+ * on v12 that class does not exist, and a unit run there has to declare itself
+ * as backend *and* CLI. Collapsing the branch to the v13 arm - which this file
+ * did while the extension supported v13 and v14 only - leaves a v12 run with a
+ * request type the core does not expect.
  *
  * The recommended way to execute the suite is "Build/Scripts/runTests.sh".
  */
@@ -63,7 +71,17 @@ use TYPO3\TestingFramework\Core\Testbase;
     // This should be always true except for TYPO3 mono repository.
     $composerMode = defined('TYPO3_COMPOSER_MODE') && TYPO3_COMPOSER_MODE === true;
 
-    SystemEnvironmentBuilder::run(0, CoreSystemEnvironmentBuilder::REQUESTTYPE_CLI, $composerMode);
+    // TYPO3 v13 and above: one consolidated HTTP entry point, CLI alone is right.
+    // TYPO3 v12: no such class, and the request type has to name both.
+    if (class_exists(CoreHttpApplication::class)) {
+        SystemEnvironmentBuilder::run(0, CoreSystemEnvironmentBuilder::REQUESTTYPE_CLI, $composerMode);
+    } else {
+        SystemEnvironmentBuilder::run(
+            0,
+            CoreSystemEnvironmentBuilder::REQUESTTYPE_BE | CoreSystemEnvironmentBuilder::REQUESTTYPE_CLI,
+            $composerMode,
+        );
+    }
 
     $testbase->createDirectory(Environment::getPublicPath() . '/typo3conf/ext');
     $testbase->createDirectory(Environment::getPublicPath() . '/typo3temp/assets');

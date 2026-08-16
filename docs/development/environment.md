@@ -10,16 +10,18 @@ Dependencies are installed into the git-ignored `.Build/` directory. The
 wrapper installs them for a specific TYPO3 core and PHP version:
 
 ```bash
-# Install dependencies for TYPO3 v13 on PHP 8.2 (default matrix).
-Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
+# Install dependencies for TYPO3 v12 on PHP 8.2 (the defaults).
+Build/Scripts/runTests.sh -t 12 -p 8.2 -s composerUpdate
 ```
 
-`-t` takes the supported core versions, and re-running `composerUpdate` with a
-different one replaces the whole set in `.Build/`.
+`-t` takes `12` or `13`, and re-running `composerUpdate` with a different one
+replaces the whole set in `.Build/`. `-p 8.1` is only usable together with
+`-t 12`: `typo3/cms-core` 13.4 requires PHP `^8.2`, so the combination cannot
+resolve.
 
 > [!IMPORTANT]
 > The installed dependency set must match the core version a gate is run for.
-> See [Core version setup](dual-core-setup.md) — this is the single most common
+> See [Dual core setup](dual-core-setup.md) — this is the single most common
 > source of false positives in this repository.
 
 Run `Build/Scripts/runTests.sh -h` to see all suites and options.
@@ -41,8 +43,8 @@ hosted runners, not of this repository.
 | Option         | Meaning                                                                   |
 |----------------|---------------------------------------------------------------------------|
 | `-s <suite>`   | Suite to run (`unit`, `functional`, `cgl`, `phpstan`, …).                 |
-| `-t <13>`      | TYPO3 core major version to run against. Default `13`.                    |
-| `-p <version>` | PHP version (`8.2` … `8.5`). Default `8.2`.                               |
+| `-t <12\|13>`  | TYPO3 core major version to run against. Default `12`, the lowest.        |
+| `-p <version>` | PHP version (`8.1` … `8.4`). Default `8.2`. `8.1` is TYPO3 v12 only.      |
 | `-d <dbms>`    | Database for functional tests (`sqlite`, `mariadb`, `mysql`, `postgres`). |
 | `-i <version>` | Database image version, together with `-d`. `-h` lists the accepted ones. |
 | `-b <bin>`     | Container binary, `podman` or `docker`. Auto-detected, podman preferred.  |
@@ -92,6 +94,6 @@ Build/Scripts/runTests.sh -s functional -d sqlite -- --filter DummyTest
 
 ## See also
 
-- [Core version setup](dual-core-setup.md)
+- [Dual core setup](dual-core-setup.md)
 - [Quality gates](quality-gates.md)
 - [Testing](../testing/Index.md)

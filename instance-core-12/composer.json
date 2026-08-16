@@ -1,0 +1,64 @@
+{
+    "name": "sbuerk/theme-extension-development-instance-core-12",
+    "description": "TYPO3 v12 development instance for the theme extension",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+        "sbuerk/theme-extension-development": "@dev",
+        "tests/dev-site": "@dev",
+        "typo3/minimal": "^12"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        },
+        "sort-packages": true,
+        "audit": {
+            "block-insecure": false,
+            "block-abandoned": false
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "web-dir": "public"
+        }
+    },
+    "repositories": {
+        "theme": {
+            "type": "path",
+            "url": "../theme"
+        },
+        "packages-dev": {
+            "type": "path",
+            "url": "../packages-dev/*"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "sqlite:backup": [
+            "@php vendor/bin/typo3 cache:flush",
+            "@php ../theme/Build/Scripts/sqliteSnapshot.php backup var/sqlite/core-12.sqlite ../sqlite-databases/core-12.sqlite",
+            "@php vendor/bin/typo3 cache:warmup"
+        ],
+        "sqlite:apply": [
+            "@php ../theme/Build/Scripts/sqliteSnapshot.php restore ../sqlite-databases/core-12.sqlite var/sqlite/core-12.sqlite",
+            "@php vendor/bin/typo3 cache:flush",
+            "@php vendor/bin/typo3 cache:warmup"
+        ],
+        "system:refresh": [
+            "@php vendor/bin/typo3 cache:flush",
+            "@php vendor/bin/typo3 cache:warmup",
+            "@php vendor/bin/typo3 language:update",
+            "@php vendor/bin/typo3 extension:setup"
+        ]
+    },
+    "scripts-descriptions": {
+        "sqlite:backup": "Copy this instance's database to \"../sqlite-databases/core-12.sqlite\" so it can be committed.",
+        "sqlite:apply": "Restore this instance from \"../sqlite-databases/core-12.sqlite\", discarding its current database.",
+        "system:refresh": "Refresh the system after changes: flush and warm up caches, update languages, run extension setup."
+    }
+}

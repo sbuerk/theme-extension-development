@@ -17,6 +17,7 @@
 # repository root, which must never end up inside a composer dist archive or a
 # TER artifact.
 /theme export-ignore
+/instance-core-12 export-ignore
 /instance-core-13 export-ignore
 /packages-dev export-ignore
 /sqlite-databases export-ignore

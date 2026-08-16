@@ -40,12 +40,17 @@ class level docblock saying so.
 
 Both use
 [`ExtensionCoreVersionCompatTestsTrait`](../../Tests/ExtensionCoreVersionCompatTestsTrait.php),
-which asserts that the running major version is the supported one — that `-t 13`
-really is v13. `-t` selects a core version but installs nothing, so without this
-a stale `.Build/`, a skipped `composerUpdate` or a wrong CI matrix entry produces
-a green run that proved nothing. The assertion is deliberately ungrouped: with a
-single supported version there is nothing to exclude it from, and a group would
-only create the possibility of a guard that never executes.
+which asserts that the running major version is one this extension supports, and
+that `-t 12` really is v12 and `-t 13` really is v13. `-t` selects a core version
+but installs nothing, so without this a stale `.Build/`, a skipped
+`composerUpdate` or a wrong CI matrix entry produces a green run that proved
+nothing.
+
+The trait works from both sides. One ungrouped assertion checks that the running
+major is supported at all; two grouped ones — `#[Group('not-core-13')]` and
+`#[Group('not-core-12')]` — name a single version each, so the group exclusion
+`runTests.sh` passes leaves exactly one of them standing per run, and that one
+fails when what is installed disagrees with what was asked for.
 
 The functional one earns its keep before its assertions run: booting the
 instance compiles the dependency injection container, executes the extension
@@ -68,10 +73,13 @@ same as the backend being able to render a form from it.
 - Functional tests extend `AbstractFunctionalTestCase`, never the testing
   framework `FunctionalTestCase` directly — see
   [Site based tests](site-based-tests.md#no-test-extends-the-framework-test-case-directly).
-- Core version aware tests live in a `Core<major>/` subdirectory — `Core13/`
-  today — and carry `#[Group('not-core-<other version>')]` for every version
-  they must not run on. See
-  [Core version setup](../development/dual-core-setup.md#test-grouping).
+- Core version aware tests live in a `Core<major>/` subdirectory — `Core12/` and
+  `Core13/` — and carry `#[Group('not-core-<other version>')]` for every version
+  they must not run on. The group is for a test whose **subject** is version
+  specific; a test that merely needs a differently arranged fixture goes through
+  a seam instead, so it keeps running on both versions. See
+  [Dual core setup](../development/dual-core-setup.md#test-grouping) and
+  [`ThemeSiteTrait`](site-based-tests.md#arranging-the-theme-themesitetrait).
 - Data provider keys are named, so a failing case is identifiable from the
   output alone.
 

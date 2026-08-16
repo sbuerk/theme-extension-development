@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use SBUERK\ThemeExtensionDevelopment\Compatibility\ContentTypeRegistration;
 
 defined('TYPO3') or die();
 
 // A list of links. "header" is the optional list title, not a content
 // heading, so it is used as a bare field rather than through the "headers"
 // palette - header_layout, header_position and date have no meaning for it.
-ExtensionManagementUtility::addRecordType(
+ContentTypeRegistration::addRecordType(
     [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_linklist.label',
         'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_linklist.description',

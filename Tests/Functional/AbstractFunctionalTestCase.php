@@ -17,6 +17,10 @@ use SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase;
  * `sys_template` record. Having every functional test go through this class
  * means the whole suite gains that without a second base class — see the
  * "Site based tests" page of the developer documentation in "docs/testing/".
+ *
+ * A test that needs a site delivering the theme does not arrange one itself:
+ * how the theme reaches a site differs between the supported core versions, and
+ * that difference lives in exactly one place, {@see ThemeSiteTrait}.
  */
 abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {

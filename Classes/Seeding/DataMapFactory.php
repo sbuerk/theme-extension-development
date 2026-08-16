@@ -42,7 +42,7 @@ use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
  *
  * @internal Part of the seeding implementation, not public API.
  */
-final readonly class DataMapFactory
+final class DataMapFactory
 {
     /**
      * @param array<string, int> $fileUids The sys_file uid of each seeded file,

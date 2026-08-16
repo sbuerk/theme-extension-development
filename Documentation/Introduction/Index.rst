@@ -40,7 +40,9 @@ in a frontend rather than only in a test assertion:
 
 ..  note::
 
-    The theme renders a page once a site depends on its site set — see
+    The theme renders a page once it is enabled for a site — through its site
+    set on TYPO3 v13, or through a :sql:`sys_template` record selecting the
+    classic static include, which is the only way on TYPO3 v12. See
     :ref:`configuration`. It covers **every classic content element**
     :file:`EXT:frontend` registers, the eleven menu elements, ten elements of
     its own, and third-party Extbase plugins, none of which requires
@@ -52,9 +54,10 @@ in a frontend rather than only in a test assertion:
     for it first — see :ref:`feature-styleguide`. This chapter is extended along
     with the implemented features.
 
-    Underneath that sits the foundation: TYPO3 v13 support from one code base
-    with :ref:`core version aware <introduction-core-version-aware>` classes,
-    wired by the dependency injection container of the running TYPO3 version.
+    Underneath that sits the foundation: TYPO3 v12 and v13 support from one
+    code base with :ref:`core version aware <introduction-core-version-aware>`
+    classes, wired by the dependency injection container of the running TYPO3
+    version.
 
 ..  _introduction-core-version-aware:
 
@@ -62,10 +65,10 @@ Core version aware implementations
 ==================================
 
 Code that has to differ between TYPO3 versions lives in one directory per
-supported major version in the repository root — this branch supports TYPO3
-v13, so there is exactly one, :file:`Core13/`. Shared code — interfaces,
-abstract base classes and everything that does not depend on a core version —
-lives in :file:`Classes/`.
+supported major version in the repository root — :file:`Core12/` and
+:file:`Core13/` on this branch. Shared code — interfaces, abstract base classes
+and everything that does not depend on a core version — lives in
+:file:`Classes/`.
 
 Only the directory matching the running TYPO3 version is registered in the
 dependency injection container, so a service asking for an interface always
@@ -85,8 +88,16 @@ Compatibility
         -   PHP
     *   -   1
         -   1.x
-        -   v13
-        -   8.2 - 8.5
+        -   v12.4
+        -   8.1 - 8.4
+    *   -   1
+        -   1.x
+        -   v13.4
+        -   8.2 - 8.4
+
+One row per supported TYPO3 version, because the PHP ranges differ: PHP 8.1 is
+supported for TYPO3 v12 only, as :composer:`typo3/cms-core` 13.4 requires PHP
+``^8.2``. The lowest TYPO3 v12 patch level supported is **12.4.22**.
 
 Contributing
 ============

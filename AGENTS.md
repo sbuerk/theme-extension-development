@@ -131,11 +131,11 @@ Nothing below `.agent/` is ever committed.
 |-----------------------------------------------------|-------------------------------------------------------------------------|
 | Development environment, container based tooling    | [Environment](docs/development/environment.md)                          |
 | **The development instances, and `theme`**          | [Development instances](docs/development/instances.md)                  |
-| **Core version setup — read this first**            | [Core version setup](docs/development/dual-core-setup.md)               |
+| **Dual core setup (v12 + v13) — read this first**   | [Dual core setup](docs/development/dual-core-setup.md)                  |
 | The gates and what they check                       | [Quality gates](docs/development/quality-gates.md)                      |
 | Version differences split classes, not conditionals | [Core version aware code](docs/architecture/core-version-aware-code.md) |
 | Symfony DI attributes, stateless services           | [Dependency injection](docs/architecture/dependency-injection.md)       |
-| `final readonly`, injected abstracts, DTOs          | [Class design](docs/architecture/class-design.md)                       |
+| `readonly` properties, injected abstracts, DTOs     | [Class design](docs/architecture/class-design.md)                       |
 | Both test suites and their strictness               | [Testing](docs/testing/Index.md)                                        |
 | Design tokens, and the light/dark contract          | [Design tokens](DESIGN.md)                                              |
 | Commit message conventions                          | [Commit messages](docs/workflow/commit-messages.md)                     |
@@ -147,14 +147,18 @@ violation of any of them is a rejected change, not a review comment.
 
 1. **Version differences split classes, they never add conditionals.** Shared
    code in `Classes/`, one implementation per supported core version in its own
-   `Core<major>/` directory — `Core13/` today — and only the directory matching
-   the running core registered in the container.
+   `Core<major>/` directory — `Core12/` and `Core13/` — and only the directory
+   matching the running core registered in the container. The worked example is
+   `Classes/Seeding/FileImporterInterface` with its two implementations.
    → [Core version aware code](docs/architecture/core-version-aware-code.md)
 
-   The exception is **configuration** — TCA, TypoScript, `ext_localconf.php` —
-   which TYPO3 loads from a fixed path and which therefore cannot be split. Apply
-   the difference to the finished array before returning it, add a `@todo` naming
-   the condition under which it goes away, and name the changelog issue.
+   The exception is **configuration** — TCA, TypoScript, page TSconfig,
+   `ext_localconf.php`, `ext_tables.sql` — which TYPO3 loads from a fixed path
+   and which therefore cannot be split. Apply the difference to the finished
+   array or wrap it in one condition, add a `@todo` naming the condition under
+   which it goes away, and name the changelog issue. Look for a spelling valid on
+   both versions first: `Classes/Compatibility/ContentTypeRegistration` replaces
+   a v13-only core method with API both versions have, and needs no switch at all.
    → [Configuration is the exception](docs/architecture/core-version-aware-code.md#configuration-is-the-exception)
 
 2. **Services are wired with Symfony DI attributes on the class**, never in
@@ -164,10 +168,17 @@ violation of any of them is a rejected change, not a review comment.
    has to fetch them from the container.
    → [Dependency injection](docs/architecture/dependency-injection.md#rules)
 
-3. **Classes are `final readonly`** unless a framework constraint prevents it.
+3. **Classes are `final`, and every property they carry is `readonly`** unless a
+   framework constraint prevents it. Class level `readonly` is **not** used on
+   this branch: it supports PHP 8.1 for TYPO3 v12, and `readonly` on a class is
+   PHP 8.2. A class backported from `main` as `final readonly class` becomes
+   `final class` here, with `readonly` written on each property — dropping the
+   class keyword without adding the property ones makes the state mutable, and
+   nothing reports it.
    Abstract classes never use constructor injection; they use `#[Required]`
    `inject*()` methods so the constructor stays free for extending classes.
-   → [Class design](docs/architecture/class-design.md)
+   → [Class design](docs/architecture/class-design.md#prefer-final-with-readonly-properties) ·
+   [Backports from `main`](docs/architecture/class-design.md#backports-from-main-readonly-moves-off-the-class)
 
 4. **Models, entities, value objects and DTOs are data, not services.** They are
    never registered in the container and carry no dependencies, and they
@@ -215,7 +226,7 @@ they are on disk — there is no reason to work from memory.
   the option is still required on the older version.
 
 ```bash
-grep -rl "searchFields" .Build/vendor/typo3/cms-core/Documentation/Changelog/13*/
+grep -rl "DuplicationBehavior" .Build/vendor/typo3/cms-core/Documentation/Changelog/13*/
 ```
 
 The rendered version is at
@@ -224,18 +235,20 @@ The rendered version is at
 
 > [!IMPORTANT]
 > The changelogs on disk reach only as far as the installed core version: with
-> TYPO3 v13 installed the newest directory is `13.4.x`. A package does ship the
-> changelogs of all **earlier** versions, so the **highest** supported version
-> always carries the complete set — everything from `7.0/` to `13.4.x/` today.
-> Anything newer than the installed version is not on disk and cannot be
-> verified from this checkout; say so rather than asserting it.
+> TYPO3 v12 installed the newest directory is `12.4.x` and there is no `13.0/`
+> to read. A package does ship the changelogs of all **earlier** versions, so
+> installing the **highest** supported version — v13 — puts both the v12 and the
+> v13 changelogs on disk at once, everything from `7.0/` to `13.4.x/`, and saves
+> switching back and forth to look something up. Anything newer than the
+> installed version is not on disk and cannot be verified from this checkout;
+> say so rather than asserting it.
 >
 > Reading a changelog is not running a gate. Look things up, then
 > `composerUpdate` back to the version you are working on before running
 > anything — see
-> [the core version hint](#quality-gates-and-the-core-version-hint) below.
+> [the dual core hint](#quality-gates-and-the-dual-core-hint) below.
 
-## Quality gates, and the core version hint
+## Quality gates, and the dual core hint
 
 Every gate runs in a container through
 [`Build/Scripts/runTests.sh`](Build/Scripts/runTests.sh). Nothing needs to be
@@ -252,25 +265,32 @@ installed on the host except **podman** (preferred) or docker.
 > and never interleave `-t` values.** Do one version completely, then switch.
 
 ```bash
-# TYPO3 v13 — install first, then run everything for v13.
+# TYPO3 v12 — install first, then run everything for v12.
+Build/Scripts/runTests.sh -t 12 -s composerUpdate
+Build/Scripts/runTests.sh -t 12 -s cgl -n
+Build/Scripts/runTests.sh -t 12 -s phpstan
+Build/Scripts/runTests.sh -t 12 -s lintPhp
+Build/Scripts/runTests.sh -t 12 -s unit
+Build/Scripts/runTests.sh -t 12 -s unitRandom
+Build/Scripts/runTests.sh -t 12 -s functional -d sqlite
+Build/Scripts/runTests.sh -t 12 -s composerValidate
+Build/Scripts/runTests.sh -t 12 -s checkBom
+Build/Scripts/runTests.sh -t 12 -s checkExceptionCodes
+Build/Scripts/runTests.sh -t 12 -s checkMarkdownTables
+Build/Scripts/runTests.sh -t 12 -s checkTestMethodsPrefix
+Build/Scripts/runTests.sh -t 12 -s checkCssBuild
+
+# Then the same for TYPO3 v13, starting with composerUpdate again.
 Build/Scripts/runTests.sh -t 13 -s composerUpdate
-Build/Scripts/runTests.sh -t 13 -s cgl -n
-Build/Scripts/runTests.sh -t 13 -s phpstan
-Build/Scripts/runTests.sh -t 13 -s lintPhp
-Build/Scripts/runTests.sh -t 13 -s unit
-Build/Scripts/runTests.sh -t 13 -s unitRandom
-Build/Scripts/runTests.sh -t 13 -s functional -d sqlite
-Build/Scripts/runTests.sh -t 13 -s composerValidate
-Build/Scripts/runTests.sh -t 13 -s checkBom
-Build/Scripts/runTests.sh -t 13 -s checkExceptionCodes
-Build/Scripts/runTests.sh -t 13 -s checkMarkdownTables
-Build/Scripts/runTests.sh -t 13 -s checkTestMethodsPrefix
-Build/Scripts/runTests.sh -t 13 -s checkCssBuild
+# ...
 ```
 
-v13 is the only supported core version on this branch, so this is the whole
-matrix. A further supported version repeats the same block from
-`composerUpdate` on, never interleaved with another `-t` value.
+`-t` defaults to **12**, the lowest supported version, and `-p` to **8.2**, the
+lowest PHP version both cores accept. `-p 8.1` is TYPO3 v12 only —
+`typo3/cms-core` 13.4 requires PHP `^8.2`, so `-t 13 -p 8.1` fails to resolve in
+`composerUpdate`. Run `-t 12 -p 8.1 -s lintPhp` after adding or moving a class:
+it is the only run that catches PHP 8.2-only syntax such as a `readonly` class
+or a constant in a trait.
 
 Further:
 
@@ -293,8 +313,9 @@ Further:
 - Arguments for PHPUnit go after `--`:
   `-s functional -d sqlite -- --filter SomeTest`.
 - A **growing PHPStan baseline is a defect.** Fix the finding.
-- The development instances, one per supported core version below
-  `instance-core-13/`, are **not** driven by `runTests.sh`. They are installed
+- The development instances, one per supported core version —
+  `instance-core-12/` and `instance-core-13/` — are **not** driven by
+  `runTests.sh`. They are installed
   with `ddev composer` or from the host, and the two ways must not be mixed —
   the resulting `vendor/` differs and does not travel. `theme` at the repository root is a symlink to
   that root; never follow it when walking the tree, and never add it to a path a
@@ -328,7 +349,7 @@ trailing newline — which is byte identical to `jq --indent 4`. Do not introduc
 a `jq` dependency in a new script; mirror those helpers instead.
 
 → [Quality gates](docs/development/quality-gates.md) ·
-[Core version setup](docs/development/dual-core-setup.md)
+[Dual core setup](docs/development/dual-core-setup.md)
 
 ## The test suites are deliberately hard breaking
 

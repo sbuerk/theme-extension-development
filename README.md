@@ -34,10 +34,12 @@ users and integrators, with the full scope warning.
 
 ## Status
 
-A site enables the theme by depending on the site set
+On TYPO3 v13 a site enables the theme by depending on the site set
 `sbuerk/theme-extension-development`, which brings the TypoScript, a Fluid page
-rendering and the compiled stylesheet. A classic `sys_template` static include
-is available for installations that do not use site sets.
+rendering and the compiled stylesheet. On TYPO3 v12, which has no site sets, the
+same is delivered by a `sys_template` record selecting the classic static
+include — the two paths read the same files.
+→ [TypoScript delivery](docs/architecture/typoscript-delivery.md)
 
 **Every classic core content type renders** without depending on
 `fluid_styled_content` — header, text, images, text & media, bullets, table,
@@ -66,7 +68,11 @@ change without a deprecation phase until the first stable release.
 
 | Branch | Extension | TYPO3 | PHP       |
 |--------|-----------|-------|-----------|
-| `1`    | 1.x       | v13   | 8.2 - 8.5 |
+| `1`    | 1.x       | v12.4 | 8.1 - 8.4 |
+| `1`    | 1.x       | v13.4 | 8.2 - 8.4 |
+
+One row per core version, because the PHP ranges differ: PHP 8.1 is supported
+for TYPO3 v12 only — `typo3/cms-core` 13.4 requires `^8.2`.
 
 ## Installation
 
@@ -79,7 +85,7 @@ composer require --dev sbuerk/theme-extension-development
 ```
 
 As long as no stable version has been released, require the development version
-of the main branch explicitly:
+of the `1` branch explicitly:
 
 ```bash
 composer require --dev sbuerk/theme-extension-development:^1.0@dev
@@ -116,8 +122,8 @@ requirement on the host is a container runtime — **podman** (preferred) or
 **docker**.
 
 ```bash
-# Install dependencies for TYPO3 v13 on PHP 8.2 (default matrix).
-Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
+# Install dependencies for TYPO3 v12 on PHP 8.2 (the defaults).
+Build/Scripts/runTests.sh -t 12 -p 8.2 -s composerUpdate
 
 # Quality gates.
 Build/Scripts/runTests.sh -s cgl -n
@@ -132,9 +138,9 @@ Build/Scripts/runTests.sh -s functional -d sqlite
 Build/Scripts/runTests.sh -h
 ```
 
-Everything has to pass for **every** supported TYPO3 version, each after its own
-`composerUpdate` — see
-[Core version setup](docs/development/dual-core-setup.md).
+Everything has to pass for **both** supported TYPO3 versions (`-t 12` and
+`-t 13`), each after its own `composerUpdate` and never interleaved — see
+[Dual core setup](docs/development/dual-core-setup.md).
 
 → [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution workflow ·
 [`docs/`](docs/Index.md) for the full developer documentation

@@ -53,7 +53,7 @@ use TYPO3\CMS\Frontend\ContentObject\DataProcessorInterface;
  * in practice while never throwing.
  */
 #[Autoconfigure(tags: [['name' => 'data.processor', 'identifier' => 'table']])]
-final readonly class TableProcessor implements DataProcessorInterface
+final class TableProcessor implements DataProcessorInterface
 {
     /**
      * @param ContentObjectRenderer $cObj The data of the content element or page

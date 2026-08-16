@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use SBUERK\ThemeExtensionDevelopment\Compatibility\ContentTypeRegistration;
 
 defined('TYPO3') or die();
 
@@ -18,7 +18,7 @@ defined('TYPO3') or die();
 // "LLL:" prefix and returns anything else unchanged, so the tab would render
 // its own untranslated identifier instead of "Images". The traditional form is
 // what works here.
-ExtensionManagementUtility::addRecordType(
+ContentTypeRegistration::addRecordType(
     [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero.label',
         'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero.description',

@@ -21,7 +21,7 @@ Build/Scripts/runTests.sh -s unit -- --filter DummyTest
 the output contains the seed; replay it with `-o <seed>` to reproduce.
 
 Remember to run every supported core version, each after its own
-`composerUpdate` — see [Core version setup](../development/dual-core-setup.md).
+`composerUpdate` — see [Dual core setup](../development/dual-core-setup.md).
 
 ## Conventions
 
@@ -60,23 +60,26 @@ Remember to run every supported core version, each after its own
 ## Core version aware unit tests
 
 Tests for classes below a `Core<major>/` directory mirror that layout in
-`Tests/Unit/Core<major>/` — `Tests/Unit/Core13/` today — and carry the group of
-every core version they must **not** run on:
+`Tests/Unit/Core12/` and `Tests/Unit/Core13/`, and carry the group of every core
+version they must **not** run on:
 
 ```php
-#[Group('not-core-<version>')]
+#[Group('not-core-12')]
 final class ExampleTest extends UnitTestCase
 {
 }
 ```
 
-With one supported version there is nothing to exclude, so no test carries a
-group. See [Core version setup](../development/dual-core-setup.md#test-grouping).
+The two `Example` test classes are mirror images of each other for that reason:
+`Tests/Unit/Core13/Example/ExampleTest` carries `#[Group('not-core-12')]` and
+`Tests/Unit/Core12/Example/ExampleTest` carries `#[Group('not-core-13')]`, so
+each runs on exactly the version whose implementation it instantiates.
+See [Dual core setup](../development/dual-core-setup.md#test-grouping).
 
 [`Tests/Unit/VersionCompatTest`](../../Tests/Unit/VersionCompatTest.php) is the
-guard underneath all of it: it asserts that a run with `-t 13` really is v13, so
-a stale `.Build/` cannot produce a green suite that proved nothing. That test is
-**never removed** —
+guard underneath all of it: it asserts that a run with `-t 12` really is v12 and
+a run with `-t 13` really is v13, so a stale `.Build/` cannot produce a green
+suite that proved nothing. That test is **never removed** —
 see [the two tests that must never be dropped](Index.md#the-two-tests-that-must-never-be-dropped).
 
 ## Testing classes with injected dependencies

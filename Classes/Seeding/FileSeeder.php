@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SBUERK\ThemeExtensionDevelopment\Seeding;
 
 use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
-use TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
@@ -20,23 +19,28 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * `copy()` exists on disk and does not exist for TYPO3, so nothing can
  * reference it.
  *
- * Two details of `addFile()` are worth naming, both of them easy to get wrong:
+ * The `addFile()` call itself is **not** made here but delegated to
+ * {@see FileImporterInterface}, whose implementation is picked by the running
+ * core version. That is the one operation of this class that differs between
+ * TYPO3 v12 and v13: the conflict mode argument is a class constant on v12 and
+ * a native enum on v13 (#101151), and there is no spelling that is correct on
+ * both. Everything else in this class — resolving the storage, resolving the
+ * folder, the permission dance below, the returned uid map — is identical on
+ * both versions and stays shared rather than being duplicated into two copies
+ * of the seeder. The reasoning is written out in full on the interface.
  *
- * - **`removeOriginal` defaults to `true`**, which would *move* the file and
- *   delete the source out of the repository. It is passed as `false` here.
- * - The conflict mode is the **native enum**
- *   `TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior`. TYPO3 v13 still carries
- *   the older class of the same name, marked `@deprecated` in
- *   `.Build/vendor/typo3/cms-core/Classes/Resource/DuplicationBehavior.php`,
- *   and passing that one triggers a deprecation (#101151) which this test
- *   suite turns into a failure.
+ * The one `addFile()` detail worth naming here, because it is easy to get wrong
+ * and invisible from the call site: **`removeOriginal` defaults to `true`**,
+ * which would *move* the file and delete the source out of the repository. The
+ * importer passes `false`, and its method name says so.
  *
  * @internal Part of the seeding implementation, not public API.
  */
-final readonly class FileSeeder
+final class FileSeeder
 {
     public function __construct(
-        private StorageRepository $storageRepository,
+        private readonly StorageRepository $storageRepository,
+        private readonly FileImporterInterface $fileImporter,
     ) {}
 
     /**
@@ -67,12 +71,11 @@ final readonly class FileSeeder
             $storage->setEvaluatePermissions(false);
 
             try {
-                $addedFile = $storage->addFile(
+                $addedFile = $this->fileImporter->addFileReplacingExisting(
+                    $storage,
                     $source,
                     $this->resolveFolder($storage, $file->folder),
                     $file->name ?? basename($source),
-                    DuplicationBehavior::REPLACE,
-                    false,
                 );
             } finally {
                 $storage->setEvaluatePermissions($evaluatePermissions);

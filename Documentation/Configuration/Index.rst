@@ -9,8 +9,32 @@ Configuration
 Enabling the theme for a site
 =============================
 
-The theme ships a **site set**. A site enables it by depending on that set in
-its :file:`config/sites/<identifier>/config.yaml`:
+There are two ways, and which are available depends on the TYPO3 version:
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   TYPO3
+        -   Site set
+        -   Classic static include
+    *   -   v12.4
+        -   not available
+        -   the only way
+    *   -   v13.4
+        -   recommended
+        -   supported
+
+Site sets are a TYPO3 v13.1 feature. On TYPO3 v12 a ``dependencies`` key in a
+site configuration is read by nothing, so the classic static include described
+below is not a fallback there — it is *the* way to enable the theme.
+
+Both paths read the same TypoScript files, so what they deliver is identical.
+
+Site set — TYPO3 v13
+--------------------
+
+A site enables the theme by depending on the set in its
+:file:`config/sites/<identifier>/config.yaml`:
 
 ..  code-block:: yaml
 
@@ -25,15 +49,16 @@ integrator changes is a TypoScript constant, and those are described below.
 In the backend the same set can be selected under
 :guilabel:`Site Management > Sites` in the :guilabel:`Sets` field of the site.
 
-Installations without site sets
-===============================
+Classic static include — TYPO3 v12 and v13
+------------------------------------------
 
-For an installation that does not use site sets, the theme additionally
-registers a classic static template. Create a :guilabel:`sys_template` record on
-the root page and include :guilabel:`Theme Extension Development` in
+The theme also registers a classic static template. Create a
+:guilabel:`sys_template` record on the root page — :guilabel:`Web > List`,
+:guilabel:`Create new record`, :guilabel:`System records`,
+:guilabel:`TypoScript record` — check :guilabel:`Rootlevel`, check
+:guilabel:`Clear` for :guilabel:`Constants` and :guilabel:`Setup`, and select
+:guilabel:`Theme Extension Development` in
 :guilabel:`Include static (from extensions)`.
-
-Both paths read the same TypoScript files, so what they deliver is identical.
 
 ..  note::
 
@@ -46,6 +71,9 @@ Both paths read the same TypoScript files, so what they deliver is identical.
     that pulls the theme in transitively, by depending on another set which in
     turn depends on this one, is not covered: there the static include has to
     stay out of the :guilabel:`sys_template` record.
+
+    On TYPO3 v12 the condition is always true, because no site can declare a
+    set there, and the include is never suppressed.
 
 Templates and stylesheet
 ========================

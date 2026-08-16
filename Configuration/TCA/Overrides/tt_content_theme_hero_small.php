@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use SBUERK\ThemeExtensionDevelopment\Compatibility\ContentTypeRegistration;
 
 defined('TYPO3') or die();
 
 // The reduced hero variant, same field set as theme_hero - see that file for
 // why the "images" tab is spelled out with the traditional LLL:EXT: reference
 // rather than camino's "core.form.tabs:images" shorthand.
-ExtensionManagementUtility::addRecordType(
+ContentTypeRegistration::addRecordType(
     [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero_small.label',
         'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero_small.description',

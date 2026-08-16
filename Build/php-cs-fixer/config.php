@@ -52,13 +52,15 @@ return (new Config())
             ->in([
                 __DIR__ . '/../../Classes',
                 __DIR__ . '/../../Configuration',
+                __DIR__ . '/../../Core12',
                 __DIR__ . '/../../Core13',
                 __DIR__ . '/../../Tests',
                 __DIR__ . '/../../Build',
                 // Only the committed configuration of the development
-                // instance, never the instance root: everything else below it
+                // instances, never an instance root: everything else below one
                 // is generated, and "ignoreVCSIgnored()" does not catch it
                 // because it is git-ignored through a glob pattern.
+                __DIR__ . '/../../instance-core-12/config',
                 __DIR__ . '/../../instance-core-13/config',
             ])
             ->exclude([

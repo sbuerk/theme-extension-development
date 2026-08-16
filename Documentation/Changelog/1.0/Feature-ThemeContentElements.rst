@@ -43,10 +43,11 @@ this extension:
 
 All ten are grouped under their own :guilabel:`Theme` entry in the
 :guilabel:`Create new content element` wizard, so an editor can tell them
-apart from the core set at a glance. No page TSconfig registers that group -
-since TYPO3 v13 the wizard is generated straight from the :php:`label`,
-:php:`description`, :php:`group` and :php:`icon` already given to
-:php:`ExtensionManagementUtility::addRecordType()`.
+apart from the core set at a glance. On TYPO3 v13 no page TSconfig registers
+that group - the wizard is generated straight from the :php:`label`,
+:php:`description`, :php:`group` and :php:`icon` given on the registration
+call (:issue:`102834`). TYPO3 v12 has no such generation and gets the same
+entries as page TSconfig instead - see :ref:`feature-typo3-v12-support`.
 
 Naming
 ======

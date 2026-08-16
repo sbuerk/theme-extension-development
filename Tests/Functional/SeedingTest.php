@@ -7,6 +7,7 @@ namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\ThemeExtensionDevelopment\Seeding\DataMapFactory;
 use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
+use SBUERK\ThemeExtensionDevelopment\Seeding\FileImporterInterface;
 use SBUERK\ThemeExtensionDevelopment\Seeding\FileSeeder;
 use SBUERK\ThemeExtensionDevelopment\Seeding\Seeder;
 use SBUERK\ThemeExtensionDevelopment\Seeding\YamlSeedParser;
@@ -31,6 +32,7 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 final class SeedingTest extends AbstractFunctionalTestCase
 {
     use SiteBasedTestTrait;
+    use ThemeSiteTrait;
 
     private const DEMO_SEED = 'EXT:theme_extension_development/Configuration/Seeds/Demo.yaml';
 
@@ -55,9 +57,16 @@ final class SeedingTest extends AbstractFunctionalTestCase
 
     private function createSeeder(): Seeder
     {
+        // The file importer is fetched from the container rather than
+        // constructed: it is the core version aware half of the seeding, and
+        // only the container knows which of "Core12/" and "Core13/" the running
+        // core version registers.
         return new Seeder(
             new DataMapFactory(),
-            new FileSeeder(GeneralUtility::makeInstance(StorageRepository::class)),
+            new FileSeeder(
+                GeneralUtility::makeInstance(StorageRepository::class),
+                $this->get(FileImporterInterface::class),
+            ),
         );
     }
 
@@ -552,23 +561,7 @@ final class SeedingTest extends AbstractFunctionalTestCase
     {
         $this->seedDemo();
 
-        $this->writeSiteConfiguration(
-            'demo',
-            $this->buildSiteConfiguration(
-                rootPageId: 1,
-                base: 'https://theme.example.com/',
-                websiteTitle: 'Theme demo',
-            ) + [
-                'dependencies' => ['sbuerk/theme-extension-development'],
-            ],
-            [
-                $this->buildDefaultLanguageConfiguration(
-                    identifier: 'EN',
-                    base: 'https://theme.example.com/',
-                ),
-            ],
-        );
-        $this->setUpFrontendRootPage(1, [], [], false);
+        $this->setUpThemeSite(identifier: 'demo', websiteTitle: 'Theme demo');
 
         $body = (string)$this->executeFrontendSubRequest(
             new InternalRequest('https://theme.example.com/typography'),

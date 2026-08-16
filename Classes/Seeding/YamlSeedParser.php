@@ -59,7 +59,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @internal Part of the seeding implementation, not public API.
  */
-final readonly class YamlSeedParser
+final class YamlSeedParser
 {
     private const PAGES = 'pages';
     private const CONTENT = 'content';
@@ -90,6 +90,27 @@ final readonly class YamlSeedParser
      * seeding an empty relation without a word.
      */
     private const IDENTIFIER_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9-]*$/';
+
+    /**
+     * The longest identifier a definition may use, which is the same guarantee
+     * from the other end: the placeholder is `NEW` plus the identifier, and on
+     * TYPO3 v12 DataHandler writes every placeholder into `sys_log.NEWid`, a
+     * `varchar(30)` column. 30 minus the three characters of `NEW` is 27.
+     *
+     * Enforcing it here rather than letting the database do it is the difference
+     * between a message naming the definition and the identifier, and a
+     * `DriverException` out of the middle of `process_datamap()` that says
+     * "value too long for type character varying(30)" and names nothing. It is
+     * also the difference between failing on every DBMS and failing on three of
+     * them: SQLite ignores a declared `varchar` length, so a seed exceeding the
+     * limit would pass the SQLite leg of the test matrix and fail the other
+     * three.
+     *
+     * @todo Remove this limit once support for TYPO3 v12 is dropped. TYPO3 v13
+     *       has no `sys_log.NEWid` column at all, so nothing constrains the
+     *       length of a placeholder there.
+     */
+    private const IDENTIFIER_MAX_LENGTH = 27;
 
     public function parseFile(string $fileName): SeedDefinition
     {
@@ -356,6 +377,18 @@ final readonly class YamlSeedParser
                         $source,
                     ),
                     1786924833,
+                );
+            }
+            if (strlen($identifier) > self::IDENTIFIER_MAX_LENGTH) {
+                throw new SeedingException(
+                    sprintf(
+                        'The identifier "%s" in the seed definition "%s" is %d characters long. An identifier may be at most %d characters long, because it is written to the "sys_log.NEWid" column of TYPO3 v12, which is a varchar(30) holding "NEW" plus the identifier.',
+                        $identifier,
+                        $source,
+                        strlen($identifier),
+                        self::IDENTIFIER_MAX_LENGTH,
+                    ),
+                    1786924838,
                 );
             }
             if (isset($seen[$identifier])) {

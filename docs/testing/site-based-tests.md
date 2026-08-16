@@ -23,16 +23,21 @@ Its majors are pinned to a core version, so the constraint names one major per
 supported version:
 
 ```json
-"sbuerk/typo3-site-based-test-trait": "^2.0.1"
+"sbuerk/typo3-site-based-test-trait": "^1.0.2 || ^2.0.1"
 ```
 
 | Package major | TYPO3 |
 |---------------|-------|
+| `1.x`         | v12   |
 | `2.x`         | v13   |
+
+The pin is in the package, not a convention: `sbuerk/typo3-site-based-test-trait`
+1.0.2 requires `typo3/cms-core: 12.*.*@dev` and nothing else, so composer has no
+choice to make.
 
 `composerUpdate` resolves the major matching the `-t` core version, which is one
 more reason why the installed dependency set must match the version a suite is
-run for — see [Core version setup](../development/dual-core-setup.md).
+run for — see [Dual core setup](../development/dual-core-setup.md).
 
 Beyond availability, the package differs from the core trait in ways that matter
 for a test suite: a language that cannot be resolved **fails** the test instead
@@ -62,6 +67,86 @@ Since every functional test already extends `AbstractFunctionalTestCase`, the
 whole chain roots in the package class through that one edit. When adding an
 intermediate abstract test case, keep it — just make sure the chain ends there
 and not at the framework class.
+
+## Arranging the theme: `ThemeSiteTrait`
+
+Eleven functional tests need the same thing — "a site rooted at page N whose
+pages render through this theme" — and **how** a site delivers the theme is the
+one thing about them that depends on the core version:
+
+| Core version | Delivery                                                                            |
+|--------------|-------------------------------------------------------------------------------------|
+| v13          | `dependencies: [sbuerk/theme-extension-development]`, **no** `sys_template` record. |
+| v12          | A `sys_template` record whose `include_static_file` names the static directory.     |
+
+[`Tests/Functional/ThemeSiteTrait`](../../Tests/Functional/ThemeSiteTrait.php)
+is the single seam where that lives. A test calls `setUpThemeSite()` and knows
+nothing else:
+
+```php
+protected function setUp(): void
+{
+    parent::setUp();
+
+    $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/SomePageTree.csv');
+    $this->setUpThemeSite();
+}
+```
+
+The trait picks one of two implementations of
+[`ThemeDeliveryInterface`](../../Tests/Functional/ThemeDeliveryInterface.php),
+`Tests/Functional/Core12/ThemeDelivery` and `Core13/ThemeDelivery`, with
+literally the same expression `Configuration/Services.php` uses to select the
+version aware directory of the extension:
+
+```php
+$className = sprintf('%s\\Core%d\\ThemeDelivery', __NAMESPACE__, (new Typo3Version())->getMajorVersion());
+```
+
+It ends in `new` rather than in the container because a test case is not
+container managed — PHPUnit instantiates it — so the selector has to be written
+out. It is deliberately the identical expression so the two places stay
+recognisably the same mechanism.
+
+### Why this is an interface and not an `if`
+
+The two deliveries are **mutually exclusive**, not merely different, and
+arranging both "just in case" produces an empty page on v13:
+
+- `setUpFrontendRootPage()` hard-codes `'clear' => 3` on the record it writes.
+- A clear-flagged `SysTemplateInclude` resets the whole AST built so far
+  (`IncludeTreeAstBuilderVisitor::visitBeforeChildren()`).
+- The site set node is added *before* the `sys_template` rows
+  (`SysTemplateTreeBuilder::getTreeBySysTemplateRowsAndSite()`).
+
+So the record throws away everything the set delivered, while the condition
+guarding the static include suppresses the import because a set *is* active.
+Nothing renders, and nothing says why.
+
+### The implementations describe, they do not perform
+
+`writeSiteConfiguration()` and `setUpFrontendRootPage()` are `protected` members
+of the test case. A delivery object is a plain object and cannot call them, and
+handing it the test case so it can reach through would trade one seam for a much
+wider one. Each implementation therefore answers three questions — which site
+configuration keys to add, which `sys_template` field values to use, and whether
+to write a record at all — and the trait does the arranging.
+
+That has a pleasant side effect: the implementations are directly assertable.
+`Tests/Functional/Core12/ThemeDeliveryTest` and `Core13/ThemeDeliveryTest` check
+that the harness arranged what it claims — a record and no `dependencies` versus
+`dependencies` and no record. A harness that silently arranges nothing is
+exactly the failure mode a rendering suite cannot detect on its own.
+
+### No rendering test carries a core version group
+
+`#[Group('not-core-12')]` on the eleven tests would have been the short way to
+green, and it would have deleted two thirds of the v12 coverage. The group
+belongs only where the **subject** is version specific:
+`SiteSetRenderingTest` and `StaticIncludeGuardTest`, whose subject is the site
+set, and the two version specific assertions of
+`Tests/ExtensionCoreVersionCompatTestsTrait`.
+→ [Dual core setup](../development/dual-core-setup.md#test-grouping)
 
 ## The three parts of a site based test
 
@@ -230,13 +315,16 @@ Two details of the plugin registration are worth knowing, both of them the
 reason it needs no version aware code:
 
 - `ExtensionUtility::configurePlugin()` is called with
-  `PLUGIN_TYPE_CONTENT_ELEMENT` explicitly, and it has to be. TYPO3 v13 still
-  defaults to `list_type` and **triggers a deprecation** for it. Naming `CType`
-  is the spelling that stays correct as versions move. Omitting it would not
-  fail silently either: the deprecation turns the run red, because
+  `PLUGIN_TYPE_CONTENT_ELEMENT` explicitly, and it has to be. Both supported
+  versions still *default* to `list_type`, and TYPO3 v13 **triggers a
+  deprecation** for it (#105076; v12 does not). Naming `CType` is the spelling
+  that is correct on v12 and v13 alike and stays correct as versions move — the
+  constant exists in v12's `ExtensionUtility` too, so this needs no version
+  aware code. Omitting it would not fail silently either: on v13 the
+  deprecation turns the run red, because
   [the suites fail on deprecations](phpunit-configuration.md#strictness-policy).
   See the changelog entry `Important-105538-ListTypeAndSubTypes.rst` shipped
-  with `typo3/cms-core`.
+  with `typo3/cms-core` 13.4.
 - `Configuration/TCA/Overrides/tt_content.php` passes **no** plugin type:
   `ExtensionUtility::registerPlugin()` reads it back from what `configurePlugin()`
   registered, and `ext_localconf.php` is loaded before the TCA overrides.
@@ -250,4 +338,4 @@ reason it needs no version aware code:
 - [Functional tests](functional-tests.md)
 - [Fixture extensions](fixture-extensions.md)
 - [Environment state](environment-state.md)
-- [Core version setup](../development/dual-core-setup.md)
+- [Dual core setup](../development/dual-core-setup.md)

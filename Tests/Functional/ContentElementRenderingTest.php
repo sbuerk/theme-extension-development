@@ -25,6 +25,7 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 final class ContentElementRenderingTest extends AbstractFunctionalTestCase
 {
     use SiteBasedTestTrait;
+    use ThemeSiteTrait;
 
     private const NO_RENDERING_DEFINITION = 'has no rendering definition';
 
@@ -37,27 +38,7 @@ final class ContentElementRenderingTest extends AbstractFunctionalTestCase
         parent::setUp();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/PageWithContentElements.csv');
-        $this->writeSiteConfiguration(
-            'theme',
-            // See SiteSetRenderingTest for why this is not the "additional"
-            // argument: https://github.com/sbuerk/typo3-site-based-test-trait/issues/25
-            $this->buildSiteConfiguration(
-                rootPageId: 1,
-                base: 'https://theme.example.com/',
-                websiteTitle: 'Theme',
-            ) + [
-                'dependencies' => [
-                    'sbuerk/theme-extension-development',
-                ],
-            ],
-            [
-                $this->buildDefaultLanguageConfiguration(
-                    identifier: 'EN',
-                    base: 'https://theme.example.com/',
-                ),
-            ],
-        );
-        $this->setUpFrontendRootPage(1, [], [], false);
+        $this->setUpThemeSite();
     }
 
     private function renderRootPage(): string

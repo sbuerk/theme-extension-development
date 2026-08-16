@@ -15,8 +15,8 @@ All four are **copies** of the boilerplate maintained in
 those files directly but to copy them, because an extension needs different test
 suite paths and usually additional bootstrap code.
 
-They are currently baselined from **testing-framework 9.6.1**, which each file
-records in its own header comment together with its deviations.
+They record their baseline version in their own header comment, together with
+their deviations.
 
 Being copies, they do not update themselves. When `typo3/testing-framework` is
 raised to a new version, diff the four files against the new template, adopt
@@ -27,19 +27,46 @@ diff -u .Build/vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTes
         Build/phpunit/FunctionalTests.xml
 ```
 
+> [!IMPORTANT]
+> On this branch the template itself is core version dependent. The constraint
+> is `typo3/testing-framework: ^8.3.3` — the line covering v12 **and** v13 — so
+> the boilerplate on disk is the 8.x one, and it still carries the TYPO3 v12
+> branches the 9.x line dropped. Diff against what `composerUpdate` installed,
+> not against a remembered version.
+
+## One configuration, one PHPUnit major
+
+`Build/phpunit/UnitTests.xml` and `FunctionalTests.xml` are **not** forked per
+core version, and must not be. `typo3/testing-framework` 8.x permits PHPUnit 10
+*or* 11, and PHPUnit 11 requires PHP ≥ 8.2, so left alone composer would resolve
+11.5 on every job except the PHP 8.1 one — two majors in one branch. This branch
+pins **PHPUnit `^10.5.64`** instead, so every job runs the same major.
+
+The reason is not the configuration files, which validate against both XSDs
+anyway. It is the runner: the two majors disagree about how to spell things the
+harness passes. `--exclude-group` is the concrete case — 10.5 rejects a repeated
+option and 11 deprecates the comma separated list, and since this suite fails on
+runner warnings, there is no spelling that satisfies both. One major removes the
+question.
+
+The schema location resolves against
+`.Build/vendor/phpunit/phpunit/phpunit.xsd`, i.e. against whichever PHPUnit was
+installed, so an attribute that only exists in 11 would be caught the moment the
+v12 set is installed rather than at review time.
+
 ## Deliberate deviations from the template
 
 Everything that differs from the upstream boilerplate is intentional and listed
 here. Anything not on this list is drift and should be reconciled.
 
-| Deviation                                                                 | Reason                                                                                                                                |
-|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| `<directory>../../Tests/Unit/</directory>` and `../../Tests/Functional/`  | The template points at the TYPO3 mono-repository system extension paths.                                                              |
-| Schema location `../../.Build/vendor/phpunit/phpunit/phpunit.xsd`         | Resolves against the installed PHPUnit instead of a remote URL, so validation works offline and always matches the installed version. |
-| Additional `failOn*`, `beStrictAbout*` and `displayDetailsOn*` attributes | The strictness policy below. The template stops at the defaults of a core test run.                                                   |
-| Imports and `: void` in the bootstraps                                    | Coding guidelines of this repository (`cgl` gate).                                                                                    |
-| `AvailableFixturePackages` adoption in `FunctionalTestsBootstrap.php`     | Makes fixture extensions loadable by composer package name — see [Fixture extensions](fixture-extensions.md).                         |
-| No TYPO3 v12 fallback branch in `UnitTestsBootstrap.php`                  | v12 is not supported here.                                                                                                            |
+| Deviation                                                                                               | Reason                                                                                                                                                                                                                                                    |
+|---------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `<directory>../../Tests/Unit/</directory>` and `../../Tests/Functional/`                                | The template points at the TYPO3 mono-repository system extension paths.                                                                                                                                                                                  |
+| Schema location `../../.Build/vendor/phpunit/phpunit/phpunit.xsd`                                       | Resolves against the installed PHPUnit instead of a remote URL, so validation works offline and always matches the installed version.                                                                                                                     |
+| Additional `failOn*`, `beStrictAbout*` and `displayDetailsOn*` attributes                               | The strictness policy below. The template stops at the defaults of a core test run.                                                                                                                                                                       |
+| Imports and `: void` in the bootstraps                                                                  | Coding guidelines of this repository (`cgl` gate).                                                                                                                                                                                                        |
+| `AvailableFixturePackages` adoption in `FunctionalTestsBootstrap.php`                                   | Makes fixture extensions loadable by composer package name — see [Fixture extensions](fixture-extensions.md).                                                                                                                                             |
+| `UnitTestsBootstrap.php` calls `SystemEnvironmentBuilder::run()` with `REQUESTTYPE_CLI` unconditionally | The 8.x boilerplate branches on `class_exists(\TYPO3\CMS\Core\Http\Application::class)` and adds `REQUESTTYPE_BE` where that class is absent, which is the case on TYPO3 v12.4. **Reconcile this before relying on the request type in a v12 unit test.** |
 
 ## Strictness policy
 
@@ -84,7 +111,7 @@ Four consequences worth knowing:
   version split relies on (`--exclude-group not-core-<version>`), so failing on
   skipped tests would break the core version setup. Use groups, not
   `markTestSkipped()`, to exclude a test from a core version — see
-  [Core version setup](../development/dual-core-setup.md#test-grouping).
+  [Dual core setup](../development/dual-core-setup.md#test-grouping).
 
 `failOnAllIssues` would cover most of the table with a single attribute, but it
 implies `failOnSkipped`, so the flags are listed individually instead.

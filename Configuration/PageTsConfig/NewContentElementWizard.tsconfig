@@ -1,0 +1,145 @@
+# Registers the theme's content elements in the "new content element" wizard
+# on TYPO3 v12.
+#
+# On v13 nothing in this file is needed: Feature #102834 ("Auto-registration of
+# New Content Element Wizard via TCA", v13.0) builds the wizard from the CType
+# items and their "itemGroups" -
+# "NewContentElementController::loadAvailableWizards()" turns every item of the
+# type field into a wizard entry, keyed "<group>_<value>", with the item's
+# label, description and icon. The ten calls in
+# "Configuration/TCA/Overrides/tt_content_theme_*.php" therefore already produce
+# the wizard entries there.
+#
+# v12 has none of that. Its "NewContentElementController::getWizards()" reads
+# "mod.wizards.newContentElement.wizardItems" out of page TSconfig and nothing
+# else, which is why both EXT:backend and EXT:frontend still ship their wizard
+# items as page TSconfig on that version
+# (".Build/vendor/typo3/cms-backend/Configuration/page.tsconfig" and
+# ".Build/vendor/typo3/cms-frontend/Configuration/page.tsconfig" with a v12
+# dependency set installed; no such file exists in either sysext on v13).
+# Without this file the ten types are selectable in the CType dropdown of an
+# existing element but cannot be created, which is the only way an editor ever
+# reaches them.
+#
+# The entries are deliberately not left switched on for v13 as well. They would
+# not duplicate anything there - v13's
+# "NewContentElementController::mergeContentElementWizardsWithPageTSConfigWizards()"
+# drops the TCA generated entry whenever a page TSconfig entry carries the same
+# "tt_content_defValues", and the surviving entry lands under the same
+# "<group>.elements.<value>" key. What it would do is *shadow* the TCA: the
+# page TSconfig title, description and icon would win over the ones the TCA
+# item carries, and "types.<value>.creationOptions" would be dropped along with
+# the TCA entry. Two sources of truth for the same wizard entry, of which only
+# one is read - that is the trap this condition avoids, not a duplicate tile.
+#
+# @todo Delete this file, its "@import" in "Configuration/page.tsconfig" and the
+#       condition around it as soon as support for TYPO3 v12 is dropped. Nothing
+#       else has to change then: the TCA registration already covers v13.
+
+# Only TYPO3 v12 evaluates the block below. "typo3.branch" is provided by
+# "TYPO3\CMS\Core\ExpressionLanguage\DefaultProvider", which is registered for
+# the "typoscript" expression language context that page TSconfig conditions are
+# resolved in as well, and it returns the "BRANCH" constant of
+# "TYPO3\CMS\Core\Information\Typo3Version" - "12.4" and "13.4" for the two
+# versions this extension supports. A branch literal is exact rather than
+# clever here, because "12.4" is the only v12 branch the composer constraint
+# ("^12.4.22 || ^13.4") can ever resolve to.
+[typo3.branch == "12.4"]
+    mod.wizards.newContentElement.wizardItems {
+        theme.header = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.group.theme
+
+        # Mirrors the "before:default" position the CType item group is
+        # registered with in "Configuration/TCA/Overrides/tt_content.php". v12
+        # has no "default" wizard group - its equivalent is "common", defined by
+        # EXT:backend - so the group is ordered before that one instead.
+        theme.before = common
+
+        theme.elements {
+            theme_author {
+                iconIdentifier = content-user
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_author.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_author.description
+                tt_content_defValues {
+                    CType = theme_author
+                }
+            }
+            theme_hero {
+                iconIdentifier = content-header
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero.description
+                tt_content_defValues {
+                    CType = theme_hero
+                }
+            }
+            theme_hero_small {
+                iconIdentifier = content-header
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero_small.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero_small.description
+                tt_content_defValues {
+                    CType = theme_hero_small
+                }
+            }
+            theme_hero_text_only {
+                iconIdentifier = content-header
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero_text_only.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero_text_only.description
+                tt_content_defValues {
+                    CType = theme_hero_text_only
+                }
+            }
+            theme_linklist {
+                iconIdentifier = content-bullets
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_linklist.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_linklist.description
+                tt_content_defValues {
+                    CType = theme_linklist
+                }
+            }
+            theme_media_teaser {
+                iconIdentifier = content-beside-text-img-left
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_media_teaser.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_media_teaser.description
+                tt_content_defValues {
+                    CType = theme_media_teaser
+                }
+            }
+            theme_media_teaser_grid {
+                iconIdentifier = content-card-group
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_media_teaser_grid.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_media_teaser_grid.description
+                tt_content_defValues {
+                    CType = theme_media_teaser_grid
+                }
+            }
+            theme_sociallinks {
+                iconIdentifier = content-listgroup
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_sociallinks.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_sociallinks.description
+                tt_content_defValues {
+                    CType = theme_sociallinks
+                }
+            }
+            theme_teaser {
+                iconIdentifier = content-text-teaser
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_teaser.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_teaser.description
+                tt_content_defValues {
+                    CType = theme_teaser
+                }
+            }
+            theme_testimonial {
+                iconIdentifier = content-quote
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_testimonial.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_testimonial.description
+                tt_content_defValues {
+                    CType = theme_testimonial
+                }
+            }
+        }
+
+        # v12 only offers the elements listed in "show"; "*" is what EXT:backend
+        # itself uses for its "plugins" group. v13 has no "show" handling left
+        # at all, so the key is inert there even if this block were evaluated.
+        theme.show = *
+    }
+[END]

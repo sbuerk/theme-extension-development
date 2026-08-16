@@ -12,6 +12,16 @@
 # "site('sets')" lists the sets a site declares itself, so a theme pulled in as
 # a transitive dependency of another set is not covered here. Enabling the theme
 # through its own set, which is the documented way, is.
-[not ('sbuerk/theme-extension-development' in site('sets'))]
+#
+# The "?: []" is not defensive noise. Site sets do not exist before TYPO3 v13.1
+# (#103437), so on v12 "site('sets')" resolves a method the Site entity does not
+# have and returns NULL. Symfony compiles "in" to "in_array($left, $right,
+# true)", which raises a TypeError for NULL - and
+# "IncludeTreeConditionMatcherVisitor" catches only SyntaxError and
+# RuntimeException, so the error is not contained: every frontend request that
+# loads this file dies. Falling back to an empty array makes the condition
+# answer "no set is active" on v12, which is the only truthful answer there.
+# @todo Drop the fallback when TYPO3 v12 support is dropped.
+[not ('sbuerk/theme-extension-development' in (site('sets') ?: []))]
     @import 'EXT:theme_extension_development/Configuration/TypoScript/setup.typoscript'
 [END]

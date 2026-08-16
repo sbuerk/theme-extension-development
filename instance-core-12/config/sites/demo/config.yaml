@@ -1,0 +1,33 @@
+# Site of the seeded demo page tree.
+#
+# "rootPageId" is 1 because the seed definition declares that uid - see
+# "Configuration/Seeds/Demo.yaml" of the theme. That is the whole reason a seed
+# may declare uids at all: without it this file could not be committed.
+#
+# The base is relative and carries no host name, so the instance is reachable
+# under its DDEV host name and under whatever a host stack serves it as.
+#
+# Unlike "instance-core-13", this file carries no "dependencies" key. Site sets
+# are a TYPO3 v13.1 feature (changelog 13.1 "Feature: #103437 - Introduce site
+# sets", and "Feature: #103439" for the TypoScript provider that makes a set
+# deliver "setup.typoscript"). On v12 the key resolves to nothing, so writing it
+# down would claim that this file enables the theme when it does not.
+#
+# On v12 the theme is enabled through its other delivery path, the classic
+# static include registered by "Configuration/TCA/Overrides/sys_template.php".
+# That needs a "sys_template" record on page 1, which is a database row and
+# therefore expressible in neither this file nor a seed definition - it is a
+# manual step, described in "docs/development/instances.md".
+rootPageId: 1
+base: /
+websiteTitle: 'Theme demo, TYPO3 v12'
+languages:
+  -
+    title: English
+    enabled: true
+    languageId: 0
+    base: /
+    locale: en_US.UTF-8
+    navigationTitle: English
+    flag: us
+    websiteTitle: ''

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
@@ -22,7 +23,18 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * That is what makes this test worth its runtime: it fails if the set is not
  * found, if its "typoscript" path stops resolving, if the page object is not
  * built, or if the Fluid paths break.
+ *
+ * This is the one rendering test that carries a core version group. Site sets
+ * arrived in TYPO3 v13.1 (#103437) and this test's subject *is* the set, so on
+ * v12 there is nothing here to run. The other rendering tests deliberately have
+ * no group: they arrange the theme through {@see ThemeSiteTrait}, which
+ * delivers it the way the running version can, and grouping them away would
+ * give up two thirds of the v12 coverage instead of porting it. The equivalent
+ * of this test on the classic delivery path is
+ * {@see StaticFileIncludeRenderingTest}, which asserts the same three things
+ * and runs on both versions.
  */
+#[Group('not-core-12')]
 final class SiteSetRenderingTest extends AbstractFunctionalTestCase
 {
     use SiteBasedTestTrait;

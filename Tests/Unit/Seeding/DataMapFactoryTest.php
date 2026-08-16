@@ -33,8 +33,8 @@ final class DataMapFactoryTest extends UnitTestCase
 
         $map = $this->subject->createFromDefinition($definition)['dataMap'];
 
-        $this->assertSame('0', $map['pages']['NEWpages-home']['pid']);
-        $this->assertSame('NEWpages-home', $map['pages']['NEWpages-sub']['pid']);
+        $this->assertSame('0', $map['pages']['NEWhome']['pid']);
+        $this->assertSame('NEWhome', $map['pages']['NEWsub']['pid']);
     }
 
     #[Test]
@@ -50,9 +50,9 @@ final class DataMapFactoryTest extends UnitTestCase
 
         // Without this a new record goes to the top of its parent, and the tree
         // would come out in reverse declaration order.
-        $this->assertSame('0', $map['pages']['NEWpages-first']['pid']);
-        $this->assertSame('-NEWpages-first', $map['pages']['NEWpages-second']['pid']);
-        $this->assertSame('-NEWpages-second', $map['pages']['NEWpages-third']['pid']);
+        $this->assertSame('0', $map['pages']['NEWfirst']['pid']);
+        $this->assertSame('-NEWfirst', $map['pages']['NEWsecond']['pid']);
+        $this->assertSame('-NEWsecond', $map['pages']['NEWthird']['pid']);
     }
 
     #[Test]
@@ -70,9 +70,9 @@ final class DataMapFactoryTest extends UnitTestCase
 
         // A negative pid names a record of the SAME table, so the first content
         // element and the first sub page both address the page they belong to.
-        $this->assertSame('NEWpages-home', $map['tt_content']['NEWttcontent-text-one']['pid']);
-        $this->assertSame('-NEWttcontent-text-one', $map['tt_content']['NEWttcontent-text-two']['pid']);
-        $this->assertSame('NEWpages-home', $map['pages']['NEWpages-sub']['pid']);
+        $this->assertSame('NEWhome', $map['tt_content']['NEWtext-one']['pid']);
+        $this->assertSame('-NEWtext-one', $map['tt_content']['NEWtext-two']['pid']);
+        $this->assertSame('NEWhome', $map['pages']['NEWsub']['pid']);
     }
 
     #[Test]
@@ -100,8 +100,8 @@ final class DataMapFactoryTest extends UnitTestCase
         // DataHandler reads the suggestion from before it looks the key up. It
         // drops the column again before the insert, so this cannot write a uid
         // on its own.
-        $this->assertSame(1, $result['dataMap']['pages']['NEWpages-home']['uid']);
-        $this->assertArrayNotHasKey('uid', $result['dataMap']['pages']['NEWpages-no-uid']);
+        $this->assertSame(1, $result['dataMap']['pages']['NEWhome']['uid']);
+        $this->assertArrayNotHasKey('uid', $result['dataMap']['pages']['NEWno-uid']);
     }
 
     #[Test]
@@ -113,7 +113,7 @@ final class DataMapFactoryTest extends UnitTestCase
 
         // DataHandler creates records hidden, which would leave a seeded tree
         // invisible in the frontend with nothing saying why.
-        $this->assertSame(0, $map['pages']['NEWpages-home']['hidden']);
+        $this->assertSame(0, $map['pages']['NEWhome']['hidden']);
     }
 
     #[Test]
@@ -123,7 +123,7 @@ final class DataMapFactoryTest extends UnitTestCase
 
         $map = $this->subject->createFromDefinition($definition)['dataMap'];
 
-        $this->assertSame(1, $map['pages']['NEWpages-home']['hidden']);
+        $this->assertSame(1, $map['pages']['NEWhome']['hidden']);
     }
 
     #[Test]
@@ -143,7 +143,7 @@ final class DataMapFactoryTest extends UnitTestCase
         // so a field it has never heard of needs no support to be seedable.
         $this->assertSame(
             ['title' => 'Home', 'backend_layout' => 'pagets__content', 'nav_hide' => 1, 'pid' => '0', 'hidden' => 0],
-            $map['pages']['NEWpages-home'],
+            $map['pages']['NEWhome'],
         );
     }
 
@@ -154,7 +154,7 @@ final class DataMapFactoryTest extends UnitTestCase
 
         $map = $this->subject->createFromDefinition($definition, 7)['dataMap'];
 
-        $this->assertSame('7', $map['pages']['NEWpages-home']['pid']);
+        $this->assertSame('7', $map['pages']['NEWhome']['pid']);
     }
 
     #[Test]
@@ -173,7 +173,7 @@ final class DataMapFactoryTest extends UnitTestCase
         $this->assertArrayNotHasKey('sys_file_reference', $result['dataMap']);
         $this->assertSame(
             [[
-                'parent' => 'NEWpages-home',
+                'parent' => 'NEWhome',
                 'table' => 'pages',
                 'field' => 'media',
                 'file' => 7,
@@ -230,7 +230,7 @@ final class DataMapFactoryTest extends UnitTestCase
         // underscore as the "<table>_<uid>" form and takes it apart there, so a
         // placeholder carrying one resolves to nothing and the relation is
         // written empty - with an empty error log.
-        foreach (['pages' => 'NEWpages-home', 'tt_content' => 'NEWttcontent-links', 'tx_theme_list_item' => 'NEWtxthemelistitem-links-docs'] as $table => $placeholder) {
+        foreach (['pages' => 'NEWhome', 'tt_content' => 'NEWlinks', 'tx_theme_list_item' => 'NEWlinks-docs'] as $table => $placeholder) {
             $this->assertArrayHasKey($placeholder, $map[$table]);
             $this->assertStringNotContainsString('_', $placeholder);
         }
@@ -256,8 +256,8 @@ final class DataMapFactoryTest extends UnitTestCase
         // is the order the children come out in - not the order of the data map
         // and not the "sorting" of the child records.
         $this->assertSame(
-            'NEWtxthemelistitem-links-docs,NEWtxthemelistitem-links-media',
-            $map['tt_content']['NEWttcontent-links']['tx_theme_list_items'],
+            'NEWlinks-docs,NEWlinks-media',
+            $map['tt_content']['NEWlinks']['tx_theme_list_items'],
         );
     }
 
@@ -282,8 +282,8 @@ final class DataMapFactoryTest extends UnitTestCase
         // hint the sibling levels use: that is a sorting instruction against
         // the same table, and the order of inline children comes from the
         // relation list instead.
-        $this->assertSame('NEWpages-home', $map['tx_theme_list_item']['NEWtxthemelistitem-links-docs']['pid']);
-        $this->assertSame('NEWpages-home', $map['tx_theme_list_item']['NEWtxthemelistitem-links-media']['pid']);
+        $this->assertSame('NEWhome', $map['tx_theme_list_item']['NEWlinks-docs']['pid']);
+        $this->assertSame('NEWhome', $map['tx_theme_list_item']['NEWlinks-media']['pid']);
     }
 
     #[Test]
@@ -298,7 +298,7 @@ final class DataMapFactoryTest extends UnitTestCase
         $result = $this->subject->createFromDefinition($definition);
 
         $this->assertTrue($result['suggestedUids']['tx_theme_list_item:42']);
-        $this->assertSame(0, $result['dataMap']['tx_theme_list_item']['NEWtxthemelistitem-links-docs']['hidden']);
+        $this->assertSame(0, $result['dataMap']['tx_theme_list_item']['NEWlinks-docs']['hidden']);
     }
 
     #[Test]
@@ -319,13 +319,13 @@ final class DataMapFactoryTest extends UnitTestCase
         $references = $this->subject->createFromDefinition($definition, 0, ['hero' => 7])['references'];
 
         $this->assertSame([[
-            'parent' => 'NEWtxthemelistitem-grid-tile',
+            'parent' => 'NEWgrid-tile',
             'table' => 'tx_theme_list_item',
             'field' => 'image',
             'file' => 7,
             // The page the inline child sits on, which is the page its parent
             // sits on as well.
-            'pid' => 'NEWpages-home',
+            'pid' => 'NEWhome',
             'values' => [],
         ]], $references);
     }
@@ -342,10 +342,10 @@ final class DataMapFactoryTest extends UnitTestCase
 
         $map = $this->subject->createFromDefinition($definition)['dataMap'];
 
-        $this->assertSame('NEWtxthemelistitem-first', $map['tt_content']['NEWttcontent-element']['tx_theme_list_items']);
-        $this->assertSame('NEWtxthemeotheritem-second', $map['tt_content']['NEWttcontent-element']['tx_theme_other_items']);
-        $this->assertArrayHasKey('NEWtxthemelistitem-first', $map['tx_theme_list_item']);
-        $this->assertArrayHasKey('NEWtxthemeotheritem-second', $map['tx_theme_other_item']);
+        $this->assertSame('NEWfirst', $map['tt_content']['NEWelement']['tx_theme_list_items']);
+        $this->assertSame('NEWsecond', $map['tt_content']['NEWelement']['tx_theme_other_items']);
+        $this->assertArrayHasKey('NEWfirst', $map['tx_theme_list_item']);
+        $this->assertArrayHasKey('NEWsecond', $map['tx_theme_other_item']);
     }
 
     #[Test]
@@ -367,9 +367,9 @@ final class DataMapFactoryTest extends UnitTestCase
         // The children of two different parents share one table. Chaining them
         // per table, as the page and content levels do, would make the second
         // parent's child point at the first parent's child.
-        $this->assertSame('NEWpages-home', $map['tx_theme_list_item']['NEWtxthemelistitem-social-mastodon']['pid']);
+        $this->assertSame('NEWhome', $map['tx_theme_list_item']['NEWsocial-mastodon']['pid']);
         // The content elements themselves are still chained.
-        $this->assertSame('-NEWttcontent-links', $map['tt_content']['NEWttcontent-social']['pid']);
+        $this->assertSame('-NEWlinks', $map['tt_content']['NEWsocial']['pid']);
     }
 
     #[Test]
@@ -381,7 +381,7 @@ final class DataMapFactoryTest extends UnitTestCase
 
         $map = $this->subject->createFromDefinition($definition)['dataMap'];
 
-        $this->assertArrayNotHasKey('tx_theme_list_items', $map['tt_content']['NEWttcontent-links']);
+        $this->assertArrayNotHasKey('tx_theme_list_items', $map['tt_content']['NEWlinks']);
     }
 
     #[Test]
@@ -391,6 +391,6 @@ final class DataMapFactoryTest extends UnitTestCase
 
         $map = $this->subject->createFromDefinition($definition, 42)['dataMap'];
 
-        $this->assertSame('42', $map['pages']['NEWpages-home']['pid']);
+        $this->assertSame('42', $map['pages']['NEWhome']['pid']);
     }
 }

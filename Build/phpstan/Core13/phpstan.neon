@@ -14,13 +14,14 @@ parameters:
   treatPhpDocTypesAsCertain: false
 
   # One configuration per supported core version, each analysing only its own
-  # "Core<major>/" sources: a directory written for a different core version may
-  # use API that does not exist here, so it is never in this path list. As long
-  # as a single version is supported there is exactly one such directory and
-  # nothing under "Tests/" has to be excluded either; a second supported version
-  # gets its own directory beside this one, not a widened path list here.
+  # "Core<major>/" sources: a directory written for a different core version
+  # uses API that does not exist here, so it is never in this path list, and
+  # the tests of that directory are excluded for the same reason.
   paths:
     - ../../../Classes
     - ../../../Configuration
     - ../../../Core13
     - ../../../Tests
+
+  excludePaths:
+    - ../../../Tests/*/Core12/*

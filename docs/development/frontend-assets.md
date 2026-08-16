@@ -195,4 +195,4 @@ in the workflow.
 
 - [Development environment](environment.md)
 - [Quality gates](quality-gates.md)
-- [Core version setup](dual-core-setup.md)
+- [Dual core setup](dual-core-setup.md)

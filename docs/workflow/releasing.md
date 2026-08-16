@@ -40,6 +40,28 @@ Build/Scripts/runTests.sh -s setVersion -- 1.2.0 release
 Everything after `--` is passed to the script unchanged, `--dry-run` included.
 Both ways produce the same result — the wrapper only adds the container.
 
+### `--source-branch` on a maintenance branch
+
+`extra.branch-alias` is keyed to a branch name — `dev-<source-branch>` — and
+both scripts still default that to `main`:
+
+```bash
+SOURCE_BRANCH="main"
+```
+
+**This branch is `1`, not `main`**, so it has to be passed until the default is
+corrected:
+
+```bash
+Build/Scripts/setVersion.sh 1.0.1 post-release --source-branch=1
+Build/Scripts/release.sh 1.0.0 --source-branch=1 --dry-run
+```
+
+`release.sh` uses it for more than the alias: it is the branch it branches off,
+refreshes, targets pull requests at with `gh pr create --base`, and tags. Run
+with the default on a maintenance branch it would open the release pull request
+against `main`.
+
 ## `release.sh` — orchestrate the release
 
 Drives the full two-phase workflow for one release version: branch, apply the

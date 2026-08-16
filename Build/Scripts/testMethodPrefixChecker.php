@@ -32,7 +32,19 @@ class NodeVisitor extends NodeVisitorAbstract
     }
 }
 
-$parser = (new ParserFactory())->createForVersion(PhpVersion::fromComponents(8, 2));
+// Both supported php-parser majors are reachable here, and they spell the
+// factory differently. "typo3/cms-install" requires "nikic/php-parser" ^4.15.4
+// on TYPO3 v12, so the v12 dependency set resolves php-parser 4 while v13
+// resolves 5. Nothing else this script uses differs between them: the node
+// types, the traverser and the visitor base class are the same in both.
+// "PhpVersion" is the class php-parser 5 added along with "createForVersion()",
+// which makes it the honest thing to test for - "::class" does not autoload, so
+// this asks whether the class exists rather than loading it.
+// @todo Collapse to the "createForVersion()" branch when TYPO3 v12 support is
+//       dropped and php-parser 4 goes with it.
+$parser = class_exists(PhpVersion::class)
+    ? (new ParserFactory())->createForVersion(PhpVersion::fromComponents(8, 2))
+    : (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
 
 $finder = new Finder();
 $finder->files()

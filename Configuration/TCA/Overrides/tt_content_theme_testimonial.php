@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use SBUERK\ThemeExtensionDevelopment\Compatibility\ContentTypeRegistration;
 
 defined('TYPO3') or die();
 
@@ -11,7 +11,7 @@ defined('TYPO3') or die();
 // attributed person's name and role, not a content heading - the same
 // relabelling camino applies to its own camino_testimonial
 // (.agent/tmp/theme_camino/Configuration/TCA/Overrides/20_tt_content_testimonial.php).
-ExtensionManagementUtility::addRecordType(
+ContentTypeRegistration::addRecordType(
     [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_testimonial.label',
         'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_testimonial.description',

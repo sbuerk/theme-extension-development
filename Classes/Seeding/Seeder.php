@@ -8,6 +8,7 @@ use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -22,11 +23,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @internal Part of the seeding implementation, not public API.
  */
-final readonly class Seeder
+final class Seeder
 {
     public function __construct(
-        private DataMapFactory $dataMapFactory,
-        private FileSeeder $fileSeeder,
+        private readonly DataMapFactory $dataMapFactory,
+        private readonly FileSeeder $fileSeeder,
     ) {}
 
     /**
@@ -59,6 +60,8 @@ final readonly class Seeder
                 1786924815,
             );
         }
+
+        $this->assureLanguageService($backendUser);
 
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $dataHandler->suggestedInsertUids = $map['suggestedUids'];
@@ -129,6 +132,12 @@ final readonly class Seeder
             // "RelationHandler::writeForeignField()" - which never runs. Every
             // seeded reference kept a "sorting_foreign" of 0, leaving the order
             // of a multi file relation up to the database.
+            //
+            // The counter rather than the parent's identifier also keeps this
+            // placeholder inside the 30 characters TYPO3 v12 allows in
+            // "sys_log.NEWid" - see "SeedRecord::placeholder()" for why that
+            // budget matters. "NEWsysfilereference-" is 20 characters, so it
+            // holds until a single seed declares 10^10 file references.
             $placeholder = 'NEWsysfilereference-' . ++$counter;
             // The declared fields first and the structural ones on top:
             // "array_merge" lets the later value win, so a definition cannot
@@ -153,6 +162,39 @@ final readonly class Seeder
         $dataHandler->start($dataMap, [], $backendUser);
         $dataHandler->process_datamap();
         $this->assertNoErrors($dataHandler, $definition);
+    }
+
+    /**
+     * Makes sure `$GLOBALS['LANG']` holds a language service before DataHandler
+     * is let loose.
+     *
+     * DataHandler writes a log entry for every record it creates, and building
+     * one runs the record through `BackendUtility::getRecordTitle()`, which
+     * ends in `BackendUtility::getLanguageService()` — a method returning
+     * `$GLOBALS['LANG']` under a non-nullable `LanguageService` return type. In
+     * a backend request the middleware stack has set that global long before
+     * DataHandler runs; on the command line and in a functional test nothing
+     * has, and TYPO3 v12 answers the missing global with
+     * "Return value must be of type LanguageService, null returned" — a
+     * `TypeError` out of the middle of `process_datamap()`.
+     *
+     * TYPO3 v12 offered `Bootstrap::initializeLanguageObject()` for exactly
+     * this and TYPO3 v13 removed it, so the initialisation is done here rather
+     * than through a core helper that exists on one version only. This is
+     * shared code and not a version switch: `LanguageServiceFactory` and
+     * `createFromUserPreferences()` are the same on both versions, and the
+     * `??=` leaves an already initialised language service — the backend case —
+     * untouched.
+     *
+     * Turning DataHandler's logging off would avoid the call as well and is not
+     * an option: `DataHandler::log()` returns early when logging is disabled
+     * and fills `errorLog` on its way, so a seeder without logging is a seeder
+     * that cannot notice a failed write.
+     */
+    private function assureLanguageService(BackendUserAuthentication $backendUser): void
+    {
+        $GLOBALS['LANG'] ??= GeneralUtility::makeInstance(LanguageServiceFactory::class)
+            ->createFromUserPreferences($backendUser);
     }
 
     private function assertNoErrors(DataHandler $dataHandler, SeedDefinition $definition): void
