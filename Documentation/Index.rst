@@ -35,11 +35,10 @@ based test instances and acceptance tests.
 
 ..  note::
 
-    This is a development tool, not a production theme. It renders a page and
-    the :guilabel:`Header`, :guilabel:`Text` and :guilabel:`Images` content
-    elements without depending on :file:`fluid_styled_content`, and the public
-    API is not stable and may change without a deprecation phase until the first
-    stable release.
+    This is a development tool, not a production theme. It renders pages,
+    navigation and every content element the core registers without depending
+    on :file:`fluid_styled_content`, and the public API is not stable and may
+    change without a deprecation phase until the first stable release.
 
 ----
 
