@@ -1,0 +1,28 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Section index" menu - the pages the editor selected in "pages" (or,
+    left empty, the current page - see "ContentElements.typoscript",
+    "tt_content.menu_section", for the "special.value.override" that makes
+    an empty selection fall back to the current page rather than the site
+    root "special = list" would otherwise use), each with one level of its
+    own children nested beneath it.
+
+    That nested level is this element's "including sections" - the shared
+    partial's recursion (see its header comment) renders it the same way it
+    renders a whole sitemap tree, just one level deep here instead of seven.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuSectionLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

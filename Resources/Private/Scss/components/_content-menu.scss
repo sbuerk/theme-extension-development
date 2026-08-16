@@ -1,0 +1,105 @@
+// Content menu.
+//
+// Markup contract:
+//
+//     <nav class="theme-content-menu" aria-label="…">
+//         <ul class="theme-content-menu__list">
+//             <li class="theme-content-menu__item">
+//                 <a class="theme-content-menu__link" href="…" aria-current="page">…</a>
+//                 <time class="theme-content-menu__date" datetime="…">…</time>
+//                 <p class="theme-content-menu__abstract">…</p>
+//                 <ul class="theme-content-menu__list theme-content-menu__list--sub">…</ul>
+//             </li>
+//         </ul>
+//     </nav>
+//
+// The shared component for all eleven "menu_*" content elements - a list of
+// links, each optionally carrying a date ("menu_recently_updated") and an
+// abstract line ("menu_abstract"), plus a nested "__list" for the one element
+// that is a tree rather than a flat list ("menu_sitemap"). Not every element
+// uses every part: "__date" and "__abstract" are omitted from the markup
+// entirely rather than rendered empty wherever a menu has neither, the same
+// rule "Partials/Navigation/Main.html" documents for "aria-current".
+//
+// --- Not "_nav-sub.scss" ----------------------------------------------------
+//
+// "_nav-sub.scss" is section-scoped site navigation, rendered once per page
+// from the backend layout. A "menu_*" content element is authored content -
+// an editor drops it into the content column like any other element, and it
+// can appear zero, one or several times on a page, at any depth the column
+// allows. Reusing the navigation component would pull navigation styling
+// (and navigation's separate cascade position, see "theme.scss") into content
+// rendering for two components that only coincidentally both draw a list of
+// links.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-content-menu {
+    --theme-content-menu-gap: var(--theme-space-2, 0.625rem);
+    --theme-content-menu-link-color: var(--theme-color-primary, #0b57d0);
+    --theme-content-menu-link-color-hover: var(--theme-color-primary-hover, #0a4bb4);
+    --theme-content-menu-current-color: var(--theme-color-text-primary, #14181f);
+    --theme-content-menu-date-color: var(--theme-color-text-muted, #616b80);
+    --theme-content-menu-abstract-color: var(--theme-color-text-secondary, #4a5567);
+}
+
+.theme-content-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-content-menu-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+// Indented rather than given its own background - the same reasoning
+// "_nav-sub.scss" gives for its "--level-2": the indent alone says "inside
+// the item above" for as many levels as "menu_sitemap" recurses. Named
+// "--sub" rather than "--level-2": "Partials/ContentElement/Menu.html"
+// calls its own recursive section for every depth beyond the first with the
+// same modifier, not one name per level, since the recursion does not know
+// in advance how deep "menu_sitemap" will go.
+.theme-content-menu__list--sub {
+    margin-block-start: var(--theme-content-menu-gap);
+    padding-inline-start: var(--theme-space-4, 1.25rem);
+}
+
+.theme-content-menu__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-1, 0.3125rem);
+}
+
+.theme-content-menu__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--theme-tap-target-min);
+    color: var(--theme-content-menu-link-color);
+    text-decoration: none;
+    transition: color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        color: var(--theme-content-menu-link-color-hover);
+    }
+
+    // Weight rather than a background fill: unlike "_nav-sub.scss" this list
+    // sits in the content column, not a fixed chrome block, so a solid fill
+    // the width of the reader's own text measure would read as a callout
+    // rather than "you are here".
+    &[aria-current='page'] {
+        color: var(--theme-content-menu-current-color);
+        font-weight: var(--theme-font-weight-medium);
+    }
+}
+
+.theme-content-menu__date {
+    color: var(--theme-content-menu-date-color);
+    font-size: var(--theme-font-size-xs);
+}
+
+.theme-content-menu__abstract {
+    margin: 0;
+    color: var(--theme-content-menu-abstract-color);
+    font-size: var(--theme-font-size-sm);
+}

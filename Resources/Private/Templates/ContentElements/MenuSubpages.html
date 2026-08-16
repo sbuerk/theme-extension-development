@@ -1,0 +1,27 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Subpages" menu - one link per direct child of the pages the editor
+    selected in "pages" (not the selected pages themselves). "special =
+    directory" in "ContentElements.typoscript" ("tt_content.menu_subpages")
+    is what tells "MenuProcessor" to fetch the children rather than the
+    pages themselves; an empty "pages" selection falls back to the current
+    page's own children.
+
+    Same shared partial as "menu_pages" - the difference between the two is
+    entirely the TypoScript "special".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuSubpagesLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

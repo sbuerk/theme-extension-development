@@ -1,0 +1,24 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Section index of subpages" menu - "menu_subpages" (the children of
+    the selected "pages") with one more level: each subpage's own children,
+    standing in for "including sections" the same way "menu_section" does -
+    see that template's comment. "ContentElements.typoscript",
+    "tt_content.menu_section_pages", is "=< tt_content.menu_subpages" plus
+    "levels = 2".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuSectionPagesLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

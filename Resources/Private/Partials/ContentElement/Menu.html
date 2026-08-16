@@ -1,0 +1,82 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Shared list rendering for the nine "menu_*" content elements built on
+    core "MenuProcessor" in
+    "Configuration/TypoScript/ContentElements.typoscript" - all nine produce
+    the same item shape ("title", "link", "current", "children", and "data",
+    the full page row) regardless of which "special" produced it. Only the
+    "<nav>" itself and its translated "aria-label" are the calling
+    template's own; everything inside it is this partial.
+
+    Recursion follows "Partials/Navigation/Main.html": one "Item" section
+    calling itself for "item.children" rather than the list markup written
+    out once per level. "children" is only ever populated when the
+    "levels" TypoScript option is more than 1 ("menu_section",
+    "menu_section_pages", "menu_sitemap", "menu_sitemap_pages") - for a
+    single-level menu the key is simply absent, "f:if" is false, and the
+    recursive branch never fires. One section therefore serves both a flat
+    menu and a whole sitemap tree with no level argument to gate it.
+
+    "showAbstract" and "showDate" are the only two things that change what
+    is rendered, not just what is listed - "menu_abstract" passes
+    "showAbstract: 1" to read "item.data.abstract" and
+    "menu_recently_updated" passes "showDate: 1" to read
+    "item.data.SYS_LASTCHANGED", both already present on the page row
+    "MenuProcessor" puts at "item.data" with nothing added by
+    "dataProcessing" to reach them - see the header comments of
+    "Templates/ContentElements/MenuAbstract.html" and
+    "MenuRecentlyUpdated.html". Every other template renders this partial
+    with neither argument, and both default to unset/false.
+
+    The boolean conditions below write the double-ampersand operator raw,
+    never HTML-entity-escaped: an escaped form is valid XML and silently
+    evaluates true regardless of the operands, since "BooleanParser" matches
+    the literal token and Fluid decodes no entities. TYPO3 core itself never
+    escapes it in a Fluid condition.
+
+    Empty guard: no items means no list at all, not an empty one - whether
+    that also means no "<nav>" is for the calling template to decide.
+</f:comment>
+
+<f:if condition="{items}">
+    <ul class="theme-content-menu__list">
+        <f:for each="{items}" as="item">
+            <f:render section="Item" arguments="{item: item, showAbstract: showAbstract, showDate: showDate}" />
+        </f:for>
+    </ul>
+</f:if>
+
+<f:section name="Item">
+    <li class="theme-content-menu__item">
+        <f:if condition="{item.current}">
+            <f:then>
+                <a class="theme-content-menu__link" href="{item.link}" aria-current="page">{item.title}</a>
+            </f:then>
+            <f:else>
+                <a class="theme-content-menu__link" href="{item.link}">{item.title}</a>
+            </f:else>
+        </f:if>
+
+        <f:if condition="{showAbstract} && {item.data.abstract}">
+            <p class="theme-content-menu__abstract">{item.data.abstract}</p>
+        </f:if>
+
+        <f:if condition="{showDate} && {item.data.SYS_LASTCHANGED}">
+            <time class="theme-content-menu__date" datetime="{f:format.date(date: item.data.SYS_LASTCHANGED, format: 'c')}">
+                <f:format.date date="{item.data.SYS_LASTCHANGED}" format="Y-m-d" />
+            </time>
+        </f:if>
+
+        <f:if condition="{item.children}">
+            <ul class="theme-content-menu__list theme-content-menu__list--sub">
+                <f:for each="{item.children}" as="childItem">
+                    <f:render section="Item" arguments="{item: childItem, showAbstract: showAbstract, showDate: showDate}" />
+                </f:for>
+            </ul>
+        </f:if>
+    </li>
+</f:section>
+
+</html>

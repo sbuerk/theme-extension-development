@@ -1,0 +1,58 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "menu_categorized_content" - a menu of the content elements that share a
+    category, selected through "selected_categories" and "category_field".
+
+    "{items}" is a list of tt_content *rows*, not rendered markup: the
+    TypoScript uses "DatabaseQueryProcessor" with an explicit join on
+    "sys_category_record_mm", which is the only way the category relation can
+    be expressed in a query. See the comment above
+    "tt_content.menu_categorized_content" in
+    "Configuration/TypoScript/ContentElements.typoscript" for why that was
+    chosen over "RECORDS", which the sibling "menu_categorized_pages" does use.
+
+    The short version: "RECORDS" would render each match as a full content
+    element inside this one, which is the wrong shape for a menu and inherits
+    the recursion exposure documented above the shortcut element - on TYPO3 v14
+    the core has no guard for it at all. Rendering rows as links means nothing
+    can nest and the cycle cannot form in the first place.
+
+    Each entry is ["data" => $row], not the row itself - "DatabaseQueryProcessor"
+    wraps every record that way so a nested "dataProcessing" has somewhere to
+    add to. So the fields are "item.data.header", never "item.header"; the
+    latter resolves to nothing at all and renders an empty link rather than
+    failing.
+
+    An element with no header falls back to its uid, so a link is never empty
+    and never unlabelled. The anchor is the content element's own "c<uid>"
+    id, which "Layouts/ContentElement.html" puts on every wrapper.
+
+    Empty guard: no matches means no navigation landmark at all, rather than an
+    empty one for a screen reader to announce and step into.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{items}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuCategorizedContentLabel')}">
+            <ul class="theme-content-menu__list">
+                <f:for each="{items}" as="item">
+                    <li class="theme-content-menu__item">
+                        <a class="theme-content-menu__link" href="{f:uri.page(pageUid: item.data.pid, section: 'c{item.data.uid}')}">
+                            <f:if condition="{item.data.header}">
+                                <f:then>{item.data.header}</f:then>
+                                <f:else>#{item.data.uid}</f:else>
+                            </f:if>
+                        </a>
+                    </li>
+                </f:for>
+            </ul>
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

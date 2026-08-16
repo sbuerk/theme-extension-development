@@ -1,0 +1,28 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Sitemap" menu - the whole site, seven levels deep, from the site
+    root. "ContentElements.typoscript", "tt_content.menu_sitemap", sets no
+    "special" at all (the same default "MenuProcessor" uses for the site's
+    own main navigation) and "levels = 7"; it has no "pages" field at all
+    (see the core TCA), which is why nothing here reads one.
+
+    This is a whole tree, not a flat list - "Partials/ContentElement/Menu"
+    renders it with the same recursive "Item" section
+    "Partials/Navigation/Main.html" uses for the site's own two-level main
+    navigation, just for as many levels as "menu.children" actually goes.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuSitemapLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

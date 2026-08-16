@@ -15,12 +15,13 @@
 # has no branch below renders the notice.
 #
 # Covered here: header, text, image, textpic, textmedia, bullets, table,
-# uploads, shortcut, div and html - the whole classic set except the menus.
-#
-# @todo Cover the eleven "menu_*" content types. They are the last of the set
-#       EXT:frontend registers that still renders the notice, and they differ
-#       from everything above in needing a data processor configured per type
-#       rather than only a template.
+# uploads, shortcut, div, html, and every "menu_*" type EXT:frontend
+# registers - the whole classic set. "menu_categorized_pages" and
+# "menu_categorized_content" select by category rather than by rootline
+# position and are built on "RECORDS" (see the comment above
+# "tt_content.menu_categorized_pages" for why); the remaining nine are all
+# "MenuProcessor" with a different "special" - see the comment above
+# "tt_content.menu_pages", further down, for how that set is put together.
 
 # The equivalent of "lib.contentElement" from "fluid_styled_content": the frame
 # every content element is rendered through. Consumers of this theme can
@@ -267,5 +268,346 @@ tt_content.shortcut {
             conf.tt_content.shortcut = TEXT
             conf.tt_content.shortcut.value =
         }
+    }
+}
+
+# The "Categorized Pages" menu. "selected_categories" and "category_field"
+# (EXT:frontend TCA,
+# "Overrides/255-tt_content-content_type-menu_categorized_pages.php") pick
+# pages by category membership, not by rootline position - "MenuProcessor"
+# cannot express that at all (it only ever builds a menu from "HMENU", and
+# none of "HMENU"'s own "special" modes reach into a category, except one -
+# see below).
+#
+# HMENU does have a "special = categories"
+# (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/Menu/AbstractMenuContentObject.php",
+# the "prepareMenuItems()" switch), backed by "CategoryMenuUtility::collectPages()"
+# in the file alongside it. It was read and ruled out for a narrower reason
+# than "cannot express it at all": "collectPages()" passes the literal string
+# "'pages'" as the table argument to "CategoryCollection::load()" - hard-coded,
+# not configurable - so it could only ever serve this element, never
+# "menu_categorized_content" below, which needs the identical selection
+# against "tt_content" instead.
+#
+# The core's "RECORDS" cObject serves both, table-agnostic by construction:
+# its "categories"/"categories.relation" properties
+# (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php",
+# "collectRecordsFromCategories()") are backed by that same
+# "CategoryCollection::load()", called with whichever "$table" the
+# surrounding "foreach ($tables as $table)" is currently on - "pages" here,
+# "tt_content" below. One mechanism covers both elements, which is also why
+# both are built on it rather than splitting the pair across "RECORDS" and
+# "special = categories" for no structural reason.
+#
+# "DatabaseQueryProcessor" was read too and ruled out outright: its
+# ".select" syntax (implemented in "getQuery()"/"exec_getQuery()" of
+# "ContentObjectRenderer") has no notion of a category anywhere in it - a
+# search for "categor" across the whole class matches nothing outside the
+# two methods above. Using it here would mean hand-writing a WHERE clause
+# against "sys_category_record_mm" for every call, which is exactly the raw
+# SQL this theme avoids elsewhere (see "DataProcessing/TableProcessor.php").
+#
+# Each matched page is rendered by its own small FLUIDTEMPLATE
+# ("Templates/ContentElements/Partials/CategorizedMenuPageItem.html") rather
+# than a TypoScript-built string: "RECORDS" only ever concatenates whatever
+# "conf.pages" returns for each match, and everything one item needs -
+# "href"/attribute escaping and comparing the matched page against the page
+# currently being rendered for "aria-current" - is safer left to Fluid than
+# assembled by hand in TypoScript.
+tt_content.menu_categorized_pages =< lib.contentElement
+tt_content.menu_categorized_pages {
+    templateName = ContentElements/MenuCategorizedPages
+
+    variables {
+        items = RECORDS
+        items {
+            tables = pages
+            categories.field = selected_categories
+            categories.relation.field = category_field
+
+            conf.pages = FLUIDTEMPLATE
+            conf.pages {
+                templateName = ContentElements/Partials/CategorizedMenuPageItem
+                templateRootPaths.10 = {$theme.templateRootPath}
+
+                variables {
+                    currentPageUid = TEXT
+                    currentPageUid.data = page:uid
+                }
+            }
+        }
+    }
+}
+
+# The "Categorized Content" menu. Same selection as above, against
+# "tt_content" instead of "pages" - see the comment there for why "RECORDS"
+# rather than "MenuProcessor" or "DatabaseQueryProcessor". Unlike
+# "menu_categorized_pages" this one renders content elements, not links to
+# them: the TCA
+# ("Overrides/255-tt_content-content_type-menu_categorized_content.php")
+# gives it no "pages" field at all, only "selected_categories" and
+# "category_field".
+#
+# Rendering another content element is exactly what "tt_content.shortcut"
+# above does, and it carries the identical recursion exposure: a categorized
+# content element can match itself by category, or match another categorized
+# content element that matches it back, and "RecordsContentObject::render()"
+# does not guard against that on TYPO3 v14 - see the long comment above
+# "tt_content.shortcut" for what was verified in source there; nothing about
+# that finding is specific to "shortcut", it is a property of "RECORDS"
+# itself on v14.
+#
+# The same structural break is applied here, in the same shape: inside a
+# categorized-content listing, a nested categorized-content element renders
+# nothing, so a direct or indirect self-reference through this branch cannot
+# return to where it started, on both core versions, with no state kept
+# between requests. "conf.tt_content" is copied fresh per invocation (the
+# "=<" below), so the override is local to this element's own rendering and
+# never leaks into how any other element's "RECORDS" call resolves the same
+# branch.
+#
+# What this does not cover, the same as "shortcut" does not cover it either:
+# a *different* content type reached from inside this listing that itself
+# embeds a reference back to this element - a shortcut inside a categorized
+# listing pointing at that same listing, say - is not newly guarded by this
+# change. Breaking every possible mixed-type cycle in the content graph is
+# not what either guard does; each one only closes the direct/same-branch
+# cycle its own element is exposed to, which is what "RecordsContentObject"
+# needed replacing here.
+#
+# "RECORDS" gives no per-item boundary in "{items}" to hang the component's
+# "<li>" on from Fluid - it only ever concatenates whatever each match
+# renders - so the wrapper is added here instead, as the CASE cObject's own
+# "stdWrap", which "CaseContentObject::render()" applies to whichever branch
+# fired after it has rendered: every match gets the "<li>" regardless of its
+# own CType.
+tt_content.menu_categorized_content =< lib.contentElement
+tt_content.menu_categorized_content {
+    templateName = ContentElements/MenuCategorizedContent
+
+    # A "DatabaseQueryProcessor" with an explicit join, not "RECORDS" with its
+    # "categories" property, and not because "RECORDS" cannot select by
+    # category - it can, and the sibling element above uses it for pages.
+    #
+    # The difference is what the two produce. "RECORDS" renders each match
+    # through the content element CASE, so a menu of content would re-render
+    # whole content elements inside itself: heavy, visually wrong for a menu,
+    # and it inherits the recursion exposure documented above the shortcut
+    # element, which on v14 has no core guard at all. This processor returns
+    # the rows as data instead, so the template renders a list of links and
+    # nothing can nest. The cycle simply cannot form.
+    #
+    # The join is the one "fluid_styled_content" itself used for this element -
+    # the category relation lives in "sys_category_record_mm", and no
+    # "select" syntax expresses it.
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
+        10 {
+            table = tt_content
+            selectFields = {#tt_content}.*
+            groupBy = uid
+            pidInList.data = leveluid : 0
+            recursive = 99
+            join.data = field:selected_categories
+            join.wrap = {#sys_category_record_mm} ON uid = {#sys_category_record_mm}.{#uid_foreign} AND {#sys_category_record_mm}.{#uid_local} IN(|)
+            where.data = field:category_field
+            where.wrap = {#tablenames}='tt_content' AND {#fieldname}='|'
+            orderBy = tt_content.sorting
+            as = items
+        }
+    }
+}
+
+# The remaining nine "menu_*" content types. All are core "MenuProcessor"
+# (unchanged on v13.4 and v14.3, see "Configuration/TypoScript/Navigation.-
+# typoscript") with a different "special" - the "special"/HMENU documentation
+# and "AbstractMenuContentObject.php" were read for every one below, not
+# guessed, and cross-checked against the historical "fluid_styled_content"
+# TypoScript that originally rendered these same nine CTypes before TYPO3 v13
+# made the TCA an "EXT:frontend"-only concern (github.com/TYPO3/typo3, tag
+# "12.4",
+# "typo3/sysext/fluid_styled_content/Configuration/TypoScript/ContentElement/
+# Menu*.typoscript") - reproduced close to verbatim for seven of the nine.
+#
+# One full definition, "menu_pages" - every other type is "=< tt_content.
+# menu_X" plus only the lines that actually differ, so the difference between
+# the nine is what is visible in this file, not nine near-identical blocks.
+# Each block below says what changed from its parent and why.
+#
+# "as = menu" throughout is deliberately not "as = mainMenu"/"subMenu" the
+# way "Navigation.typoscript" names its three: these are content elements,
+# each producing its own independent menu, not one of the three fixed page
+# navigations every page carries.
+tt_content.menu_pages =< lib.contentElement
+tt_content.menu_pages {
+    templateName = ContentElements/MenuPages
+
+    # "special = list" - "pages" is a list of specific page uids, not a
+    # rootline position, so "MenuProcessor" is told exactly which pages to
+    # render rather than where to find them
+    # ("prepareMenuItemsForListMenu()", "AbstractMenuContentObject.php:680").
+    # Left empty (no "pages" selected), it falls back to "$this->id" - the
+    # site root, via the standard "entryLevel" resolution every "HMENU" does
+    # in "start()" (see "Navigation.typoscript" for why "mainMenu" resolves
+    # the same way with no "special" set at all) - not the current page. See
+    # "menu_section" below for the type that needs the current page instead
+    # and overrides that fallback explicitly.
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\MenuProcessor
+        10 {
+            as = menu
+            special = list
+            special.value.field = pages
+        }
+    }
+}
+
+# One level deeper than "menu_pages", and falling back to the *current* page
+# rather than the site root when no "pages" are selected - the CType's own
+# description ("Page content marked for section menus",
+# "EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:
+# CType.menu_section.description") is about the page(s) this element itself
+# sits among, not an arbitrary site-wide list. The override reproduces the
+# one FSC's own "MenuSection.typoscript" used for the identical reason,
+# minus its second-order "page:content_from_pid" fallback (the page a
+# request was actually served from, when the current page borrows another
+# page's content) - a narrower edge case, left out rather than carried along
+# unread; "page:uid" (the current page as TYPO3 already knows it, no lookup
+# needed) covers the case this element set was asked to cover.
+#
+# "levels = 2" is this theme's stand-in for "including sections": historical
+# FSC additionally queried each page's own "tt_content" rows flagged
+# "sectionIndex" and linked into them by anchor - out of scope here, the
+# same way "menu_categorized_content" is the only element in this file that
+# renders more than a link (see the comment above it) and "menu_abstract"/
+# "menu_recently_updated" below are the only two among these nine that do -
+# a fourth type quietly doing the same would contradict that. A second menu
+# level - the pages themselves, and one level of their own children beneath
+# each - is exactly "MenuProcessor" territory instead.
+tt_content.menu_section =< tt_content.menu_pages
+tt_content.menu_section {
+    templateName = ContentElements/MenuSection
+
+    dataProcessing.10 {
+        special.value.override.data = page:uid
+        special.value.override.if.isFalse.field = pages
+        levels = 2
+    }
+}
+
+# "special = directory" - the children of the selected "pages", not the
+# pages themselves ("prepareMenuItemsForDirectoryMenu()",
+# "AbstractMenuContentObject.php:639"). Left empty, its own fallback is
+# already the *current* page
+# ("$this->request->getAttribute('frontend.page.information')->getId()",
+# line 643) - unlike "special = list" above, no override is needed to reach
+# it.
+tt_content.menu_subpages =< tt_content.menu_pages
+tt_content.menu_subpages {
+    templateName = ContentElements/MenuSubpages
+    dataProcessing.10.special = directory
+}
+
+# "menu_subpages" plus one more level - the subpages' own children, standing
+# in for "including sections" the same way "menu_section" does above, and
+# for the identical reason (see that comment for what was left out).
+tt_content.menu_section_pages =< tt_content.menu_subpages
+tt_content.menu_section_pages {
+    templateName = ContentElements/MenuSectionPages
+    dataProcessing.10.levels = 2
+}
+
+# No "special" at all - "MenuProcessor"'s own default, the same one
+# "Navigation.typoscript" uses for "mainMenu": "entryLevel" resolves to index
+# 0 of the *local rootline*, the site root, regardless of which page this
+# element sits on ("AbstractMenuContentObject::start()", line ~223 ff., and
+# see "Navigation.typoscript" for the full "leveluid"/rootline-index
+# reasoning). "levels = 7" then walks the whole site from that root - "an
+# expanded menu of all subpages of the current site" per the CType's own
+# description
+# ("EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:
+# CType.menu_sitemap.description") - deep enough for any realistic page tree
+# without being unbounded, matching FSC's own "MenuSitemap.typoscript".
+# "special" is unset explicitly ("special >") rather than left to default,
+# because this type is built "=< tt_content.menu_subpages" below, which did
+# set one.
+tt_content.menu_sitemap =< tt_content.menu_subpages
+tt_content.menu_sitemap {
+    templateName = ContentElements/MenuSitemap
+
+    dataProcessing.10 {
+        special >
+        levels = 7
+    }
+}
+
+# Same tree as "menu_sitemap", rooted at the selected "pages" instead of the
+# site root - "special = directory" the same way "menu_subpages" uses it,
+# just seven levels deep instead of one.
+tt_content.menu_sitemap_pages =< tt_content.menu_subpages
+tt_content.menu_sitemap_pages {
+    templateName = ContentElements/MenuSitemapPages
+    dataProcessing.10.levels = 7
+}
+
+# Same shape as "menu_subpages" - "special = directory" over "pages", one
+# level. The difference is entirely in the template: "item.data.abstract" is
+# already there for the reading, on the same page row "MenuProcessor" always
+# puts at "item.data" (the "'*'"-selected page record HMENU fetches
+# internally, JSON-encoded verbatim by "MenuProcessor::getDataAsJson()") -
+# nothing had to be added with "dataProcessing" to reach it, unlike
+# "menu_recently_updated" below where the same is true for a different
+# reason. See the header comment of
+# "Templates/ContentElements/MenuAbstract.html".
+tt_content.menu_abstract =< tt_content.menu_subpages
+tt_content.menu_abstract {
+    templateName = ContentElements/MenuAbstract
+}
+
+# "special = updated" - "prepareMenuItemsForUpdatedMenu()",
+# "AbstractMenuContentObject.php:736", sorts the page tree beneath "pages"
+# (or, empty, the current page - same request-attribute fallback as
+# "directory" above) by "SYS_LASTCHANGED" descending by default
+# ("getMode()", same file). FSC's own "MenuRecentlyUpdated.typoscript" also
+# sets "maxAge = 3600*24*7" - deliberately not reproduced here: a hard
+# cutoff window is a display choice for a site package to make, not a
+# default this theme should bake in, and an unset "maxAge" makes the age
+# filter never apply (`if ($maxAge > 0)`, line 775) rather than the query
+# silently returning nothing wherever "SYS_LASTCHANGED" has no real history
+# yet. "excludeNoSearchPages" is kept - pages an editor marked out of search
+# are the same pages that should stay out of a "what changed recently"
+# listing.
+#
+# The template's "date" is "item.data.SYS_LASTCHANGED" - the very field the
+# query above already sorts by, on the same "item.data" page row
+# "menu_abstract" reads "abstract" from above; nothing had to be added with
+# "dataProcessing" here either.
+tt_content.menu_recently_updated =< tt_content.menu_pages
+tt_content.menu_recently_updated {
+    templateName = ContentElements/MenuRecentlyUpdated
+
+    dataProcessing.10 {
+        special = updated
+        special.excludeNoSearchPages = 1
+    }
+}
+
+# "special = keywords" - "prepareMenuItemsForKeywordsMenu()",
+# "AbstractMenuContentObject.php:800": the page "pages" resolves to (or,
+# empty, the current page) is matched against every other page under the
+# same entry point sharing at least one of that page's own "keywords".
+# "alternativeSortingField = title" and "excludeNoSearchPages" are both
+# reproduced from FSC's own "MenuRelatedPages.typoscript" - an alphabetical
+# related-pages list reads better than one ordered by an internal "tstamp"/
+# "SYS_LASTCHANGED" sort field a reader never sees, and a page excluded from
+# search has no business turning up as "related" either.
+tt_content.menu_related_pages =< tt_content.menu_pages
+tt_content.menu_related_pages {
+    templateName = ContentElements/MenuRelatedPages
+
+    dataProcessing.10 {
+        special = keywords
+        special.excludeNoSearchPages = 1
+        alternativeSortingField = title
     }
 }

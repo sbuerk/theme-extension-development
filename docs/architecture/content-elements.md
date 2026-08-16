@@ -48,30 +48,40 @@ shortcut's target. A shared assertion,
 
 Taken from the TypoScript branches, not summarised from memory:
 
-| `CType`     | Template                    | Processing                                                                      |
-|-------------|-----------------------------|---------------------------------------------------------------------------------|
-| `header`    | `ContentElements/Header`    | —                                                                               |
-| `text`      | `ContentElements/Text`      | —                                                                               |
-| `image`     | `ContentElements/Image`     | `FilesProcessor` (`image`) → `GalleryProcessor`                                 |
-| `textpic`   | `ContentElements/TextPic`   | `FilesProcessor` (`image`) → `GalleryProcessor`                                 |
-| `textmedia` | `ContentElements/TextMedia` | `FilesProcessor` (`assets`) → `GalleryProcessor`                                |
-| `bullets`   | `ContentElements/Bullets`   | `SplitProcessor` (core)                                                         |
-| `table`     | `ContentElements/Table`     | `TableProcessor` (this extension)                                               |
-| `uploads`   | `ContentElements/Uploads`   | `FilesProcessor` (`media` + `file_collections`)                                 |
-| `div`       | `ContentElements/Div`       | —                                                                               |
-| `html`      | `ContentElements/Html`      | —                                                                               |
-| `shortcut`  | `ContentElements/Shortcut`  | `RECORDS` cObject, wired as a TypoScript variable, not a `dataProcessing` entry |
+| `CType`                    | Template                                 | Processing                                                                      |
+|----------------------------|------------------------------------------|---------------------------------------------------------------------------------|
+| `header`                   | `ContentElements/Header`                 | —                                                                               |
+| `text`                     | `ContentElements/Text`                   | —                                                                               |
+| `image`                    | `ContentElements/Image`                  | `FilesProcessor` (`image`) → `GalleryProcessor`                                 |
+| `textpic`                  | `ContentElements/TextPic`                | `FilesProcessor` (`image`) → `GalleryProcessor`                                 |
+| `textmedia`                | `ContentElements/TextMedia`              | `FilesProcessor` (`assets`) → `GalleryProcessor`                                |
+| `bullets`                  | `ContentElements/Bullets`                | `SplitProcessor` (core)                                                         |
+| `table`                    | `ContentElements/Table`                  | `TableProcessor` (this extension)                                               |
+| `uploads`                  | `ContentElements/Uploads`                | `FilesProcessor` (`media` + `file_collections`)                                 |
+| `div`                      | `ContentElements/Div`                    | —                                                                               |
+| `html`                     | `ContentElements/Html`                   | —                                                                               |
+| `shortcut`                 | `ContentElements/Shortcut`               | `RECORDS` cObject, wired as a TypoScript variable, not a `dataProcessing` entry |
+| `menu_pages`               | `ContentElements/MenuPages`              | `MenuProcessor` (`special = list`)                                              |
+| `menu_subpages`            | `ContentElements/MenuSubpages`           | `MenuProcessor` (`special = directory`)                                         |
+| `menu_section`             | `ContentElements/MenuSection`            | `MenuProcessor` (`special = list`, 2 levels)                                    |
+| `menu_section_pages`       | `ContentElements/MenuSectionPages`       | `MenuProcessor` (`special = directory`, 2 levels)                               |
+| `menu_sitemap`             | `ContentElements/MenuSitemap`            | `MenuProcessor` (no `special`, 7 levels)                                        |
+| `menu_sitemap_pages`       | `ContentElements/MenuSitemapPages`       | `MenuProcessor` (`special = directory`, 7 levels)                               |
+| `menu_abstract`            | `ContentElements/MenuAbstract`           | `MenuProcessor` (`special = directory`)                                         |
+| `menu_recently_updated`    | `ContentElements/MenuRecentlyUpdated`    | `MenuProcessor` (`special = updated`)                                           |
+| `menu_related_pages`       | `ContentElements/MenuRelatedPages`       | `MenuProcessor` (`special = keywords`)                                          |
+| `menu_categorized_pages`   | `ContentElements/MenuCategorizedPages`   | `RECORDS` cObject with `categories`/`categories.relation`                       |
+| `menu_categorized_content` | `ContentElements/MenuCategorizedContent` | `DatabaseQueryProcessor` with an explicit `sys_category_record_mm` join         |
 
 `header`, `text` and `image` predate this page — see
 [Page rendering](page-rendering.md) and the `Feature-ContentElementRendering`
-/ `Feature-ImageContentElementRendering` changelog entries. Everything from
-`textpic` down is what this page documents.
-
-Out of scope: the eleven `menu_*` types. They are the last of the classic set
-`EXT:frontend` registers that still renders the core notice, and they differ
-from everything above in needing a `MenuProcessor` configured per menu type
-rather than only a template — tracked as a `@todo` in
-`ContentElements.typoscript`, not covered here.
+/ `Feature-ImageContentElementRendering` changelog entries. `textpic` through
+`shortcut` are covered directly below; the eleven `menu_*` types get their own
+section, [The eleven `menu_*` types](#the-eleven-menu_-types), further down —
+they needed a `MenuProcessor` (or, for the two categorized types, a
+category-aware query) configured per type rather than only a template, which
+is enough of a difference to keep them out of the prose that follows and give
+them their own section instead.
 
 `textpic` and `textmedia` reuse the same `FilesProcessor` →
 `GalleryProcessor` pair `image` already uses (see
@@ -274,6 +284,195 @@ covers both the direct and the indirect case — **on v13.4**.
 > anyone relying on "the core already guards recursive shortcuts" should
 > read that as **v13.4 only** until this is re-verified or a test is added
 > that would catch it on v14.
+
+## The eleven `menu_*` types
+
+The last of the classic set `EXT:frontend` registers without shipping a
+rendering for it. Nine are the core's `MenuProcessor` with a different
+`special`; the remaining two — `menu_categorized_pages` and
+`menu_categorized_content` — select by category rather than rootline
+position, which `MenuProcessor` cannot express at all, and are built on
+`RECORDS` and `DatabaseQueryProcessor` instead. All eleven share one Fluid
+partial, `Partials/ContentElement/Menu.html`, and one new SCSS component,
+`.theme-content-menu`.
+
+### The nine `MenuProcessor` types
+
+One full definition, `tt_content.menu_pages`; every other type in
+`ContentElements.typoscript` is `=< tt_content.menu_X` plus only the lines
+that actually differ, so the difference between the nine is what is visible
+in the TypoScript, not nine near-identical blocks. Each `special` was read
+against its own `prepareMenuItemsFor*Menu()` method in
+`AbstractMenuContentObject.php` and cross-checked against the historical
+`fluid_styled_content` TypoScript that rendered these same nine CTypes before
+TYPO3 v13 made the TCA an `EXT:frontend`-only concern, reproduced close to
+verbatim for seven of the nine:
+
+| `CType`                 | `special`   | Levels | Falls back to (no `pages` selected)               |
+|-------------------------|-------------|--------|---------------------------------------------------|
+| `menu_pages`            | `list`      | 1      | site root (`entryLevel` default)                  |
+| `menu_subpages`         | `directory` | 1      | current page                                      |
+| `menu_section`          | `list`      | 2      | current page (`special.value.override`)           |
+| `menu_section_pages`    | `directory` | 2      | current page                                      |
+| `menu_sitemap`          | *(none)*    | 7      | site root — the CType has no `pages` field at all |
+| `menu_sitemap_pages`    | `directory` | 7      | current page                                      |
+| `menu_abstract`         | `directory` | 1      | current page                                      |
+| `menu_recently_updated` | `updated`   | 1      | current page                                      |
+| `menu_related_pages`    | `keywords`  | 1      | current page                                      |
+
+`menu_pages` and `menu_recently_updated`/`menu_related_pages` fall back to the
+site root only through `special = list`'s own default when no override
+applies; `menu_section` is the one `list`-based type that overrides that
+default explicitly (`special.value.override.data = page:uid`,
+`special.value.override.if.isFalse.field = pages`), because its whole purpose
+— "page content marked for section menus" per the CType's own description —
+is about the page(s) the element itself sits among, not an arbitrary
+site-wide list. Every `directory`-based type already defaults to the current
+page through `MenuProcessor`'s own request-attribute fallback, so none of
+them needs the same override.
+
+`menu_section` and `menu_section_pages` are the two whose `levels = 2` is
+this theme's stand-in for what historical `fluid_styled_content` did instead
+— see [the known gap](#known-gap-no-sectionindex-embedding) below.
+
+### `menu_abstract` and `menu_recently_updated` needed no extra processor
+
+Both templates render more than a link — an abstract line, a last-changed
+date — and neither needed a `dataProcessing` entry to reach it.
+`MenuProcessor::getDataAsJson()` selects each menu page with `'*'` and
+JSON-encodes the whole row onto `item.data` for every item it produces, so
+`item.data.abstract` and `item.data.SYS_LASTCHANGED` are simply there on the
+same page row every other menu type already carries at `item.data` — nothing
+had to be added to go and fetch them. `menu_recently_updated`'s `special =
+updated` already sorts by `SYS_LASTCHANGED` descending
+(`prepareMenuItemsForUpdatedMenu()`), so the field the template reads is the
+very field the query itself is keyed on.
+
+Both are read through the same shared partial, `Partials/ContentElement/Menu.html`
+— its `Item` section takes `showAbstract`/`showDate` arguments that gate
+whether `item.data.abstract`/`item.data.SYS_LASTCHANGED` are rendered at all;
+every other menu template renders the partial with neither argument set, and
+both default to unset/false.
+
+The **date format is hardcoded**, not configurable through TypoScript: the
+visible text is `Y-m-d` (`f:format.date`, `format="Y-m-d"`, e.g.
+`2026-08-16`), and the `<time>` element's `datetime` attribute is always the
+full ISO 8601 form (`format="c"`) regardless of what the visible text shows.
+A site package that wants a different visible format has to override the
+template, not a constant.
+
+### The two categorized types are built differently — deliberately
+
+`menu_categorized_pages` and `menu_categorized_content` both select records
+by category membership (`selected_categories`/`category_field`), not by
+rootline position, which `MenuProcessor` cannot express — `HMENU`'s own
+`special = categories` was read and ruled out too, because
+`CategoryMenuUtility::collectPages()` behind it hard-codes `'pages'` as the
+table it queries, so it could only ever serve the pages variant, never the
+content one.
+
+`menu_categorized_pages` uses the core's `RECORDS` cObject, with its
+`categories`/`categories.relation` properties — the same mechanism
+`CategoryCollection::load()` backs on both sides, `RECORDS` just calls it
+with whichever table the surrounding loop is currently on. Each matched page
+renders through its own small `FLUIDTEMPLATE`,
+`Templates/ContentElements/Partials/CategorizedMenuPageItem.html`, invoked
+once per match by `RECORDS` itself, since `RECORDS` only ever concatenates
+whatever its `conf.<table>` cObject returns for each row.
+
+`menu_categorized_content` selects the identical way against `tt_content`
+instead, but does **not** reuse `RECORDS` to do it — this is deliberate, not
+an inconsistency between two elements that otherwise look alike.
+`DatabaseQueryProcessor` with an explicit join on `sys_category_record_mm` is
+used instead, because `RECORDS` would render each match as a **whole content
+element nested inside this one**: the wrong shape for a menu — a menu of
+content should be a list of links, not a stack of embedded content elements —
+and it would inherit the exact recursion exposure documented above for
+`shortcut`, which TYPO3 v14 no longer guards at all. A categorized-content
+element can match itself by category, or match another one that matches it
+back, and rendering rows as links rather than whole elements means nothing
+can nest and the cycle cannot form in the first place; no structural break
+like the one added for `shortcut` was needed here because the rendering
+shape itself rules the cycle out.
+
+**`DatabaseQueryProcessor` wraps every row as `['data' => $row]`**
+(`DatabaseQueryProcessor.php`, `$processedRecordVariables[$key] = ['data' =>
+$record]`), the same shape `FluidTemplateContentObject` gives every content
+element its own record in. `MenuCategorizedContent.html` therefore reads
+`item.data.header`, never `item.header` — the latter resolves to nothing at
+all and renders an empty link rather than failing, which cost a debugging
+session in this repository before the wrapping was understood. An element
+with no `header` falls back to `#<uid>` so a link is never silently empty.
+
+### Markup: `.theme-content-menu`, shared by all eleven
+
+One new component, `.theme-content-menu`
+(`Resources/Private/Scss/components/_content-menu.scss`), is the shared
+list rendering for all eleven types — a flat list of links, optionally
+carrying a date (`menu_recently_updated`) or an abstract line
+(`menu_abstract`), nested one level for `menu_sitemap`'s tree. It is
+**deliberately not `.theme-nav-sub`**: that component is section-scoped site
+chrome rendered once per page from the backend layout, while a `menu_*`
+content element is authored content an editor drops into the content column
+like any other element, zero, one or several times, at any depth the column
+allows. Reusing the navigation component would drag navigation styling — and
+navigation's separate position in `theme.scss`'s cascade order — into
+content rendering for two components that only coincidentally both draw a
+list of links. See [Component library](../development/component-library.md#markup-contracts)
+for the full markup contract.
+
+`menu_sitemap` is the one type that is a tree rather than a flat list, and
+`Partials/ContentElement/Menu.html` renders it the same way
+`Partials/Navigation/Main.html` renders the site's own main navigation: one
+`Item` section calling itself for `item.children`, rather than the list
+markup written out once per level. `children` is only ever populated when
+`levels` is more than 1 (`menu_section`, `menu_section_pages`,
+`menu_sitemap`, `menu_sitemap_pages`), so the same section serves a
+single-level menu and a whole seven-level sitemap with no level argument
+needed to gate it.
+
+### Known gap: no `sectionIndex` embedding
+
+Historical `fluid_styled_content` gave `menu_section` and `menu_section_pages`
+one thing this theme does not reproduce: it additionally queried each listed
+page's own `tt_content` rows flagged `sectionIndex` and linked into them by
+anchor, so a section menu could jump straight to a heading inside a page, not
+only to the page itself. **That is not implemented here.** `levels = 2` — a
+second menu level, the listed pages' own children — stands in for it instead,
+the same way `menu_categorized_content` is the only element in this file that
+renders more than a link and `menu_abstract`/`menu_recently_updated` are the
+only two among the nine that render more than a title. A fourth type quietly
+doing the same would contradict that boundary, so this is stated here as a
+gap, not folded in as a feature: a site package that needs anchor-level
+section navigation has to add it itself.
+
+### What the tests guard
+
+`Tests/Functional/CoreContentElementRenderingTest.php` covers the eleven
+`menu_*` types the same way it covers every other classic type, plus two
+assertions specific to menus:
+
+- The sweep, `noRenderedElementFallsBackToTheCoreNotice`, and the per-type
+  `everyCoveredTypeIsRenderedThroughTheContentElementWrapper` (driven by
+  `coveredContentTypes()`, nineteen types including all eleven menus) fail
+  the moment any covered `CType` regresses to the core's "no rendering
+  definition" notice or stops going through `lib.contentElement` — the same
+  guard every other type in this page relies on.
+- `aPageMenuListsTheSubPages` renders past the wrapper into the actual
+  markup: a menu configured with the wrong `special` produces a perfectly
+  valid, perfectly empty wrapper, which looks like "no pages match" rather
+  than like a defect, so the sweep alone cannot catch it.
+- `aCategorisedMenuSelectsWhatShareItsCategory` is the one that actually
+  exercises the category join: the fixture
+  (`Tests/Functional/Fixtures/Database/PageWithCoreContentElements.csv`) puts
+  one page and one content element in the same category and points both
+  categorized elements at it, then asserts `menu_categorized_pages` lists
+  the categorized page and not the uncategorized one, and
+  `menu_categorized_content` links the categorized content element by its
+  header and its `c<uid>` anchor. Without that fixture data both elements
+  render a correct empty wrapper and nothing proves the selection was ever
+  wired up — which is exactly the state this test was added in, and it
+  caught two real defects before it passed.
 
 ## `html`: unescaped by design, restricted by convention
 

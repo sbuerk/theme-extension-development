@@ -1,20 +1,40 @@
-"pages",,,,,,,,,,
-,"uid","pid","sys_language_uid","l10n_parent","l10n_source","doktype","is_siteroot","title","slug",
-,1,0,0,0,0,1,1,"Theme root","/",
-"tt_content",,,,,,,,,,,
-,"uid","pid","sys_language_uid","l18n_parent","colPos","sorting","CType","header","header_layout","bodytext","records"
-,10,1,0,0,0,10,"bullets","A bullet list",3,"First item
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+,2,1,0,0,0,1,0,A listed sub page,/sub-one
+,3,1,0,0,0,1,0,Another listed sub page,/sub-two
+tt_content,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,records,selected_categories,category_field
+,10,1,0,0,0,10,bullets,A bullet list,3,"First item
 Second item
-Third item",""
-,20,1,0,0,0,20,"table","A table",3,"Name|Role
+Third item",,,
+,20,1,0,0,0,20,table,A table,3,"Name|Role
 Ada|Analyst
-Grace|Compiler",""
-,30,1,0,0,0,30,"div","",100,"",""
-,40,1,0,0,0,40,"html","",100,"<em data-raw=""yes"">Unescaped on purpose</em>",""
-,50,1,0,0,0,50,"textmedia","A textmedia element",3,"<p>Text beside media.</p>",""
-,60,1,0,0,0,60,"textpic","A textpic element",3,"<p>Text beside a picture.</p>",""
-,70,1,0,0,0,70,"uploads","An uploads element",3,"",""
-,80,1,0,0,0,80,"shortcut","A shortcut element",3,"","tt_content_10"
-,81,1,0,0,0,81,"shortcut","A shortcut pointing at itself",3,"","tt_content_81"
-,82,1,0,0,0,82,"shortcut","One half of a reference cycle",3,"","tt_content_83"
-,83,1,0,0,0,83,"shortcut","The other half of the cycle",3,"","tt_content_82"
+Grace|Compiler",,,
+,30,1,0,0,0,30,div,,100,,,,
+,40,1,0,0,0,40,html,,100,"<em data-raw=""yes"">Unescaped on purpose</em>",,,
+,50,1,0,0,0,50,textmedia,A textmedia element,3,<p>Text beside media.</p>,,,
+,60,1,0,0,0,60,textpic,A textpic element,3,<p>Text beside a picture.</p>,,,
+,70,1,0,0,0,70,uploads,An uploads element,3,,,,
+,80,1,0,0,0,80,shortcut,A shortcut element,3,,tt_content_10,,
+,81,1,0,0,0,81,shortcut,A shortcut pointing at itself,3,,tt_content_81,,
+,82,1,0,0,0,82,shortcut,One half of a reference cycle,3,,tt_content_83,,
+,83,1,0,0,0,83,shortcut,The other half of the cycle,3,,tt_content_82,,
+,100,1,0,0,0,100,menu_pages,A menu_pages element,3,,,,
+,110,1,0,0,0,110,menu_subpages,A menu_subpages element,3,,,,
+,120,1,0,0,0,120,menu_section,A menu_section element,3,,,,
+,130,1,0,0,0,130,menu_section_pages,A menu_section_pages element,3,,,,
+,140,1,0,0,0,140,menu_sitemap,A menu_sitemap element,3,,,,
+,150,1,0,0,0,150,menu_sitemap_pages,A menu_sitemap_pages element,3,,,,
+,160,1,0,0,0,160,menu_abstract,A menu_abstract element,3,,,,
+,170,1,0,0,0,170,menu_recently_updated,A menu_recently_updated element,3,,,,
+,180,1,0,0,0,180,menu_related_pages,A menu_related_pages element,3,,,,
+,190,1,0,0,0,190,menu_categorized_pages,A menu_categorized_pages element,3,,,5,categories
+,200,1,0,0,0,200,menu_categorized_content,A menu_categorized_content element,3,,,5,categories
+sys_category,,,,
+,uid,pid,title,deleted
+,5,1,Listed,0
+sys_category_record_mm,,,,
+,uid_local,uid_foreign,tablenames,fieldname
+,5,2,pages,categories
+,5,10,tt_content,categories
