@@ -13,40 +13,28 @@
 // The typography metrics, the spacing grid, the radii and the border widths
 // are measured from an internal reference design; the palette is deliberately
 // neutral and authored - see "Provenance" in DESIGN.md.
-
-// The dark palette is written once and emitted twice, because it has to answer
-// both the system preference and an explicit "data-theme" attribute. A mixin
-// keeps the two in step; duplicating it by hand would not stay that way.
-@mixin dark-palette {
-    color-scheme: dark;
-
-    --theme-color-background: #0f1319;
-    --theme-color-surface: #161c25;
-    --theme-color-surface-raised: #1d2531;
-
-    --theme-color-primary: #82abff;
-    --theme-color-primary-hover: #9dbeff;
-    --theme-color-on-primary: #0f1319;
-    --theme-color-secondary: #4fd1c5;
-    --theme-color-secondary-hover: #6ee0d6;
-    --theme-color-on-secondary: #0f1319;
-
-    --theme-color-text-primary: #e9edf4;
-    --theme-color-text-secondary: #a9b4c5;
-    --theme-color-text-muted: #808b9d;
-
-    --theme-color-border: #29313d;
-    --theme-color-border-strong: #5f6c7d;
-
-    --theme-color-success: #4ade80;
-    --theme-color-warning: #fbbf24;
-    --theme-color-danger: #ff8a80;
-
-    --theme-focus-ring: 0 0 0 3px rgb(130 171 255 / 40%);
-}
+//
+// --- Why "light-dark()" -------------------------------------------------
+//
+// Every colour is declared once and carries both appearances. The appearance
+// is then selected by "color-scheme" alone, because "light-dark()" resolves
+// against the *used value* of that property.
+//
+// The alternative - a second palette block repeated for the media query and
+// again for the attribute override - multiplies with the number of palettes:
+// five palettes would cost 255 colour declarations instead of 85. It also
+// makes it possible for the two copies to drift, which is a class of bug that
+// simply cannot occur here.
+//
+// The one thing "light-dark()" cannot do is wrap a value that is not a colour,
+// which is why the focus ring is decomposed into a colour token and a shadow
+// built around it rather than being declared whole.
 
 :root {
-    color-scheme: light;
+    // Both branches of every "light-dark()" below are reachable because of
+    // this line. Without it the used colour scheme is "light" and the dark
+    // half is dead.
+    color-scheme: light dark;
 
     // --- Typography -----------------------------------------------------
     //
@@ -77,6 +65,11 @@
     --theme-line-height-heading: 1.5;   // 34px headings and the display size
     --theme-line-height-base: 1.6;      // 16px body
 
+    // Mono is 1.5 in the type role table too, but it needs its own token: with
+    // a shared one, changing the heading line height would silently change
+    // code blocks as well. The values being equal today is a coincidence.
+    --theme-line-height-mono: 1.5;
+
     // The design tracks *out*, not in: exactly 0.05em at every size that
     // carries tracking at all. Body prose is the exception.
     --theme-letter-spacing-wide: 0.05em;
@@ -84,30 +77,61 @@
 
     --theme-measure: 68ch;
 
-    // --- Colour ---------------------------------------------------------
-    --theme-color-background: #ffffff;
-    --theme-color-surface: #f4f6fa;
-    --theme-color-surface-raised: #ffffff;
+    // --- Colour: neutrals -----------------------------------------------
+    //
+    // Shared by every palette. A palette varies accents only - see
+    // "_palettes.scss" - which is what keeps a palette to one block.
+    --theme-color-background: light-dark(#ffffff, #0f1319);
+    --theme-color-surface: light-dark(#f4f6fa, #161c25);
+    --theme-color-surface-raised: light-dark(#ffffff, #1d2531);
 
-    --theme-color-primary: #0b57d0;
-    --theme-color-primary-hover: #0a4bb4;
-    --theme-color-on-primary: #ffffff;
-    --theme-color-secondary: #0f766e;
-    --theme-color-secondary-hover: #0c5f59;
-    --theme-color-on-secondary: #ffffff;
-
-    --theme-color-text-primary: #14181f;
-    --theme-color-text-secondary: #4a5567;
-    --theme-color-text-muted: #616b80;
+    --theme-color-text-primary: light-dark(#14181f, #e9edf4);
+    --theme-color-text-secondary: light-dark(#4a5567, #a9b4c5);
+    --theme-color-text-muted: light-dark(#616b80, #808b9d);
 
     // "border" is decorative separation; "border-strong" is the one that
     // reaches 3:1 and belongs on anything delimiting a control.
-    --theme-color-border: #d6dce6;
-    --theme-color-border-strong: #828d9f;
+    --theme-color-border: light-dark(#d6dce6, #29313d);
+    --theme-color-border-strong: light-dark(#828d9f, #5f6c7d);
 
-    --theme-color-success: #146c43;
-    --theme-color-warning: #8a5a00;
-    --theme-color-danger: #b3261e;
+    // --- Colour: accents ------------------------------------------------
+    //
+    // The neutral palette, and the only group a palette overrides.
+    --theme-color-primary: light-dark(#0b57d0, #82abff);
+    --theme-color-primary-hover: light-dark(#0a4bb4, #9dbeff);
+    --theme-color-on-primary: light-dark(#ffffff, #0f1319);
+    --theme-color-secondary: light-dark(#0f766e, #4fd1c5);
+    --theme-color-secondary-hover: light-dark(#0c5f59, #6ee0d6);
+    --theme-color-on-secondary: light-dark(#ffffff, #0f1319);
+
+    // --- Colour: semantic -----------------------------------------------
+    //
+    // Three values per meaning, because the same colour cannot do all three
+    // jobs: the accent is a text and border colour, "on-*" is the foreground
+    // for a solid fill of it, and "*-surface" is the soft tint an alert or a
+    // badge sits on. Each was contrast checked for the job it does.
+    --theme-color-success: light-dark(#146c43, #4ade80);
+    --theme-color-on-success: light-dark(#ffffff, #0f1319);
+    --theme-color-success-surface: light-dark(#e6f2ec, #12251b);
+
+    --theme-color-warning: light-dark(#8a5a00, #fbbf24);
+    --theme-color-on-warning: light-dark(#ffffff, #0f1319);
+    --theme-color-warning-surface: light-dark(#fbf0dd, #2a2113);
+
+    --theme-color-danger: light-dark(#b3261e, #ff8a80);
+    --theme-color-on-danger: light-dark(#ffffff, #0f1319);
+    --theme-color-danger-surface: light-dark(#fbeae9, #2e1717);
+
+    // "info" deliberately aliases the primary accent rather than introducing a
+    // fifth hue: an informational message is not a different kind of thing
+    // from the theme's own accent, and a palette should not have to author one
+    // more colour to say so.
+    --theme-color-info: var(--theme-color-primary);
+    --theme-color-on-info: var(--theme-color-on-primary);
+    --theme-color-info-surface: light-dark(#e7effc, #152033);
+
+    // The scrim behind a modal or an off-canvas panel.
+    --theme-color-overlay: light-dark(rgb(20 24 31 / 55%), rgb(0 0 0 / 65%));
 
     // --- Spacing --------------------------------------------------------
     //
@@ -141,7 +165,28 @@
     // The design is flat: the reference contains no visible effect of any
     // kind, so there are deliberately no elevation tokens. Focus is the
     // exception, because it is a requirement rather than decoration.
-    --theme-focus-ring: 0 0 0 3px rgb(11 87 208 / 35%);
+    //
+    // Split in two because "light-dark()" takes colours, not shadows. The
+    // composite stays a token so a site package can still replace the whole
+    // ring in one declaration.
+    --theme-focus-ring-color: light-dark(rgb(11 87 208 / 35%), rgb(130 171 255 / 40%));
+    --theme-focus-ring: 0 0 0 3px var(--theme-focus-ring-color);
+
+    // --- Controls -------------------------------------------------------
+    //
+    // 44px is the WCAG 2.2 target size minimum (2.5.8, AA). It is a floor for
+    // anything clickable, not a height for everything.
+    --theme-tap-target-min: 44px;
+    --theme-opacity-disabled: 0.5;
+
+    // --- Stacking -------------------------------------------------------
+    //
+    // Named rather than numeric at the point of use, so two components cannot
+    // disagree about what "10" means.
+    --theme-z-sticky: 100;
+    --theme-z-overlay: 200;
+    --theme-z-modal: 300;
+    --theme-z-tooltip: 400;
 
     // --- Motion ---------------------------------------------------------
     --theme-duration-fast: 120ms;
@@ -156,16 +201,18 @@
     --theme-content-max-width: 75rem;
 }
 
-// The system preference decides, unless the document asks for light explicitly.
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) {
-        @include dark-palette;
-    }
+// The appearance override, in full. The system preference decides while no
+// attribute is set; an explicit request wins over it in both directions.
+//
+// Note that this does *not* work by changing what "prefers-color-scheme"
+// matches - that stays tied to the operating system and cannot be influenced
+// from CSS. It works because "light-dark()" resolves against "color-scheme".
+:root[data-theme='light'] {
+    color-scheme: light;
 }
 
-// An explicit request wins over the system preference, in both directions.
 :root[data-theme='dark'] {
-    @include dark-palette;
+    color-scheme: dark;
 }
 
 @media (prefers-reduced-motion: reduce) {

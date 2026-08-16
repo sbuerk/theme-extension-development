@@ -20,6 +20,7 @@ Two different origins, and the difference matters when you change something.
 | Typography metrics, spacing, radius, borders, elevation | **Measured** from an internal reference design            |
 | Colour                                                  | **Authored.** Deliberately neutral, see [Colour](#colour) |
 | Motion, layout width, the type role mapping             | **Authored**, marked below                                |
+| Controls, stacking, semantic colour, palettes           | **Authored**, added for the component library             |
 
 The reference design tokenises colour and nothing else — no spacing, radius or
 type tokens exist in it. Colour is precisely the part this theme does not take,
@@ -97,8 +98,12 @@ on the 5px grid.
 Weights: `400` regular, `500` medium, `800` bold. There is no 600 or 700 in the
 reference. A system font may synthesise 800 or clamp it to its boldest weight.
 
-Line heights: `tight` 1.1, `snug` 1.3, `heading` 1.5, `base` 1.6.
+Line heights: `tight` 1.1, `snug` 1.3, `heading` 1.5, `base` 1.6, `mono` 1.5.
 Tracking: `wide` 0.05em, `none` 0. Measure: 68ch (authored).
+
+`--theme-line-height-mono` is 1.5, the same number as `heading` — and it is a
+separate token precisely because that is a coincidence. Sharing one would mean
+that changing a heading silently re-set every code block.
 
 ## Colour
 
@@ -111,6 +116,37 @@ site package can drop its own values in.
 Contrast was **computed**, not estimated, for every value, against both the
 background and the surface of its own mode. Body text clears 4.5:1 (WCAG AA);
 borders that delimit a control clear 3:1 (WCAG 1.4.11).
+
+### One declaration, both appearances
+
+Every colour is declared **once**, carrying its light and dark value together,
+with the CSS `light-dark()` function:
+
+```css
+:root {
+    color-scheme: light dark;
+    --theme-color-background: light-dark(#ffffff, #0f1319);
+}
+```
+
+`light-dark()` resolves against the **used value of `color-scheme`**, which is
+what makes the appearance switch a one-property affair. `color-scheme: light
+dark` on the root is load-bearing: without it the used scheme is light, the
+second argument of every call is unreachable, and the entire dark appearance
+disappears silently.
+
+The alternative — a second palette block for the media query and a third for
+the attribute override — costs three declarations per token instead of one, and
+multiplies again per palette. With five palettes that is 255 colour
+declarations against 85. It also lets the copies drift, which is a class of
+defect that cannot occur here at all.
+
+**`light-dark()` takes colours, not arbitrary values.** That is why the focus
+ring is split into `--theme-focus-ring-color` and a shadow built around it,
+rather than being declared whole.
+
+Support: Firefox 120, Chrome and Edge 123, Safari 17.5 — Baseline since
+May 2024.
 
 ### Light
 
@@ -165,20 +201,77 @@ becomes a light tint and `--theme-color-on-primary` becomes the background.
 separation, not the boundary of a control. `--theme-color-border-strong` is the
 one to use where a border carries meaning.
 
-### How light and dark are selected
+### Semantic colour
 
-```css
-:root                       { /* light — the default */ }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) { /* dark */ }
-}
-:root[data-theme='dark']    { /* dark */ }
+Three tokens per meaning, because one colour cannot do all three jobs. The
+accent is a **text and border** colour, `on-*` is the **foreground on a solid
+fill** of it, and `*-surface` is the **soft tint** an alert or a badge sits on.
+Each was checked for the job it actually does.
+
+| Meaning | Accent (light / dark) | On (light / dark)     | Surface (light / dark) |
+|---------|-----------------------|-----------------------|------------------------|
+| success | `#146c43` / `#4ade80` | `#ffffff` / `#0f1319` | `#e6f2ec` / `#12251b`  |
+| warning | `#8a5a00` / `#fbbf24` | `#ffffff` / `#0f1319` | `#fbf0dd` / `#2a2113`  |
+| danger  | `#b3261e` / `#ff8a80` | `#ffffff` / `#0f1319` | `#fbeae9` / `#2e1717`  |
+| info    | aliases `primary`     | aliases `on-primary`  | `#e7effc` / `#152033`  |
+
+`info` deliberately **aliases the primary accent** rather than introducing a
+fifth hue. An informational message is not a different kind of thing from the
+theme's own accent, and a palette should not have to author one more colour to
+say so.
+
+Accent-on-tint clears 4.5:1 in every combination (lowest: warning light, 5.25),
+and so does body text on a tint (lowest: dark warning, 13.49). Solid fills clear
+4.5:1 with their `on-*` foreground (lowest: warning light, 5.93).
+
+`--theme-color-overlay` is the scrim behind a modal or an off-canvas panel:
+`rgb(20 24 31 / 55%)` light, `rgb(0 0 0 / 65%)` dark.
+
+### Palettes
+
+The neutral palette above is the **default**. Four alternates ship, and each
+varies **accents only** — `primary`, `secondary`, their hover states and the
+focus ring. Neutrals, semantic colour, spacing, radius and typography are
+shared, which is what keeps a palette to a single block.
+
+```html
+<html data-palette="ocean">
 ```
 
-The system preference wins by default, and a `data-theme` attribute on the root
-element overrides it **in both directions**. No JavaScript ships with the
-extension; the attribute is there for whoever wants to build a switch.
-`color-scheme` is set per mode so form controls and scrollbars follow.
+| Palette           | Primary (light / dark) | Secondary (light / dark) |
+|-------------------|------------------------|--------------------------|
+| neutral (default) | `#0b57d0` / `#82abff`  | `#0f766e` / `#4fd1c5`    |
+| ember             | `#9a4212` / `#f0a882`  | `#7c5310` / `#e8c16a`    |
+| ocean             | `#00629a` / `#7cc4ee`  | `#0d6d76` / `#63cfd8`    |
+| moss              | `#2f6a26` / `#8fd782`  | `#5c6218` / `#cbd06a`    |
+| violet            | `#6a3ba8` / `#c2a4f2`  | `#a03270` / `#f090c0`    |
+
+All 60 pairs were computed. Every accent clears 4.5:1 against both the
+background and the surface of its own appearance — the lowest is ocean
+secondary on light surface, at 5.60 — and every `on-*` foreground clears 4.5:1
+against its fill.
+
+**Why a development theme ships more than one.** Not for variety. An extension
+that renders correctly across every palette in both appearances is one that is
+not hardcoding colour, and that is exactly the class of defect this theme exists
+to surface. The palettes are a test surface.
+
+### How the appearance is selected
+
+```css
+:root                     { color-scheme: light dark; }  /* follow the system */
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark']  { color-scheme: dark; }
+```
+
+The system preference decides while no attribute is set, and a `data-theme`
+attribute on the root element overrides it **in both directions**.
+
+This does **not** work by changing what `prefers-color-scheme` matches — that
+stays tied to the operating system and cannot be influenced from CSS. It works
+because `light-dark()` resolves against `color-scheme`, and `color-scheme` is
+an ordinary property that any selector can set. Setting it per appearance also
+means form controls, scrollbars and the canvas follow along.
 
 ## Spacing
 
@@ -234,11 +327,36 @@ decision that needs a source rather than a default.
 
 The single exception is focus, which is a requirement and not decoration:
 
-| Token                | Value                                         |
-|----------------------|-----------------------------------------------|
-| `--theme-focus-ring` | `0 0 0 3px` in `--theme-color-primary` at 35% |
+| Token                      | Value                                                       |
+|----------------------------|-------------------------------------------------------------|
+| `--theme-focus-ring-color` | `rgb(11 87 208 / 35%)` light, `rgb(130 171 255 / 40%)` dark |
+| `--theme-focus-ring`       | `0 0 0 3px var(--theme-focus-ring-color)`                   |
 
-Applied through `:focus-visible`.
+Applied through `:focus-visible`. Split in two because `light-dark()` takes
+colours and not shadows; the composite stays a token so a site package can
+still replace the whole ring in one declaration. A palette overrides the colour
+half, so the ring follows the accent.
+
+## Controls
+
+| Token                      | Value | Origin                                    |
+|----------------------------|-------|-------------------------------------------|
+| `--theme-tap-target-min`   | 44px  | WCAG 2.2 §2.5.8 Target Size (Minimum), AA |
+| `--theme-opacity-disabled` | 0.5   | authored                                  |
+
+44px is a **floor for anything clickable**, not a height for everything.
+
+## Stacking
+
+Named rather than numeric at the point of use, so two components cannot
+disagree about what `10` means.
+
+| Token               | Value |
+|---------------------|-------|
+| `--theme-z-sticky`  | 100   |
+| `--theme-z-overlay` | 200   |
+| `--theme-z-modal`   | 300   |
+| `--theme-z-tooltip` | 400   |
 
 ## Motion
 
@@ -264,7 +382,23 @@ moves, the other has to.**
 
 ## What this file does not decide
 
-Tokens are the vocabulary, not the design. Component and layout design — how a
-page is composed, what a card looks like, how the content elements use this
-vocabulary — has not started. The stylesheet applies the tokens to an element
-baseline and to the image gallery, and nothing else yet.
+Tokens are the vocabulary, not the design.
+
+The **structural variant is chosen: Frame.** Components sit in a box — surface
+fill, hairline border, the single 5px radius — and a content element carries a
+visible outline labelled with its `CType`. That outline is a deliberate
+development affordance rather than a style: it makes an element's boundary
+something you can see while building against it, which is the whole reason this
+theme exists. It is one token away from being switched off for a production
+site package.
+
+Two alternatives were rejected, and the reasons are worth keeping. *Rule* —
+whitespace and hairline rules, no boxes — is the most faithful reading of the
+flat finding above and would be the pick for a content site, but element
+boundaries are invisible in it. *Band* — full-bleed alternating bands — is the
+closest to how the TYPO3 v14 default theme feels, and is the only one with an
+architectural cost: an element's appearance would depend on the band it sits in,
+so the backend layout would have to pass a context down to every element.
+
+What each component actually looks like in that variant, and which tokens it
+consumes, is not settled here — that belongs with the components.

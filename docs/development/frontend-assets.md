@@ -35,13 +35,23 @@ Every value in the stylesheet comes from a CSS custom property declared in
 yet. [`DESIGN.md`](../../DESIGN.md) is the specification — what each token is,
 where its value came from, and the contrast ratios behind the palette.
 
-Two things about it are easy to break by accident:
+Colour is declared once per token and carries both appearances through
+`light-dark()`; the appearance is then selected by `color-scheme` alone. The
+alternates in `_palettes.scss` vary **accents only**, which is what keeps a
+palette to one block.
 
-- **Both palettes have to ship.** `checkCssBuild` proves only that the committed
-  CSS matches the build; delete the dark palette and it stays green, because the
-  committed file still matches. `Tests/Unit/StylesheetTest` is what asserts the
-  light/dark contract, including that the dark palette is emitted for *both* the
-  `prefers-color-scheme` query and the `data-theme` override.
+Three things about it are easy to break by accident:
+
+- **`color-scheme: light dark` on `:root` is load-bearing.** Without it the used
+  colour scheme is light, the second argument of every `light-dark()` becomes
+  unreachable, and the whole dark appearance disappears — silently, with no
+  build error and no visual clue in light mode.
+- **Both appearances have to ship.** `checkCssBuild` proves only that the
+  committed CSS matches the build; drop the dark half of a colour and it stays
+  green, because the committed file still matches.
+  `Tests/Unit/StylesheetTest` is what asserts the appearance contract — that
+  every colour carries two values in one declaration, that a neutral is declared
+  exactly once, and that no palette restates anything but an accent.
 - **`--theme-content-max-width` and `theme.media.maxGalleryWidth` are the same
   number** — 1200px — because the second decides how wide images are processed
   for the first. They are in different languages and nothing enforces the

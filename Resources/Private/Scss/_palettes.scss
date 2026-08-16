@@ -1,0 +1,58 @@
+// Alternate colour palettes.
+//
+// A palette varies the **accents only** - primary, secondary, their hover
+// states and the focus ring. Neutrals, spacing, radius, typography and motion
+// are shared with "_tokens.scss" and are never restated here. That is what
+// keeps a palette to a single block: five palettes cost 85 colour declarations
+// in total, not 255.
+//
+// The neutral palette is the default and lives in "_tokens.scss"; selecting it
+// explicitly means removing the attribute rather than setting it.
+//
+//     <html data-palette="ocean">
+//
+// --- Why a development theme ships more than one --------------------------
+//
+// Not for variety. An extension that renders correctly across every palette in
+// both appearances is one that is not hardcoding colour, and that is precisely
+// the class of defect this theme exists to surface. The palettes are a test
+// surface.
+//
+// --- Contrast -------------------------------------------------------------
+//
+// Every value below was computed, not estimated, against both the background
+// and the surface of its own appearance, and every "on-*" foreground against
+// the fill it sits on. All clear 4.5:1. The ratios are tabulated in
+// "DESIGN.md"; do not add or change a value here without recomputing them.
+
+:root[data-palette='ember'] {
+    --theme-color-primary: light-dark(#9a4212, #f0a882);
+    --theme-color-primary-hover: light-dark(#7d350e, #f7c0a3);
+    --theme-color-secondary: light-dark(#7c5310, #e8c16a);
+    --theme-color-secondary-hover: light-dark(#63420c, #f0d190);
+    --theme-focus-ring-color: light-dark(rgb(154 66 18 / 35%), rgb(240 168 130 / 40%));
+}
+
+:root[data-palette='ocean'] {
+    --theme-color-primary: light-dark(#00629a, #7cc4ee);
+    --theme-color-primary-hover: light-dark(#004e7a, #9dd4f3);
+    --theme-color-secondary: light-dark(#0d6d76, #63cfd8);
+    --theme-color-secondary-hover: light-dark(#0a575e, #8adde3);
+    --theme-focus-ring-color: light-dark(rgb(0 98 154 / 35%), rgb(124 196 238 / 40%));
+}
+
+:root[data-palette='moss'] {
+    --theme-color-primary: light-dark(#2f6a26, #8fd782);
+    --theme-color-primary-hover: light-dark(#25541e, #abe3a1);
+    --theme-color-secondary: light-dark(#5c6218, #cbd06a);
+    --theme-color-secondary-hover: light-dark(#4a4e13, #d9dd91);
+    --theme-focus-ring-color: light-dark(rgb(47 106 38 / 35%), rgb(143 215 130 / 40%));
+}
+
+:root[data-palette='violet'] {
+    --theme-color-primary: light-dark(#6a3ba8, #c2a4f2);
+    --theme-color-primary-hover: light-dark(#552f86, #d3bcf6);
+    --theme-color-secondary: light-dark(#a03270, #f090c0);
+    --theme-color-secondary-hover: light-dark(#80285a, #f4aed1);
+    --theme-focus-ring-color: light-dark(rgb(106 59 168 / 35%), rgb(194 164 242 / 40%));
+}
