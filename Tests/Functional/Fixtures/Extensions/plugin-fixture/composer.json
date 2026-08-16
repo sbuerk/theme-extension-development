@@ -1,0 +1,23 @@
+{
+    "name": "tests/plugin-fixture",
+    "description": "Fixture extension of the functional test suite: an Extbase plugin registered with no rendering definition of its own, to prove the theme's own lib.contentElement/Generic.html is what makes it render at all.",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "version": "1.0.0-dev",
+    "require": {
+        "typo3/cms-core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "TESTS\\PluginFixture\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "tests_plugin_fixture",
+            "Package": {
+                "providesPackages": []
+            }
+        }
+    }
+}

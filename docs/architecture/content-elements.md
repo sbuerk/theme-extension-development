@@ -788,6 +788,115 @@ throws (`Exception`, code `1437425804`, "Icon with identifier … is not
 registered") the moment something tries to resolve it — there is no silent
 fallback icon to lean on if a future addition typos one.
 
+## Extbase plugins, and `tt_content.list`
+
+Everything above is a `CType` this theme's own TypoScript branch is written
+for by name. An Extbase plugin registered through
+`TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin()` is different:
+the method generates its own TypoScript, and it does so whether or not
+`fluid_styled_content` is installed. Read on both installed core versions
+(`.Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php`), it
+emits, verbatim, for a plugin registered with the `CType` type — the only
+type v14.3 accepts, and the only one that does not log a deprecation on
+v13.4 either:
+
+```typoscript
+tt_content.<pluginSignature> =< lib.contentElement
+tt_content.<pluginSignature> {
+    templateName = Generic
+    20 = EXTBASEPLUGIN
+    20 {
+        extensionName = <ExtensionName>
+        pluginName = <PluginName>
+    }
+}
+```
+
+`=< lib.contentElement` is generated unconditionally, on a v14.3.6 core where
+nothing outside this theme defines that object at all — grepping the whole
+installed v14 vendor tree for `lib.contentElement =` returns nothing. This
+theme is therefore not an optional convenience for a third-party plugin, it is
+the only thing that makes one render: without a `Generic` template the plugin
+falls through to the same core "no rendering definition" notice as any
+uncovered classic type.
+
+`Resources/Private/Templates/Generic.html` is that template — at the *root*
+of `templateRootPath`, not below `ContentElements/` the way every other
+template in the coverage table above is. That is not a stray inconsistency:
+`templateName = Generic` is a fixed string `configurePlugin()` writes itself,
+never `ContentElements/Generic`, and `FluidTemplateContentObject` resolves it
+literally. A copy placed under `ContentElements/` was tried first and fails
+with `TYPO3Fluid\Fluid\View\Exception\InvalidTemplateResourceException` —
+confirmed by actually running it, not inferred — which is why it sits where it
+does.
+
+The template itself cannot be per-plugin, so it does not try: it reads back
+the `20` cObject `configurePlugin()` places beside `templateName` in the very
+same branch, at a path built from the current record rather than fixed —
+`tt_content.{data.CType}.20` — because `CType` *is* the plugin signature for a
+plugin registered this way (`ExtensionUtility::registerPlugin()` adds that
+exact string as the `CType` select item's value). Confirmed to actually
+resolve with a throwaway functional test against a fixture plugin, on both
+core versions, before being deleted again — `f:cObject`'s own
+`typoscriptObjectPath` resolves from the root of the merged setup array, not
+relative to the branch it is rendered from, which is why the path spells out
+`tt_content` rather than reading `20` alone.
+
+`Tests/Functional/Fixtures/Extensions/plugin-fixture` is the fixture that
+keeps this covered going forward: an Extbase plugin registered with **no**
+TypoScript of its own — unlike `tests/example-fixture`, which deliberately
+overrides what `configurePlugin()` generates (see that extension's own
+`Configuration/TypoScript/setup.typoscript`) — so the only thing that can make
+it render is this theme's `lib.contentElement` and `Generic.html`.
+
+### `tt_content.list`
+
+One CType still reaches `configurePlugin()`'s *other* branch: `list`, the
+historical "General Plugin" registration, still present in EXT:frontend's own
+v13.4 TCA (`Configuration/TCA/tt_content.php`, `types.list`, the `CType`
+select's own `value => 'list'`) even though it is deprecated there
+(Deprecation #105076). A plugin registered with `configurePlugin()`'s fifth
+argument omitted or `list_type` writes into it directly on v13.4:
+
+```typoscript
+tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN
+```
+
+`fluid_styled_content` supplied `tt_content.list` itself, as a `CASE` object
+keyed on `list_type` — not a dependency here — and removed it outright in
+v14.0 along with the `list` CType and its own `List.html` template (Breaking
+#105377, `DeprecatedFunctionalityRemoved`: *"The following content element
+definitions have been removed: `tt_content.list`"*). Without that `CASE`
+object, the assignment above has nothing to add a branch to, and a `list`
+element renders the core notice on v13.4 the same as every other uncovered
+type.
+
+`ContentElements.typoscript` declares it, in this theme's own house style —
+`=< lib.contentElement`, `templateName = Generic` — which lets `Generic.html`
+render it too: a `list` record's own `CType` is `list`, so
+`{data.CType}.20` resolves to `tt_content.list.20`, the `CASE` itself, in
+place of a single plugin's `EXTBASEPLUGIN`.
+
+It is declared **unconditionally**, not behind a `[not (...)]` version
+condition — verified rather than assumed to be harmless on v14, not merely
+argued from the changelog. With v14.3.6 installed,
+`grep -n "'list'\|list_type" .Build/vendor/typo3/cms-frontend/Configuration/TCA/tt_content.php`
+returns nothing at all: no `types.list`, no `CType` select item, no
+`subtype_value_field`. The changelog explains why so completely that nothing
+could reach this branch regardless — the `list_type` **database column
+itself** was dropped (`Breaking-105377`: *"The following database table
+fields have been removed: `tt_content.list_type`"*), so even the `CASE`'s own
+`key.field = list_type` names a column the schema no longer has. A `CType` no
+v14 installation can offer an editor, keyed on a column that does not exist,
+is exactly as inert as never declaring the object at all — and it stays
+useful for as long as an installation is still on v13.4. This is the
+documented exception to splitting version differences into `Core13`/`Core14`
+classes (TypoScript is configuration, see
+[Core version aware code](core-version-aware-code.md#configuration-is-the-exception))
+applied in its simplest form: the difference needs no condition at all, only
+evidence that leaving it unconditional does not do anything on the newer
+version.
+
 ## See also
 
 - [Page rendering](page-rendering.md)
