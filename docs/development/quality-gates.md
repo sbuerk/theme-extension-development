@@ -1,8 +1,9 @@
 # Quality gates
 
-The same gates run locally and in the GitHub Actions workflows for TYPO3 v13
-and v14. Every one of them must pass for both core versions, each after the
-matching `composerUpdate` — see [Dual core setup](dual-core-setup.md).
+The same gates run locally and in the GitHub Actions workflows, for every
+supported TYPO3 version — v13 today. Every one of them must pass for every
+supported core version, each after its own `composerUpdate` — see
+[Core version setup](dual-core-setup.md).
 
 ## The gates
 
@@ -41,7 +42,7 @@ Build/Scripts/runTests.sh -s checkCssBuild
 | Gate                     | Configuration                                                                                        | Core version dependent |
 |--------------------------|------------------------------------------------------------------------------------------------------|------------------------|
 | `cgl`                    | [`Build/php-cs-fixer/config.php`](../../Build/php-cs-fixer/config.php)                               | no                     |
-| `phpstan`                | `Build/phpstan/Core13/`, `Build/phpstan/Core14/`                                                     | **yes**                |
+| `phpstan`                | `Build/phpstan/Core<major>/`, one directory per core version                                         | **yes**                |
 | `lintPhp`                | —                                                                                                    | no                     |
 | `composerValidate`       | `composer.json`                                                                                      | no                     |
 | `checkBom`               | [`Build/Scripts/checkUtf8Bom.sh`](../../Build/Scripts/checkUtf8Bom.sh)                               | no                     |
@@ -55,8 +56,9 @@ Build/Scripts/runTests.sh -s checkCssBuild
 PHPStan runs at **level 8** and is configured **per core version**. Each
 configuration analyses only its own core version aware sources —
 `Build/phpstan/Core13/phpstan.neon` lists `Classes`, `Configuration`, `Core13`
-and `Tests`, and excludes `Tests/*/Core14/*`. Analysing the sources of the other
-core version would report false positives about API that does not exist there.
+and `Tests`. Analysing the sources of another core version would report false
+positives about API that does not exist there, so a second supported version
+gets its own configuration beside this one rather than a widened path list.
 
 Both PHPStan suites pass arguments after `--` through to the tool and do not
 force an output format, so `-- --error-format=json` or `-- --no-progress` is the
@@ -67,7 +69,6 @@ baseline can be regenerated per core version — but **prefer fixing the finding
 
 ```bash
 Build/Scripts/runTests.sh -t 13 -s phpstanGenerateBaseline
-Build/Scripts/runTests.sh -t 14 -s phpstanGenerateBaseline
 ```
 
 A growing baseline is a defect, not a configuration. Regenerating it to make a
@@ -139,22 +140,22 @@ lint    ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB
 docs ────┘
 ```
 
-| Job                 | Matrix                                   | Runs                                        |
-|---------------------|------------------------------------------|---------------------------------------------|
-| `quality`           | lowest PHP, one core version             | The gates that inspect source files         |
-| `phpstan`           | lowest PHP × both core versions          | The one gate configured per core version    |
-| `lint`              | all PHP versions × both core versions    | `lintPhp`                                   |
-| `unit`              | edge PHP versions × both core versions   | `unit`, `unitRandom`                        |
-| `functional-sqlite` | edge PHP versions × both core versions   | `functional -d sqlite`                      |
-| `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs | `functional` against each database          |
-| `documentation`     | —                                        | `renderDocumentation`, uploads the artifact |
+| Job                 | Matrix                                  | Runs                                        |
+|---------------------|-----------------------------------------|---------------------------------------------|
+| `quality`           | lowest PHP, one core version            | The gates that inspect source files         |
+| `phpstan`           | lowest PHP × every core version         | The one gate configured per core version    |
+| `lint`              | all PHP versions × every core version   | `lintPhp`                                   |
+| `unit`              | edge PHP versions × every core version  | `unit`, `unitRandom`                        |
+| `functional-sqlite` | edge PHP versions × every core version  | `functional -d sqlite`                      |
+| `functional-dbms`   | edge PHP × every core × 4 DBMS — 8 jobs | `functional` against each database          |
+| `documentation`     | —                                       | `renderDocumentation`, uploads the artifact |
 
 Two decisions are worth knowing:
 
-- **The DBMS matrix is gated on SQLite.** It is the expensive part, sixteen jobs
+- **The DBMS matrix is gated on SQLite.** It is the expensive part, eight jobs
   each starting a database container. Running it only after the same tests pass
-  on SQLite for both core versions means a defect that is not DBMS specific is
-  reported by four jobs instead of twenty.
+  on SQLite for every supported core version means a defect that is not DBMS
+  specific is reported by two jobs instead of ten.
 - **The version independent gates run once, not per core version and PHP
   version.** They inspect source files rather than the installed core, so
   repeating them tests the same files again. Only `phpstan` is genuinely per
@@ -205,13 +206,12 @@ What is deliberately *not* symmetric is who keeps it: `composerUpdate` deletes
 `.cache/` **locally** and keeps it in CI, guarded by the same `IS_CORE_CI` the
 rest of the script uses. The two contexts differ in what the cache can collide
 with. A CI job starts from an empty checkout, installs once and ends; a working
-copy switches between the core versions for months, and that switch changes the
-major version of `typo3/class-alias-loader` — v13 resolves `^1.2`, v14 resolves
-`^2.0.1`.
+copy accumulates installs for months, and switching core versions also switches
+the major version of `typo3/class-alias-loader`.
 
 The local clear is a **precaution rather than a fix for a reproduced defect**.
 Switching back and forth four times does not fail today; what it buys is that an
-install never resolves against a cache belonging to the other major, which is a
+install never resolves against a cache belonging to a different major, which is a
 class of failure that costs far more to recognize than the one download it
 costs to avoid — of a dependency set that was going to be replaced anyway.
 
@@ -245,6 +245,6 @@ Two consequences:
 ## See also
 
 - [Development environment](environment.md)
-- [Dual core setup](dual-core-setup.md)
+- [Core version setup](dual-core-setup.md)
 - [Testing](../testing/Index.md)
 - [Pull requests](../workflow/pull-requests.md)

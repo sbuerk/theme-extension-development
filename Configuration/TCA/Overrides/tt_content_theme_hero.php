@@ -13,12 +13,11 @@ defined('TYPO3') or die();
 // "LLL:EXT:.../Form/locallang_tabs.xlf:images" reference rather than the
 // shorter "core.form.tabs:images" seen in camino's own hero
 // (.agent/tmp/theme_camino/Configuration/TCA/Overrides/20_tt_content_hero.php):
-// that shorthand is TYPO3 v14's Translation Domain Mapping (Feature #93334,
-// .Build/vendor/typo3/cms-core/Documentation/Changelog/14.0/Feature-93334-TranslationDomainMapping.rst).
-// LanguageService::sL() on v13.4 only translates a string carrying the "LLL:"
-// prefix and otherwise returns it unchanged - so on v13 that tab would render
-// its own untranslated identifier instead of "Images". The traditional form
-// works unchanged on both versions.
+// that shorthand needs a translation domain mapping this core version does not
+// have. LanguageService::sL() on v13.4 only translates a string carrying the
+// "LLL:" prefix and returns anything else unchanged, so the tab would render
+// its own untranslated identifier instead of "Images". The traditional form is
+// what works here.
 ExtensionManagementUtility::addRecordType(
     [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero.label',

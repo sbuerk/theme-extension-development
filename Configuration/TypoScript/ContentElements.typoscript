@@ -8,11 +8,11 @@
 # What FSC supplies is the *rendering*, not the TCA. EXT:frontend registers the
 # whole classic set of content types itself, in
 # "Configuration/TCA/Overrides/2xx-tt_content-content_type-*.php" - image,
-# textmedia, bullets, table, uploads, the menus, shortcut, div and html - on
-# v13.4 and v14 alike, and FSC's own "Configuration/TCA/Overrides/" holds
-# nothing but a "sys_template.php". Every one of those elements can therefore be
-# created in the backend of an installation using this theme, and every one that
-# has no branch below renders the notice.
+# textmedia, bullets, table, uploads, the menus, shortcut, div and html - while
+# FSC's own "Configuration/TCA/Overrides/" holds nothing but a
+# "sys_template.php". Every one of those elements can therefore be created in
+# the backend of an installation using this theme, and every one that has no
+# branch below renders the notice.
 #
 # Covered here: header, text, image, textpic, textmedia, bullets, table,
 # uploads, shortcut, div, html, and every "menu_*" type EXT:frontend
@@ -44,15 +44,17 @@ lib.contentElement {
 #
 # "ExtensionUtility::configurePlugin()"
 # (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php",
-# read on both installed core versions) emits "=< lib.contentElement" /
-# "templateName = Generic" for every plugin registered as its own CType,
-# unconditionally - v14.3.6 emits it even though nothing in a vanilla v14 core
-# defines "lib.contentElement" any more (a "grep -r 'lib.contentElement ='"
-# across the whole installed v14 vendor tree returns nothing outside this
-# extension). This theme is therefore what makes a third-party Extbase plugin
-# render at all, not an optional convenience: without a "Generic" template
-# every such plugin falls through to the core's own "no rendering definition"
-# notice, indistinguishable to an editor from a broken content element.
+# v13.4.34) emits "=< lib.contentElement" / "templateName = Generic" for every
+# plugin registered as its own CType, unconditionally - it never checks that
+# anything defines "lib.contentElement". Nothing in the installed core does:
+# "lib.contentElement" is a "fluid_styled_content" object, and FSC is not a
+# dependency of this theme, so a "grep -r 'lib.contentElement ='" across the
+# whole installed vendor tree returns nothing outside an 8.7 changelog entry
+# and this extension. This theme is therefore what makes a third-party Extbase
+# plugin render at all, not an optional convenience: without a "Generic"
+# template every such plugin falls through to the core's own "no rendering
+# definition" notice, indistinguishable to an editor from a broken content
+# element.
 # "Templates/Generic.html" is that template - at the *root* of
 # "templateRootPath", not below "ContentElements/" the way every other
 # template in this file is: "templateName = Generic" is the literal string
@@ -69,42 +71,22 @@ lib.contentElement {
 # in EXT:frontend's own v13.4 TCA ("Configuration/TCA/tt_content.php",
 # "types.list", the "CType" select's own "value => 'list'" - verified) as the
 # historical, pre-CType way of registering a plugin, and
-# "fluid_styled_content" is what rendered it - not a dependency here, and its
-# own "Resources/Private/Templates/List.html" plus the "tt_content.list"
-# TypoScript object were removed outright in v14.0 (Breaking #105377,
-# "DeprecatedFunctionalityRemoved": "The following content element
-# definitions have been removed: tt_content.list"). "configurePlugin()" still
-# writes straight into it on v13.4 whenever its fifth argument is omitted or
-# "list_type" ("TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN",
-# deprecated in 13.4 by #105076 and gone on v14, where the same call throws):
+# "fluid_styled_content" is what rendered it, through its own
+# "Resources/Private/Templates/List.html" and its own "tt_content.list"
+# TypoScript object - neither of which is present here, because FSC is not a
+# dependency. "configurePlugin()" still writes straight into it on v13.4
+# whenever its fifth argument is omitted or "list_type"
+# ("TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN", deprecated
+# in 13.4 by #105076, which is why a plugin registering that way also raises an
+# "E_USER_DEPRECATED" from "configurePlugin()" itself):
 # "tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN". For that assignment
 # to do anything, "tt_content.list.20" has to already be a CASE keyed on
-# "list_type" - exactly what "fluid_styled_content" supplied and no longer
-# does - so it is declared here, in this theme's own house style, which lets
-# the very same "Generic.html" render it: a "list" record's own "CType" is
-# "list", so "{data.CType}" in that template resolves to "tt_content.list.20",
-# the CASE itself, the same way it resolves to a single "EXTBASEPLUGIN" for
-# every other plugin's own branch above.
-#
-# Declared unconditionally, not behind a "[not (...)]" version condition -
-# deliberate, not an oversight: on v14 nothing can ever reach this branch at
-# all, verified directly rather than inferred from the changelog alone. With
-# v14.3.6 installed, "grep -n \"'list'\\|list_type\"
-# .Build/vendor/typo3/cms-frontend/Configuration/TCA/tt_content.php" returns
-# nothing at all - no "types.list" entry, no "CType" select item, no
-# "subtype_value_field" - and the changelog explains why so completely that
-# nothing short of it could be reached anyway: the "list_type" *database
-# column itself* was dropped ("The following database table fields have been
-# removed: tt_content.list_type", Breaking #105377), so even the CASE's own
-# "key.field = list_type" reads a column that does not exist. A CType no
-# installation can offer an editor, keyed on a column the schema no longer
-# has, is exactly as inert as never declaring this object, and it stays
-# exactly as useful as "tt_content.header" below it for as long as an
-# installation is still running v13.4. No "@todo" is attached for the same
-# reason none of the "@todo"s elsewhere in this file name a version condition
-# to remove: nothing here becomes *wrong* on v14, only unreachable - the same
-# relationship every classic CType below already has to a v14 installation
-# that never creates one of its records either.
+# "list_type" - exactly what "fluid_styled_content" supplied and what an
+# installation without it lacks - so it is declared here, in this theme's own
+# house style, which lets the very same "Generic.html" render it: a "list"
+# record's own "CType" is "list", so "{data.CType}" in that template resolves
+# to "tt_content.list.20", the CASE itself, the same way it resolves to a
+# single "EXTBASEPLUGIN" for every other plugin's own branch above.
 tt_content.list =< lib.contentElement
 tt_content.list {
     templateName = Generic
@@ -319,31 +301,27 @@ tt_content.html.templateName = ContentElements/Html
 # referenced record renders exactly as it would on its own, including, if it
 # is itself a "shortcut", going through this branch again.
 #
-# Recursion guard, verified in source rather than assumed
-# (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php"):
-#   1. On TYPO3 v13.4 it does. "RecordsContentObject::render()" registers
-#      "table:uid" in "TypoScriptFrontendController::$recordRegister" before
-#      fetching, and skips any item already registered.
-#   2. On TYPO3 v14 it does not. "TypoScriptFrontendController" was removed
-#      entirely (Breaking #107831) and "$recordRegister" went with it - the
-#      string does not occur anywhere in the v14 source outside its own
-#      changelog. "RecordsContentObject::render()" on v14 renders every
-#      referenced record unconditionally, and the older "cObjectDepthCounter"
-#      that might have caught it was itself removed in v11.4, whose
-#      deprecation note says PHP's own nesting limit is the expected outcome.
-#      A shortcut pointing at itself therefore recurses until the process
-#      dies.
+# The core does carry a guard of its own here, read in source rather than
+# assumed (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/-
+# RecordsContentObject.php", v13.4.34): "render()" registers each "table:uid"
+# it is about to render in "TypoScriptFrontendController::$recordRegister" and
+# skips any item already registered, so a self-referencing shortcut is caught
+# before it recurses.
 #
-# So the cycle is broken here rather than left to the core, and it is broken
-# by construction rather than by a register: a shortcut reached *through* a
-# shortcut renders nothing. One level of indirection is followed, which is all
-# the element is for; a second is refused. That makes both the direct and the
-# indirect cycle impossible on both core versions, with no state to keep and
-# no version split - the difference is in what the core guarantees, not in
-# what this theme does.
+# This theme does not rely on it. That guard is per-request state on a
+# controller a rendering definition never sees, held by one cObject
+# implementation, and a TypoScript object cannot assert anything about either.
+# Depending on it would make the correctness of this element a property of the
+# core rather than of the theme, and it would be invisible here - nothing in
+# this file would show why the element is safe.
 #
-# @todo Revisit if a later v14 patch level restores a recursion guard. The
-#       override below is harmless in that case, only redundant.
+# So the cycle is broken here, and broken by construction rather than by a
+# register: a shortcut reached *through* a shortcut renders nothing. One level
+# of indirection is followed, which is all the element is for; a second is
+# refused. That makes both the direct and the indirect cycle impossible with
+# no state kept between requests, and it holds whether or not the cObject
+# underneath keeps a register - the theme's own definition is what closes the
+# cycle, and "Tests/Functional/CoreContentElementRenderingTest.php" pins it.
 tt_content.shortcut =< lib.contentElement
 tt_content.shortcut {
     templateName = ContentElements/Shortcut
@@ -357,8 +335,8 @@ tt_content.shortcut {
 
             # The cycle break. Inside a shortcut, the shortcut branch renders
             # nothing at all, so no chain of references can return to its
-            # start. See the note above for why the core cannot be relied on
-            # for this on v14.
+            # start. See the note above for why this theme closes the cycle
+            # itself instead of leaning on the core's own register.
             conf.tt_content.shortcut = TEXT
             conf.tt_content.shortcut.value =
         }
@@ -433,67 +411,43 @@ tt_content.menu_categorized_pages {
     }
 }
 
-# The "Categorized Content" menu. Same selection as above, against
-# "tt_content" instead of "pages" - see the comment there for why "RECORDS"
-# rather than "MenuProcessor" or "DatabaseQueryProcessor". Unlike
-# "menu_categorized_pages" this one renders content elements, not links to
-# them: the TCA
-# ("Overrides/255-tt_content-content_type-menu_categorized_content.php")
-# gives it no "pages" field at all, only "selected_categories" and
-# "category_field".
+# The "Categorized Content" menu. The same category selection as the sibling
+# above, against "tt_content" instead of "pages": the TCA
+# ("Overrides/255-tt_content-content_type-menu_categorized_content.php") gives
+# it no "pages" field at all, only "selected_categories" and "category_field".
 #
-# Rendering another content element is exactly what "tt_content.shortcut"
-# above does, and it carries the identical recursion exposure: a categorized
-# content element can match itself by category, or match another categorized
-# content element that matches it back, and "RecordsContentObject::render()"
-# does not guard against that on TYPO3 v14 - see the long comment above
-# "tt_content.shortcut" for what was verified in source there; nothing about
-# that finding is specific to "shortcut", it is a property of "RECORDS"
-# itself on v14.
+# What it renders is a list of links, not the matched content elements
+# themselves. "fluid_styled_content" rendered this element through "RECORDS",
+# which puts every match back through the content element CASE and therefore
+# re-renders whole content elements inside a menu - heavy, visually wrong for
+# a menu, and exposed to exactly the reference cycle documented above
+# "tt_content.shortcut", because a categorized content element can match
+# itself by category, or match another one that matches it back.
 #
-# The same structural break is applied here, in the same shape: inside a
-# categorized-content listing, a nested categorized-content element renders
-# nothing, so a direct or indirect self-reference through this branch cannot
-# return to where it started, on both core versions, with no state kept
-# between requests. "conf.tt_content" is copied fresh per invocation (the
-# "=<" below), so the override is local to this element's own rendering and
-# never leaks into how any other element's "RECORDS" call resolves the same
-# branch.
-#
-# What this does not cover, the same as "shortcut" does not cover it either:
-# a *different* content type reached from inside this listing that itself
-# embeds a reference back to this element - a shortcut inside a categorized
-# listing pointing at that same listing, say - is not newly guarded by this
-# change. Breaking every possible mixed-type cycle in the content graph is
-# not what either guard does; each one only closes the direct/same-branch
-# cycle its own element is exposed to, which is what "RecordsContentObject"
-# needed replacing here.
-#
-# "RECORDS" gives no per-item boundary in "{items}" to hang the component's
-# "<li>" on from Fluid - it only ever concatenates whatever each match
-# renders - so the wrapper is added here instead, as the CASE cObject's own
-# "stdWrap", which "CaseContentObject::render()" applies to whichever branch
-# fired after it has rendered: every match gets the "<li>" regardless of its
-# own CType.
+# Selecting the rows as data with "DatabaseQueryProcessor" avoids all three at
+# once. Nothing nests, so the cycle cannot form in the first place and no
+# structural break is needed here the way one is needed for "shortcut" - the
+# rendering shape rules it out rather than a guard ruling it back in.
 tt_content.menu_categorized_content =< lib.contentElement
 tt_content.menu_categorized_content {
     templateName = ContentElements/MenuCategorizedContent
 
-    # A "DatabaseQueryProcessor" with an explicit join, not "RECORDS" with its
-    # "categories" property, and not because "RECORDS" cannot select by
+    # A "DatabaseQueryProcessor" with an explicit condition, not "RECORDS" with
+    # its "categories" property, and not because "RECORDS" cannot select by
     # category - it can, and the sibling element above uses it for pages.
     #
     # The difference is what the two produce. "RECORDS" renders each match
     # through the content element CASE, so a menu of content would re-render
     # whole content elements inside itself: heavy, visually wrong for a menu,
     # and it inherits the recursion exposure documented above the shortcut
-    # element, which on v14 has no core guard at all. This processor returns
-    # the rows as data instead, so the template renders a list of links and
-    # nothing can nest. The cycle simply cannot form.
+    # element. This processor returns the rows as data instead, so the template
+    # renders a list of links and nothing can nest. The cycle simply cannot
+    # form.
     #
-    # The join is the one "fluid_styled_content" itself used for this element -
-    # the category relation lives in "sys_category_record_mm", and no
-    # "select" syntax expresses it.
+    # Selecting by category at all needs the MM table spelled out - the
+    # relation lives in "sys_category_record_mm" and no "select" syntax
+    # expresses it - which is why "fluid_styled_content" reached for a join
+    # here as well.
     dataProcessing {
         10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
         10 {
@@ -559,7 +513,7 @@ tt_content.menu_categorized_content {
 }
 
 # The remaining nine "menu_*" content types. All are core "MenuProcessor"
-# (unchanged on v13.4 and v14.3, see "Configuration/TypoScript/Navigation.-
+# (unchanged across the v13 series, see "Configuration/TypoScript/Navigation.-
 # typoscript") with a different "special" - the "special"/HMENU documentation
 # and "AbstractMenuContentObject.php" were read for every one below, not
 # guessed, and cross-checked against the historical "fluid_styled_content"

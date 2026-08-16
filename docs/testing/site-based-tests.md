@@ -19,20 +19,20 @@ to get wrong, and it breaks whenever the core moves the file.
 provides an equivalent trait as a normal package, and hides the differences the
 core version introduced over time behind one API.
 
-Its majors are pinned to a core version, so the constraint names both:
+Its majors are pinned to a core version, so the constraint names one major per
+supported version:
 
 ```json
-"sbuerk/typo3-site-based-test-trait": "^2.0.1 || ^3.0.0"
+"sbuerk/typo3-site-based-test-trait": "^2.0.1"
 ```
 
 | Package major | TYPO3 |
 |---------------|-------|
 | `2.x`         | v13   |
-| `3.x`         | v14   |
 
 `composerUpdate` resolves the major matching the `-t` core version, which is one
 more reason why the installed dependency set must match the version a suite is
-run for — see [Dual core setup](../development/dual-core-setup.md).
+run for — see [Core version setup](../development/dual-core-setup.md).
 
 Beyond availability, the package differs from the core trait in ways that matter
 for a test suite: a language that cannot be resolved **fails** the test instead
@@ -222,20 +222,19 @@ $this->view->assign(
 );
 ```
 
-The request attribute is used rather than the language aspect because it behaves
-identically in TYPO3 v13 and v14 — a fixture extension should not need
+The request attribute is used rather than the language aspect because a fixture
+extension should not need
 [core version aware code](../architecture/core-version-aware-code.md).
 
 Two details of the plugin registration are worth knowing, both of them the
-reason it works on both core versions unchanged:
+reason it needs no version aware code:
 
 - `ExtensionUtility::configurePlugin()` is called with
   `PLUGIN_TYPE_CONTENT_ELEMENT` explicitly, and it has to be. TYPO3 v13 still
-  defaults to `list_type` and **triggers a deprecation** for it; v14 removed
-  that plugin content element and throws an `\InvalidArgumentException` for
-  anything but `CType`. Naming `CType` is the one call correct on both. Omitting
-  it would not fail silently either: the deprecation turns the v13 run red,
-  because [the suites fail on deprecations](phpunit-configuration.md#strictness-policy).
+  defaults to `list_type` and **triggers a deprecation** for it. Naming `CType`
+  is the spelling that stays correct as versions move. Omitting it would not
+  fail silently either: the deprecation turns the run red, because
+  [the suites fail on deprecations](phpunit-configuration.md#strictness-policy).
   See the changelog entry `Important-105538-ListTypeAndSubTypes.rst` shipped
   with `typo3/cms-core`.
 - `Configuration/TCA/Overrides/tt_content.php` passes **no** plugin type:
@@ -251,4 +250,4 @@ reason it works on both core versions unchanged:
 - [Functional tests](functional-tests.md)
 - [Fixture extensions](fixture-extensions.md)
 - [Environment state](environment-state.md)
-- [Dual core setup](../development/dual-core-setup.md)
+- [Core version setup](../development/dual-core-setup.md)

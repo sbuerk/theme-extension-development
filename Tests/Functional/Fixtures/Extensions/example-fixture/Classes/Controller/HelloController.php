@@ -17,8 +17,8 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
  * page of the developer documentation in "docs/testing/".
  *
  * The site language is read from the request attribute rather than from the
- * language aspect, because that is the same in TYPO3 v13 and v14 and needs no
- * core version aware code in a fixture extension.
+ * language aspect: the attribute is the documented way to reach it, and it
+ * keeps a fixture extension free of anything core version aware.
  */
 final class HelloController extends ActionController
 {

@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\AsAlias;
  * Wired with a Symfony dependency injection attribute, following the same
  * interface plus default implementation pattern the extension itself uses. It
  * is deliberately *not* core version aware: a fixture extension has no reason
- * to carry a `Core13/` and `Core14/` split.
+ * to carry a `Core<major>/` split.
  *
  * It is published with `public: true` so a functional test can fetch it from
  * the container with `$this->get()`.

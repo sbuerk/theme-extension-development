@@ -57,14 +57,13 @@ config.htmlTag.attributes.data-theme-content-outline = {$theme.appearance.conten
 
 `RequestHandler::generateHtmlTag()` iterates `htmlTag.attributes.*` and writes
 each value onto the tag **raw**: `stdWrap` is only applied when a matching
-`attributes.<name>.` sub-array is configured, and none is here. Verified
-identical on both core versions —
-`.Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php` (v13.4,
-the loop at line 833) and
-`instance-core-14/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php`
-(v14.3, line 829) — the same method, the same behaviour. A constant is
-therefore the only thing that can be assigned here; a cObject would need the
-`stdWrap` this code path never runs.
+`attributes.<name>.` sub-array is configured, and none is here. Verified in
+source rather than from the TypoScript reference —
+`.Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php` of the
+installed v13.4.34 core, `generateHtmlTag()` at line 833, whose loop at line
+837 concatenates `htmlspecialchars()` of the name and the value and nothing
+else. A constant is therefore the only thing that can be assigned here; a
+cObject would need the `stdWrap` this code path never runs.
 
 `data-theme` is behind a condition rather than a plain assignment, for a
 different reason: `auto` is the **absence** of the attribute, not a value for
@@ -78,9 +77,9 @@ it is simply what `_tokens.scss` already declares — so it is rendered
 unconditionally even though it is also the default.
 
 Constants are substituted into setup conditions before they are evaluated
-(`IncludeTreeSetupConditionConstantSubstitutionVisitor`, byte-identical
-between the two core versions), so the condition above reads
-`theme.appearance.default` the same way the unconditional assignments do.
+(`TYPO3\CMS\Core\TypoScript\IncludeTree\Visitor\IncludeTreeSetupConditionConstantSubstitutionVisitor`),
+so the condition above reads `theme.appearance.default` the same way the
+unconditional assignments do.
 
 ## The no-flash script
 

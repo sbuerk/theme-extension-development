@@ -12,14 +12,14 @@ wrapper installs them for a specific TYPO3 core and PHP version:
 ```bash
 # Install dependencies for TYPO3 v13 on PHP 8.2 (default matrix).
 Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
-
-# Switch the working copy to the TYPO3 v14 dependency set.
-Build/Scripts/runTests.sh -t 14 -p 8.2 -s composerUpdate
 ```
+
+`-t` takes the supported core versions, and re-running `composerUpdate` with a
+different one replaces the whole set in `.Build/`.
 
 > [!IMPORTANT]
 > The installed dependency set must match the core version a gate is run for.
-> See [Dual core setup](dual-core-setup.md) — this is the single most common
+> See [Core version setup](dual-core-setup.md) — this is the single most common
 > source of false positives in this repository.
 
 Run `Build/Scripts/runTests.sh -h` to see all suites and options.
@@ -41,7 +41,7 @@ hosted runners, not of this repository.
 | Option         | Meaning                                                                   |
 |----------------|---------------------------------------------------------------------------|
 | `-s <suite>`   | Suite to run (`unit`, `functional`, `cgl`, `phpstan`, …).                 |
-| `-t <13\|14>`  | TYPO3 core major version to run against. Default `13`.                    |
+| `-t <13>`      | TYPO3 core major version to run against. Default `13`.                    |
 | `-p <version>` | PHP version (`8.2` … `8.5`). Default `8.2`.                               |
 | `-d <dbms>`    | Database for functional tests (`sqlite`, `mariadb`, `mysql`, `postgres`). |
 | `-i <version>` | Database image version, together with `-d`. `-h` lists the accepted ones. |
@@ -92,6 +92,6 @@ Build/Scripts/runTests.sh -s functional -d sqlite -- --filter DummyTest
 
 ## See also
 
-- [Dual core setup](dual-core-setup.md)
+- [Core version setup](dual-core-setup.md)
 - [Quality gates](quality-gates.md)
 - [Testing](../testing/Index.md)

@@ -10,11 +10,10 @@ defined('TYPO3') or die();
 // Registers the controller actions of the plugin and the TypoScript rendering
 // definition of its content element.
 //
-// The plugin type is passed explicitly, and it has to be: TYPO3 v13 still
-// defaults to "list_type" and triggers a deprecation for it, while v14 removed
-// that plugin content element and throws for anything but "CType". Naming
-// "CType" is the one call that is correct on both, so this file needs no core
-// version switch.
+// The plugin type is passed explicitly, and it has to be: with the fifth
+// argument omitted "configurePlugin()" defaults to "list_type" and triggers
+// "Plugin subtype \"list_type\" has been deprecated..." (#105076), which this
+// test suite turns into a failure. Naming "CType" is what avoids it.
 //
 // "Configuration/TCA/Overrides/tt_content.php" then takes no plugin type at
 // all: ExtensionUtility::registerPlugin() reads it back from what this file

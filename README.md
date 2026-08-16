@@ -34,35 +34,39 @@ users and integrators, with the full scope warning.
 
 ## Status
 
-**The theme renders a page, and not much more yet.** A site enables it by
-depending on the site set `sbuerk/theme-extension-development`, which brings the
-TypoScript, a Fluid page rendering and the compiled stylesheet.
+A site enables the theme by depending on the site set
+`sbuerk/theme-extension-development`, which brings the TypoScript, a Fluid page
+rendering and the compiled stylesheet. A classic `sys_template` static include
+is available for installations that do not use site sets.
 
-It renders **Header**, **Text** and **Images** without depending on
-`fluid_styled_content`. The remaining classic elements — Text & Media, Bullet
-List, Table, File Links, the menus — **can be created**: their TCA comes from
-EXT:frontend, and what `fluid_styled_content` contributes is only the rendering.
-They render the TYPO3 "no rendering definition" notice until the theme gives
-them a template, which needs no TCA of its own.
+**Every classic core content type renders** without depending on
+`fluid_styled_content` — header, text, images, text & media, bullets, table,
+file links, `div`, `html`, `shortcut` and the eleven `menu_*` types — plus ten
+content types of the theme's own (heroes, teasers, a testimonial, an author
+block and two link lists). Extbase plugins render too, through a generic
+template. → [Content elements](docs/architecture/content-elements.md)
 
-Backend layouts are missing too, so every page renders the same template.
+**Backend layouts decide the page template.** Five are shipped, registered as
+PageTsConfig rather than as database records.
+→ [Page rendering](docs/architecture/page-rendering.md)
 
 The stylesheet is built from a documented set of design tokens with a light
 and a dark appearance — see [`DESIGN.md`](DESIGN.md). They are CSS custom
 properties, so a site package re-themes the extension by overriding a handful
-of them, without rebuilding the SCSS.
+of them, without rebuilding the SCSS. A styleguide page renders the whole
+component library, and `theme:seed` builds a showcase page tree from a
+definition in the repository.
 
-Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
-base, the core version aware wiring, the SCSS build, two development instances
-and the container based test and quality gate harness. The public API is not
-stable yet and may change without a deprecation phase until the first stable
-release.
+Underneath that sits the foundation: core version aware wiring, the SCSS build,
+one development instance per supported TYPO3 version, and the container based
+test and quality gate harness. The public API is **not stable yet** and may
+change without a deprecation phase until the first stable release.
 
 ## Compatibility
 
-| Branch | Extension | TYPO3     | PHP       |
-|--------|-----------|-----------|-----------|
-| main   | 1.x       | v13 / v14 | 8.2 - 8.5 |
+| Branch | Extension | TYPO3 | PHP       |
+|--------|-----------|-------|-----------|
+| `1`    | 1.x       | v13   | 8.2 - 8.5 |
 
 ## Installation
 
@@ -128,9 +132,9 @@ Build/Scripts/runTests.sh -s functional -d sqlite
 Build/Scripts/runTests.sh -h
 ```
 
-Everything has to pass for **both** TYPO3 v13 and v14, each after the matching
+Everything has to pass for **every** supported TYPO3 version, each after its own
 `composerUpdate` — see
-[Dual core setup](docs/development/dual-core-setup.md).
+[Core version setup](docs/development/dual-core-setup.md).
 
 → [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution workflow ·
 [`docs/`](docs/Index.md) for the full developer documentation

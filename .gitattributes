@@ -18,7 +18,6 @@
 # TER artifact.
 /theme export-ignore
 /instance-core-13 export-ignore
-/instance-core-14 export-ignore
 /packages-dev export-ignore
 /sqlite-databases export-ignore
 

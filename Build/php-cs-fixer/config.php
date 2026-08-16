@@ -53,15 +53,13 @@ return (new Config())
                 __DIR__ . '/../../Classes',
                 __DIR__ . '/../../Configuration',
                 __DIR__ . '/../../Core13',
-                __DIR__ . '/../../Core14',
                 __DIR__ . '/../../Tests',
                 __DIR__ . '/../../Build',
                 // Only the committed configuration of the development
-                // instances, never the instance roots: everything else below
-                // them is generated, and "ignoreVCSIgnored()" does not catch it
+                // instance, never the instance root: everything else below it
+                // is generated, and "ignoreVCSIgnored()" does not catch it
                 // because it is git-ignored through a glob pattern.
                 __DIR__ . '/../../instance-core-13/config',
-                __DIR__ . '/../../instance-core-14/config',
             ])
             ->exclude([
                 '.Build/',

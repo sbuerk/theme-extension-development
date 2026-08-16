@@ -69,15 +69,14 @@ shipped with the installed core:
 
 Because it ships with the dependency, what is on disk depends on what is
 installed — and it reaches only as far as the installed version. A package does
-carry the changelogs of all **earlier** versions, so with TYPO3 v14 installed
-both `13.*` and `14.*` are there, while a v13 installation has no `14.0/` at
-all.
+carry the changelogs of all **earlier** versions, so the highest supported
+version always has the complete set on disk; with v13 installed everything from
+`7.0/` to `13.4.x/` is readable and nothing newer is.
 
-Installing the **highest** supported version therefore gives the complete set in
-one step. Switching is only needed to read changelogs *newer* than the installed
+Switching is only ever needed to read changelogs *newer* than the installed
 version, never older ones. Reading is not running a gate: `composerUpdate` back
 to the version you are working on before running anything — see
-[Dual core setup](../development/dual-core-setup.md).
+[Core version setup](../development/dual-core-setup.md).
 
 The rendered version is at
 <https://docs.typo3.org/c/typo3/cms-core/main/en-us/Index.html>.

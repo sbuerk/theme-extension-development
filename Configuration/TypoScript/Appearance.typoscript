@@ -13,12 +13,11 @@
 #
 # "config.htmlTag.attributes.*" is the only mechanism that can carry these:
 # "RequestHandler::generateHtmlTag()" iterates that array and writes every
-# value *raw* onto the tag - there is no stdWrap applied to it - so a constant
-# is the only thing that can go here, never a cObject. Verified identical on
-# both core versions: same method, same behaviour, in
-# ".Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php" (v13.4,
-# line 833) and "instance-core-14/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php"
-# (v14.3, line 829).
+# value *raw* onto the tag - "htmlspecialchars()" and nothing else, no stdWrap
+# anywhere in the loop - so a constant is the only thing that can go here,
+# never a cObject. Read, not assumed:
+# ".Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php" (v13.4.34,
+# line 833).
 
 config.htmlTag.attributes.data-palette = {$theme.appearance.palette}
 config.htmlTag.attributes.data-theme-content-outline = {$theme.appearance.contentOutline}
@@ -29,9 +28,10 @@ config.htmlTag.attributes.data-theme-content-outline = {$theme.appearance.conten
 # like a deliberate choice while doing nothing.
 #
 # Constants are substituted into setup conditions before they are evaluated -
-# "IncludeTreeSetupConditionConstantSubstitutionVisitor", byte-identical
-# between the two core versions - so this reads "theme.appearance.default" the
-# same way the unconditional attributes above do.
+# ".Build/vendor/typo3/cms-core/Classes/TypoScript/IncludeTree/Visitor/-
+# IncludeTreeSetupConditionConstantSubstitutionVisitor.php" - so this reads
+# "theme.appearance.default" the same way the unconditional attributes above
+# do.
 ["{$theme.appearance.default}" != "auto"]
     config.htmlTag.attributes.data-theme = {$theme.appearance.default}
 [END]
@@ -102,21 +102,18 @@ page.headerData.10 {
 # --- The module script -----------------------------------------------------
 #
 # "page.includeJSFooter" with ".type = module" is what produces
-# `<script type="module" src="...">` on both core versions - verified against:
+# `<script type="module" src="...">`. Both halves of that were read in source
+# rather than assumed:
 #
-#   - "RequestHandler::processJavaScriptAndCss()", the "includeJSFooter."
-#     branch: identical in name, shape and the "addJsFooterFile($file, $type, ...)"
-#     call it makes, in both
+#   - "RequestHandler::processHtmlBasedRenderingSettings()", the
+#     "includeJSFooter." branch, passes the resource's own ".type" straight on
+#     as the second argument of "addJsFooterFile($file, $type, ...)" -
 #     ".Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php"
-#     (v13.4) and
-#     "instance-core-14/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php"
-#     (v14.3);
-#   - "PageRenderer::renderJavaScriptFiles()", which writes "type" onto the
-#     tag as a literal attribute whenever it is non-empty, unchanged in that
-#     respect between ".Build/vendor/typo3/cms-core/Classes/Page/PageRenderer.php"
-#     (v13.4, line 1726) and
-#     "instance-core-14/vendor/typo3/cms-core/Classes/Page/PageRenderer.php"
-#     (v14.3, line 1574).
+#     (v13.4.34, the branch at line 567, the call at line 587);
+#   - "PageRenderer::renderJavaScriptFiles()" writes that "type" onto the tag
+#     as a literal attribute whenever it is non-empty -
+#     ".Build/vendor/typo3/cms-core/Classes/Page/PageRenderer.php"
+#     (v13.4.34, line 1726).
 #
 # The footer, not the head, because this script only wires up event listeners
 # on elements that already exist by the time it can matter - it never has to

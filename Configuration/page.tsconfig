@@ -12,12 +12,15 @@
 # opposed to a "*" wildcard or a directory) includes exactly that file - see
 # "TYPO3\CMS\Core\TypoScript\IncludeTree\TreeFromLineStreamBuilder::processAtImport()".
 #
-# Every column carries an "identifier" as well as a "name" and a "colPos".
-# TYPO3 v14 raises a deprecation for a column without one
-# ("ContentAreaResolver::collectContentAreasRecursive()") and will throw in
-# v15; it is ignored on v13, so one spelling serves both. The identifiers are
-# the slot names the "lib.content.*" objects use, which is also what a later
-# move to PAGEVIEW would address a content area by.
+# Every column carries an "identifier" as well as a "name" and a "colPos". The
+# core reads it - "GridColumn::__construct()" takes it from the column
+# definition and "getIdentifierCleaned()" turns it into the
+# "t3-grid-cell-<identifier>" class the page module puts on the column
+# ("Resources/Private/Partials/PageLayout/Grid/Column.html") - so it is a
+# stable hook rather than decoration. The identifiers are the slot names the
+# "lib.content.*" objects use, which is also what a later move to PAGEVIEW
+# would address a content area by, so one vocabulary covers the layout
+# definition and the rendering.
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Default.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Content.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/ContentSidebar.tsconfig'

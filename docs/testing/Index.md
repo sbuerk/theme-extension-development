@@ -40,19 +40,19 @@ class level docblock saying so.
 
 Both use
 [`ExtensionCoreVersionCompatTestsTrait`](../../Tests/ExtensionCoreVersionCompatTestsTrait.php),
-which asserts that the running major version is supported and — through the
-`not-core-13` and `not-core-14` groups — that `-t 13` really is v13 and `-t 14`
-really is v14. `-t` selects a core version but installs nothing, so without this
-a stale `.Build/` produces a green run that proved nothing. Running a suite with
-`-t 14` while the v13 set is installed fails it with
-`Failed asserting that 13 is identical to 14`.
+which asserts that the running major version is the supported one — that `-t 13`
+really is v13. `-t` selects a core version but installs nothing, so without this
+a stale `.Build/`, a skipped `composerUpdate` or a wrong CI matrix entry produces
+a green run that proved nothing. The assertion is deliberately ungrouped: with a
+single supported version there is nothing to exclude it from, and a group would
+only create the possibility of a guard that never executes.
 
 The functional one earns its keep before its assertions run: booting the
 instance compiles the dependency injection container, executes the extension
 bootstrap, loads and **migrates** the TCA — the migration raises
 `E_USER_DEPRECATED` for everything it had to change, which this suite converts
 into a failure — and derives the database schema. An unresolvable service
-argument or a TCA structure the other core version has migrated away is reported
+argument or a TCA structure the installed core has migrated away is reported
 there, not in whichever feature test happens to touch it first.
 
 It does not cover FormEngine rendering. That TCA loads and migrates is not the
@@ -68,9 +68,10 @@ same as the backend being able to render a form from it.
 - Functional tests extend `AbstractFunctionalTestCase`, never the testing
   framework `FunctionalTestCase` directly — see
   [Site based tests](site-based-tests.md#no-test-extends-the-framework-test-case-directly).
-- Core version aware tests live in a `Core13/` or `Core14/` subdirectory and
-  carry `#[Group('not-core-<other version>')]` — see
-  [Dual core setup](../development/dual-core-setup.md#test-grouping).
+- Core version aware tests live in a `Core<major>/` subdirectory — `Core13/`
+  today — and carry `#[Group('not-core-<other version>')]` for every version
+  they must not run on. See
+  [Core version setup](../development/dual-core-setup.md#test-grouping).
 - Data provider keys are named, so a failing case is identifiable from the
   output alone.
 

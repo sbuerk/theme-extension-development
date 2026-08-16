@@ -26,9 +26,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *   delete the source out of the repository. It is passed as `false` here.
  * - The conflict mode is the **native enum**
  *   `TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior`. TYPO3 v13 still carries
- *   the older class of the same name, and passing that one triggers a
- *   deprecation (#101151) which this test suite turns into a failure. The
- *   native enum exists in v13.4 and v14 alike, so this needs no version split.
+ *   the older class of the same name, marked `@deprecated` in
+ *   `.Build/vendor/typo3/cms-core/Classes/Resource/DuplicationBehavior.php`,
+ *   and passing that one triggers a deprecation (#101151) which this test
+ *   suite turns into a failure.
  *
  * @internal Part of the seeding implementation, not public API.
  */

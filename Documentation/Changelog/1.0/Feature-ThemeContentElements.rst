@@ -65,8 +65,7 @@ No schema of its own
 This extension ships no ``ext_tables.sql``. The whole schema - the four
 ``tx_theme_*`` columns added to ``tt_content`` and every column of
 ``tx_theme_list_item`` - is derived from TCA by
-:php:`TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()`, on both
-supported core versions.
+:php:`TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()`.
 
 One column needed to be declared explicitly rather than left to that
 derivation. An inline relation's :php:`foreign_field` and
@@ -84,11 +83,9 @@ declares its own ``fieldname`` for the identical reason.
 ``tx_theme_link`` and the child table's ``link`` column are both TCA
 :php:`type=link`. Their stored value is :php:`stdWrap.typolink` syntax, not a
 bare URL, so every template renders it through :html:`f:link.typolink` or
-:html:`f:uri.typolink`, never as a plain ``href``. TYPO3 v14's Fluid 5
-null-handling change names :html:`f:link.typolink` as an explicit exception -
-it renders through the TypoScript link API rather than building a tag itself
-- so no version split was needed to keep this working on both v13.4 and
-v14.3.
+:html:`f:uri.typolink`, never as a plain ``href``. Both view helpers hand the
+value to the TypoScript link API rather than building a tag themselves, which
+is what turns the stored syntax into a URL.
 
 Inline children, and the ``item.data`` trap
 ==============================================

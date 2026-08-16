@@ -1,19 +1,18 @@
 # Development instances
 
-Two TYPO3 instances live in the repository, one per supported core version:
+One TYPO3 instance lives in the repository per supported core version:
 
 ```
 instance-core-13/    TYPO3 v13
-instance-core-14/    TYPO3 v14
 ```
 
 They exist so the theme can be looked at and rendered against — the thing the
 extension is for. They are **development instances**: disposable, not deployed,
 and not part of the distributed package.
 
-Each is an independent composer project and an independent DDEV project. Both
-resolve the extension out of the repository root, and both run on SQLite with no
-database container.
+Each is an independent composer project and an independent DDEV project, and
+each resolves the extension out of the repository root and runs on SQLite with
+no database container.
 
 ```bash
 # With DDEV.
@@ -27,11 +26,11 @@ composer install
 ```
 
 > [!IMPORTANT]
-> **Do not mix the two.** An instance installed with DDEV and an instance
-> installed on the host produce different, mutually incompatible `vendor/`
-> directories — see [why](#the-theme-symlink) below. `vendor/` is git-ignored,
-> so the fix is simply to re-run `composer install` in whichever world you
-> switched to.
+> **Do not mix the two worlds.** An instance installed with DDEV and the same
+> instance installed on the host produce different, mutually incompatible
+> `vendor/` directories — see [why](#the-theme-symlink) below. `vendor/` is
+> git-ignored, so the fix is simply to re-run `composer install` in whichever
+> world you switched to.
 
 ## What is committed
 
@@ -39,12 +38,12 @@ Only what describes an instance, never what an install produces:
 
 | Path                                 | Is                                                           |
 |--------------------------------------|--------------------------------------------------------------|
-| `.ddev/config.yaml`                  | The DDEV project, `core13-theme-v1` / `core14-theme-v1`.     |
+| `.ddev/config.yaml`                  | The DDEV project, `core13-theme-v1`.                         |
 | `.ddev/docker-compose.mounts.yaml`   | The mounts that make the relative paths resolve, see below.  |
 | `composer.json`                      | Dependencies, path repositories, the snapshot scripts.       |
 | `config/system/settings.php`         | Instance configuration. The database path there is advisory. |
 | `config/system/additional.php`       | Resolves the database and includes local overrides.          |
-| `../sqlite-databases/core-1*.sqlite` | The committed database template, once one exists.            |
+| `../sqlite-databases/core-13.sqlite` | The committed database template, once one exists.            |
 
 Generated and git-ignored: `vendor/`, `public/`, `var/`, `.cache/`,
 `composer.lock` and `config/system/additional/*.php`.
@@ -113,7 +112,7 @@ and `config/system/additional.php` recomputes the path from `__DIR__` on every
 request rather than trusting `settings.php`, so the same checkout resolves its
 database identically under DDEV and on a host stack.
 
-When a template exists at `sqlite-databases/core-1*.sqlite` it is copied into
+When a template exists at `sqlite-databases/core-13.sqlite` it is copied into
 `var/sqlite/` on first start. Until one has been committed, the instance starts
 empty: set it up with `vendor/bin/typo3 setup` and then fill it with
 `vendor/bin/typo3 theme:seed` — see [Seeding](seeding.md). The site
@@ -154,8 +153,11 @@ The checkpoint is harmless in any other journal mode.
 
 ## Switching branches in the same checkout
 
-The DDEV project name carries the version line (`core13-theme-v1`), and DDEV
-refuses a second name for a project path it already knows:
+The DDEV project name carries **two** dimensions, the core version and the
+extension's own version line — `core13-theme-v1` on this branch. The second half
+is what matters here: the instance directory is the same path on every branch,
+DDEV keys a project on its root directory, and it refuses a second name for a
+path it already knows.
 
 ```
 Failed to start app core13-theme-v2: this project root '…/instance-core-13'
@@ -166,8 +168,14 @@ already contains a project named 'core13-theme-v1'.
 the registration; the database in the git-ignored `var/` survives and still holds
 the other branch's state, so `ddev composer sqlite:apply` resets it.
 
+Two branches naming the project *identically* would not produce that error at
+all — they would silently share one registration and one database, and content
+seeded on one branch would show up on the other. That is why the version line is
+part of the name and not only the core version, and it is the reason to check
+`.ddev/config.yaml` when a branch is cut from another.
+
 ## See also
 
 - [Development environment](environment.md)
-- [Dual core setup](dual-core-setup.md)
+- [Core version setup](dual-core-setup.md)
 - [Frontend assets](frontend-assets.md)

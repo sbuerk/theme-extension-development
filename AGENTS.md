@@ -130,8 +130,8 @@ Nothing below `.agent/` is ever committed.
 | Topic                                               | Page                                                                    |
 |-----------------------------------------------------|-------------------------------------------------------------------------|
 | Development environment, container based tooling    | [Environment](docs/development/environment.md)                          |
-| **The two development instances, and `theme`**      | [Development instances](docs/development/instances.md)                  |
-| **Dual core setup — read this first**               | [Dual core setup](docs/development/dual-core-setup.md)                  |
+| **The development instances, and `theme`**          | [Development instances](docs/development/instances.md)                  |
+| **Core version setup — read this first**            | [Core version setup](docs/development/dual-core-setup.md)               |
 | The gates and what they check                       | [Quality gates](docs/development/quality-gates.md)                      |
 | Version differences split classes, not conditionals | [Core version aware code](docs/architecture/core-version-aware-code.md) |
 | Symfony DI attributes, stateless services           | [Dependency injection](docs/architecture/dependency-injection.md)       |
@@ -146,8 +146,9 @@ These are stated in the documentation as well. They are repeated here because a
 violation of any of them is a rejected change, not a review comment.
 
 1. **Version differences split classes, they never add conditionals.** Shared
-   code in `Classes/`, one implementation per core version in `Core13/` and
-   `Core14/`, only the matching directory registered in the container.
+   code in `Classes/`, one implementation per supported core version in its own
+   `Core<major>/` directory — `Core13/` today — and only the directory matching
+   the running core registered in the container.
    → [Core version aware code](docs/architecture/core-version-aware-code.md)
 
    The exception is **configuration** — TCA, TypoScript, `ext_localconf.php` —
@@ -203,8 +204,8 @@ TYPO3 ships its changelogs **with the core package**:
 .Build/vendor/typo3/cms-core/Documentation/Changelog/
 ```
 
-They are the authoritative record of what changed between v13 and v14, and they
-are on disk — there is no reason to work from memory.
+They are the authoritative record of what changed between TYPO3 versions, and
+they are on disk — there is no reason to work from memory.
 
 - Before writing version aware code, **search them** for the API in question.
 - When a change reacts to a core change, **cite the entry** in the commit message
@@ -214,7 +215,7 @@ are on disk — there is no reason to work from memory.
   the option is still required on the older version.
 
 ```bash
-grep -rl "searchFields" .Build/vendor/typo3/cms-core/Documentation/Changelog/14*/
+grep -rl "searchFields" .Build/vendor/typo3/cms-core/Documentation/Changelog/13*/
 ```
 
 The rendered version is at
@@ -223,18 +224,18 @@ The rendered version is at
 
 > [!IMPORTANT]
 > The changelogs on disk reach only as far as the installed core version: with
-> TYPO3 v13 installed the newest directory is `13.4.x`, and there is no `14.0/`
-> to read. A package does ship the changelogs of all **earlier** versions, so
-> installing the **highest** supported version — v14 — puts both v13 and v14
-> changelogs on disk at once, and saves switching back and forth to look
-> something up.
+> TYPO3 v13 installed the newest directory is `13.4.x`. A package does ship the
+> changelogs of all **earlier** versions, so the **highest** supported version
+> always carries the complete set — everything from `7.0/` to `13.4.x/` today.
+> Anything newer than the installed version is not on disk and cannot be
+> verified from this checkout; say so rather than asserting it.
 >
-> Reading a changelog is not running a gate. Look things up with v14 installed,
-> then `composerUpdate` back to the version you are working on before running
+> Reading a changelog is not running a gate. Look things up, then
+> `composerUpdate` back to the version you are working on before running
 > anything — see
-> [the dual core hint](#quality-gates-and-the-dual-core-hint) below.
+> [the core version hint](#quality-gates-and-the-core-version-hint) below.
 
-## Quality gates, and the dual core hint
+## Quality gates, and the core version hint
 
 Every gate runs in a container through
 [`Build/Scripts/runTests.sh`](Build/Scripts/runTests.sh). Nothing needs to be
@@ -242,14 +243,13 @@ installed on the host except **podman** (preferred) or docker.
 
 > [!CAUTION]
 > **`-t` selects the core version but installs nothing.** Only `composerUpdate`
-> installs a dependency set. Running a gate with `-t 13` while the v14 set is
-> installed produces results that look real and are worthless — tests failing on
-> the wrong core version, PHPStan reporting API that does exist, changelogs
-> missing from disk.
+> installs a dependency set. Running a gate with a `-t` value other than the
+> installed set produces results that look real and are worthless — tests
+> failing on the wrong core version, PHPStan reporting API that does exist,
+> changelogs missing from disk.
 >
 > **Always `composerUpdate` for a core version before running anything for it,
-> and never interleave `-t 13` and `-t 14` commands.** Do one version completely,
-> then switch.
+> and never interleave `-t` values.** Do one version completely, then switch.
 
 ```bash
 # TYPO3 v13 — install first, then run everything for v13.
@@ -266,11 +266,11 @@ Build/Scripts/runTests.sh -t 13 -s checkExceptionCodes
 Build/Scripts/runTests.sh -t 13 -s checkMarkdownTables
 Build/Scripts/runTests.sh -t 13 -s checkTestMethodsPrefix
 Build/Scripts/runTests.sh -t 13 -s checkCssBuild
-
-# Then the same for TYPO3 v14, starting with composerUpdate again.
-Build/Scripts/runTests.sh -t 14 -s composerUpdate
-# …
 ```
+
+v13 is the only supported core version on this branch, so this is the whole
+matrix. A further supported version repeats the same block from
+`composerUpdate` on, never interleaved with another `-t` value.
 
 Further:
 
@@ -293,10 +293,10 @@ Further:
 - Arguments for PHPUnit go after `--`:
   `-s functional -d sqlite -- --filter SomeTest`.
 - A **growing PHPStan baseline is a defect.** Fix the finding.
-- The development instances below `instance-core-13/` and `instance-core-14/`
-  are **not** driven by `runTests.sh`. They are installed with `ddev composer`
-  or from the host, and the two must not be mixed — the resulting `vendor/`
-  differs and does not travel. `theme` at the repository root is a symlink to
+- The development instances, one per supported core version below
+  `instance-core-13/`, are **not** driven by `runTests.sh`. They are installed
+  with `ddev composer` or from the host, and the two ways must not be mixed —
+  the resulting `vendor/` differs and does not travel. `theme` at the repository root is a symlink to
   that root; never follow it when walking the tree, and never add it to a path a
   tool descends into.
   → [Development instances](docs/development/instances.md)
@@ -328,7 +328,7 @@ trailing newline — which is byte identical to `jq --indent 4`. Do not introduc
 a `jq` dependency in a new script; mirror those helpers instead.
 
 → [Quality gates](docs/development/quality-gates.md) ·
-[Dual core setup](docs/development/dual-core-setup.md)
+[Core version setup](docs/development/dual-core-setup.md)
 
 ## The test suites are deliberately hard breaking
 
