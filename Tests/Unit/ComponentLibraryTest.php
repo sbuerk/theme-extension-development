@@ -64,6 +64,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'page' => '.theme-page',
             'site header' => '.theme-site-header',
             'site footer' => '.theme-site-footer',
+            'styleguide' => '.theme-styleguide',
         ] as $name => $selector) {
             yield $name => ['selector' => $selector];
         }

@@ -87,6 +87,12 @@ is, nothing was chosen. Only the explicitly set ones were taken: 160% at 16px,
 | `--theme-font-size-xl`      | 1.5rem                                    | 24    | measured |
 | `--theme-font-size-2xl`     | 2.125rem                                  | 34    | measured |
 | `--theme-font-size-display` | `clamp(2.125rem, 1.5rem + 3vw, 3.375rem)` | 34→54 | measured |
+| `--theme-font-size-mono`    | 0.9375rem                                 | 15    | measured |
+
+`--theme-font-size-mono` sits outside the progression on purpose: it is not a
+step of the scale but a correction. A monospace face at the same nominal size
+reads larger than the body face next to it, so it is set one notch down to
+match the surrounding text optically rather than numerically.
 
 There is **no single modular ratio**. The steps run 1.17, 1.14, 1.5, 1.42, 1.59
 — a real design, not a generated scale. That irregularity is preserved rather

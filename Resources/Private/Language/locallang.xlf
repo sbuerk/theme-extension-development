@@ -87,9 +87,6 @@
 			<trans-unit id="theme.styleguideHeading">
 				<source>Styleguide</source>
 			</trans-unit>
-			<trans-unit id="theme.styleguideNotImplemented">
-				<source>The styleguide content is not implemented yet.</source>
-			</trans-unit>
 			<trans-unit id="backendLayout.default.title">
 				<source>Default</source>
 			</trans-unit>

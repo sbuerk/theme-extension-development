@@ -1,0 +1,340 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section D1 "Typography".
+
+    What it shows is the element baseline of "base/_elements.scss" - the
+    styling every tag gets without a class, because "bodytext" out of the RTE
+    is markup the theme did not choose - plus the one component that belongs
+    with it, the table from "components/_table.scss".
+
+    The file is a single "<section>" and nothing else: no layout, no section
+    definition, no "f:cObject". "Templates/Page/Styleguide.html" places it.
+    Specimen copy is literal English, not "f:translate" (contract D3), and it
+    describes what it demonstrates, so a reader learns the baseline instead of
+    reading filler.
+
+    Heading levels. The page already owns "<h1>" (its own title), "<h2>" (one
+    per styleguide section) and "<h3>" (one per specimen). The heading
+    specimen therefore carries "role=presentation" on every sample heading:
+    the element keeps its typographic treatment, its text stays in the
+    accessibility tree as static content, and the page keeps exactly one
+    "<h1>" and a heading outline that describes the page rather than the
+    specimen. Sample headings without that attribute would put a second
+    "<h1>" and four stray levels into the outline of a page whose whole job
+    is to be read as a reference.
+
+    The table specimen is copied from the markup contract in the header of
+    "components/_table.scss": "tabindex=0" plus "role=region" plus an
+    "aria-label" on the wrapper - the W3C APG scrollable-region-focusable
+    pattern, because a box that scrolls but carries no tab stop cannot be
+    reached by keyboard - a "<caption>" carrying "theme-table__caption",
+    "<thead>"/"<tbody>", and the one helper class
+    "theme-table__cell--numeric". The bare table above it carries no class at
+    all and is the RTE case: same element, element-baseline styling only, and
+    the only specimen on this page with a "<tfoot>", which
+    "components/_table.scss" does not style.
+
+    Deliberately not demonstrated here, each because another section owns it:
+    "a:has(img)" needs an image and belongs to Media; "details"/"summary" are
+    the "theme-accordion" case in Boxes; "progress", "meter", "dialog",
+    "iframe"/"audio"/"video" are not typography. "::selection" cannot be
+    demonstrated in markup at all - it needs a text selection.
+</f:comment>
+<section class="theme-styleguide__section" id="typography">
+    <h2 class="theme-styleguide__heading">Typography</h2>
+
+    <h3>Headings</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            All six heading levels share one rule: weight, tracking of 0.05em -
+            the one place this design tracks out rather than in - and
+            <code>text-wrap: balance</code>, so a heading that wraps does not
+            leave a two-word orphan on the last line. Only the size and the
+            weight differ, and only down to level three: levels four to six
+            hold at the level three step rather than shrink onto a scale the
+            design was never measured against, because the RTE lets an editor
+            nest that deep and the result still has to be readable. The six
+            samples below are marked as presentational, so they demonstrate the
+            type without adding themselves to this page's heading outline.
+        </p>
+        <h1 role="presentation">Heading level one, 34 pixels, weight 800</h1>
+        <h2 role="presentation">Heading level two, 24 pixels, weight 800</h2>
+        <h3 role="presentation">Heading level three, 20 pixels, weight 500</h3>
+        <h4 role="presentation">Heading level four holds at the level three step</h4>
+        <h5 role="presentation">Heading level five holds there too</h5>
+        <h6 role="presentation">Heading level six is the last level and no smaller</h6>
+    </div>
+
+    <h3>Running text</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Body copy is set at 16 pixels with a line height of 1.6 and no
+            letter spacing at all. The zero is written out as a token rather
+            than left to the browser default, because letter spacing inherits:
+            a paragraph sitting inside a heading-tracked ancestor would
+            otherwise pick that tracking up by accident and read as slightly
+            wrong without anybody being able to say why. Line length is held by
+            the page frame, not by this paragraph, so the measure you see here
+            is the measure an editor gets.
+        </p>
+        <p>
+            A second paragraph makes the vertical rhythm visible: every prose
+            block in the baseline ends with the same 20 pixel bottom margin and
+            has no top margin, so the gap between two blocks is one value and
+            never the sum of two. Long unbroken strings wrap instead of
+            widening the page - a URL such as
+            https://docs.typo3.org/permalink/t3coreapi:frontend-typoscript-typoscript
+            breaks mid-token rather than pushing a horizontal scrollbar onto
+            the whole document.
+        </p>
+        <address>
+            Contact blocks are set upright, not italic as the browser default
+            has them, and in secondary ink.
+        </address>
+    </div>
+
+    <h3>Inline elements</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Inline semantics carry meaning, so each one is given a treatment
+            that survives without colour: <strong>strong is bold</strong> at
+            weight 800 and <em>emphasis is italic</em>, while
+            <small>small drops to 12 pixels in secondary ink</small> for the
+            caption role. A <mark>marked passage</mark> takes the warning
+            surface tint, and a revision reads as a diff, with
+            <del>deleted text struck through</del> next to
+            <ins>inserted text underlined</ins> - the line, not the colour,
+            is what carries it.
+        </p>
+        <p>
+            Scientific and technical notation is covered as well: water is
+            H<sub>2</sub>O, an area is measured in m<sup>2</sup>, and an
+            <abbr title="Rich Text Editor">RTE</abbr> abbreviation is marked by
+            a dotted underline rather than a box, because a box already means
+            a cell or a badge here. Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to
+            insert <a href="#typography">a link</a>, which takes the primary
+            colour and shifts to the hover colour on pointer over. A shell
+            answers <samp>Nothing to commit, working tree clean</samp>, an
+            identifier such as <var>maxWidth</var> is italic, and
+            <code>--theme-font-size-md</code> is set in the mono family on the
+            surface tint.
+        </p>
+        <p>
+            Quotation marks are set explicitly rather than left to the browser,
+            which picks a different pair per engine and per document language:
+            <q>an outer quotation contains <q>an inner one</q> and both marks
+            are this theme's own</q>. A date such as
+            <time datetime="2026-08-16">16 August 2026</time> is set in
+            tabular figures, so a column of dated items lines up.
+        </p>
+    </div>
+
+    <h3>Lists</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Unordered and ordered lists share one indent of 40 pixels and one
+            item gap of 5 pixels. A nested list is the case worth checking: it
+            sits inside a list item that already carries that item's own bottom
+            margin, so it drops its own and the gap before the first nested
+            item stays a single value.
+        </p>
+        <ul>
+            <li>A top level item in an unordered list.</li>
+            <li>
+                An item that carries a nested list of its own:
+                <ul>
+                    <li>The first nested item, one indent further in.</li>
+                    <li>The second nested item, at the same depth.</li>
+                </ul>
+            </li>
+            <li>The last item, whose bottom margin is removed.</li>
+        </ul>
+        <ol>
+            <li>Ordered lists take the same indent as unordered ones.</li>
+            <li>The marker is the browser's own; no counter is redefined.</li>
+            <li>Numbering is what distinguishes them, not spacing.</li>
+        </ol>
+        <dl>
+            <dt>Definition term</dt>
+            <dd>
+                A description is indented by the same 40 pixels as a list item
+                and set in secondary ink, so a definition list and a bullet
+                list read as the same kind of thing side by side.
+            </dd>
+            <dt>Second term</dt>
+            <dd>
+                Terms are bold, and every term after the first gains a top
+                margin so the pairs do not run together.
+            </dd>
+        </dl>
+    </div>
+
+    <h3>Quotations</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A block quotation is marked by a two pixel rule on the inline start
+            edge and secondary ink, never by italics: the quoted text may well
+            contain emphasis of its own, and that has to stay visible.
+        </p>
+        <blockquote>
+            A quotation without an attribution is still a block quotation, and
+            it has to look right on its own, because that is what an editor
+            most often produces.
+        </blockquote>
+        <figure>
+            <blockquote>
+                Content coming out of bodytext is markup the theme did not
+                choose and cannot add a class to, so it has to look right from
+                the tag alone.
+            </blockquote>
+            <figcaption>
+                The element baseline, <cite>base/_elements.scss</cite>
+            </figcaption>
+        </figure>
+    </div>
+
+    <h3>Preformatted text and code blocks</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A code block is data, not prose. Letting it wrap would silently
+            reindent or reflow it, which changes what it says, so it scrolls
+            its own overflow instead of widening the page. Inline
+            <code>code</code> inside a block loses the highlight it carries in
+            running text, because there it is the block's own text rather than
+            a term picked out of it.
+        </p>
+        <pre><code>&lt;div class="theme-table-wrapper" tabindex="0" role="region" aria-label="…"&gt;
+    &lt;table class="theme-table"&gt;
+        &lt;caption class="theme-table__caption"&gt;…&lt;/caption&gt;
+        &lt;thead&gt;…&lt;/thead&gt;&lt;tbody&gt;…&lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+
+    <h3>Horizontal rule</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A rule is one border width tall and drawn as a background colour
+            rather than a border, so it cannot inherit a browser's inset
+            shading. It takes 30 pixels of space above and below, more than a
+            paragraph, because it separates passages rather than lines.
+        </p>
+        <hr />
+        <p>
+            The text after the rule sits at the same distance from it as the
+            text before, which is the point of setting one value for both.
+        </p>
+    </div>
+
+    <h3>Table, unclassed</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            This is the table an editor produces: no wrapper, no class, styled
+            from the tags alone. Collapsed borders let a row rule and a cell
+            rule sit on one line instead of doubling, cells align to the top so
+            a wrapped cell keeps every row's first line level, and the caption
+            starts at the inline edge rather than centred. It is also the only
+            specimen on this page with a footer row.
+        </p>
+        <table>
+            <caption>Bottom margin of each prose block in the element baseline</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Element</th>
+                    <th scope="col">Bottom margin</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Paragraph</th>
+                    <td>20 pixels</td>
+                </tr>
+                <tr>
+                    <th scope="row">List, ordered or unordered</th>
+                    <td>20 pixels</td>
+                </tr>
+                <tr>
+                    <th scope="row">Block quotation</th>
+                    <td>20 pixels</td>
+                </tr>
+                <tr>
+                    <th scope="row">Horizontal rule</th>
+                    <td>30 pixels, and the same above</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2">
+                        One shared value, and no top margin anywhere, is what
+                        keeps the gap between two blocks from becoming the sum
+                        of two margins.
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <h3>Table, as a component</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The component adds the frame and the scrolling region around the
+            same element. The wrapper is focusable and labelled as a region:
+            it scrolls horizontally so the page never has to, and a box that
+            scrolls without a tab stop of its own cannot be reached by
+            keyboard at all. Focus it and the arrow keys scroll it, with no
+            script involved. Header rows sit on the surface tint, body rows
+            are striped by position rather than by a class, and a cell holding
+            a number takes the one helper class there is, which aligns it to
+            the end and sets it in figures of equal width.
+        </p>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Heading scale of the element baseline">
+            <table class="theme-table">
+                <caption class="theme-table__caption">Size, weight and line height of each heading level</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Level</th>
+                        <th scope="col" class="theme-table__cell--numeric">Size</th>
+                        <th scope="col" class="theme-table__cell--numeric">Weight</th>
+                        <th scope="col" class="theme-table__cell--numeric">Line height</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Heading 1</th>
+                        <td class="theme-table__cell--numeric">34</td>
+                        <td class="theme-table__cell--numeric">800</td>
+                        <td class="theme-table__cell--numeric">1.5</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Heading 2</th>
+                        <td class="theme-table__cell--numeric">24</td>
+                        <td class="theme-table__cell--numeric">800</td>
+                        <td class="theme-table__cell--numeric">1.3</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Heading 3</th>
+                        <td class="theme-table__cell--numeric">20</td>
+                        <td class="theme-table__cell--numeric">500</td>
+                        <td class="theme-table__cell--numeric">1.3</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Heading 4 to 6</th>
+                        <td class="theme-table__cell--numeric">20</td>
+                        <td class="theme-table__cell--numeric">500</td>
+                        <td class="theme-table__cell--numeric">1.3</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Body copy</th>
+                        <td class="theme-table__cell--numeric">16</td>
+                        <td class="theme-table__cell--numeric">400</td>
+                        <td class="theme-table__cell--numeric">1.6</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+</html>

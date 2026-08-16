@@ -21,6 +21,7 @@ Documentation for people **using** the extension lives in
 | [Quality gates](development/quality-gates.md)               | Every gate and its configuration, PHPStan per core version, CI.                     |
 | [Frontend assets](development/frontend-assets.md)           | The SCSS build, the node image, the `checkCssBuild` gate, design tokens.            |
 | [Component library](development/component-library.md)       | Every component's markup contract, the two switches, what the tests guard.          |
+| [Styleguide page](development/styleguide.md)                | The page that renders the library from Fluid, why it ignores content, its tests.    |
 | [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher. |
 | [Development instances](development/instances.md)           | The two TYPO3 instances, the `theme` symlink, snapshot and restore.                 |
 | [Seeding](development/seeding.md)                           | `theme:seed`, the definition format, inline relations, the demo tree.               |
