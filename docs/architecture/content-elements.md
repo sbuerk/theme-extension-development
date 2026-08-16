@@ -71,7 +71,7 @@ Taken from the TypoScript branches, not summarised from memory:
 | `menu_recently_updated`    | `ContentElements/MenuRecentlyUpdated`    | `MenuProcessor` (`special = updated`)                                           |
 | `menu_related_pages`       | `ContentElements/MenuRelatedPages`       | `MenuProcessor` (`special = keywords`)                                          |
 | `menu_categorized_pages`   | `ContentElements/MenuCategorizedPages`   | `RECORDS` cObject with `categories`/`categories.relation`                       |
-| `menu_categorized_content` | `ContentElements/MenuCategorizedContent` | `DatabaseQueryProcessor` with an explicit `sys_category_record_mm` join         |
+| `menu_categorized_content` | `ContentElements/MenuCategorizedContent` | `DatabaseQueryProcessor` with a `sys_category_record_mm` subquery               |
 
 `header`, `text` and `image` predate this page — see
 [Page rendering](page-rendering.md) and the `Feature-ContentElementRendering`
@@ -383,7 +383,7 @@ whatever its `conf.<table>` cObject returns for each row.
 `menu_categorized_content` selects the identical way against `tt_content`
 instead, but does **not** reuse `RECORDS` to do it — this is deliberate, not
 an inconsistency between two elements that otherwise look alike.
-`DatabaseQueryProcessor` with an explicit join on `sys_category_record_mm` is
+`DatabaseQueryProcessor` with a subquery against `sys_category_record_mm` is
 used instead, because `RECORDS` would render each match as a **whole content
 element nested inside this one**: the wrong shape for a menu — a menu of
 content should be a list of links, not a stack of embedded content elements —
@@ -394,6 +394,19 @@ back, and rendering rows as links rather than whole elements means nothing
 can nest and the cycle cannot form in the first place; no structural break
 like the one added for `shortcut` was needed here because the rendering
 shape itself rules the cycle out.
+
+`fluid_styled_content` expressed the same selection as a **join** plus a
+`GROUP BY uid` to collapse the duplicate rows a join produces when a record
+matches more than one selected category. That group is invalid under
+`ONLY_FULL_GROUP_BY`, because `SELECT tt_content.*` names columns the group does
+not. PostgreSQL and MySQL accept it regardless — both infer the functional
+dependency from `uid` being the primary key — and **MariaDB does not implement
+that inference**, so it was the only one of the four supported databases that
+rejected the query. It failed there and passed everywhere else, which is exactly
+the shape of defect the four-DBMS matrix exists to catch.
+
+`IN (subquery)` cannot multiply rows in the first place, so there is nothing to
+group and the query is identical on every DBMS.
 
 **`DatabaseQueryProcessor` wraps every row as `['data' => $row]`**
 (`DatabaseQueryProcessor.php`, `$processedRecordVariables[$key] = ['data' =>
@@ -463,7 +476,7 @@ assertions specific to menus:
   valid, perfectly empty wrapper, which looks like "no pages match" rather
   than like a defect, so the sweep alone cannot catch it.
 - `aCategorisedMenuSelectsWhatShareItsCategory` is the one that actually
-  exercises the category join: the fixture
+  exercises the category selection: the fixture
   (`Tests/Functional/Fixtures/Database/PageWithCoreContentElements.csv`) puts
   one page and one content element in the same category and points both
   categorized elements at it, then asserts `menu_categorized_pages` lists

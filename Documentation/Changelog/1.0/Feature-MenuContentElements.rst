@@ -70,8 +70,8 @@ are built on two different mechanisms on purpose, not by accident:
 - :guilabel:`Categorized pages` uses the core's :typoscript:`RECORDS`
   cObject, which can select by category directly.
 - :guilabel:`Categorized content` uses
-  :php:`TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor` with an
-  explicit join on ``sys_category_record_mm`` instead of :typoscript:`RECORDS`,
+  :php:`TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor` with a
+  subquery against ``sys_category_record_mm`` instead of :typoscript:`RECORDS`,
   even though :typoscript:`RECORDS` could select the same rows. Rendering
   through :typoscript:`RECORDS` would render every matched content element
   in full, nested inside this one - the wrong shape for a menu, and exposed

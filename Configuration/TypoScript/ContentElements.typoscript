@@ -404,14 +404,35 @@ tt_content.menu_categorized_content {
         10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
         10 {
             table = tt_content
-            selectFields = {#tt_content}.*
-            groupBy = uid
             pidInList.data = leveluid : 0
             recursive = 99
-            join.data = field:selected_categories
-            join.wrap = {#sys_category_record_mm} ON uid = {#sys_category_record_mm}.{#uid_foreign} AND {#sys_category_record_mm}.{#uid_local} IN(|)
-            where.data = field:category_field
-            where.wrap = {#tablenames}='tt_content' AND {#fieldname}='|'
+
+            # A subquery rather than the join "fluid_styled_content" used here,
+            # and the reason is portability rather than taste.
+            #
+            # A join against the MM table returns one row per matching category,
+            # so it needs a "GROUP BY uid" to collapse them. That group is
+            # invalid under ONLY_FULL_GROUP_BY, because "SELECT tt_content.*"
+            # names columns the group does not. PostgreSQL and MySQL accept it
+            # anyway - both infer the functional dependency from "uid" being the
+            # primary key - and MariaDB does not implement that inference, so it
+            # is the only DBMS of the four that rejects the query. It failed
+            # there and nowhere else.
+            #
+            # "IN (subquery)" cannot multiply rows in the first place, so there
+            # is nothing to group and the query is the same on every DBMS.
+            #
+            # Both interpolated values are TCA constrained: "selected_categories"
+            # is a category relation, so integers, and "category_field" is a
+            # select whose items are generated from the actual category fields
+            # of the table. This is the same trust boundary the core's own
+            # version relied on.
+            where.cObject = TEXT
+            where.cObject {
+                value = {#uid} IN (SELECT {#uid_foreign} FROM {#sys_category_record_mm} WHERE {#uid_local} IN ({field:selected_categories}) AND {#tablenames} = 'tt_content' AND {#fieldname} = '{field:category_field}')
+                insertData = 1
+            }
+
             orderBy = tt_content.sorting
             as = items
         }
