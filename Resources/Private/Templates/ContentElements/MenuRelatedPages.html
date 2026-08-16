@@ -1,0 +1,26 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Related pages" menu - "special = keywords" in
+    "ContentElements.typoscript" ("tt_content.menu_related_pages") matches
+    the page "pages" resolves to (or, empty, the current page) against every
+    other page sharing at least one of its own "keywords".
+
+    Same shared partial as "menu_pages", with neither "showAbstract" nor
+    "showDate" - a related page is a plain link, the same as a page-selected
+    or subpages menu.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuRelatedPagesLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

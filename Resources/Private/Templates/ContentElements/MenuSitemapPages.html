@@ -1,0 +1,26 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Sitemap of these pages" menu - the same seven-level tree as
+    "menu_sitemap", rooted at the pages the editor selected in "pages"
+    instead of the site root. "ContentElements.typoscript",
+    "tt_content.menu_sitemap_pages", is "=< tt_content.menu_subpages" (so
+    "special = directory") plus "levels = 7".
+
+    Recursion is the same shared partial "menu_sitemap" uses - see that
+    template's comment.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuSitemapPagesLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

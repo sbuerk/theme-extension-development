@@ -74,11 +74,95 @@ final class CoreContentElementRenderingTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * A menu that lists pages has to actually list them.
+     *
+     * The sweep above only proves a template ran. A menu configured with the
+     * wrong `special` renders its wrapper perfectly and lists nothing, which
+     * looks like "no pages match" rather than like a defect.
+     */
+    #[Test]
+    public function aPageMenuListsTheSubPages(): void
+    {
+        $body = $this->render();
+
+        $this->assertStringContainsString('A listed sub page', $body);
+        $this->assertStringContainsString('Another listed sub page', $body);
+    }
+
+    /**
+     * The categorised menus select by category rather than by rootline
+     * position, which `MenuProcessor` cannot express at all.
+     *
+     * The two are built differently on purpose. The pages variant uses
+     * `RECORDS`, which can select by category. The content variant uses
+     * `DatabaseQueryProcessor` with an explicit join on
+     * `sys_category_record_mm`, because `RECORDS` would render each match as a
+     * whole content element nested inside this one - the wrong shape for a
+     * menu, and it would inherit the recursion exposure the shortcut element
+     * documents, which TYPO3 v14 no longer guards at all.
+     *
+     * The fixture puts one page and one content element in a category and
+     * points both elements at it. Without that, the pair render a correct
+     * empty wrapper and nothing proves the selection was ever wired up - which
+     * is exactly the state this test was added in, and it caught two real
+     * defects before it passed.
+     */
+    #[Test]
+    public function aCategorisedMenuSelectsWhatShareItsCategory(): void
+    {
+        $body = $this->render();
+
+        $pages = $this->contentElement($body, 'menu_categorized_pages');
+        $this->assertStringContainsString('A listed sub page', $pages);
+        $this->assertStringNotContainsString('Another listed sub page', $pages);
+
+        // The content variant lists what shares the category rather than
+        // re-rendering it, so it links the element by its header and anchor.
+        $content = $this->contentElement($body, 'menu_categorized_content');
+        $this->assertStringContainsString('A bullet list', $content);
+        $this->assertStringContainsString('#c10', $content);
+        $this->assertStringNotContainsString('menu_categorized_pages', $content);
+    }
+
+    /**
+     * The markup of one content element, by its CType.
+     *
+     * The page renders nineteen elements, so asserting against the whole
+     * response cannot tell "this menu selected it" from "some other element on
+     * the page happens to contain it".
+     */
+    private function contentElement(string $body, string $ctype): string
+    {
+        // The lookahead has to name the *wrapper* class specifically. Matching
+        // "theme-content-element" alone also matches the element's own
+        // "__inner" child, which ends the fragment on its first line and makes
+        // every assertion against it fail for a reason that has nothing to do
+        // with what was rendered.
+        $matched = preg_match(
+            sprintf(
+                '#<div[^>]*data-ctype="%s"[^>]*>(.*?)(?=<div[^>]*class="theme-content-element theme-content-element--|</main>)#s',
+                preg_quote($ctype, '#'),
+            ),
+            $body,
+            $matches,
+        );
+        $this->assertSame(1, $matched, sprintf('No "%s" element was rendered.', $ctype));
+
+        return $matches[0];
+    }
+
+    /**
      * @return \Generator<string, array{ctype: string}>
      */
     public static function coveredContentTypes(): \Generator
     {
-        foreach (['bullets', 'table', 'div', 'html', 'textmedia', 'textpic', 'uploads', 'shortcut'] as $ctype) {
+        foreach ([
+            'bullets', 'table', 'div', 'html', 'textmedia', 'textpic', 'uploads', 'shortcut',
+            'menu_pages', 'menu_subpages', 'menu_section', 'menu_section_pages',
+            'menu_sitemap', 'menu_sitemap_pages', 'menu_abstract',
+            'menu_recently_updated', 'menu_related_pages',
+            'menu_categorized_pages', 'menu_categorized_content',
+        ] as $ctype) {
             yield $ctype => ['ctype' => $ctype];
         }
     }

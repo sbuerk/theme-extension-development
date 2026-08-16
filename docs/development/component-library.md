@@ -32,6 +32,7 @@ against, and the rename was cheap while only one template depended on it.
 | Button                  | `.theme-button`              | `components/_button.scss`              |
 | Card                    | `.theme-card`                | `components/_card.scss`                |
 | Content element wrapper | `.theme-content-element`     | `components/_content-element.scss`     |
+| Content menu            | `.theme-content-menu`        | `components/_content-menu.scss`        |
 | Gallery                 | `.theme-gallery`             | `components/_gallery.scss`             |
 | Hero                    | `.theme-hero`                | `components/_hero.scss`                |
 | Main navigation         | `.theme-nav-main`            | `components/_nav-main.scss`            |
@@ -52,7 +53,7 @@ against, and the rename was cheap while only one template depended on it.
 `__ellipsis` are styled, current-page state comes from `[aria-current="page"]`
 rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
-asserts every one of the twenty-three selectors above is actually compiled into
+asserts every one of the twenty-four selectors above is actually compiled into
 `Resources/Public/Css/theme.css`. The appearance switcher is covered twice over,
 because its swatches duplicate colour that lives in `abstracts/_palettes.scss` —
 see [Appearance switching](appearance-switching.md#what-the-tests-guard).
@@ -193,6 +194,29 @@ below for the two switches this component owns:
 <div class="theme-content-element theme-content-element--text" id="c123" data-ctype="text">
     <div class="theme-content-element__inner">…</div>
 </div>
+```
+
+Content menu — the shared component for all eleven `menu_*` content
+elements, a flat list of links unless nested for `menu_sitemap`'s tree.
+`__date` and `__abstract` are only present when the underlying menu type has
+one (`menu_recently_updated`, `menu_abstract`); omitted rather than rendered
+empty, the same rule the navigation components use for `aria-current`. Not
+`.theme-nav-sub`: a content element is authored content in the content
+column, not section-scoped site chrome, and reusing the navigation component
+would drag navigation styling into content rendering for two components that
+only coincidentally both draw a list of links:
+
+```html
+<nav class="theme-content-menu" aria-label="…">
+    <ul class="theme-content-menu__list">
+        <li class="theme-content-menu__item">
+            <a class="theme-content-menu__link" href="…" aria-current="page">…</a>
+            <time class="theme-content-menu__date" datetime="…">…</time>
+            <p class="theme-content-menu__abstract">…</p>
+            <ul class="theme-content-menu__list theme-content-menu__list--sub">…</ul>
+        </li>
+    </ul>
+</nav>
 ```
 
 Gallery of the image content element — unprefixed, see

@@ -1,0 +1,29 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Abstracts" menu - "menu_subpages" (the children of the selected
+    "pages") with each page's own "abstract" field shown beneath its link.
+
+    "abstract" needs no "dataProcessing" of its own to reach: "MenuProcessor"
+    already puts the full page row - a "'*'"-selected "pages" record,
+    "abstract" included - at "item.data" for every item
+    ("MenuProcessor::getDataAsJson()",
+    ".Build/vendor/typo3/cms-frontend/Classes/DataProcessing/
+    MenuProcessor.php:495"), so passing "showAbstract: 1" into the shared
+    partial is the only thing this template does differently from
+    "menu_subpages".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuAbstractLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu, showAbstract: 1}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

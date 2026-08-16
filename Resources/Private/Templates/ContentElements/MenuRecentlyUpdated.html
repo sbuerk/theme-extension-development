@@ -1,0 +1,29 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Recently updated pages" menu - "special = updated" in
+    "ContentElements.typoscript" ("tt_content.menu_recently_updated") sorts
+    the tree beneath "pages" (or, empty, the current page) by
+    "SYS_LASTCHANGED" descending, and each item shows that date beneath its
+    link.
+
+    "SYS_LASTCHANGED" needs no "dataProcessing" of its own either - it is
+    the very field the query already sorts by, on the same "item.data" page
+    row "menu_abstract" reads "abstract" from. Passing "showDate: 1" into
+    the shared partial is the only thing this template does differently
+    from "menu_pages".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuRecentlyUpdatedLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu, showDate: 1}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

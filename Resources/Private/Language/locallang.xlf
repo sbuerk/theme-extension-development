@@ -27,6 +27,33 @@
 			<trans-unit id="theme.breadcrumbLabel">
 				<source>Breadcrumb</source>
 			</trans-unit>
+			<trans-unit id="theme.menuPagesLabel">
+				<source>Pages</source>
+			</trans-unit>
+			<trans-unit id="theme.menuSubpagesLabel">
+				<source>Subpages</source>
+			</trans-unit>
+			<trans-unit id="theme.menuSectionLabel">
+				<source>Section</source>
+			</trans-unit>
+			<trans-unit id="theme.menuSectionPagesLabel">
+				<source>Section pages</source>
+			</trans-unit>
+			<trans-unit id="theme.menuSitemapLabel">
+				<source>Sitemap</source>
+			</trans-unit>
+			<trans-unit id="theme.menuSitemapPagesLabel">
+				<source>Sitemap of these pages</source>
+			</trans-unit>
+			<trans-unit id="theme.menuAbstractLabel">
+				<source>Abstracts</source>
+			</trans-unit>
+			<trans-unit id="theme.menuRecentlyUpdatedLabel">
+				<source>Recently updated pages</source>
+			</trans-unit>
+			<trans-unit id="theme.menuRelatedPagesLabel">
+				<source>Related pages</source>
+			</trans-unit>
 			<trans-unit id="theme.appearanceLabel">
 				<source>Appearance</source>
 			</trans-unit>
@@ -104,6 +131,12 @@
 			</trans-unit>
 			<trans-unit id="backendLayout.colPos.unused.name">
 				<source>Unused (not rendered)</source>
+			</trans-unit>
+			<trans-unit id="theme.menuCategorizedPagesLabel">
+				<source>Categorized pages</source>
+			</trans-unit>
+			<trans-unit id="theme.menuCategorizedContentLabel">
+				<source>Categorized content</source>
 			</trans-unit>
 		</body>
 	</file>

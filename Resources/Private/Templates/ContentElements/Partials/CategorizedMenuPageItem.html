@@ -1,0 +1,49 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    One item of "menu_categorized_pages" - see the comment above
+    "tt_content.menu_categorized_pages" in
+    "Configuration/TypoScript/ContentElements.typoscript" for why this is a
+    separate FLUIDTEMPLATE the "RECORDS" cObject invokes once per matched
+    page, rather than a string "RECORDS" itself builds.
+
+    "data" is the matched page record: "RecordsContentObject" starts a fresh
+    "ContentObjectRenderer" on it before rendering this cObject, and
+    "FluidTemplateContentObject" always assigns the current record as
+    "data" (see "getContentObjectVariables()") - the same variable every
+    content element template reads, just holding a "pages" row here instead
+    of a "tt_content" one.
+
+    "currentPageUid" comes from the TypoScript above ("data = page:uid"):
+    this record is the page being linked to, not the page currently being
+    rendered, so nothing here has another way to compare the two. Two full
+    branches rather than a conditionally-empty "aria-current" attribute,
+    the same reasoning "Partials/Navigation/Main.html" documents.
+
+    "nav_title" falls back to "title" the way "MenuProcessor"'s own
+    "titleField" default ("nav_title // title") would, resolved here in
+    Fluid because this record never goes through "MenuProcessor" at all.
+</f:comment>
+<li class="theme-content-menu__item">
+    <f:if condition="{data.uid} == {currentPageUid}">
+        <f:then>
+            <a class="theme-content-menu__link" href="{f:uri.page(pageUid: data.uid)}" aria-current="page">
+                <f:if condition="{data.nav_title}">
+                    <f:then>{data.nav_title}</f:then>
+                    <f:else>{data.title}</f:else>
+                </f:if>
+            </a>
+        </f:then>
+        <f:else>
+            <a class="theme-content-menu__link" href="{f:uri.page(pageUid: data.uid)}">
+                <f:if condition="{data.nav_title}">
+                    <f:then>{data.nav_title}</f:then>
+                    <f:else>{data.title}</f:else>
+                </f:if>
+            </a>
+        </f:else>
+    </f:if>
+</li>
+
+</html>

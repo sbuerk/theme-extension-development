@@ -1,0 +1,28 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The "Pages" menu - one link per page the editor selected in "pages",
+    nothing more. "special = list" in "ContentElements.typoscript"
+    ("tt_content.menu_pages") is what tells "MenuProcessor" to fetch exactly
+    those uids rather than a rootline position; see that file's comment for
+    what an empty "pages" selection falls back to.
+
+    Rendering itself is the shared "Partials/ContentElement/Menu" - this
+    element differs from "menu_subpages" only in the TypoScript "special", not
+    in anything Fluid needs to know, so neither "showAbstract" nor "showDate"
+    is passed.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{menu}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuPagesLabel')}">
+            <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
+        </nav>
+    </f:if>
+</f:section>
+
+</html>

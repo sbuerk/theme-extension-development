@@ -1,0 +1,34 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "menu_categorized_pages" - pages picked by category
+    ("selected_categories"/"category_field"), not by rootline position. See
+    the comment above "tt_content.menu_categorized_pages" in
+    "Configuration/TypoScript/ContentElements.typoscript" for why "RECORDS"
+    renders the selection.
+
+    "{items}" is "RECORDS"'s own concatenated output - one "<li>" per matched
+    page, each already built by
+    "Templates/ContentElements/Partials/CategorizedMenuPageItem.html".
+    "f:format.raw" is used for the same reason as "Shortcut.html": this is
+    TYPO3's own rendered markup, not unescaped user input.
+
+    Empty guard: no matches - an editor removed every page from the category,
+    or none of them is accessible - means no "<nav>" at all, not an empty one.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{items}">
+        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuCategorizedPagesLabel')}">
+            <ul class="theme-content-menu__list">
+                <f:format.raw>{items}</f:format.raw>
+            </ul>
+        </nav>
+    </f:if>
+</f:section>
+
+</html>
