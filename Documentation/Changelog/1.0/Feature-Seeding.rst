@@ -73,6 +73,16 @@ core rather than reimplemented.
             files:
               media:
                 - placeholder
+                - identifier: portrait
+                  alternative: 'A placeholder graphic'
+                  title: 'Placeholder'
+                  description: 'Rendered as the caption'
 
-    File metadata is not written: the alternative text and title of a file or
-    of the reference itself are outside what the seeding covers.
+    A reference is either the bare identifier of a declared file or a map
+    naming it alongside the fields of the :sql:`sys_file_reference` record -
+    the alternative text, title, description and link an editor fills in on a
+    file relation. They belong to the reference and not to the file, so the
+    same image can carry a different alternative text in two places.
+
+    Metadata of the :sql:`sys_file` record itself is still outside what the
+    seeding covers.

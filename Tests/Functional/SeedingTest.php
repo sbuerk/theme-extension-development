@@ -214,6 +214,86 @@ final class SeedingTest extends AbstractFunctionalTestCase
     }
 
     #[Test]
+    public function fileReferencesCarryTheFieldsTheDefinitionDeclaresOnThem(): void
+    {
+        $this->seedDemo();
+
+        $references = $this->queryTable(
+            'sys_file_reference',
+            ['uid', 'alternative', 'title', 'description'],
+            'uid',
+        );
+
+        // The reference on the root page declares an alternative text and a
+        // title, and no description.
+        $this->assertSame('A placeholder graphic', $references[0]['alternative']);
+        $this->assertSame('Placeholder', $references[0]['title']);
+        $this->assertSame('', (string)$references[0]['description']);
+
+        // The one on the single image element declares a description, which is
+        // what the theme renders as the caption.
+        $this->assertSame('A placeholder graphic in landscape format', $references[1]['alternative']);
+        $this->assertSame(
+            'The description of a file reference is rendered as the caption.',
+            $references[1]['description'],
+        );
+    }
+
+    #[Test]
+    public function aReferenceCannotPointItselfSomewhereElseThroughDeclaredColumns(): void
+    {
+        $definition = (new YamlSeedParser())->parse([
+            'identifier' => 'structural',
+            'files' => [
+                [
+                    'identifier' => 'placeholder',
+                    'source' => 'EXT:theme_extension_development/Configuration/Seeds/Files/placeholder.svg',
+                    'folder' => 'structural',
+                ],
+            ],
+            'pages' => [
+                [
+                    'identifier' => 'home',
+                    'uid' => 1,
+                    'title' => 'Home',
+                    'slug' => '/',
+                    'is_siteroot' => 1,
+                    'doktype' => 1,
+                    'files' => [
+                        'media' => [
+                            [
+                                'identifier' => 'placeholder',
+                                // The columns the seeder owns...
+                                'uid_foreign' => 999,
+                                'tablenames' => 'tt_content',
+                                'fieldname' => 'image',
+                                // ...and one it does not.
+                                'alternative' => 'Kept',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->createSeeder()->seed($definition, $this->setUpBackendUser(1));
+
+        $references = $this->queryTable(
+            'sys_file_reference',
+            ['uid_foreign', 'tablenames', 'fieldname', 'alternative'],
+            'uid',
+        );
+
+        // Structural values win, so a definition cannot detach a reference from
+        // the record that declares it - the same rule a record's "pid" follows.
+        $this->assertSame(1, (int)$references[0]['uid_foreign']);
+        $this->assertSame('pages', $references[0]['tablenames']);
+        $this->assertSame('media', $references[0]['fieldname']);
+        // Everything else is written as declared.
+        $this->assertSame('Kept', $references[0]['alternative']);
+    }
+
+    #[Test]
     public function referencingAnUndeclaredFileIsRejected(): void
     {
         $this->expectException(SeedingException::class);

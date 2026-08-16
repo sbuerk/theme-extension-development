@@ -41,7 +41,7 @@ final readonly class DataMapFactory
      * @return array{
      *     dataMap: array<string, array<string, array<string, scalar|null>>>,
      *     suggestedUids: array<string, int>,
-     *     references: list<array{parent: string, table: string, field: string, file: int, pid: string}>
+     *     references: list<array{parent: string, table: string, field: string, file: int, pid: string, values: array<string, scalar|null>}>
      * }
      */
     public function createFromDefinition(
@@ -63,7 +63,7 @@ final readonly class DataMapFactory
      * @param array<string, array<string, array<string, scalar|null>>> $dataMap
      * @param array<string, int> $suggestedUids
      * @param array<string, int> $fileUids
-     * @param list<array{parent: string, table: string, field: string, file: int, pid: string}> $references
+     * @param list<array{parent: string, table: string, field: string, file: int, pid: string, values: array<string, scalar|null>}> $references
      */
     private function collect(
         array $records,
@@ -90,14 +90,14 @@ final readonly class DataMapFactory
             // for a hidden record by declaring "hidden: 1" itself.
             $values += ['hidden' => 0];
 
-            foreach ($record->files as $field => $fileIdentifiers) {
-                foreach ($fileIdentifiers as $fileIdentifier) {
-                    if (!isset($fileUids[$fileIdentifier])) {
+            foreach ($record->files as $field => $fileReferences) {
+                foreach ($fileReferences as $fileReference) {
+                    if (!isset($fileUids[$fileReference->identifier])) {
                         throw new SeedingException(
                             sprintf(
                                 'The record "%s" references the file "%s", which the definition does not declare.',
                                 $record->identifier,
-                                $fileIdentifier,
+                                $fileReference->identifier,
                             ),
                             1786924828,
                         );
@@ -106,11 +106,14 @@ final readonly class DataMapFactory
                         'parent' => $placeholder,
                         'table' => $record->table,
                         'field' => $field,
-                        'file' => $fileUids[$fileIdentifier],
+                        'file' => $fileUids[$fileReference->identifier],
                         // The parent of this level, never the record's own pid:
                         // that one may be the negative "insert after" hint,
                         // which is a sorting instruction and not a page.
                         'pid' => $parentId,
+                        // The fields of the reference record itself, for
+                        // instance the alternative text and the description.
+                        'values' => $fileReference->values,
                     ];
                 }
             }

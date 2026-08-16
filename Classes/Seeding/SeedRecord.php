@@ -29,8 +29,8 @@ final readonly class SeedRecord
     /**
      * @param array<string, scalar|null> $values
      * @param list<SeedRecord> $children
-     * @param array<string, list<string>> $files File references to create, as
-     *        a map of field name to the seed identifiers of the files.
+     * @param array<string, list<SeedFileReference>> $files File references to
+     *        create, as a map of field name to the references declared for it.
      */
     public function __construct(
         public string $table,

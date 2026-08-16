@@ -82,7 +82,7 @@ final readonly class Seeder
      * exist before their references can be written, which is what makes this a
      * second pass rather than more entries in the same data map.
      *
-     * @param list<array{parent: string, table: string, field: string, file: int, pid: string}> $references
+     * @param list<array{parent: string, table: string, field: string, file: int, pid: string, values: array<string, scalar|null>}> $references
      * @param array<string, int|string> $written Placeholder to written uid.
      */
     private function attachFileReferences(
@@ -113,13 +113,17 @@ final readonly class Seeder
             }
             $pid = $written[ltrim($reference['pid'], '-')] ?? $reference['pid'];
             $placeholder = 'NEWsys_file_reference_' . ++$counter;
-            $dataMap['sys_file_reference'][$placeholder] = [
+            // The declared fields first and the structural ones on top:
+            // "array_merge" lets the later value win, so a definition cannot
+            // point a reference somewhere else by declaring "uid_foreign"
+            // itself. This mirrors how a record's "pid" is handled.
+            $dataMap['sys_file_reference'][$placeholder] = array_merge($reference['values'], [
                 'uid_local' => $reference['file'],
                 'uid_foreign' => (int)$parentUid,
                 'tablenames' => $reference['table'],
                 'fieldname' => $reference['field'],
                 'pid' => (int)$pid,
-            ];
+            ]);
             $perRecord[$reference['table'] . ':' . $parentUid . ':' . $reference['field']][] = $placeholder;
         }
 
