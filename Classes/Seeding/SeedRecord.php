@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  *           own later.
  */
 #[Exclude]
-final readonly class SeedRecord
+final class SeedRecord
 {
     /**
      * @param array<string, scalar|null> $values
@@ -37,13 +37,13 @@ final readonly class SeedRecord
      *        relation, so the field name is what ties them to the parent.
      */
     public function __construct(
-        public string $table,
-        public string $identifier,
-        public array $values,
-        public ?int $uid = null,
-        public array $children = [],
-        public array $files = [],
-        public array $inline = [],
+        public readonly string $table,
+        public readonly string $identifier,
+        public readonly array $values,
+        public readonly ?int $uid = null,
+        public readonly array $children = [],
+        public readonly array $files = [],
+        public readonly array $inline = [],
     ) {}
 
     /**
@@ -57,15 +57,37 @@ final readonly class SeedRecord
      * `DataHandler::processRemapStack()`, which reads a value containing an
      * underscore as the `<table>_<uid>` form and splits it there
      * (.Build/vendor/typo3/cms-core/Classes/DataHandling/DataHandler.php,
-     * around line 7169). `NEWtx_theme_list_item_docs` is then taken apart into
+     * around line 7169). `NEWtx_theme_list_item_docs` would be taken apart into
      * the table `NEWtx_theme_list_item` and the id `docs`, neither of which
      * resolves, and the relation is written as empty - with an empty error log,
-     * so nothing reports it. The table name therefore has its underscores
-     * removed and is joined to the identifier with a dash, and `YamlSeedParser`
-     * rejects an identifier that would reintroduce one.
+     * so nothing reports it. `YamlSeedParser` therefore rejects an identifier
+     * carrying one, which is what keeps the guarantee for the whole placeholder.
+     *
+     * **The table name is not part of the placeholder, and that is deliberate.**
+     * It never contributed uniqueness: `YamlSeedParser` tracks the identifiers
+     * of a definition in a single set across all levels and all tables, so two
+     * records can never share one. What the table name did contribute was
+     * length, and length is a hard limit here: TYPO3 v12 logs every record
+     * DataHandler creates with the placeholder in `sys_log.NEWid`, a column its
+     * own `ext_tables.sql` declares as `varchar(30)`
+     * (.Build/vendor/typo3/cms-core/ext_tables.sql, "NEWid varchar(30)"), and
+     * `BackendUserAuthentication::writelog()` writes it there unconditionally.
+     * A longer value passes only on SQLite, which does not enforce a declared
+     * `varchar` length at all; PostgreSQL answers "value too long for type
+     * character varying(30)" and MySQL and MariaDB answer "Data too long for
+     * column 'NEWid'", each out of the middle of `process_datamap()`.
+     * `NEWttcontent-theme-linklist-unlabelled` is 38 characters, so with the
+     * table name in front the seeder worked on one of the four supported DBMS.
+     *
+     * TYPO3 v13 dropped the column - `sys_log` has no `NEWid` there and its
+     * `writelog()` takes the parameter as the unused `$___` - which is why this
+     * never surfaced on the v13/v14 line this branch was split from.
+     *
+     * @todo Once support for TYPO3 v12 is dropped, the length limit
+     *       `YamlSeedParser` enforces on an identifier can go with it.
      */
     public function placeholder(): string
     {
-        return 'NEW' . str_replace('_', '', $this->table) . '-' . $this->identifier;
+        return 'NEW' . $this->identifier;
     }
 }

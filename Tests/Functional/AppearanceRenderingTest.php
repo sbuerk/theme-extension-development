@@ -20,6 +20,7 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 final class AppearanceRenderingTest extends AbstractFunctionalTestCase
 {
     use SiteBasedTestTrait;
+    use ThemeSiteTrait;
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8'],
@@ -30,25 +31,7 @@ final class AppearanceRenderingTest extends AbstractFunctionalTestCase
         parent::setUp();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/SiteSetPageTree.csv');
-        $this->writeSiteConfiguration(
-            'theme',
-            $this->buildSiteConfiguration(
-                rootPageId: 1,
-                base: 'https://theme.example.com/',
-                websiteTitle: 'Theme',
-            ) + [
-                'dependencies' => [
-                    'sbuerk/theme-extension-development',
-                ],
-            ],
-            [
-                $this->buildDefaultLanguageConfiguration(
-                    identifier: 'EN',
-                    base: 'https://theme.example.com/',
-                ),
-            ],
-        );
-        $this->setUpFrontendRootPage(1, [], [], false);
+        $this->setUpThemeSite();
     }
 
     private function render(): string

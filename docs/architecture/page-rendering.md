@@ -12,13 +12,18 @@ either.
 ## Why `FLUIDTEMPLATE` and not `PAGEVIEW`
 
 `PAGEVIEW` exists since TYPO3 v13.1
-(`Feature-103504-NewContentObjectPageView.rst`), so age is not the reason.
-The reason is the layer normally used with it: `ContentAreaCollection`,
-`{content.main.records}` and the `f:render.contentArea` / `f:render.record`
-ViewHelpers do not exist on v13.4 at all. Verified rather than recalled —
-`.Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/` ships neither ViewHelper
-in the installed v13.4.34 core. `PAGEVIEW` itself would run; there is simply
-nothing to render content areas with beside it.
+(`Feature-103504-NewContentObjectPageView.rst`), which settles it for this
+branch on its own: **there is no `PAGEVIEW` on TYPO3 v12**, so using it would
+mean a split of the page rendering layer rather than a choice between two
+objects.
+
+Even on v13 alone it would not be the better one. The layer normally used with
+it — `ContentAreaCollection`, `{content.main.records}` and the
+`f:render.contentArea` / `f:render.record` ViewHelpers — does not exist on
+v13.4 at all. Verified rather than recalled:
+`.Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/` shipped neither ViewHelper
+in v13.4.34. `PAGEVIEW` itself would run; there is simply nothing to render
+content areas with beside it.
 
 `FLUIDTEMPLATE` is not deprecated, and the changelog entry introducing
 `PAGEVIEW` does not present it as a replacement either — it describes it as
@@ -39,8 +44,10 @@ imports one file per layout from
 [`Configuration/PageTsConfig/BackendLayouts/`](../../Configuration/PageTsConfig/BackendLayouts).
 TYPO3 auto-loads `Configuration/page.tsconfig` from every package since v12.0
 (`Feature-96614-AutomaticInclusionOfPageTsConfigOfExtensions.rst`) — no
-registration call and no DB seeding. Verified in the installed v13.4.34 core
-rather than taken from the changelog:
+registration call and no DB seeding. That is comfortably below this branch's
+floor of 12.4.22, so the mechanism needs no version aware code and is what the
+[v12 new content element wizard](core-version-aware-code.md#the-worked-example-the-new-content-element-wizard)
+rides on as well. Verified in the core rather than taken from the changelog:
 `TsConfigTreeBuilder::getPagesTsConfigTree()` walks the active packages and
 picks up `Configuration/page.tsconfig` from each
 (`.Build/vendor/typo3/cms-core/Classes/TypoScript/IncludeTree/TsConfigTreeBuilder.php`,
@@ -235,15 +242,20 @@ slide mode on.
 
 Every column in every `*.tsconfig` file under
 `Configuration/PageTsConfig/BackendLayouts/` carries an `identifier` in
-addition to `name` and `colPos`. Nothing forces that on v13.4 — a column
-without one is accepted silently — but it is not decoration either: the
-backend page module reads it. `GridColumn` takes the key off the column
-definition and exposes it as `identifierCleaned`
+addition to `name` and `colPos`. Nothing forces that on either supported version
+— a column without one is accepted silently — but it is not decoration either:
+on **v13** the backend page module reads it. `GridColumn` takes the key off the
+column definition and exposes it as `identifierCleaned`
 (`.Build/vendor/typo3/cms-backend/Classes/View/BackendLayout/Grid/GridColumn.php`,
-lines 72 and 138–141), and
+lines 72 and 138–141 of v13.4.34), and
 `Resources/Private/Partials/PageLayout/Grid/Column.html` renders it as a
 `t3-grid-cell-<identifier>` class on the grid cell. A column without an
 identifier loses that styling hook, and nothing reports it.
+
+TYPO3 v12's `GridColumn` has no `identifier` handling at all — the word does not
+occur in the file — so on v12 the key is simply carried and ignored. That is a
+reason to keep writing it, not to drop it: the same layout definition serves
+both versions and gains the styling hook wherever it is read.
 
 `colPos` cannot stand in for it: it is the number a content element is stored
 against, shared across every layout, while the identifier names *this*

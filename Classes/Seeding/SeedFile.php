@@ -14,13 +14,13 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  * @internal Part of the seeding implementation, not public API.
  */
 #[Exclude]
-final readonly class SeedFile
+final class SeedFile
 {
     public function __construct(
-        public string $identifier,
-        public string $source,
-        public string $folder = '/',
-        public ?string $name = null,
-        public ?int $storage = null,
+        public readonly string $identifier,
+        public readonly string $source,
+        public readonly string $folder = '/',
+        public readonly ?string $name = null,
+        public readonly ?int $storage = null,
     ) {}
 }

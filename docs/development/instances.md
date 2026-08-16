@@ -3,6 +3,7 @@
 One TYPO3 instance lives in the repository per supported core version:
 
 ```
+instance-core-12/    TYPO3 v12
 instance-core-13/    TYPO3 v13
 ```
 
@@ -25,6 +26,16 @@ composer install
 # then point a vhost at instance-core-13/public
 ```
 
+Substitute `instance-core-12` throughout for the v12 instance. The two differ in
+their `typo3/minimal` constraint, their DDEV project name, their SQLite file
+name, their website title — and in **how the theme is enabled**, which is the
+one difference that is not cosmetic; see
+[below](#enabling-the-theme-on-typo3-v12).
+
+Both instances pin `php_version: "8.2"`. PHP 8.1 is supported for TYPO3 v12, but
+covering it belongs in [CI](quality-gates.md#continuous-integration), not in an
+instance whose purpose is to look at the theme.
+
 > [!IMPORTANT]
 > **Do not mix the two worlds.** An instance installed with DDEV and the same
 > instance installed on the host produce different, mutually incompatible
@@ -36,14 +47,15 @@ composer install
 
 Only what describes an instance, never what an install produces:
 
-| Path                                 | Is                                                           |
-|--------------------------------------|--------------------------------------------------------------|
-| `.ddev/config.yaml`                  | The DDEV project, `core13-theme-v1`.                         |
-| `.ddev/docker-compose.mounts.yaml`   | The mounts that make the relative paths resolve, see below.  |
-| `composer.json`                      | Dependencies, path repositories, the snapshot scripts.       |
-| `config/system/settings.php`         | Instance configuration. The database path there is advisory. |
-| `config/system/additional.php`       | Resolves the database and includes local overrides.          |
-| `../sqlite-databases/core-13.sqlite` | The committed database template, once one exists.            |
+| Path                                 | Is                                                                    |
+|--------------------------------------|-----------------------------------------------------------------------|
+| `.ddev/config.yaml`                  | The DDEV project, `core12-theme-v1` / `core13-theme-v1`.              |
+| `.ddev/docker-compose.mounts.yaml`   | The mounts that make the relative paths resolve, see below.           |
+| `composer.json`                      | Dependencies, path repositories, the snapshot scripts.                |
+| `config/system/settings.php`         | Instance configuration. The database path there is advisory.          |
+| `config/system/additional.php`       | Resolves the database and includes local overrides.                   |
+| `config/sites/demo/config.yaml`      | The site of the seeded demo tree — **not identical between the two**. |
+| `../sqlite-databases/core-1*.sqlite` | The committed database template, once one exists.                     |
 
 Generated and git-ignored: `vendor/`, `public/`, `var/`, `.cache/`,
 `composer.lock` and `config/system/additional/*.php`.
@@ -112,9 +124,9 @@ and `config/system/additional.php` recomputes the path from `__DIR__` on every
 request rather than trusting `settings.php`, so the same checkout resolves its
 database identically under DDEV and on a host stack.
 
-When a template exists at `sqlite-databases/core-13.sqlite` it is copied into
-`var/sqlite/` on first start. Until one has been committed, the instance starts
-empty: set it up with `vendor/bin/typo3 setup` and then fill it with
+When a template exists at `sqlite-databases/core-<major>.sqlite` it is copied
+into `var/sqlite/` on first start. Until one has been committed, the instance
+starts empty: set it up with `vendor/bin/typo3 setup` and then fill it with
 `vendor/bin/typo3 theme:seed` — see [Seeding](seeding.md). The site
 configuration below `config/sites/demo/` is committed and points at the root
 page uid the seed definition declares.
@@ -122,6 +134,46 @@ page uid the seed definition declares.
 `config/system/additional/` is git-ignored and included automatically — the
 place for anything belonging to one machine rather than the repository, such as
 a different ImageMagick path or mail transport on a host stack.
+
+## Enabling the theme on TYPO3 v12
+
+`instance-core-13/config/sites/demo/config.yaml` carries
+
+```yaml
+dependencies:
+  - sbuerk/theme-extension-development
+```
+
+and that is all it takes there. `instance-core-12/`'s site configuration
+deliberately carries **no** `dependencies` key: site sets arrived in TYPO3 v13.1
+(#103437), so on v12 the key is read by nothing. Writing it down would claim
+this file enables the theme when it does not.
+→ [TypoScript delivery](../architecture/typoscript-delivery.md)
+
+The replacement is a `sys_template` record — a database row, expressible in
+neither a configuration file nor a
+[seed definition](seeding.md) (`YamlSeedParser` has exactly two top-level
+containers, `files` and `pages`). It is therefore a **manual step, between
+`typo3 setup` and `theme:seed`**:
+
+1. **Web > List**, page `1` — the site root.
+2. *Create new record* → **System records** → **"TypoScript record"**
+   (`sys_template`).
+3. Set a *Title*.
+4. Check **Rootlevel**.
+5. Check **Clear** for both *Constants* and *Setup*.
+6. Under **"Include TypoScript sets"** (`include_static_file`), select
+   **"Theme Extension Development"**.
+
+> [!NOTE]
+> There is no **Web > Template** module in these instances. `typo3/minimal` does
+> not ship `typo3/cms-tstemplate`, which is why the record is created through
+> Web > List rather than the module a TYPO3 developer would reach for first.
+
+Committing a prepared `sqlite-databases/core-12.sqlite` would remove the step,
+and extending the seeder with a `records:` key would remove it for good. Neither
+is done here: the first commits a binary nobody can review, and the second is a
+feature rather than a compatibility change.
 
 ## Snapshot and restore
 
@@ -154,8 +206,9 @@ The checkpoint is harmless in any other journal mode.
 ## Switching branches in the same checkout
 
 The DDEV project name carries **two** dimensions, the core version and the
-extension's own version line — `core13-theme-v1` on this branch. The second half
-is what matters here: the instance directory is the same path on every branch,
+extension's own version line — `core12-theme-v1` and `core13-theme-v1` on this
+branch. The second half is what matters here: `instance-core-13/` exists on this
+branch *and* on `main`, the instance directory is the same path on every branch,
 DDEV keys a project on its root directory, and it refuses a second name for a
 path it already knows.
 
@@ -177,5 +230,5 @@ part of the name and not only the core version, and it is the reason to check
 ## See also
 
 - [Development environment](environment.md)
-- [Core version setup](dual-core-setup.md)
+- [Dual core setup](dual-core-setup.md)
 - [Frontend assets](frontend-assets.md)

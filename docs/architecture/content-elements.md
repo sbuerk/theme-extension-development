@@ -10,10 +10,15 @@ element reaches `lib.contentElement` at all — this page does not repeat the
 
 ## TCA without rendering
 
-`EXT:frontend` registers the whole classic set of content types itself, in
-`Configuration/TCA/Overrides/2xx-tt_content-content_type-*.php` — image,
-textmedia, bullets, table, uploads, the eleven `menu_*` types, shortcut, div
-and html — verified against the installed v13.4 core.
+`EXT:frontend` registers the whole classic set of content types itself — image,
+textmedia, bullets, table, uploads, the eleven `menu_*` types, shortcut, div and
+html. **Where** it writes them down differs between the supported versions and
+nothing else does: v13 ships one
+`Configuration/TCA/Overrides/2xx-tt_content-content_type-*.php` per type, each
+calling `ExtensionManagementUtility::addRecordType()`, while v12 declares all of
+them inline in the `types` array of `Configuration/TCA/tt_content.php`. Verified
+in both installed cores. The set of `CType` values a theme has to cover is
+identical.
 `fluid_styled_content` was never a dependency of this theme and is not
 installed here at all. What that extension supplies, when present, is the
 *rendering* — a `lib.contentElement` TypoScript object and one template per
@@ -162,7 +167,7 @@ enough on its own:
   result afterwards, which is the same "not reasonable in Fluid" territory as
   the two-level split itself.
 
-`Classes/DataProcessing/TableProcessor.php` (`final readonly`, wired with a
+`Classes/DataProcessing/TableProcessor.php` (`final`, wired with a
 Symfony `#[Autoconfigure]` attribute tagging it `data.processor`, per
 [Dependency injection](dependency-injection.md)) does both: decodes the two
 character codes with `chr()`, splits with `CsvUtility::csvToArray()`, then
@@ -300,9 +305,14 @@ that actually differ, so the difference between the nine is what is visible
 in the TypoScript, not nine near-identical blocks. Each `special` was read
 against its own `prepareMenuItemsFor*Menu()` method in
 `AbstractMenuContentObject.php` and cross-checked against the historical
-`fluid_styled_content` TypoScript that rendered these same nine CTypes before
-TYPO3 v13 made the TCA an `EXT:frontend`-only concern, reproduced close to
-verbatim for seven of the nine:
+`fluid_styled_content` TypoScript that rendered these same nine CTypes,
+reproduced close to verbatim for seven of the nine.
+
+Their **TCA** is `EXT:frontend`'s on both supported versions, so this is not a
+v13 change one has to work around here: v12's
+`EXT:frontend/Configuration/TCA/tt_content.php` declares the eleven `menu_*`
+types in its `types` array, and v13 registers the same types from
+`Configuration/TCA/Overrides/`. Only the file layout moved.
 
 | `CType`                 | `special`   | Levels | Falls back to (no `pages` selected)               |
 |-------------------------|-------------|--------|---------------------------------------------------|
@@ -612,14 +622,28 @@ accepts is real — another extension is free to also prefix its own fields
 `theme_` — and it is accepted deliberately, the same way camino accepts it for
 its own prefix, rather than overlooked.
 
-### No `ext_tables.sql`: the schema derives from TCA
+### `ext_tables.sql`, and why it exists although the schema derives from TCA
 
-This extension ships no `ext_tables.sql` anywhere below `Configuration/` — the
-whole schema for `tx_theme_list_item` and the four `tx_theme_*` columns added
-to `tt_content` comes from `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()`
-reading the TCA at compare-schema time.
+On TYPO3 v13 the whole schema for `tx_theme_list_item` and the four
+`tx_theme_*` columns added to `tt_content` comes from
+`TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()` reading the TCA at
+compare-schema time (#101553, extended by #104311 in 13.3).
 
-One column needed more than "add a `type=input` field and let it happen",
+**TYPO3 v12 does none of that.** Its `DefaultTcaSchema` derives the management
+columns from `ctrl`, the `category|datetime|slug|json|uuid` types and MM tables,
+and has no branch for `input`, `text`, `link`, `file` or `inline` — so on v12
+the table and the four columns are simply never created and every theme element
+using them fails. [`ext_tables.sql`](../../ext_tables.sql) therefore ships the
+definitions v13 would generate, reproduced column for column from what v13's own
+analyzer derives, so the analyzer stays quiet on both versions. #101553 states
+that an explicit definition takes precedence, which is why one non-version-aware
+file serves both. `Tests/Functional/DatabaseSchemaTest` is the gate.
+
+The practical consequence: **adding a column to a theme element means adding it
+to `ext_tables.sql` as well**, or the element works on v13 and fails on v12.
+→ [The other configuration exception: `ext_tables.sql`](core-version-aware-code.md#the-other-configuration-exception-ext_tablessql)
+
+The TCA still has to be right, and one column needed more than "add a `type=input` field and let it happen",
 because `DefaultTcaSchema` does not treat every part of an inline relation the
 same way. Reading `enrichSingleTableFieldsFromTcaColumns()`
 (`.Build/vendor/typo3/cms-core/Classes/Database/Schema/DefaultTcaSchema.php`):
@@ -755,15 +779,37 @@ longer offers the field to an editor at all.)
 ### The wizard group, and what an unresolved icon identifier does
 
 Every one of the ten types carries a `label`, a `description` and an `icon` on
-its `addRecordType()`/`addTcaSelectItemGroup()` call, all under one wizard
-group ("Theme",
+its registration call, all under one wizard group ("Theme",
 `tt_content.group.theme` in `locallang_tca.xlf`, inserted `before:default`).
-No page TSconfig registers any of this: since TYPO3 v13
-(`Feature-102834-Auto-registrationOfNewContentElementWizardViaTCA.rst`, on
-disk in the installed core), the "new content element" wizard is
-generated from exactly those TCA keys, which replaced the former
-`mod.wizards.newContentElement.wizardItems.<group>` TSconfig step this theme
-therefore never needed to write.
+
+The registration call is
+[`Compatibility\ContentTypeRegistration::addRecordType()`](../../Classes/Compatibility/ContentTypeRegistration.php),
+not the core method of the same name: `ExtensionManagementUtility::addRecordType()`
+is v13 only, and v12.4 has nothing that writes a `types` definition. The helper
+reproduces what v13's method does using API both versions have, so the ten TCA
+files each keep exactly one call and carry no version switch.
+`Tests/Functional/ThemeContentTypeRegistrationTest` asserts on both versions
+that all ten `CType` items, their `types` entries and their `typeicon_classes`
+entries are there.
+→ [Core version aware code](core-version-aware-code.md#configuration-is-the-exception)
+
+**On v13, no page TSconfig registers the wizard**: since
+`Feature-102834-Auto-registrationOfNewContentElementWizardViaTCA.rst` (v13.0)
+the "new content element" wizard is generated from exactly those TCA keys, which
+replaced the former `mod.wizards.newContentElement.wizardItems.<group>` TSconfig
+step.
+
+**On v12 that step is still the only one there is.** Its
+`NewContentElementController::getWizards()` reads
+`mod.wizards.newContentElement.wizardItems` and nothing else, so without page
+TSconfig the ten types are selectable in the `CType` dropdown of an existing
+element and cannot be created —
+[`Configuration/PageTsConfig/NewContentElementWizard.tsconfig`](../../Configuration/PageTsConfig/NewContentElementWizard.tsconfig)
+supplies them behind a `[typo3.branch == "12.4"]` condition, imported from
+`Configuration/page.tsconfig`. The condition is not caution: leaving the block
+on for v13 would let the page TSconfig title, description and icon shadow the
+TCA ones and drop `types.<value>.creationOptions` with them.
+→ [The worked example: the new content element wizard](core-version-aware-code.md#the-worked-example-the-new-content-element-wizard)
 
 The core requires an icon identifier, and none of this theme's own is
 invented — all eight reused identifiers (`content-header`,
@@ -786,7 +832,7 @@ the method generates its own TypoScript, and it does so whether or not
 `fluid_styled_content` is installed. Read in the installed core
 (`.Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php`), it
 emits, verbatim, for a plugin registered with the `CType` type — the only type
-that does not log a deprecation on v13.4:
+that does not log a deprecation on v13.4, and a spelling v12 accepts unchanged:
 
 ```typoscript
 tt_content.<pluginSignature> =< lib.contentElement
@@ -840,11 +886,12 @@ it render is this theme's `lib.contentElement` and `Generic.html`.
 ### `tt_content.list`
 
 One CType still reaches `configurePlugin()`'s *other* branch: `list`, the
-historical "General Plugin" registration, still present in EXT:frontend's own
-v13.4 TCA (`Configuration/TCA/tt_content.php`, `types.list`, the `CType`
-select's own `value => 'list'`) even though it is deprecated there
-(Deprecation #105076). A plugin registered with `configurePlugin()`'s fifth
-argument omitted or `list_type` writes into it directly on v13.4:
+historical "General Plugin" registration, present in EXT:frontend's own TCA on
+both supported versions (`Configuration/TCA/tt_content.php`, `types.list`, the
+`CType` select's own `value => 'list'`) — deprecated on v13.4 (Deprecation
+#105076) and not deprecated at all on v12.4. A plugin registered with
+`configurePlugin()`'s fifth argument omitted or `list_type` writes into it
+directly on either:
 
 ```typoscript
 tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN
@@ -853,8 +900,7 @@ tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN
 `fluid_styled_content` supplied `tt_content.list` itself, as a `CASE` object
 keyed on `list_type` — and it is not a dependency here. Without that `CASE`
 object, the assignment above has nothing to add a branch to, and a `list`
-element renders the core notice on v13.4 the same as every other uncovered
-type.
+element renders the core notice the same as every other uncovered type.
 
 `ContentElements.typoscript` declares it, in this theme's own house style —
 `=< lib.contentElement`, `templateName = Generic` — which lets `Generic.html`
@@ -866,8 +912,9 @@ It is declared **unconditionally**, with no `[...]` condition around it: every
 supported core version still carries the `list` CType, so there is no
 difference to resolve and nothing to guard. Verified rather than assumed —
 `grep -n "'list'\|list_type" .Build/vendor/typo3/cms-frontend/Configuration/TCA/tt_content.php`
-against the installed v13.4.34 core returns `types.list`, the `CType` select
-item and `subtype_value_field = list_type`, all present.
+returns `types.list`, the `CType` select item and
+`subtype_value_field = list_type` on the v12.4 dependency set as it did on
+v13.4.
 
 Deprecated is not the same as gone. #105076 asks plugin authors to register
 with the `CType` type instead — which the fixture plugins in this repository

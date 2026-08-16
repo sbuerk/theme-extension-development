@@ -134,8 +134,14 @@ definition do.
 
 ## Placeholders carry no underscore
 
-The placeholder of a record is `NEW<table without underscores>-<identifier>`,
-and both halves of that shape exist to work around one line of DataHandler.
+The placeholder of a record is `NEW<identifier>`, and the identifier may carry
+no underscore. That restriction exists to work around one line of DataHandler.
+
+The placeholder used to carry the table name as well —
+`NEW<table without underscores>-<identifier>`. It never contributed uniqueness:
+`YamlSeedParser` tracks identifiers in a single set across every level and every
+table, so two records cannot share one. It only contributed length, and length
+turned out to matter — see [the identifier length limit](#identifiers-are-at-most-27-characters).
 
 `processRemapStack()` resolves the `NEW…` placeholders in a relation field. It
 first asks whether the value contains an underscore
@@ -168,10 +174,28 @@ That is the worst kind of failure, and it cost twice here:
   the parent's field resolve. The order of a multi-file gallery was left to the
   database.
 
-So the table name has its underscores stripped and is joined to the identifier
-with a dash, and `YamlSeedParser` rejects an identifier that would reintroduce
-one. Restricting the identifier is what makes the guarantee hold: a definition
-that would seed an empty relation is rejected with a message instead.
+`YamlSeedParser` therefore rejects an identifier carrying an underscore.
+Restricting the identifier is what makes the guarantee hold: a definition that
+would seed an empty relation is rejected with a message instead of seeding one.
+
+## Identifiers are at most 27 characters
+
+`YamlSeedParser` rejects an identifier longer than 27 characters, by name and
+with the definition it came from, rather than letting it fail later.
+
+The limit comes from TYPO3 v12. `sys_log` has a `NEWid varchar(30)` column
+there (`.Build/vendor/typo3/cms-core/ext_tables.sql`), and
+`BackendUserAuthentication::writelog()` writes the raw data map key into it on
+every record DataHandler creates — so `NEW` plus the identifier has to fit into
+thirty characters. TYPO3 v13 has no `NEWid` column at all and its `writelog()`
+ignores that parameter position entirely, which is why the `main` line never
+saw this.
+
+Exceeding it is not a soft failure. SQLite does not enforce a declared
+`varchar` length, so a too-long identifier passes there and throws a
+`DriverException` from inside `process_datamap()` on PostgreSQL, MySQL and
+MariaDB — the kind of defect that only a four database run finds. The parser
+checks it up front instead.
 
 ## Files
 
@@ -233,10 +257,16 @@ each easy to get wrong:
 - **`addFile()` moves by default.** Its `removeOriginal` argument defaults to
   `true`, which would delete the source out of the repository. It is passed as
   `false`.
-- **The conflict mode is the native enum.** TYPO3 v13 still carries the older
-  `Resource\DuplicationBehavior` class alongside `Resource\Enum\DuplicationBehavior`,
-  and passing the old one triggers a deprecation (#101151) that this test suite
-  turns into a failure.
+- **The conflict mode changed type between the supported versions**, and it is
+  the one thing in the seeder that needed a core version split. v13 introduced
+  the native enum `Resource\Enum\DuplicationBehavior` (#101151) and triggers a
+  deprecation for the older `Resource\DuplicationBehavior` class, which this
+  test suite turns into a failure; v12 has only the older one, and the enum does
+  not exist there at all. `FileSeeder` therefore type hints
+  `Classes/Seeding/FileImporterInterface` and receives
+  `Core12/Seeding/FileImporter` or `Core13/Seeding/FileImporter` from the
+  container.
+  → [Core version aware code](../architecture/core-version-aware-code.md#the-worked-example-duplicationbehavior)
 - **A storage evaluates backend user file mounts.** Seeding runs on the command
   line into a folder no user has a mount for, so the check is suspended for the
   duration of the copy and restored afterwards.
@@ -284,9 +314,15 @@ hidden record by declaring `hidden: 1` itself.
 ## Why a seed may declare uids
 
 So a site configuration can be committed. `instance-core-13/config/sites/demo/`
-references `rootPageId: 1`, which only works because the definition declares
-that uid. Without it the root page would get whatever the
+and its v12 counterpart both reference `rootPageId: 1`, which only works because
+the definition declares that uid. Without it the root page would get whatever the
 database assigned and the site configuration could not be written in advance.
+
+What a seed definition **cannot** declare is a database record outside the page
+tree: `YamlSeedParser` has exactly two top-level containers, `files` and
+`pages`. That is why enabling the theme on TYPO3 v12 — which needs a
+`sys_template` row — is a manual backend step rather than part of the seed.
+→ [Development instances](instances.md#enabling-the-theme-on-typo3-v12)
 
 That is also why the command refuses to run into a non-empty page tree: a
 definition declaring uids collides rather than adding. `--force` overrides that

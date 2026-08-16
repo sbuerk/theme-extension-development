@@ -158,9 +158,25 @@ split at all — TYPO3 loads them from a fixed path — so a difference is appli
 to the finished array before it is returned, with a `@todo` naming the condition
 under which it goes away; see
 [Core version aware code](../architecture/core-version-aware-code.md#configuration-is-the-exception).
-With a single supported core version there is no such difference, and the TCA
-here is unconditional. A fixture extension is held to the same rules as the
-extension itself.
+There is no such difference in this fixture's TCA today, so it is
+unconditional. A fixture extension is held to the same rules as the extension
+itself.
+
+Its `ext_tables.sql` declaring only the own fields is *not* a version
+difference, and works on both: v12 and v13 alike derive the management columns
+from `ctrl`. What v12 does **not** derive is a column for an ordinary
+`columns` entry — which is why the extension's own
+[`ext_tables.sql`](../../ext_tables.sql) has to exist and this one is complete
+as it stands, declaring `title` and `message` explicitly.
+→ [`ext_tables.sql`](../architecture/core-version-aware-code.md#the-other-configuration-exception-ext_tablessql)
+
+The one place a core version difference *does* show up around this fixture is in
+static analysis rather than in the fixture: `GreetingRepository` annotates
+`@return QueryResultInterface<int, Greeting>`, and the 1.x line of
+`saschaegerer/phpstan-typo3` — the only line supporting v12 — ships a stub
+declaring a single template type for that interface. It is corrected by a stub
+of this repository's own rather than by a baseline entry.
+→ [PHPStan](../development/quality-gates.md#phpstan)
 
 The [`composer.json`](../../Tests/Functional/Fixtures/Extensions/example-fixture/composer.json)
 is what turns the directory into a package the plugin can find. It needs a name,
@@ -197,8 +213,12 @@ implementation pattern as the extension:
 
 ```php
 #[AsAlias(id: DummyServiceInterface::class, public: true)]
-final readonly class DummyService implements DummyServiceInterface
+final class DummyService implements DummyServiceInterface
 ```
+
+Plain `final`, like everything else on this branch — `readonly` classes are PHP
+8.2 and TYPO3 v12 is supported down to PHP 8.1.
+→ [Class design](../architecture/class-design.md#prefer-final-with-readonly-properties)
 
 A fixture extension is **not** core version aware. There is no `Core<major>/`
 split — if a fixture needs to behave differently per core version, that belongs

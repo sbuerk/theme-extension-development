@@ -54,8 +54,14 @@ User facing changes need a changelog entry below
 | `Deprecation-*.rst` | Functionality marked for removal, with the migration path. |
 | `Important-*.rst`   | Notable changes that are neither of the above.             |
 
-Each version directory has an `Index.rst` listing its entries; add new files
-there as well.
+Each version directory has an `Index.rst`, and it does **not** have to be
+edited: its four toctrees are `:glob:`-ed over `Breaking-*`, `Feature-*`,
+`Deprecation-*` and `Important-*`, so dropping a correctly named file into the
+directory is enough. The file itself needs the `..  include:: /Includes.rst.txt`
+line, an anchor, and a title underlined and overlined with `=`.
+
+Entry file names carry **no issue number** here, unlike the TYPO3 core
+convention: `<Type>-<UpperCamelCaseTopic>.rst`.
 
 ## The TYPO3 core changelogs
 
@@ -70,13 +76,14 @@ shipped with the installed core:
 Because it ships with the dependency, what is on disk depends on what is
 installed — and it reaches only as far as the installed version. A package does
 carry the changelogs of all **earlier** versions, so the highest supported
-version always has the complete set on disk; with v13 installed everything from
-`7.0/` to `13.4.x/` is readable and nothing newer is.
+version always has the complete set on disk: with v13 installed everything from
+`7.0/` to `13.4.x/` is readable, and with v12 installed the newest directory is
+`12.4.x/`.
 
 Switching is only ever needed to read changelogs *newer* than the installed
 version, never older ones. Reading is not running a gate: `composerUpdate` back
 to the version you are working on before running anything — see
-[Core version setup](../development/dual-core-setup.md).
+[Dual core setup](../development/dual-core-setup.md).
 
 The rendered version is at
 <https://docs.typo3.org/c/typo3/cms-core/main/en-us/Index.html>.

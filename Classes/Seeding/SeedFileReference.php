@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  * @internal Part of the seeding implementation, not public API.
  */
 #[Exclude]
-final readonly class SeedFileReference
+final class SeedFileReference
 {
     /**
      * @param array<string, scalar|null> $values Fields of the
@@ -29,7 +29,7 @@ final readonly class SeedFileReference
      *        are structural and always win over a declared value.
      */
     public function __construct(
-        public string $identifier,
-        public array $values = [],
+        public readonly string $identifier,
+        public readonly array $values = [],
     ) {}
 }

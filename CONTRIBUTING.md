@@ -27,7 +27,10 @@ requirement on the host is a container runtime — **podman** (preferred) or
 **docker**. Neither PHP nor Composer needs to be installed.
 
 ```bash
-# Install dependencies for TYPO3 v13 on PHP 8.2 (default matrix).
+# Install dependencies for TYPO3 v12 on PHP 8.2 (the defaults).
+Build/Scripts/runTests.sh -t 12 -p 8.2 -s composerUpdate
+
+# The other supported set. Never interleave the two.
 Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
 
 # All available suites and options.
@@ -39,14 +42,17 @@ Build/Scripts/runTests.sh -h
 > is run for. `-t` selects the version but installs nothing — only
 > `composerUpdate` does. Running a suite with a different core version installed
 > than selected reports false positives.
+>
+> `-p 8.1` works only together with `-t 12`: `typo3/cms-core` 13.4 requires PHP
+> `^8.2`, so the combination cannot resolve.
 
 → [Development environment](docs/development/environment.md) ·
-[Core version setup](docs/development/dual-core-setup.md)
+[Dual core setup](docs/development/dual-core-setup.md)
 
 ## Quality gates
 
-The same gates run locally and in the GitHub Actions workflows, for every
-supported TYPO3 version:
+The same gates run locally and in the GitHub Actions workflows, for both
+supported TYPO3 versions:
 
 ```bash
 Build/Scripts/runTests.sh -s cgl          # coding guidelines, "-n" to check only
@@ -95,22 +101,28 @@ frontend sub-requests available everywhere.
 
 ## Code rules
 
-The extension serves every supported TYPO3 version — v13 today — from one code
-base. The rules that make that work:
+The extension serves **TYPO3 v12.4 and v13.4** from one code base. The rules
+that make that work:
 
 - **Version differences split classes, they do not add conditionals.**
   `Classes/` holds everything working on all supported versions; one
-  `Core<major>/` directory per version holds its implementations, and only the
-  directory matching the running core is registered in the dependency injection
-  container.
+  `Core<major>/` directory per version — `Core12/` and `Core13/` — holds its
+  implementations, and only the directory matching the running core is
+  registered in the dependency injection container. Configuration is the
+  documented exception: TCA, TypoScript, page TSconfig and `ext_tables.sql` are
+  loaded from a fixed path, so a difference is resolved in the file, with a
+  `@todo` and the changelog issue that will retire it.
   → [Core version aware code](docs/architecture/core-version-aware-code.md)
 - **Services are stateless and wired with Symfony DI attributes on the class** —
   not with `Services.yaml`, not with service definitions in
   `Configuration/Services.php`. They are private unless something really has to
   fetch them from the container.
   → [Dependency injection](docs/architecture/dependency-injection.md)
-- **Classes are `final readonly`** where a framework constraint does not prevent
-  it. Abstract classes never use constructor injection — they use `#[Required]`
+- **Classes are `final`, with `readonly` on every property**, where a framework
+  constraint does not prevent it. The keyword is deliberately not on the class:
+  this branch supports PHP 8.1 for TYPO3 v12, where `readonly class` does not
+  parse — which also means a class backported from `main` has to be adjusted.
+  Abstract classes never use constructor injection — they use `#[Required]`
   `inject*()` methods, so the constructor stays free for extending classes.
   → [Class design](docs/architecture/class-design.md)
 - **Models, entities, value objects and DTOs are data, not services** and always
@@ -140,8 +152,8 @@ characters. An issue reference is not required, but must be verified when used.
 
 Before opening a pull request, run every gate from
 [Quality gates](#quality-gates), both test suites, and `renderDocumentation`
-when anything below `Documentation/` changed — for **every** supported core
-version, each after its own `composerUpdate`.
+when anything below `Documentation/` changed — for **both** supported core
+versions, each after its own `composerUpdate`, never interleaved.
 
 Add another DBMS (`-d mariadb -i 10.6`, `mysql`, `postgres`) when the change
 touches queries, schema or TCA.

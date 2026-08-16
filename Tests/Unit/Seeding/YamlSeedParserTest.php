@@ -210,6 +210,26 @@ final class YamlSeedParserTest extends UnitTestCase
     }
 
     /**
+     * The upper bound of what the parser accepts, asserted from the other side:
+     * the longest identifier it lets through has to produce a placeholder that
+     * still fits into the `sys_log.NEWid varchar(30)` column TYPO3 v12 writes
+     * every `NEW…` id into. Pinning both numbers in one place is what keeps the
+     * limit and the reason for it from drifting apart.
+     */
+    #[Test]
+    public function theLongestAcceptedIdentifierStillFitsTheSysLogColumn(): void
+    {
+        $identifier = str_repeat('a', 27);
+
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [['identifier' => $identifier]],
+        ]);
+
+        $this->assertSame(30, strlen($definition->records[0]->placeholder()));
+    }
+
+    /**
      * @return \Generator<string, array{definition: mixed, code: int}>
      */
     public static function invalidDefinitions(): \Generator
@@ -288,6 +308,13 @@ final class YamlSeedParserTest extends UnitTestCase
         yield 'identifier starting with a dash' => [
             'definition' => ['identifier' => 'demo', 'pages' => [['identifier' => '-home']]],
             'code' => 1786924833,
+        ];
+        // 28 characters, one over the limit. The placeholder is "NEW" plus the
+        // identifier and TYPO3 v12 stores it in "sys_log.NEWid varchar(30)", so
+        // this is the last length the definition may still use plus one.
+        yield 'identifier longer than the sys_log.NEWid column allows' => [
+            'definition' => ['identifier' => 'demo', 'pages' => [['identifier' => str_repeat('a', 28)]]],
+            'code' => 1786924838,
         ];
         yield 'inline not a map' => [
             'definition' => ['identifier' => 'demo', 'pages' => [['identifier' => 'home', 'inline' => 'nope']]],

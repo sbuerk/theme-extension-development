@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use SBUERK\ThemeExtensionDevelopment\Compatibility\ContentTypeRegistration;
 
 defined('TYPO3') or die();
 
@@ -10,7 +10,7 @@ defined('TYPO3') or die();
 // and role, same relabelling as theme_testimonial; "tx_theme_list_items" is
 // reused here for the person's own profile/contact links, the same child
 // table theme_linklist and theme_sociallinks use.
-ExtensionManagementUtility::addRecordType(
+ContentTypeRegistration::addRecordType(
     [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_author.label',
         'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_author.description',

@@ -9,7 +9,7 @@
                project-issues="https://github.com/sbuerk/theme-extension-development/issues"
                edit-on-github-branch="1"
                edit-on-github="sbuerk/theme-extension-development"
-               typo3-core-preferred="stable"
+               typo3-core-preferred="13.4"
     />
     <project title="Frontend Theme for Extension Development"
              release="1 (development)"

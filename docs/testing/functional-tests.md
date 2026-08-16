@@ -97,7 +97,7 @@ message naming the server that did not answer means the database never came up,
 and the run stopped there.
 
 Remember to run every supported core version, each after its own
-`composerUpdate` — see [Core version setup](../development/dual-core-setup.md).
+`composerUpdate` — see [Dual core setup](../development/dual-core-setup.md).
 
 ## The test that proves the instance boots
 
@@ -169,12 +169,12 @@ Additionally:
 
 ## Core version aware functional tests
 
-Mirroring the source layout, they live in `Tests/Functional/Core<major>/` —
-`Tests/Functional/Core13/` today — and carry the group of every core version
-they must **not** run on:
+Mirroring the source layout, they live in `Tests/Functional/Core12/` and
+`Tests/Functional/Core13/`, and carry the group of every core version they must
+**not** run on:
 
 ```php
-#[Group('not-core-<version>')]
+#[Group('not-core-12')]
 final class ExampleTest extends AbstractFunctionalTestCase
 {
     #[Test]
@@ -185,8 +185,13 @@ final class ExampleTest extends AbstractFunctionalTestCase
 }
 ```
 
-With one supported version there is nothing to exclude, so no test carries a
-group. See [Core version setup](../development/dual-core-setup.md#test-grouping).
+With both versions present, each of the two also asserts that the *other*
+version's implementation is **not** registered — an assertion that is only
+meaningful once there is another implementation to name.
+
+See [Dual core setup](../development/dual-core-setup.md#test-grouping) for when
+the group is the right tool and when a
+[delivery seam](site-based-tests.md#arranging-the-theme-themesitetrait) is.
 
 ## Strictness
 

@@ -21,7 +21,8 @@ use TYPO3\TestingFramework\Core\Testbase;
  *
  * Derived from the boilerplate shipped with typo3/testing-framework in
  * "Resources/Core/Build/FunctionalTestsBootstrap.php", baselined from version
- * 9.6.1. Re-check it against that file when the testing-framework is updated.
+ * 8.3.3 - the 8.x line is the one covering TYPO3 v12 and v13 alike. Re-check
+ * it against that file when the testing-framework is updated.
  *
  * Deliberate deviations from the boilerplate:
  *

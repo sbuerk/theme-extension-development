@@ -14,29 +14,29 @@ Documentation for people **using** the extension lives in
 
 ## [Development](development/Index.md)
 
-| Page                                                        | Contents                                                                                 |
-|-------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| [Development environment](development/environment.md)       | `runTests.sh`, container runtimes, suites and options.                                   |
-| [Core version setup](development/dual-core-setup.md)        | Running against every supported TYPO3 version, and the rule that avoids false positives. |
-| [Quality gates](development/quality-gates.md)               | Every gate and its configuration, PHPStan per core version, CI.                          |
-| [Frontend assets](development/frontend-assets.md)           | The SCSS build, the node image, the `checkCssBuild` gate, design tokens.                 |
-| [Component library](development/component-library.md)       | Every component's markup contract, the two switches, what the tests guard.               |
-| [Styleguide page](development/styleguide.md)                | The page that renders the library from Fluid, why it ignores content, its tests.         |
-| [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher.      |
-| [Development instances](development/instances.md)           | The TYPO3 instance per core version, the `theme` symlink, snapshot and restore.          |
-| [Seeding](development/seeding.md)                           | `theme:seed`, the definition format, inline relations, the demo tree.                    |
+| Page                                                        | Contents                                                                                           |
+|-------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| [Development environment](development/environment.md)       | `runTests.sh`, container runtimes, suites and options.                                             |
+| [Dual core setup](development/dual-core-setup.md)           | TYPO3 v12 and v13 from one code base, the PHP asymmetry, and the rule that avoids false positives. |
+| [Quality gates](development/quality-gates.md)               | Every gate and its configuration, PHPStan per core version, CI.                                    |
+| [Frontend assets](development/frontend-assets.md)           | The SCSS build, the node image, the `checkCssBuild` gate, design tokens.                           |
+| [Component library](development/component-library.md)       | Every component's markup contract, the two switches, what the tests guard.                         |
+| [Styleguide page](development/styleguide.md)                | The page that renders the library from Fluid, why it ignores content, its tests.                   |
+| [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher.                |
+| [Development instances](development/instances.md)           | The TYPO3 instance per core version, the `theme` symlink, snapshot and restore.                    |
+| [Seeding](development/seeding.md)                           | `theme:seed`, the definition format, inline relations, the demo tree.                              |
 
 ## [Architecture](architecture/Index.md)
 
-| Page                                                               | Contents                                                                                            |
-|--------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| [Core version aware code](architecture/core-version-aware-code.md) | `Classes/` vs `Core<major>/`, and how the right variant is selected.                                |
-| [Dependency injection](architecture/dependency-injection.md)       | Symfony DI attributes, stateless services, the rules that apply.                                    |
-| [Class design](architecture/class-design.md)                       | `final readonly`, method injection in abstract classes, data objects, the accepted PHPStan ignores. |
-| [TypoScript delivery](architecture/typoscript-delivery.md)         | Site set, the guarded static include fallback, page rendering.                                      |
-| [Page rendering](architecture/page-rendering.md)                   | Backend layout registration, template name resolution, content slots, the Fluid structure.          |
-| [Navigation](architecture/navigation.md)                           | Main menu, sub navigation, breadcrumb, the fixed rootline position, placement, accessibility.       |
-| [Content elements](architecture/content-elements.md)               | Classic `CType` coverage, the `table` and `shortcut` decisions, escaping, a Fluid `&&` gotcha.      |
+| Page                                                               | Contents                                                                                                              |
+|--------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| [Core version aware code](architecture/core-version-aware-code.md) | `Classes/` vs `Core12/` vs `Core13/`, how the right variant is selected, the configuration exception.                 |
+| [Dependency injection](architecture/dependency-injection.md)       | Symfony DI attributes, stateless services, the rules that apply.                                                      |
+| [Class design](architecture/class-design.md)                       | `final` with `readonly` properties, method injection in abstract classes, data objects, the accepted PHPStan ignores. |
+| [TypoScript delivery](architecture/typoscript-delivery.md)         | Site set on v13, the classic static include on both, the guard condition, page rendering.                             |
+| [Page rendering](architecture/page-rendering.md)                   | Backend layout registration, template name resolution, content slots, the Fluid structure.                            |
+| [Navigation](architecture/navigation.md)                           | Main menu, sub navigation, breadcrumb, the fixed rootline position, placement, accessibility.                         |
+| [Content elements](architecture/content-elements.md)               | Classic `CType` coverage, the `table` and `shortcut` decisions, escaping, a Fluid `&&` gotcha.                        |
 
 ## [Testing](testing/Index.md)
 

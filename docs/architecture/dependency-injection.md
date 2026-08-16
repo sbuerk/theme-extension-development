@@ -37,10 +37,15 @@ is selecting the core version aware directory to register — see
 
   ```php
   #[Autoconfigure(public: true)]
-  final readonly class Dummy
+  final class Dummy
   {
   }
   ```
+
+  The class keyword is `final`, not `final readonly` — this branch supports PHP
+  8.1, where a `readonly` class does not parse, so the keyword sits on the
+  properties instead.
+  → [Class design](class-design.md#prefer-final-with-readonly-properties)
 
 - **Register a default implementation of an interface with `#[AsAlias]`**, so
   consumers depend on the interface. This is what makes the core version aware

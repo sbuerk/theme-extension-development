@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
  *       is added.
  */
 #[Autoconfigure(public: true)]
-final readonly class Dummy
+final class Dummy
 {
     public function getExtensionKey(): string
     {

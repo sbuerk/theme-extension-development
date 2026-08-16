@@ -27,6 +27,12 @@ extensions)` field of a :guilabel:`sys_template` record. The two mechanisms are
 safe side by side: the static include detects an active set and skips its own
 import, so a site configured with both is not served the theme twice.
 
+..  note::
+
+    Site sets are a TYPO3 v13.1 feature. On TYPO3 v12 the classic static
+    template is not an alternative but the only delivery path - see
+    :ref:`feature-typo3-v12-support`.
+
 What is rendered
 ================
 

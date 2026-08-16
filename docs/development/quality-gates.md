@@ -1,9 +1,9 @@
 # Quality gates
 
-The same gates run locally and in the GitHub Actions workflows, for every
-supported TYPO3 version — v13 today. Every one of them must pass for every
-supported core version, each after its own `composerUpdate` — see
-[Core version setup](dual-core-setup.md).
+The same gates run locally and in the GitHub Actions workflows, for both
+supported TYPO3 versions — v12.4 and v13.4. Every one of them must pass for
+both, each after its own `composerUpdate` — see
+[Dual core setup](dual-core-setup.md).
 
 ## The gates
 
@@ -53,12 +53,36 @@ Build/Scripts/runTests.sh -s checkCssBuild
 
 ## PHPStan
 
-PHPStan runs at **level 8** and is configured **per core version**. Each
-configuration analyses only its own core version aware sources —
-`Build/phpstan/Core13/phpstan.neon` lists `Classes`, `Configuration`, `Core13`
-and `Tests`. Analysing the sources of another core version would report false
-positives about API that does not exist there, so a second supported version
-gets its own configuration beside this one rather than a widened path list.
+PHPStan runs at **level 8** and is configured **per core version**, in
+`Build/phpstan/Core12/` and `Build/phpstan/Core13/`. Each configuration analyses
+only its own core version aware sources — `Core12/phpstan.neon` lists `Classes`,
+`Configuration`, `Core12` and `Tests` and excludes `Tests/*/Core13/*`, and the
+v13 configuration is the mirror image. Analysing the sources of another core
+version would report false positives about API that does not exist there, so a
+supported version gets its own configuration beside the other rather than a
+widened path list.
+
+The two configurations do not run the same PHPStan. The v12 dependency set
+resolves **PHPStan 1.x**, because `saschaegerer/phpstan-typo3` has no v12
+capable release beyond its 1.x line and that line requires PHPStan 1.x; the v13
+set keeps 2.x. Both are pinned by the same `composer.json` constraint and picked
+by `composerUpdate`, so nothing has to be selected by hand —
+[Dual core setup](dual-core-setup.md#the-dependency-sets-differ-by-more-than-the-core)
+has the full set.
+
+`Build/phpstan/Core12/stubs/QueryResultInterface.stub` exists for the same
+reason. The stub `saschaegerer/phpstan-typo3` 1.10.2 ships for
+`QueryResultInterface` declares a **single** template type; the interface itself
+declares two, `TKey` and `TValue of object`, on v12 and v13 alike, and the 2.x
+line of the analyser extension spells it that way as well. The extension's stub
+is simply behind its own subject, and only the v12 set resolves it — so code
+annotating the two type arguments the interface really takes is reported as
+wrong on the v12 leg alone.
+
+Correcting the stub beats every alternative: annotating one type argument would
+be false on both core versions, dropping the annotation trips the missing
+generics rule at level 8, and a baseline entry would record a defect in this
+repository that does not exist. **Both baselines are empty.**
 
 Both PHPStan suites pass arguments after `--` through to the tool and do not
 force an output format, so `-- --error-format=json` or `-- --no-progress` is the
@@ -68,6 +92,7 @@ When PHPStan reports pre-existing findings that cannot be fixed right away, the
 baseline can be regenerated per core version — but **prefer fixing the finding**:
 
 ```bash
+Build/Scripts/runTests.sh -t 12 -s phpstanGenerateBaseline
 Build/Scripts/runTests.sh -t 13 -s phpstanGenerateBaseline
 ```
 
@@ -140,26 +165,39 @@ lint    ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB
 docs ────┘
 ```
 
-| Job                 | Matrix                                  | Runs                                        |
-|---------------------|-----------------------------------------|---------------------------------------------|
-| `quality`           | lowest PHP, one core version            | The gates that inspect source files         |
-| `phpstan`           | lowest PHP × every core version         | The one gate configured per core version    |
-| `lint`              | all PHP versions × every core version   | `lintPhp`                                   |
-| `unit`              | edge PHP versions × every core version  | `unit`, `unitRandom`                        |
-| `functional-sqlite` | edge PHP versions × every core version  | `functional -d sqlite`                      |
-| `functional-dbms`   | edge PHP × every core × 4 DBMS — 8 jobs | `functional` against each database          |
-| `documentation`     | —                                       | `renderDocumentation`, uploads the artifact |
+| Job                 | Matrix                                             | Runs                                        |
+|---------------------|----------------------------------------------------|---------------------------------------------|
+| `quality`           | PHP 8.2 × v12 — one job                            | The gates that inspect source files         |
+| `phpstan`           | PHP 8.2 × v12, v13 — 2 jobs                        | The one gate configured per core version    |
+| `lint`              | PHP 8.1–8.4 × v12, v13 minus `{v13, 8.1}` — 7 jobs | `lintPhp`                                   |
+| `unit`              | the four edge pairs below — 4 jobs                 | `unit`, `unitRandom`                        |
+| `functional-sqlite` | the four edge pairs below — 4 jobs                 | `functional -d sqlite`                      |
+| `functional-dbms`   | the four edge pairs × 4 DBMS — 16 jobs             | `functional` against each database          |
+| `documentation`     | —                                                  | `renderDocumentation`, uploads the artifact |
 
-Two decisions are worth knowing:
+The "edge pairs" are `{v12, 8.1}`, `{v12, 8.4}`, `{v13, 8.2}`, `{v13, 8.4}` —
+the lowest and highest PHP version each core version accepts.
 
-- **The DBMS matrix is gated on SQLite.** It is the expensive part, eight jobs
+Three decisions are worth knowing:
+
+- **The matrices are not a cross-product, because the lower PHP edge is core
+  version dependent.** `typo3/cms-core` 13.4 requires PHP `^8.2`, so `{v13, 8.1}`
+  cannot resolve. `lint` states that as an `exclude:`, because it genuinely wants
+  every PHP version; `unit`, `functional-sqlite` and `functional-dbms` list the
+  four pairs under `include:` instead, because enumerating four pairs is clearer
+  than a cross-product with a hole in it.
+  `{v12, 8.1}` is the only job that can run at all on PHP 8.1, which is also the
+  only PHP version PHPUnit 11 could not run on — the reason this branch pins
+  PHPUnit to 10.5 everywhere rather than resolving two majors.
+- **The DBMS matrix is gated on SQLite.** It is the expensive part, sixteen jobs
   each starting a database container. Running it only after the same tests pass
-  on SQLite for every supported core version means a defect that is not DBMS
-  specific is reported by two jobs instead of ten.
+  on SQLite for both core versions means a defect that is not DBMS specific is
+  reported by a handful of jobs instead of all of them.
 - **The version independent gates run once, not per core version and PHP
   version.** They inspect source files rather than the installed core, so
-  repeating them tests the same files again. Only `phpstan` is genuinely per
-  core version.
+  repeating them tests the same files again. `quality` therefore runs against
+  the **lowest** supported set, v12 — which is also why `-t` defaults to `12`.
+  Only `phpstan` is genuinely per core version.
 
 ### Why CI passes `-b docker`
 
@@ -206,8 +244,10 @@ What is deliberately *not* symmetric is who keeps it: `composerUpdate` deletes
 `.cache/` **locally** and keeps it in CI, guarded by the same `IS_CORE_CI` the
 rest of the script uses. The two contexts differ in what the cache can collide
 with. A CI job starts from an empty checkout, installs once and ends; a working
-copy accumulates installs for months, and switching core versions also switches
-the major version of `typo3/class-alias-loader`.
+copy accumulates installs for months, and switching core versions here exchanges
+the **major** version of four packages at once — `phpstan`,
+`saschaegerer/phpstan-typo3`, `nikic/php-parser` and, via the PHP version,
+`phpunit/phpunit`.
 
 The local clear is a **precaution rather than a fix for a reproduced defect**.
 Switching back and forth four times does not fail today; what it buys is that an
@@ -245,6 +285,6 @@ Two consequences:
 ## See also
 
 - [Development environment](environment.md)
-- [Core version setup](dual-core-setup.md)
+- [Dual core setup](dual-core-setup.md)
 - [Testing](../testing/Index.md)
 - [Pull requests](../workflow/pull-requests.md)

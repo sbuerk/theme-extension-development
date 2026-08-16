@@ -23,9 +23,9 @@
    Build/Scripts/runTests.sh -s renderDocumentation
    ```
 
-   Repeat all of it for **every** supported TYPO3 version, each after its own
-   `composerUpdate` — see
-   [Core version setup](../development/dual-core-setup.md#verifying-a-change).
+   Repeat all of it for **both** supported TYPO3 versions (`-t 12` and
+   `-t 13`), each after its own `composerUpdate` and never interleaved — see
+   [Dual core setup](../development/dual-core-setup.md#verifying-a-change).
 
    Run the functional suite against at least one other DBMS
    (`-d mariadb -i 10.6`, `mysql`, `postgres`) when the change touches queries,
@@ -34,9 +34,9 @@
    [`docs/`](../Index.md) page covering what changed, and a changelog entry
    below `Documentation/Changelog/` for user facing changes. See
    [Changelog and documentation](changelog-and-documentation.md).
-5. Open the pull request against `main`, describing what changes and why. The
-   [CI workflow](../../.github/workflows/ci.yml) runs the full matrix for every
-   supported TYPO3 version, and comments the rendered documentation on the pull
+5. Open the pull request against `1`, describing what changes and why. The
+   [CI workflow](../../.github/workflows/ci.yml) runs the full matrix for both
+   supported TYPO3 versions, and comments the rendered documentation on the pull
    request —
    for a fork as well, see
    [continuous integration](../development/quality-gates.md#continuous-integration).

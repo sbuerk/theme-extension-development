@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  * @internal Part of the seeding implementation, not public API.
  */
 #[Exclude]
-final readonly class SeedDefinition
+final class SeedDefinition
 {
     /**
      * @param list<SeedRecord> $records
@@ -23,8 +23,8 @@ final readonly class SeedDefinition
      *        records are written, so records can reference them.
      */
     public function __construct(
-        public string $identifier,
-        public array $records,
-        public array $files = [],
+        public readonly string $identifier,
+        public readonly array $records,
+        public readonly array $files = [],
     ) {}
 }

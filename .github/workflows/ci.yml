@@ -17,22 +17,35 @@ name: "CI"
 #   docs ────┤  (independent, for fast feedback on documentation changes)
 #   css  ────┘  (independent, neither PHP nor core version dependent)
 #
-# The DBMS matrix is the expensive part — 8 jobs, each starting a database
+# The DBMS matrix is the expensive part — 16 jobs, each starting a database
 # container — so it only runs once the same tests have passed on SQLite for every
-# supported core version and both edge PHP versions. A failure that is not DBMS
-# specific is then reported by 2 jobs instead of 10.
+# supported (core version, PHP version) pair. A failure that is not DBMS
+# specific is then reported by 4 jobs instead of 20.
 #
 # Supported versions are declared in the matrices below. There are three PHP
 # sets, and they have to be changed together:
 #
 #   all edges  PHP versions      Used by
 #   ---------  ----------------  -------------------------------------------
-#   all        8.2 8.3 8.4 8.5   lint
-#   edges      8.2 8.5           unit, functional
+#   all        8.1 8.2 8.3 8.4   lint
+#   edges      8.1|8.2 and 8.4   unit, functional (lower edge per core version)
 #   lowest     8.2               quality, phpstan
 #
 # Only the lowest PHP version is used for the gates that do not depend on it,
 # because running them once per PHP version tests the same files again.
+#
+# PHP 8.1 belongs to TYPO3 v12 only: "typo3/cms-core" 13.4 requires PHP "^8.2",
+# so a (v13, PHP 8.1) dependency set cannot be installed at all. The lower edge
+# of the supported PHP range is therefore a property of the core version — 8.1
+# for v12, 8.2 for v13 — and the upper edge is 8.4 for both.
+#
+# That is what a cross-product cannot express: crossing a PHP list with a core
+# version list gives every core version the same lower edge, and this branch has
+# two. "lint" still crosses the two lists and removes the single impossible pair
+# with "exclude:", because it genuinely wants every PHP version. The test jobs
+# want the edges only, so they enumerate their four combinations instead —
+# "include:" for "unit" and "functional-sqlite", and a paired matrix dimension
+# for "functional-dbms", which has a second dimension to cross (see there).
 #
 # Every step goes through "Build/Scripts/runTests.sh", so a gate behaves
 # identically here and on a developer machine — see
@@ -80,9 +93,13 @@ jobs:
       fail-fast: false
       matrix:
         # These gates inspect source files, not the installed core, so one
-        # dependency set is enough. The lowest supported one is used.
+        # dependency set is enough. The lowest supported one is used, which on
+        # this branch is TYPO3 v12. PHP stays 8.2 rather than dropping to 8.1
+        # with it: the gates do not depend on the PHP version, and 8.2 is the
+        # one version both core versions accept, so this job needs no thought
+        # when the core version below changes. One job.
         php-version: [ "8.2" ]
-        typo3: [ "13" ]
+        typo3: [ "12" ]
     steps:
 
       - name: "Checkout"
@@ -127,9 +144,14 @@ jobs:
         # The only gate configured per core version: each configuration analyses
         # the "Core<major>/" sources of its own version against the core
         # installed for it. Every supported version needs an entry here - the
-        # sources of a version left out are not analysed at all.
+        # sources of a version left out are not analysed at all. Two jobs.
+        #
+        # PHP 8.2 for both, so the two legs differ in the core version only.
+        # It is also the lowest version v13 accepts, and analysing v12 on 8.2
+        # rather than on 8.1 loses nothing: PHPStan reads the sources, it does
+        # not execute them.
         php-version: [ "8.2" ]
-        typo3: [ "13" ]
+        typo3: [ "12", "13" ]
     steps:
 
       - name: "Checkout"
@@ -156,8 +178,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ "8.2", "8.3", "8.4", "8.5" ]
-        typo3: [ "13" ]
+        # Every supported PHP version against every supported core version,
+        # minus the one pair that cannot be installed. 4 x 2 - 1 = 7 jobs.
+        php-version: [ "8.1", "8.2", "8.3", "8.4" ]
+        typo3: [ "12", "13" ]
+        exclude:
+          # "typo3/cms-core" 13.4 requires PHP "^8.2", so this dependency set
+          # does not resolve. PHP 8.1 is a v12-only version on this branch.
+          - { typo3: "13", php-version: "8.1" }
     steps:
 
       - name: "Checkout"
@@ -185,8 +213,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ "8.2", "8.5" ]
-        typo3: [ "13" ]
+        # The four edge combinations, enumerated instead of crossed, because the
+        # lower edge is 8.1 on v12 and 8.2 on v13 - see the header. With no other
+        # matrix dimension present, "include:" *is* the job list: every entry
+        # becomes exactly one job, so this is 4 jobs.
+        include:
+          # PHP 8.1 runs here and nowhere else, and it is the only PHP version
+          # PHPUnit 11 does not support - which is why "composer.json" pins
+          # PHPUnit to the 10.5 line for the whole branch rather than letting
+          # composer resolve 11.5 for every other job. One PHPUnit major means
+          # one set of runner semantics; two would differ in how the harness has
+          # to spell "--exclude-group".
+          - { typo3: "12", php-version: "8.1" }
+          - { typo3: "12", php-version: "8.4" }
+          - { typo3: "13", php-version: "8.2" }
+          - { typo3: "13", php-version: "8.4" }
     steps:
 
       - name: "Checkout"
@@ -217,8 +258,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ "8.2", "8.5" ]
-        typo3: [ "13" ]
+        # The same four combinations as "unit", and for the same reason. 4 jobs.
+        include:
+          - { typo3: "12", php-version: "8.1" }
+          - { typo3: "12", php-version: "8.4" }
+          - { typo3: "13", php-version: "8.2" }
+          - { typo3: "13", php-version: "8.4" }
     steps:
 
       - name: "Checkout"
@@ -240,16 +285,42 @@ jobs:
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -s functional"
 
   functional-dbms:
-    name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
+    name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.target.typo3 }}, PHP ${{ matrix.target.php-version }})"
     runs-on: ubuntu-22.04
-    # Only after the same tests passed on SQLite for every core and edge PHP
-    # version. A defect that is not DBMS specific never reaches these 8 jobs.
+    # Only after the same tests passed on SQLite for every (core version, PHP
+    # version) pair. A defect that is not DBMS specific never reaches these
+    # 16 jobs.
     needs: [ "functional-sqlite" ]
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ "8.2", "8.5" ]
-        typo3: [ "13" ]
+        # Two dimensions, crossed - which is exactly what this job wants: every
+        # edge combination against every DBMS. The (core version, PHP version)
+        # pairs are ONE dimension, a nested object, because they are not a
+        # cross-product among themselves (see the header).
+        #
+        # They cannot be written as "include:" the way "unit" and
+        # "functional-sqlite" write them, because that shape only produces the
+        # job list while no other dimension is declared. An "include:" entry
+        # whose keys are none of the declared dimensions is merged into *every*
+        # combination of them, and a later entry overwrites what an earlier one
+        # merged in ("Using a matrix for your jobs" -> "Expanding or adding
+        # matrix configurations"). Declaring "dbms:" and listing the four pairs
+        # under "include:" would therefore not yield 16 jobs but 4 - one per
+        # DBMS, each carrying the pair of the *last* include entry - silently
+        # dropping three quarters of the coverage and leaving v12 untested.
+        #
+        # 4 pairs x 4 DBMS = 16 jobs:
+        #
+        #   (v12, PHP 8.1)  x  mysql 8.0, mariadb 10.4, mariadb 10.6, postgres 10
+        #   (v12, PHP 8.4)  x  the same four
+        #   (v13, PHP 8.2)  x  the same four
+        #   (v13, PHP 8.4)  x  the same four
+        target:
+          - { typo3: "12", php-version: "8.1" }
+          - { typo3: "12", php-version: "8.4" }
+          - { typo3: "13", php-version: "8.2" }
+          - { typo3: "13", php-version: "8.4" }
         dbms:
           - { name: "mysql", version: "8.0" }
           - { name: "mariadb", version: "10.4" }
@@ -264,16 +335,16 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ".cache/composer"
-          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}"
+          key: "composer-${{ matrix.target.php-version }}-v${{ matrix.target.typo3 }}-${{ hashFiles('composer.json') }}"
           restore-keys: |
-            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
-            composer-${{ matrix.php-version }}-
+            composer-${{ matrix.target.php-version }}-v${{ matrix.target.typo3 }}-
+            composer-${{ matrix.target.php-version }}-
 
-      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.target.typo3 }}"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.target.typo3 }} -p ${{ matrix.target.php-version }} -s composerUpdate"
 
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.target.typo3 }} -p ${{ matrix.target.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
 
   # Independent of PHP and of the core version: the stylesheet is compiled from
   # SCSS and depends on neither, so this is a single job rather than a matrix

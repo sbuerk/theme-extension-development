@@ -26,3 +26,12 @@
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/ContentSidebar.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Start.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Styleguide.tsconfig'
+
+# Registers the theme's content elements in the "new content element" wizard on
+# TYPO3 v12, where the wizard is still page TSconfig and not derived from the
+# TCA. The imported file carries the version condition and the reasoning; it is
+# imported unconditionally here so the condition lives in exactly one place.
+#
+# @todo Remove this import together with the imported file as soon as support
+#       for TYPO3 v12 is dropped.
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/NewContentElementWizard.tsconfig'

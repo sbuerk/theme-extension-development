@@ -26,6 +26,8 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 final class ExtbasePluginRenderingTest extends AbstractFunctionalTestCase
 {
     use SiteBasedTestTrait;
+    use ThemeSiteTrait;
+
     protected array $testExtensionsToLoad = [
         'sbuerk/theme-extension-development',
         'tests/plugin-fixture',
@@ -40,25 +42,7 @@ final class ExtbasePluginRenderingTest extends AbstractFunctionalTestCase
         parent::setUp();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/PageWithExtbasePlugin.csv');
-        $this->writeSiteConfiguration(
-            'theme',
-            $this->buildSiteConfiguration(
-                rootPageId: 1,
-                base: 'https://theme.example.com/',
-                websiteTitle: 'Theme',
-            ) + [
-                'dependencies' => [
-                    'sbuerk/theme-extension-development',
-                ],
-            ],
-            [
-                $this->buildDefaultLanguageConfiguration(
-                    identifier: 'EN',
-                    base: 'https://theme.example.com/',
-                ),
-            ],
-        );
-        $this->setUpFrontendRootPage(1, [], [], false);
+        $this->setUpThemeSite();
     }
 
     private function render(): string

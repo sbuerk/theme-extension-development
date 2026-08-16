@@ -11,10 +11,10 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
  * Controller of the "Plugin" plugin of this fixture extension.
  *
  * Extbase instantiates a controller through the DI container and hands it a
- * request-scoped view, so it cannot be "final readonly" the way the rest of
- * this codebase's classes are - "ActionController" itself carries mutable,
- * framework-set properties (view, request, response) that a readonly class
- * could not accept. It stays plain "final".
+ * request-scoped view, so it cannot carry the immutable state the rest of this
+ * codebase's classes do - "ActionController" itself carries mutable,
+ * framework-set properties (view, request, response). It has no state of its
+ * own, so there is nothing to declare "readonly" here either.
  *
  * "indexAction()" renders a fixed, easily grepped string
  * ("Resources/Private/Templates/Plugin/Index.html") rather than anything

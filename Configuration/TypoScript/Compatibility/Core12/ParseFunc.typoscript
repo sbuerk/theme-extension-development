@@ -1,0 +1,106 @@
+# lib.parseFunc / lib.parseFunc_RTE for TYPO3 v12.
+#
+# Copied verbatim from TYPO3 v13.4's `EXT:frontend/ext_localconf.php`, lines 15
+# to 102 of the `addTypoScriptSetup()` argument - the block introduced by
+# #103485 ("Provide lib.parseFunc via ext:frontend", TYPO3 v13.2). Everything
+# below this header is that block byte for byte; nothing is added, removed or
+# reformatted, so v12 gets the same two objects v13 ships rather than an
+# approximation of them.
+#
+# This file is loaded by `ext_localconf.php` in the extension root, and only
+# there - it is deliberately NOT named `setup.typoscript` and deliberately not
+# placed in a directory a site set or a `sys_template` static include reads.
+# `ext_localconf.php` states why it exists and why only v12 gets it.
+#
+# @todo Delete this file together with the block in `ext_localconf.php` that
+#       loads it as soon as support for TYPO3 v12 is dropped. From TYPO3 v13.2
+#       on, `EXT:frontend` registers exactly this itself.
+
+# Creates persistent ParseFunc setup for non-HTML content.
+lib.parseFunc {
+    tags {
+        a = TEXT
+        a {
+            current = 1
+            typolink {
+                parameter.data = parameters:href
+                title.data = parameters:title
+                target.data = parameters:target
+                ATagParams.data = parameters:allParams
+            }
+        }
+    }
+    nonTypoTagStdWrap {
+        HTMLparser = 1
+        HTMLparser {
+            keepNonMatchedTags = 1
+            htmlSpecialChars = 2
+        }
+    }
+}
+
+# Creates persistent ParseFunc setup for RTE content (which is mainly HTML) based on the "default" transformation.
+lib.parseFunc_RTE < lib.parseFunc
+lib.parseFunc_RTE {
+    # Processing <ol>, <ul> and <table> blocks separately
+    externalBlocks = article, aside, blockquote, div, dd, dl, footer, header, nav, ol, section, table, ul, pre, figure, figcaption
+    externalBlocks {
+        ol {
+            stripNL = 1
+            stdWrap.parseFunc = < lib.parseFunc
+        }
+        ul {
+            stripNL = 1
+            stdWrap.parseFunc = < lib.parseFunc
+        }
+        pre {
+            stdWrap.parseFunc < lib.parseFunc
+        }
+        table {
+            stripNL = 1
+            stdWrap {
+                HTMLparser = 1
+                HTMLparser {
+                    keepNonMatchedTags = 1
+                }
+            }
+            HTMLtableCells = 1
+            HTMLtableCells {
+                # Recursive call to self but without wrapping non-wrapped cell content
+                default.stdWrap {
+                    parseFunc = < lib.parseFunc_RTE
+                    parseFunc.nonTypoTagStdWrap.encapsLines {
+                        nonWrappedTag =
+                        innerStdWrap_all.ifBlank =
+                    }
+                }
+            }
+        }
+        # ideally, "div" is not calling itself recursive, but instead uses a similar approach as ol/ul/pre
+        # so it is a container with content, which does not need to be wrapping <p> tags in it.
+        div {
+            stripNL = 1
+            callRecursive = 1
+        }
+        article < .div
+        aside < .div
+        figure < .div
+        figcaption {
+            stripNL = 1
+        }
+        blockquote < .div
+        footer < .div
+        header < .div
+        nav < .div
+        section < .div
+        dl < .div
+        dd < .div
+    }
+    nonTypoTagStdWrap {
+        encapsLines {
+            encapsTagList = p,pre,h1,h2,h3,h4,h5,h6,hr,dt
+            nonWrappedTag = P
+            innerStdWrap_all.ifBlank = &nbsp;
+        }
+    }
+}
