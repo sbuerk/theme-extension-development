@@ -1,0 +1,139 @@
+// Button.
+//
+// Markup contract:
+//
+//     <a class="theme-button" href="…">Label</a>
+//     <button class="theme-button theme-button--secondary" type="button">…</button>
+//     <button class="theme-button theme-button--danger theme-button--small">…</button>
+//
+// Modifiers: --secondary, --ghost, --danger, --small, --large.
+//
+// --- The token layer ------------------------------------------------------
+//
+// Every component declares its own tokens once, each falling back to a global
+// token and then to a literal. Three things follow, and all three are wanted:
+//
+//  1. The fallback literal appears once per component rather than once per
+//     declaration, so "abstracts/_tokens.scss" stays authoritative.
+//  2. A site package can re-theme globally (--theme-color-primary) or just
+//     here (--theme-button-background) without touching the other.
+//  3. The component is portable into a shadow root: custom properties inherit
+//     through a shadow boundary, so only the token file has to live in the
+//     outer document, and the fallback covers the case where it does not.
+//
+// A modifier then re-points the component token rather than restating the
+// property, which is why every variant below is a handful of lines.
+
+.theme-button {
+    --theme-button-background: var(--theme-color-primary, #0b57d0);
+    --theme-button-foreground: var(--theme-color-on-primary, #ffffff);
+    --theme-button-border-color: var(--theme-button-background);
+    --theme-button-background-hover: var(--theme-color-primary-hover, #0a4bb4);
+    --theme-button-foreground-hover: var(--theme-button-foreground);
+    --theme-button-padding-block: var(--theme-space-2, 0.625rem);
+    --theme-button-padding-inline: var(--theme-space-4, 1.25rem);
+    --theme-button-radius: var(--theme-radius-sm, 5px);
+    --theme-button-font-size: var(--theme-font-size-sm, 0.875rem);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--theme-space-2);
+
+    // A floor for the pointer target, not a fixed height: the button still
+    // grows with its content and with the reader's font size.
+    min-height: var(--theme-tap-target-min);
+    padding: var(--theme-button-padding-block) var(--theme-button-padding-inline);
+
+    border: var(--theme-border-width) solid var(--theme-button-border-color);
+    border-radius: var(--theme-button-radius);
+    background-color: var(--theme-button-background);
+    color: var(--theme-button-foreground);
+
+    font-size: var(--theme-button-font-size);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-tight);
+    text-align: center;
+    text-decoration: none;
+
+    cursor: pointer;
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard),
+        border-color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        background-color: var(--theme-button-background-hover);
+        border-color: var(--theme-button-background-hover);
+        color: var(--theme-button-foreground-hover);
+    }
+
+    // Both spellings, because a link carries [aria-disabled] while a control
+    // carries the attribute, and the two cannot be merged in the markup.
+    &:disabled,
+    &[aria-disabled='true'] {
+        opacity: var(--theme-opacity-disabled);
+        cursor: not-allowed;
+    }
+}
+
+// Outlined: the accent moves from the fill to the text and the border.
+.theme-button--secondary {
+    --theme-button-background: transparent;
+    --theme-button-foreground: var(--theme-color-primary, #0b57d0);
+    --theme-button-border-color: var(--theme-color-primary, #0b57d0);
+    --theme-button-background-hover: transparent;
+    --theme-button-foreground-hover: var(--theme-color-primary-hover, #0a4bb4);
+
+    &:hover {
+        border-color: var(--theme-button-foreground-hover);
+    }
+}
+
+// No border at all - for a tertiary action sitting next to a real one.
+.theme-button--ghost {
+    --theme-button-background: transparent;
+    --theme-button-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-button-border-color: transparent;
+    --theme-button-background-hover: var(--theme-color-surface, #f4f6fa);
+    --theme-button-foreground-hover: var(--theme-color-primary, #0b57d0);
+
+    &:hover {
+        border-color: transparent;
+    }
+}
+
+// Destructive. Deliberately the same shape as the default: the colour is the
+// warning, and a different shape would only make it harder to recognise as a
+// button.
+.theme-button--danger {
+    --theme-button-background: var(--theme-color-danger, #b3261e);
+    --theme-button-foreground: var(--theme-color-on-danger, #ffffff);
+    --theme-button-background-hover: var(--theme-color-danger, #b3261e);
+}
+
+.theme-button--small {
+    --theme-button-padding-block: var(--theme-space-1, 0.3125rem);
+    --theme-button-padding-inline: var(--theme-space-3, 0.9375rem);
+    --theme-button-font-size: var(--theme-font-size-xs, 0.75rem);
+
+    // Still a 44px target, but the visible box is smaller than the hit area
+    // rather than the other way round.
+    min-height: var(--theme-tap-target-min);
+}
+
+.theme-button--large {
+    --theme-button-padding-block: var(--theme-space-3, 0.9375rem);
+    --theme-button-padding-inline: var(--theme-space-5, 1.5625rem);
+    --theme-button-font-size: var(--theme-font-size-md, 1rem);
+}
+
+// A row of buttons. Wraps rather than overflowing, because the labels are
+// translated and a German label is routinely half again as long.
+.theme-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--theme-space-3);
+    align-items: center;
+}

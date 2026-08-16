@@ -3,7 +3,7 @@
 The design token specification of `sbuerk/theme-extension-development`.
 
 Every token is a **CSS custom property**, declared in
-[`Resources/Private/Scss/_tokens.scss`](Resources/Private/Scss/_tokens.scss) and
+[`Resources/Private/Scss/abstracts/_tokens.scss`](Resources/Private/Scss/abstracts/_tokens.scss) and
 compiled into `Resources/Public/Css/theme.css`. Custom properties survive
 compilation, so a site can re-theme the extension by overriding a handful of
 properties in its own CSS — **without rebuilding the SCSS**.

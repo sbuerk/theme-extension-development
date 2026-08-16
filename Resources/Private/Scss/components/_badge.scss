@@ -1,0 +1,82 @@
+// Badge.
+//
+// Markup contract:
+//
+//     <span class="theme-badge theme-badge--success">…</span>
+//     <span class="theme-badge theme-badge--solid theme-badge--danger">…</span>
+//
+// Two independent axes, both re-pointing tokens rather than restating
+// properties - see "components/_button.scss" for why that is the pattern:
+//
+//  - Severity: --info (the default), --success, --warning, --danger. Each
+//    sets the raw pair the badge is built from, "--theme-badge-accent" and
+//    "--theme-badge-tint", plus the on-accent colour "--solid" needs.
+//  - Fill: soft by default (tint background, accent text), or "--solid" when
+//    combined with a severity class.
+//
+// The two axes do not collide: a severity modifier only ever writes the raw
+// "-accent"/"-tint"/"-on-accent" tokens, "--solid" only ever writes the
+// rendered "-background"/"-foreground" tokens, so which severity class comes
+// first in the markup or which order the rules appear in this file does not
+// matter - unlike a single token being written by two competing rules, where
+// source order would decide.
+
+.theme-badge {
+    --theme-badge-accent: var(--theme-color-info, #0b57d0);
+    --theme-badge-tint: var(--theme-color-info-surface, #e7effc);
+    --theme-badge-on-accent: var(--theme-color-on-info, #ffffff);
+    --theme-badge-background: var(--theme-badge-tint);
+    --theme-badge-foreground: var(--theme-badge-accent);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--theme-space-1, 0.3125rem);
+
+    padding: var(--theme-space-1, 0.3125rem) var(--theme-space-3, 0.9375rem);
+    border-radius: var(--theme-radius-full, 9999px);
+    background-color: var(--theme-badge-background);
+    color: var(--theme-badge-foreground);
+
+    // Kept explicit rather than inherited: a badge sits inside body text,
+    // card titles, table cells - contexts with wildly different sizes and
+    // weights of their own - and has to read the same severity regardless.
+    font-size: var(--theme-font-size-xs);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-tight);
+    white-space: nowrap;
+}
+
+// Listed explicitly so a template can name it rather than rely on the
+// default, same reasoning as ".theme-alert--info".
+.theme-badge--info {
+    --theme-badge-accent: var(--theme-color-info, #0b57d0);
+    --theme-badge-tint: var(--theme-color-info-surface, #e7effc);
+    --theme-badge-on-accent: var(--theme-color-on-info, #ffffff);
+}
+
+.theme-badge--success {
+    --theme-badge-accent: var(--theme-color-success, #146c43);
+    --theme-badge-tint: var(--theme-color-success-surface, #e6f2ec);
+    --theme-badge-on-accent: var(--theme-color-on-success, #ffffff);
+}
+
+.theme-badge--warning {
+    --theme-badge-accent: var(--theme-color-warning, #8a5a00);
+    --theme-badge-tint: var(--theme-color-warning-surface, #fbf0dd);
+    --theme-badge-on-accent: var(--theme-color-on-warning, #ffffff);
+}
+
+.theme-badge--danger {
+    --theme-badge-accent: var(--theme-color-danger, #b3261e);
+    --theme-badge-tint: var(--theme-color-danger-surface, #fbeae9);
+    --theme-badge-on-accent: var(--theme-color-on-danger, #ffffff);
+}
+
+// Accent fill, "on-*" text - the pair contrast-verified for a solid chip,
+// which is why it is "on-accent" and not "the badge's own foreground
+// inverted": the two are not always the same colour.
+.theme-badge--solid {
+    --theme-badge-background: var(--theme-badge-accent);
+    --theme-badge-foreground: var(--theme-badge-on-accent);
+}

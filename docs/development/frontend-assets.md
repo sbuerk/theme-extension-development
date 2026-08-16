@@ -26,14 +26,75 @@ Build/Scripts/runTests.sh -s npm -- outdated
 | `Resources/Public/Css/theme.css` | The compiled stylesheet. **Committed** — see below.                   |
 | `package.json`                   | The single dependency `sass`, and the four build scripts.             |
 | `package-lock.json`              | Committed, so `npm ci` and the gate are reproducible.                 |
-| [`DESIGN.md`](../../DESIGN.md)   | The design token specification `_tokens.scss` implements.             |
+| [`DESIGN.md`](../../DESIGN.md)   | The design token specification `abstracts/_tokens.scss` implements.   |
+
+## The source tree
+
+```
+Resources/Private/Scss/
+├── theme.scss          the bundle, and the cascade order
+├── abstracts/          tokens, palettes, mixins — mixins emit nothing
+├── base/               the reset, then bare element selectors
+├── forms/              native controls, field wrapper, validation
+├── components/         one file per component, alphabetical
+└── layout/             page chrome; last, because positioning has to win
+```
+
+The order in `theme.scss` **is** the cascade. Every rule has the same
+specificity by construction — single class selectors, no nesting deeper than a
+modifier — so nothing but source order separates a component rule from a base
+rule. Reordering the `@use` list changes the output.
+
+### Components are self-contained
+
+A component file reads tokens through `var()` with a literal fallback and
+reaches into no other component. Two things follow:
+
+- **A subset compiles.** A site package that wants three components writes its
+  own entry point and compiles it against this directory with `--load-path`:
+
+  ```scss
+  @use 'abstracts/tokens';
+  @use 'components/button';
+  @use 'components/card';
+  ```
+
+- **A component is portable into a shadow root.** Custom properties inherit
+  through a shadow boundary, so only the token file has to live in the outer
+  document, and the fallback covers the case where it does not. Inherited *CSS*
+  does not cross that boundary, which is what `standalone-reset` in
+  `abstracts/_mixins.scss` exists for.
+
+No per-component bundle is emitted today, because nothing consumes one. What is
+built is the structure that makes emitting one a build-script change rather than
+a refactor.
 
 ## Design tokens
 
 Every value in the stylesheet comes from a CSS custom property declared in
-`_tokens.scss`. A literal anywhere else is a token that has not been declared
-yet. [`DESIGN.md`](../../DESIGN.md) is the specification — what each token is,
-where its value came from, and the contrast ratios behind the palette.
+`abstracts/_tokens.scss`. A literal anywhere except a `var()` fallback is a
+token that has not been declared yet. [`DESIGN.md`](../../DESIGN.md) is the
+specification — what each token is, where its value came from, and the contrast
+ratios behind the palette.
+
+### Component tokens
+
+A component declares its own token layer at the top of its block, each entry
+falling back to a global token and then to a literal:
+
+```scss
+.theme-card {
+    --theme-card-background: var(--theme-color-surface, #f4f6fa);
+
+    background-color: var(--theme-card-background);
+}
+```
+
+The fallback literal therefore appears **once per component**, not once per
+declaration, which is what keeps `abstracts/_tokens.scss` authoritative. A site
+package can re-theme globally (`--theme-color-surface`) or surgically
+(`--theme-card-background`) without touching the other, and a modifier
+re-points a token rather than restating the property.
 
 Colour is declared once per token and carries both appearances through
 `light-dark()`; the appearance is then selected by `color-scheme` alone. The

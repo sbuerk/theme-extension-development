@@ -8,11 +8,11 @@
 // @todo The position modifiers and the border the "imageborder" field asks for
 //       are structural only. They get their real values with the design work.
 
-.gallery {
+.theme-gallery {
     margin: 0 0 var(--theme-space-6);
 }
 
-.gallery__row {
+.theme-gallery__row {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
@@ -23,19 +23,19 @@
     }
 }
 
-.gallery--center .gallery__row {
+.theme-gallery--center .theme-gallery__row {
     justify-content: center;
 }
 
-.gallery--right .gallery__row {
+.theme-gallery--right .theme-gallery__row {
     justify-content: flex-end;
 }
 
-.gallery--left .gallery__row {
+.theme-gallery--left .theme-gallery__row {
     justify-content: flex-start;
 }
 
-.gallery__item {
+.theme-gallery__item {
     // "min-width: 0" keeps a flex item from refusing to shrink below the
     // intrinsic width of its image, which is what makes a wide image break the
     // row instead of scaling down with it.
@@ -43,15 +43,15 @@
     margin: 0;
 }
 
-.gallery__zoom {
+.theme-gallery__zoom {
     display: block;
 }
 
-.gallery__image {
+.theme-gallery__image {
     height: auto;
 }
 
-.gallery__caption {
+.theme-gallery__caption {
     margin-top: var(--theme-space-1);
     font-size: var(--theme-font-size-sm);
 }

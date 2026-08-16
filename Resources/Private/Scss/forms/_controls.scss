@@ -1,0 +1,303 @@
+// Form controls.
+//
+// Markup contract (the full form, because the three "forms/" partials style
+// one contract between them):
+//
+//     <form class="theme-form">
+//         <div class="theme-form-summary theme-form-summary--error" role="alert" tabindex="-1">
+//             <p class="theme-form-summary__title">…</p>
+//             <ul class="theme-form-summary__list"><li><a href="#f-mail">…</a></li></ul>
+//         </div>
+//
+//         <div class="theme-field theme-field--invalid">
+//             <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required">*</span></label>
+//             <input class="theme-input" id="f-mail" type="email" aria-invalid="true" aria-describedby="f-mail-error f-mail-hint">
+//             <p class="theme-field__error" id="f-mail-error">…</p>
+//             <p class="theme-field__hint" id="f-mail-hint">…</p>
+//         </div>
+//
+//         <fieldset class="theme-fieldset">
+//             <legend class="theme-fieldset__legend">…</legend>
+//             <label class="theme-check"><input type="checkbox"> …</label>
+//         </fieldset>
+//     </form>
+//
+// This file styles the native controls only: ".theme-input", ".theme-textarea",
+// ".theme-select", ".theme-check", ".theme-fieldset" and "output". Field
+// chrome (label, hint, required marker, layout) is "_field.scss"; error and
+// success painting is "_validation.scss" - a control here never mentions
+// "invalid" or "danger" directly, it only exposes the custom properties
+// validation re-points.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback rather than reading the design tokens directly.
+//
+// --- One class for every native input type ---------------------------------
+//
+// ".theme-input" is the single class applied regardless of "type": text,
+// email, url, tel, number, password, search, date, time, datetime-local,
+// month and week all resolve to the same box once border, background, padding
+// and font are normalised - none of them needs a selector of its own. Only
+// "color", "range" and "file" render a fundamentally different UA widget and
+// get an explicit "[type='…']" override below. The date/time family's picker
+// indicator already tracks the palette on its own: "abstracts/_tokens.scss"
+// sets "color-scheme: light dark" on ":root", and that is what the native
+// picker icon reads, so nothing here has to touch it.
+
+.theme-input,
+.theme-textarea,
+.theme-select {
+    --theme-input-background: var(--theme-color-surface-raised, #ffffff);
+    --theme-input-foreground: var(--theme-color-text-primary, #14181f);
+    --theme-input-border-color: var(--theme-color-border, #d6dce6);
+    --theme-input-border-color-hover: var(--theme-color-border-strong, #828d9f);
+    --theme-input-border-width: var(--theme-border-width, 1px);
+    --theme-input-radius: var(--theme-radius-sm, 5px);
+    --theme-input-padding-block: var(--theme-space-2, 0.625rem);
+    --theme-input-padding-inline: var(--theme-space-3, 0.9375rem);
+    --theme-input-font-size: var(--theme-font-size-md, 1rem);
+    --theme-input-placeholder-color: var(--theme-color-text-muted, #616b80);
+
+    display: block;
+    width: 100%;
+    min-height: var(--theme-tap-target-min);
+    padding: var(--theme-input-padding-block) var(--theme-input-padding-inline);
+
+    border: var(--theme-input-border-width) solid var(--theme-input-border-color);
+    border-radius: var(--theme-input-radius);
+    background-color: var(--theme-input-background);
+    color: var(--theme-input-foreground);
+
+    font-size: var(--theme-input-font-size);
+    line-height: var(--theme-line-height-base);
+
+    transition: border-color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        border-color: var(--theme-input-border-color-hover);
+    }
+
+    // Opacity rather than a second background, matching ".theme-button": one
+    // rule reads as "inactive" everywhere in the library instead of a
+    // per-component definition of what disabled looks like.
+    &:disabled {
+        opacity: var(--theme-opacity-disabled);
+        cursor: not-allowed;
+    }
+}
+
+// Read-only is not disabled: the value is still submitted and the control is
+// still focusable and selectable, only editing is blocked - so it keeps full
+// opacity and only trades the editable background for the same tint a
+// disabled surface would use, and "select" is excluded because the attribute
+// does not exist on it.
+.theme-input:read-only,
+.theme-textarea:read-only {
+    background-color: var(--theme-color-surface, #f4f6fa);
+    cursor: default;
+}
+
+.theme-input::placeholder,
+.theme-textarea::placeholder {
+    color: var(--theme-input-placeholder-color);
+}
+
+// Ellipsis rather than a hard clip: a placeholder is guidance text, not data,
+// so losing its tail to overflow is preferable to the field jumping in width.
+.theme-input:placeholder-shown,
+.theme-textarea:placeholder-shown {
+    text-overflow: ellipsis;
+}
+
+.theme-textarea {
+    // Vertical only - horizontal resize breaks the field grid it sits in.
+    resize: vertical;
+    min-height: calc(var(--theme-tap-target-min) * 2);
+}
+
+// No custom arrow: replacing the native indicator needs an icon asset, and
+// this library ships none - see "base/_reset.scss" on carrying no CSS
+// dependency. The UA arrow is left in place and only the box around it is
+// themed.
+.theme-select {
+    &[multiple] {
+        // Tall enough to show a handful of options at once rather than
+        // opening as a single-row scroller indistinguishable from a text
+        // field.
+        min-height: calc(var(--theme-tap-target-min) * 3);
+        padding-block: var(--theme-input-padding-block);
+    }
+
+    optgroup {
+        color: var(--theme-color-text-secondary, #4a5567);
+        font-style: normal;
+        font-weight: var(--theme-font-weight-bold);
+    }
+
+    option {
+        color: var(--theme-color-text-primary, #14181f);
+    }
+}
+
+.theme-input[type='color'] {
+    --theme-input-color-swatch-size: var(--theme-space-7, 2.5rem);
+
+    inline-size: var(--theme-input-color-swatch-size);
+    block-size: var(--theme-tap-target-min);
+    padding: var(--theme-space-1, 0.3125rem);
+    cursor: pointer;
+
+    // Both engines need their own pseudo elements reset to lose the inset
+    // border the UA draws around the swatch by default; the box already has
+    // one from the shared rule above.
+    &::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+
+    &::-webkit-color-swatch {
+        border: 0;
+        border-radius: var(--theme-radius-sm, 5px);
+    }
+
+    &::-moz-color-swatch {
+        border: 0;
+        border-radius: var(--theme-radius-sm, 5px);
+    }
+}
+
+.theme-input[type='range'] {
+    // A range is not a box with a border - it is a track. The shared border
+    // and background from ".theme-input" above are switched off rather than
+    // themed.
+    min-height: var(--theme-tap-target-min);
+    padding-block: 0;
+    border: 0;
+    background: none;
+
+    // Colours the track and the thumb in every browser that implements the
+    // property, which is every current one; there is no fallback path left
+    // to write.
+    accent-color: var(--theme-color-primary, #0b57d0);
+    cursor: pointer;
+
+    &:disabled {
+        opacity: var(--theme-opacity-disabled);
+        cursor: not-allowed;
+    }
+}
+
+.theme-input[type='file'] {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+    padding-block: var(--theme-space-1, 0.3125rem);
+    cursor: pointer;
+
+    // The button gets the secondary accent, not the primary one: the primary
+    // fill is reserved for the form's own submit action, and a file picker
+    // sitting next to it in the same colour would compete for attention it
+    // has not earned.
+    &::file-selector-button {
+        --theme-input-file-button-background: var(--theme-color-secondary, #0f766e);
+        --theme-input-file-button-foreground: var(--theme-color-on-secondary, #ffffff);
+        --theme-input-file-button-background-hover: var(--theme-color-secondary-hover, #0c5f59);
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: var(--theme-tap-target-min);
+        padding: var(--theme-space-1, 0.3125rem) var(--theme-space-3, 0.9375rem);
+
+        border: 0;
+        border-radius: var(--theme-input-radius, var(--theme-radius-sm, 5px));
+        background-color: var(--theme-input-file-button-background);
+        color: var(--theme-input-file-button-foreground);
+
+        font: inherit;
+        font-weight: var(--theme-font-weight-medium);
+        cursor: pointer;
+
+        transition: background-color var(--theme-duration-fast) var(--theme-easing-standard);
+    }
+
+    &:hover::file-selector-button {
+        background-color: var(--theme-input-file-button-background-hover);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+
+        &::file-selector-button {
+            opacity: var(--theme-opacity-disabled);
+            cursor: not-allowed;
+        }
+    }
+}
+
+// Checkbox and radio: "accent-color" themes the native widget in every
+// current browser, so there is no reason to hide the input and draw a
+// replacement - that path exists mainly for browsers this design does not
+// have to support.
+.theme-check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+    min-height: var(--theme-tap-target-min);
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    cursor: pointer;
+
+    input[type='checkbox'],
+    input[type='radio'] {
+        inline-size: var(--theme-space-4, 1.25rem);
+        block-size: var(--theme-space-4, 1.25rem);
+        margin: 0;
+        accent-color: var(--theme-color-primary, #0b57d0);
+        cursor: pointer;
+
+        // Checked itself needs no rule: "accent-color" above already paints
+        // that state in every current browser. Indeterminate gets its own
+        // colour because it is a third state, not a variant of checked, and
+        // sharing the primary accent with "checked" would make the two
+        // indistinguishable at a glance.
+        &:indeterminate {
+            accent-color: var(--theme-color-text-secondary, #4a5567);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    &:has(input:disabled) {
+        color: var(--theme-color-text-muted, #616b80);
+        opacity: var(--theme-opacity-disabled);
+        cursor: not-allowed;
+    }
+}
+
+.theme-fieldset {
+    display: grid;
+    gap: var(--theme-space-3, 0.9375rem);
+    margin: 0;
+    padding: var(--theme-space-4, 1.25rem);
+    border: var(--theme-border-width, 1px) solid var(--theme-color-border, #d6dce6);
+    border-radius: var(--theme-radius-sm, 5px);
+}
+
+.theme-fieldset__legend {
+    padding-inline: var(--theme-space-2, 0.625rem);
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+}
+
+// No class: the element already carries the meaning, the way "hr" and
+// "small" are styled directly in "base/_elements.scss" rather than through a
+// modifier class.
+output {
+    display: inline-block;
+    color: var(--theme-color-text-primary, #14181f);
+    font-weight: var(--theme-font-weight-medium);
+}

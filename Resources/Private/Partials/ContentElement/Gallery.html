@@ -15,12 +15,12 @@
     which is the difference between a page that settles and a page that jumps.
 </f:comment>
 <f:if condition="{gallery.count.files}">
-    <div class="gallery gallery--{gallery.position.vertical} gallery--{gallery.position.horizontal}"
-         data-gallery-columns="{gallery.count.columns}">
+    <div class="theme-gallery theme-gallery--{gallery.position.vertical} theme-gallery--{gallery.position.horizontal}"
+         data-theme-gallery-columns="{gallery.count.columns}">
         <f:for each="{gallery.rows}" as="row">
-            <div class="gallery__row">
+            <div class="theme-gallery__row">
                 <f:for each="{row.columns}" as="column">
-                    <figure class="gallery__item">
+                    <figure class="theme-gallery__item">
                         <f:if condition="{data.image_zoom}">
                             <f:then>
                                 <f:comment>
@@ -30,7 +30,7 @@
                                     file: a lightbox is JavaScript, and this
                                     extension ships none.
                                 </f:comment>
-                                <a class="gallery__zoom" href="{f:uri.image(image: column.media)}">
+                                <a class="theme-gallery__zoom" href="{f:uri.image(image: column.media)}">
                                     <f:render section="Media" arguments="{column: column}" />
                                 </a>
                             </f:then>
@@ -39,7 +39,7 @@
                             </f:else>
                         </f:if>
                         <f:if condition="{column.media.description}">
-                            <figcaption class="gallery__caption">{column.media.description}</figcaption>
+                            <figcaption class="theme-gallery__caption">{column.media.description}</figcaption>
                         </f:if>
                     </figure>
                 </f:for>
@@ -55,7 +55,7 @@
         and passing an empty string would suppress that fallback rather than
         fill it in.
     </f:comment>
-    <f:image class="gallery__image"
+    <f:image class="theme-gallery__image"
              image="{column.media}"
              width="{column.dimensions.width}"
              height="{column.dimensions.height}"

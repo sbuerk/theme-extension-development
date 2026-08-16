@@ -1,0 +1,109 @@
+// Alert.
+//
+// Markup contract:
+//
+//     <div class="theme-alert theme-alert--warning" role="status">
+//         <span class="theme-alert__icon" aria-hidden="true">…</span>
+//         <div class="theme-alert__body">
+//             <p class="theme-alert__title">…</p>
+//             <p class="theme-alert__text">…</p>
+//         </div>
+//     </div>
+//
+// Modifiers: --info (the default, and the appearance of the bare class),
+// --success, --warning, --danger. "role" is fixed by the contract above and is
+// a markup concern, not a styling one - this file does not touch it.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- Colour is not the only signal ----------------------------------------
+//
+// The four modifiers differ in nothing but colour: the tint, the leading
+// border and the icon accent all repoint to the same semantic trio. A reader
+// who cannot distinguish those colours - low vision, colour blindness, a
+// black-and-white printout - is left with nothing if colour is the only
+// carrier. It is not: "theme-alert__icon" holds a distinct glyph per
+// severity, chosen by whatever renders the markup (an icon ViewHelper, most
+// likely). That glyph, not the colour, is what actually communicates
+// severity; this stylesheet only sizes and tints the slot it sits in.
+//
+// Body text is deliberately left out of the repointing. "--theme-alert-text"
+// stays "--theme-color-text-primary" in every modifier because that colour
+// was contrast-checked against all four tints - re-deriving it per severity
+// would reopen a check that has already been done once for good.
+
+.theme-alert {
+    --theme-alert-background: var(--theme-color-info-surface, #e7effc);
+    --theme-alert-accent: var(--theme-color-info, #0b57d0);
+    --theme-alert-text: var(--theme-color-text-primary, #14181f);
+    --theme-alert-icon-size: var(--theme-space-5, 1.5625rem);
+    --theme-alert-gap: var(--theme-space-3, 0.9375rem);
+    --theme-alert-padding: var(--theme-space-4, 1.25rem);
+    --theme-alert-radius: var(--theme-radius-sm, 5px);
+
+    display: flex;
+    align-items: flex-start;
+    gap: var(--theme-alert-gap);
+
+    padding: var(--theme-alert-padding);
+    border-inline-start: var(--theme-border-width-strong, 2px) solid var(--theme-alert-accent);
+    border-radius: var(--theme-alert-radius);
+    background-color: var(--theme-alert-background);
+    color: var(--theme-alert-text);
+}
+
+.theme-alert__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+
+    // A square slot, not a font-size: the glyph inside is whatever markup
+    // put there (inline SVG, most likely) and scales to fill it via its own
+    // "width"/"height", same as "img" in "base/_elements.scss".
+    width: var(--theme-alert-icon-size);
+    height: var(--theme-alert-icon-size);
+    color: var(--theme-alert-accent);
+}
+
+.theme-alert__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-1, 0.3125rem);
+}
+
+.theme-alert__title {
+    margin: 0;
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-snug);
+}
+
+.theme-alert__text {
+    margin: 0;
+    font-size: var(--theme-font-size-sm);
+    line-height: var(--theme-line-height-base);
+}
+
+// Neutral, and the appearance of ".theme-alert" with no modifier - listed
+// explicitly so a template can name it rather than rely on the default.
+.theme-alert--info {
+    --theme-alert-background: var(--theme-color-info-surface, #e7effc);
+    --theme-alert-accent: var(--theme-color-info, #0b57d0);
+}
+
+.theme-alert--success {
+    --theme-alert-background: var(--theme-color-success-surface, #e6f2ec);
+    --theme-alert-accent: var(--theme-color-success, #146c43);
+}
+
+.theme-alert--warning {
+    --theme-alert-background: var(--theme-color-warning-surface, #fbf0dd);
+    --theme-alert-accent: var(--theme-color-warning, #8a5a00);
+}
+
+.theme-alert--danger {
+    --theme-alert-background: var(--theme-color-danger-surface, #fbeae9);
+    --theme-alert-accent: var(--theme-color-danger, #b3261e);
+}

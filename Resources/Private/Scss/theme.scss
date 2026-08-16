@@ -7,10 +7,69 @@
 // Partials are pulled in with "@use", never with "@import": "@import" is
 // deprecated since dart-sass 1.80.0 and is removed in dart-sass 3.0.
 //
-// @todo The style layer itself is deliberately minimal for now and is filled
-//       in once the design work starts.
+// --- Layer order ----------------------------------------------------------
+//
+// The order below is the cascade, and it is deliberate. Everything has the
+// same specificity by construction - single class selectors, no nesting deeper
+// than a modifier - so the only thing that separates a component rule from a
+// base rule is the order they are written in.
+//
+//   abstracts   token declarations. Must come first: everything reads them.
+//               "mixins" emits nothing at all.
+//   base        the reset, then bare element selectors.
+//   forms       native controls, which are elements but need enough rules to
+//               be worth their own layer.
+//   components  single-purpose blocks, alphabetical. None of them depends on
+//               another, so the order inside this group carries no meaning.
+//   layout      page chrome. Last, because it positions components rather than
+//               styling them, and a positioning rule has to win.
+//
+// --- Building a subset ----------------------------------------------------
+//
+// Every component file is self-contained: it reads tokens through "var()" with
+// a literal fallback and reaches into no other component. A site package that
+// wants three components rather than all of them can therefore write its own
+// entry point:
+//
+//     @use 'abstracts/tokens';
+//     @use 'components/button';
+//     @use 'components/card';
+//
+// and compile it against this directory with "--load-path".
+//
+// The same property makes a component portable into a shadow root, where
+// custom properties still inherit from the host document but inherited CSS
+// does not - see "standalone-reset" in "abstracts/_mixins.scss". No such
+// bundle is emitted yet, because nothing consumes one; the structure is what
+// makes it possible without duplicating the palette into every file.
 
-@use 'tokens';
-@use 'palettes';
-@use 'base';
-@use 'gallery';
+@use 'abstracts/tokens';
+@use 'abstracts/palettes';
+
+@use 'base/reset';
+@use 'base/elements';
+
+@use 'forms/controls';
+@use 'forms/field';
+@use 'forms/validation';
+
+@use 'components/accordion';
+@use 'components/alert';
+@use 'components/badge';
+@use 'components/breadcrumb';
+@use 'components/button';
+@use 'components/card';
+@use 'components/content-element';
+@use 'components/gallery';
+@use 'components/hero';
+@use 'components/nav-main';
+@use 'components/nav-sub';
+@use 'components/pagination';
+@use 'components/quote';
+@use 'components/skip-link';
+@use 'components/table';
+@use 'components/teaser';
+
+@use 'layout/page';
+@use 'layout/site-header';
+@use 'layout/site-footer';

@@ -1,0 +1,85 @@
+// Page frame.
+//
+// Markup contract:
+//
+//     <body>
+//         <a class="theme-skip-link" href="#content">…</a>
+//         <div class="theme-page">
+//             <header class="theme-site-header">…</header>
+//             <div class="theme-page__body">
+//                 <aside class="theme-page__aside"><nav class="theme-nav-sub">…</nav></aside>
+//                 <main class="theme-page__main" id="content">…</main>
+//             </div>
+//             <footer class="theme-site-footer">…</footer>
+//         </div>
+//     </body>
+//
+// ".theme-skip-link" belongs to "base/", not to this file - it precedes
+// ".theme-page" as a sibling, not a descendant. The header and footer are
+// styled in their own partials, "layout/_site-header.scss" and
+// "layout/_site-footer.scss"; this file owns ".theme-page" and its direct
+// ".theme-page__body" row, including the aside/main split.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback - the same pattern is used below wherever a
+// value is worth re-theming.
+
+@use '../abstracts/breakpoints' as bp;
+
+@use '../abstracts/mixins' as mixins;
+
+.theme-page {
+    display: flex;
+    flex-direction: column;
+
+    // "100dvh", not "100vh": "vh" resolves against the *large* viewport,
+    // which assumes the browser's own chrome (address bar, and on some
+    // mobile browsers a tab strip) is already retracted. A page shorter than
+    // that appears to fill the screen and then jumps as the chrome shows and
+    // hides while the reader scrolls, dragging the footer with it. "dvh"
+    // tracks the viewport that is actually visible at any given moment, so a
+    // short page's footer sits at the real bottom and stays there.
+    min-height: 100dvh;
+}
+
+.theme-page__body {
+    --theme-page-body-gap: var(--theme-space-6, 1.875rem);
+    --theme-page-body-padding-block: var(--theme-space-6, 1.875rem);
+    --theme-page-body-aside-width: 15rem;
+
+    @include mixins.content-container;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    flex: 1;
+    gap: var(--theme-page-body-gap);
+    padding-block: var(--theme-page-body-padding-block);
+
+    // ":has()" rather than a page-level modifier class kept in sync by the
+    // template: whether the two-column grid applies follows directly from
+    // whether an aside is actually present in the markup, the same way
+    // ".theme-card--linked" in "components/_card.scss" reacts to its link
+    // rather than needing a card-level modifier for it.
+    @media (min-width: bp.$md) {
+        &:has(.theme-page__aside) {
+            grid-template-columns: var(--theme-page-body-aside-width) minmax(0, 1fr);
+        }
+    }
+}
+
+.theme-page__aside {
+    min-width: 0;
+}
+
+// The vertical rhythm between whatever ".theme-page__main" holds is owned by
+// "components/_content-element.scss", not by this file: a "main" is not
+// guaranteed to hold content elements only (a form, a card grid, …), and a
+// layout partial selecting on a component class name would put a dependency
+// on the component layer that the component layer does not have on it in
+// return. What this rule owns instead is a block formatting context, so a
+// child's own top margin cannot collapse through "__main" into the grid row
+// above it.
+.theme-page__main {
+    display: flow-root;
+    min-width: 0;
+}

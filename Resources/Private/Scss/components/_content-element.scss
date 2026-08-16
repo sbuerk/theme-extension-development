@@ -1,0 +1,141 @@
+// Content element wrapper.
+//
+// Markup contract:
+//
+//     <div class="theme-content-element theme-content-element--text" id="c123" data-ctype="text">
+//         <div class="theme-content-element__inner">…</div>
+//     </div>
+//
+// Every rendered content element is wrapped in ".theme-content-element"; the
+// "--{CType}" modifier and "data-ctype" both carry the CType, one for styling
+// hooks and one for the diagnostic label below.
+//
+// --- Why this component exists --------------------------------------------
+//
+// This is the affordance that made "Frame" the chosen structural variant: a
+// dashed outline and a small CType chip around every content element, so an
+// editor or an integrator can see the column and CType boundaries the
+// backend layout produces without opening the page module. It is a
+// development/staging aid, not a permanent part of the rendered page, and it
+// is designed to be turned off wholesale for a production site package.
+//
+// --- Turning it off ---------------------------------------------------
+//
+// One attribute on the root element turns the whole affordance off - outline
+// and label together:
+//
+//     <html data-theme-content-outline="off">
+//
+// The theme's own TypoScript sets it from a setting, so an integrator normally
+// never writes it by hand. Written directly it is still one declaration.
+//
+// Why an attribute rather than a custom property, which would be the more
+// obvious choice here: the label is generated content, and hiding it has to
+// depend on the *value* of a property rather than on the DOM. ":has()" cannot
+// see a property value at all. A CSS container style query can - and a
+// pseudo-element genuinely can query its own originating element, which is the
+// documented exception to "elements cannot query themselves" - but Firefox
+// only shipped style queries in 151, on 19 May 2026. On anything older the
+// query is dropped as unparseable, the outline disappears and the label does
+// not, leaving a stray CType chip floating on a production page. That is a
+// visible defect rather than a graceful degradation, and it is not worth
+// buying with a three-month-old feature when an attribute selector does the
+// same job in every browser that runs this theme.
+//
+// The custom property below still exists and still works. It controls the
+// outline, it is what "--plain" re-points for a single element, and a site
+// package may set it. It simply is not the documented global switch, because
+// on its own it cannot take the label with it.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-content-element {
+    --theme-content-element-outline-style: dashed;
+    --theme-content-element-outline-color: var(--theme-color-border, #d6dce6);
+    --theme-content-element-outline-width: var(--theme-border-width, 1px);
+    --theme-content-element-radius: var(--theme-radius-sm, 5px);
+    --theme-content-element-spacing: var(--theme-space-6, 1.875rem);
+    --theme-content-element-label-background: var(--theme-color-background, #ffffff);
+    --theme-content-element-label-color: var(--theme-color-text-muted, #616b80);
+
+    position: relative;
+    border-radius: var(--theme-content-element-radius);
+
+    // The frame is an outline, not a border: an outline is not part of the
+    // box model, so toggling it off never reflows the content beside it, and
+    // "outline-offset" can pull it fully inside the box without the corner
+    // radius fighting a border's mitred corners.
+    outline: var(--theme-content-element-outline-width) var(--theme-content-element-outline-style) var(--theme-content-element-outline-color);
+    outline-offset: calc(-1 * var(--theme-content-element-outline-width));
+
+    // First element carries no extra top margin; every following one is
+    // pushed down by its own spacing token, read from itself rather than
+    // from its predecessor so a modifier on one element cannot leak into its
+    // neighbour.
+    & + & {
+        margin-block-start: var(--theme-content-element-spacing);
+    }
+
+    // The CType chip. Positioned to straddle the top edge of the outline -
+    // "outline-offset" above pulls the line to exactly the box edge, and
+    // "translateY(-50%)" centres the chip on that line - so the chip's own
+    // background interrupts the dashes instead of sitting beside them.
+    &::before {
+        content: attr(data-ctype);
+        position: absolute;
+        inset-block-start: 0;
+        inset-inline-start: var(--theme-space-3, 0.9375rem);
+        transform: translateY(-50%);
+        padding-inline: var(--theme-space-1, 0.3125rem);
+
+        background-color: var(--theme-content-element-label-background);
+        color: var(--theme-content-element-label-color);
+        font-family: var(--theme-font-family-mono);
+        font-size: var(--theme-font-size-xs);
+        line-height: var(--theme-line-height-mono);
+
+        // Diagnostic only: never sits between the pointer and the content
+        // element's own interactive children.
+        pointer-events: none;
+    }
+
+}
+
+// The global switch. Removes the label as well as the outline, and does so in
+// every browser rather than only in those with container style queries.
+//
+// "content: none" rather than an empty string: the box stops being generated
+// at all instead of becoming a zero-width one that still occupies its corner.
+[data-theme-content-outline='off'] .theme-content-element {
+    --theme-content-element-outline-style: none;
+
+    &::before {
+        content: none;
+    }
+}
+
+// Per-element escape hatch, for the page that wants the frame everywhere
+// except one embedded element (a hero, a plugin with its own visible chrome).
+.theme-content-element--plain {
+    --theme-content-element-outline-style: none;
+
+    &::before {
+        content: none;
+    }
+}
+
+// Loose/tight re-point the same spacing token the base rule already reads,
+// exactly like the size modifiers in "components/_button.scss" re-point a
+// padding token rather than restating the property.
+.theme-content-element--spaced-loose {
+    --theme-content-element-spacing: var(--theme-space-8, 3.75rem);
+}
+
+.theme-content-element--spaced-tight {
+    --theme-content-element-spacing: var(--theme-space-3, 0.9375rem);
+}
+
+.theme-content-element__inner {
+    padding: var(--theme-space-4, 1.25rem);
+}

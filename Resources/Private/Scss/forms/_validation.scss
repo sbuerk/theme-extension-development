@@ -1,0 +1,162 @@
+// Error and success states, and the form-level error summary.
+//
+// Markup contract (the full form - see "_controls.scss" for why all three
+// "forms/" partials repeat it):
+//
+//     <form class="theme-form">
+//         <div class="theme-form-summary theme-form-summary--error" role="alert" tabindex="-1">
+//             <p class="theme-form-summary__title">…</p>
+//             <ul class="theme-form-summary__list"><li><a href="#f-mail">…</a></li></ul>
+//         </div>
+//
+//         <div class="theme-field theme-field--invalid">
+//             <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required">*</span></label>
+//             <input class="theme-input" id="f-mail" type="email" aria-invalid="true" aria-describedby="f-mail-error f-mail-hint">
+//             <p class="theme-field__error" id="f-mail-error">…</p>
+//             <p class="theme-field__hint" id="f-mail-hint">…</p>
+//         </div>
+//
+//         <fieldset class="theme-fieldset">
+//             <legend class="theme-fieldset__legend">…</legend>
+//             <label class="theme-check"><input type="checkbox"> …</label>
+//         </fieldset>
+//     </form>
+//
+// --- Never colour alone -----------------------------------------------------
+//
+// A red border is invisible to roughly 1 in 12 men with a colour vision
+// deficiency, and to anyone reading the page in greyscale. Every rule below
+// therefore pairs the colour change with a second, colour-independent signal:
+// the invalid border also gets thicker ("--theme-border-width-strong" instead
+// of "--theme-border-width"), and the error message is prefixed with a glyph
+// that is real content, not a decorative background image.
+//
+// --- Why ":user-invalid" and not ":invalid" ---------------------------------
+//
+// ":invalid" matches the moment the field fails constraint validation, which
+// for a required field is the moment the form loads - every empty required
+// field would paint itself red before the reader has typed a single
+// character. ":user-invalid" only matches once the browser considers the
+// field "dirty" (after a blur or a submit attempt), which is the point an
+// unfilled-in state actually means something. The explicit
+// ".theme-field--invalid" modifier below stays available for a form that
+// drives its own, server-side or async validation instead of the native one.
+
+.theme-field--invalid {
+    .theme-input,
+    .theme-textarea,
+    .theme-select {
+        --theme-input-border-color: var(--theme-color-danger, #b3261e);
+        --theme-input-border-color-hover: var(--theme-color-danger, #b3261e);
+        --theme-input-border-width: var(--theme-border-width-strong, 2px);
+    }
+}
+
+.theme-field--valid {
+    .theme-input,
+    .theme-textarea,
+    .theme-select {
+        --theme-input-border-color: var(--theme-color-success, #146c43);
+        --theme-input-border-color-hover: var(--theme-color-success, #146c43);
+    }
+}
+
+// The automatic counterpart of ".theme-field--invalid" above, for a control
+// that is not wrapped in a modifier class at all - see the comment block at
+// the top of the file for why this is ":user-invalid" and not ":invalid".
+.theme-input:user-invalid,
+.theme-textarea:user-invalid,
+.theme-select:user-invalid {
+    --theme-input-border-color: var(--theme-color-danger, #b3261e);
+    --theme-input-border-color-hover: var(--theme-color-danger, #b3261e);
+    --theme-input-border-width: var(--theme-border-width-strong, 2px);
+}
+
+.theme-field__error,
+.theme-field__success {
+    display: flex;
+    align-items: start;
+    gap: var(--theme-space-1, 0.3125rem);
+    margin: 0;
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-medium);
+}
+
+.theme-field__error {
+    color: var(--theme-color-danger, #b3261e);
+
+    // Content, not decoration: the glyph carries the same meaning the colour
+    // does, so it survives greyscale printing and a colour vision deficiency
+    // that the border-and-text colour alone would not.
+    &::before {
+        content: '⚠';
+        flex: none;
+    }
+}
+
+.theme-field__success {
+    color: var(--theme-color-success, #146c43);
+
+    &::before {
+        content: '✓';
+        flex: none;
+    }
+}
+
+.theme-field--inline .theme-field__error {
+    grid-column: 1 / -1;
+}
+
+// The form-level summary. "role='alert'" and "tabindex='-1'" are on the
+// element in the markup contract, not here - focus management on submit is
+// behaviour, and this file only paints the box that receives it.
+.theme-form-summary {
+    --theme-form-summary-background: var(--theme-color-danger-surface, #fbeae9);
+    --theme-form-summary-border-color: var(--theme-color-danger, #b3261e);
+    --theme-form-summary-foreground: var(--theme-color-text-primary, #14181f);
+
+    display: grid;
+    gap: var(--theme-space-2, 0.625rem);
+    margin: 0 0 var(--theme-space-5, 1.5625rem);
+    padding: var(--theme-space-4, 1.25rem);
+
+    // Strong, not the default border width: the summary is the one place a
+    // reader learns *how many* fields failed, so it gets the same
+    // colour-plus-weight treatment as an individual invalid field.
+    border: var(--theme-border-width-strong, 2px) solid var(--theme-form-summary-border-color);
+    border-radius: var(--theme-radius-sm, 5px);
+    background-color: var(--theme-form-summary-background);
+    color: var(--theme-form-summary-foreground);
+}
+
+.theme-form-summary__title {
+    margin: 0;
+    font-size: var(--theme-font-size-md, 1rem);
+    font-weight: var(--theme-font-weight-bold);
+}
+
+.theme-form-summary__list {
+    display: grid;
+    gap: var(--theme-space-1, 0.3125rem);
+    margin: 0;
+    padding-inline-start: var(--theme-space-4, 1.25rem);
+
+    // No separate hover colour: there is no "-hover" token for danger or
+    // success the way there is for primary and secondary (see
+    // "abstracts/_tokens.scss"), so hover is signalled by the underline
+    // instead of by swapping to an invented colour.
+    a {
+        color: var(--theme-form-summary-border-color);
+        font-weight: var(--theme-font-weight-medium);
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
+
+.theme-form-summary--success {
+    --theme-form-summary-background: var(--theme-color-success-surface, #e6f2ec);
+    --theme-form-summary-border-color: var(--theme-color-success, #146c43);
+}

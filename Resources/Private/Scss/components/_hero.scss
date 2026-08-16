@@ -1,0 +1,129 @@
+// Hero.
+//
+// Markup contract:
+//
+//     <section class="theme-hero theme-hero--media">
+//         <div class="theme-hero__media"><img …></div>
+//         <div class="theme-hero__body">
+//             <p class="theme-hero__eyebrow">…</p>
+//             <h1 class="theme-hero__title">…</h1>
+//             <p class="theme-hero__lead">…</p>
+//             <div class="theme-hero__actions"><a class="theme-button" …>…</a></div>
+//         </div>
+//     </section>
+//
+// Modifiers: default (text only), --media (adds "theme-hero__media"),
+// --compact (smaller vertical padding, for sub-pages). "theme-hero__media" is
+// only present in markup for the --media variant; the default variant renders
+// "theme-hero__body" as the section's only child, which the base rules below
+// already lay out correctly without a modifier of their own.
+//
+// Structural variant: Frame - see "DESIGN.md#what-this-file-does-not-decide".
+// The hero is a surface panel with a hairline border and the single 5px
+// radius, the same box "_card.scss" and "_teaser.scss" use.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-hero {
+    --theme-hero-background: var(--theme-color-surface, #f4f6fa);
+    --theme-hero-border-color: var(--theme-color-border, #d6dce6);
+    --theme-hero-radius: var(--theme-radius-sm, 5px);
+    --theme-hero-padding-block: var(--theme-space-8, 3.75rem);
+    --theme-hero-padding-inline: var(--theme-space-6, 1.875rem);
+    --theme-hero-gap: var(--theme-space-6, 1.875rem);
+
+    // Re-pointed by "--compact" below, and by the default/compact split of
+    // "theme-hero__title" further down - one token instead of two competing
+    // font-size declarations.
+    --theme-hero-title-font-size: var(--theme-font-size-display, clamp(2.125rem, 1.5rem + 3vw, 3.375rem));
+    --theme-hero-media-basis: 45%;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-hero-gap);
+
+    padding: var(--theme-hero-padding-block) var(--theme-hero-padding-inline);
+
+    background-color: var(--theme-hero-background);
+    border: var(--theme-border-width) solid var(--theme-hero-border-color);
+    border-radius: var(--theme-hero-radius);
+}
+
+.theme-hero__media {
+    img,
+    picture,
+    video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.theme-hero__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-3, 0.9375rem);
+}
+
+.theme-hero__eyebrow {
+    margin: 0;
+    color: var(--theme-color-primary, #0b57d0);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-medium, 500);
+    letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+    text-transform: uppercase;
+}
+
+.theme-hero__title {
+    margin: 0;
+    font-size: var(--theme-hero-title-font-size);
+    font-weight: var(--theme-font-weight-bold, 800);
+    letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+    line-height: var(--theme-line-height-heading, 1.5);
+}
+
+// Constrained to the reading measure even though the panel itself may be much
+// wider - the lead is prose, and "DESIGN.md" fixes the measure at 68ch for
+// exactly this reason.
+.theme-hero__lead {
+    margin: 0;
+    max-width: var(--theme-measure, 68ch);
+    color: var(--theme-color-text-secondary, #4a5567);
+    font-size: var(--theme-font-size-lg, 1.25rem);
+    line-height: var(--theme-line-height-base, 1.6);
+}
+
+.theme-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--theme-space-3, 0.9375rem);
+}
+
+// Image beside the text on wide viewports, stacked below it. The base rules
+// above already stack ("flex-direction: column"), so only the wide case needs
+// stating here.
+.theme-hero--media {
+    @media (min-width: bp.$md) {
+        flex-direction: row;
+        align-items: center;
+
+        .theme-hero__media {
+            flex: 0 0 auto;
+            flex-basis: var(--theme-hero-media-basis);
+        }
+
+        .theme-hero__body {
+            flex: 1;
+        }
+    }
+}
+
+// Sub-page header: same panel, less air above and below the text.
+.theme-hero--compact {
+    --theme-hero-padding-block: var(--theme-space-5, 1.5625rem);
+    --theme-hero-title-font-size: var(--theme-font-size-2xl, 2.125rem);
+}

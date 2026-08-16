@@ -1,0 +1,125 @@
+// Teaser.
+//
+// Markup contract:
+//
+//     <article class="theme-teaser theme-teaser--reversed">
+//         <div class="theme-teaser__media"><img …></div>
+//         <div class="theme-teaser__body">
+//             <h2 class="theme-teaser__title">…</h2>
+//             <p class="theme-teaser__text">…</p>
+//             <a class="theme-teaser__link" href="…">…</a>
+//         </div>
+//     </article>
+//
+// Modifier: --reversed, media and body swap sides once the row layout kicks
+// in - see the comment on that rule for why the swap is done the way it is.
+// Stacks below 48rem, same as "_hero.scss--media".
+//
+// Structural variant: Frame, same box as "_card.scss" and "_hero.scss" -
+// surface fill, hairline border, the single 5px radius. The media bleeds to
+// the article's edge and the padding lives on the body only, exactly the
+// split "_card.scss" already uses and for the same reason: an image sitting
+// flush against the frame needs no negative margin to get there.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-teaser {
+    --theme-teaser-background: var(--theme-color-surface, #f4f6fa);
+    --theme-teaser-border-color: var(--theme-color-border, #d6dce6);
+    --theme-teaser-radius: var(--theme-radius-sm, 5px);
+    --theme-teaser-body-padding: var(--theme-space-4, 1.25rem);
+    --theme-teaser-media-basis: 42%;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    background-color: var(--theme-teaser-background);
+    border: var(--theme-border-width) solid var(--theme-teaser-border-color);
+    border-radius: var(--theme-teaser-radius);
+
+    @media (min-width: bp.$md) {
+        flex-direction: row;
+        align-items: stretch;
+    }
+}
+
+.theme-teaser__media {
+    flex: 0 0 auto;
+
+    @media (min-width: bp.$md) {
+        flex-basis: var(--theme-teaser-media-basis);
+    }
+
+    img,
+    picture,
+    video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.theme-teaser__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--theme-space-2, 0.625rem);
+    padding: var(--theme-teaser-body-padding);
+}
+
+.theme-teaser__title {
+    margin: 0;
+    font-size: var(--theme-font-size-xl, 1.5rem);
+    font-weight: var(--theme-font-weight-bold, 800);
+    letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+    line-height: var(--theme-line-height-snug, 1.3);
+}
+
+.theme-teaser__text {
+    margin: 0;
+    color: var(--theme-color-text-secondary, #4a5567);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    line-height: var(--theme-line-height-base, 1.6);
+}
+
+// Pushed to the bottom of the body, same reasoning as "_card.scss": a row of
+// teasers with unequal text still lines its links up.
+.theme-teaser__link {
+    margin-top: auto;
+    color: var(--theme-color-primary, #0b57d0);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    font-weight: var(--theme-font-weight-medium, 500);
+    letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+
+    &:hover {
+        color: var(--theme-color-primary-hover, #0a4bb4);
+    }
+}
+
+// Reversed: media and body swap sides once the row layout applies.
+//
+// "flex-direction: row-reverse" only changes paint order, not source order -
+// the markup still puts "theme-teaser__media" before "theme-teaser__body",
+// exactly as the default variant does. That is deliberate and is the reason
+// this is safe: WCAG 1.3.2 (Meaningful Sequence) is about the reading and
+// focus order diverging from what a sighted user sees, and neither order
+// changes here. A screen reader still announces the image before the title,
+// text and link, in that order, in both variants. Tab order is untouched for
+// the same reason - the only focusable element is "theme-teaser__link", and
+// its position relative to the title and text inside "theme-teaser__body"
+// never moves, regardless of which side the whole body sits on. A CSS "order"
+// property on a grid would have the identical property - it is a paint-order
+// tool, not a source-order one - so the choice between the two is a stylistic
+// one; "row-reverse" was picked because "_hero.scss--media" already uses plain
+// flex row/column and mixing in "order" here for the same job would be a
+// second technique for one effect.
+.theme-teaser--reversed {
+    @media (min-width: bp.$md) {
+        flex-direction: row-reverse;
+    }
+}

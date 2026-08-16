@@ -1,0 +1,97 @@
+// Pagination.
+//
+// Markup contract:
+//
+//     <nav class="theme-pagination" aria-label="Pagination">
+//         <ul class="theme-pagination__list">
+//             <li><a class="theme-pagination__link" href="…" aria-label="Previous">…</a></li>
+//             <li><a class="theme-pagination__link" href="…" aria-current="page">2</a></li>
+//             <li><span class="theme-pagination__ellipsis">…</span></li>
+//         </ul>
+//     </nav>
+//
+// No modifier classes: the current page is expressed in markup as
+// "aria-current=page" on the link, and this file styles that attribute rather
+// than a class the markup contract does not carry. That keeps the visual
+// state and the accessible state from being able to disagree with each other.
+//
+// Structural variant: Frame governs the boxed content components
+// ("_card.scss", "_hero.scss", "_teaser.scss", the table wrapper); the
+// pagination nav is a cluster of individual controls rather than a content
+// panel, so it carries no outer box of its own here - only the links
+// themselves get the single 5px radius, the same one every other framed
+// surface in this theme uses.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-pagination__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--theme-space-2, 0.625rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-pagination__link {
+    --theme-pagination-link-background: transparent;
+    --theme-pagination-link-foreground: var(--theme-color-text-primary, #14181f);
+    --theme-pagination-link-border-color: var(--theme-color-border, #d6dce6);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    // These are individual page-number targets, not a single wide control
+    // like ".theme-button" - both axes need the 44px floor, not just the
+    // block one, which is why "min-width" is stated here and "theme-button"
+    // states only "min-height".
+    min-width: var(--theme-tap-target-min);
+    min-height: var(--theme-tap-target-min);
+
+    border: var(--theme-border-width) solid var(--theme-pagination-link-border-color);
+    border-radius: var(--theme-radius-sm, 5px);
+    background-color: var(--theme-pagination-link-background);
+    color: var(--theme-pagination-link-foreground);
+
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    font-weight: var(--theme-font-weight-medium, 500);
+    text-decoration: none;
+
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        border-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        background-color: var(--theme-color-surface, #f4f6fa);
+        border-color: var(--theme-color-border-strong, #828d9f);
+    }
+
+    // The current page: filled with the accent rather than merely outlined or
+    // bolded, so the state survives without colour too - a filled square
+    // reads as "selected" by shape and contrast alone.
+    &[aria-current='page'] {
+        --theme-pagination-link-background: var(--theme-color-primary, #0b57d0);
+        --theme-pagination-link-foreground: var(--theme-color-on-primary, #ffffff);
+        --theme-pagination-link-border-color: var(--theme-color-primary, #0b57d0);
+
+        &:hover {
+            background-color: var(--theme-color-primary-hover, #0a4bb4);
+            border-color: var(--theme-color-primary-hover, #0a4bb4);
+        }
+    }
+}
+
+// Not a link, so it gets no min-height/min-width floor of its own weight -
+// but it sits in the same row of squares, so it is sized to match rather than
+// collapsing to the height of its text.
+.theme-pagination__ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--theme-tap-target-min);
+    min-height: var(--theme-tap-target-min);
+    color: var(--theme-color-text-muted, #616b80);
+}
