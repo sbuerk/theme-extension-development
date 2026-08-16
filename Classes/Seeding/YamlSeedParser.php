@@ -34,6 +34,24 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * is written to the record as-is. `children` nests pages, `content` nests
  * `tt_content` records below the page carrying them.
  *
+ * `inline` nests records into a *relation* rather than below a page, as a map
+ * of the parent field carrying the relation to the records declared for it:
+ *
+ *     content:
+ *       - identifier: links
+ *         CType: theme_linklist
+ *         inline:
+ *           tx_theme_list_items:
+ *             - identifier: links-docs
+ *               table: tx_theme_list_item
+ *               link_label: 'Documentation'
+ *
+ * An inline child declares the `table` it belongs to itself. Inferring it from
+ * `config.foreign_table` of the parent's field would make a seed definition
+ * depend on the TCA being loaded, and would fail with a null dereference rather
+ * than a message when it is not - so `table` is structural on an inline child,
+ * exactly as `identifier` is.
+ *
  * `uid` is optional. Where it is given it is passed to DataHandler as a
  * *suggested* uid, which makes a seed reproducible - a site configuration can
  * then reference a root page id that is known in advance instead of whatever
@@ -49,12 +67,29 @@ final readonly class YamlSeedParser
     private const IDENTIFIER = 'identifier';
     private const UID = 'uid';
     private const FILES = 'files';
+    private const INLINE = 'inline';
+    private const TABLE = 'table';
 
     /**
      * Keys that describe the shape of the definition rather than a field of the
      * record they appear on.
+     *
+     * `table` is deliberately not in here: it is structural only on an inline
+     * child, and `tt_content` and `pages` both have fields whose name starts
+     * with `table`. A key that is structure in one place and a field in another
+     * has to be decided where the context is known, which is per level.
      */
-    private const STRUCTURAL_KEYS = [self::IDENTIFIER, self::UID, self::CHILDREN, self::CONTENT, self::FILES];
+    private const STRUCTURAL_KEYS = [self::IDENTIFIER, self::UID, self::CHILDREN, self::CONTENT, self::FILES, self::INLINE];
+
+    /**
+     * An identifier ends up inside the `NEW…` placeholder of the record, and a
+     * placeholder naming a relation target must not contain an underscore - see
+     * the docblock of `SeedRecord::placeholder()` for what DataHandler does with
+     * one. Restricting the identifier itself is what keeps that guarantee, and
+     * doing it here means the definition is rejected with a message rather than
+     * seeding an empty relation without a word.
+     */
+    private const IDENTIFIER_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9-]*$/';
 
     public function parseFile(string $fileName): SeedDefinition
     {
@@ -285,18 +320,23 @@ final readonly class YamlSeedParser
 
     /**
      * @param array<mixed> $records
+     * @param string|null $table The table these records belong to, or null when
+     *        each of them declares its own - which is the case for inline
+     *        children, where one field may even point at a different table than
+     *        the next.
      * @param array<string, true> $seen Identifiers already used, by reference,
      *                                  so a duplicate is caught across the whole
      *                                  definition rather than per level.
      * @return list<SeedRecord>
      */
-    private function parseRecords(array $records, string $table, string $source, array &$seen): array
+    private function parseRecords(array $records, ?string $table, string $source, array &$seen): array
     {
+        $context = $table ?? 'inline';
         $parsed = [];
         foreach ($records as $record) {
             if (!is_array($record)) {
                 throw new SeedingException(
-                    sprintf('A record of "%s" in the seed definition "%s" is not a map.', $table, $source),
+                    sprintf('A record of "%s" in the seed definition "%s" is not a map.', $context, $source),
                     1786924806,
                 );
             }
@@ -304,8 +344,18 @@ final readonly class YamlSeedParser
             $identifier = $record[self::IDENTIFIER] ?? null;
             if (!is_string($identifier) || $identifier === '') {
                 throw new SeedingException(
-                    sprintf('A record of "%s" in the seed definition "%s" has no "identifier".', $table, $source),
+                    sprintf('A record of "%s" in the seed definition "%s" has no "identifier".', $context, $source),
                     1786924807,
+                );
+            }
+            if (preg_match(self::IDENTIFIER_PATTERN, $identifier) !== 1) {
+                throw new SeedingException(
+                    sprintf(
+                        'The identifier "%s" in the seed definition "%s" is not usable. An identifier may contain letters, digits and dashes only, and has to start with a letter or a digit.',
+                        $identifier,
+                        $source,
+                    ),
+                    1786924833,
                 );
             }
             if (isset($seen[$identifier])) {
@@ -332,6 +382,22 @@ final readonly class YamlSeedParser
                 );
             }
 
+            $recordTable = $table;
+            if ($recordTable === null) {
+                $declaredTable = $record[self::TABLE] ?? null;
+                if (!is_string($declaredTable) || $declaredTable === '') {
+                    throw new SeedingException(
+                        sprintf(
+                            'The inline child "%s" in the seed definition "%s" has no "table". It is never inferred from the TCA of the parent field.',
+                            $identifier,
+                            $source,
+                        ),
+                        1786924834,
+                    );
+                }
+                $recordTable = $declaredTable;
+            }
+
             $children = [];
             $nestedContent = $record[self::CONTENT] ?? [];
             if ($nestedContent !== []) {
@@ -354,9 +420,17 @@ final readonly class YamlSeedParser
                 $children = [...$children, ...$this->parseRecords($nestedChildren, 'pages', $source, $seen)];
             }
 
+            $inline = $this->parseInline($record[self::INLINE] ?? [], $identifier, $source, $seen);
+
+            // "table" is a field everywhere but on an inline child, where it is
+            // the structural key naming the table the child belongs to.
+            $structuralKeys = $table === null
+                ? [...self::STRUCTURAL_KEYS, self::TABLE]
+                : self::STRUCTURAL_KEYS;
+
             $values = [];
             foreach ($record as $key => $value) {
-                if (in_array($key, self::STRUCTURAL_KEYS, true)) {
+                if (in_array($key, $structuralKeys, true)) {
                     continue;
                 }
                 if (!is_string($key)) {
@@ -380,13 +454,54 @@ final readonly class YamlSeedParser
             }
 
             $parsed[] = new SeedRecord(
-                $table,
+                $recordTable,
                 $identifier,
                 $values,
                 $uid,
                 $children,
                 $this->parseFileReferences($record[self::FILES] ?? [], $identifier, $source),
+                $inline,
             );
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * The inline children of one record, as a map of the parent field carrying
+     * the relation to the records declared for it.
+     *
+     * @param array<string, true> $seen Identifiers already used, by reference,
+     *        so an inline child cannot reuse an identifier either.
+     * @return array<string, list<SeedRecord>>
+     */
+    private function parseInline(mixed $inline, string $recordIdentifier, string $source, array &$seen): array
+    {
+        if ($inline === [] || $inline === null) {
+            return [];
+        }
+        if (!is_array($inline)) {
+            throw new SeedingException(
+                sprintf('The "inline" of "%s" in "%s" is not a map of field name to child records.', $recordIdentifier, $source),
+                1786924835,
+            );
+        }
+
+        $parsed = [];
+        foreach ($inline as $field => $children) {
+            if (!is_string($field) || $field === '') {
+                throw new SeedingException(
+                    sprintf('An inline field of "%s" in "%s" is not a field name.', $recordIdentifier, $source),
+                    1786924836,
+                );
+            }
+            if (!is_array($children)) {
+                throw new SeedingException(
+                    sprintf('The inline field "%s" of "%s" in "%s" is not a list of records.', $field, $recordIdentifier, $source),
+                    1786924837,
+                );
+            }
+            $parsed[$field] = $this->parseRecords($children, null, $source, $seen);
         }
 
         return $parsed;

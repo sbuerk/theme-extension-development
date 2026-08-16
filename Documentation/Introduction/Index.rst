@@ -40,13 +40,14 @@ in a frontend rather than only in a test assertion:
 
 ..  note::
 
-    The theme is being built up. It renders a page once a site depends on its
-    site set — see :ref:`configuration` — together with the :guilabel:`Header`,
-    :guilabel:`Text` and :guilabel:`Images` content elements, without depending
-    on :file:`fluid_styled_content`. The remaining classic elements can be
-    created but have no rendering yet. It brings no backend layouts either, so
-    every page renders the same template. This chapter is extended along with
-    the implemented features.
+    The theme renders a page once a site depends on its site set — see
+    :ref:`configuration`. It covers **every classic content element**
+    :file:`EXT:frontend` registers, the eleven menu elements, ten elements of
+    its own, and third-party Extbase plugins, none of which requires
+    :file:`fluid_styled_content` — that extension is not a dependency here, and
+    on TYPO3 v14 it is not installed at all. It ships five backend layouts, a
+    main menu, a section menu and a breadcrumb, and a light/dark appearance
+    switch. This chapter is extended along with the implemented features.
 
     Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
     base with :ref:`core version aware <introduction-core-version-aware>`

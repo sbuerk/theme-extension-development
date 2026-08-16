@@ -21,8 +21,10 @@ vendor/bin/typo3 theme:seed --root-page=12 --force
 
 ## The format
 
-Structural keys are `identifier`, `uid`, `children` and `content`. Everything
-else is a field of the record and is written as it stands:
+Structural keys are `identifier`, `uid`, `children`, `content`, `files` and
+`inline` — plus `table`, which is structure on an inline child and an ordinary
+field everywhere else. Everything else is a field of the record and is written
+as it stands:
 
 ```yaml
 identifier: demo
@@ -43,15 +45,133 @@ pages:
         slug: '/about'
 ```
 
-- `identifier` is symbolic and has to be unique across the whole definition. It
-  becomes the DataHandler placeholder and is what the command reports the
-  written uids under.
+- `identifier` is symbolic and has to be unique across the whole definition,
+  inline children included. It becomes the DataHandler placeholder and is what
+  the command reports the written uids under. **Letters, digits and dashes
+  only, starting with a letter or a digit** — an underscore is rejected with a
+  message, for the reason in [Placeholders carry no underscore](#placeholders-carry-no-underscore).
 - `uid` is **optional**, and where it is given it is passed to DataHandler as a
   *suggested* uid.
 - `children` nests pages, `content` nests `tt_content` records below the page
   carrying them.
 - `files` on a record creates file references, as a map of field name to the
   references declared for it.
+- `inline` nests records into a **relation** rather than below a page, as a map
+  of field name to the children declared for it.
+
+Everything that is not one of those keys reaches the record untouched, which is
+the answer to the question the format invites: **a field needs no support in the
+seeder to be seedable.** `backend_layout`, `nav_hide`, `abstract`, `keywords`
+and the `table_*` fields of the `table` element are all ordinary columns and are
+all written by declaring them. `DataMapFactory::write()` sets `pid` and defaults
+`hidden`, and copies the rest of `SeedRecord::$values` verbatim. A seeder that
+special-cases a field it does not have to is a seeder that will special-case the
+next one too, so the absence of that branch is deliberate and
+`SeedingTest::fieldsTheSeederKnowsNothingAboutAreWrittenAsDeclared()` is what
+keeps it true.
+
+## Inline children
+
+`children` and `content` express the page tree, where nesting becomes a `pid`.
+A relation is a different shape: the child is not *below* the parent, it is
+*pointed at* by one of the parent's fields. That is what `inline` expresses — a
+map of the parent field carrying the relation to the records declared for it:
+
+```yaml
+content:
+  - identifier: showcase-linklist
+    CType: theme_linklist
+    header: 'Where to read more'
+    inline:
+      tx_theme_list_items:            # the field on the parent record
+        - identifier: showcase-docs
+          table: tx_theme_list_item   # required, never inferred
+          link: 't3://page?uid=2'
+          link_label: 'Typography'
+        - identifier: showcase-media
+          table: tx_theme_list_item
+          link: 't3://page?uid=3'
+          link_label: 'Media'
+```
+
+Four rules, each of which is a decision rather than a detail:
+
+**A child declares its own `table`.** It would be derivable — the parent's field
+has a `config.foreign_table` in the TCA — and deriving it is wrong twice over: a
+seed definition would then only be parseable with the TCA loaded, and a field
+name that does not exist would produce a null dereference somewhere in the
+factory rather than a message naming the child. `table` is therefore structural
+on an inline child exactly as `identifier` is, and it is structural *only*
+there: `tt_content` and `pages` both have real fields whose name begins with
+`table`, so the key is decided per level, where the context is known
+(`YamlSeedParser::STRUCTURAL_KEYS` and the `$table === null` branch in
+`parseRecords()`).
+
+**The parent's field is written as the comma-joined list of the children's
+placeholders**, in declaration order, and nothing else. Which columns the
+relation actually uses is a property of that relation and comes from the TCA of
+the parent field — for `tt_content.tx_theme_list_items` they are `uid_foreign`,
+`tablename` and `sorting_foreign`, and the singular `tablename` there is not the
+`tablenames` of `sys_file_reference`. DataHandler reads the list, resolves the
+placeholders and writes those columns itself. A seeder filling them in would
+produce identical rows for this relation and the wrong rows for the first one
+whose TCA names them differently, so it names none of them.
+
+**Order comes from that list.** Not from `sorting`, and not from the negative
+`pid` trick that orders pages and content elements — that convention names a
+record of the same table and is a sorting instruction, which a relation does not
+need. `DataHandler` numbers `sorting_foreign` by walking the value of the
+parent's field.
+
+**A child's `pid` is the page its parent sits on.** A relation is not a
+containment: the child is an ordinary record on an ordinary page, and only the
+relation columns tie it to the parent. Writing the parent's placeholder there
+would put content records on a content record.
+
+A child is a record like any other otherwise — it may declare a `uid`, and it
+may carry `files`, which the four cards of `theme_media_teaser_grid` in the demo
+definition do.
+
+## Placeholders carry no underscore
+
+The placeholder of a record is `NEW<table without underscores>-<identifier>`,
+and both halves of that shape exist to work around one line of DataHandler.
+
+`processRemapStack()` resolves the `NEW…` placeholders in a relation field. It
+first asks whether the value contains an underscore
+(`.Build/vendor/typo3/cms-core/Classes/DataHandling/DataHandler.php:7165-7189`,
+the *Replace relations to NEW...-IDs* block). If it does not, the value is a
+plain placeholder and the table comes from `config.foreign_table`. If it does,
+the value is read as the `<table>_<uid>` form the backend writes for a group
+field: it is split on every underscore, the **last** segment is taken as the id
+and everything before it as the table name.
+
+A placeholder like `NEWtt_content_home` therefore does not resolve. It is taken
+apart into a table `NEWtt_content` and an id `home`, `substNEWwithIDs['home']`
+does not exist, and the `?? ''` puts an empty string in its place. The relation
+is written **empty, with an empty error log** — nothing about that path is an
+error condition.
+
+That is the worst kind of failure, and it cost twice here:
+
+- **Every inline relation would have been empty**, which renders as a correct,
+  empty wrapper — indistinguishable from an editor who added no entries. That is
+  precisely the failure mode `ThemeContentElementRenderingTest` exists to catch.
+- **Every seeded file reference had kept `sorting_foreign = 0`** since file
+  seeding was added. That one was invisible:
+  `FileRepository::findByRelation()` selects by
+  `uid_foreign`/`tablenames`/`fieldname` and never reads the parent's counter
+  column (`.Build/vendor/typo3/cms-core/Classes/Resource/FileRepository.php:86-113`),
+  so the images appeared and looked right. It orders by `sorting_foreign`
+  though, and that column is only written by
+  `RelationHandler::writeForeignField()`, which runs after the placeholders in
+  the parent's field resolve. The order of a multi-file gallery was left to the
+  database.
+
+So the table name has its underscores stripped and is joined to the identifier
+with a dash, and `YamlSeedParser` rejects an identifier that would reintroduce
+one. Restricting the identifier is what makes the guarantee hold: a definition
+that would seed an empty relation is rejected with a message instead.
 
 ## Files
 
@@ -173,8 +293,86 @@ That is also why the command refuses to run into a non-empty page tree: a
 definition declaring uids collides rather than adding. `--force` overrides that
 for a definition known not to overlap.
 
+**Handing DataHandler a suggested uid takes two things, and neither is
+obvious.** `insertDB()` reads the suggestion from `$fieldArray['uid']` — the
+data map row — and looks it up in `suggestedInsertUids` under the key
+`"<table>:<uid>"`, not under the placeholder
+(`.Build/vendor/typo3/cms-core/Classes/DataHandling/DataHandler.php:7793-7811`).
+It then unsets the column again — *"Do NOT insert the UID field, ever!"* — so
+writing it into the data map cannot force a uid by itself, and populating only
+`suggestedInsertUids` with a placeholder key finds nothing.
+
+Getting either half wrong fails silently: DataHandler assigns the next free uid,
+the seeder reports whatever it got, and the result is correct exactly as long as
+declaration order happens to equal insertion order. It did, for the whole first
+version of the demo definition, which is why nothing noticed. The regression
+test therefore declares a single page with uid `4711` — a number that cannot be
+reached by counting.
+
+## The demo tree
+
+[`Configuration/Seeds/Demo.yaml`](../../Configuration/Seeds/Demo.yaml) is not a
+sample of the format, it is the frontend this extension is developed against.
+Nine pages, and between them every backend layout the extension registers and
+every `CType` it renders:
+
+| uid | Title          | Slug              | `backend_layout`  | What it is for                              |
+|-----|----------------|-------------------|-------------------|---------------------------------------------|
+| 1   | Theme demo     | `/`               | `start`           | The site root, and the footer columns.      |
+| 2   | Typography     | `/typography`     | `content`         | Headings, running text, the inline cases.   |
+| 3   | Media          | `/media`          | `content`         | One image, and a two column gallery.        |
+| 4   | Empty page     | `/empty`          | *(none)*          | The `default` layout fallback.              |
+| 5   | Elements       | `/elements`       | `content`         | The showcase branch, parent of 6 to 8.      |
+| 6   | Core elements  | `/elements/core`  | `content_sidebar` | Every classic `CType` the theme renders.    |
+| 7   | Menu elements  | `/elements/menu`  | `content_sidebar` | The eleven `menu_*` elements.               |
+| 8   | Theme elements | `/elements/theme` | `content`         | The ten `theme_*` elements.                 |
+| 9   | Styleguide     | `/styleguide`     | `styleguide`      | The component library, straight from Fluid. |
+
+Uids 1 to 4 do not move: the committed site configurations of both development
+instances point at root page 1, and the tests assert against the others.
+
+Four properties of that tree are deliberate, and are asserted by
+`Tests/Functional/ShowcaseTreeTest.php` and `Tests/Functional/SeedingTest.php`
+rather than left to a reader to preserve:
+
+- **Page 4 declares no `backend_layout` at all**, and that is the point of it.
+  It is the only page in the tree that reaches the hard-coded `default` in
+  `PageLayoutResolver::getLayoutIdentifierForPage()`
+  (`.Build/vendor/typo3/cms-core/Classes/Page/PageLayoutResolver.php:118-120`),
+  after the `backend_layout_next_level` walk up the rootline found nothing. That
+  path has no other coverage in a seeded tree.
+- **Pages 6 and 7 use `content_sidebar` and their sibling 8 does not.** Two
+  pages under one parent rendering with and without the sub navigation is what
+  proves the layout is resolved per page rather than inherited down the branch.
+- **The styleguide page uses `nav_hide`, never `hidden`.** A hidden page returns
+  404 in the frontend and is only reachable through a backend preview link
+  carrying a valid hash, which defeats the point of seeding a page that exists
+  to be opened. `nav_hide` keeps it reachable by URL and out of every menu,
+  which is what "not published" meant here.
+- **The two lists that hold the tree complete are read from the repository, not
+  from the test.** `ShowcaseTreeTest` derives the backend layouts from
+  `Configuration/PageTsConfig/BackendLayouts/` and the content types from the
+  TypoScript. A layout or an element added without a demo page then fails there,
+  instead of shipping undemonstrated — a list maintained in a test goes stale
+  silently, because a demo page nobody seeded is a page nobody misses.
+
 ## What it does not do
 
+- **No categories, and no MM relations.** The format expresses neither a
+  `sys_category` record nor the MM rows that relate one to a page or a content
+  element. That is why `menu_categorized_pages` and `menu_categorized_content`
+  are seeded with `selected_categories: 0` — an empty selection, which renders
+  an empty menu, and an empty menu is the correct rendering of "nothing
+  chosen". This is a limitation of the format rather than a defect of the demo
+  tree, and closing it means a second structural feature: a way to declare
+  records outside the page tree, and a way to declare a relation between two of
+  them. That is out of proportion to demonstrating two elements, so it is named
+  here and left. The `0` is written out rather than the field left off because
+  it is the value the column carries once anything real has touched it, and
+  because it keeps the two elements identical so neither reads as the special
+  case; the empty value itself is handled in
+  `Configuration/TypoScript/ContentElements.typoscript`, where
+  `selected_categories` reaches the subquery through an `ifEmpty = 0`.
 - **No file metadata.** The fields of a *reference* are written; the
   `sys_file_metadata` of the file itself — the alternative text and title that
   apply wherever the file is used — is not. That is deliberate rather than
@@ -206,4 +404,8 @@ engine is extracted.
 ## See also
 
 - [Development instances](instances.md)
+- [Page rendering](../architecture/page-rendering.md) — the backend layouts the
+  demo tree uses, and how a layout resolves to a template.
+- [Content elements](../architecture/content-elements.md) — the `CType` set the
+  showcase pages have to cover.
 - [Functional tests](../testing/functional-tests.md)

@@ -23,7 +23,7 @@ Documentation for people **using** the extension lives in
 | [Component library](development/component-library.md)       | Every component's markup contract, the two switches, what the tests guard.          |
 | [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher. |
 | [Development instances](development/instances.md)           | The two TYPO3 instances, the `theme` symlink, snapshot and restore.                 |
-| [Seeding](development/seeding.md)                           | `theme:seed`, the definition format, why it goes through DataHandler.               |
+| [Seeding](development/seeding.md)                           | `theme:seed`, the definition format, inline relations, the demo tree.               |
 
 ## [Architecture](architecture/Index.md)
 
