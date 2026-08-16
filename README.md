@@ -47,6 +47,11 @@ them a template, which needs no TCA of its own.
 
 Backend layouts are missing too, so every page renders the same template.
 
+The stylesheet is built from a documented set of design tokens with a light
+and a dark appearance — see [`DESIGN.md`](DESIGN.md). They are CSS custom
+properties, so a site package re-themes the extension by overriding a handful
+of them, without rebuilding the SCSS.
+
 Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
 base, the core version aware wiring, the SCSS build, two development instances
 and the container based test and quality gate harness. The public API is not

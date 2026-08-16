@@ -1,31 +1,176 @@
 // Design tokens.
 //
+// The specification, including where every value comes from and the contrast
+// ratios behind the palette, is "DESIGN.md" in the repository root. This file
+// is the implementation; keep the two in step.
+//
 // Declared as CSS custom properties rather than as Sass variables on purpose:
 // a custom property survives compilation, so an integrator can re-theme the
 // stylesheet from their own CSS without rebuilding the SCSS, and the browser
 // devtools show the token rather than the value it was compiled to. Sass
 // variables are used only where a value has to exist at compile time.
+//
+// The typography metrics, the spacing grid, the radii and the border widths
+// are measured from an internal reference design; the palette is deliberately
+// neutral and authored - see "Provenance" in DESIGN.md.
+
+// The dark palette is written once and emitted twice, because it has to answer
+// both the system preference and an explicit "data-theme" attribute. A mixin
+// keeps the two in step; duplicating it by hand would not stay that way.
+@mixin dark-palette {
+    color-scheme: dark;
+
+    --theme-color-background: #0f1319;
+    --theme-color-surface: #161c25;
+    --theme-color-surface-raised: #1d2531;
+
+    --theme-color-primary: #82abff;
+    --theme-color-primary-hover: #9dbeff;
+    --theme-color-on-primary: #0f1319;
+    --theme-color-secondary: #4fd1c5;
+    --theme-color-secondary-hover: #6ee0d6;
+    --theme-color-on-secondary: #0f1319;
+
+    --theme-color-text-primary: #e9edf4;
+    --theme-color-text-secondary: #a9b4c5;
+    --theme-color-text-muted: #808b9d;
+
+    --theme-color-border: #29313d;
+    --theme-color-border-strong: #5f6c7d;
+
+    --theme-color-success: #4ade80;
+    --theme-color-warning: #fbbf24;
+    --theme-color-danger: #ff8a80;
+
+    --theme-focus-ring: 0 0 0 3px rgb(130 171 255 / 40%);
+}
 
 :root {
-    // Typography.
-    --theme-font-family-base: system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+    color-scheme: light;
+
+    // --- Typography -----------------------------------------------------
+    //
+    // The reference design is set in Mulish, which this extension does not ship:
+    // it carries no webfonts and makes no external request. What is taken from
+    // it are the metrics below. Loading Mulish and overriding this one token
+    // restores the reference design.
+    --theme-font-family-sans: system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
     --theme-font-family-mono: ui-monospace, 'SFMono-Regular', 'Consolas', monospace;
-    --theme-font-size-base: 1rem;
-    --theme-line-height-base: 1.5;
 
-    // Spacing scale.
-    --theme-spacing-xs: 0.25rem;
-    --theme-spacing-sm: 0.5rem;
-    --theme-spacing-md: 1rem;
-    --theme-spacing-lg: 2rem;
-    --theme-spacing-xl: 4rem;
+    --theme-font-size-xs: 0.75rem;      // 12px
+    --theme-font-size-sm: 0.875rem;     // 14px
+    --theme-font-size-md: 1rem;         // 16px
+    --theme-font-size-lg: 1.25rem;      // 20px, the one added step
+    --theme-font-size-xl: 1.5rem;       // 24px
+    --theme-font-size-2xl: 2.125rem;    // 34px
+    --theme-font-size-display: clamp(2.125rem, 1.5rem + 3vw, 3.375rem); // 34-54px
+    --theme-font-size-mono: 0.9375rem;  // 15px
 
-    // Colours.
-    --theme-color-text: #1a1a1a;
+    --theme-font-weight-regular: 400;
+    --theme-font-weight-medium: 500;
+    --theme-font-weight-bold: 800;
+
+    // Only the line heights the reference sets explicitly. Its remaining
+    // values are automatic, which means nothing was chosen.
+    --theme-line-height-tight: 1.1;     // 14px controls
+    --theme-line-height-snug: 1.3;      // 24px headings
+    --theme-line-height-heading: 1.5;   // 34px headings and the display size
+    --theme-line-height-base: 1.6;      // 16px body
+
+    // The design tracks *out*, not in: exactly 0.05em at every size that
+    // carries tracking at all. Body prose is the exception.
+    --theme-letter-spacing-wide: 0.05em;
+    --theme-letter-spacing-none: 0;
+
+    --theme-measure: 68ch;
+
+    // --- Colour ---------------------------------------------------------
     --theme-color-background: #ffffff;
-    --theme-color-accent: #0b57d0;
-    --theme-color-border: #d7d7d7;
+    --theme-color-surface: #f4f6fa;
+    --theme-color-surface-raised: #ffffff;
 
-    // Layout.
+    --theme-color-primary: #0b57d0;
+    --theme-color-primary-hover: #0a4bb4;
+    --theme-color-on-primary: #ffffff;
+    --theme-color-secondary: #0f766e;
+    --theme-color-secondary-hover: #0c5f59;
+    --theme-color-on-secondary: #ffffff;
+
+    --theme-color-text-primary: #14181f;
+    --theme-color-text-secondary: #4a5567;
+    --theme-color-text-muted: #616b80;
+
+    // "border" is decorative separation; "border-strong" is the one that
+    // reaches 3:1 and belongs on anything delimiting a control.
+    --theme-color-border: #d6dce6;
+    --theme-color-border-strong: #828d9f;
+
+    --theme-color-success: #146c43;
+    --theme-color-warning: #8a5a00;
+    --theme-color-danger: #b3261e;
+
+    // --- Spacing --------------------------------------------------------
+    //
+    // A 5px grid, measured from the auto-layout gaps of the reference. In rem so
+    // spacing grows when a reader enlarges the base font size.
+    --theme-space-0: 0;
+    --theme-space-1: 0.3125rem;  // 5px
+    --theme-space-2: 0.625rem;   // 10px
+    --theme-space-3: 0.9375rem;  // 15px
+    --theme-space-4: 1.25rem;    // 20px
+    --theme-space-5: 1.5625rem;  // 25px
+    --theme-space-6: 1.875rem;   // 30px
+    --theme-space-7: 2.5rem;     // 40px
+    --theme-space-8: 3.75rem;    // 60px, added for page level rhythm
+
+    // --- Radius and borders ---------------------------------------------
+    //
+    // The reference has exactly two radii, 5px and a pill. "md" is the single
+    // extrapolation, kept on the 5px grid. In px: a corner should not grow
+    // with the root font size.
+    --theme-radius-none: 0;
+    --theme-radius-sm: 5px;
+    --theme-radius-md: 10px;
+    --theme-radius-full: 9999px;
+
+    --theme-border-width: 1px;
+    --theme-border-width-strong: 2px;
+
+    // --- Elevation ------------------------------------------------------
+    //
+    // The design is flat: the reference contains no visible effect of any
+    // kind, so there are deliberately no elevation tokens. Focus is the
+    // exception, because it is a requirement rather than decoration.
+    --theme-focus-ring: 0 0 0 3px rgb(11 87 208 / 35%);
+
+    // --- Motion ---------------------------------------------------------
+    --theme-duration-fast: 120ms;
+    --theme-duration-base: 200ms;
+    --theme-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+    // --- Layout ---------------------------------------------------------
+    //
+    // 1200px, deliberately the same number as the TypoScript constant
+    // "theme.media.maxGalleryWidth", which decides how wide images are
+    // processed. If one moves, the other has to.
     --theme-content-max-width: 75rem;
+}
+
+// The system preference decides, unless the document asks for light explicitly.
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+        @include dark-palette;
+    }
+}
+
+// An explicit request wins over the system preference, in both directions.
+:root[data-theme='dark'] {
+    @include dark-palette;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --theme-duration-fast: 1ms;
+        --theme-duration-base: 1ms;
+    }
 }

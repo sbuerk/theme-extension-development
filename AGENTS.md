@@ -137,6 +137,7 @@ Nothing below `.agent/` is ever committed.
 | Symfony DI attributes, stateless services           | [Dependency injection](docs/architecture/dependency-injection.md)       |
 | `final readonly`, injected abstracts, DTOs          | [Class design](docs/architecture/class-design.md)                       |
 | Both test suites and their strictness               | [Testing](docs/testing/Index.md)                                        |
+| Design tokens, and the light/dark contract          | [Design tokens](DESIGN.md)                                              |
 | Commit message conventions                          | [Commit messages](docs/workflow/commit-messages.md)                     |
 
 ## The rules that are not negotiable

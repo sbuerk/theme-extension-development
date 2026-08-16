@@ -9,17 +9,17 @@
 //       are structural only. They get their real values with the design work.
 
 .gallery {
-    margin: 0 0 var(--theme-spacing-lg);
+    margin: 0 0 var(--theme-space-6);
 }
 
 .gallery__row {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: var(--theme-spacing-md);
+    gap: var(--theme-space-3);
 
     & + & {
-        margin-top: var(--theme-spacing-md);
+        margin-top: var(--theme-space-3);
     }
 }
 
@@ -52,6 +52,6 @@
 }
 
 .gallery__caption {
-    margin-top: var(--theme-spacing-xs);
-    font-size: 0.875rem;
+    margin-top: var(--theme-space-1);
+    font-size: var(--theme-font-size-sm);
 }
