@@ -1,0 +1,66 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:comment>
+        "uploads" is a file list, not a gallery: file name, an optional size, an
+        optional thumbnail and an optional description, driven by the core TCA
+        under
+        ".Build/vendor/typo3/cms-frontend/Configuration/TCA/Overrides/245-tt_content-content_type-uploads.php":
+
+        - "media" (type "file", no "allowed" restriction) and "file_collections"
+          are both valid sources, wired into "FilesProcessor" the same way
+          "collections" complements "references" for the image element -
+          skipping "file_collections" here would make that field's tab do
+          nothing.
+        - "filelink_sorting"/"filelink_sorting_direction" order the merged list;
+          "FilesProcessor" sorts natively via its "sorting"/"sorting.direction"
+          options, so this stays a processor concern rather than a Fluid one.
+        - "filelink_size" (checkbox) toggles the byte count, formatted with
+          "f:format.bytes" - see
+          ".Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/Format/BytesViewHelper.php".
+        - "uploads_description" (checkbox) toggles the reference's own
+          description, when one was entered.
+        - "uploads_type" chooses between "only file name" (0), "file name and
+          extension icon" (1) and "file name and thumbnail" (2). The component
+          library has no file-type icon component (see
+          "docs/development/component-library.md"), so value 1 renders the same
+          as 0 rather than inventing one; value 2 renders a thumbnail, and only
+          for files FAL actually classifies as an image ("file.type == 2",
+          "TYPO3\CMS\Core\Resource\FileType::IMAGE") - "f:image" cannot process
+          a PDF or a text file, and "uploads_type"'s own label already says
+          "if possible".
+        - "target" is passed straight through to the link.
+
+        None of the classes below have a stylesheet rule yet, the same way
+        "theme-content-element__body" in "Text.html" does not - they are the
+        structural hook, styling is a separate decision left to whoever owns
+        "Resources/Private/Scss/".
+    </f:comment>
+    <f:if condition="{files}">
+        <ul class="theme-content-element__file-list">
+            <f:for each="{files}" as="file">
+                <li class="theme-content-element__file-item">
+                    <a class="theme-content-element__file-link" href="{file.publicUrl}" target="{data.target}">
+                        <f:if condition="{data.uploads_type} == 2 && {file.type} == 2">
+                            <f:image class="theme-content-element__file-thumbnail" image="{file}" width="60" loading="lazy" />
+                        </f:if>
+                        <span class="theme-content-element__file-name">{file.name}</span>
+                    </a>
+                    <f:if condition="{data.filelink_size}">
+                        <span class="theme-content-element__file-size">(<f:format.bytes>{file.size}</f:format.bytes>)</span>
+                    </f:if>
+                    <f:if condition="{data.uploads_description} && {file.description}">
+                        <p class="theme-content-element__file-description">{file.description}</p>
+                    </f:if>
+                </li>
+            </f:for>
+        </ul>
+    </f:if>
+</f:section>
+
+</html>

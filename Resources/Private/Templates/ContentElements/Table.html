@@ -1,0 +1,84 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:comment>
+        "bodytext" is delimited/enclosed text, shaped by "table_caption",
+        "table_delimiter", "table_enclosure", "table_header_position" and
+        "table_tfoot". "TableProcessor" (see
+        "Classes/DataProcessing/TableProcessor.php", wired below in
+        "Configuration/TypoScript/ContentElements.typoscript") does the
+        decoding and the row/column split - splitting a two-level,
+        character-code-delimited structure is not something Fluid can
+        reasonably do - and hands this template a ready-to-render
+        {table.headerRow}/{table.bodyRows}/{table.footerRow}/{table.headerColumn}.
+
+        Markup follows the "Table" contract in
+        "docs/development/component-library.md": ".theme-table-wrapper" is the
+        scrollable, focusable region ("tabindex=0" + "role=region" +
+        "aria-label", the W3C APG scrollable-region-focusable pattern),
+        ".theme-table" the element itself, ".theme-table__caption" the
+        caption. "<thead>"/"<tbody>"/"<th>"/"<td>" are styled through plain
+        element selectors under ".theme-table", not a class each.
+
+        "table_tfoot" is honoured with a real "<tfoot>" - correct semantic
+        HTML needs no class of its own - but note for anyone extending the
+        stylesheet: "components/_table.scss" only documents and styles
+        "<thead>"/"<tbody>", so a footer row currently renders with no
+        component styling beyond what it inherits from ".theme-table" itself.
+
+        Escaping: "table.caption" and every cell come straight from an editor.
+        Both are output through plain Fluid variable interpolation, which
+        HTML-escapes by default - nothing here uses "f:format.raw" or
+        "f:format.html", so text typed into a cell is shown as text, never
+        executed as markup.
+    </f:comment>
+    <f:if condition="{table.headerRow} || {table.bodyRows} || {table.footerRow}">
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="{f:if(condition: table.caption, then: table.caption, else: data.header)}">
+            <table class="theme-table">
+                <f:if condition="{table.caption}">
+                    <caption class="theme-table__caption">{table.caption}</caption>
+                </f:if>
+                <f:if condition="{table.headerRow}">
+                    <thead>
+                        <tr>
+                            <f:for each="{table.headerRow}" as="cell">
+                                <th>{cell}</th>
+                            </f:for>
+                        </tr>
+                    </thead>
+                </f:if>
+                <tbody>
+                    <f:for each="{table.bodyRows}" as="row">
+                        <tr>
+                            <f:for each="{row}" as="cell" iteration="cellIterator">
+                                <f:if condition="{table.headerColumn} && {cellIterator.isFirst}">
+                                    <f:then><th scope="row">{cell}</th></f:then>
+                                    <f:else><td>{cell}</td></f:else>
+                                </f:if>
+                            </f:for>
+                        </tr>
+                    </f:for>
+                </tbody>
+                <f:if condition="{table.footerRow}">
+                    <tfoot>
+                        <tr>
+                            <f:for each="{table.footerRow}" as="cell" iteration="cellIterator">
+                                <f:if condition="{table.headerColumn} && {cellIterator.isFirst}">
+                                    <f:then><th scope="row">{cell}</th></f:then>
+                                    <f:else><td>{cell}</td></f:else>
+                                </f:if>
+                            </f:for>
+                        </tr>
+                    </tfoot>
+                </f:if>
+            </table>
+        </div>
+    </f:if>
+</f:section>
+
+</html>

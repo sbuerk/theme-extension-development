@@ -12,6 +12,7 @@ demonstrate them and are meant to be deleted once real code arrives.
 | [TypoScript delivery](typoscript-delivery.md)         | The site set, the guarded static include fallback, why `addStaticFile()` sits in a TCA override, and page rendering with `FLUIDTEMPLATE`.               |
 | [Page rendering](page-rendering.md)                   | Why `FLUIDTEMPLATE` over `PAGEVIEW`, backend layout registration, template name resolution, content slots, the Fluid structure.                         |
 | [Navigation](navigation.md)                           | Main menu, sub navigation and breadcrumb, the fixed-rootline `leveluid:1` resolution, placement by backend layout, accessibility.                       |
+| [Content elements](content-elements.md)               | Classic `CType` coverage, why `table` needed a `DataProcessor`, `shortcut` recursion, escaping, a Fluid `&&` gotcha.                                    |
 
 ## The short version
 

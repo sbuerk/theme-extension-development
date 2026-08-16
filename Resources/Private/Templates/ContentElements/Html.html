@@ -1,0 +1,45 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "html" renders "bodytext" raw and unescaped - deliberately, that is the
+    entire point of the element. Two things follow from that:
+
+    1. "f:format.raw", not "f:format.html". "f:format.html" runs the value
+       through "lib.parseFunc_RTE" (EXT:frontend's own ParseFunc setup for rich
+       text), which would rewrite links and reinterpret tags - exactly what an
+       editor pasting raw markup or a script tag does not want done to it.
+       "f:format.raw" (TYPO3Fluid\Fluid\ViewHelpers\Format\RawViewHelper) emits
+       the value completely untouched: no escaping, no parsing, no RTE.
+
+    2. Access has to be restricted, and it is - through the general mechanism
+       TYPO3 uses for every value of the "CType" field, not a check specific to
+       "html". The "CType" column carries "authMode = explicitAllow"
+       (EXT:frontend/Configuration/TCA/tt_content.php). Per
+       "BackendUserAuthentication::checkAuthMode()" and
+       "::recordEditAccessInternals()" (typo3/cms-core), a non-admin editor may
+       only save a record whose "CType" value is explicitly present in their
+       backend group's "explicit_allowdeny" list; admins bypass the check
+       entirely ("isAdmin()" short-circuits both methods). A freshly created
+       backend group starts with an empty list, so *every* CType - not only
+       "html" - needs to be explicitly granted before a non-admin editor can
+       use it. "html" being "admin-only by default" is therefore a convention,
+       not a hardcoded flag: it is the one CType site administrators are
+       expected to leave off that grant, because its content reaches the
+       frontend unescaped. This template does not (and cannot) enforce that
+       from the frontend side - it is a backend-group configuration decision -
+       so raw output here is exactly as trusted as whoever was granted the
+       "html" CType.
+
+    "header" is not rendered for the same reason as "div": EXT:frontend's
+    language file overrides its label to "Name (not visible in frontend)"
+    (locallang_ttc.xlf, "header.ALT.html_formlabel" /
+    "header.description.ALT").
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:format.raw>{data.bodytext}</f:format.raw>
+</f:section>
+
+</html>

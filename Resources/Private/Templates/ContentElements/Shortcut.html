@@ -1,0 +1,32 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "shortcut" carries no content of its own. "records" holds one or more
+    "tt_content_UID" references (the TCA "group" field only allows
+    "tt_content" - EXT:frontend/Configuration/TCA/tt_content.php), and the
+    TypoScript branch below resolves them through the core's "RECORDS" cObject
+    into "{records}" - already-rendered markup, one full content-element
+    render per reference, wrapper and all. "f:format.raw" is used here only
+    because that markup is TYPO3's own output, not user input; see "Html.html"
+    for what "f:format.raw" means when the value is not trusted the same way.
+
+    Rendering another content element risks recursion: a shortcut pointing at
+    itself, or at a shortcut that points back. See
+    "Configuration/TypoScript/ContentElements.typoscript" for what was
+    verified about the core's guard against exactly that, in
+    "RecordsContentObject::render()" - this template does not add one of its
+    own because the core one already covers it.
+
+    "header" is not rendered, same reasoning as "div" and "html":
+    EXT:frontend's language file overrides its label to "Name (not visible in
+    frontend)" (locallang_ttc.xlf, "header.ALT.shortcut_formlabel" /
+    "header.description.ALT").
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:format.raw>{records}</f:format.raw>
+</f:section>
+
+</html>

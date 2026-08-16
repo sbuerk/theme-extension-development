@@ -1,0 +1,71 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:comment>
+        "bodytext" is one item per line. "TYPO3\CMS\Frontend\DataProcessing\
+        SplitProcessor" already does exactly the split this needs - one field,
+        one delimiter (its default is LF, which is what "bodytext" already
+        uses), no nesting - so no processor of this extension's own was
+        written for "bullets"; see "ContentElements.typoscript" for the
+        TypoScript-only wiring.
+
+        "bullets_type" (core TCA, EXT:frontend
+        "Configuration/TCA/Overrides/235-tt_content-content_type-bullets.php")
+        selects the list type: 0 = unordered ("<ul>"), 1 = ordered ("<ol>"),
+        2 = definition list ("<dl>").
+
+        The component library ("docs/development/component-library.md") has
+        no dedicated list/bullets component - no ".theme-list" or similar is
+        documented, so none is invented here. This renders plain semantic
+        "<ul>"/"<ol>"/"<dl>" inside the same ".theme-content-element__body"
+        wrapper "Text.html" uses, styled only by whatever base typography the
+        theme already applies to those elements.
+
+        A definition list has no second field to supply the "<dd>" half of a
+        term/description pair - "bodytext" for "bullets" is documented as one
+        item per line with no delimiter convention for splitting a term from
+        its description, and no reference rendering ships with this core
+        version to defer to (this distribution carries no
+        "fluid_styled_content"). Each line therefore becomes a "<dt>" on its
+        own; inventing an ad-hoc in-line delimiter the editor was never told
+        about would be worse than leaving "<dd>" out.
+
+        Escaping: each bullet item comes straight from an editor and is output
+        through plain Fluid variable interpolation, which HTML-escapes by
+        default - nothing here uses "f:format.raw" or "f:format.html".
+    </f:comment>
+    <f:if condition="{bullets}">
+        <div class="theme-content-element__body">
+            <f:switch expression="{data.bullets_type}">
+                <f:case value="1">
+                    <ol>
+                        <f:for each="{bullets}" as="bullet">
+                            <li>{bullet}</li>
+                        </f:for>
+                    </ol>
+                </f:case>
+                <f:case value="2">
+                    <dl>
+                        <f:for each="{bullets}" as="bullet">
+                            <dt>{bullet}</dt>
+                        </f:for>
+                    </dl>
+                </f:case>
+                <f:defaultCase>
+                    <ul>
+                        <f:for each="{bullets}" as="bullet">
+                            <li>{bullet}</li>
+                        </f:for>
+                    </ul>
+                </f:defaultCase>
+            </f:switch>
+        </div>
+    </f:if>
+</f:section>
+
+</html>

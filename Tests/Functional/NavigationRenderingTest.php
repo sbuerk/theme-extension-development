@@ -153,6 +153,35 @@ final class NavigationRenderingTest extends AbstractFunctionalTestCase
         $this->assertStringContainsString('aria-current="page"', $this->render('/first/a'));
     }
 
+    /**
+     * The trail marker has to mark one branch, not all of them.
+     *
+     * This is asserted because the condition behind it is the kind that fails
+     * open: written with an escaped ampersand - which reads as correct and is
+     * even valid XML - Fluid does not parse it as a conjunction at all and the
+     * whole expression evaluates true, so every top level item is marked and
+     * the menu answers "where am I" with "everywhere".
+     */
+    #[Test]
+    public function onlyTheBranchLeadingToTheCurrentPageIsMarkedActive(): void
+    {
+        $mainMenu = $this->navigation($this->render('/first/a'), 'theme-nav-main');
+
+        $this->assertSame(
+            1,
+            substr_count($mainMenu, 'theme-nav-main__item--active'),
+            'Exactly one top level item leads to the current page.',
+        );
+
+        $matched = preg_match(
+            '#<li[^>]*theme-nav-main__item--active[^>]*>\s*<a[^>]*>\s*([^<]+?)\s*</a>#s',
+            $mainMenu,
+            $active,
+        );
+        $this->assertSame(1, $matched, 'No active item was rendered at all.');
+        $this->assertSame('First section', trim($active[1]));
+    }
+
     #[Test]
     public function theBreadcrumbShowsTheTrailAndDoesNotLinkTheCurrentPage(): void
     {
