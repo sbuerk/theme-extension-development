@@ -70,9 +70,10 @@ reports it. That is exactly what a branch cut from `main` inherits, since it
 takes this file along with `main` in it.
 
 `release.sh` uses it for more than the alias: it is the branch it branches off,
-refreshes, targets pull requests at with `gh pr create --base`, and tags. Run
-with the default on a maintenance branch it would open the release pull request
-against `main`.
+refreshes, targets pull requests at with `gh pr create --base`, and tags. That
+is why the default matters here — before it was corrected, a release run on this
+branch would have branched off `main`, opened the release pull request against
+`main` and tagged `main`, all without complaining.
 
 ## `release.sh` — orchestrate the release
 
