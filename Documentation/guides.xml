@@ -12,8 +12,8 @@
                typo3-core-preferred="stable"
     />
     <project title="Frontend Theme for Extension Development"
-             release="main (development)"
-             version="main (development)"
+             release="2 (development)"
+             version="2 (development)"
              copyright="sbuerk &amp; Contributors"
     />
 </guides>

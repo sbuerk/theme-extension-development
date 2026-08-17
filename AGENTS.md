@@ -125,6 +125,26 @@ costs RAM. Use `.agent/` in the repository root, which is git-ignored:
 
 Nothing below `.agent/` is ever committed.
 
+## Which branch this is
+
+The repository maintains one branch per core version tuple:
+
+| Branch | Extension | TYPO3         | PHP       |
+|--------|-----------|---------------|-----------|
+| `main` | 2.x       | v13.4 / v14.3 | 8.2 - 8.5 |
+| `1`    | 1.x       | v12.4 / v13.4 | 8.1 - 8.4 |
+
+**This checkout is `main`.** Everything below applies to the v13/v14 tuple:
+`Core13/` and `Core14/` are the version aware directories, `-t 13` and `-t 14`
+are the only valid core selectors, and PHP 8.2 is the floor.
+
+Branch `1` is not a copy of `main` with a different constraint. It diverges
+deliberately — PHP 8.1 rules out `readonly` on a class there, TYPO3 v12 has no
+site sets — and it documents its own divergences. Do not carry its content here,
+and do not assume a statement made here holds there. A change that belongs on
+both is made on `main` and backported.
+→ [Release branches](docs/workflow/releasing.md#release-branches)
+
 ## Read this before changing code
 
 | Topic                                               | Page                                                                    |

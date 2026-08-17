@@ -2,10 +2,10 @@
 
 ..  include:: /Includes.rst.txt
 
-..  _changelog-1-0:
+..  _changelog-2-0:
 
 ===========
-1.0 Changes
+2.0 Changes
 ===========
 
 **Table of contents**

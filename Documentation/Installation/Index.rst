@@ -37,7 +37,7 @@ between ``require`` and ``require-dev``. A deployment installing with
 
     ..  code-block:: bash
 
-        composer require --dev sbuerk/theme-extension-development:^1.0@dev
+        composer require --dev sbuerk/theme-extension-development:^2.0@dev
 
     This additionally requires ``minimum-stability`` to be set to ``dev``
     together with ``prefer-stable`` set to ``true`` in the root

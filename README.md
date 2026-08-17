@@ -60,9 +60,14 @@ release.
 
 ## Compatibility
 
-| Branch | Extension | TYPO3     | PHP       |
-|--------|-----------|-----------|-----------|
-| main   | 1.x       | v13 / v14 | 8.2 - 8.5 |
+| Branch | Extension | TYPO3         | PHP       |
+|--------|-----------|---------------|-----------|
+| `main` | 2.x       | v13.4 / v14.3 | 8.2 - 8.5 |
+| `1`    | 1.x       | v12.4 / v13.4 | 8.1 - 8.4 |
+
+`main` is the development line and the branch to open a pull request against.
+Branch `1` is the maintained line for the previous core version tuple; PHP 8.1
+is supported there for TYPO3 v12 only, because TYPO3 v13.4 requires PHP 8.2.
 
 ## Installation
 
@@ -78,7 +83,7 @@ As long as no stable version has been released, require the development version
 of the main branch explicitly:
 
 ```bash
-composer require --dev sbuerk/theme-extension-development:^1.0@dev
+composer require --dev sbuerk/theme-extension-development:^2.0@dev
 ```
 
 This additionally requires `minimum-stability: "dev"` together with

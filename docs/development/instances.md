@@ -39,7 +39,7 @@ Only what describes an instance, never what an install produces:
 
 | Path                                 | Is                                                           |
 |--------------------------------------|--------------------------------------------------------------|
-| `.ddev/config.yaml`                  | The DDEV project, `core13-theme-v1` / `core14-theme-v1`.     |
+| `.ddev/config.yaml`                  | The DDEV project, `core13-theme-v2` / `core14-theme-v2`.     |
 | `.ddev/docker-compose.mounts.yaml`   | The mounts that make the relative paths resolve, see below.  |
 | `composer.json`                      | Dependencies, path repositories, the snapshot scripts.       |
 | `config/system/settings.php`         | Instance configuration. The database path there is advisory. |
@@ -154,8 +154,12 @@ The checkpoint is harmless in any other journal mode.
 
 ## Switching branches in the same checkout
 
-The DDEV project name carries the version line (`core13-theme-v1`), and DDEV
-refuses a second name for a project path it already knows:
+The DDEV project name carries **two** dimensions, the core version and the
+extension's own version line — `core13-theme-v2` and `core14-theme-v2` on this
+branch, `core12-theme-v1` and `core13-theme-v1` on branch `1`. The second half
+is what matters here: `instance-core-13/` exists on both branches, the instance
+directory is the same path on every branch, DDEV keys a project on its root
+directory, and it refuses a second name for a path it already knows.
 
 ```
 Failed to start app core13-theme-v2: this project root '…/instance-core-13'
@@ -165,6 +169,13 @@ already contains a project named 'core13-theme-v1'.
 `ddev stop --unlist <other-name> && ddev start` fixes it. `--unlist` removes only
 the registration; the database in the git-ignored `var/` survives and still holds
 the other branch's state, so `ddev composer sqlite:apply` resets it.
+
+The error is the good outcome, and it is why the names differ. Two branches
+naming the project *identically* would not produce it at all — they would
+silently share one registration and one database, and content seeded on one
+branch would show up on the other. `instance-core-13/` is exactly that case:
+both branches ship it, and only the `-v1`/`-v2` suffix keeps the two apart. So
+check `.ddev/config.yaml` whenever a branch is cut from another.
 
 ## See also
 
