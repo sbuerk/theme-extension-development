@@ -1,0 +1,47 @@
+# Records of tables other than "pages" and "tt_content", declared on a page.
+#
+# The tables are picked for what they prove rather than for what they mean:
+# "sys_category" is a core table this extension has nothing to do with, so a
+# record of it can only be written because the format expresses the table
+# rather than knowing it; and the "tt_content" element carrying an inline
+# child shows that a record declared under "records" is a record like any
+# other, with the same nesting available to it.
+identifier: records
+
+pages:
+  - identifier: home
+    uid: 1
+    title: 'Records'
+    slug: '/'
+    is_siteroot: 1
+    doktype: 1
+    children:
+      - identifier: storage
+        uid: 2
+        title: 'Storage'
+        slug: '/storage'
+        doktype: 254
+        # A relation to a record declared below, by the uid that record
+        # declares. "pages.categories" is an MM relation, so what this proves is
+        # that DataHandler writes the MM row - the seeder neither knows nor
+        # names the table it goes into.
+        categories: 4711
+        records:
+          # A uid that cannot be reached by counting, so honouring it proves
+          # the suggestion is passed for any table and not just for pages.
+          - identifier: category-first
+            table: sys_category
+            uid: 4711
+            title: 'First'
+          - identifier: category-second
+            table: sys_category
+            title: 'Second'
+          - identifier: storage-linklist
+            table: tt_content
+            CType: theme_linklist
+            header: 'Where to read more'
+            inline:
+              tx_theme_list_items:
+                - identifier: storage-docs
+                  table: tx_theme_list_item
+                  link_label: 'Documentation'

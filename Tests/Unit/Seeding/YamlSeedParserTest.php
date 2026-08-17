@@ -7,6 +7,7 @@ namespace SBUERK\ThemeExtensionDevelopment\Tests\Unit\Seeding;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\ThemeExtensionDevelopment\Seeding\Exception\SeedingException;
+use SBUERK\ThemeExtensionDevelopment\Seeding\SeedRecord;
 use SBUERK\ThemeExtensionDevelopment\Seeding\YamlSeedParser;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
@@ -191,6 +192,106 @@ final class YamlSeedParserTest extends UnitTestCase
     }
 
     #[Test]
+    public function recordsCarryTheirOwnTableAndAreNestedOntoThePageDeclaringThem(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [[
+                'identifier' => 'storage',
+                'doktype' => 254,
+                'records' => [
+                    ['identifier' => 'category-news', 'table' => 'sys_category', 'title' => 'News'],
+                    ['identifier' => 'user-doe', 'table' => 'fe_users', 'username' => 'doe'],
+                ],
+            ]],
+        ]);
+
+        $page = $definition->records[0];
+        $records = $page->children;
+
+        $this->assertCount(2, $records);
+        $this->assertSame('sys_category', $records[0]->table);
+        $this->assertSame('fe_users', $records[1]->table);
+        // "table" is structure under "records", exactly as it is on an inline
+        // child, so it is not written as a field of the record.
+        $this->assertSame(['title' => 'News'], $records[0]->values);
+        // ... and "records" is not written as a field of the page either.
+        $this->assertSame(['doktype' => 254], $page->values);
+    }
+
+    #[Test]
+    public function recordsJoinContentAndChildrenRatherThanReplacingThem(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [[
+                'identifier' => 'home',
+                'content' => [['identifier' => 'home-heading', 'CType' => 'header']],
+                'records' => [['identifier' => 'home-category', 'table' => 'sys_category']],
+                'children' => [['identifier' => 'about']],
+            ]],
+        ]);
+
+        $tables = array_map(
+            static fn(SeedRecord $record): string => $record->table,
+            $definition->records[0]->children,
+        );
+
+        $this->assertSame(['tt_content', 'sys_category', 'pages'], $tables);
+    }
+
+    #[Test]
+    public function aRecordTakesTheSameUidFilesAndInlineAsAnyOtherRecord(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [[
+                'identifier' => 'storage',
+                'records' => [[
+                    'identifier' => 'profile-doe',
+                    'table' => 'tx_example_profile',
+                    'uid' => 42,
+                    'files' => ['image' => ['placeholder']],
+                    'inline' => [
+                        'contracts' => [[
+                            'identifier' => 'contract-doe',
+                            'table' => 'tx_example_contract',
+                            'position' => 'Professor',
+                        ]],
+                    ],
+                ]],
+            ]],
+        ]);
+
+        $record = $definition->records[0]->children[0];
+
+        $this->assertSame(42, $record->uid);
+        $this->assertSame('placeholder', $record->files['image'][0]->identifier);
+        $this->assertSame('tx_example_contract', $record->inline['contracts'][0]->table);
+        $this->assertSame(['position' => 'Professor'], $record->inline['contracts'][0]->values);
+    }
+
+    #[Test]
+    public function recordsIsAFieldEverywhereButOnAPage(): void
+    {
+        $definition = $this->subject->parse([
+            'identifier' => 'demo',
+            'pages' => [[
+                'identifier' => 'home',
+                'content' => [['identifier' => 'insert', 'CType' => 'shortcut', 'records' => 'tt_content_601']],
+            ]],
+        ]);
+
+        $record = $definition->records[0]->children[0];
+
+        // "tt_content" has a column of that name - the one the "Insert records"
+        // element writes into - so on a content element it is an ordinary field
+        // and has to survive as one.
+        $this->assertSame(['CType' => 'shortcut', 'records' => 'tt_content_601'], $record->values);
+        $this->assertSame([], $record->children);
+    }
+
+    #[Test]
     public function tableIsAFieldEverywhereButOnAnInlineChild(): void
     {
         $definition = $this->subject->parse([
@@ -325,6 +426,30 @@ final class YamlSeedParserTest extends UnitTestCase
                     'inline' => [
                         'tx_theme_list_items' => [['identifier' => 'home', 'table' => 'tx_theme_list_item']],
                     ],
+                ]],
+            ],
+            'code' => 1786924808,
+        ];
+        yield 'records not a list' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [['identifier' => 'home', 'records' => 'nope']],
+            ],
+            'code' => 1786955122,
+        ];
+        yield 'record without table' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [['identifier' => 'home', 'records' => [['identifier' => 'orphan']]]],
+            ],
+            'code' => 1786924834,
+        ];
+        yield 'duplicate identifier between a record and a page' => [
+            'definition' => [
+                'identifier' => 'demo',
+                'pages' => [[
+                    'identifier' => 'home',
+                    'records' => [['identifier' => 'home', 'table' => 'sys_category']],
                 ]],
             ],
             'code' => 1786924808,
