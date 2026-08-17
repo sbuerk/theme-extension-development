@@ -35,6 +35,7 @@ final class SeedingTest extends AbstractFunctionalTestCase
     use ThemeSiteTrait;
 
     private const DEMO_SEED = 'EXT:theme_extension_development/Configuration/Seeds/Demo.yaml';
+    private const RECORDS_SEED = 'EXT:theme_extension_development/Tests/Functional/Fixtures/Seeds/Records.yaml';
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8'],
@@ -78,6 +79,16 @@ final class SeedingTest extends AbstractFunctionalTestCase
         $backendUser = $this->setUpBackendUser(1);
 
         return $this->createSeeder()->seed((new YamlSeedParser())->parseFile(self::DEMO_SEED), $backendUser);
+    }
+
+    /**
+     * @return array<string, int> The written uids, keyed by seed identifier.
+     */
+    private function seedRecords(): array
+    {
+        $backendUser = $this->setUpBackendUser(1);
+
+        return $this->createSeeder()->seed((new YamlSeedParser())->parseFile(self::RECORDS_SEED), $backendUser);
     }
 
     /**
@@ -260,6 +271,88 @@ final class SeedingTest extends AbstractFunctionalTestCase
         // and needs a backend preview link, which defeats seeding it.
         $this->assertSame(1, (int)$byUid[9]['nav_hide']);
         $this->assertSame(0, (int)$byUid[1]['nav_hide']);
+    }
+
+    /**
+     * A record of any table is written onto the page declaring it.
+     *
+     * The point of the "records" key is that the seeder knows nothing about the
+     * table: `sys_category` belongs to the core and has no relationship with
+     * this extension whatsoever, so the only way such a record can be written
+     * is that the definition names the table and the engine carries it through.
+     * The same test covers what would otherwise be taken on trust for a table
+     * that is neither `pages` nor `tt_content` - a declared uid is honoured,
+     * declaration order survives, and the record is seeded visible.
+     */
+    #[Test]
+    public function recordsOfAnyTableAreWrittenOntoThePageThatDeclaresThem(): void
+    {
+        $uids = $this->seedRecords();
+
+        $categories = $this->queryTable('sys_category', ['uid', 'pid', 'title', 'hidden'], 'sorting');
+
+        $this->assertSame(4711, $uids['category-first']);
+        $this->assertSame(['First', 'Second'], array_column($categories, 'title'));
+        foreach ($categories as $category) {
+            $this->assertSame($uids['storage'], (int)$category['pid']);
+            $this->assertSame(0, (int)$category['hidden']);
+        }
+    }
+
+    /**
+     * A relation to a seeded record is expressed by declaring its uid, and an
+     * MM relation is no different.
+     *
+     * This is what makes "records" worth having: a record of any table can be
+     * declared, and any relation field can point at it, without the seeder
+     * knowing either the table or the MM table its rows end up in. Asserted on
+     * "pages.categories" because it is a core MM relation the extension has
+     * nothing to do with.
+     */
+    #[Test]
+    public function aRelationToASeededRecordIsWrittenFromTheDeclaredUid(): void
+    {
+        $uids = $this->seedRecords();
+
+        $relations = $this->queryTable(
+            'sys_category_record_mm',
+            ['uid_local', 'uid_foreign', 'tablenames', 'fieldname'],
+            'uid_local',
+        );
+
+        $this->assertCount(1, $relations);
+        $this->assertSame(4711, (int)$relations[0]['uid_local']);
+        $this->assertSame($uids['storage'], (int)$relations[0]['uid_foreign']);
+        $this->assertSame('pages', $relations[0]['tablenames']);
+        $this->assertSame('categories', $relations[0]['fieldname']);
+    }
+
+    /**
+     * A record declared under "records" is a record like any other, so the
+     * nesting available to a content element is available to it too.
+     *
+     * Asserted through a `tt_content` element carrying an inline child, because
+     * the failure mode of that relation is silent: an unresolved placeholder
+     * writes the relation empty and logs nothing.
+     */
+    #[Test]
+    public function aRecordDeclaredUnderRecordsCarriesItsOwnInlineChildren(): void
+    {
+        $uids = $this->seedRecords();
+
+        $children = $this->queryTable(
+            'tx_theme_list_item',
+            ['uid', 'pid', 'uid_foreign', 'tablename', 'fieldname', 'link_label'],
+            'uid',
+        );
+
+        $this->assertCount(1, $children);
+        $this->assertSame('Documentation', $children[0]['link_label']);
+        $this->assertSame($uids['storage-linklist'], (int)$children[0]['uid_foreign']);
+        $this->assertSame('tt_content', $children[0]['tablename']);
+        $this->assertSame('tx_theme_list_items', $children[0]['fieldname']);
+        // The child sits on the page its parent sits on, never on the parent.
+        $this->assertSame($uids['storage'], (int)$children[0]['pid']);
     }
 
     /**

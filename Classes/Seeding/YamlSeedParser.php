@@ -34,6 +34,22 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * is written to the record as-is. `children` nests pages, `content` nests
  * `tt_content` records below the page carrying them.
  *
+ * `records` nests records of *any* table onto the page carrying them, which is
+ * what `content` does for `tt_content` alone. A record declares the table it
+ * belongs to itself, exactly as an inline child does:
+ *
+ *     pages:
+ *       - identifier: storage
+ *         doktype: 254
+ *         title: 'Storage'
+ *         records:
+ *           - identifier: category-news
+ *             table: sys_category
+ *             title: 'News'
+ *
+ * That is what makes a seed definition able to describe the data a plugin
+ * reads, rather than only the pages and content elements around it.
+ *
  * `inline` nests records into a *relation* rather than below a page, as a map
  * of the parent field carrying the relation to the records declared for it:
  *
@@ -50,7 +66,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * `config.foreign_table` of the parent's field would make a seed definition
  * depend on the TCA being loaded, and would fail with a null dereference rather
  * than a message when it is not - so `table` is structural on an inline child,
- * exactly as `identifier` is.
+ * exactly as `identifier` is. It is structural under `records` for the same
+ * reason and a simpler one: there is no parent field to infer anything from.
  *
  * `uid` is optional. Where it is given it is passed to DataHandler as a
  * *suggested* uid, which makes a seed reproducible - a site configuration can
@@ -64,6 +81,7 @@ final class YamlSeedParser
     private const PAGES = 'pages';
     private const CONTENT = 'content';
     private const CHILDREN = 'children';
+    private const RECORDS = 'records';
     private const IDENTIFIER = 'identifier';
     private const UID = 'uid';
     private const FILES = 'files';
@@ -78,6 +96,13 @@ final class YamlSeedParser
      * child, and `tt_content` and `pages` both have fields whose name starts
      * with `table`. A key that is structure in one place and a field in another
      * has to be decided where the context is known, which is per level.
+     *
+     * `records` is the same case and is decided the same way. `tt_content` has
+     * a **column** of that name - the one the "Insert records" element writes
+     * `tt_content_<uid>` into - so the key can only be structure where the
+     * level is `pages`, which is also the only level it means anything on.
+     * The shipped demo definition uses that column, so this is not theory:
+     * putting `records` in this list makes `SeedingTest` red.
      */
     private const STRUCTURAL_KEYS = [self::IDENTIFIER, self::UID, self::CHILDREN, self::CONTENT, self::FILES, self::INLINE];
 
@@ -344,15 +369,18 @@ final class YamlSeedParser
      * @param string|null $table The table these records belong to, or null when
      *        each of them declares its own - which is the case for inline
      *        children, where one field may even point at a different table than
-     *        the next.
+     *        the next, and for the records of a page.
      * @param array<string, true> $seen Identifiers already used, by reference,
      *                                  so a duplicate is caught across the whole
      *                                  definition rather than per level.
+     * @param string $childContext Names the structural key these records were
+     *        declared under, for the messages of the levels that do not have a
+     *        table to name themselves by.
      * @return list<SeedRecord>
      */
-    private function parseRecords(array $records, ?string $table, string $source, array &$seen): array
+    private function parseRecords(array $records, ?string $table, string $source, array &$seen, string $childContext = self::INLINE): array
     {
-        $context = $table ?? 'inline';
+        $context = $table ?? $childContext;
         $parsed = [];
         foreach ($records as $record) {
             if (!is_array($record)) {
@@ -421,7 +449,8 @@ final class YamlSeedParser
                 if (!is_string($declaredTable) || $declaredTable === '') {
                     throw new SeedingException(
                         sprintf(
-                            'The inline child "%s" in the seed definition "%s" has no "table". It is never inferred from the TCA of the parent field.',
+                            'The "%s" child "%s" in the seed definition "%s" has no "table". It is never inferred: under "inline" it would have to come from the TCA of the parent field, and under "records" there is no field it could come from at all.',
+                            $context,
                             $identifier,
                             $source,
                         ),
@@ -442,6 +471,23 @@ final class YamlSeedParser
                 }
                 $children = [...$children, ...$this->parseRecords($nestedContent, 'tt_content', $source, $seen)];
             }
+            // Only on a page, where "records" cannot be a field: see the
+            // docblock of STRUCTURAL_KEYS.
+            $nestedRecords = $table === self::PAGES ? ($record[self::RECORDS] ?? []) : [];
+            if ($nestedRecords !== []) {
+                if (!is_array($nestedRecords)) {
+                    throw new SeedingException(
+                        sprintf('The "records" of "%s" in the seed definition "%s" is not a list.', $identifier, $source),
+                        1786955122,
+                    );
+                }
+                // Parsed with no table of their own, so each declares one. They
+                // join the children of this record like content does: the page
+                // carrying them becomes their pid, and "DataMapFactory" chains
+                // the declaration order per table, so records of three tables on
+                // one page do not disturb each other's sorting.
+                $children = [...$children, ...$this->parseRecords($nestedRecords, null, $source, $seen, self::RECORDS)];
+            }
             $nestedChildren = $record[self::CHILDREN] ?? [];
             if ($nestedChildren !== []) {
                 if (!is_array($nestedChildren)) {
@@ -455,11 +501,16 @@ final class YamlSeedParser
 
             $inline = $this->parseInline($record[self::INLINE] ?? [], $identifier, $source, $seen);
 
-            // "table" is a field everywhere but on an inline child, where it is
-            // the structural key naming the table the child belongs to.
-            $structuralKeys = $table === null
-                ? [...self::STRUCTURAL_KEYS, self::TABLE]
-                : self::STRUCTURAL_KEYS;
+            // "table" is a field everywhere but on an inline or "records"
+            // child, where it is the structural key naming the table the record
+            // belongs to; "records" is a field everywhere but on a page.
+            $structuralKeys = self::STRUCTURAL_KEYS;
+            if ($table === null) {
+                $structuralKeys[] = self::TABLE;
+            }
+            if ($table === self::PAGES) {
+                $structuralKeys[] = self::RECORDS;
+            }
 
             $values = [];
             foreach ($record as $key => $value) {
