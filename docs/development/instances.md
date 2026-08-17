@@ -150,11 +150,11 @@ deliberately carries **no** `dependencies` key: site sets arrived in TYPO3 v13.1
 this file enables the theme when it does not.
 → [TypoScript delivery](../architecture/typoscript-delivery.md)
 
-The replacement is a `sys_template` record — a database row, expressible in
-neither a configuration file nor a
-[seed definition](seeding.md) (`YamlSeedParser` has exactly two top-level
-containers, `files` and `pages`). It is therefore a **manual step, between
-`typo3 setup` and `theme:seed`**:
+The replacement is a `sys_template` record — a database row, and one no
+configuration file can carry. A [seed definition](seeding.md) can express it
+since the [`records`](seeding.md#records-of-any-table) key, because the row sits
+on page 1 like any other record; the demo definition does not declare one, so
+this is still a **manual step, between `typo3 setup` and `theme:seed`**:
 
 1. **Web > List**, page `1` — the site root.
 2. *Create new record* → **System records** → **"TypoScript record"**
@@ -171,9 +171,10 @@ containers, `files` and `pages`). It is therefore a **manual step, between
 > Web > List rather than the module a TYPO3 developer would reach for first.
 
 Committing a prepared `sqlite-databases/core-12.sqlite` would remove the step,
-and extending the seeder with a `records:` key would remove it for good. Neither
-is done here: the first commits a binary nobody can review, and the second is a
-feature rather than a compatibility change.
+and declaring the record under `records:` in the demo definition would remove it
+for good. Neither is done here: the first commits a binary nobody can review,
+and the second changes the shipped demo tree for the sake of one core version —
+which is a decision about the demo, not about the seeder.
 
 ## Snapshot and restore
 
