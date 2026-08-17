@@ -40,22 +40,34 @@ Build/Scripts/runTests.sh -s setVersion -- 1.2.0 release
 Everything after `--` is passed to the script unchanged, `--dry-run` included.
 Both ways produce the same result — the wrapper only adds the container.
 
-### `--source-branch` on a maintenance branch
+### `--source-branch`, and the key the alias is stored under
 
-`extra.branch-alias` is keyed to a branch name — `dev-<source-branch>` — and
-both scripts still default that to `main`:
-
-```bash
-SOURCE_BRANCH="main"
-```
-
-**This branch is `1`, not `main`**, so it has to be passed until the default is
-corrected:
+Both scripts default `--source-branch` to **`1`** on this branch:
 
 ```bash
-Build/Scripts/setVersion.sh 1.0.1 post-release --source-branch=1
-Build/Scripts/release.sh 1.0.0 --source-branch=1 --dry-run
+SOURCE_BRANCH="1"
 ```
+
+so nothing has to be passed here. `main` defaults to `main` for the same
+reason. Pass it explicitly only when driving one branch's release from a
+checkout of another.
+
+The key `extra.branch-alias` is stored under is **not** `dev-<source-branch>`.
+Composer derives a version from the branch name before it consults the alias
+map, and a branch whose name looks like a version is normalised to
+`<name>.x-dev`:
+
+| Branch | Derived by composer | Alias key  |
+|--------|---------------------|------------|
+| `main` | `dev-main`          | `dev-main` |
+| `1`    | `1.x-dev`           | `1.x-dev`  |
+
+`setVersion.sh` derives it, so this is not something to get right by hand — but
+it is worth knowing, because getting it wrong is **silent**. An alias keyed
+`dev-1` on a branch named `1` matches no reference composer ever produces, so it
+is ignored: the branch does not provide the version it claims to, and nothing
+reports it. That is exactly what a branch cut from `main` inherits, since it
+takes this file along with `main` in it.
 
 `release.sh` uses it for more than the alias: it is the branch it branches off,
 refreshes, targets pull requests at with `gh pr create --base`, and tags. Run
