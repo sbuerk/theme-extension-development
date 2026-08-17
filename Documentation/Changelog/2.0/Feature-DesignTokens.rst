@@ -111,8 +111,8 @@ built around it, because :css:`light-dark()` takes colours and not shadows.
 
 ..  note::
 
-    The token names changed before the 1.0 release, which is a rename and not a
-    breaking change: version 1.0 has not been released yet.
+    The token names changed while this was still unreleased, which makes it a
+    rename rather than a breaking change: no version had shipped at that point.
 
     ..  list-table::
         :header-rows: 1

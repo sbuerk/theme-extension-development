@@ -82,9 +82,17 @@ Compatibility
         -   TYPO3
         -   PHP
     *   -   main
-        -   1.x
-        -   v13 / v14
+        -   2.x
+        -   v13.4 / v14.3
         -   8.2 - 8.5
+    *   -   1
+        -   1.x
+        -   v12.4 / v13.4
+        -   8.1 - 8.4
+
+This manual documents the ``main`` branch. Branch ``1`` is the maintained line
+for the previous core version tuple and has a manual of its own; PHP 8.1 is
+supported there for TYPO3 v12 only, because TYPO3 v13.4 requires PHP 8.2.
 
 Contributing
 ============

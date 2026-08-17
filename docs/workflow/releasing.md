@@ -4,6 +4,20 @@ Two scripts in [`Build/Scripts/`](../../Build/Scripts) drive the release. Both
 always operate on the repository root, no matter from where they are called, and
 both show all options with `--help`.
 
+## Release branches
+
+One branch per core version tuple, one major version line each:
+
+| Branch | Extension | TYPO3         | PHP       |
+|--------|-----------|---------------|-----------|
+| `main` | 2.x       | v13.4 / v14.3 | 8.2 - 8.5 |
+| `1`    | 1.x       | v12.4 / v13.4 | 8.1 - 8.4 |
+
+`main` is where development happens and where a pull request is opened. Branch
+`1` is released from its own checkout with `--source-branch=1`, which is already
+its default there — see [below](#--source-branch-and-the-key-the-alias-is-stored-under).
+A change that belongs on both is made on `main` first and then backported.
+
 ## `setVersion.sh` — apply a version
 
 Applies a version and its derived variants to every file carrying one: the
@@ -39,6 +53,40 @@ Build/Scripts/runTests.sh -s setVersion -- 1.2.0 release
 
 Everything after `--` is passed to the script unchanged, `--dry-run` included.
 Both ways produce the same result — the wrapper only adds the container.
+
+### `--source-branch`, and the key the alias is stored under
+
+Both scripts default `--source-branch` to **`main`** on this branch:
+
+```bash
+SOURCE_BRANCH="main"
+```
+
+so nothing has to be passed here. Branch `1` — the maintained line for the
+previous core version tuple — defaults to `1` for the same reason. Pass it
+explicitly only when driving one branch's release from a checkout of another.
+
+The key `extra.branch-alias` is stored under is **not** `dev-<source-branch>`.
+Composer derives a version from the branch name before it consults the alias
+map, and a branch whose name looks like a version is normalised to
+`<name>.x-dev`:
+
+| Branch | Derived by composer | Alias key  |
+|--------|---------------------|------------|
+| `main` | `dev-main`          | `dev-main` |
+| `1`    | `1.x-dev`           | `1.x-dev`  |
+
+`setVersion.sh` derives it, so this is not something to get right by hand — but
+it is worth knowing, because getting it wrong is **silent**. An alias keyed
+`dev-1` on a branch named `1` matches no reference composer ever produces, so it
+is ignored: the branch does not provide the version it claims to, and nothing
+reports it. That is exactly what a branch cut from `main` inherits, since it
+takes this file along with `main` in it.
+
+`release.sh` uses it for more than the alias: it is the branch it branches off,
+refreshes, targets pull requests at with `gh pr create --base`, and tags. Run
+with the default from a maintenance branch it would open the release pull
+request against `main`.
 
 ## `release.sh` — orchestrate the release
 

@@ -105,8 +105,9 @@ and before transport compression.
 
 ..  note::
 
-    The image gallery's classes were renamed to carry the prefix, which is a
-    rename and not a breaking change: version 1.0 has not been released yet.
+    The image gallery's classes were renamed to carry the prefix while this was
+    still unreleased, which makes it a rename rather than a breaking change: no
+    version had shipped at that point.
 
     ..  list-table::
         :header-rows: 1

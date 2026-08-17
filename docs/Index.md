@@ -56,7 +56,7 @@ Documentation for people **using** the extension lives in
 | [Commit messages](workflow/commit-messages.md)                         | TYPO3 core commit message conventions.                  |
 | [Pull requests](workflow/pull-requests.md)                             | Branching, the pre-flight checklist, review.            |
 | [Changelog and documentation](workflow/changelog-and-documentation.md) | reST changelog entries, rendering, the core changelogs. |
-| [Releasing](workflow/releasing.md)                                     | `setVersion.sh` and `release.sh`.                       |
+| [Releasing](workflow/releasing.md)                                     | Release branches, `setVersion.sh` and `release.sh`.     |
 
 ## Conventions of this documentation
 

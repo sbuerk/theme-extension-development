@@ -1,7 +1,10 @@
 # Pull requests
 
 1. Create a topic branch off `main` — for example `feature/example-service` or
-   `bugfix/empty-response`.
+   `bugfix/empty-response`. `main` is the 2.x line for TYPO3 v13 and v14, and
+   the branch every change starts on; branch `1` is the maintained 1.x line for
+   TYPO3 v12 and v13 and receives backports, never the original change. See
+   [Release branches](releasing.md#release-branches).
 2. Keep commits focused; one logical change per commit, following the
    [commit message rules](commit-messages.md).
 3. Make sure the quality gates and both test suites pass locally before opening

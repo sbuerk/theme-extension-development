@@ -137,6 +137,11 @@ characters. An issue reference is not required, but must be verified when used.
 
 ## Pull request checklist
 
+Pull requests target **`main`**, the 2.x line for TYPO3 v13 and v14. Branch `1`
+is the maintained 1.x line for TYPO3 v12 and v13; a change that belongs there
+too is made on `main` first and backported, and its own documentation states
+where the two branches deliberately differ.
+
 Before opening a pull request, run every gate from
 [Quality gates](#quality-gates), both test suites, and `renderDocumentation`
 when anything below `Documentation/` changed — for **both** core versions
