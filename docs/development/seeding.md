@@ -22,9 +22,9 @@ vendor/bin/typo3 theme:seed --root-page=12 --force
 ## The format
 
 Structural keys are `identifier`, `uid`, `children`, `content`, `files` and
-`inline` — plus `table`, which is structure on an inline child and an ordinary
-field everywhere else. Everything else is a field of the record and is written
-as it stands:
+`inline` — plus two that are structure on one level and an ordinary field
+everywhere else: `table`, on an inline or `records` child, and `records`, on a
+page. Everything else is a field of the record and is written as it stands:
 
 ```yaml
 identifier: demo
@@ -54,6 +54,8 @@ pages:
   *suggested* uid.
 - `children` nests pages, `content` nests `tt_content` records below the page
   carrying them.
+- `records` nests records of **any** table below the page carrying them, each
+  declaring its own `table`. See [Records of any table](#records-of-any-table).
 - `files` on a record creates file references, as a map of field name to the
   references declared for it.
 - `inline` nests records into a **relation** rather than below a page, as a map
@@ -131,6 +133,61 @@ would put content records on a content record.
 A child is a record like any other otherwise — it may declare a `uid`, and it
 may carry `files`, which the four cards of `theme_media_teaser_grid` in the demo
 definition do.
+
+## Records of any table
+
+`content` puts `tt_content` records on a page. `records` does the same for every
+other table, and the child names the table itself:
+
+```yaml
+pages:
+  - identifier: persons-storage
+    title: 'Persons'
+    doktype: 254
+    records:
+      - identifier: profile-doe
+        table: tx_academicpersons_domain_model_profile
+        first_name: 'Jane'
+        last_name: 'Doe'
+        inline:
+          contracts:
+            - identifier: contract-doe
+              table: tx_academicpersons_domain_model_contract
+              position: 'Professor'
+```
+
+That is what lets a definition describe **the data a plugin reads**, and not
+only the pages and content elements around it. A plugin page whose records have
+to be clicked together by hand afterwards is a page tree, not a development
+instance.
+
+Four things follow from the design rather than needing their own machinery:
+
+**A record under `records` is a record like any other.** It may declare a `uid`,
+carry `files`, and carry `inline` children — the profile above nests its
+contracts through a relation exactly as a content element nests its list items.
+Nothing about those keys knows which table it is applied to.
+
+**Its `pid` is the page that declares it**, the same rule `content` follows.
+Nesting expresses the page tree; a relation is what `inline` expresses.
+
+**Declaration order is kept per table.** `DataMapFactory` tracks the predecessor
+of the negative-`pid` chain per table, so pages, content elements and three
+other tables can sit on one page without disturbing each other's sorting.
+
+**A relation to a seeded record is written by declaring its uid.** The record
+declares `uid: 4711`, the field pointing at it is written with `4711`, and
+DataHandler does the rest — including an **MM** relation, whose rows it writes
+into a table the seeder never names. `SeedingTest::aRelationToASeededRecordIsWrittenFromTheDeclaredUid()`
+asserts that on `pages.categories`.
+
+The one restriction is where the key may appear: **`records` is structure on a
+page and an ordinary field everywhere else.** `tt_content` has a column of that
+name — the one the *Insert records* element writes `tt_content_<uid>` into, and
+the demo tree uses it — so the key is decided per level, exactly as `table` is
+(`YamlSeedParser::STRUCTURAL_KEYS` and the `$table === self::PAGES` branch in
+`parseRecords()`). Declaring `records` on a content element therefore does not
+nest anything; it writes a field.
 
 ## Placeholders carry no underscore
 
@@ -358,19 +415,16 @@ rather than left to a reader to preserve:
 
 ## What it does not do
 
-- **No categories, and no MM relations.** The format expresses neither a
-  `sys_category` record nor the MM rows that relate one to a page or a content
-  element. That is why `menu_categorized_pages` and `menu_categorized_content`
-  are seeded with `selected_categories: 0` — an empty selection, which renders
-  an empty menu, and an empty menu is the correct rendering of "nothing
-  chosen". This is a limitation of the format rather than a defect of the demo
-  tree, and closing it means a second structural feature: a way to declare
-  records outside the page tree, and a way to declare a relation between two of
-  them. That is out of proportion to demonstrating two elements, so it is named
-  here and left. The `0` is written out rather than the field left off because
-  it is the value the column carries once anything real has touched it, and
-  because it keeps the two elements identical so neither reads as the special
-  case; the empty value itself is handled in
+- **No categorized menus in the demo tree**, although the format can express
+  them since [`records`](#records-of-any-table). `menu_categorized_pages` and
+  `menu_categorized_content` are still seeded with `selected_categories: 0` — an
+  empty selection, which renders an empty menu, and an empty menu is the correct
+  rendering of "nothing chosen". Seeding categories and relating pages to them
+  would demonstrate the two elements better; it is a change to the demo
+  definition, and it is not made here. The `0` is written out rather than the
+  field left off because it is the value the column carries once anything real
+  has touched it, and because it keeps the two elements identical so neither
+  reads as the special case; the empty value itself is handled in
   `Configuration/TypoScript/ContentElements.typoscript`, where
   `selected_categories` reaches the subquery through an `ifEmpty = 0`.
 - **No file metadata.** The fields of a *reference* are written; the
