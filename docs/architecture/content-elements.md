@@ -350,9 +350,21 @@ JSON-encodes the whole row onto `item.data` for every item it produces, so
 `item.data.abstract` and `item.data.SYS_LASTCHANGED` are simply there on the
 same page row every other menu type already carries at `item.data` — nothing
 had to be added to go and fetch them. `menu_recently_updated`'s `special =
-updated` already sorts by `SYS_LASTCHANGED` descending
+updated` sorts by `SYS_LASTCHANGED` descending
 (`prepareMenuItemsForUpdatedMenu()`), so the field the template reads is the
 very field the query itself is keyed on.
+
+The core sorts by that field and nothing else, and pages changed in the same
+second — every page of a tree imported or published at once — then come back
+in whatever order the database returns them: ascending uid on SQLite, an order
+that differed between two identical page trees on PostgreSQL. The theme sets
+`alternativeSortingField = SYS_LASTCHANGED DESC, uid DESC`, which the core
+hands to `getMenuForPages()` as the complete `ORDER BY`, so it repeats the
+primary sort and adds the newer uid as tie-breaker.
+`RecentlyUpdatedMenuRenderingTest` asserts the complete order over three tied
+pages. `special.mode` still decides which column `maxAge` filters on, but no
+longer the order: a site package setting `mode = tstamp` sets
+`alternativeSortingField = tstamp DESC, uid DESC` with it.
 
 Both are read through the same shared partial, `Partials/ContentElement/Menu.html`
 — its `Item` section takes `showAbstract`/`showDate` arguments that gate
