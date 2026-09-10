@@ -31,7 +31,9 @@ itself, not something a plugin author controls. It reads back the
 per-plugin :typoscript:`20` cObject the core places beside
 :typoscript:`templateName` at a path built from the record being rendered
 (:typoscript:`tt_content.{data.CType}.20`), rather than a fixed one, so the
-one template serves every plugin without knowing which one it is.
+one template serves every plugin without knowing which one it is. The plugin
+is rendered with its content element, so the settings an editor chose in its
+FlexForm reach it.
 
 :guilabel:`General Plugin` / ``list``
 ======================================

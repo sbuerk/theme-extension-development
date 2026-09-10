@@ -17,15 +17,21 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
  * own, so there is nothing to declare "readonly" here either.
  *
  * "indexAction()" renders a fixed, easily grepped string
- * ("Resources/Private/Templates/Plugin/Index.html") rather than anything
- * derived from the request - that string is what a functional test asserts
- * is present in the response body, proof the plugin actually rendered rather
- * than falling through to the core's own "no rendering definition" notice.
+ * ("Resources/Private/Templates/Plugin/Index.html") - proof the plugin
+ * actually rendered rather than falling through to the core's own "no
+ * rendering definition" notice - and, beside it, the "greeting" FlexForm
+ * setting and the uid of the content element it was rendered from, which a
+ * plugin only has when the theme hands the record to it.
  */
 final class PluginController extends ActionController
 {
     public function indexAction(): ResponseInterface
     {
+        // What a plugin only has when it is rendered with its content element:
+        // a FlexForm setting, and the record itself on the Extbase request.
+        $this->view->assign('greeting', (string)($this->settings['greeting'] ?? ''));
+        $this->view->assign('contentElementUid', (int)($this->request->getAttribute('currentContentObject')?->data['uid'] ?? 0));
+
         return $this->htmlResponse();
     }
 }

@@ -2,5 +2,6 @@
 ,"uid","pid","sys_language_uid","l10n_parent","l10n_source","doktype","is_siteroot","title","slug"
 ,1,0,0,0,0,1,1,"Theme root","/"
 "tt_content",,,,,,,,,
-,"uid","pid","sys_language_uid","l18n_parent","colPos","sorting","CType","header",,
-,10,1,0,0,0,10,"testspluginfixture_plugin","A plugin",,
+,"uid","pid","sys_language_uid","l18n_parent","colPos","sorting","CType","header","pi_flexform"
+,10,1,0,0,0,10,"testspluginfixture_plugin","A plugin","<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms><data><sheet index=""sDEF""><language index=""lDEF""><field index=""settings.greeting""><value index=""vDEF"">Hello from the FlexForm</value></field></language></sheet></data></T3FlexForms>"
+,20,1,0,0,0,20,"testspluginfixture_uncached","An uncached plugin","<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms><data><sheet index=""sDEF""><language index=""lDEF""><field index=""settings.greeting""><value index=""vDEF"">Hello from the uncached FlexForm</value></field></language></sheet></data></T3FlexForms>"
