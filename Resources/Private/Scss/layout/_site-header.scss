@@ -74,7 +74,11 @@
     gap: var(--theme-space-4, 1.25rem);
     margin-inline-start: auto;
 
-    ul {
+    // The top level only. A plain "ul" here also matched the second level of
+    // the main menu, and at 0,1,1 it outranked the "display: none" of
+    // ".theme-nav-main__list--sub" (0,1,0) in "components/_nav-main.scss", so
+    // the second level of every item was always open on a wide screen.
+    > ul {
         display: flex;
         align-items: center;
         gap: inherit;
