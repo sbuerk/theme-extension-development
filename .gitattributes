@@ -20,7 +20,6 @@
 /instance-core-13 export-ignore
 /instance-core-14 export-ignore
 /packages-dev export-ignore
-/sqlite-databases export-ignore
 
 # "Resources/Private/Scss", "package.json" and "package-lock.json" are
 # deliberately NOT export-ignored: the SCSS sources ship, so the rebuild path

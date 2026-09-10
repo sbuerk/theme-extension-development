@@ -11,7 +11,7 @@ versions green.
 | [Frontend assets](frontend-assets.md)           | The SCSS build, the node image, why the compiled CSS is committed, the `checkCssBuild` gate.                           |
 | [Component library](component-library.md)       | Every component's markup contract, the two switches that change behaviour, what the tests guard.                       |
 | [Styleguide page](styleguide.md)                | The page rendering the library straight from Fluid, why it ignores content elements, and what it is a live test of.    |
-| [Development instances](instances.md)           | The two TYPO3 instances, the `theme` symlink, SQLite, snapshot and restore.                                            |
+| [Development instances](instances.md)           | Setup, reseed and refresh of the two instances, their accounts, SQLite, the `theme` symlink.                           |
 | [Seeding](seeding.md)                           | The `theme-demo` and `theme-instance` seed sets, the uid rule, the demo tree, the `/legacy/` mirror, the tests.        |
 | [Appearance switching](appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher, and why there is no cookie.        |
 

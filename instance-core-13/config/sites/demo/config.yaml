@@ -13,6 +13,11 @@ base: /
 websiteTitle: 'Theme demo, TYPO3 v13'
 dependencies:
   - sbuerk/theme-extension-development
+  # The login page of the seed carries a felogin element. felogin registers
+  # its TypoScript for sys_template sites only ("addTypoScriptSetup()" with
+  # "$includeInSiteSets = false"), so on a site set site its plugin
+  # configuration arrives through its own set or not at all.
+  - typo3/felogin
 languages:
   -
     title: English

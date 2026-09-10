@@ -49,20 +49,25 @@ return (new Config())
     ->setFinder(
         (new Finder())
             ->ignoreVCSIgnored(true)
-            ->in([
+            ->in(array_map('realpath', [
                 __DIR__ . '/../../Classes',
                 __DIR__ . '/../../Configuration',
                 __DIR__ . '/../../Core13',
                 __DIR__ . '/../../Core14',
                 __DIR__ . '/../../Tests',
                 __DIR__ . '/../../Build',
+                // The development site package of the instances. Never
+                // released, held to the same rules all the same.
+                __DIR__ . '/../../packages-dev',
                 // Only the committed configuration of the development
-                // instances, never the instance roots: everything else below
-                // them is generated, and "ignoreVCSIgnored()" does not catch it
-                // because it is git-ignored through a glob pattern.
+                // instances, never the instance roots. "ignoreVCSIgnored()"
+                // then keeps out what is generated below them - the
+                // "settings.php" "typo3 setup" writes, the local overrides in
+                // "additional/" - and it only does so for normalised paths:
+                // with the "../.." left in, it matched none of them.
                 __DIR__ . '/../../instance-core-13/config',
                 __DIR__ . '/../../instance-core-14/config',
-            ])
+            ]))
             ->exclude([
                 '.Build/',
                 'var/',
