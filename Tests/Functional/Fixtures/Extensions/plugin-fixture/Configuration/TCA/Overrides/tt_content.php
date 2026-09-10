@@ -13,3 +13,9 @@ ExtensionUtility::registerPlugin(
     'Plugin',
     'Plugin fixture: Plugin',
 );
+
+ExtensionUtility::registerPlugin(
+    'TestsPluginFixture',
+    'Uncached',
+    'Plugin fixture: Uncached',
+);

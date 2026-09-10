@@ -23,8 +23,8 @@ defined('TYPO3') or die();
 // nothing here overrides what "configurePlugin()" generates
 // ("tt_content.<signature> =< lib.contentElement" / "templateName = Generic").
 // That is the entire reason this fixture exists: it proves the theme's own
-// "lib.contentElement" and "Resources/Private/Templates/ContentElements/
-// Generic.html" - not a fixture-provided rendering definition - are what make
+// "lib.contentElement" and "Resources/Private/Templates/Generic.html" - not a
+// fixture-provided rendering definition - are what make
 // a third-party Extbase plugin render at all once "fluid_styled_content" is
 // out of the picture.
 //
@@ -38,5 +38,21 @@ ExtensionUtility::configurePlugin(
         PluginController::class => 'index',
     ],
     [],
+    ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
+);
+
+// The same action once more, non-cacheable. A non-cacheable plugin is rendered
+// as a USER_INT, after the page, from a serialised copy of its content object
+// renderer - a second way for the content element to get lost on the way to
+// the plugin, and the way EXT:felogin's login form is rendered.
+ExtensionUtility::configurePlugin(
+    'TestsPluginFixture',
+    'Uncached',
+    [
+        PluginController::class => 'index',
+    ],
+    [
+        PluginController::class => 'index',
+    ],
     ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
 );
