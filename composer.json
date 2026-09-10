@@ -35,9 +35,13 @@
         "phpstan/phpstan-phpunit": "^2.0.18",
         "phpunit/phpunit": "^11.5.56",
         "saschaegerer/phpstan-typo3": "^2.1.1 || ^3.0.1",
+        "sbuerk/data-factory": "^2.0",
         "sbuerk/fixture-packages": "^1.1.3",
         "sbuerk/typo3-site-based-test-trait": "^2.0.1 || ^3.0.0",
         "typo3/testing-framework": "^9.6.1"
+    },
+    "suggest": {
+        "sbuerk/data-factory": "Imports the showcase page tree of the theme: \"vendor/bin/typo3 data-factory:import theme-demo\""
     },
     "config": {
         "allow-plugins": {
