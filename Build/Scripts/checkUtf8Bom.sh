@@ -17,6 +17,7 @@ FILES=`find . -type f \
     ! -path "./.php-cs-fixer.cache" \
     ! -path "./Documentation-GENERATED-temp/*" \
     ! -path "./node_modules/*" \
+    ! -path "./Tests/Acceptance/node_modules/*" \
     ! -path "./theme/*" \
     ! -path "./instance-core-*/vendor/*" \
     ! -path "./instance-core-*/public/*" \

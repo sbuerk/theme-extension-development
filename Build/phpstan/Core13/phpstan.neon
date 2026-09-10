@@ -27,4 +27,5 @@ parameters:
     - ../../../Build/Scripts/instance.php
 
   excludePaths:
+    - ../../../Tests/Acceptance/node_modules/*
     - ../../../Tests/*/Core14/*
