@@ -6,9 +6,10 @@ webserver_type: nginx-fpm
 xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns: []
-# The instance runs on SQLite, resolved by "config/system/additional.php". No
-# database container is started at all - the "database" block below only
-# satisfies DDEV's own schema, which requires it.
+# The instance runs on SQLite, resolved by "config/system/additional.php" and
+# built by the "system:setup" hook below. No database container is started at
+# all - the "database" block below only satisfies DDEV's own schema, which
+# requires it.
 database:
     type: mariadb
     version: "11.8"
@@ -24,3 +25,7 @@ hooks:
         # packages from remotes that need it.
         - exec-host: ddev auth ssh
         - composer: install
+        # Installs TYPO3 and imports the seed set when either is missing, and
+        # does nothing when both are there - see "Build/Scripts/instance.php".
+        # This is what makes a fresh clone come up ready with one "ddev start".
+        - composer: system:setup

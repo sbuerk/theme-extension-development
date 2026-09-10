@@ -316,9 +316,17 @@ Further:
 - The development instances below `instance-core-13/` and `instance-core-14/`
   are **not** driven by `runTests.sh`. They are installed with `ddev composer`
   or from the host, and the two must not be mixed — the resulting `vendor/`
-  differs and does not travel. `theme` at the repository root is a symlink to
-  that root; never follow it when walking the tree, and never add it to a path a
-  tool descends into.
+  differs and does not travel. `ddev start` sets an instance up and seeds it
+  (`composer system:setup`, idempotent); `composer system:reseed` rebuilds it
+  from nothing, `composer system:refresh` flushes caches and runs
+  `extension:setup`. No database and no `config/system/settings.php` is
+  committed — the latter holds the encryption key and is written by
+  `typo3 setup` per checkout. Instance configuration belongs in the tracked
+  `config/system/additional.php`, never in `settings.php`. The seeded backend
+  and frontend accounts and their credentials are documented on the page
+  linked below. `theme` at the repository root is a symlink to that root;
+  never follow it when walking the tree, and never add it to a path a tool
+  descends into.
   → [Development instances](docs/development/instances.md)
 - The instances are built from the seed set `theme-instance` of
   `packages-dev/dev-site`, which imports the showcase `theme-demo` of the

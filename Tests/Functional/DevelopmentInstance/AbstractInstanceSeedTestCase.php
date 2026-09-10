@@ -29,6 +29,16 @@ abstract class AbstractInstanceSeedTestCase extends AbstractFunctionalTestCase
 
     protected const SEED_SET = 'theme-instance';
 
+    /**
+     * The login page of the seed carries a felogin element, and the development
+     * instances require EXT:felogin for it. Loaded here as well, so the seed is
+     * written into an installation that has the same content types as the
+     * instances it is written into.
+     */
+    protected array $coreExtensionsToLoad = [
+        'typo3/cms-felogin',
+    ];
+
     protected array $testExtensionsToLoad = [
         'sbuerk/theme-extension-development',
         'sbuerk/data-factory',

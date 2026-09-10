@@ -1,0 +1,228 @@
+# The accounts of a development instance, and the pages that use them.
+#
+# Part of the seed set "theme-instance", composed with the showcase and its
+# mirror into one scenario before anything is written - so the entity settings
+# of the showcase apply here, and the "page" settings below extend them.
+#
+# CREDENTIALS - development only, and documented on purpose in
+# "docs/development/instances.md":
+#
+#   backend   john-doe        John-Doe-1701D.       admin, created by "typo3 setup"
+#   backend   erika-editor    Erika-Editor-1701D.   editor, group "Theme editors"
+#   frontend  jane.doe        Frontend-User-1701D.  group "Members"
+#   frontend  liam.rhodes     Frontend-User-1701D.  no group
+#
+# Passwords are written in plain text. DataHandler hashes "be_users.password"
+# and "fe_users.password" on save with the hashing method of the installation;
+# a pre-hashed value would pin the method and the salt of whoever generated it
+# into this file.
+#
+# UIDS
+#
+#   be_groups, be_users, sys_filemounts   10 - clear of the administrator
+#                                         "typo3 setup" creates as be_users 1
+#   pages                                 20-22, below the showcase root 1
+#   tt_content                            page uid times 100 plus position
+#   fe_groups, fe_users                   1 and up
+entitySettings:
+  page:
+    # Every page of the composed scenario - showcase, mirror and the pages
+    # below - belongs to the editor group with full rights, so the seeded
+    # editor can work on both trees. The scenario composer merges
+    # "entitySettings" of the files with mergeRecursiveWithOverrule(), so these
+    # two columns join "doktype" of the showcase instead of replacing it.
+    #
+    # Declared on "page" and not on "'*'": the wildcard is merged into every
+    # entity with array_merge_recursive(), and "defaultValues" on both sides
+    # would turn the colliding keys into lists. None collide here, and keeping
+    # the showcase's "'*'" untouched keeps it that way.
+    defaultValues: {perms_groupid: 10, perms_group: 31}
+  beGroup:
+    tableName: 'be_groups'
+  beUser:
+    tableName: 'be_users'
+  fileMount:
+    tableName: 'sys_filemounts'
+  feGroup:
+    tableName: 'fe_groups'
+  feUser:
+    tableName: 'fe_users'
+
+entities:
+  #=============================================================================
+  # The backend editor.
+  #
+  # The group is the point, not the user. Without it a non-admin in a freshly
+  # set up instance can look at the seeded tree and change nothing, which is
+  # the opposite of what a development instance has to demonstrate: how the
+  # theme's content elements, backend layouts and inline relations behave for
+  # the people who actually edit them.
+  #=============================================================================
+  beGroup:
+    - self:
+          id: 10
+          title: 'Theme editors'
+          description: 'Editors of the development instance. Seeded by the set "theme-instance".'
+          # Both trees: the showcase root and its "/legacy/" mirror.
+          db_mountpoints: '1,1001'
+          file_mountpoints: '10'
+          # Standard page, shortcut, spacer and folder.
+          pagetypes_select: '1,4,199,254'
+          tables_select: 'pages,tt_content,sys_file_reference,tx_theme_list_item'
+          tables_modify: 'pages,tt_content,sys_file_reference,tx_theme_list_item'
+          # "CType" carries "authMode = explicitAllow": a non-admin may pick a
+          # content type only when a group grants it. Every type the theme
+          # renders is granted - "DevelopmentInstance/AccountsTest" reads the
+          # list from the TypoScript and holds this one to it - except "html".
+          # Raw markup is exactly what an editor should not get by default, and
+          # the "html" element on page 6 says so in its own copy.
+          explicit_allowdeny: 'tt_content:CType:header,tt_content:CType:text,tt_content:CType:textpic,tt_content:CType:textmedia,tt_content:CType:image,tt_content:CType:bullets,tt_content:CType:table,tt_content:CType:uploads,tt_content:CType:div,tt_content:CType:shortcut,tt_content:CType:menu_abstract,tt_content:CType:menu_categorized_content,tt_content:CType:menu_categorized_pages,tt_content:CType:menu_pages,tt_content:CType:menu_recently_updated,tt_content:CType:menu_related_pages,tt_content:CType:menu_section,tt_content:CType:menu_section_pages,tt_content:CType:menu_sitemap,tt_content:CType:menu_sitemap_pages,tt_content:CType:menu_subpages,tt_content:CType:theme_author,tt_content:CType:theme_hero,tt_content:CType:theme_hero_small,tt_content:CType:theme_hero_text_only,tt_content:CType:theme_linklist,tt_content:CType:theme_media_teaser,tt_content:CType:theme_media_teaser_grid,tt_content:CType:theme_sociallinks,tt_content:CType:theme_teaser,tt_content:CType:theme_testimonial,tt_content:CType:felogin_login'
+          # The core columns marked "exclude" an editor needs. A column marked
+          # "exclude" is invisible to a non-admin whose groups do not name it,
+          # silently - the form has one field less.
+          #
+          # Content elements: every excluded field of the form of every type
+          # granted above, which "AccountsTest" derives from the TCA and holds
+          # this list to. Pages: the fields of editing a page's content and
+          # visibility - not "is_siteroot", "php_tree_stop", the cache or
+          # mount settings, which no editor group gets by default.
+          non_exclude_fields: 'pages:abstract,pages:author,pages:author_email,pages:backend_layout,pages:backend_layout_next_level,pages:categories,pages:description,pages:doktype,pages:endtime,pages:fe_group,pages:hidden,pages:keywords,pages:lastUpdated,pages:media,pages:nav_hide,pages:nav_title,pages:newUntil,pages:no_search,pages:shortcut_mode,pages:starttime,pages:subtitle,pages:target,tt_content:bullets_type,tt_content:categories,tt_content:date,tt_content:endtime,tt_content:fe_group,tt_content:file_collections,tt_content:filelink_size,tt_content:filelink_sorting,tt_content:filelink_sorting_direction,tt_content:frame_class,tt_content:header_layout,tt_content:header_link,tt_content:header_position,tt_content:hidden,tt_content:image_zoom,tt_content:imageborder,tt_content:imagecols,tt_content:imageheight,tt_content:imageorient,tt_content:imagewidth,tt_content:layout,tt_content:linkToTop,tt_content:pages,tt_content:rowDescription,tt_content:sectionIndex,tt_content:space_after_class,tt_content:space_before_class,tt_content:starttime,tt_content:subheader,tt_content:sys_language_uid,tt_content:table_caption,tt_content:table_class,tt_content:table_delimiter,tt_content:table_enclosure,tt_content:table_header_position,tt_content:table_tfoot,tt_content:uploads_description,tt_content:uploads_type'
+          # The page, list and file list modules. TYPO3 v14 renamed the list
+          # module from "web_list" to "records" (#107628). v14.3 still grants a
+          # module through its old alias ("UserGate"), but its group form offers
+          # the new identifier only, so a group carrying the old one would look
+          # as if it did not grant the module. Both spellings are listed:
+          # DataHandler stores the value as given, and each core ignores the
+          # identifier it does not have. The file list is "media_management" on
+          # both cores.
+          groupMods: 'web_layout,web_list,records,media_management'
+
+  beUser:
+    - self:
+          id: 10
+          username: 'erika-editor'
+          password: 'Erika-Editor-1701D.'
+          realName: 'Erika Editor'
+          email: 'erika.editor@example.org'
+          admin: 0
+          usergroup: '10'
+          # Enabled explicitly. EXT:core sets the default of "be_users.disable"
+          # to 1 ("Configuration/TCA/Overrides/be_users.php": new backend users
+          # are disabled by default), and a seeded editor left to that default
+          # is an account the login reports as "username not found".
+          disable: 0
+          # Take the page tree and file mounts from the group (bits 1 and 2).
+          options: 3
+
+  fileMount:
+    - self:
+          id: 10
+          title: 'Theme demo files'
+          # The folder the showcase places its files into, in the default
+          # storage "typo3 setup" creates.
+          identifier: '1:/theme-demo/'
+
+  #=============================================================================
+  # The frontend accounts, and the two pages that use them.
+  #
+  # All three pages are hidden from every menu with "nav_hide". The "/legacy/"
+  # tree mirrors the showcase and not these pages, and a login page in the
+  # main navigation of one tree only would make every page of the two trees
+  # render different markup - "LegacyDeliveryTest" compares them.
+  #=============================================================================
+  page:
+    # The storage folder the frontend users live on. "settings.pages" of the
+    # login element names it: felogin turns it into a pid restriction, and a
+    # value naming the wrong folder makes a correct password fail silently.
+    - self:
+          id: 20
+          pid: 1
+          title: 'Frontend users'
+          slug: '/frontend-users'
+          doktype: 254
+          nav_hide: 1
+      entities:
+        feGroup:
+          - self:
+                id: 1
+                title: 'Members'
+        feUser:
+          - self:
+                id: 1
+                username: 'jane.doe'
+                password: 'Frontend-User-1701D.'
+                usergroup: '1'
+                first_name: 'Jane'
+                last_name: 'Doe'
+                name: 'Jane Doe'
+                email: 'jane.doe@example.org'
+          # No group: logs in, and is still not allowed onto the members page.
+          - self:
+                id: 2
+                username: 'liam.rhodes'
+                password: 'Frontend-User-1701D.'
+                usergroup: ''
+                first_name: 'Liam'
+                last_name: 'Rhodes'
+                name: 'Liam Rhodes'
+                email: 'liam.rhodes@example.org'
+
+    # The login form of EXT:felogin, rendered by the theme. The FlexForm is the
+    # XML string DataHandler stores - checkValueForFlex() passes a string
+    # through untouched - and carries the one field this form changes: the
+    # folder of the users. Everything else keeps the defaults of felogin's
+    # TypoScript.
+    #
+    # That TypoScript reaches the page only because the "demo" site depends on
+    # the set "typo3/felogin". felogin registers it for sys_template sites only
+    # ("addTypoScriptSetup()" with "$includeInSiteSets = false"); without the
+    # set the plugin has no configuration at all, and TYPO3 v13's
+    # LoginController, which reads "settings.redirectPageLogout" without a
+    # fallback, turned the logout form of a logged in user into an error.
+    # "LoginPageTest" renders it.
+    - self:
+          id: 21
+          pid: 1
+          title: 'Login'
+          slug: '/login'
+          backend_layout: 'content'
+          nav_hide: 1
+      entities:
+        content:
+          - self:
+                id: 2101
+                CType: 'felogin_login'
+                header: 'Log in'
+                header_layout: 1
+                pi_flexform: |
+                  <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                  <T3FlexForms>
+                      <data>
+                          <sheet index="sDEF">
+                              <language index="lDEF">
+                                  <field index="settings.pages">
+                                      <value index="vDEF">20</value>
+                                  </field>
+                              </language>
+                          </sheet>
+                      </data>
+                  </T3FlexForms>
+
+    # Visible to the group "Members" only: "jane.doe" may open it after logging
+    # in on "/login", "liam.rhodes" and a visitor get a 403.
+    - self:
+          id: 22
+          pid: 1
+          title: 'Members'
+          slug: '/members'
+          backend_layout: 'content'
+          nav_hide: 1
+          fe_group: '1'
+      entities:
+        content:
+          - self:
+                id: 2201
+                CType: 'text'
+                header: 'For members'
+                header_layout: 1
+                bodytext: '<p>Visible to the frontend group <em>Members</em> only.</p>'
