@@ -29,6 +29,7 @@ parameters:
     - ../../../Build/Scripts/instance.php
 
   excludePaths:
+    - ../../../Tests/Acceptance/node_modules/*
     - ../../../Tests/*/Core13/*
 
   # Not a defect of this repository, and deliberately not a baseline entry.

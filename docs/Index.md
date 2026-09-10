@@ -48,6 +48,7 @@ Documentation for people **using** the extension lives in
 | [Fixture extensions](testing/fixture-extensions.md)       | Test-only extensions loaded by composer package name.                  |
 | [Site based tests](testing/site-based-tests.md)           | Site configuration, languages, frontend sub-requests.                  |
 | [Environment state](testing/environment-state.md)         | Application type and language context in functional tests.             |
+| [Acceptance tests](testing/acceptance-tests.md)           | Playwright against an instance built from nothing, the router, CI.     |
 
 ## [Workflow](workflow/Index.md)
 

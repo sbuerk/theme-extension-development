@@ -11,6 +11,7 @@ and must pass for **both** supported TYPO3 versions.
 | [Fixture extensions](fixture-extensions.md)       | Test-only extensions below `Tests/Functional/Fixtures/Extensions/`, loaded by composer package name.                      |
 | [Site based tests](site-based-tests.md)           | Site configuration with several languages and frontend sub-requests.                                                      |
 | [Environment state](environment-state.md)         | Application type and language context for functional tests.                                                               |
+| [Acceptance tests](acceptance-tests.md)           | Playwright against a development instance built from nothing: what a run does, the router, the specs, CI.                 |
 
 ## Quick start
 
@@ -26,6 +27,9 @@ Build/Scripts/runTests.sh -s functional -d sqlite
 
 # A single class or method — note the "--" separator.
 Build/Scripts/runTests.sh -s functional -d sqlite -- --filter ExtensionLoadedTest
+
+# Acceptance tests in a browser, against a freshly built instance.
+Build/Scripts/runTests.sh -t 12 -s acceptance
 ```
 
 ## The two tests that must never be dropped
