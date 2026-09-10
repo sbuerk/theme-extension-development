@@ -86,6 +86,9 @@
             "paths": {
                 "Tests/Functional/Fixtures/Extensions/*": [
                     "autoload"
+                ],
+                "packages-dev/*": [
+                    "autoload"
                 ]
             }
         },

@@ -1,0 +1,30 @@
+# Site of the "/legacy/" page tree - the showcase once more, delivered the way
+# an installation that predates site sets delivers it.
+#
+# "rootPageId" is 1001 because "ScenarioLegacy.yaml" of the seed set
+# "theme-instance" declares that uid (packages-dev/dev-site).
+#
+# No "dependencies". That is the whole point of this site: the TypoScript it
+# renders from arrives through the "include_static_file" column of the root
+# "sys_template" record on page 1001, and the condition in
+# "Configuration/TypoScript/Static/setup.typoscript" of the theme lets the
+# static include through only for a site that does not declare the set. A set
+# named here would suppress it, and the tree would prove nothing about the
+# static include.
+#
+# The base ends with a slash. Sites are matched by path specificity, so
+# "/legacy/" wins over the "/" of the "demo" site - but only with the trailing
+# slash, without which "/legacyfoo" would match as well.
+rootPageId: 1001
+base: /legacy/
+websiteTitle: 'Theme demo, sys_template delivery, TYPO3 v14'
+languages:
+  -
+    title: English
+    enabled: true
+    languageId: 0
+    base: /
+    locale: en_US.UTF-8
+    navigationTitle: English
+    flag: us
+    websiteTitle: ''

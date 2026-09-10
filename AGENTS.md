@@ -320,6 +320,15 @@ Further:
   that root; never follow it when walking the tree, and never add it to a path a
   tool descends into.
   → [Development instances](docs/development/instances.md)
+- The instances are built from the seed set `theme-instance` of
+  `packages-dev/dev-site`, which imports the showcase `theme-demo` of the
+  extension and mirrors it below `/legacy/`. `ScenarioLegacy.yaml` and
+  `ReferencesLegacy.yaml` there are **generated** by
+  `php Build/Scripts/generateLegacyScenario.php` from
+  `Configuration/DataFactory/theme-demo/` — change the showcase and re-run it,
+  never edit the generated files. `GeneratedLegacyScenarioTest` fails on a
+  stale mirror.
+  → [Seeding](docs/development/seeding.md)
 - The wrapper notices that it has no terminal and drops the interactive
   container flags by itself, so calling it from a tool, a pipe or a hook needs
   no special handling — it is the same command a human types.
