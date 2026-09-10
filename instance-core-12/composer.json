@@ -5,6 +5,7 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+        "sbuerk/data-factory": "^1.0",
         "sbuerk/theme-extension-development": "@dev",
         "tests/dev-site": "@dev",
         "typo3/minimal": "^12"

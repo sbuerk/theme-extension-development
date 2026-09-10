@@ -6,24 +6,17 @@ namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use SBUERK\ThemeExtensionDevelopment\Seeding\DataMapFactory;
-use SBUERK\ThemeExtensionDevelopment\Seeding\FileImporterInterface;
-use SBUERK\ThemeExtensionDevelopment\Seeding\FileSeeder;
-use SBUERK\ThemeExtensionDevelopment\Seeding\Seeder;
-use SBUERK\ThemeExtensionDevelopment\Seeding\YamlSeedParser;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use Symfony\Component\Yaml\Yaml;
-use TYPO3\CMS\Core\Resource\StorageRepository;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
- * Holds the shipped demo tree to being a complete showcase.
+ * Holds the shipped showcase tree to being a complete showcase.
  *
- * `SeedingTest` covers the seeding *mechanism* - that DataHandler is used, that
- * slugs are generated, that nesting becomes a `pid`. This covers the *result*:
- * that the tree a developer gets from `theme:seed` actually demonstrates the
- * theme, rather than demonstrating whichever parts someone remembered.
+ * The seeding *mechanism* is `sbuerk/data-factory`'s and is tested there. This
+ * covers the *result*: that the tree a developer gets from
+ * `data-factory:import theme-demo` actually demonstrates the theme, rather than
+ * demonstrating whichever parts someone remembered.
  *
  * The two assertions that matter most read the repository rather than a list
  * written here - the registered backend layouts, and the content types the
@@ -34,25 +27,30 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  */
 final class ShowcaseTreeTest extends AbstractFunctionalTestCase
 {
+    use DataFactoryImportTrait;
     use SiteBasedTestTrait;
     use ThemeSiteTrait;
 
-    private const DEMO_SEED = 'EXT:theme_extension_development/Configuration/Seeds/Demo.yaml';
+    private const SCENARIO = 'Configuration/DataFactory/theme-demo/Scenario.yaml';
+
+    protected array $testExtensionsToLoad = [
+        'sbuerk/theme-extension-development',
+        'sbuerk/data-factory',
+    ];
 
     /**
      * `list` is the Extbase plugin container, not a type an editor picks from
      * the "new content element" wizard - it is covered by
-     * `ExtbasePluginRenderingTest` and cannot be seeded without a plugin to put
-     * in it.
+     * `ExtbasePluginRenderingTest` and is not seeded without a plugin to put in
+     * it.
      *
      * The two categorized menus select through `sys_category` and an MM table,
-     * and the seed format expresses neither. They are seeded with no category
+     * and the showcase seeds no categories. They are seeded with no category
      * selected, which renders an empty menu - the correct rendering of "nothing
      * chosen" - so they are present in the tree but cannot be asserted on by
-     * their output. Closing this needs a second seed format feature; it is a
-     * named gap, not an oversight.
+     * their output. It is a named gap, not an oversight.
      */
-    private const NOT_SEEDABLE = ['list', 'menu_categorized_pages', 'menu_categorized_content'];
+    private const NOT_SEEDED = ['list', 'menu_categorized_pages', 'menu_categorized_content'];
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8'],
@@ -63,20 +61,8 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         parent::setUp();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/AdminBackendUser.csv');
-        GeneralUtility::makeInstance(StorageRepository::class)
-            ->createLocalStorage('fileadmin', 'fileadmin/', 'relative', 'Showcase test storage', true);
-
-        // The file importer comes from the container: it is the core version
-        // aware half of the seeding, and only the container knows which of
-        // "Core12/" and "Core13/" the running core version registers.
-        $seeder = new Seeder(
-            new DataMapFactory(),
-            new FileSeeder(
-                GeneralUtility::makeInstance(StorageRepository::class),
-                $this->get(FileImporterInterface::class),
-            ),
-        );
-        $seeder->seed((new YamlSeedParser())->parseFile(self::DEMO_SEED), $this->setUpBackendUser(1));
+        $this->createDefaultFileStorage();
+        $this->importSeedSet('theme-demo');
 
         $this->setUpThemeSite(identifier: 'demo', websiteTitle: 'Theme demo');
     }
@@ -173,7 +159,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             $matched,
         );
 
-        $types = array_values(array_unique(array_diff($matched[1], self::NOT_SEEDABLE)));
+        $types = array_values(array_unique(array_diff($matched[1], self::NOT_SEEDED)));
         sort($types);
 
         return $types;
@@ -243,9 +229,8 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * `backend_layout` is a plain field of the record, so the seeder needs no
-     * code for it - but "needs no code" is a claim about `DataMapFactory`
-     * passing unknown keys through, and this is what holds it to that.
+     * `backend_layout` is a plain field of the record, written as the scenario
+     * declares it, and the page is only right if the frontend agrees.
      *
      * Asserted through the frontend rather than through the row, because the
      * row being right and the page rendering through another template is
@@ -349,8 +334,8 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
 
     /**
      * The inline children of a content element are ordered by the parent's
-     * relation, not by their own `sorting`, and the seed format's whole promise
-     * is that declaration order survives.
+     * relation, not by their own `sorting`: the parent declares the ids of its
+     * children as a list, and that list is the order they have to render in.
      *
      * Read through the rendered page rather than through `sorting_foreign`,
      * because the column being right while the template reads the relation the
@@ -398,10 +383,10 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
 
     /**
      * The `link_label` of the link list's inline children, in the order the
-     * seed definition declares them.
+     * scenario lists them in the parent's relation field.
      *
-     * Read from the definition rather than written out here, so the test states
-     * the promise - declaration order survives - instead of restating today's
+     * Read from the scenario rather than written out here, so the test states
+     * the promise - the declared order survives - instead of restating today's
      * demo copy and having to be edited whenever that copy changes.
      *
      * A child may deliberately carry no `link_label`, to demonstrate the
@@ -413,29 +398,46 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      */
     private function declaredLinkListLabels(): array
     {
-        $definition = Yaml::parseFile(self::extensionPath('Configuration/Seeds/Demo.yaml'));
-        $found = [];
+        $scenario = Yaml::parseFile(self::extensionPath(self::SCENARIO));
+        $relations = [];
+        $labels = [];
 
-        $walk = static function (array $records) use (&$walk, &$found): void {
-            foreach ($records as $record) {
-                if (!is_array($record)) {
+        $walk = static function (array $items) use (&$walk, &$relations, &$labels): void {
+            foreach ($items as $item) {
+                if (!is_array($item)) {
                     continue;
                 }
-                if (($record['CType'] ?? null) === 'theme_linklist') {
-                    foreach ($record['inline']['tx_theme_list_items'] ?? [] as $child) {
-                        if (($child['link_label'] ?? '') !== '') {
-                            $found[] = (string)$child['link_label'];
-                        }
+                $self = is_array($item['self'] ?? null) ? $item['self'] : [];
+                if (($self['CType'] ?? null) === 'theme_linklist') {
+                    $relations[] = (string)($self['tx_theme_list_items'] ?? '');
+                }
+                if (array_key_exists('link', $self) && isset($self['id'])) {
+                    $labels[(int)$self['id']] = (string)($self['link_label'] ?? '');
+                }
+                foreach ($item['entities'] ?? [] as $nested) {
+                    if (is_array($nested)) {
+                        $walk($nested);
                     }
                 }
-                foreach (['children', 'content'] as $nesting) {
-                    if (is_array($record[$nesting] ?? null)) {
-                        $walk($record[$nesting]);
-                    }
+                if (is_array($item['children'] ?? null)) {
+                    $walk($item['children']);
                 }
             }
         };
-        $walk($definition['pages'] ?? []);
+        $walk($scenario['entities']['page'] ?? []);
+
+        // One element, because the rendered fragment below is looked up once.
+        $this->assertCount(1, $relations, 'The scenario has to declare exactly one "theme_linklist" element.');
+
+        $found = [];
+        foreach (array_map('intval', explode(',', $relations[0])) as $uid) {
+            // A relation naming a child the scenario does not declare would
+            // otherwise shorten the list instead of failing.
+            $this->assertArrayHasKey($uid, $labels, sprintf('The link list names list item %d, which is not declared.', $uid));
+            if ($labels[$uid] !== '') {
+                $found[] = $labels[$uid];
+            }
+        }
 
         return $found;
     }

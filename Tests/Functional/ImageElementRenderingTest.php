@@ -5,14 +5,7 @@ declare(strict_types=1);
 namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\Test;
-use SBUERK\ThemeExtensionDevelopment\Seeding\DataMapFactory;
-use SBUERK\ThemeExtensionDevelopment\Seeding\FileImporterInterface;
-use SBUERK\ThemeExtensionDevelopment\Seeding\FileSeeder;
-use SBUERK\ThemeExtensionDevelopment\Seeding\Seeder;
-use SBUERK\ThemeExtensionDevelopment\Seeding\YamlSeedParser;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
-use TYPO3\CMS\Core\Resource\StorageRepository;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
@@ -32,10 +25,15 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  */
 final class ImageElementRenderingTest extends AbstractFunctionalTestCase
 {
+    use DataFactoryImportTrait;
     use SiteBasedTestTrait;
     use ThemeSiteTrait;
 
-    private const SEED = 'EXT:theme_extension_development/Tests/Functional/Fixtures/Seeds/ImageElement.yaml';
+    protected array $testExtensionsToLoad = [
+        'sbuerk/theme-extension-development',
+        'sbuerk/data-factory',
+        'tests/data-factory-fixture',
+    ];
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8'],
@@ -46,22 +44,8 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         parent::setUp();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/AdminBackendUser.csv');
-        // A functional instance has no "sys_file_storage" record - the testing
-        // framework creates the folders, "typo3 setup" creates the record.
-        GeneralUtility::makeInstance(StorageRepository::class)
-            ->createLocalStorage('fileadmin', 'fileadmin/', 'relative', 'Image element test storage', true);
-
-        // The file importer comes from the container: it is the core version
-        // aware half of the seeding, and only the container knows which of
-        // "Core12/" and "Core13/" the running core version registers.
-        $seeder = new Seeder(
-            new DataMapFactory(),
-            new FileSeeder(
-                GeneralUtility::makeInstance(StorageRepository::class),
-                $this->get(FileImporterInterface::class),
-            ),
-        );
-        $seeder->seed((new YamlSeedParser())->parseFile(self::SEED), $this->setUpBackendUser(1));
+        $this->createDefaultFileStorage();
+        $this->importSeedSet('tests-image-element');
 
         $this->setUpThemeSite();
     }

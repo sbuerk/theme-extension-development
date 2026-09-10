@@ -1,0 +1,191 @@
+# The showcase page tree of the theme, as a seed set of sbuerk/data-factory.
+#
+# Written into an installation with:
+#
+#   vendor/bin/typo3 data-factory:import theme-demo
+#
+# sbuerk/data-factory is suggested, not required: the set is inert data until
+# that extension is installed, and nothing in the theme reads it.
+#
+# The records live in "Scenario.yaml", in the scenario format of
+# typo3/testing-framework. This file describes the set: its identity, the
+# scenario files, the files it brings and which records those files are
+# attached to. A file reference is declared here rather than in the scenario,
+# because it points at its file through "uid_local" - a uid the FAL indexer
+# hands out while the file is being placed, which nobody can write down in
+# advance.
+#
+# Every path is an "EXT:" path, although a path relative to this directory
+# would do for this set alone. data-factory resolves a relative path against
+# the directory of the ENTRY file, so a set that pulls this descriptor in
+# through "imports" would resolve it against its own directory. "EXT:"
+# resolves the same from both.
+#
+# No "sites". A site configuration names its root page by uid and carries
+# installation specific values - its base, its title - that a shipped set has
+# nothing to say about. The development instances commit theirs below
+# "instance-core-*/config/sites/".
+identifier: theme-demo
+title: 'Theme showcase page tree'
+description: >-
+  Nine pages carrying every backend layout the theme registers, every content
+  element it renders and the styleguide - the frontend the theme is developed
+  against.
+
+scenarios:
+  - 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Scenario.yaml'
+
+# Copied into "fileadmin/theme-demo/" of the default storage before any record
+# is written. data-factory copies rather than moves, so the sources stay here.
+#
+# Both are SVG on purpose, and their sizes are asserted: the landscape file
+# declares a 480x270 viewBox and the portrait one 270x480, both smaller than
+# the 1200 pixel gallery width of the theme, so a rendered image carries its
+# own dimensions rather than a scaled up size.
+files:
+  - identifier: placeholder
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder.svg'
+    folder: 'theme-demo'
+  - identifier: placeholder-portrait
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder-portrait.svg'
+    folder: 'theme-demo'
+
+# Every file relation of the tree. "uid" is the uid the scenario declares as
+# the "id" of the record the reference hangs on - see the uid scheme at the top
+# of "Scenario.yaml" - and "values" are the fields of the "sys_file_reference"
+# row itself. They belong to the reference, not to the file, which is what lets
+# the same image carry a different alternative text in two places.
+#
+# References to one field are written in the order they are declared here, and
+# that is the order of a gallery.
+references:
+  # Page 1, "Theme demo": the page media.
+  - file: placeholder
+    table: pages
+    uid: 1
+    field: media
+    values:
+      alternative: 'A placeholder graphic'
+      title: 'Placeholder'
+
+  # Page 3, "Media": one image, and a two column gallery.
+  - file: placeholder
+    table: tt_content
+    uid: 302
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'The description of a file reference is rendered as the caption.'
+  - file: placeholder
+    table: tt_content
+    uid: 303
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'Landscape'
+  - file: placeholder-portrait
+    table: tt_content
+    uid: 303
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: 'Portrait'
+
+  # Page 6, "Core elements".
+  - file: placeholder-portrait
+    table: tt_content
+    uid: 605
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: 'One column, beside the text'
+  - file: placeholder
+    table: tt_content
+    uid: 606
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'Landscape'
+  - file: placeholder-portrait
+    table: tt_content
+    uid: 606
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: 'Portrait'
+  - file: placeholder
+    table: tt_content
+    uid: 607
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'The description of a file reference is rendered as the caption.'
+  # "uploads" reads "media", and sorts by file name: the portrait file is
+  # listed first although it is declared second. See the element in the
+  # scenario for why that is the point.
+  - file: placeholder
+    table: tt_content
+    uid: 608
+    field: media
+    values:
+      title: 'Placeholder, landscape'
+      description: 'Listed second, because the list is sorted by file name rather than by the order these references are declared in.'
+  - file: placeholder-portrait
+    table: tt_content
+    uid: 608
+    field: media
+    values:
+      title: 'Placeholder, portrait'
+      description: 'Listed first for the same reason.'
+
+  # Page 8, "Theme elements".
+  - file: placeholder
+    table: tt_content
+    uid: 801
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      title: 'The hero image'
+  - file: placeholder
+    table: tt_content
+    uid: 802
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      title: 'The reduced hero image'
+  - file: placeholder
+    table: tt_content
+    uid: 805
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      title: 'The teaser image'
+  # The author portrait: the component crops this box differently from the
+  # landscape media slots, so the portrait file is the right one of the two.
+  - file: placeholder-portrait
+    table: tt_content
+    uid: 807
+    field: image
+    values:
+      alternative: 'A placeholder portrait'
+      title: 'The portrait of the author'
+  # The three cards of the media teaser grid, which are rows of the shared child
+  # table "tx_theme_list_item" rather than content elements.
+  - file: placeholder
+    table: tx_theme_list_item
+    uid: 10
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  - file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 11
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  - file: placeholder
+    table: tx_theme_list_item
+    uid: 12
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'

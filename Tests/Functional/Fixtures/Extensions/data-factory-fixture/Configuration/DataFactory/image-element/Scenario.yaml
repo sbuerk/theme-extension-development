@@ -1,0 +1,47 @@
+# One page carrying four "image" elements: one image, two images in two
+# columns, one image enlarged on click, and none at all. The images are
+# attached in "config.yml".
+entitySettings:
+  '*':
+    nodeColumnName: 'pid'
+    columnNames: {id: 'uid'}
+    defaultValues: {pid: 0, hidden: 0}
+  page:
+    isNode: true
+    tableName: 'pages'
+    parentColumnName: 'pid'
+    defaultValues: {doktype: 1}
+  content:
+    tableName: 'tt_content'
+
+entities:
+  page:
+    - self:
+          id: 1
+          title: 'Image elements'
+          slug: '/'
+          is_siteroot: 1
+      entities:
+        content:
+          - self:
+                id: 11
+                CType: 'image'
+                header: 'A single image'
+                header_layout: 2
+          - self:
+                id: 12
+                CType: 'image'
+                header: 'Two images in two columns'
+                header_layout: 2
+                imagecols: 2
+          - self:
+                id: 13
+                CType: 'image'
+                header: 'Enlarge on click'
+                header_layout: 2
+                image_zoom: 1
+          - self:
+                id: 14
+                CType: 'image'
+                header: 'An element without an image'
+                header_layout: 2

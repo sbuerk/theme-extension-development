@@ -125,11 +125,11 @@ request rather than trusting `settings.php`, so the same checkout resolves its
 database identically under DDEV and on a host stack.
 
 When a template exists at `sqlite-databases/core-<major>.sqlite` it is copied
-into `var/sqlite/` on first start. Until one has been committed, the instance
-starts empty: set it up with `vendor/bin/typo3 setup` and then fill it with
-`vendor/bin/typo3 theme:seed` — see [Seeding](seeding.md). The site
-configuration below `config/sites/demo/` is committed and points at the root
-page uid the seed definition declares.
+into `var/sqlite/` on first start. Until one has been committed, the instance starts
+empty: set it up with `vendor/bin/typo3 setup` and then fill it with
+`vendor/bin/typo3 data-factory:import theme-demo` — see [Seeding](seeding.md).
+The site configuration below `config/sites/demo/` is committed and points at
+the root page uid the seed set declares.
 
 `config/system/additional/` is git-ignored and included automatically — the
 place for anything belonging to one machine rather than the repository, such as
@@ -151,10 +151,11 @@ this file enables the theme when it does not.
 → [TypoScript delivery](../architecture/typoscript-delivery.md)
 
 The replacement is a `sys_template` record — a database row, and one no
-configuration file can carry. A [seed definition](seeding.md) can express it
-since the [`records`](seeding.md#records-of-any-table) key, because the row sits
-on page 1 like any other record; the demo definition does not declare one, so
-this is still a **manual step, between `typo3 setup` and `theme:seed`**:
+configuration file can carry. A [seed set](seeding.md) can express it — the
+scenario format writes records of any table, and the row sits on page 1 like
+any other record — but the showcase set does not declare one, so this is still
+a **manual step, between `typo3 setup` and
+`data-factory:import theme-demo`**:
 
 1. **Web > List**, page `1` — the site root.
 2. *Create new record* → **System records** → **"TypoScript record"**
@@ -171,10 +172,9 @@ this is still a **manual step, between `typo3 setup` and `theme:seed`**:
 > Web > List rather than the module a TYPO3 developer would reach for first.
 
 Committing a prepared `sqlite-databases/core-12.sqlite` would remove the step,
-and declaring the record under `records:` in the demo definition would remove it
-for good. Neither is done here: the first commits a binary nobody can review,
+and declaring the record in the showcase set would remove it for good. Neither is done here: the first commits a binary nobody can review,
 and the second changes the shipped demo tree for the sake of one core version —
-which is a decision about the demo, not about the seeder.
+which is a decision about the demo, not about the seeding.
 
 ## Snapshot and restore
 
