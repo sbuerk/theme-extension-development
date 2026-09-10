@@ -1,0 +1,3 @@
+sys_template,,,,,
+,uid,pid,root,clear,title
+,100,10,1,0,"A section flagged as TypoScript root"

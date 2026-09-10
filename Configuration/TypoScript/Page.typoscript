@@ -63,6 +63,25 @@ page {
             pageTitle = TEXT
             pageTitle.data = page:title
 
+            # The URL of the site root, for the brand link of the header.
+            #
+            # Resolved, not written as "/": the root of a site is its base,
+            # and a site whose base has a path - "/legacy/" in the development
+            # instances, "/en/" or "/shop/" elsewhere - has its root there. A
+            # literal "/" links every page of such a site out of it.
+            #
+            # "site:rootPageId", not "leveluid:0". The latter is the first page
+            # of the LOCAL rootline, which stops at a "sys_template" record
+            # flagged as root - below the site root when a section carries one,
+            # above it when a site takes its TypoScript from a page further up.
+            # The site configuration is what says which page the site starts
+            # at.
+            siteRootUrl = TEXT
+            siteRootUrl.typolink {
+                parameter.data = site:rootPageId
+                returnLast = url
+            }
+
             # The resolved backend layout identifier, in the form the page
             # TSconfig declares it - "content_sidebar", not "ContentSidebar".
             #

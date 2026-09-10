@@ -407,7 +407,7 @@ height on every scroll position:
 ```html
 <header class="theme-site-header">
     <div class="theme-site-header__inner">
-        <a class="theme-site-header__brand" href="/">…</a>
+        <a class="theme-site-header__brand" href="{siteRootUrl}">…</a>
         <nav class="theme-nav-main">…</nav>
         <div class="theme-site-header__actions">…</div>
     </div>
