@@ -63,6 +63,12 @@ pages` needed no data processor beyond that: :php:`MenuProcessor` already
 JSON-encodes the whole page row onto every menu item, so the abstract text
 and the last-changed timestamp were already there for the reading.
 
+:guilabel:`Recently updated pages` orders pages changed in the same second by
+descending uid, so the list comes out the same on every database system. The
+order is set with ``alternativeSortingField``; a site package that changes
+``special.mode`` - to ``tstamp``, for example - changes that property along
+with it (``tstamp DESC, uid DESC``).
+
 :guilabel:`Categorized pages` and :guilabel:`Categorized content` select by
 category membership, which :php:`MenuProcessor` cannot express at all, and
 are built on two different mechanisms on purpose, not by accident:
