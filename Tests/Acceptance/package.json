@@ -1,0 +1,9 @@
+{
+    "name": "theme-extension-development-acceptance",
+    "description": "Acceptance tests of the TYPO3 extension theme_extension_development, run by \"Build/Scripts/runTests.sh -s acceptance\".",
+    "license": "GPL-2.0-or-later",
+    "private": true,
+    "devDependencies": {
+        "@playwright/test": "1.63.0"
+    }
+}

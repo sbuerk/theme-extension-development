@@ -133,21 +133,22 @@ The jobs are staged, cheapest and most likely to fail first:
 
 ```
 quality ─┐
-phpstan ─┤
-lint    ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
+phpstan ─┤         ┌─> acceptance
+lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
          │
 docs ────┘
 ```
 
-| Job                 | Matrix                                   | Runs                                        |
-|---------------------|------------------------------------------|---------------------------------------------|
-| `quality`           | lowest PHP, one core version             | The gates that inspect source files         |
-| `phpstan`           | lowest PHP × both core versions          | The one gate configured per core version    |
-| `lint`              | all PHP versions × both core versions    | `lintPhp`                                   |
-| `unit`              | edge PHP versions × both core versions   | `unit`, `unitRandom`                        |
-| `functional-sqlite` | edge PHP versions × both core versions   | `functional -d sqlite`                      |
-| `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs | `functional` against each database          |
-| `documentation`     | —                                        | `renderDocumentation`, uploads the artifact |
+| Job                 | Matrix                                   | Runs                                                                                      |
+|---------------------|------------------------------------------|-------------------------------------------------------------------------------------------|
+| `quality`           | lowest PHP, one core version             | The gates that inspect source files                                                       |
+| `phpstan`           | lowest PHP × both core versions          | The one gate configured per core version                                                  |
+| `lint`              | all PHP versions × both core versions    | `lintPhp`                                                                                 |
+| `unit`              | edge PHP versions × both core versions   | `unit`, `unitRandom`                                                                      |
+| `functional-sqlite` | edge PHP versions × both core versions   | `functional -d sqlite`                                                                    |
+| `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs | `functional` against each database                                                        |
+| `acceptance`        | lowest PHP × both core versions          | `acceptance`: an instance built from nothing, in a browser; uploads the report on failure |
+| `documentation`     | —                                        | `renderDocumentation`, uploads the artifact                                               |
 
 Two decisions are worth knowing:
 
@@ -191,7 +192,9 @@ its user namespace and never saw it.
 
 The composer **download cache** is shared per PHP and core version, so the
 repeated `composerUpdate` resolves against a warm cache instead of downloading
-the dependency set again in every job.
+the dependency set again in every job. The `acceptance` job keeps its own key,
+because it installs the development instance rather than the root dependency
+set, and falls back to the key of its PHP and core version.
 
 It lives in `.cache/` at the repository root, and that location is load-bearing:
 `runTests.sh -s composerUpdate` starts with `rm -rf .Build`, so a cache kept

@@ -18,6 +18,9 @@
 # the source maps are written by the development build only - the committed
 # stylesheet is built without them.
 /node_modules
+# The Playwright dependency of the acceptance suite, installed by
+# "runTests.sh -s acceptance" from "Tests/Acceptance/package.json".
+/Tests/Acceptance/node_modules
 /Resources/Public/Css/*.map
 
 # Composer download and phpstan result cache. Deliberately NOT under ".Build/":

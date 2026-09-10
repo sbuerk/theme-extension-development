@@ -52,34 +52,35 @@ hosted runners, not of this repository.
 
 ## Suites
 
-| Suite                        | Purpose                                                       |
-|------------------------------|---------------------------------------------------------------|
-| `unit`                       | PHP unit tests (default suite).                               |
-| `unitRandom`                 | Unit tests in random order.                                   |
-| `functional`                 | PHP functional tests.                                         |
-| `cgl`                        | Coding guidelines, fix in place or check with `-n`.           |
-| `phpstan`                    | Static analysis.                                              |
-| `phpstanGenerateBaseline`    | Regenerate the PHPStan baseline of the selected core version. |
-| `lintPhp`                    | PHP linting.                                                  |
-| `checkBom`                   | UTF-8 files must not contain a BOM.                           |
-| `checkExceptionCodes`        | Duplicate or missing exception codes.                         |
-| `checkMarkdownTables`        | Markdown tables must be formatted, `-- --fix` formats them.   |
-| `checkTestMethodsPrefix`     | Test methods must not start with `test`.                      |
-| `buildCss`                   | Compile the SCSS into `Resources/Public/Css`.                 |
-| `checkCssBuild`              | The committed CSS must match its SCSS sources.                |
-| `watchCss`                   | Compile the SCSS, re-compiling on every change.               |
-| `npm`                        | `npm` with all remaining arguments dispatched.                |
-| `composer`                   | `composer` with all remaining arguments dispatched.           |
-| `composerInstall`            | `composer install`.                                           |
-| `composerUpdate`             | `composer update` for the core version given with `-t`.       |
-| `composerValidate`           | `composer validate --strict` of the root `composer.json`.     |
-| `renderDocumentation`        | Render `Documentation/` into `Documentation-GENERATED-temp/`. |
-| `setVersion`                 | Apply a version, `-- <version> <type>`.                       |
-| `watchDocumentation`         | Serve `Documentation/`, re-rendering on every change.         |
-| `clean`                      | Remove build, cache, rendered documentation and test files.   |
-| `cleanCache`                 | Cache files and folders only.                                 |
-| `cleanRenderedDocumentation` | `Documentation-GENERATED-temp/` only.                         |
-| `cleanTests`                 | Test related files and folders only.                          |
+| Suite                        | Purpose                                                                                                    |
+|------------------------------|------------------------------------------------------------------------------------------------------------|
+| `unit`                       | PHP unit tests (default suite).                                                                            |
+| `unitRandom`                 | Unit tests in random order.                                                                                |
+| `functional`                 | PHP functional tests.                                                                                      |
+| `acceptance`                 | Playwright against an instance built from nothing, see [Acceptance tests](../testing/acceptance-tests.md). |
+| `cgl`                        | Coding guidelines, fix in place or check with `-n`.                                                        |
+| `phpstan`                    | Static analysis.                                                                                           |
+| `phpstanGenerateBaseline`    | Regenerate the PHPStan baseline of the selected core version.                                              |
+| `lintPhp`                    | PHP linting.                                                                                               |
+| `checkBom`                   | UTF-8 files must not contain a BOM.                                                                        |
+| `checkExceptionCodes`        | Duplicate or missing exception codes.                                                                      |
+| `checkMarkdownTables`        | Markdown tables must be formatted, `-- --fix` formats them.                                                |
+| `checkTestMethodsPrefix`     | Test methods must not start with `test`.                                                                   |
+| `buildCss`                   | Compile the SCSS into `Resources/Public/Css`.                                                              |
+| `checkCssBuild`              | The committed CSS must match its SCSS sources.                                                             |
+| `watchCss`                   | Compile the SCSS, re-compiling on every change.                                                            |
+| `npm`                        | `npm` with all remaining arguments dispatched.                                                             |
+| `composer`                   | `composer` with all remaining arguments dispatched.                                                        |
+| `composerInstall`            | `composer install`.                                                                                        |
+| `composerUpdate`             | `composer update` for the core version given with `-t`.                                                    |
+| `composerValidate`           | `composer validate --strict` of the root `composer.json`.                                                  |
+| `renderDocumentation`        | Render `Documentation/` into `Documentation-GENERATED-temp/`.                                              |
+| `setVersion`                 | Apply a version, `-- <version> <type>`.                                                                    |
+| `watchDocumentation`         | Serve `Documentation/`, re-rendering on every change.                                                      |
+| `clean`                      | Remove build, cache, rendered documentation and test files.                                                |
+| `cleanCache`                 | Cache files and folders only.                                                                              |
+| `cleanRenderedDocumentation` | `Documentation-GENERATED-temp/` only.                                                                      |
+| `cleanTests`                 | Test related files and folders only.                                                                       |
 
 ## Passing arguments to the underlying tool
 

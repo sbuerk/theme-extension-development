@@ -202,7 +202,9 @@ cleanTestFiles() {
     # test related
     echo -n "Clean test related files ... "
     rm -rf \
-        .Build/Web/typo3temp/var/tests/
+        .Build/Web/typo3temp/var/tests/ \
+        .Build/acceptance/ \
+        Tests/Acceptance/node_modules/
     echo "done"
 }
 
@@ -225,6 +227,8 @@ Usage: $0 [options] [file]
 Options:
     -s <...>
         Specifies which test suite to run
+            - acceptance: Playwright tests against a development instance built from nothing,
+              needs no composerUpdate, "-- <arguments>" go to "playwright test"
             - buildCss: compile Resources/Private/Scss into Resources/Public/Css
             - cgl: test and fix all php files
             - checkBom: check UTF-8 files do not contain BOM
@@ -541,6 +545,11 @@ IMAGE_DOCS="ghcr.io/typo3-documentation/render-guides:latest"
 # TYPO3 node image instead. It is picked up by "-u" like every other image,
 # because that globs "ghcr.io/typo3/core-testing-*".
 IMAGE_NODEJS="ghcr.io/typo3/core-testing-nodejs24:latest"
+# The browsers of the acceptance suite. Pinned to the exact "@playwright/test"
+# version of "Tests/Acceptance/package.json": the image carries the browser
+# builds of one Playwright release, and a different library version refuses to
+# start them.
+IMAGE_PLAYWRIGHT="mcr.microsoft.com/playwright:v1.63.0-noble"
 IMAGE_MARIADB="docker.io/mariadb:${DBMS_VERSION}"
 IMAGE_MYSQL="docker.io/mysql:${DBMS_VERSION}"
 IMAGE_POSTGRES="docker.io/postgres:${DBMS_VERSION}-alpine"
@@ -600,6 +609,57 @@ fi
 
 # Suite execution
 case ${TEST_SUITE} in
+    acceptance)
+        # A throwaway development instance of the core version "-t" selects, built below
+        # ".Build/acceptance/" from the committed "instance-core-<version>/" - its composer.json,
+        # its site configurations and its "additional.php" - by the same "composer system:setup"
+        # a DDEV instance runs on its first start. The committed instances are not touched.
+        #
+        # ".Build/acceptance/theme" and ".Build/acceptance/packages-dev" recreate the two paths an
+        # instance resolves one level up, the way the repository root provides them for
+        # "instance-core-*/". The instance is served by the PHP built-in server in a container of
+        # its own and tested by Playwright in a third one, on the network of this run.
+        #
+        # Arguments after "--" go to "playwright test": "-- --grep login".
+        # See "docs/testing/acceptance-tests.md".
+        ACCEPTANCE_ROOT=".Build/acceptance"
+        ACCEPTANCE_INSTANCE="${ACCEPTANCE_ROOT}/instance"
+        if [ ! -d "instance-core-${CORE_VERSION}" ]; then
+            echo "There is no development instance \"instance-core-${CORE_VERSION}\"." >&2
+            SUITE_EXIT_CODE=1
+            printSummary
+        fi
+        rm -rf "${ACCEPTANCE_ROOT}"
+        mkdir -p "${ACCEPTANCE_INSTANCE}/config/system" "${ACCEPTANCE_ROOT}/home"
+        ln -s ../.. "${ACCEPTANCE_ROOT}/theme"
+        ln -s ../../packages-dev "${ACCEPTANCE_ROOT}/packages-dev"
+        cp "instance-core-${CORE_VERSION}/composer.json" "${ACCEPTANCE_INSTANCE}/"
+        cp -R "instance-core-${CORE_VERSION}/config/sites" "${ACCEPTANCE_INSTANCE}/config/"
+        cp "instance-core-${CORE_VERSION}/config/system/additional.php" "${ACCEPTANCE_INSTANCE}/config/system/"
+
+        COMMAND="composer install --no-progress --no-interaction && composer system:setup"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name acceptance-setup-${SUFFIX} -w "${ROOT_DIR}/${ACCEPTANCE_INSTANCE}" -e COMPOSER_CACHE_DIR="${ROOT_DIR}/.cache/composer" ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
+        SUITE_EXIT_CODE=$?
+        if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+            # One PHP worker: the instance is SQLite, which allows one writer, and parallel
+            # requests of one backend page were enough to answer "database is locked". The
+            # router sends every path which is not a file to "index.php" - see
+            # "Tests/Acceptance/router.php" for the paths TYPO3 v14 routes that the built-in
+            # server would answer with 404 otherwise. Its output goes to the log of the instance,
+            # which a failed run keeps.
+            ${CONTAINER_BIN} run -d ${CONTAINER_COMMON_PARAMS} --name acceptance-web-${SUFFIX} -w "${ROOT_DIR}/${ACCEPTANCE_INSTANCE}" ${IMAGE_PHP} /bin/sh -c "exec php -S 0.0.0.0:8000 -t public ${ROOT_DIR}/Tests/Acceptance/router.php > var/log/php-server.log 2>&1" >/dev/null
+            SUITE_EXIT_CODE=$?
+            # Quoted one by one: the arguments run through "sh -c" as one string, and
+            # "-- --grep 'log in'" has to arrive as two arguments, not three.
+            PLAYWRIGHT_ARGUMENTS=""
+            [[ $# -gt 0 ]] && PLAYWRIGHT_ARGUMENTS=$(printf ' %q' "$@")
+            COMMAND="cd Tests/Acceptance && npm ci --no-audit --no-fund && npx playwright test${PLAYWRIGHT_ARGUMENTS}"
+            if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+                ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name acceptance-playwright-${SUFFIX} -e BASE_URL="http://acceptance-web-${SUFFIX}:8000" -e HOME="${ROOT_DIR}/${ACCEPTANCE_ROOT}/home" -e npm_config_cache="${ROOT_DIR}/.cache/npm" -e CI="${CI:-}" ${IMAGE_PLAYWRIGHT} /bin/sh -c "${COMMAND}"
+                SUITE_EXIT_CODE=$?
+            fi
+        fi
+        ;;
     buildCss)
         COMMAND="npm ci --no-audit --no-fund && npm run build"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name build-css-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
@@ -751,7 +811,7 @@ case ${TEST_SUITE} in
         # depending on a default. The generated trees of the instances are
         # excluded as well; their committed configuration below "config/" is
         # deliberately still linted.
-        COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./.agent/\\*" ! -path "./.cache/\\*" ! -path "./var/\\*" ! -path "./node_modules/\\*" ! -path "./theme/\\*" ! -path "./instance-core-\\*/vendor/\\*" ! -path "./instance-core-\\*/public/\\*" ! -path "./instance-core-\\*/var/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
+        COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./.agent/\\*" ! -path "./.cache/\\*" ! -path "./var/\\*" ! -path "./node_modules/\\*" ! -path "./Tests/Acceptance/node_modules/\\*" ! -path "./theme/\\*" ! -path "./instance-core-\\*/vendor/\\*" ! -path "./instance-core-\\*/public/\\*" ! -path "./instance-core-\\*/var/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
         ;;

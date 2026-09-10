@@ -286,6 +286,7 @@ Build/Scripts/runTests.sh -t 13 -s checkExceptionCodes
 Build/Scripts/runTests.sh -t 13 -s checkMarkdownTables
 Build/Scripts/runTests.sh -t 13 -s checkTestMethodsPrefix
 Build/Scripts/runTests.sh -t 13 -s checkCssBuild
+Build/Scripts/runTests.sh -t 13 -s acceptance
 
 # Then the same for TYPO3 v14, starting with composerUpdate again.
 Build/Scripts/runTests.sh -t 14 -s composerUpdate
@@ -310,6 +311,14 @@ Further:
   → [Frontend assets](docs/development/frontend-assets.md)
 - `-s functional -d mariadb -i 10.6` (also `mysql`, `postgres`) when a change
   touches queries, schema or TCA. SQLite alone is not enough there.
+- `-s acceptance` builds a development instance of the `-t` core version from
+  nothing below `.Build/acceptance/` and runs the Playwright specs of
+  `Tests/Acceptance/` against it. It needs no `composerUpdate`, and it is the
+  test of the instance tooling as well. `@playwright/test` in
+  `Tests/Acceptance/package.json` - not the root `package.json`, which ships -
+  and the Playwright image in `runTests.sh` are pinned to the same version:
+  change both together.
+  → [Acceptance tests](docs/testing/acceptance-tests.md)
 - Arguments for PHPUnit go after `--`:
   `-s functional -d sqlite -- --filter SomeTest`.
 - A **growing PHPStan baseline is a defect.** Fix the finding.

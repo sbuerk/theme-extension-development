@@ -78,6 +78,11 @@ uids the first one already wrote.
 `config/system/additional.php` does nothing at request time besides setting
 configuration: a request is the wrong place to build an instance.
 
+`Build/Scripts/runTests.sh -s acceptance` builds an instance exactly this way,
+below `.Build/acceptance/`, and tests it in a browser — which makes it the
+automated test of this tooling as well. See
+[Acceptance tests](../testing/acceptance-tests.md).
+
 ## What is committed
 
 Only what describes an instance, never what an install produces:

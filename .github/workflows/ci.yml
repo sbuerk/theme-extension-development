@@ -1,7 +1,8 @@
 name: "CI"
 
 # Everything that runs for a pull request: quality gates, linting, unit tests,
-# functional tests against every supported DBMS, and the rendered documentation.
+# functional tests against every supported DBMS, acceptance tests against a
+# freshly built development instance, and the rendered documentation.
 #
 # One workflow rather than one per core version. The core version is a matrix
 # dimension, which keeps a single place to add v15 later and makes the
@@ -10,8 +11,8 @@ name: "CI"
 # Staging, cheapest and most likely to fail first:
 #
 #   quality ─┐
-#   phpstan ─┤
-#   lint    ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
+#   phpstan ─┤         ┌─> acceptance (a built instance, in a browser)
+#   lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
 #            │
 #   docs ────┤  (independent, for fast feedback on documentation changes)
 #   css  ────┘  (independent, neither PHP nor core version dependent)
@@ -273,6 +274,56 @@ jobs:
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
 
+  # A development instance built from nothing, the way "ddev start" builds one,
+  # and tested in a browser. Per core version, because the instance is: its
+  # composer.json, its site configurations and the backend it serves differ.
+  # It needs the gates of the code it renders, not the functional matrix, so
+  # it starts with the unit tests passed and runs beside the functional jobs.
+  acceptance:
+    name: "acceptance (v${{ matrix.typo3 }})"
+    runs-on: ubuntu-latest
+    needs: [ "unit" ]
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2" ]
+        typo3: [ "13", "14" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-acceptance-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles(format('instance-core-{0}/composer.json', matrix.typo3)) }}"
+          restore-keys: |
+            composer-acceptance-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+
+      - name: "Cache npm downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/npm"
+          key: "npm-acceptance-v${{ matrix.typo3 }}-${{ hashFiles('Tests/Acceptance/package-lock.json') }}"
+          restore-keys: "npm-acceptance-v${{ matrix.typo3 }}-"
+
+      - name: "Build an instance from nothing and test it in a browser"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s acceptance"
+
+      - name: "Upload the Playwright report"
+        if: "failure()"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "acceptance-report-v${{ matrix.typo3 }}"
+          path: |
+            .Build/acceptance/report/
+            .Build/acceptance/test-results/
+            .Build/acceptance/instance/var/log/
+          if-no-files-found: "ignore"
+          retention-days: 5
+
   # Independent of PHP and of the core version: the stylesheet is compiled from
   # SCSS and depends on neither, so this is a single job rather than a matrix
   # dimension. It also needs no "composerUpdate", which is what makes it the
@@ -289,8 +340,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ".cache/npm"
-          key: "npm-${{ hashFiles('package-lock.json') }}"
-          restore-keys: "npm-"
+          key: "npm-css-${{ hashFiles('package-lock.json') }}"
+          restore-keys: "npm-css-"
 
       - name: "Ensure the committed CSS matches its SCSS sources"
         run: "Build/Scripts/runTests.sh -b docker -s checkCssBuild"
