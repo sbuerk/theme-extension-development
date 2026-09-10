@@ -888,6 +888,19 @@ deleted again — `f:cObject`'s own
 relative to the branch it is rendered from, which is why the path spells out
 `tt_content` rather than reading `20` alone.
 
+The call passes `data="{data}" table="tt_content"`, and it has to. Without
+them `CObjectViewHelper` starts its content object renderer with an empty
+record, and the plugin runs without its content element: no FlexForm settings
+— the `pi_flexform` of the record is what Extbase merges into `settings` — and
+an empty record as `currentContentObject` on the Extbase request. The plugin
+still renders, which is why nothing looks wrong. `ExtbasePluginRenderingTest`
+holds it for a cached and for a non-cacheable plugin, which is rendered after
+the page from a serialised content object renderer: the fixture plugin prints
+a FlexForm setting and the uid of its content element. The `list_type` CASE
+of `tt_content.list` depends on the record the same way and has no test of its
+own — registering a `list_type` plugin raises a deprecation on v13.4, which
+this suite turns into a failure.
+
 `Tests/Functional/Fixtures/Extensions/plugin-fixture` is the fixture that
 keeps this covered going forward: an Extbase plugin registered with **no**
 TypoScript of its own — unlike `tests/example-fixture`, which deliberately

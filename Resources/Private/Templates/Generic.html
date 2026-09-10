@@ -38,12 +38,19 @@
     CType, so "{data.CType}" resolves to "tt_content.list.20" there instead -
     the CASE keyed on "list_type" that section declares, in place of a single
     "EXTBASEPLUGIN".
+
+    "data" and "table" hand the content element to that cObject. Without
+    them "CObjectViewHelper" starts a content object renderer with an empty
+    record: the plugin then runs without its content element - no FlexForm
+    settings, an empty record as "currentContentObject" on the Extbase
+    request - and the "list_type" CASE of "tt_content.list" has no field to
+    switch on.
 </f:comment>
 
 <f:layout name="ContentElement" />
 
 <f:section name="Main">
-    <f:cObject typoscriptObjectPath="tt_content.{data.CType}.20" />
+    <f:cObject typoscriptObjectPath="tt_content.{data.CType}.20" data="{data}" table="tt_content" />
 </f:section>
 
 </html>

@@ -76,6 +76,34 @@ final class ExtbasePluginRenderingTest extends AbstractFunctionalTestCase
         $this->assertStringContainsString('theme-content-element--testspluginfixture_plugin', $body);
     }
 
+    /**
+     * A plugin is rendered with its content element: the FlexForm settings it
+     * was configured with reach it, and so does the record itself. Without
+     * the record, "CObjectViewHelper" starts a content object renderer with an
+     * empty one, and the plugin runs as if nobody had configured it.
+     *
+     * Asserted for a cached and for a non-cacheable plugin: the second is
+     * rendered after the page from a serialised content object renderer,
+     * which is a second place for the record to get lost.
+     */
+    #[Test]
+    public function aPluginIsRenderedWithItsContentElement(): void
+    {
+        $body = $this->render();
+
+        $this->assertStringContainsString('<div class="plugin-fixture__greeting">Hello from the FlexForm</div>', $body);
+        $this->assertStringContainsString('<div class="plugin-fixture__content-element">10</div>', $body);
+    }
+
+    #[Test]
+    public function aNonCacheablePluginIsRenderedWithItsContentElement(): void
+    {
+        $body = $this->render();
+
+        $this->assertStringContainsString('<div class="plugin-fixture__greeting">Hello from the uncached FlexForm</div>', $body);
+        $this->assertStringContainsString('<div class="plugin-fixture__content-element">20</div>', $body);
+    }
+
     #[Test]
     public function thePluginDoesNotFallBackToTheCoreNotice(): void
     {
