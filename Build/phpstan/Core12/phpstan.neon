@@ -22,6 +22,11 @@ parameters:
     - ../../../Configuration
     - ../../../Core12
     - ../../../Tests
+    - ../../../packages-dev/dev-site/Classes
+    - ../../../packages-dev/dev-site/Configuration
+    # The script that builds and deletes instance state. The other scripts of
+    # "Build/Scripts/" are not analysed; this one removes files.
+    - ../../../Build/Scripts/instance.php
 
   excludePaths:
     - ../../../Tests/*/Core13/*

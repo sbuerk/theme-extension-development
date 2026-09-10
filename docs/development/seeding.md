@@ -8,19 +8,17 @@ clicked together by hand:
 ```bash
 # The showcase, in any installation that has sbuerk/data-factory installed.
 vendor/bin/typo3 data-factory:import theme-demo
-
-# A development instance, inside DDEV or on a host stack.
-cd instance-core-13
-ddev exec vendor/bin/typo3 data-factory:import theme-instance
-cd ../instance-core-12
-ddev exec vendor/bin/typo3 data-factory:import theme-instance-core12
 ```
 
-`theme-demo` ships with the extension; `theme-instance` is the showcase plus a
-second tree, and it is what the v13 instance is built from — see
-[The instance set](#the-instance-set-the-showcase-delivered-twice).
-`theme-instance-core12` is that set plus the one record TYPO3 v12 needs — see
-[On TYPO3 v12](#on-typo3-v12-both-trees-through-sys_template).
+`theme-demo` ships with the extension. The development instances are built from
+`theme-instance`, the showcase plus a second tree and the accounts — see
+[The instance set](#the-instance-set-the-showcase-delivered-twice) — and the v12
+instance from `theme-instance-core12`, that set plus the one record TYPO3 v12
+needs — see [On TYPO3 v12](#on-typo3-v12-both-trees-through-sys_template). They
+do not import it by hand: `ddev start` runs `composer system:setup`, which
+imports the set of the instance into one that is not seeded yet, and
+`composer system:reseed` rebuilds one from nothing. See
+[Development instances](instances.md).
 
 `data-factory:list` shows every set an installation provides, and
 `data-factory:import --help` every option and exit code. The format, the
@@ -189,8 +187,15 @@ showcase and adds what only a development instance needs:
 packages-dev/dev-site/Configuration/DataFactory/theme-instance/
 ├── config.yml              imports the showcase descriptor, adds the rest
 ├── ScenarioLegacy.yaml     GENERATED - the "/legacy/" tree
-└── ReferencesLegacy.yaml   GENERATED - its file references
+├── ReferencesLegacy.yaml   GENERATED - its file references
+└── Accounts.yaml           backend editor and group, frontend users, login pages
 ```
+
+The accounts, their credentials and why each is shaped the way it is are on
+[Development instances](instances.md#accounts). `Accounts.yaml` extends the
+`page` entity of the showcase with the editor group's page permissions, so
+every page of the composed scenario — showcase, mirror and account pages —
+belongs to that group.
 
 `config.yml` pulls the descriptor of the showcase in with `imports`. The core's
 `YamlFileLoader` merges an import with

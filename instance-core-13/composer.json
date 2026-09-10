@@ -8,6 +8,8 @@
         "sbuerk/data-factory": "^1.0",
         "sbuerk/theme-extension-development": "@dev",
         "tests/dev-site": "@dev",
+        "typo3/cms-felogin": "^13",
+        "typo3/cms-install": "^13",
         "typo3/minimal": "^13"
     },
     "config": {
@@ -40,15 +42,11 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "sqlite:backup": [
-            "@php vendor/bin/typo3 cache:flush",
-            "@php ../theme/Build/Scripts/sqliteSnapshot.php backup var/sqlite/core-13.sqlite ../sqlite-databases/core-13.sqlite",
-            "@php vendor/bin/typo3 cache:warmup"
+        "system:setup": [
+            "@php ../theme/Build/Scripts/instance.php setup theme-instance"
         ],
-        "sqlite:apply": [
-            "@php ../theme/Build/Scripts/sqliteSnapshot.php restore ../sqlite-databases/core-13.sqlite var/sqlite/core-13.sqlite",
-            "@php vendor/bin/typo3 cache:flush",
-            "@php vendor/bin/typo3 cache:warmup"
+        "system:reseed": [
+            "@php ../theme/Build/Scripts/instance.php reseed theme-instance"
         ],
         "system:refresh": [
             "@php vendor/bin/typo3 cache:flush",
@@ -58,8 +56,8 @@
         ]
     },
     "scripts-descriptions": {
-        "sqlite:backup": "Copy this instance's database to \"../sqlite-databases/core-13.sqlite\" so it can be committed.",
-        "sqlite:apply": "Restore this instance from \"../sqlite-databases/core-13.sqlite\", discarding its current database.",
+        "system:setup": "Install TYPO3 and import the seed set \"theme-instance\" - whatever of the two is missing. Idempotent; \"ddev start\" runs it.",
+        "system:reseed": "Rebuild this instance from nothing: remove its database, settings.php, seeded files and caches, then run system:setup.",
         "system:refresh": "Refresh the system after changes: flush and warm up caches, update languages, run extension setup."
     }
 }

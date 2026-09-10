@@ -227,8 +227,9 @@ final class LegacyDeliveryTest extends AbstractInstanceSeedTestCase
     }
 
     /**
-     * The legacy site depends on no set, and the `/` site on the theme's. TYPO3
-     * v12 has no site sets - `Core12/DevelopmentInstance/InstanceDeliveryTest`.
+     * The legacy site depends on no set, and the `/` site on the theme's -
+     * among others: it depends on "typo3/felogin" too, for its login page.
+     * TYPO3 v12 has no site sets - `Core12/DevelopmentInstance/InstanceDeliveryTest`.
      *
      * The static include is guarded by a condition on `site('sets')`, so a
      * legacy site that names the theme set by mistake is rendered by the set
@@ -241,9 +242,9 @@ final class LegacyDeliveryTest extends AbstractInstanceSeedTestCase
     public function onlyTheSiteSetTreeDependsOnTheThemeSet(): void
     {
         $this->assertSame(
-            ['sbuerk/theme-extension-development'],
+            ['sbuerk/theme-extension-development', 'typo3/felogin'],
             $this->sites['demo']['dependencies'] ?? null,
-            'The "demo" site does not deliver the theme through its site set.',
+            'The "demo" site does not deliver the theme through its site set, or depends on more than it should.',
         );
         $this->assertArrayHasKey('demo-legacy', $this->sites, 'The committed "demo-legacy" site is missing.');
         $this->assertSame(
