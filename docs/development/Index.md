@@ -12,7 +12,7 @@ version green.
 | [Component library](component-library.md)       | Every component's markup contract, the two switches that change behaviour, what the tests guard.                                       |
 | [Styleguide page](styleguide.md)                | The page rendering the library straight from Fluid, why it ignores content elements, and what it is a live test of.                    |
 | [Development instances](instances.md)           | The TYPO3 instance per core version, the `theme` symlink, SQLite, snapshot and restore, enabling the theme on v12.                     |
-| [Seeding](seeding.md)                           | The `theme-demo` seed set of `sbuerk/data-factory`, its uid rule and relations, the demo tree, how tests import it.                    |
+| [Seeding](seeding.md)                           | The `theme-demo` and `theme-instance` seed sets, the uid rule, the demo tree, the `/legacy/` mirror, the tests.                        |
 | [Appearance switching](appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher, and why there is no cookie.                        |
 
 ## Quick start

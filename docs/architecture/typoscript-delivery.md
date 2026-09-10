@@ -308,15 +308,18 @@ site package makes it.
 
 ## What the tests cover
 
-| Test                                    | Proves                                                                                                | Runs on  |
-|-----------------------------------------|-------------------------------------------------------------------------------------------------------|----------|
-| `SiteSetRenderingTest`                  | A page renders through the set, with **no** `sys_template`.                                           | v13 only |
-| `StaticFileIncludeRenderingTest`        | A page renders through the `include_static_file` field — the production path of the classic delivery. | both     |
-| `StaticTypoScriptFallbackRenderingTest` | A page renders through the static directory imported into `sys_template.config`.                      | both     |
-| `StaticIncludeGuardTest`                | With a set **and** a `sys_template` record, the theme is applied exactly once.                        | v13 only |
-| `StaticTypoScriptIncludeTest`           | The static include is registered in the TCA at all.                                                   | both     |
-| `ContentElementRenderingTest`           | `header` and `text` render, and the core error notice does not appear.                                | both     |
-| `ImageElementRenderingTest`             | The `image` element renders, and its backend fields reach the output.                                 | both     |
+| Test                                              | Proves                                                                                                | Runs on  |
+|---------------------------------------------------|-------------------------------------------------------------------------------------------------------|----------|
+| `SiteSetRenderingTest`                            | A page renders through the set, with **no** `sys_template`.                                           | v13 only |
+| `StaticFileIncludeRenderingTest`                  | A page renders through the `include_static_file` field — the production path of the classic delivery. | both     |
+| `StaticTypoScriptFallbackRenderingTest`           | A page renders through the static directory imported into `sys_template.config`.                      | both     |
+| `StaticIncludeGuardTest`                          | With a set **and** a `sys_template` record, the theme is applied exactly once.                        | v13 only |
+| `StaticTypoScriptIncludeTest`                     | The static include is registered in the TCA at all.                                                   | both     |
+| `ContentElementRenderingTest`                     | `header` and `text` render, and the core error notice does not appear.                                | both     |
+| `ImageElementRenderingTest`                       | The `image` element renders, and its backend fields reach the output.                                 | both     |
+| `DevelopmentInstance/LegacyDeliveryTest`          | The seeded showcase renders the same markup in its two trees, page by page.                           | both     |
+| `DevelopmentInstance/DeliveryRegistrationTest`    | Every static include of every seeded `sys_template` root resolves and is registered.                  | both     |
+| `Core12/DevelopmentInstance/InstanceDeliveryTest` | Both tree roots of the v12 instance carry the `sys_template` record, and no site declares a set.      | v12 only |
 
 `SiteSetRenderingTest` and `StaticFileIncludeRenderingTest` are deliberately the
 same three assertions on the two delivery paths, so the paths are held to

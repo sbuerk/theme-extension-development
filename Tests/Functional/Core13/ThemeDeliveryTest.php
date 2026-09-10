@@ -71,4 +71,10 @@ final class ThemeDeliveryTest extends AbstractFunctionalTestCase
             'A sys_template record next to a site set discards the TypoScript of the set.',
         );
     }
+
+    #[Test]
+    public function theInstanceIsBuiltFromTheSeedSetOfThisCoreVersion(): void
+    {
+        $this->assertSame('theme-instance', $this->themeDelivery()->instanceSeedSet());
+    }
 }

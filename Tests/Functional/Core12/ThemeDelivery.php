@@ -52,4 +52,9 @@ final class ThemeDelivery implements ThemeDeliveryInterface
     {
         return true;
     }
+
+    public function instanceSeedSet(): string
+    {
+        return 'theme-instance-core12';
+    }
 }
