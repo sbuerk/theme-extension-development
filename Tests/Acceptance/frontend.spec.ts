@@ -110,3 +110,15 @@ test('the main navigation collapses behind a toggle on a narrow screen', async (
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator('nav.theme-nav-main').getByRole('link', { name: 'Typography' })).toBeVisible();
 });
+
+test('the second level of the main menu stays closed until hovered, on a wide screen', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/typography');
+    const item = page.locator('nav.theme-nav-main .theme-nav-main__item').filter({ has: page.getByRole('link', { name: 'Elements', exact: true }) });
+    const secondLevel = item.locator('.theme-nav-main__list--sub');
+
+    await expect(secondLevel).toBeHidden();
+    await item.hover();
+    await expect(secondLevel).toBeVisible();
+    await expect(secondLevel.getByRole('link', { name: 'Core elements' })).toBeVisible();
+});
