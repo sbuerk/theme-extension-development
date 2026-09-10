@@ -176,17 +176,22 @@ had deliberately hidden.
 
 ## What the tests cover
 
-| Test                                    | Proves                                                                 |
-|-----------------------------------------|------------------------------------------------------------------------|
-| `SiteSetRenderingTest`                  | A page renders through the set, with **no** `sys_template`.            |
-| `StaticTypoScriptFallbackRenderingTest` | A page renders through the static include, with no set.                |
-| `StaticTypoScriptIncludeTest`           | The static include is registered in the TCA at all.                    |
-| `ContentElementRenderingTest`           | `header` and `text` render, and the core error notice does not appear. |
-| `ImageElementRenderingTest`             | The `image` element renders, and its backend fields reach the output.  |
+| Test                                           | Proves                                                                             |
+|------------------------------------------------|------------------------------------------------------------------------------------|
+| `SiteSetRenderingTest`                         | A page renders through the set, with **no** `sys_template`.                        |
+| `StaticTypoScriptFallbackRenderingTest`        | A page renders through the static include, with no set.                            |
+| `StaticTypoScriptIncludeTest`                  | The static include is registered in the TCA at all.                                |
+| `ContentElementRenderingTest`                  | `header` and `text` render, and the core error notice does not appear.             |
+| `ImageElementRenderingTest`                    | The `image` element renders, and its backend fields reach the output.              |
+| `DevelopmentInstance/LegacyDeliveryTest`       | The seeded showcase renders the same markup through both mechanisms.               |
+| `DevelopmentInstance/DeliveryRegistrationTest` | Every static include of the seeded `sys_template` root resolves and is registered. |
 
 The first two cover the two branches of the guard condition. Both were shown to
 fail: renaming the set breaks the first, inverting the condition breaks the
-second.
+second. `DevelopmentInstance/LegacyDeliveryTest` runs the same comparison over
+the whole seeded showcase, page by page, and `DeliveryRegistrationTest` checks
+the static include the seeded `sys_template` names — see
+[Seeding](../development/seeding.md#two-trees-two-delivery-mechanisms).
 
 `ImageElementRenderingTest` was shown to fail twice, in the two ways that
 matter: removing the `tt_content.image` branch turns all eight tests red, and

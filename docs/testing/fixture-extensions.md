@@ -68,13 +68,19 @@ Three pieces, all of them already in place:
         "paths": {
             "Tests/Functional/Fixtures/Extensions/*": [
                 "autoload"
+            ],
+            "packages-dev/*": [
+                "autoload"
             ]
         }
     }
 }
 ```
 
-Every directory below that path containing a `composer.json` is picked up. Its
+Every directory below those paths containing a `composer.json` is picked up.
+`packages-dev/*` is scanned for the development site package `tests/dev-site`,
+which carries the seed set of the development instances and is loaded by the
+`DevelopmentInstance/` tests — see [Seeding](../development/seeding.md). Its
 `autoload` section is adopted into the **`autoload-dev`** section of the root
 package, which is what makes the fixture classes autoloadable in tests without
 being autoloadable in a production installation. The plugin does this while

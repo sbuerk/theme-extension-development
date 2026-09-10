@@ -104,7 +104,7 @@ entities:
                     bodytext: |
                       <p>A paragraph of running text, so the theme has something to set
                       in its body font. It carries <strong>bold</strong> and
-                      <em>emphasised</em> words and a <a href="/">link</a>, which are
+                      <em>emphasised</em> words and a <a href="t3://page?uid=1">link</a>, which are
                       the three inline cases a stylesheet has to answer for.</p>
 
         - self:
