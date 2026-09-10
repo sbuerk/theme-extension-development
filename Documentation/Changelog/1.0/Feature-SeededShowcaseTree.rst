@@ -9,10 +9,18 @@ Feature: A seeded showcase of every element
 Description
 ===========
 
-:ref:`feature-seeding` writes a page tree from a YAML definition. The shipped
-definition :file:`EXT:theme_extension_development/Configuration/Seeds/Demo.yaml`
-now describes a tree that demonstrates the whole theme rather than a handful of
-pages:
+The extension ships a showcase page tree as a seed set of
+`sbuerk/data-factory <https://packagist.org/packages/sbuerk/data-factory>`__,
+in :file:`EXT:theme_extension_development/Configuration/DataFactory/theme-demo/`.
+That extension is suggested, not required: the set is inert data until it is
+installed, and nothing in the theme reads it.
+
+..  code-block:: bash
+
+    composer require --dev sbuerk/data-factory
+    vendor/bin/typo3 data-factory:import theme-demo
+
+The tree demonstrates the whole theme rather than a handful of pages:
 
 ..  list-table::
     :header-rows: 1
@@ -60,91 +68,30 @@ to see the default fallback, and :guilabel:`Styleguide` is set to
 returns 404 in the frontend and is only reachable through a preview link, which
 defeats the point of seeding a page that exists to be opened.
 
-Inline children in the seed format
-==================================
-
-Four of the theme's own content elements - :guilabel:`Author`,
-:guilabel:`Link list`, :guilabel:`Social links` and :guilabel:`Media teaser
-grid` - read their entries from an inline child table. A seed definition can
-now describe those entries with a new structural key, ``inline``: a map of the
-field on the parent record to the child records declared for it.
-
-..  code-block:: yaml
-
-    content:
-      - identifier: showcase-linklist
-        CType: theme_linklist
-        header: 'Where to read more'
-        inline:
-          tx_theme_list_items:
-            - identifier: showcase-docs
-              table: tx_theme_list_item
-              link: 't3://page?uid=2'
-              link_label: 'Typography'
-            - identifier: showcase-media
-              table: tx_theme_list_item
-              link: 't3://page?uid=3'
-              link_label: 'Media'
-
-Each child names the ``table`` it belongs to. That is never inferred from the
-TCA of the parent's field, so a definition stays readable on its own and a
-mistyped field name is reported rather than dereferenced. The children come out
-in the order they are declared, and they may carry ``uid`` and ``files`` like
-any other record.
-
-The structural keys of the format are therefore ``identifier``, ``uid``,
-``children``, ``content``, ``files`` and ``inline``, plus ``table`` on an inline
-child. Everything else is a field of the record and is written as it stands -
-which is why the backend layout and the "hide in menus" flag of the pages above
-need nothing from the seeding at all.
-
-Identifiers may no longer contain an underscore
-===============================================
-
-An ``identifier`` in a seed definition may contain letters, digits and dashes,
-and has to start with a letter or a digit. A definition using anything else is
-now rejected with an exception naming the identifier.
-
-This is not a style rule. The identifier ends up inside the placeholder
-DataHandler is given for the record, and a placeholder used as the value of a
-relation field is read as the ``<table>_<uid>`` form when it contains an
-underscore - so ``NEWtt_content_home`` is split into a table ``NEWtt_content``
-and an id ``home``, neither of which resolves. The relation is then written
-**empty, with nothing logged**. Rejecting the identifier is what turns a seed
-that silently loses its relations into one that refuses to run.
-
-Two fixes come with it
-======================
-
-Both failed silently, and both are now covered by a regression test:
-
-*   **A declared** ``uid`` **was not honoured.** DataHandler reads a suggested
-    uid from the data map row and looks it up under a ``<table>:<uid>`` key;
-    the seeding supplied neither, so the next free uid was assigned and the
-    command reported whatever it got. That looked correct only for as long as
-    the declaration order of a definition happened to match its insertion
-    order.
-
-*   **File references were not ordered.** The placeholder of a reference had
-    the same underscore problem, so ``sorting_foreign`` stayed at 0 on every
-    seeded reference and the order of a gallery with more than one image was
-    left to the database.
-
 Known limitation
 ================
 
 :guilabel:`Categorized pages` and :guilabel:`Categorized content` are part of
-the seeded tree but select nothing: the format expresses neither
-:sql:`sys_category` records nor the MM rows relating them to a page or a
-content element. Both elements render an empty menu, which is the correct
-rendering of "no category chosen". Supporting this needs a way to declare
-records outside the page tree and a relation between two of them, which is out
-of proportion to demonstrating two elements.
+the seeded tree but select nothing: the set seeds no :sql:`sys_category`
+records. Both elements render an empty menu, which is the correct rendering of
+"no category chosen".
 
 Impact
 ======
 
-``vendor/bin/typo3 theme:seed`` produces a frontend that exercises the theme
-end to end, so a development or test instance no longer needs pages built by
-hand to see what an element looks like. Definitions of your own can describe
-inline relations, and have to use identifiers without underscores.
+``vendor/bin/typo3 data-factory:import theme-demo`` produces a frontend that
+exercises the theme end to end, so a development or test instance needs no
+pages built by hand to see what an element looks like.
+
+The set declares the uid of every record it writes - pages 1 to 9, content
+elements from 101 - because the records point at each other by uid: the links
+name ``t3://page?uid=2``, the :guilabel:`Insert records` element names
+``tt_content_601``, and a site configuration names its root page. The import
+therefore needs an installation where those uids are free, and refuses rather
+than overwrites when they are not. ``--root-page=<uid>`` writes the tree below
+an existing page instead of at the root of the page tree, which changes where
+it lands and not which uids it takes. The set declares no site configuration:
+create one with root page ``1`` after importing it at the page tree root. On
+TYPO3 v12, which has no site sets, a :guilabel:`sys_template` record on that
+page selecting the static include enables the theme — see
+:ref:`configuration-static-include`.

@@ -148,8 +148,8 @@ violation of any of them is a rejected change, not a review comment.
 1. **Version differences split classes, they never add conditionals.** Shared
    code in `Classes/`, one implementation per supported core version in its own
    `Core<major>/` directory — `Core12/` and `Core13/` — and only the directory
-   matching the running core registered in the container. The worked example is
-   `Classes/Seeding/FileImporterInterface` with its two implementations.
+   matching the running core registered in the container. The worked example on
+   the test side is `Tests/Functional/Core12|Core13/ThemeDelivery`.
    → [Core version aware code](docs/architecture/core-version-aware-code.md)
 
    The exception is **configuration** — TCA, TypoScript, page TSconfig,

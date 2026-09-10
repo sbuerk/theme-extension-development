@@ -49,6 +49,8 @@ integrator changes is a TypoScript constant, and those are described below.
 In the backend the same set can be selected under
 :guilabel:`Site Management > Sites` in the :guilabel:`Sets` field of the site.
 
+..  _configuration-static-include:
+
 Classic static include — TYPO3 v12 and v13
 ------------------------------------------
 
@@ -242,32 +244,25 @@ the core's "no rendering definition" notice appears for any of them.
 Demo content
 ============
 
-A page tree to look at is written by a console command rather than by hand:
+A page tree to look at is imported rather than built by hand. The extension
+ships it as a seed set of
+`sbuerk/data-factory <https://packagist.org/packages/sbuerk/data-factory>`__,
+which is suggested rather than required:
 
 ..  code-block:: bash
 
-    vendor/bin/typo3 theme:seed
+    composer require --dev sbuerk/data-factory
+    vendor/bin/typo3 data-factory:import theme-demo
 
-..  list-table::
-    :header-rows: 1
-
-    *   -   Argument or option
-        -   Default
-        -   Meaning
-    *   -   ``definition``
-        -   :file:`EXT:theme_extension_development/Configuration/Seeds/Demo.yaml`
-        -   The YAML definition to write. An ``EXT:`` path is resolved.
-    *   -   ``--root-page``
-        -   ``0``
-        -   The page the definition is written below. ``0`` is the page tree
-            root.
-    *   -   ``--force``
-        -   —
-        -   Seed even though the page tree is not empty. A definition declaring
-            uids will collide.
-
-The shipped definition seeds a start page, pages for typography and media, one
-page deliberately without a backend layout, a ``/elements`` branch carrying
-every content type, and a ``/styleguide`` page rendering the whole component
-library — see :ref:`feature-seeded-showcase-tree` and :ref:`feature-styleguide`.
-The definition format is described in :ref:`feature-seeding`.
+The set seeds a start page, pages for typography and media, one page
+deliberately without a backend layout, a ``/elements`` branch carrying every
+content type, and a ``/styleguide`` page rendering the whole component library
+— see :ref:`feature-seeded-showcase-tree` and :ref:`feature-styleguide`. Its
+records declare their uids and point at each other by them, so it is imported
+into an installation where those uids are free. The set declares no site
+configuration: create one with root page ``1`` afterwards, which is also what
+makes the tree answer in the frontend. On TYPO3 v12, which has no site sets,
+the tree renders through the theme once a :guilabel:`sys_template` record on
+page ``1`` selects the static include as well — see
+:ref:`configuration-static-include`. ``data-factory:import --help`` lists every
+option.

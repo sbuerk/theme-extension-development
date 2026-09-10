@@ -1,8 +1,9 @@
-# Site of the seeded demo page tree.
+# Site of the seeded showcase page tree.
 #
-# "rootPageId" is 1 because the seed definition declares that uid - see
-# "Configuration/Seeds/Demo.yaml" of the theme. That is the whole reason a seed
-# may declare uids at all: without it this file could not be committed.
+# "rootPageId" is 1 because the seed set declares that uid - see
+# "Configuration/DataFactory/theme-demo/Scenario.yaml" of the theme. A seed
+# declaring its uids is what lets this file be committed before the tree
+# exists.
 #
 # The base is relative and carries no host name, so the instance is reachable
 # under its DDEV host name and under whatever a host stack serves it as.

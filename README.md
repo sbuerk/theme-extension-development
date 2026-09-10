@@ -56,8 +56,8 @@ The stylesheet is built from a documented set of design tokens with a light
 and a dark appearance — see [`DESIGN.md`](DESIGN.md). They are CSS custom
 properties, so a site package re-themes the extension by overriding a handful
 of them, without rebuilding the SCSS. A styleguide page renders the whole
-component library, and `theme:seed` builds a showcase page tree from a
-definition in the repository.
+component library, and a seed set of `sbuerk/data-factory` builds a
+showcase page tree from a definition in the repository.
 
 Underneath that sits the foundation: core version aware wiring, the SCSS build,
 one development instance per supported TYPO3 version, and the container based

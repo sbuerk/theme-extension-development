@@ -99,7 +99,8 @@ unreadable in the source, which is the one place they have to be readable.
 Impact
 ======
 
-Running :bash:`vendor/bin/typo3 theme:seed` gives a frontend where
+Importing the showcase with
+:bash:`vendor/bin/typo3 data-factory:import theme-demo` gives a frontend where
 ``/styleguide`` answers with the whole component library. It is the only place
 the design tokens can be seen *resolved* rather than read as values, and
 because of that it doubles as a live test of the appearance and palette

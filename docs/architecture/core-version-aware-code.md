@@ -90,48 +90,20 @@ with this extension.
 > aware layout.
 > → [Class design](class-design.md#backports-from-main-readonly-moves-off-the-class)
 
-### The worked example: `DuplicationBehavior`
+### The worked example: `ThemeDelivery`
 
-The `Example` pair above demonstrates the mechanism. The
-[seeder](../development/seeding.md) contains the real one, and it is the shape
-every future split should copy.
+The `Example` pair above demonstrates the mechanism. The real splits of this
+branch live on the test side: `Tests/Functional/Core12/ThemeDelivery.php` and
+`Tests/Functional/Core13/ThemeDelivery.php` describe how a functional test
+enables the theme — a `sys_template` record on v12, the site set on v13 — behind
+one interface, so no test carries a version condition.
 
-`ResourceStorage::addFile()` takes a conflict mode, and its **type** changed
-between the two supported versions. TYPO3 v13.0 introduced the native enum
-`TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior` (#101151, "Native
-DuplicationBehavior enumeration"); on v12 the only spelling is the class
-constant `TYPO3\CMS\Core\Resource\DuplicationBehavior::REPLACE`. Neither works on
-both versions:
-
-- The enum does not exist in `typo3/cms-core` 12.4 at all, so naming it there is
-  a fatal error rather than a deprecation one could live with.
-- The v12 constant is the string `'replace'`, and v13's `addFile()` answers
-  anything that is not an instance of the enum with `E_USER_DEPRECATED`. The
-  suites of this extension
-  [fail on deprecations](../testing/phpunit-configuration.md#strictness-policy),
-  so that turns the run red.
-
-So this is code, and rule 1 applies in full:
-
-| File                                                                                           | Is                                                       |
-|------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| [`Classes/Seeding/FileImporterInterface.php`](../../Classes/Seeding/FileImporterInterface.php) | The seam. One method, fully typed, no `mixed`.           |
-| [`Core12/Seeding/FileImporter.php`](../../Core12/Seeding/FileImporter.php)                     | Uses the v12 class constant.                             |
-| [`Core13/Seeding/FileImporter.php`](../../Core13/Seeding/FileImporter.php)                     | Uses the v13 enum.                                       |
-| [`Classes/Seeding/FileSeeder.php`](../../Classes/Seeding/FileSeeder.php)                       | Type hints the interface and knows nothing about either. |
-
-Two decisions in it are worth copying:
-
-- **Only the operation is split, not the seeder.** The two implementations
-  differ in one `use` statement and one argument. Everything else — resolving the
-  storage, the target folder, the file name — stays in the shared seeder.
-- **The interface models the operation, not the argument.** A method handing the
-  conflict mode back to shared code would have to declare a `mixed` return: an
-  enum case on one version, a string on the other. That is the version
-  difference pushed back into `Classes/` in a shape neither the type system nor
-  PHPStan can check. `addFileReplacingExisting()` puts the whole `addFile()`
-  call inside the implementation instead, so each version's argument type is
-  concrete.
+The seeder carried the one split of production code, the conflict mode of
+`ResourceStorage::addFile()` — a class constant on v12, the native enum
+`Resource\Enum\DuplicationBehavior` on v13 (#101151). The seeder has since been
+extracted into [`sbuerk/data-factory`](https://github.com/sbuerk/data-factory),
+whose 1.x line carries that split in its own `Core12/` and `Core13/`
+(`Seeding/DataHandling/FileImporter.php`).
 
 ## Configuration is the exception
 

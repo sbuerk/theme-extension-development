@@ -1,0 +1,19 @@
+{
+    "name": "tests/data-factory-fixture",
+    "description": "Fixture extension of the functional test suite: seed sets of sbuerk/data-factory that only a test imports.",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "version": "1.0.0-dev",
+    "require": {
+        "sbuerk/theme-extension-development": "*",
+        "typo3/cms-core": "*"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "tests_data_factory_fixture",
+            "Package": {
+                "providesPackages": []
+            }
+        }
+    }
+}
