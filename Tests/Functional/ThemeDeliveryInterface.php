@@ -69,4 +69,14 @@ interface ThemeDeliveryInterface
      * with `clear = 3` and discard the TypoScript of the set.
      */
     public function createsSysTemplateRecord(): bool;
+
+    /**
+     * The seed set a development instance of this core version is built from.
+     *
+     * The instances deliver the theme the same way the tests do: through the
+     * site set on v13, through a root `sys_template` record on v12. That record
+     * is a database row, so on v12 it comes from a seed set of its own, which
+     * contains the one of v13 and adds it.
+     */
+    public function instanceSeedSet(): string;
 }

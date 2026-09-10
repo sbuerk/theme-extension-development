@@ -49,4 +49,9 @@ final class ThemeDelivery implements ThemeDeliveryInterface
     {
         return false;
     }
+
+    public function instanceSeedSet(): string
+    {
+        return 'theme-instance';
+    }
 }

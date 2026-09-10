@@ -1,0 +1,26 @@
+# The seed set the TYPO3 v12 development instance is built from.
+#
+#   vendor/bin/typo3 data-factory:import theme-instance-core12
+#
+# "theme-instance" and one record more. On TYPO3 v13 the "demo" site enables
+# the theme through its site set; TYPO3 v12 has no site sets (they arrived in
+# v13.1, #103437), so there the "/" tree needs what the "/legacy/" tree has on
+# both versions: a root "sys_template" record including the static include of
+# the theme. A database row, so it is seeded - and it is seeded here, in the
+# development site package, not in the showcase the extension ships, where it
+# would reach TYPO3 v13 installations as well.
+#
+# On TYPO3 v12 both trees are therefore delivered through "sys_template". The
+# comparison of the two still holds the mirror to the showcase; what it no
+# longer compares there is two delivery mechanisms.
+identifier: theme-instance-core12
+title: 'Theme development instance, TYPO3 v12'
+description: >-
+  The seed set "theme-instance" plus the root TypoScript record TYPO3 v12
+  delivers the theme of the "/" tree through.
+
+imports:
+  - { resource: 'EXT:tests_dev_site/Configuration/DataFactory/theme-instance/config.yml' }
+
+scenarios:
+  - RootTemplate.yaml

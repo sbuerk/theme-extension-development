@@ -1,0 +1,14 @@
+# The root TypoScript record of the "/" tree on TYPO3 v12 - see "config.yml".
+#
+# The entity "template" is declared by "ScenarioLegacy.yaml" of
+# "theme-instance", which is composed with this file before anything is
+# written. uid 2, because the "/legacy/" root carries uid 1.
+entities:
+  template:
+    - self:
+          id: 2
+          pid: 1
+          title: 'Theme demo, static include (TYPO3 v12)'
+          root: 1
+          clear: 3
+          include_static_file: 'EXT:theme_extension_development/Configuration/TypoScript/Static'

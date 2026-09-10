@@ -24,7 +24,7 @@ Documentation for people **using** the extension lives in
 | [Styleguide page](development/styleguide.md)                | The page that renders the library from Fluid, why it ignores content, its tests.                   |
 | [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher.                |
 | [Development instances](development/instances.md)           | The TYPO3 instance per core version, the `theme` symlink, snapshot and restore.                    |
-| [Seeding](development/seeding.md)                           | The `theme-demo` set of data-factory, its uids and relations, the demo tree.                       |
+| [Seeding](development/seeding.md)                           | The `theme-demo` and `theme-instance` sets of data-factory, the demo tree, the mirror.             |
 
 ## [Architecture](architecture/Index.md)
 

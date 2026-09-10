@@ -6,10 +6,21 @@ so an instance is rebuilt from a definition in the repository instead of being
 clicked together by hand:
 
 ```bash
-cd instance-core-13
-ddev exec vendor/bin/typo3 data-factory:import theme-demo   # or, on a host stack:
+# The showcase, in any installation that has sbuerk/data-factory installed.
 vendor/bin/typo3 data-factory:import theme-demo
+
+# A development instance, inside DDEV or on a host stack.
+cd instance-core-13
+ddev exec vendor/bin/typo3 data-factory:import theme-instance
+cd ../instance-core-12
+ddev exec vendor/bin/typo3 data-factory:import theme-instance-core12
 ```
+
+`theme-demo` ships with the extension; `theme-instance` is the showcase plus a
+second tree, and it is what the v13 instance is built from — see
+[The instance set](#the-instance-set-the-showcase-delivered-twice).
+`theme-instance-core12` is that set plus the one record TYPO3 v12 needs — see
+[On TYPO3 v12](#on-typo3-v12-both-trees-through-sys_template).
 
 `data-factory:list` shows every set an installation provides, and
 `data-factory:import --help` every option and exit code. The format, the
@@ -167,6 +178,145 @@ preserve:
   TypoScript. A layout or an element added without a demo page then fails there,
   instead of shipping undemonstrated.
 
+## The instance set: the showcase, delivered twice
+
+The development instances do not import `theme-demo`. They import
+`theme-instance`, a set of the development-only package
+[`packages-dev/dev-site`](../../packages-dev/dev-site) that contains the
+showcase and adds what only a development instance needs:
+
+```
+packages-dev/dev-site/Configuration/DataFactory/theme-instance/
+├── config.yml              imports the showcase descriptor, adds the rest
+├── ScenarioLegacy.yaml     GENERATED - the "/legacy/" tree
+└── ReferencesLegacy.yaml   GENERATED - its file references
+```
+
+`config.yml` pulls the descriptor of the showcase in with `imports`. The core's
+`YamlFileLoader` merges an import with
+`ArrayUtility::replaceAndAppendScalarValuesRecursive()`: a **list** of the
+imported file is appended to, and a **scalar** of the importing file wins. So
+`scenarios`, `files` and `references` of `theme-instance` add to those of
+`theme-demo` — the showcase scenario first — and its `identifier` and `title`
+replace the showcase's. Nothing of the showcase is repeated, which is also why
+the showcase names every path with `EXT:`: a relative path would be resolved
+against the directory of `theme-instance/config.yml`.
+
+The two sets are never imported into one installation. `theme-instance`
+contains the showcase, and a second import of it is a uid collision the import
+refuses.
+
+### On TYPO3 v12: both trees through `sys_template`
+
+```
+packages-dev/dev-site/Configuration/DataFactory/theme-instance-core12/
+├── config.yml         imports the descriptor of theme-instance
+└── RootTemplate.yaml  a root "sys_template" record on page 1, uid 2
+```
+
+TYPO3 v12 has no site sets — they arrived in v13.1 (#103437) — so the `/` tree
+cannot be delivered through one there. `theme-instance-core12` imports
+`theme-instance` the same way that set imports the showcase, and adds a root
+`sys_template` record on page 1 with the static include of the theme: what the
+`/legacy/` root carries on both versions. On TYPO3 v12 both trees are therefore
+delivered through `sys_template`, and the markup comparison below still holds
+the mirror to the showcase, but no longer compares two delivery mechanisms.
+
+The record sits in the development site package, not in the showcase, because
+the showcase ships with the extension and the record would reach TYPO3 v13
+installations as well. Which set a test imports for the running core version
+is `ThemeDeliveryInterface::instanceSeedSet()`, one implementation per core
+version below `Tests/Functional/Core12|Core13/`.
+
+### Two trees, two delivery mechanisms
+
+| Tree       | Root | Site          | Delivered through                                                                            |
+|------------|------|---------------|----------------------------------------------------------------------------------------------|
+| `/`        | 1    | `demo`        | the site set `sbuerk/theme-extension-development`; on TYPO3 v12 a root `sys_template` record |
+| `/legacy/` | 1001 | `demo-legacy` | a root `sys_template` record including the static include of the theme                       |
+
+The theme supports both, and they fail differently: a site set that is missing
+is loud, an `include_static_file` entry that resolves to nothing is not — it is
+a comma separated list read with `trimExplode`, and the page still answers 200.
+The static include is also guarded by a condition on `site('sets')`
+(`Configuration/TypoScript/Static/setup.typoscript`), so a site that names the
+set is rendered by the set and never reaches the include. The second tree
+exists so that both mechanisms are looked at, in the backend and the frontend,
+every time an instance is.
+
+`/legacy/` is a **mirror**, generated rather than written:
+
+```bash
+php Build/Scripts/generateLegacyScenario.php           # rewrite both files
+php Build/Scripts/generateLegacyScenario.php --check   # exit 1 if they are stale
+```
+
+Every mirrored record carries the uid of its original plus 1000, in every
+table — page 3 is 1003, content element 601 is 1601, list item 12 is 1012 — and
+so do the pointers at one the generator knows: `t3://page` links and their
+content anchors, the page lists of the menu elements, `tt_content_601` of
+*Insert records*, the inline child lists. The root
+page is mirrored like every other page and then given a title of its own and
+the `sys_template` record, the one record without an original, at uid 1. A
+column it lists as a pointer it cannot rewrite — `shortcut`, `mount_pid`,
+`content_from_pid`, a translation parent, `categories` — stops it when it
+carries a value, rather than reaching the mirror unrewritten. What it does not
+list, it does not recognise, which is why the result is checked from the
+rendered side as well.
+
+The generator needs the root composer install for `symfony/yaml` and writes
+committed files, so it is run by hand after changing the showcase — never edit
+the generated files. `--check` compares the committed files with what it would
+write as data under the same header, not byte for byte, because the bytes are
+those of whichever `symfony/yaml` the installed dependency set brings. It writes
+multi-line values as quoted strings and refuses to write a file that does not
+parse back to the data it came from: `symfony/yaml` reads a literal block (`|`)
+back without its final line break when the next line is dedented, and the plain
+text of a card rendered through `nl2br()` lost its trailing `<br />` that way.
+That is how the mirror was first found to differ.
+
+### What holds the two trees together
+
+| Test                                              | Fails when                                                                                 |
+|---------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `Tests/Unit/GeneratedLegacyScenarioTest`          | the showcase changed and the generator was not run                                         |
+| `DevelopmentInstance/LegacyDeliveryTest`          | a page of one tree renders different markup than its mirror, or not at all                 |
+| `DevelopmentInstance/LegacyDeliveryTest`          | a link of the rendered mirror leads out of it                                              |
+| `DevelopmentInstance/LegacyDeliveryTest`          | TYPO3 v13: the legacy site declares a set, or the `/` tree carries a `sys_template` record |
+| `Core12/DevelopmentInstance/InstanceDeliveryTest` | TYPO3 v12: a tree root lacks its `sys_template` record, or a site declares a set           |
+| `DevelopmentInstance/DeliveryRegistrationTest`    | an `include_static_file` entry does not resolve, or is not offered by `addStaticFile()`    |
+
+`LegacyDeliveryTest` imports the instance set of the running core version and
+**adopts the committed site configurations** of
+`instance-core-<major>/config/sites/` rather than writing its own, so it
+measures what an instance serves. The comparison normalises only
+what a mirror differs in by being one — the `/legacy` path segment, the two site
+titles, the two root page titles, the content element anchors `c<uid>` of
+mirrored elements, a CSP nonce — and every rule says why in `normalise()`. An
+image width or a column count is not normalised: a constant the static include
+failed to deliver changes exactly those, and making the legacy tree's
+`maxGalleryWidth` differ makes the comparison fail on `/media` and
+`/elements/core`.
+
+The comparison maps `/legacy/` to `/` before comparing, so it cannot tell a link
+that stays in the mirror from one that leaves it. A separate test reads the raw
+markup of the mirror and requires every page link to stay below `/legacy/` and
+every content anchor to name an element of the mirror. It
+found two leaks when it was added: the brand link of the site header was a
+literal `/`, and a paragraph of the showcase linked to `href="/"` instead of to
+`t3://page?uid=1`.
+
+Breaking the static include name makes the comparison, the rendering check and
+`DeliveryRegistrationTest` fail; adding a set dependency to the legacy site
+makes the dependency test fail, the one case the markup comparison cannot see,
+because the set then renders the very same markup. The number of compared
+pages is held to the number of pages the showcase scenario declares: an empty
+comparison would pass.
+
+An instance that was seeded with `theme-demo` alone cannot import
+`theme-instance` on top — it contains the showcase, and the uids collide. Rebuild
+it, see [Development instances](instances.md).
+
 ## How the tests import it
 
 Through the command. `Tests/Functional/DataFactoryImportTrait.php` runs
@@ -199,11 +349,13 @@ the showcase is free to change what it shows.
 - **No site configuration.** A site names its root page by uid and carries
   values of the installation, its base and title. The instances commit theirs
   below `instance-core-*/config/sites/`.
-- **No TypoScript record.** On TYPO3 v13 the site of an instance enables the
+- **No TypoScript record in the showcase.** On TYPO3 v13 a site enables the
   theme through its site set. TYPO3 v12 has no site sets, and a `sys_template`
-  record on page 1 would enable it there — the set could declare one, but it
+  record on page 1 enables it there — the showcase could declare one, but it
   would then carry it on v13 as well, which changes the shipped showcase for one
-  core version. See [Enabling the theme on TYPO3 v12](instances.md#enabling-the-theme-on-typo3-v12).
+  core version. The v12 instance gets it from `theme-instance-core12` instead;
+  an installation importing `theme-demo` on TYPO3 v12 creates it by hand. See
+  [Enabling the theme on TYPO3 v12](instances.md#enabling-the-theme-on-typo3-v12).
 - **No file metadata.** The fields of a *reference* are written; the
   `sys_file_metadata` of the file itself is not. An alternative text describes
   what an image means *in this place*, which is a property of the reference.

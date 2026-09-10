@@ -84,4 +84,10 @@ final class ThemeDeliveryTest extends AbstractFunctionalTestCase
         $this->assertIsArray($configuration);
         $this->assertArrayNotHasKey('dependencies', $configuration);
     }
+
+    #[Test]
+    public function theInstanceIsBuiltFromTheSeedSetOfThisCoreVersion(): void
+    {
+        $this->assertSame('theme-instance-core12', $this->themeDelivery()->instanceSeedSet());
+    }
 }

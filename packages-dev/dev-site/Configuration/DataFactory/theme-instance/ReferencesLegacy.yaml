@@ -1,0 +1,143 @@
+# The file references of the "/legacy/" tree of the seed set "theme-instance".
+#
+# GENERATED FILE. Written by "Build/Scripts/generateLegacyScenario.php" from
+# "Configuration/DataFactory/theme-demo/config.yml" of the extension - edit
+# that file and run the script, never this one.
+#
+# A descriptor fragment, pulled into "config.yml" through "imports": it
+# carries the same references as the showcase, at the mirrored uids. The files
+# themselves are declared by the showcase and are placed once.
+references:
+  -
+    file: placeholder
+    table: pages
+    uid: 1001
+    field: media
+    values:
+      alternative: 'A placeholder graphic'
+      title: Placeholder
+  -
+    file: placeholder
+    table: tt_content
+    uid: 1302
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'The description of a file reference is rendered as the caption.'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 1303
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: Landscape
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 1303
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: Portrait
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 1605
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: 'One column, beside the text'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 1606
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: Landscape
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 1606
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: Portrait
+  -
+    file: placeholder
+    table: tt_content
+    uid: 1607
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'The description of a file reference is rendered as the caption.'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 1608
+    field: media
+    values:
+      title: 'Placeholder, landscape'
+      description: 'Listed second, because the list is sorted by file name rather than by the order these references are declared in.'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 1608
+    field: media
+    values:
+      title: 'Placeholder, portrait'
+      description: 'Listed first for the same reason.'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 1801
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      title: 'The hero image'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 1802
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      title: 'The reduced hero image'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 1805
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      title: 'The teaser image'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 1807
+    field: image
+    values:
+      alternative: 'A placeholder portrait'
+      title: 'The portrait of the author'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1010
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 1011
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1012
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'

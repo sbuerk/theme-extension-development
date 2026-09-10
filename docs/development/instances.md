@@ -127,9 +127,11 @@ database identically under DDEV and on a host stack.
 When a template exists at `sqlite-databases/core-<major>.sqlite` it is copied
 into `var/sqlite/` on first start. Until one has been committed, the instance starts
 empty: set it up with `vendor/bin/typo3 setup` and then fill it with
-`vendor/bin/typo3 data-factory:import theme-demo` — see [Seeding](seeding.md).
-The site configuration below `config/sites/demo/` is committed and points at
-the root page uid the seed set declares.
+`vendor/bin/typo3 data-factory:import theme-instance` —
+`theme-instance-core12` on TYPO3 v12 — see
+[Seeding](seeding.md). The site configurations below `config/sites/demo/` and
+`config/sites/demo-legacy/` are committed and point at the root page uids the
+seed set declares, 1 and 1001.
 
 `config/system/additional/` is git-ignored and included automatically — the
 place for anything belonging to one machine rather than the repository, such as
@@ -151,30 +153,18 @@ this file enables the theme when it does not.
 → [TypoScript delivery](../architecture/typoscript-delivery.md)
 
 The replacement is a `sys_template` record — a database row, and one no
-configuration file can carry. A [seed set](seeding.md) can express it — the
-scenario format writes records of any table, and the row sits on page 1 like
-any other record — but the showcase set does not declare one, so this is still
-a **manual step, between `typo3 setup` and
-`data-factory:import theme-demo`**:
+configuration file can carry. The v12 instance is therefore built from the
+seed set `theme-instance-core12`, which is `theme-instance` plus a root
+`sys_template` record on page 1 including the static include of the theme — see
+[Seeding](seeding.md#on-typo3-v12-both-trees-through-sys_template). On TYPO3 v12
+both trees of the instance are delivered through `sys_template`.
 
-1. **Web > List**, page `1` — the site root.
-2. *Create new record* → **System records** → **"TypoScript record"**
-   (`sys_template`).
-3. Set a *Title*.
-4. Check **Rootlevel**.
-5. Check **Clear** for both *Constants* and *Setup*.
-6. Under **"Include TypoScript sets"** (`include_static_file`), select
-   **"Theme Extension Development"**.
-
-> [!NOTE]
-> There is no **Web > Template** module in these instances. `typo3/minimal` does
-> not ship `typo3/cms-tstemplate`, which is why the record is created through
-> Web > List rather than the module a TYPO3 developer would reach for first.
-
-Committing a prepared `sqlite-databases/core-12.sqlite` would remove the step,
-and declaring the record in the showcase set would remove it for good. Neither is done here: the first commits a binary nobody can review,
-and the second changes the shipped demo tree for the sake of one core version —
-which is a decision about the demo, not about the seeding.
+An installation importing only the showcase `theme-demo` on TYPO3 v12 still
+creates the record by hand: in **Web > List** on the site root, a new
+**"TypoScript record"** with *Rootlevel* and *Clear* checked and
+**"Theme Extension Development"** selected under *Include TypoScript sets*.
+`typo3/minimal` ships no `typo3/cms-tstemplate`, so there is no Web > Template
+module in the instances to do it with.
 
 ## Snapshot and restore
 

@@ -16,9 +16,10 @@
 #
 # On v12 the theme is enabled through its other delivery path, the classic
 # static include registered by "Configuration/TCA/Overrides/sys_template.php".
-# That needs a "sys_template" record on page 1, which is a database row and
-# therefore expressible in neither this file nor a seed definition - it is a
-# manual step, described in "docs/development/instances.md".
+# That needs a "sys_template" record on page 1, a database row this file cannot
+# carry. The seed set this instance is built from, "theme-instance-core12" of
+# "packages-dev/dev-site", writes it - see "docs/development/seeding.md", "On
+# TYPO3 v12: both trees through sys_template".
 rootPageId: 1
 base: /
 websiteTitle: 'Theme demo, TYPO3 v12'
