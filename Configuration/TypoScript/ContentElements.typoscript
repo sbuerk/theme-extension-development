@@ -722,6 +722,18 @@ tt_content.menu_abstract {
 # query above already sorts by, on the same "item.data" page row
 # "menu_abstract" reads "abstract" from above; nothing had to be added with
 # "dataProcessing" here either.
+#
+# "alternativeSortingField" adds the tie-breaker the core leaves out. Without
+# it the query orders by "SYS_LASTCHANGED DESC" alone, and pages changed in the
+# same second - every page of a tree that was imported or published at once -
+# come back in whatever order the database returns them: ascending uid on
+# SQLite, and on PostgreSQL an order that differed between two identical page
+# trees of one database. "prepareMenuItemsForUpdatedMenu()" hands the value
+# to "getMenuForPages()" as the complete ORDER BY, so it has to repeat the
+# primary sort; the newer uid wins a tie. It replaces the order of
+# "special.mode" as well, which the theme does not set - "mode" still decides
+# which column "maxAge" filters on, and a site package that sets
+# "mode = tstamp" sets this to "tstamp DESC, uid DESC" along with it.
 tt_content.menu_recently_updated =< tt_content.menu_pages
 tt_content.menu_recently_updated {
     templateName = ContentElements/MenuRecentlyUpdated
@@ -729,6 +741,7 @@ tt_content.menu_recently_updated {
     dataProcessing.10 {
         special = updated
         special.excludeNoSearchPages = 1
+        alternativeSortingField = SYS_LASTCHANGED DESC, uid DESC
     }
 }
 

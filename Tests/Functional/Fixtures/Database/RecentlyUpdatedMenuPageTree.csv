@@ -1,0 +1,10 @@
+pages,,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug,SYS_LASTCHANGED
+,1,0,0,0,0,1,1,Theme root,/,1600000000
+,2,1,0,0,0,1,0,Tied page two,/two,1700000000
+,3,1,0,0,0,1,0,Tied page three,/three,1700000000
+,4,1,0,0,0,1,0,Tied page four,/four,1700000000
+,5,1,0,0,0,1,0,Newest page,/newest,1800000000
+tt_content,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,pages
+,10,1,0,0,0,10,menu_recently_updated,Recently updated,3,1
