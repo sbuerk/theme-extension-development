@@ -16,6 +16,8 @@ $EM_CONF['theme_extension_development'] = [
             'core' => '13.4.0-14.3.99',
         ],
         'conflicts' => [],
-        'suggests' => [],
+        'suggests' => [
+            'data_factory' => '2.0.0-2.99.99',
+        ],
     ],
 ];

@@ -19,8 +19,9 @@ and the guard in
 ## Where the page is
 
 The seeded demo tree carries it as page uid 9,
-`Configuration/Seeds/Demo.yaml`, slug `/styleguide`, backend layout
-`styleguide`. After `vendor/bin/typo3 theme:seed` it is at
+`Configuration/DataFactory/theme-demo/Scenario.yaml`, slug `/styleguide`,
+backend layout `styleguide`. After
+`vendor/bin/typo3 data-factory:import theme-demo` it is at
 `https://<instance>/styleguide` — see [Seeding](seeding.md).
 
 It is **`nav_hide`, not `hidden`**. A hidden page answers 404 in the frontend

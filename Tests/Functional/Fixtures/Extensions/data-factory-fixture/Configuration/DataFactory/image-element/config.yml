@@ -1,0 +1,51 @@
+# The page tree of "ImageElementRenderingTest".
+#
+# Seeded rather than imported from a CSV data set, because a rendered image
+# needs a file storage, an indexed "sys_file" and a "sys_file_reference"
+# pointing at the content element - three records whose uids a fixture would
+# have to guess. The import writes all three.
+#
+# It is a set of its own rather than a page of "theme-demo": the test asserts
+# how many figures the page renders and at which sizes, and a page of the
+# showcase is free to change what it shows.
+identifier: tests-image-element
+title: 'Image element test tree'
+
+scenarios:
+  - Scenario.yaml
+
+# The files of the showcase set, placed into a folder of their own. The
+# landscape file declares a 480x270 viewBox and the portrait one 270x480, which
+# is what the test asserts the rendered dimensions against.
+files:
+  - identifier: landscape
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder.svg'
+    folder: 'test-images'
+  - identifier: portrait
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder-portrait.svg'
+    folder: 'test-images'
+
+references:
+  # One image, with the fields of the reference record itself - which is where
+  # the alternative text and the caption live.
+  - file: landscape
+    table: tt_content
+    uid: 11
+    field: image
+    values:
+      alternative: 'A placeholder image'
+      description: 'The caption of the image'
+  # Two images, in this order.
+  - file: landscape
+    table: tt_content
+    uid: 12
+    field: image
+  - file: portrait
+    table: tt_content
+    uid: 12
+    field: image
+  # One image, enlarged on click.
+  - file: landscape
+    table: tt_content
+    uid: 13
+    field: image

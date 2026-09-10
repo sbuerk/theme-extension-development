@@ -1,375 +1,133 @@
 # Seeding
 
-A development instance is worth nothing empty. `theme:seed` writes a page tree
-and its content from a definition that lives in the repository, so an instance
-can be rebuilt from nothing instead of being clicked together by hand.
+A development instance is worth nothing empty. The showcase page tree of the
+theme is a **seed set** of [`sbuerk/data-factory`](https://github.com/sbuerk/data-factory),
+so an instance is rebuilt from a definition in the repository instead of being
+clicked together by hand:
 
 ```bash
 cd instance-core-13
-ddev exec vendor/bin/typo3 theme:seed          # or, on a host stack:
-vendor/bin/typo3 theme:seed
+ddev exec vendor/bin/typo3 data-factory:import theme-demo   # or, on a host stack:
+vendor/bin/typo3 data-factory:import theme-demo
 ```
 
-The shipped definition is
-[`Configuration/Seeds/Demo.yaml`](../../Configuration/Seeds/Demo.yaml). Another
-one is written by passing its path, and `EXT:` is resolved:
+`data-factory:list` shows every set an installation provides, and
+`data-factory:import --help` every option and exit code. The format, the
+command and what happens between them are documented by that extension —
+[seed definitions](https://github.com/sbuerk/data-factory/blob/main/docs/development/seed-definitions.md),
+[seed sets and the CLI](https://github.com/sbuerk/data-factory/blob/main/docs/development/seed-sets.md).
+This page documents the set, not the tool.
 
-```bash
-vendor/bin/typo3 theme:seed EXT:my_package/Configuration/Seeds/Other.yaml
-vendor/bin/typo3 theme:seed --root-page=12 --force
+## Where the set lives, and why there
+
+```
+Configuration/DataFactory/theme-demo/
+├── config.yml      identifier, scenario files, files, file references
+├── Scenario.yaml   the records, in the scenario format
+└── Files/          placeholder.svg, placeholder-portrait.svg
 ```
 
-## The format
+The set ships **with the extension**, not with the development instances. That
+is what the built-in `theme:seed` command offered before the seeder was
+extracted, and it stays true: any installation that has `sbuerk/data-factory`
+installed can import the showcase with one command, a test instance of another
+extension included.
 
-Structural keys are `identifier`, `uid`, `children`, `content`, `files` and
-`inline` — plus two that are structure on one level and an ordinary field
-everywhere else: `table`, on an inline or `records` child, and `records`, on a
-page. Everything else is a field of the record and is written as it stands:
+`sbuerk/data-factory` is **suggested**, not required — in `composer.json` and in
+`ext_emconf.php`. Discovery finds a set in `Configuration/DataFactory/` of every
+active package, so the set costs an installation without that extension
+nothing: it is a directory of YAML that nothing reads. The root `composer.json`
+requires it for development, because the functional tests import the set, and
+both instances require it, because that is how they get their content.
 
-```yaml
-identifier: demo
+Every path in `config.yml` is an `EXT:` path, although a path relative to the
+set directory would do for the set on its own. data-factory resolves a relative
+path against the directory of the **entry file**, and a set composed from this
+one — through `imports` — has an entry file somewhere else. `EXT:` resolves the
+same from both.
 
-pages:
-  - identifier: home
-    uid: 1
-    title: 'Theme demo'
-    slug: '/'
-    is_siteroot: 1
-    content:
-      - identifier: home-heading
-        CType: header
-        header: 'A frontend to look at'
-    children:
-      - identifier: about
-        title: 'About'
-        slug: '/about'
-```
+## Two files, two formats
 
-- `identifier` is symbolic and has to be unique across the whole definition,
-  inline children included. It becomes the DataHandler placeholder and is what
-  the command reports the written uids under. **Letters, digits and dashes
-  only, starting with a letter or a digit** — an underscore is rejected with a
-  message, for the reason in [Placeholders carry no underscore](#placeholders-carry-no-underscore).
-- `uid` is **optional**, and where it is given it is passed to DataHandler as a
-  *suggested* uid.
-- `children` nests pages, `content` nests `tt_content` records below the page
-  carrying them.
-- `records` nests records of **any** table below the page carrying them, each
-  declaring its own `table`. See [Records of any table](#records-of-any-table).
-- `files` on a record creates file references, as a map of field name to the
-  references declared for it.
-- `inline` nests records into a **relation** rather than below a page, as a map
-  of field name to the children declared for it.
+| File            | Format                                                        | Owner                             |
+|-----------------|---------------------------------------------------------------|-----------------------------------|
+| `config.yml`    | the set descriptor: identity, scenarios, files, references    | data-factory, closed key set      |
+| `Scenario.yaml` | the scenario format of `typo3/testing-framework`, key for key | upstream, the core's own fixtures |
 
-Everything that is not one of those keys reaches the record untouched, which is
-the answer to the question the format invites: **a field needs no support in the
-seeder to be seedable.** `backend_layout`, `nav_hide`, `abstract`, `keywords`
-and the `table_*` fields of the `table` element are all ordinary columns and are
-all written by declaring them. `DataMapFactory::write()` sets `pid` and defaults
-`hidden`, and copies the rest of `SeedRecord::$values` verbatim. A seeder that
-special-cases a field it does not have to is a seeder that will special-case the
-next one too, so the absence of that branch is deliberate and
-`SeedingTest::fieldsTheSeederKnowsNothingAboutAreWrittenAsDeclared()` is what
-keeps it true.
+A record is a field map below `self`, nested under its page through `entities`
+(content, list items) or `children` (sub pages). Every key that is not
+structural is written to the record as it stands, which is why
+`backend_layout`, `nav_hide`, `abstract`, `keywords` and the `table_*` fields of
+the `table` element need nothing from the tool.
 
-## Inline children
+## Uids are declared, and they are a rule
 
-`children` and `content` express the page tree, where nesting becomes a `pid`.
-A relation is a different shape: the child is not *below* the parent, it is
-*pointed at* by one of the parent's fields. That is what `inline` expresses — a
-map of the parent field carrying the relation to the records declared for it:
+| Table                | Uids                                                             |
+|----------------------|------------------------------------------------------------------|
+| `pages`              | 1 to 9                                                           |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603 |
+| `tx_theme_list_item` | 1 to 12 on page 8, in declaration order                          |
 
-```yaml
-content:
-  - identifier: showcase-linklist
-    CType: theme_linklist
-    header: 'Where to read more'
-    inline:
-      tx_theme_list_items:            # the field on the parent record
-        - identifier: showcase-docs
-          table: tx_theme_list_item   # required, never inferred
-          link: 't3://page?uid=2'
-          link_label: 'Typography'
-        - identifier: showcase-media
-          table: tx_theme_list_item
-          link: 't3://page?uid=3'
-          link_label: 'Media'
-```
+Every record declares one, because the records point at each other by uid and
+a scenario record has no other handle:
 
-Four rules, each of which is a decision rather than a detail:
+- the committed site configurations of both instances name root page `1`;
+- `config.yml` names the record a file reference hangs on by its uid;
+- the *Insert records* element writes `records: 'tt_content_601'`;
+- the link fields hold `t3://page?uid=2`;
+- an inline parent lists its children as `tx_theme_list_items: '5,3,6,4'`.
 
-**A child declares its own `table`.** It would be derivable — the parent's field
-has a `config.foreign_table` in the TCA — and deriving it is wrong twice over: a
-seed definition would then only be parseable with the TCA loaded, and a field
-name that does not exist would produce a null dereference somewhere in the
-factory rather than a message naming the child. `table` is therefore structural
-on an inline child exactly as `identifier` is, and it is structural *only*
-there: `tt_content` and `pages` both have real fields whose name begins with
-`table`, so the key is decided per level, where the context is known
-(`YamlSeedParser::STRUCTURAL_KEYS` and the `$table === null` branch in
-`parseRecords()`).
+A declared uid is a *suggestion* DataHandler honours for an admin backend user
+only, which is why `data-factory:import` refuses to run as anybody else. A
+record without one would not get an auto increment uid either, but one from a
+counter at 10000 — so nothing here relies on that.
 
-**The parent's field is written as the comma-joined list of the children's
-placeholders**, in declaration order, and nothing else. Which columns the
-relation actually uses is a property of that relation and comes from the TCA of
-the parent field — for `tt_content.tx_theme_list_items` they are `uid_foreign`,
-`tablename` and `sorting_foreign`, and the singular `tablename` there is not the
-`tablenames` of `sys_file_reference`. DataHandler reads the list, resolves the
-placeholders and writes those columns itself. A seeder filling them in would
-produce identical rows for this relation and the wrong rows for the first one
-whose TCA names them differently, so it names none of them.
+The import refuses an installation that already uses one of those uids. It does
+not reconcile, merge or overwrite, and `--force` is no way around it for this
+set. It gives up the suggestions of every table something collides in and
+writes those records under free uids. The file references of `config.yml`
+follow — data-factory resolves each to the uid the run actually wrote — but
+nothing else does: a link, a menu page list, `tt_content_601` and an inline list
+are literal uids in a field, and would then name whatever record of the
+installation carries them.
 
-**Order comes from that list.** Not from `sorting`, and not from the negative
-`pid` trick that orders pages and content elements — that convention names a
-record of the same table and is a sorting instruction, which a relation does not
-need. `DataHandler` numbers `sorting_foreign` by walking the value of the
-parent's field.
+## Relations
 
-**A child's `pid` is the page its parent sits on.** A relation is not a
-containment: the child is an ordinary record on an ordinary page, and only the
-relation columns tie it to the parent. Writing the parent's placeholder there
-would put content records on a content record.
+An **inline relation** needs no construct of its own. The parent writes the
+comma separated list of the declared ids of its children into its relation
+field, the children are records of their own on the same page, and DataHandler
+resolves the list like a backend form submit: `uid_foreign`, `tablename` and
+`sorting_foreign` come from the TCA of the parent field
+(`tt_content.tx_theme_list_items`), never from the scenario. The order of the
+list is the order of the children — `ShowcaseTreeTest::inlineChildrenKeepTheirDeclarationOrderInTheFrontend()`
+reads the list from the scenario and holds the rendering to it. The link list
+names its children out of uid order (`5,3,6,4`) for that test's sake: uid order
+is also creation order, and a list in that order could not tell a rendering
+that follows the relation from one that sorts by uid.
 
-A child is a record like any other otherwise — it may declare a `uid`, and it
-may carry `files`, which the four cards of `theme_media_teaser_grid` in the demo
-definition do.
+A **file reference** is the one relation the scenario cannot express: a
+`sys_file_reference` points at its file through `uid_local`, a uid the FAL
+indexer hands out while the file is placed. So files and references are declared
+in `config.yml` — `files:` places a file into `fileadmin/theme-demo/` through the
+storage API, `references:` attaches it to a field of a record named by table and
+uid, with the fields of the reference itself (alternative text, caption, title)
+under `values`. References to one field are ordered as declared.
 
-## Records of any table
+## Two traps the scenario format sets
 
-`content` puts `tt_content` records on a page. `records` does the same for every
-other table, and the child names the table itself:
+**`hidden: 0` sits on the wildcard entity `'*'` and nowhere else.** The `pages`
+TCA defaults `hidden` to `1`, so a page written without it exists and renders
+nothing. Repeating the key on a declared entity is worse than leaving it out:
+the wildcard is merged into each entity with `array_merge_recursive()`, so a key
+on both sides becomes the list `[0, 0]` and reaches the database as the string
+`Array`.
 
-```yaml
-pages:
-  - identifier: persons-storage
-    title: 'Persons'
-    doktype: 254
-    records:
-      - identifier: profile-doe
-        table: tx_academicpersons_domain_model_profile
-        first_name: 'Jane'
-        last_name: 'Doe'
-        inline:
-          contracts:
-            - identifier: contract-doe
-              table: tx_academicpersons_domain_model_contract
-              position: 'Professor'
-```
-
-That is what lets a definition describe **the data a plugin reads**, and not
-only the pages and content elements around it. A plugin page whose records have
-to be clicked together by hand afterwards is a page tree, not a development
-instance.
-
-Four things follow from the design rather than needing their own machinery:
-
-**A record under `records` is a record like any other.** It may declare a `uid`,
-carry `files`, and carry `inline` children — the profile above nests its
-contracts through a relation exactly as a content element nests its list items.
-Nothing about those keys knows which table it is applied to.
-
-**Its `pid` is the page that declares it**, the same rule `content` follows.
-Nesting expresses the page tree; a relation is what `inline` expresses.
-
-**Declaration order is kept per table.** `DataMapFactory` tracks the predecessor
-of the negative-`pid` chain per table, so pages, content elements and three
-other tables can sit on one page without disturbing each other's sorting.
-
-**A relation to a seeded record is written by declaring its uid.** The record
-declares `uid: 4711`, the field pointing at it is written with `4711`, and
-DataHandler does the rest — including an **MM** relation, whose rows it writes
-into a table the seeder never names. `SeedingTest::aRelationToASeededRecordIsWrittenFromTheDeclaredUid()`
-asserts that on `pages.categories`.
-
-The one restriction is where the key may appear: **`records` is structure on a
-page and an ordinary field everywhere else.** `tt_content` has a column of that
-name — the one the *Insert records* element writes `tt_content_<uid>` into, and
-the demo tree uses it — so the key is decided per level, exactly as `table` is
-(`YamlSeedParser::STRUCTURAL_KEYS` and the `$table === self::PAGES` branch in
-`parseRecords()`). Declaring `records` on a content element therefore does not
-nest anything; it writes a field.
-
-## Placeholders carry no underscore
-
-The placeholder of a record is `NEW<table without underscores>-<identifier>`,
-and both halves of that shape exist to work around one line of DataHandler.
-
-`processRemapStack()` resolves the `NEW…` placeholders in a relation field. It
-first asks whether the value contains an underscore
-(`.Build/vendor/typo3/cms-core/Classes/DataHandling/DataHandler.php:7165-7189`,
-the *Replace relations to NEW...-IDs* block). If it does not, the value is a
-plain placeholder and the table comes from `config.foreign_table`. If it does,
-the value is read as the `<table>_<uid>` form the backend writes for a group
-field: it is split on every underscore, the **last** segment is taken as the id
-and everything before it as the table name.
-
-A placeholder like `NEWtt_content_home` therefore does not resolve. It is taken
-apart into a table `NEWtt_content` and an id `home`, `substNEWwithIDs['home']`
-does not exist, and the `?? ''` puts an empty string in its place. The relation
-is written **empty, with an empty error log** — nothing about that path is an
-error condition.
-
-That is the worst kind of failure, and it cost twice here:
-
-- **Every inline relation would have been empty**, which renders as a correct,
-  empty wrapper — indistinguishable from an editor who added no entries. That is
-  precisely the failure mode `ThemeContentElementRenderingTest` exists to catch.
-- **Every seeded file reference had kept `sorting_foreign = 0`** since file
-  seeding was added. That one was invisible:
-  `FileRepository::findByRelation()` selects by
-  `uid_foreign`/`tablenames`/`fieldname` and never reads the parent's counter
-  column (`.Build/vendor/typo3/cms-core/Classes/Resource/FileRepository.php:86-113`),
-  so the images appeared and looked right. It orders by `sorting_foreign`
-  though, and that column is only written by
-  `RelationHandler::writeForeignField()`, which runs after the placeholders in
-  the parent's field resolve. The order of a multi-file gallery was left to the
-  database.
-
-So the table name has its underscores stripped and is joined to the identifier
-with a dash, and `YamlSeedParser` rejects an identifier that would reintroduce
-one. Restricting the identifier is what makes the guarantee hold: a definition
-that would seed an empty relation is rejected with a message instead.
-
-## Files
-
-Files are copied into a file storage before any record is written, so a record
-can reference them:
-
-```yaml
-files:
-  - identifier: placeholder
-    source: 'EXT:my_package/Configuration/Seeds/Files/placeholder.svg'
-    folder: 'theme-demo'     # optional, storage root by default
-    # name: 'other-name.svg' # optional, the source name by default
-    # storage: 2             # optional, the default storage otherwise
-
-pages:
-  - identifier: home
-    title: 'Home'
-    files:
-      media:                 # any FAL field of the record
-        - placeholder
-```
-
-A reference is either the bare identifier of a declared file, as above, or a map
-naming that identifier alongside the fields of the `sys_file_reference` record —
-the alternative text, title, description and link an editor fills in on a file
-relation:
-
-```yaml
-    files:
-      image:
-        - placeholder                            # short form, no fields
-        - identifier: placeholder-portrait       # long form
-          alternative: 'A placeholder graphic'
-          title: 'Placeholder'
-          description: 'Rendered as the caption'
-```
-
-Those fields live on the **reference**, not on the file, which is what lets the
-same image carry a different alternative text in two places. `identifier` is the
-only structural key; everything else is written to the reference as it stands,
-and a field the TCA of `sys_file_reference` does not know is dropped by
-DataHandler without a word.
-
-The columns the seeder owns — `uid_local`, `uid_foreign`, `tablenames`,
-`fieldname` and `pid` — always win over a declared value, so a definition cannot
-detach a reference from the record carrying it. This is the same rule a record's
-own `pid` follows.
-
-The FAL fields available are `pages.media` and `tt_content.image`, `assets` and
-`media` — all of them from EXT:frontend, so none of them depends on
-`fluid_styled_content`. Of those, `tt_content.image` is the one the theme
-renders, through the `image` content element.
-
-The copy goes through the storage API, not through the filesystem: a file copied
-into `fileadmin/` with `cp` exists on disk and does not exist for TYPO3, so
-nothing can reference it. Three details of that API are handled here and are
-each easy to get wrong:
-
-- **`addFile()` moves by default.** Its `removeOriginal` argument defaults to
-  `true`, which would delete the source out of the repository. It is passed as
-  `false`.
-- **The conflict mode is the native enum.** TYPO3 v13 still carries the older
-  `Resource\DuplicationBehavior` class alongside `Resource\Enum\DuplicationBehavior`,
-  and passing the old one triggers a deprecation (#101151) that this test suite
-  turns into a failure. The enum exists in v13.4 and v14 alike, so this needs no
-  version split.
-- **A storage evaluates backend user file mounts.** Seeding runs on the command
-  line into a folder no user has a mount for, so the check is suspended for the
-  duration of the copy and restored afterwards.
-
-### Why references need a second pass
-
-A `sys_file_reference` carries the uid of the record it belongs to in
-`uid_foreign`, and that is a plain integer column rather than a relation
-DataHandler resolves. A `NEW...` placeholder written there stays unresolved and
-the reference silently points at record 0.
-
-So the records are written first, their real uids are read back from
-`substNEWwithIDs`, and the references are attached in a second DataHandler pass.
-That is also why a file reference cannot simply be another entry in the same
-data map.
-
-## Why it goes through DataHandler
-
-Because the alternative is reimplementing TYPO3. Writing rows directly means
-owning slug generation, TCA defaults and evaluations, `sorting`, the reference
-index and the cache flush — and getting them subtly wrong. Through DataHandler
-the core does all of it, and what comes out is a page tree rather than rows that
-merely resemble one.
-
-Three consequences are worth knowing, because each one bit during
-implementation:
-
-**An admin backend user is required.** DataHandler honours suggested uids only
-for an admin, and *silently ignores them otherwise* — a seed declaring uid 1
-would quietly get whatever was free, and a site configuration pointing at it
-would be wrong. The seeder refuses rather than allowing that.
-
-**Declaration order needs negative pids.** A new record is placed at the *top*
-of its parent, so records created in declared order come out reversed. The
-convention DataHandler offers is a negative `pid`, meaning "directly after this
-record", so only the first sibling addresses its parent. That predecessor is
-tracked **per table**, because a negative pid names a record of the same table
-and a page's children are a mix of sub pages and content elements.
-
-**Records are seeded visible.** DataHandler creates them hidden, which is right
-for an editor and wrong for a seed: the tree would exist, the frontend would
-render nothing, and nothing would say why. A definition can still ask for a
-hidden record by declaring `hidden: 1` itself.
-
-## Why a seed may declare uids
-
-So a site configuration can be committed. `instance-core-13/config/sites/demo/`
-and its v14 counterpart reference `rootPageId: 1`, which only works because the
-definition declares that uid. Without it the root page would get whatever the
-database assigned and the site configuration could not be written in advance.
-
-That is also why the command refuses to run into a non-empty page tree: a
-definition declaring uids collides rather than adding. `--force` overrides that
-for a definition known not to overlap.
-
-**Handing DataHandler a suggested uid takes two things, and neither is
-obvious.** `insertDB()` reads the suggestion from `$fieldArray['uid']` — the
-data map row — and looks it up in `suggestedInsertUids` under the key
-`"<table>:<uid>"`, not under the placeholder
-(`.Build/vendor/typo3/cms-core/Classes/DataHandling/DataHandler.php:7793-7811`).
-It then unsets the column again — *"Do NOT insert the UID field, ever!"* — so
-writing it into the data map cannot force a uid by itself, and populating only
-`suggestedInsertUids` with a placeholder key finds nothing.
-
-Getting either half wrong fails silently: DataHandler assigns the next free uid,
-the seeder reports whatever it got, and the result is correct exactly as long as
-declaration order happens to equal insertion order. It did, for the whole first
-version of the demo definition, which is why nothing noticed. The regression
-test therefore declares a single page with uid `4711` — a number that cannot be
-reached by counting.
+**`entities:` is only read on an entity with `isNode: true`.** On any other
+entity it is ignored without a word, which is the most likely way to write a
+scenario that seeds less than it says. Only `page` is a node here.
 
 ## The demo tree
 
-[`Configuration/Seeds/Demo.yaml`](../../Configuration/Seeds/Demo.yaml) is not a
-sample of the format, it is the frontend this extension is developed against.
+Not a sample of the format — the frontend this extension is developed against.
 Nine pages, and between them every backend layout the extension registers and
 every `CType` it renders:
 
@@ -385,75 +143,64 @@ every `CType` it renders:
 | 8   | Theme elements | `/elements/theme` | `content`         | The ten `theme_*` elements.                 |
 | 9   | Styleguide     | `/styleguide`     | `styleguide`      | The component library, straight from Fluid. |
 
-Uids 1 to 4 do not move: the committed site configurations of both development
-instances point at root page 1, and the tests assert against the others.
-
 Four properties of that tree are deliberate, and are asserted by
-`Tests/Functional/ShowcaseTreeTest.php` and `Tests/Functional/SeedingTest.php`
-rather than left to a reader to preserve:
+`Tests/Functional/ShowcaseTreeTest.php` rather than left to a reader to
+preserve:
 
 - **Page 4 declares no `backend_layout` at all**, and that is the point of it.
   It is the only page in the tree that reaches the hard-coded `default` in
-  `PageLayoutResolver::getLayoutIdentifierForPage()`
-  (`.Build/vendor/typo3/cms-core/Classes/Page/PageLayoutResolver.php:118-120`),
-  after the `backend_layout_next_level` walk up the rootline found nothing. That
-  path has no other coverage in a seeded tree.
+  `PageLayoutResolver::getLayoutIdentifierForPage()`, after the
+  `backend_layout_next_level` walk up the rootline found nothing.
 - **Pages 6 and 7 use `content_sidebar` and their sibling 8 does not.** Two
   pages under one parent rendering with and without the sub navigation is what
   proves the layout is resolved per page rather than inherited down the branch.
 - **The styleguide page uses `nav_hide`, never `hidden`.** A hidden page returns
   404 in the frontend and is only reachable through a backend preview link
   carrying a valid hash, which defeats the point of seeding a page that exists
-  to be opened. `nav_hide` keeps it reachable by URL and out of every menu,
-  which is what "not published" meant here.
+  to be opened.
 - **The two lists that hold the tree complete are read from the repository, not
   from the test.** `ShowcaseTreeTest` derives the backend layouts from
   `Configuration/PageTsConfig/BackendLayouts/` and the content types from the
   TypoScript. A layout or an element added without a demo page then fails there,
-  instead of shipping undemonstrated — a list maintained in a test goes stale
-  silently, because a demo page nobody seeded is a page nobody misses.
+  instead of shipping undemonstrated.
+
+## How the tests import it
+
+Through the command. `Tests/Functional/DataFactoryImportTrait.php` runs
+`data-factory:import <identifier>` with a `CommandTester` and asserts exit code
+`0`, printing the command output when it is not. The command, its options and
+its exit codes are the supported interface of data-factory; the parser, the
+composer and the seeder behind it are `@internal` there. A test that assembled
+those services itself would be pinned to the one part of the dependency that
+promises nothing.
+
+A test importing a set loads `sbuerk/data-factory` and the extension shipping
+the set, imports `Fixtures/Database/AdminBackendUser.csv` — the import runs as
+an admin or not at all — and calls `createDefaultFileStorage()`, because a
+functional test instance has a `fileadmin/` folder but no `sys_file_storage`
+record.
+
+`ImageElementRenderingTest` imports a set of its own, `tests-image-element`,
+from the fixture extension
+[`data-factory-fixture`](../../Tests/Functional/Fixtures/Extensions/data-factory-fixture).
+It asserts how many figures one page renders and at which sizes, and a page of
+the showcase is free to change what it shows.
 
 ## What it does not do
 
-- **No categorized menus in the demo tree**, although the format can express
-  them since [`records`](#records-of-any-table). `menu_categorized_pages` and
-  `menu_categorized_content` are still seeded with `selected_categories: 0` — an
-  empty selection, which renders an empty menu, and an empty menu is the correct
-  rendering of "nothing chosen". Seeding categories and relating pages to them
-  would demonstrate the two elements better; it is a change to the demo
-  definition, and it is not made here. The `0` is written out rather than the
-  field left off because it is the value the column carries once anything real
-  has touched it, and because it keeps the two elements identical so neither
-  reads as the special case; the empty value itself is handled in
-  `Configuration/TypoScript/ContentElements.typoscript`, where
-  `selected_categories` reaches the subquery through an `ifEmpty = 0`.
+- **No categorized menus.** `menu_categorized_pages` and
+  `menu_categorized_content` are seeded with `selected_categories: 0` and render
+  an empty menu, which is the correct rendering of "nothing chosen". The format
+  could express categories and their MM relation — a relation field listing
+  declared uids — and the set does not seed any yet.
+- **No site configuration.** A site names its root page by uid and carries
+  values of the installation, its base and title. The instances commit theirs
+  below `instance-core-*/config/sites/`.
 - **No file metadata.** The fields of a *reference* are written; the
-  `sys_file_metadata` of the file itself — the alternative text and title that
-  apply wherever the file is used — is not. That is deliberate rather than
-  missing: an alternative text describes what the image means *in this place*,
-  which is a property of the reference.
-- **No site configuration.** Sites are committed files under
-  `instance-core-*/config/sites/`, which is why the seed declares uids rather
-  than the seeder writing sites.
-- **No update.** Seeding writes; it does not reconcile an existing tree against
-  a definition.
-
-## Where the code lives
-
-`Classes/Seeding/`, and every class in it is `@internal`. It deliberately
-depends on nothing else in this extension, so it can be extracted into a package
-of its own once it earns that.
-
-| Class                                      | Does                                                             |
-|--------------------------------------------|------------------------------------------------------------------|
-| `YamlSeedParser`                           | Reads a definition into value objects, and validates it.         |
-| `FileSeeder`                               | Copies the files into a storage and returns their sys_file uids. |
-| `DataMapFactory`                           | Turns a definition into the DataHandler data map.                |
-| `Seeder`                                   | Runs DataHandler, attaches the references, reports the uids.     |
-| `SeedDefinition`, `SeedRecord`, `SeedFile` | The value objects. Data, not services.                           |
-
-`Classes/Command/SeedCommand.php` is the CLI surface and stays behind when the
-engine is extracted.
+  `sys_file_metadata` of the file itself is not. An alternative text describes
+  what an image means *in this place*, which is a property of the reference.
+- **No update.** An import writes. It does not reconcile an existing tree
+  against the set, and importing twice is a uid collision.
 
 ## See also
 
@@ -462,4 +209,5 @@ engine is extracted.
   demo tree uses, and how a layout resolves to a template.
 - [Content elements](../architecture/content-elements.md) — the `CType` set the
   showcase pages have to cover.
+- [Fixture extensions](../testing/fixture-extensions.md)
 - [Functional tests](../testing/functional-tests.md)

@@ -5,8 +5,16 @@ A *fixture extension* is a minimal TYPO3 extension that exists only inside
 and is loaded by functional tests to provide test doubles, additional TCA,
 service overrides or a plugin to render.
 
-This repository ships one, `example-fixture`, to prove the mechanism works and
-to serve as the starting point for real ones.
+| Fixture                | Package                      | Loaded by                                                |
+|------------------------|------------------------------|----------------------------------------------------------|
+| `example-fixture`      | `tests/example-fixture`      | proves the mechanism, and is the template for a new one  |
+| `plugin-fixture`       | `tests/plugin-fixture`       | `ExtbasePluginRenderingTest`, a plugin with no rendering |
+| `data-factory-fixture` | `tests/data-factory-fixture` | `ImageElementRenderingTest`, which imports its seed set  |
+
+`data-factory-fixture` holds no code, only
+`Configuration/DataFactory/image-element/`. A seed set is found by discovery in
+an **active** package, so a set only one test imports needs a package that only
+that test loads — see [Seeding](../development/seeding.md#how-the-tests-import-it).
 
 ## Why load them by composer package name
 
