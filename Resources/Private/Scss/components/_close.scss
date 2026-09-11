@@ -1,0 +1,92 @@
+// Close button.
+//
+// Markup contract:
+//
+//     <button class="theme-close" type="button" aria-label="Close"></button>
+//
+// A square, borderless control that dismisses whatever it sits in - a dialog
+// header, a panel header. Its only content is the glyph the stylesheet draws,
+// so "aria-label" is not optional: without it the button has no accessible
+// name at all. Inside a "<form method='dialog'>" it drops "type='button'" and
+// carries "value='cancel'" instead, which closes the dialog with no script -
+// see "components/_dialog.scss".
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- Its own file, not a button modifier ------------------------------------
+//
+// It shares nothing with ".theme-button" except the element: no fill, no
+// border, no label, no size modifiers, and a negative margin a button must
+// never have. As a modifier it would first have to switch off most of what the
+// base rule sets; as its own root class it states only what it needs, and a
+// subset build that takes the dialog does not have to take every button
+// variant with it.
+//
+// --- The glyph is two borders ------------------------------------------------
+//
+// The same reasoning as the chevron in "_accordion.scss": no icon asset for a
+// shape this simple. Borders rather than filled bars, because forced colours
+// mode repaints a border in the text colour and drops a background - an "x"
+// drawn from two backgrounds would disappear exactly where contrast matters
+// most.
+
+.theme-close {
+    --theme-close-size: var(--theme-tap-target-min, 44px);
+    --theme-close-glyph-size: var(--theme-space-4, 1.25rem);
+    --theme-close-glyph-weight: var(--theme-border-width-strong, 2px);
+    --theme-close-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-close-foreground-hover: var(--theme-color-text-primary, #14181f);
+    --theme-close-background-hover: var(--theme-color-surface, #f4f6fa);
+    --theme-close-radius: var(--theme-radius-sm, 5px);
+
+    // Pulled outwards by the room between the glyph and the edge of the hit
+    // area, so the glyph - not the invisible 44px box around it - lines up
+    // with the content edge next to it.
+    --theme-close-offset: calc(-1 * var(--theme-space-2, 0.625rem));
+
+    position: relative;
+    display: inline-block;
+    flex: none;
+    inline-size: var(--theme-close-size);
+    block-size: var(--theme-close-size);
+    margin: var(--theme-close-offset);
+    padding: 0;
+
+    border: 0;
+    border-radius: var(--theme-close-radius);
+    background-color: transparent;
+    color: var(--theme-close-foreground);
+
+    cursor: pointer;
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    // Centred by "inset: 0" plus auto margins rather than "50%" and a
+    // translate: that pair is written against the physical left edge and
+    // needs a mirror for right-to-left, this needs nothing.
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        inline-size: var(--theme-close-glyph-size);
+        block-size: 0;
+        margin: auto;
+        border-block-start: var(--theme-close-glyph-weight) solid currentColor;
+    }
+
+    &::before {
+        rotate: 45deg;
+    }
+
+    &::after {
+        rotate: -45deg;
+    }
+
+    &:hover {
+        background-color: var(--theme-close-background-hover);
+        color: var(--theme-close-foreground-hover);
+    }
+}

@@ -62,6 +62,11 @@ based test instances and acceptance tests.
 
         Enable the theme for a site and override its templates.
 
+    ..  card:: :ref:`Components <components>`
+
+        The component library, the components that need JavaScript and what
+        they do without it.
+
     ..  card:: :ref:`Changelog <changelog>`
 
         Overview of the changes per released version.
@@ -74,4 +79,5 @@ based test instances and acceptance tests.
     Introduction/Index
     Installation/Index
     Configuration/Index
+    Components/Index
     Changelog/Index

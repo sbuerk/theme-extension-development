@@ -1,0 +1,67 @@
+// Text roles.
+//
+// Markup contract:
+//
+//     <p class="theme-eyebrow">…</p>
+//     <h1 class="theme-display">…</h1>
+//     <p class="theme-lead">…</p>
+//
+// Three roles of DESIGN.md's type table that no element carries by itself: a
+// heading level says where something sits in the outline, not how loud it is,
+// and a lead paragraph is still a "p". Each is a class, applied to whatever
+// element the outline asks for.
+//
+// A component file rather than "base/": "base/_elements.scss" is element
+// selectors only, and reads global tokens directly because a bare "<p>" has
+// nothing to re-theme on its own. A class does, so these follow the component
+// convention and carry a token layer - see "components/_button.scss".
+//
+// Unrelated to ".theme-hero__eyebrow" and ".theme-hero__lead", which are the
+// hero's own and stay sized by it.
+
+// The display size, for the one heading on a landing page that is set larger
+// than a page title. The "h1" rule already carries the weight and the
+// tracking; stating them here is what lets the class sit on any element.
+.theme-display {
+    --theme-display-font-size: var(--theme-font-size-display, clamp(2.125rem, 1.5rem + 3vw, 3.375rem));
+
+    margin: 0 0 var(--theme-space-3, 0.9375rem);
+    font-size: var(--theme-display-font-size);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-heading);
+    text-transform: none;
+    text-wrap: balance;
+}
+
+// The paragraph that opens a page. Held to the reading measure like the hero's
+// lead, and in secondary ink so the body copy after it still reads as the text
+// and this as the introduction to it.
+.theme-lead {
+    --theme-lead-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-lead-font-size: var(--theme-font-size-lg, 1.25rem);
+
+    max-inline-size: var(--theme-measure);
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+    color: var(--theme-lead-color);
+    font-size: var(--theme-lead-font-size);
+    font-weight: var(--theme-font-weight-regular);
+    letter-spacing: var(--theme-letter-spacing-none);
+    line-height: var(--theme-line-height-base);
+}
+
+// The short label above a heading. Uppercase at the caption size, so it takes
+// the caps tracking that "h5" and "h6" use rather than the +0.05em mixed case
+// is set at.
+.theme-eyebrow {
+    --theme-eyebrow-color: var(--theme-color-primary, #0b57d0);
+
+    display: block;
+    margin: 0 0 var(--theme-space-2, 0.625rem);
+    color: var(--theme-eyebrow-color);
+    font-size: var(--theme-font-size-xs);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-caps);
+    line-height: var(--theme-line-height-snug);
+    text-transform: uppercase;
+}

@@ -75,6 +75,11 @@
     --theme-letter-spacing-wide: 0.05em;
     --theme-letter-spacing-none: 0;
 
+    // Authored together with the step for H5 and H6: text set in capitals is
+    // tracked wider than mixed case. Used by "h5", "h6" and the eyebrow text
+    // role, and by nothing set in mixed case.
+    --theme-letter-spacing-caps: 0.08em;
+
     --theme-measure: 68ch;
 
     // --- Colour: neutrals -----------------------------------------------

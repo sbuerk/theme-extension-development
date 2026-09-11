@@ -46,17 +46,52 @@ h2 {
     line-height: var(--theme-line-height-snug);
 }
 
-// H4-H6 have no role of their own in DESIGN.md's table. Rather than invent a
-// step the reference was never measured against, they hold at the H3 size and
-// weight: the RTE lets an editor nest past H3, and the result still has to be
-// legible rather than shrink further on a scale nothing backs.
-h3,
-h4,
-h5,
-h6 {
+h3 {
     font-size: var(--theme-font-size-lg);
     font-weight: var(--theme-font-weight-medium);
     line-height: var(--theme-line-height-snug);
+}
+
+// H4 to H6 have a step of their own in DESIGN.md's role table, and none of it
+// is a new size: they land on the body size and the two steps below it. That
+// is exactly why size cannot separate them from the text around them - an H4
+// at 16px is the size of a paragraph - so weight and case do it instead:
+//
+//   H4  the body size at weight 800. The weight is the whole difference.
+//   H5  14px, weight 800, in capitals with the caps tracking. Below the body
+//       size a mixed-case heading reads as small print; capitals give it the
+//       shape of a label instead.
+//   H6  12px, the same treatment, in secondary ink: the smallest level is the
+//       least important one, and says so.
+//
+// Capitals come from "text-transform", not from the source text, so the
+// casing the editor typed is still what is stored. A component that selects
+// its title by class on whatever level the editor picked
+// ("theme-hero__title", "theme-teaser__title") states "text-transform: none",
+// so a title rendered as "h5" keeps the case its component chose.
+h4,
+h5,
+h6 {
+    line-height: var(--theme-line-height-snug);
+}
+
+h4 {
+    font-size: var(--theme-font-size-md);
+}
+
+h5,
+h6 {
+    letter-spacing: var(--theme-letter-spacing-caps);
+    text-transform: uppercase;
+}
+
+h5 {
+    font-size: var(--theme-font-size-sm);
+}
+
+h6 {
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-xs);
 }
 
 // --- Prose blocks --------------------------------------------------------

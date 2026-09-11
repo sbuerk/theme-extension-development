@@ -1,0 +1,111 @@
+// Panel.
+//
+// Markup contract:
+//
+//     <section class="theme-panel" aria-labelledby="p-instance-title">
+//         <header class="theme-panel__header">
+//             <h3 class="theme-panel__title" id="p-instance-title">…</h3>
+//             <div class="theme-panel__aside">…</div>
+//         </header>
+//         <div class="theme-panel__body">…</div>
+//         <footer class="theme-panel__footer">…</footer>
+//     </section>
+//
+// Header, aside and footer are optional; the body is the panel. "header" and
+// "footer" inside a "section" are not landmarks - they are scoped to it - but
+// a "section" with an accessible name is a region landmark, so a panel that
+// is not a destination of its own takes a "div" instead of the "section".
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- Panel, not card ----------------------------------------------------------
+//
+// The two look related and are not the same thing. A card
+// ("components/_card.scss") is a teaser for content that lives elsewhere: an
+// optional image, a title, a summary and one link, and "--linked" makes the
+// whole card that link. A panel is content that lives *here*, grouped under a
+// heading - a status block, a set of settings, a summary with its own
+// actions. It has no media slot, it is never a link as a whole, and its footer
+// holds controls rather than a "read more". Reaching for a card to get a box
+// around a form is what this component exists to prevent.
+
+.theme-panel {
+    --theme-panel-background: var(--theme-color-surface-raised, #ffffff);
+    --theme-panel-header-background: var(--theme-color-surface, #f4f6fa);
+    --theme-panel-foreground: var(--theme-color-text-primary, #14181f);
+    --theme-panel-border-color: var(--theme-color-border, #d6dce6);
+    --theme-panel-border-width: var(--theme-border-width, 1px);
+    --theme-panel-radius: var(--theme-radius-sm, 5px);
+    --theme-panel-padding: var(--theme-space-4, 1.25rem);
+    --theme-panel-padding-compact: var(--theme-space-3, 0.9375rem);
+    --theme-panel-gap: var(--theme-space-3, 0.9375rem);
+
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    border: var(--theme-panel-border-width) solid var(--theme-panel-border-color);
+    border-radius: var(--theme-panel-radius);
+    background-color: var(--theme-panel-background);
+    color: var(--theme-panel-foreground);
+}
+
+// The one filled part. Its top corners follow the panel's inner radius - the
+// outer one minus the border - rather than clipping the panel with
+// "overflow: hidden", which would also clip the focus ring of anything inside
+// that sits close to the edge.
+.theme-panel__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--theme-panel-gap);
+    padding: var(--theme-panel-padding-compact) var(--theme-panel-padding);
+
+    border-block-end: var(--theme-panel-border-width) solid var(--theme-panel-border-color);
+    border-start-start-radius: calc(var(--theme-panel-radius) - var(--theme-panel-border-width));
+    border-start-end-radius: calc(var(--theme-panel-radius) - var(--theme-panel-border-width));
+    background-color: var(--theme-panel-header-background);
+}
+
+// Selected by class, so the level is the template's choice. Case and colour
+// are stated for the same reason as on ".theme-dialog__title".
+.theme-panel__title {
+    margin: 0;
+    color: var(--theme-panel-foreground);
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+}
+
+// Whatever sits opposite the title - a badge, a small button, a timestamp.
+// Wraps under the title rather than squeezing it when the row runs out.
+.theme-panel__aside {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+}
+
+.theme-panel__body {
+    padding: var(--theme-panel-padding);
+    font-size: var(--theme-font-size-sm);
+
+    > :last-child {
+        margin-block-end: 0;
+    }
+}
+
+// Controls, aligned to the end like a dialog's actions, on a hairline rather
+// than a fill: the header already carries the one tint the panel has.
+.theme-panel__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--theme-space-2, 0.625rem);
+    padding: var(--theme-panel-padding-compact) var(--theme-panel-padding);
+    border-block-start: var(--theme-panel-border-width) solid var(--theme-panel-border-color);
+}

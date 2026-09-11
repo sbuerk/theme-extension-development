@@ -46,23 +46,33 @@ final class ComponentLibraryTest extends UnitTestCase
             'breadcrumb' => '.theme-breadcrumb',
             'button' => '.theme-button',
             'card' => '.theme-card',
+            'close button' => '.theme-close',
             'content element' => '.theme-content-element',
             'content menu' => '.theme-content-menu',
+            'dialog' => '.theme-dialog',
             'gallery' => '.theme-gallery',
             'hero' => '.theme-hero',
             'main navigation' => '.theme-nav-main',
             'sub navigation' => '.theme-nav-sub',
             'pagination' => '.theme-pagination',
+            'panel' => '.theme-panel',
             'quote' => '.theme-quote',
             'display settings' => '.theme-settings',
             'segmented control' => '.theme-segmented',
             'palette swatch' => '.theme-swatch',
             'skip link' => '.theme-skip-link',
             'table' => '.theme-table',
+            'tabs' => '.theme-tabs',
             'teaser' => '.theme-teaser',
+            'display text role' => '.theme-display',
+            'eyebrow text role' => '.theme-eyebrow',
+            'lead text role' => '.theme-lead',
+            'tooltip' => '.theme-tooltip',
             'form field' => '.theme-field',
             'form input' => '.theme-input',
             'form switch' => '.theme-switch',
+            'form choice group' => '.theme-choice-group',
+            'form input group' => '.theme-input-group',
             'form validation summary' => '.theme-form-summary',
             'page' => '.theme-page',
             'site header' => '.theme-site-header',
@@ -129,6 +139,85 @@ final class ComponentLibraryTest extends UnitTestCase
             'Switching the outline off has to remove the CType label as well.',
         );
         $this->assertStringContainsString('[data-theme-content-outline=off] .theme-content-element{', $css);
+    }
+
+    /**
+     * Tabs must leave every panel readable until the script has bound them.
+     *
+     * A tab is a button, and a button does nothing without a script, so tabs
+     * shown without one would strand every panel but the first. The list is
+     * therefore hidden by default, and only shown - and the per-panel headings
+     * only hidden - on the group's own `data-theme-tabs-bound`, which only
+     * "theme.js" sets. Not on `data-js`: that says the inline head script ran,
+     * not that "theme.js" did, and a page whose "theme.js" failed to load would
+     * show tabs that do nothing over panels nobody can reach. Both mistakes
+     * are invisible in every check made with a working script.
+     */
+    #[Test]
+    public function tabsShowEveryPanelUntilTheScriptHasBoundThem(): void
+    {
+        $css = $this->stylesheet();
+
+        $this->assertStringContainsString(
+            '.theme-tabs__list{display:none;',
+            $css,
+            'Until the script has bound the group the tab list must not be rendered, or every panel but the first is out of reach.',
+        );
+        $this->assertStringContainsString('.theme-tabs[data-theme-tabs-bound]>.theme-tabs__list{display:flex}', $css);
+        $this->assertStringContainsString(
+            '.theme-tabs[data-theme-tabs-bound]>.theme-tabs__panel>.theme-tabs__heading{display:none}',
+            $css,
+        );
+        $this->assertStringNotContainsString(
+            '[data-js] .theme-tabs',
+            $css,
+            'The tabs must not be gated on the root marker: it does not say that "theme.js" ran.',
+        );
+    }
+
+    /**
+     * Nothing can open a dialog without a script, so no opener is offered.
+     *
+     * Written as a negation on purpose - an opener is any element, and a rule
+     * showing it again would have to know its `display` - so the assertion is
+     * on the negated selector itself. See "components/_dialog.scss".
+     */
+    #[Test]
+    public function aDialogOpenerIsHiddenWithoutTheScriptMarker(): void
+    {
+        $this->assertStringContainsString(
+            ':root:not([data-js]) [data-theme-dialog-open]{display:none}',
+            $this->stylesheet(),
+            'An opener without the script marker is a button that does nothing.',
+        );
+    }
+
+    /**
+     * @return \Generator<string, array{selector: string}>
+     */
+    public static function titlesRenderedOnAnyHeadingLevel(): \Generator
+    {
+        // "Partials/ContentElement/Hero.html" and "Teaser.html" put these on
+        // h1 to h5, whichever "header_layout" asks for.
+        yield 'hero title' => ['selector' => '.theme-hero__title'];
+        yield 'teaser title' => ['selector' => '.theme-teaser__title'];
+    }
+
+    /**
+     * `h5` and `h6` are set in capitals by the element baseline. A title that
+     * a component selects by class, on whatever level the editor picked, must
+     * not pick that up: "Hero.html" promises that the level changes nothing
+     * about how the title looks, and `text-transform` is a property the class
+     * would otherwise leave to the element.
+     */
+    #[DataProvider('titlesRenderedOnAnyHeadingLevel')]
+    #[Test]
+    public function aTitleOnAnyHeadingLevelKeepsItsOwnCase(string $selector): void
+    {
+        $this->assertMatchesRegularExpression(
+            sprintf('/%s\{[^}]*text-transform:none/', preg_quote($selector, '/')),
+            $this->stylesheet(),
+        );
     }
 
     /**

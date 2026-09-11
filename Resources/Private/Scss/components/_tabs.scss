@@ -1,0 +1,213 @@
+// Tabs.
+//
+// Markup contract:
+//
+//     <div class="theme-tabs">
+//         <div class="theme-tabs__list" role="tablist" aria-label="…">
+//             <button class="theme-tabs__tab" type="button" role="tab" id="t-set" aria-selected="true" aria-controls="t-set-panel">…</button>
+//             <button class="theme-tabs__tab" type="button" role="tab" id="t-static" aria-selected="false" aria-controls="t-static-panel" tabindex="-1">…</button>
+//         </div>
+//         <div class="theme-tabs__panel" id="t-set-panel">
+//             <h3 class="theme-tabs__heading">…</h3>
+//             …
+//         </div>
+//         <div class="theme-tabs__panel" id="t-static-panel">
+//             <h3 class="theme-tabs__heading">…</h3>
+//             …
+//         </div>
+//     </div>
+//
+// Three rules the markup has to keep, because the stylesheet and the script
+// both depend on them:
+//
+//  1. The **first** tab is the selected one, and every other tab carries
+//     "tabindex='-1'" - the roving tab stop of the WAI-ARIA tabs pattern.
+//  2. **A panel carries nothing but its class and its id.** No "hidden",
+//     because a panel hidden in the markup is a panel nobody can read without
+//     the script; and no "role", "aria-labelledby" or "tabindex" either. The
+//     script adds "role='tabpanel'", "aria-labelledby" naming its tab and
+//     "tabindex='0'" when it binds the group. Without the script there is no
+//     tab to label a panel, and a tab panel of tabs nobody can see, with a tab
+//     stop of its own, is an orphan in the accessibility tree and one more
+//     stop in the tab sequence for every panel.
+//  3. Every panel repeats its tab's label as a ".theme-tabs__heading". It is
+//     what labels the panel when there are no tabs to label it - see below.
+//
+// Behaviour - selection on click, the arrow keys, Home and End, automatic
+// activation - is "Resources/Public/JavaScript/theme.js". Selection state is
+// read off "aria-selected" rather than off a class, so the state a screen
+// reader announces and the state this file paints cannot disagree.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- Without the script ---------------------------------------------------------
+//
+// A tab is a "button", and a button does nothing without a script. Tabs that
+// cannot switch would show one panel and strand the others, so the undecorated
+// state is the usable one: the tab list is not rendered, every panel is shown,
+// stacked, each in its own frame and headed by its ".theme-tabs__heading".
+//
+// The gate is the group's own "data-theme-tabs-bound", which the script sets
+// once it has bound that group - not the root's "data-js". "data-js" only says
+// that the inline head script ran; it says nothing about whether "theme.js"
+// loaded after it, and a page gated on it would show tab buttons that do
+// nothing over panels nobody can reach. Bound, the list is shown and the
+// headings are not, since the tab now labels the panel and a heading would say
+// the same thing twice.
+//
+// The price is one reflow: the footer module binds the group after first
+// paint, and the panels that are not selected disappear then. That is accepted
+// deliberately - a jump once on load against content that is out of reach
+// whenever the script fails to load.
+//
+// --- Frame --------------------------------------------------------------------
+//
+// Folder tabs, per the structural variant in DESIGN.md: the selected tab takes
+// the panel's surface and border and opens into it. The rule under the list is
+// an inset "box-shadow" rather than a border, and that is not elevation: it is
+// the one way to draw a line that the selected tab's own background can cover,
+// which is what makes the tab and its panel read as one shape.
+
+.theme-tabs {
+    --theme-tabs-background: var(--theme-color-surface-raised, #ffffff);
+    --theme-tabs-border-color: var(--theme-color-border, #d6dce6);
+    --theme-tabs-border-width: var(--theme-border-width, 1px);
+    --theme-tabs-radius: var(--theme-radius-sm, 5px);
+    --theme-tabs-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-tabs-foreground-hover: var(--theme-color-text-primary, #14181f);
+    --theme-tabs-foreground-selected: var(--theme-color-primary, #0b57d0);
+    --theme-tabs-padding: var(--theme-space-4, 1.25rem);
+    --theme-tabs-stack-gap: var(--theme-space-3, 0.9375rem);
+
+    display: grid;
+    gap: var(--theme-tabs-stack-gap);
+    min-width: 0;
+
+    &[data-theme-tabs-bound] {
+        gap: 0;
+    }
+}
+
+.theme-tabs__list {
+    // See "Without the script" above. First in the block on purpose:
+    // "Tests/Unit/ComponentLibraryTest" asserts this gate on the compiled file.
+    display: none;
+    min-width: 0;
+
+    // A row of long labels scrolls rather than wrapping: a second row of
+    // folder tabs has no panel edge to open into.
+    overflow-x: auto;
+    box-shadow: inset 0 calc(-1 * var(--theme-tabs-border-width)) 0 var(--theme-tabs-border-color);
+
+    .theme-tabs[data-theme-tabs-bound] > & {
+        display: flex;
+    }
+}
+
+.theme-tabs__tab {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+    min-height: var(--theme-tap-target-min);
+    margin: 0;
+    padding-inline: var(--theme-tabs-padding);
+
+    border: var(--theme-tabs-border-width) solid transparent;
+    border-block-end: 0;
+    border-start-start-radius: var(--theme-tabs-radius);
+    border-start-end-radius: var(--theme-tabs-radius);
+    background-color: transparent;
+    color: var(--theme-tabs-foreground);
+
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-tight);
+    white-space: nowrap;
+
+    cursor: pointer;
+    transition: color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        color: var(--theme-tabs-foreground-hover);
+    }
+
+    // The list scrolls, and a scrolling box clips anything drawn outside its
+    // children - which is where the global ring sits. Pulled inside the tab,
+    // the outline stays visible; the shadow half of the ring is clipped and
+    // the outline alone still marks focus.
+    &:focus-visible {
+        outline-offset: calc(-2 * var(--theme-border-width-strong));
+    }
+
+    &[aria-selected='true'] {
+        border-color: var(--theme-tabs-border-color);
+        background-color: var(--theme-tabs-background);
+        color: var(--theme-tabs-foreground-selected);
+    }
+}
+
+// No "display" of its own, and that is load bearing: the script hides a panel
+// with the "hidden" attribute, whose "display: none" lives in the user agent
+// stylesheet and loses to any author "display" on this class.
+.theme-tabs__panel {
+    padding: var(--theme-tabs-padding);
+    border: var(--theme-tabs-border-width) solid var(--theme-tabs-border-color);
+    border-radius: var(--theme-tabs-radius);
+    background-color: var(--theme-tabs-background);
+    font-size: var(--theme-font-size-sm);
+
+    // With tabs, the panel's top edge is the rule under the list.
+    .theme-tabs[data-theme-tabs-bound] > & {
+        border-block-start: 0;
+        border-start-start-radius: 0;
+        border-start-end-radius: 0;
+    }
+
+    > :last-child {
+        margin-block-end: 0;
+    }
+}
+
+// The panel's label while there are no tabs. Selected by class, so the level
+// is the template's choice; case and colour are stated for the same reason as
+// on ".theme-dialog__title". Hidden through the child combinators rather than
+// as a descendant, so a group nested in a bound group's panel keeps the
+// headings of its own until it is bound itself.
+.theme-tabs__heading {
+    margin: 0 0 var(--theme-space-3, 0.9375rem);
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+
+    .theme-tabs[data-theme-tabs-bound] > .theme-tabs__panel > & {
+        display: none;
+    }
+}
+
+// --- Forced colours -----------------------------------------------------------
+//
+// See "Forced colours" in docs/development/component-library.md for the rule
+// every component follows. Here it bites twice: forced colours drop every
+// "box-shadow", which takes the rule under the list with it, and they repaint
+// every background to the canvas colour, which leaves the selected tab
+// looking exactly like the others. The rule becomes a border, and the
+// selected tab takes the system highlight pair - opted out of the repaint,
+// because a system colour is already what the reader's scheme asked for.
+@media (forced-colors: active) {
+    .theme-tabs__list {
+        border-block-end: var(--theme-tabs-border-width) solid CanvasText;
+    }
+
+    .theme-tabs__tab[aria-selected='true'] {
+        forced-color-adjust: none;
+        border-color: Highlight;
+        background-color: Highlight;
+        color: HighlightText;
+    }
+}
