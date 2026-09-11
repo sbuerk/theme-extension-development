@@ -196,16 +196,36 @@ becomes a light tint and `--theme-color-on-primary` becomes the background.
 | `--theme-color-on-secondary`    | `#0f1319` | 9.99 on secondary | —          |
 | `--theme-color-text-primary`    | `#e9edf4` | 15.86             | 14.58      |
 | `--theme-color-text-secondary`  | `#a9b4c5` | 8.89              | 8.17       |
-| `--theme-color-text-muted`      | `#808b9d` | 5.41              | 4.97       |
+| `--theme-color-text-muted`      | `#848fa1` | 5.70              | 5.24       |
 | `--theme-color-border`          | `#29313d` | 1.42              | 1.30       |
 | `--theme-color-border-strong`   | `#5f6c7d` | 3.48              | 3.20       |
 | `--theme-color-success`         | `#4ade80` | 10.69             | 9.82       |
 | `--theme-color-warning`         | `#fbbf24` | 11.16             | 10.25      |
 | `--theme-color-danger`          | `#ff8a80` | 8.16              | 7.50       |
 
+In dark, `--theme-color-surface-raised` is the **lightest** of the three
+backgrounds, not the darkest, so it is where a text colour loses the most
+contrast — and the one the table above does not list. For every text colour but
+one the margin makes that academic. `--theme-color-text-muted` is the exception:
+it sits closest to 4.5:1 by design, and form hints, dates and the current
+breadcrumb item regularly sit on a raised surface. It is therefore held to 4.5:1
+on `--theme-color-surface-raised` as well: `#848fa1` reaches 4.72 there. The
+previous `#808b9d` reached 5.41 and 4.97 against the two listed backgrounds and
+4.48:1 on the raised one (axe reports 4.47), which failed AA without either
+table showing it.
+
 `--theme-color-border` is not required to reach 3:1: it is decorative
 separation, not the boundary of a control. `--theme-color-border-strong` is the
 one to use where a border carries meaning.
+
+**Known gap, not fixed yet:** the same raised surface costs
+`--theme-color-border-strong` its 3:1 in dark. `#5f6c7d` reaches 3.48 and 3.20
+against the two listed backgrounds but only 2.89:1 on
+`--theme-color-surface-raised` — and that is exactly where it is used as the
+hover border of an input (`forms/_controls.scss`), whose background is the
+raised surface. axe does not check non-text contrast, so no test reports it.
+It is to be fixed in a change of its own; light (3.35, 3.10, 3.35) is not
+affected.
 
 ### Semantic colour
 
