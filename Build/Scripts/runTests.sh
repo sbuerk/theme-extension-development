@@ -670,6 +670,11 @@ case ${TEST_SUITE} in
         fi
         ;;
     buildCss)
+        # The sass scripts in "package.json" pass "--no-charset": dart-sass
+        # otherwise starts compressed output containing non-ASCII characters
+        # with a BOM, which breaks the first selector when the file is inlined
+        # or concatenated. Escaping the character does not help, sass writes
+        # the literal. See "docs/development/frontend-assets.md".
         COMMAND="npm ci --no-audit --no-fund && npm run build"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name build-css-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
