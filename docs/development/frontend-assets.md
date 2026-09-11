@@ -13,6 +13,9 @@ Build/Scripts/runTests.sh -s buildCss
 # Check the committed stylesheet still matches its sources, as CI does.
 Build/Scripts/runTests.sh -s checkCssBuild
 
+# Then look at the result: screenshots and axe of the styleguide partials.
+Build/Scripts/runTests.sh -s visual
+
 # Compile with source maps and re-compile on every change. Blocks until ctrl-c.
 Build/Scripts/runTests.sh -s watchCss
 

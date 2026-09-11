@@ -141,7 +141,7 @@ gate behaves identically in CI and on a developer machine.
 The jobs are staged, cheapest and most likely to fail first:
 
 ```
-quality ─┐
+quality ─┬─> visual
 phpstan ─┤         ┌─> acceptance
 lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
          │
@@ -157,6 +157,7 @@ docs ────┘
 | `functional-sqlite` | edge PHP versions × both core versions   | `functional -d sqlite`                                                                    |
 | `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs | `functional` against each database                                                        |
 | `acceptance`        | lowest PHP × both core versions          | `acceptance`: an instance built from nothing, in a browser; uploads the report on failure |
+| `visual`            | lowest PHP, one core version             | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure    |
 | `documentation`     | —                                        | `renderDocumentation`, uploads the artifact                                               |
 
 Two decisions are worth knowing:
@@ -168,7 +169,9 @@ Two decisions are worth knowing:
 - **The version independent gates run once, not per core version and PHP
   version.** They inspect source files rather than the installed core, so
   repeating them tests the same files again. Only `phpstan` is genuinely per
-  core version.
+  core version. `visual` is one job for the same reason: the partials render
+  identically with the Fluid of both dependency sets, and the stylesheet and
+  the browser image are the same — see [Visual tests](../testing/visual-tests.md#in-ci).
 
 ### Why CI passes `-b docker`
 

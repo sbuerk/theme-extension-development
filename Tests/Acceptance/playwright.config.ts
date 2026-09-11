@@ -22,6 +22,9 @@ const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:8000';
 export default defineConfig({
     testDir: '.',
     testMatch: '*.spec.ts',
+    // The visual suite shares this package, and its own configuration, but it
+    // tests static fixtures rather than an instance ("-s visual").
+    testIgnore: 'Visual/**',
     globalSetup: './global-setup.ts',
     outputDir: '../../.Build/acceptance/test-results',
     // One browser at a time, and one PHP worker serving it (runTests.sh). The

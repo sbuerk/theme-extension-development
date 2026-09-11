@@ -4,6 +4,7 @@
     "license": "GPL-2.0-or-later",
     "private": true,
     "devDependencies": {
+        "@axe-core/playwright": "4.13.0",
         "@playwright/test": "1.63.0"
     }
 }
