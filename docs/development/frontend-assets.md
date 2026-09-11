@@ -149,6 +149,37 @@ show the token rather than the value it compiled to.
 Partials are pulled in with `@use` and `@forward`, **never** with `@import`:
 `@import` is deprecated since dart-sass 1.80.0 and is removed in dart-sass 3.0.
 
+## No byte order mark
+
+Every sass script in `package.json` passes `--no-charset`. Without it, dart-sass
+marks output that contains non-ASCII characters, and this stylesheet does: the
+typographic `quotes` in `base/_elements.scss` and the glyphs in
+`forms/_validation.scss`. Compressed output starts with a BOM, expanded output
+with `@charset "UTF-8";`.
+
+A linked stylesheet loses the BOM in the decoder, but an inlined or concatenated
+one keeps it as the character U+FEFF. `includeCSS.*.inline` reads the file
+verbatim into a `<style>`, and so does critical CSS or a shadow root. The first
+selector then reads `U+FEFF:root`, which matches nothing, and the whole token
+block is gone without an error.
+
+Escaping the characters in the SCSS (`content: '\26A0'`) does not help: sass
+1.102.0 writes the literal character for the escape and adds the BOM all the
+same.
+
+Without the mark, the stylesheet still decodes as UTF-8:
+
+- The PHP built-in server of the acceptance suite sends
+  `Content-Type: text/css; charset=UTF-8`.
+- A server that sends no charset leaves the decision to the referring document.
+  TYPO3 renders the page as `text/html; charset=utf-8` with
+  `<meta charset="utf-8">`, and links the stylesheet without a `charset`
+  attribute.
+- UTF-8 is also the last fallback of CSS Syntax Level 3.
+
+`checkBom` covers `theme.css`, and `Tests/Unit/StylesheetTest` asserts that it
+starts without a BOM.
+
 ## Why the compiled CSS is committed
 
 Because nothing builds it downstream. Both distribution paths are exports of
