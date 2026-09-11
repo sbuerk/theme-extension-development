@@ -17,42 +17,46 @@
 
     Ids are all prefixed "sg-form-" so they cannot collide with the ids the
     real page chrome occupies ("content" in "Layouts/Default.html",
-    "nav-main" in "Partials/Navigation/Main.html", "theme-appearance-label"
-    and "theme-palette-label" in "Partials/Page/AppearanceSwitcher.html").
+    "nav-main" in "Partials/Navigation/Main.html", "theme-settings-panel" in
+    "Partials/Page/Settings.html").
 
     The specimens are read from the SCSS, selector by selector, not from what
     a form happens to need:
 
       Resources/Private/Scss/forms/_controls.scss
-        47   .theme-input/.theme-textarea/.theme-select   the shared box
-        76   &:hover
-        83   &:disabled
-        94   .theme-input:read-only, .theme-textarea:read-only
-        100  ::placeholder
-        107  :placeholder-shown                            ellipsis, not a clip
-        112  .theme-textarea                               vertical resize only
-        122  .theme-select
-        123    &[multiple]
-        131    optgroup
-        137    option
-        142  .theme-input[type='color']
-        153    ::-webkit-color-swatch-wrapper
-        157    ::-webkit-color-swatch
-        161    ::-moz-color-swatch
-        168  .theme-input[type='range']
-        183    &:disabled
-        189  .theme-input[type='file']
-        200    ::file-selector-button
-        223    &:hover::file-selector-button
-        227    &:disabled
-        241  .theme-check
-        250    input[type='checkbox'], input[type='radio']
-        263    &:indeterminate                             not demonstrable, see below
-        267    &:disabled
-        272    &:has(input:disabled)
-        279  .theme-fieldset
-        288  .theme-fieldset__legend
-        299  output                                        no class, like "hr"
+        49   .theme-input/.theme-textarea/.theme-select   the shared box
+        78   &:hover
+        85   &:disabled
+        96   .theme-input:read-only, .theme-textarea:read-only
+        102  ::placeholder
+        109  :placeholder-shown                            ellipsis, not a clip
+        114  .theme-textarea                               vertical resize only
+        124  .theme-select
+        125    &[multiple]
+        133    optgroup
+        139    option
+        144  .theme-input[type='color']
+        155    ::-webkit-color-swatch-wrapper
+        159    ::-webkit-color-swatch
+        164    ::-moz-color-swatch
+        170  .theme-input[type='range']
+        185    &:disabled
+        191  .theme-input[type='file']
+        202    ::file-selector-button
+        225    &:hover::file-selector-button
+        229    &:disabled
+        243  .theme-check
+        252    input[type='checkbox'], input[type='radio']
+        265    &:indeterminate                             not demonstrable, see below
+        269    &:disabled
+        274    &:has(input:disabled)
+        295  .theme-switch
+        312    input[type='checkbox']
+        335    &:checked
+        348    &:has(input:disabled)
+        354  .theme-fieldset
+        363  .theme-fieldset__legend
+        374  output                                        no class, like "hr"
 
       Resources/Private/Scss/forms/_field.scss
         30   .theme-form
@@ -172,8 +176,8 @@
             time controls tracks the palette by itself: <code>:root</code> is
             given <code>color-scheme: light dark</code> in
             <code>abstracts/_tokens.scss</code>, and that is what the native
-            icon reads &mdash; flip the appearance switcher in the header and the
-            picker glyphs follow without a rule touching them.
+            icon reads &mdash; switch the appearance in the display settings of the
+            header and the picker glyphs follow without a rule touching them.
         </p>
 
         <form class="theme-form" method="dialog">
@@ -395,6 +399,38 @@
                 <label class="theme-check">
                     <input type="radio" id="sg-form-radio-post" name="sg-form-contact" value="post" disabled="disabled">
                     By post (currently unavailable)
+                </label>
+            </fieldset>
+        </form>
+    </div>
+
+    <h3>Switch</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            A switch is still the native checkbox, drawn as a track and a thumb
+            with <code>appearance: none</code>, and it carries
+            <code>role="switch"</code> so a screen reader announces it as on or
+            off rather than checked. It is meant for a setting that takes effect
+            the moment it is flipped &mdash; the element outlines in the display
+            settings of the header are one &mdash; while a choice that is only
+            sent with the rest of a form stays a checkbox.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <fieldset class="theme-fieldset">
+                <legend class="theme-fieldset__legend">Preferences</legend>
+                <label class="theme-switch">
+                    <input type="checkbox" role="switch" id="sg-form-switch-digest" name="sg-form-switch-digest" checked="checked">
+                    <span>Weekly digest</span>
+                </label>
+                <label class="theme-switch">
+                    <input type="checkbox" role="switch" id="sg-form-switch-beta" name="sg-form-switch-beta">
+                    <span>Try new features early</span>
+                </label>
+                <label class="theme-switch">
+                    <input type="checkbox" role="switch" id="sg-form-switch-sync" name="sg-form-switch-sync" disabled="disabled">
+                    <span>Sync across devices (currently unavailable)</span>
                 </label>
             </fieldset>
         </form>

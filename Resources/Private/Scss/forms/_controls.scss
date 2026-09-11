@@ -19,11 +19,13 @@
 //         <fieldset class="theme-fieldset">
 //             <legend class="theme-fieldset__legend">…</legend>
 //             <label class="theme-check"><input type="checkbox"> …</label>
+//             <label class="theme-switch"><input type="checkbox" role="switch"> <span>…</span></label>
 //         </fieldset>
 //     </form>
 //
 // This file styles the native controls only: ".theme-input", ".theme-textarea",
-// ".theme-select", ".theme-check", ".theme-fieldset" and "output". Field
+// ".theme-select", ".theme-check", ".theme-switch", ".theme-fieldset" and
+// "output". Field
 // chrome (label, hint, required marker, layout) is "_field.scss"; error and
 // success painting is "_validation.scss" - a control here never mentions
 // "invalid" or "danger" directly, it only exposes the custom properties
@@ -273,6 +275,103 @@
         color: var(--theme-color-text-muted, #616b80);
         opacity: var(--theme-opacity-disabled);
         cursor: not-allowed;
+    }
+}
+
+// Switch: a checkbox with "role='switch'", for a setting that is on or off
+// and takes effect the moment it is flipped - the content-element outline in
+// the display settings, for one. A choice that is only submitted with the
+// rest of a form stays a ".theme-check".
+//
+// Still the native checkbox, only drawn differently: "appearance: none"
+// hands its box over to this rule, and it keeps focus, Space, form
+// submission and the checked state of the element. "role='switch'" is what
+// makes a screen reader announce "on"/"off" instead of "checked"; it belongs
+// in the markup, this rule does not depend on it.
+//
+// The thumb is a radial gradient on the input itself rather than a pseudo
+// element: "::before" and "::after" are not rendered on an input in every
+// engine, a background is.
+.theme-switch {
+    --theme-switch-track-inline-size: var(--theme-space-7, 2.5rem);
+    --theme-switch-track-block-size: var(--theme-space-5, 1.5625rem);
+    --theme-switch-track-background: var(--theme-color-surface, #f4f6fa);
+    --theme-switch-track-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-switch-thumb-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-switch-track-background-checked: var(--theme-color-primary, #0b57d0);
+    --theme-switch-thumb-color-checked: var(--theme-color-on-primary, #ffffff);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+    min-height: var(--theme-tap-target-min);
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    cursor: pointer;
+
+    input[type='checkbox'] {
+        appearance: none;
+        flex: none;
+        inline-size: var(--theme-switch-track-inline-size);
+        block-size: var(--theme-switch-track-block-size);
+        margin: 0;
+
+        border: var(--theme-border-width, 1px) solid var(--theme-switch-track-border-color);
+        border-radius: var(--theme-radius-full, 9999px);
+        background-color: var(--theme-switch-track-background);
+
+        // The thumb fills the track's inner height; its position is the state.
+        background-image: radial-gradient(circle closest-side, var(--theme-switch-thumb-color) 0 68%, transparent 72%);
+        background-position: left center;
+        background-repeat: no-repeat;
+        background-size: auto 100%;
+
+        cursor: pointer;
+        transition:
+            background-position var(--theme-duration-base) var(--theme-easing-standard),
+            background-color var(--theme-duration-fast) var(--theme-easing-standard),
+            border-color var(--theme-duration-fast) var(--theme-easing-standard);
+
+        &:checked {
+            --theme-switch-thumb-color: var(--theme-switch-thumb-color-checked);
+
+            border-color: var(--theme-switch-track-background-checked);
+            background-color: var(--theme-switch-track-background-checked);
+            background-position: right center;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    &:has(input:disabled) {
+        opacity: var(--theme-opacity-disabled);
+        cursor: not-allowed;
+    }
+
+    // In a forced colours mode the browser drops the gradient that draws the
+    // thumb and forces the track to "Canvas" in both states, so on and off
+    // look the same - and "appearance: none" leaves no native widget to fall
+    // back on. The input opts out and paints itself with system colours
+    // instead, which follow the reader's contrast theme: a "CanvasText" thumb
+    // on a "Canvas" track when off, a "HighlightText" thumb on a "Highlight"
+    // track when on. The focus outline is re-pointed the same way, since
+    // opted out it would keep the palette's primary colour.
+    @media (forced-colors: active) {
+        --theme-switch-track-background: Canvas;
+        --theme-switch-track-border-color: CanvasText;
+        --theme-switch-thumb-color: CanvasText;
+        --theme-switch-track-background-checked: Highlight;
+        --theme-switch-thumb-color-checked: HighlightText;
+
+        input[type='checkbox'] {
+            forced-color-adjust: none;
+
+            &:focus-visible {
+                outline-color: Highlight;
+            }
+        }
     }
 }
 

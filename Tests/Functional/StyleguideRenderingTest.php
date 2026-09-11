@@ -57,9 +57,10 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
      *
      * Some of the entries are satisfied by the page frame rather than by a
      * specimen: `.theme-page`, `.theme-site-header`, `.theme-site-footer`,
-     * `.theme-skip-link` and `.theme-appearance-switcher` are chrome this page
-     * carries like any other. That is not a loophole - they *are* demonstrated
-     * on the page, which is what this asserts.
+     * `.theme-skip-link`, and `.theme-settings` with the `.theme-segmented`
+     * and `.theme-swatch` controls inside it, are chrome this page carries
+     * like any other. That is not a loophole - they *are* demonstrated on the
+     * page, which is what this asserts.
      *
      * @return \Generator<string, array{selector: string}>
      */

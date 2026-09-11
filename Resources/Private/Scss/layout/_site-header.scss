@@ -17,7 +17,22 @@
 //
 // See "components/_button.scss" for why every component declares its own
 // token layer with a fallback.
+//
+// --- One row, at every width --------------------------------------------------
+//
+// Brand, main navigation and the actions slot share one row. Above "bp.$md"
+// the navigation does not shrink, so when the row gets tight it is the brand
+// that wraps onto a second line, never the menu. Below it the row holds the
+// brand, the menu toggle and the settings cog, and the menu - once its toggle
+// is expanded - drops down under the header as a full-width band instead of
+// unfolding inside the narrow slot the toggle occupies, which would squeeze
+// it next to the cog.
+//
+// That drop-down is gated behind "data-js" like the collapse itself (see
+// "components/_nav-main.scss"): without a script the list stays in the flow,
+// always open, and would otherwise lie on top of the page permanently.
 
+@use '../abstracts/breakpoints' as bp;
 @use '../abstracts/mixins' as mixins;
 
 .theme-site-header {
@@ -26,10 +41,19 @@
     --theme-site-header-gap: var(--theme-space-4, 1.25rem);
     --theme-site-header-padding-block: var(--theme-space-3, 0.9375rem);
 
+    // The anchor of the drop-down menu below "bp.$md". "--sticky" replaces it
+    // with "sticky", which anchors an absolutely positioned descendant just
+    // the same.
+    position: relative;
+
     // Bottom hairline only: the header is a band, not a card, so it does not
     // also get a top or side border.
     border-block-end: var(--theme-border-width) solid var(--theme-site-header-border-color);
     background-color: var(--theme-site-header-background);
+
+    @media (max-width: bp.$md-max) {
+        --theme-site-header-gap: var(--theme-space-3, 0.9375rem);
+    }
 }
 
 // Sticky is a modifier on the outer element, not on "__inner": the border and
@@ -60,6 +84,12 @@
 
     &:hover {
         color: var(--theme-color-primary, #0b57d0);
+    }
+
+    // Beside a toggle and a cog on a phone, the large size wraps the site
+    // title onto four lines.
+    @media (max-width: bp.$md-max) {
+        font-size: var(--theme-font-size-md, 1rem);
     }
 }
 
@@ -98,8 +128,33 @@
     }
 }
 
+// The menu keeps its row above the breakpoint - see "One row" above.
+@media (min-width: bp.$md) {
+    .theme-site-header .theme-nav-main {
+        flex-shrink: 0;
+    }
+}
+
+// The expanded menu below the breakpoint, as a band under the header - see
+// "One row" above. Only positioned here: whether it shows at all is still the
+// collapse rule of "components/_nav-main.scss".
+@media (max-width: bp.$md-max) {
+    [data-js] .theme-site-header .theme-nav-main > .theme-nav-main__list {
+        position: absolute;
+        inset-block-start: 100%;
+        inset-inline: 0;
+        z-index: var(--theme-z-overlay);
+        align-items: flex-start;
+        width: auto;
+        padding: var(--theme-space-2) var(--theme-space-4);
+        border-block-end: var(--theme-border-width) solid var(--theme-site-header-border-color);
+        background-color: var(--theme-site-header-background);
+    }
+}
+
 .theme-site-header__actions {
     display: flex;
+    flex: none;
     align-items: center;
     gap: var(--theme-space-3, 0.9375rem);
 }
