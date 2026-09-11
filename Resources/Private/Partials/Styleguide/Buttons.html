@@ -14,16 +14,24 @@
     elements happen to use:
 
       Resources/Private/Scss/components/_button.scss
-        27   .theme-button                 base, primary fill
-        66   &:hover                       re-points to the "-hover" tokens
-        74   &:disabled                    the control spelling
-        75   &[aria-disabled='true']       the link spelling
-        82   .theme-button--secondary      outlined, plus its own :hover rule
-        95   .theme-button--ghost          borderless, plus its own :hover rule
-        110  .theme-button--danger         destructive
-        116  .theme-button--small
-        126  .theme-button--large
-        134  .theme-button-group           the row wrapper
+        36   .theme-button                 base, primary fill
+        75   &:hover                       re-points to the "-hover" tokens
+        83   &:disabled                    the control spelling
+        84   &[aria-disabled='true']       the link spelling
+        91   .theme-button--secondary      outlined, plus its own :hover rule
+        104  .theme-button--ghost          borderless, plus its own :hover rule
+        119  .theme-button--danger         destructive
+        125  .theme-button--small
+        135  .theme-button--large
+        145  .theme-button--link           underlined, no fill, no border
+        162  .theme-button--icon           square, glyph only, in every size
+        184  [aria-pressed='true']         a toggle that is on, plus its :hover
+        208  [aria-busy='true']            the spinner, and its keyframes at 226
+        234  .theme-button-group           the row wrapper
+        253  .theme-button-group--attached one control in several parts
+
+      Resources/Private/Scss/components/_close.scss
+        .theme-close                       the close button, its own component
 
       Resources/Private/Scss/components/_badge.scss
         24   .theme-badge                  base, soft fill, info severity
@@ -38,7 +46,7 @@
     _reset.scss:58, so a button that styled its own would be overriding a
     global accessibility decision rather than implementing one.
 
-    The rows below are ".theme-button-group" (_button.scss:134) so that each
+    The rows below are ".theme-button-group" (_button.scss:234) so that each
     specimen sits next to the class that produced it - which demonstrates that
     component as a side effect rather than needing a row of its own.
 </f:comment>
@@ -63,6 +71,10 @@
             <button class="theme-button theme-button--danger" type="button">Delete account</button>
             <span class="theme-styleguide__label"><code>.theme-button--danger</code> — destructive. Deliberately the same shape as the default: the colour carries the warning, and a different shape would only make it harder to recognise as a button at all.</span>
         </div>
+        <div class="theme-button-group">
+            <a class="theme-button theme-button--link" href="#">Read the changelog</a>
+            <span class="theme-styleguide__label"><code>.theme-button--link</code> — no fill and no border, underlined in the accent. For an action that sits among real controls without competing with them, such as a reset beside a form's buttons, and it keeps the 44 pixel target a plain text link does not have.</span>
+        </div>
     </div>
 
     <h3>Sizes</h3>
@@ -81,9 +93,44 @@
         </div>
     </div>
 
+    <h3>Icon buttons and the close button</h3>
+    <div class="theme-styleguide__specimen">
+        <p><code>.theme-button--icon</code> is square: the 44 pixel target in both directions, with a glyph as its only content. The glyph is decoration and hidden from assistive technology, and the name is <code>aria-label</code> on the button — an icon button with neither has no accessible name at all. It combines with every variant.</p>
+        <div class="theme-button-group">
+            <button class="theme-button theme-button--icon" type="button" aria-label="Search the styleguide">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <circle cx="11" cy="11" r="6"/>
+                    <path d="M15.5 15.5 20 20"/>
+                </svg>
+            </button>
+            <button class="theme-button theme-button--secondary theme-button--icon" type="button" aria-label="Copy the link to this section">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/>
+                    <path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/>
+                </svg>
+            </button>
+            <button class="theme-button theme-button--ghost theme-button--icon" type="button" aria-label="Show more actions">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true" focusable="false">
+                    <path d="M6 12h.01M12 12h.01M18 12h.01"/>
+                </svg>
+            </button>
+            <button class="theme-button theme-button--secondary theme-button--icon theme-button--large" type="button" aria-label="Search the styleguide, the large size">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <circle cx="11" cy="11" r="6"/>
+                    <path d="M15.5 15.5 20 20"/>
+                </svg>
+            </button>
+            <span class="theme-styleguide__label">In order: the default, <code>--secondary</code> and <code>--ghost</code>, each combined with <code>--icon</code>, and <code>--secondary</code> once more with <code>--large</code> as well, which stays the same square: the size modifiers change the padding, and the icon button pins its box.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-close" type="button" aria-label="Close the specimen"></button>
+            <span class="theme-styleguide__label"><code>.theme-close</code> — a component of its own rather than one more button modifier: no fill, no border, no label, and a negative margin that lines up the glyph, not the invisible target around it, with the content edge. The cross is two borders, so it survives forced colours mode. It belongs in a dialog or panel header; the Interactive section shows it in the dialog.</span>
+        </div>
+    </div>
+
     <h3>States</h3>
     <div class="theme-styleguide__specimen">
-        <p>Two of the four states a button has cannot be put into markup: no attribute freezes a pseudo-class. They are named here so that a reader knows they exist and can reach them, because a state nobody can see is a state nobody reviews.</p>
+        <p>Two of the states a button has cannot be put into markup: no attribute freezes a pseudo-class. They are named here so that a reader knows they exist and can reach them, because a state nobody can see is a state nobody reviews.</p>
         <div class="theme-button-group">
             <button class="theme-button" type="button">Hover me</button>
             <span class="theme-styleguide__label"><code>:hover</code> — point at this button. Background, border and text colour move to the component's own hover tokens; nothing about the box changes, so the button does not shift the layout under the pointer.</span>
@@ -103,6 +150,14 @@
         <div class="theme-button-group">
             <button class="theme-button theme-button--ghost theme-button--small" type="button" disabled>Undo</button>
             <span class="theme-styleguide__label">Disabled combines with every other modifier, because it changes opacity and cursor only and leaves the token layer alone.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-button theme-button--ghost" type="button" aria-pressed="true">Show outlines</button>
+            <span class="theme-styleguide__label"><code>[aria-pressed="true"]</code> — a toggle that is on. It takes the filled default, so it shows on <code>--secondary</code> and <code>--ghost</code>, the variants a toggle is drawn in; a filled button has no further step to show and should not be a toggle. An attribute rather than a class, like disabled, because it is what a screen reader announces. Pressing this one changes nothing: the state is the one a template would render.</span>
+        </div>
+        <div class="theme-button-group">
+            <button class="theme-button" type="button" aria-busy="true" aria-disabled="true">Saving…</button>
+            <span class="theme-styleguide__label"><code>[aria-busy="true"]</code> — working. A spinner before the label, and the label says what is happening, because the spinner tells a screen reader nothing. Busy does not stop a click, so it is paired with <code>aria-disabled</code>. With reduced motion requested, the spinner stands still.</span>
         </div>
     </div>
 
@@ -133,6 +188,12 @@
             <a class="theme-button" href="#">Save and publish</a>
             <button class="theme-button theme-button--secondary" type="button">Save as draft</button>
             <button class="theme-button theme-button--ghost" type="button">Discard changes</button>
+        </div>
+        <p><code>.theme-button-group--attached</code> is one control in several parts: the buttons join edge to edge, only the outer corners stay round, and the row does not wrap, because a segmented control broken over two lines is two controls. The button whose border means something right now — hovered, focused or pressed — takes the shared edge. These three are static: pressing one changes nothing, <code>aria-pressed</code> is the state a template would render.</p>
+        <div class="theme-button-group theme-button-group--attached" role="group" aria-label="Specimen: preview width">
+            <button class="theme-button theme-button--secondary" type="button" aria-pressed="true">Desktop</button>
+            <button class="theme-button theme-button--secondary" type="button" aria-pressed="false">Tablet</button>
+            <button class="theme-button theme-button--secondary" type="button" aria-pressed="false">Phone</button>
         </div>
     </div>
 

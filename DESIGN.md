@@ -60,16 +60,37 @@ as leftovers and ignored.
 | Heading 1       | sans   | 800    | 2.125rem / 34px                                     | 1.5         | +0.05em  |
 | Heading 2       | sans   | 800    | 1.5rem / 24px                                       | 1.3         | +0.05em  |
 | Heading 3       | sans   | 500    | 1.25rem / 20px                                      | 1.3         | +0.05em  |
+| Heading 4       | sans   | 800    | 1rem / 16px                                         | 1.3         | +0.05em  |
+| Heading 5       | sans   | 800    | 0.875rem / 14px, capitals                           | 1.3         | +0.08em  |
+| Heading 6       | sans   | 800    | 0.75rem / 12px, capitals, secondary ink             | 1.3         | +0.08em  |
+| Lead            | sans   | 400    | 1.25rem / 20px, secondary ink, held to the measure  | 1.6         | 0        |
+| Eyebrow         | sans   | 800    | 0.75rem / 12px, capitals, primary accent            | 1.3         | +0.08em  |
 | Body            | sans   | 400    | 1rem / 16px                                         | 1.6         | 0        |
 | Label / control | sans   | 500    | 0.875rem / 14px                                     | 1.1         | +0.05em  |
 | Caption         | sans   | 500    | 0.75rem / 12px                                      | 1.5         | +0.05em  |
 | Mono            | mono   | 400    | 0.9375rem / 15px                                    | 1.5         | 0        |
 
+**Heading 4 to 6, Lead and Eyebrow are authored**, not measured, and none of
+them adds a size to the scale. Heading 4 lands on the body size and Heading 5
+and 6 on the two steps below it, which is exactly why size cannot carry them:
+an H4 at 16px is the size of the paragraph under it, so it takes weight 800;
+below the body size a mixed-case heading reads as small print, so H5 and H6 are
+set in capitals and tracked wider, and H6 drops to secondary ink as the least
+important level. `text-transform` does the capitals, so the casing an editor
+typed is what stays in the content.
+
+Display, Lead and Eyebrow are roles, not elements. A heading level says where
+something sits in the outline, not how loud it is, so the three are classes —
+`.theme-display`, `.theme-lead`, `.theme-eyebrow` in
+`components/_text.scss` — applied to whatever element the outline asks for.
+
 **Tracking is positive.** `+0.05em` is the reference's signature and perfectly
 consistent across it — 0.8px at 16, 1.7px at 34, 0.6px at 12, 2.7px at 54, all
 exactly 0.05em. Body prose is the exception at 0. This is
 worth stating because the reflex for display type is to track *in*; this design
-tracks *out*.
+tracks *out*. Text set in capitals is the one step wider, `+0.08em`
+(`--theme-letter-spacing-caps`, authored): H5, H6 and the eyebrow, and nothing
+set in mixed case.
 
 **Line heights are the explicitly set ones only.** The reference also carries
 values of ~1.255, which its editor reports as an *automatic* line height — that
@@ -105,7 +126,8 @@ Weights: `400` regular, `500` medium, `800` bold. There is no 600 or 700 in the
 reference. A system font may synthesise 800 or clamp it to its boldest weight.
 
 Line heights: `tight` 1.1, `snug` 1.3, `heading` 1.5, `base` 1.6, `mono` 1.5.
-Tracking: `wide` 0.05em, `none` 0. Measure: 68ch (authored).
+Tracking: `wide` 0.05em, `caps` 0.08em (authored), `none` 0. Measure: 68ch
+(authored).
 
 `--theme-line-height-mono` is 1.5, the same number as `heading` — and it is a
 separate token precisely because that is a coincidence. Sharing one would mean
@@ -249,6 +271,46 @@ say so.
 Accent-on-tint clears 4.5:1 in every combination (lowest: warning light, 5.25),
 and so does body text on a tint (lowest: dark warning, 13.49). Solid fills clear
 4.5:1 with their `on-*` foreground (lowest: warning light, 5.93).
+
+### Alert asides
+
+Two alert kinds are not severities, and neither gets a semantic colour of its
+own. `--note` sits on `--theme-color-surface` with `--theme-color-text-secondary`
+as its accent: 6.97 light and 8.17 dark against that surface, and body text on
+it at 16.45 and 14.58 — values of the neutral tables above. `--tip` follows the
+palette. Its accent is `--theme-color-secondary`, and its tint is **derived, not
+declared**:
+
+```css
+color-mix(in oklab, var(--theme-color-secondary) 12%, var(--theme-color-background))
+```
+
+A palette varies accents only. A declared `--theme-color-secondary-surface`
+would be one more colour for every palette to author, and a second copy of the
+accent that could drift away from it; mixed from the accent, the tint cannot.
+
+Computed, not estimated — the mix in Oklab, converted to sRGB, against the
+background of its own appearance:
+
+| Palette | Appearance | Tint      | Accent on tint | Text on tint |
+|---------|------------|-----------|----------------|--------------|
+| neutral | light      | `#e4eeed` | 4.63           | 15.04        |
+| neutral | dark       | `#18262a` | 8.35           | 13.26        |
+| ember   | light      | `#efe9e2` | 5.62           | 14.78        |
+| ember   | dark       | `#242524` | 9.01           | 13.13        |
+| ocean   | light      | `#e4edee` | 5.08           | 14.91        |
+| ocean   | dark       | `#19262c` | 8.47           | 13.24        |
+| moss    | light      | `#eaebe3` | 5.44           | 14.83        |
+| moss    | dark       | `#212624` | 9.33           | 13.07        |
+| violet  | light      | `#f6e6ed` | 5.49           | 14.81        |
+| violet  | dark       | `#26202a` | 7.14           | 13.50        |
+
+The accent is the leading border and the icon, which WCAG 1.4.11 holds to 3:1;
+it clears 4.5:1 in every combination (lowest: neutral light, 4.63). Title and
+body text are `--theme-color-text-primary` on the tint (lowest: moss dark,
+13.07). `Tests/Acceptance/styleguide.spec.ts` paints the tip in every palette
+and both appearances and compares the pixel with the tint recorded here, which
+is what holds this table to the formula in `components/_alert.scss`.
 
 `--theme-color-overlay` is the scrim behind a modal or an off-canvas panel:
 `rgb(20 24 31 / 55%)` light, `rgb(0 0 0 / 65%)` dark.

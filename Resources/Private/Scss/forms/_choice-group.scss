@@ -1,0 +1,45 @@
+// Choice group: a set of checkboxes or radio buttons answering one question.
+//
+// Markup contract (one part of the form contract in "_controls.scss"):
+//
+//     <fieldset class="theme-fieldset">
+//         <legend class="theme-fieldset__legend">…</legend>
+//         <div class="theme-choice-group theme-choice-group--inline">
+//             <label class="theme-check"><input type="radio" name="f-contact" value="mail"> …</label>
+//             <label class="theme-check"><input type="radio" name="f-contact" value="phone"> …</label>
+//         </div>
+//     </fieldset>
+//
+// Modifier: --inline, the choices in a row that wraps. Without it they stack.
+//
+// The question is the "legend": a "fieldset" is the one grouping the browser
+// announces with its label and needs no ARIA for. Where the group must not
+// carry the fieldset's frame, the same group sits in a ".theme-field" instead,
+// with the question as its ".theme-field__label" - a "span", since there is
+// no single control for a "label" to point at - and the group itself carries
+// "role='radiogroup'" (or "group" for checkboxes) and "aria-labelledby"
+// pointing at that span.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+// Stacked, and with no gap: every ".theme-check" already carries the 44px
+// target floor, which is spacing enough, and a list of ten options stays
+// compact without any of them dropping below the target size. "flex-start"
+// keeps each label as wide as its text, so the click target is the label and
+// not the empty row beside it.
+.theme-choice-group {
+    --theme-choice-group-gap-inline: var(--theme-space-4, 1.25rem);
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.theme-choice-group--inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--theme-choice-group-gap-inline);
+}

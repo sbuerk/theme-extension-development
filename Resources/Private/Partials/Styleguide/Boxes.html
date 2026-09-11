@@ -3,7 +3,7 @@
 
 <f:comment>
     Styleguide section D1 "Boxes": the box shaped content components of the
-    library - card, teaser, hero, quote, alert, accordion, author - each with
+    library - card, panel, teaser, hero, quote, alert, accordion, author - each with
     every modifier its own SCSS file defines, not only the ones a content
     element happens to use.
 
@@ -150,6 +150,44 @@
                     <a class="theme-card__link" href="#">Third of three</a>
                 </div>
             </article>
+        </div>
+    </div>
+
+    <h3>Panel</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_panel.scss. No
+            modifiers. Header, aside and footer are optional, which is why the
+            second specimen carries a body and nothing else.
+
+            The first panel is a "section" labelled by its title, which makes
+            it a region landmark; the second is a "div", the shape the contract
+            gives a panel that is not a destination of its own. The title is
+            "h4" for the outline reason at the top of this file. It sits
+            directly after the card on purpose: the two look related, and the
+            comparison is what says they are not the same component.
+        </f:comment>
+        <section class="theme-panel" aria-labelledby="sg-panel-instance-title">
+            <header class="theme-panel__header">
+                <h4 class="theme-panel__title" id="sg-panel-instance-title">Panel, with every part</h4>
+                <div class="theme-panel__aside">
+                    <span class="theme-badge theme-badge--success">Seeded</span>
+                </div>
+            </header>
+            <div class="theme-panel__body">
+                <p>Grouped content that lives here, rather than a teaser for content that lives somewhere else: a status block, a set of settings, a summary with actions of its own. The header is the one tinted part, and the badge opposite the title wraps under it when the row runs out of room.</p>
+            </div>
+            <footer class="theme-panel__footer">
+                <button class="theme-button theme-button--secondary theme-button--small" type="button">Flush caches</button>
+                <button class="theme-button theme-button--danger theme-button--small" type="button">Reseed</button>
+            </footer>
+        </section>
+    </div>
+    <div class="theme-styleguide__specimen">
+        <div class="theme-panel">
+            <div class="theme-panel__body">
+                <p>A panel with a body and nothing else is still a panel: a hairline frame on the raised surface, with no media slot, and no link stretched over the whole box the way a linked card has one.</p>
+            </div>
         </div>
     </div>
 
@@ -346,6 +384,40 @@
             <div class="theme-alert__body">
                 <p class="theme-alert__title">Danger</p>
                 <p class="theme-alert__text">Something failed or is about to. The four variants differ in nothing but the tint, the leading border and the icon accent - which is why each of them carries its own glyph rather than one shared symbol.</p>
+            </div>
+        </div>
+
+        <f:comment>
+            The two asides, "--note" and "--tip", after the four severities.
+            Neither is a message about the page, so neither is a live region:
+            both take "role=note", as the contract in "_alert.scss" states. The
+            tip is the one kind that follows the palette - switch the palette
+            in the header and its tint and accent move while every other alert
+            stays as it is.
+        </f:comment>
+        <div class="theme-alert theme-alert--note" role="note">
+            <span class="theme-alert__icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3.5" y="2" width="9" height="12" rx="1.5"/>
+                    <path d="M6 5.5h4M6 8h4M6 10.5h2.25"/>
+                </svg>
+            </span>
+            <div class="theme-alert__body">
+                <p class="theme-alert__title">Note</p>
+                <p class="theme-alert__text">An aside to the text around it rather than a message about the page, on the surface panels already sit on, with the secondary ink as its accent. It takes the note role and not a live region, because nothing about it ever changes.</p>
+            </div>
+        </div>
+
+        <div class="theme-alert theme-alert--tip" role="note">
+            <span class="theme-alert__icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 2a4 4 0 0 0-2.25 7.3V11h4.5V9.3A4 4 0 0 0 8 2Z"/>
+                    <path d="M6.25 13.5h3.5"/>
+                </svg>
+            </span>
+            <div class="theme-alert__body">
+                <p class="theme-alert__title">Tip</p>
+                <p class="theme-alert__text">A recommendation, and the one kind that follows the palette: its accent is the palette's secondary, and its tint is mixed from that accent in the stylesheet. Switch the palette in the header and this is the only alert that changes colour.</p>
             </div>
         </div>
     </div>

@@ -31,23 +31,33 @@ against, and the rename was cheap while only one template depended on it.
 | Breadcrumb              | `.theme-breadcrumb`       | `components/_breadcrumb.scss`      |
 | Button                  | `.theme-button`           | `components/_button.scss`          |
 | Card                    | `.theme-card`             | `components/_card.scss`            |
+| Close button            | `.theme-close`            | `components/_close.scss`           |
 | Content element wrapper | `.theme-content-element`  | `components/_content-element.scss` |
 | Content menu            | `.theme-content-menu`     | `components/_content-menu.scss`    |
 | Display settings        | `.theme-settings`         | `components/_settings.scss`        |
+| Dialog                  | `.theme-dialog`           | `components/_dialog.scss`          |
 | Gallery                 | `.theme-gallery`          | `components/_gallery.scss`         |
 | Hero                    | `.theme-hero`             | `components/_hero.scss`            |
 | Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`        |
 | Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`         |
 | Pagination              | `.theme-pagination__list` | `components/_pagination.scss`      |
+| Panel                   | `.theme-panel`            | `components/_panel.scss`           |
 | Quote                   | `.theme-quote`            | `components/_quote.scss`           |
 | Segmented control       | `.theme-segmented`        | `components/_settings.scss`        |
 | Palette swatch          | `.theme-swatch`           | `components/_settings.scss`        |
 | Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`       |
 | Table                   | `.theme-table-wrapper`    | `components/_table.scss`           |
+| Tabs                    | `.theme-tabs`             | `components/_tabs.scss`            |
 | Teaser                  | `.theme-teaser`           | `components/_teaser.scss`          |
+| Text: display           | `.theme-display`          | `components/_text.scss`            |
+| Text: eyebrow           | `.theme-eyebrow`          | `components/_text.scss`            |
+| Text: lead              | `.theme-lead`             | `components/_text.scss`            |
+| Tooltip                 | `.theme-tooltip`          | `components/_tooltip.scss`         |
 | Form controls           | `.theme-input`            | `forms/_controls.scss`             |
 | Form switch             | `.theme-switch`           | `forms/_controls.scss`             |
 | Form field wrapper      | `.theme-field`            | `forms/_field.scss`                |
+| Form choice group       | `.theme-choice-group`     | `forms/_choice-group.scss`         |
+| Form input group        | `.theme-input-group`      | `forms/_input-group.scss`          |
 | Form validation         | `.theme-field--invalid`   | `forms/_validation.scss`           |
 | Page frame              | `.theme-page`             | `layout/_page.scss`                |
 | Site header             | `.theme-site-header`      | `layout/_site-header.scss`         |
@@ -58,7 +68,7 @@ against, and the rename was cheap while only one template depended on it.
 `__ellipsis` are styled, current-page state comes from `[aria-current="page"]`
 rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
-asserts every one of the twenty-nine selectors above is actually compiled into
+asserts every one of the thirty-nine selectors above is actually compiled into
 `Resources/Public/Css/theme.css`. The palette swatch is covered twice over,
 because it duplicates colour that lives in `abstracts/_palettes.scss` and
 `abstracts/_tokens.scss` — see
@@ -155,11 +165,21 @@ Accordion, built on native `<details>`/`<summary>` — a shared `name` on every
 </div>
 ```
 
-Alert. Modifiers `--info` (default), `--success`, `--warning`, `--danger`.
-`role` is a markup concern the stylesheet does not touch, and it is **not the
-same for all four**: `--info` and `--success` take `role="status"`, a polite
-live region that waits for a pause; `--warning` and `--danger` take
-`role="alert"`, which interrupts:
+Alert. Modifiers `--info` (default), `--success`, `--warning`, `--danger` — the
+four severities — and `--note` and `--tip`, the two asides. `role` is a markup
+concern the stylesheet does not touch, and it is **not the same for all six**:
+
+| Modifier    | Is                                                      | `role`                                |
+|-------------|---------------------------------------------------------|---------------------------------------|
+| `--info`    | information; also the look of the bare class            | `status` — polite, waits for a pause  |
+| `--success` | something finished                                      | `status`                              |
+| `--warning` | needs attention before it becomes a problem             | `alert` — assertive, interrupts       |
+| `--danger`  | something failed                                        | `alert`                               |
+| `--note`    | an aside to the text around it                          | `note`, or none — never a live region |
+| `--tip`     | a recommendation; the one kind that follows the palette | `note`, or none                       |
+
+A note or a tip is not a message about the page and never changes, so there is
+nothing a live region could announce:
 
 ```html
 <div class="theme-alert theme-alert--warning" role="alert">
@@ -170,6 +190,13 @@ live region that waits for a pause; `--warning` and `--danger` take
     </div>
 </div>
 ```
+
+`--tip` takes the palette's secondary accent, and its tint is mixed from that
+accent in the stylesheet — `color-mix(in oklab, secondary 12%, background)` —
+rather than read from a surface token: a palette varies accents only, and a
+surface token would be one more colour for every palette to author, and a copy
+that could drift from the accent. Its contrast in every palette and both
+appearances is recorded in [`DESIGN.md`](../../DESIGN.md#alert-asides).
 
 Author — a person: portrait, name, role and links. The name is not part of
 this markup at all: it is the content element's own heading, rendered through
@@ -197,27 +224,59 @@ Badge. Two independent axes — severity (`--info`, `--success`, `--warning`,
 <span class="theme-badge theme-badge--solid theme-badge--danger">…</span>
 ```
 
-Button. Variants `--secondary`, `--ghost` and `--danger`; sizes `--small` and
-`--large`. It is used both as an `<a>` and as a `<button>`, and the component
-normalises the difference between them, so either is correct wherever the other
-is. `--ghost` is the strict case — with no fill and no border of its own,
-anything a browser supplies is the only thing visible:
+Button. Variants `--secondary`, `--ghost`, `--danger` and `--link`; `--icon`
+for a square button whose label is a glyph; sizes `--small` and `--large`. It is
+used both as an `<a>` and as a `<button>`, and the component normalises the
+difference between them, so either is correct wherever the other is. `--ghost`
+is the strict case — with no fill and no border of its own, anything a browser
+supplies is the only thing visible:
 
 ```html
 <a class="theme-button" href="…">…</a>
 <button class="theme-button theme-button--secondary" type="button">…</button>
 <button class="theme-button theme-button--danger theme-button--small" type="button">…</button>
+<a class="theme-button theme-button--link" href="…">…</a>
+<button class="theme-button theme-button--icon" type="button" aria-label="…"><svg aria-hidden="true" focusable="false" …>…</svg></button>
+<button class="theme-button theme-button--secondary" type="button" aria-pressed="false">…</button>
+<button class="theme-button" type="button" aria-busy="true" aria-disabled="true">…</button>
 ```
+
+States are read off attributes, never off a class — `:disabled` and
+`[aria-disabled='true']`, `[aria-pressed='true']`, `[aria-busy='true']` — so the
+state a screen reader announces and the state the button is painted in cannot
+disagree. An icon button's glyph is decoration, and its name is `aria-label`.
+A pressed toggle takes the filled default, which shows on `--secondary` and
+`--ghost`, the variants a toggle is drawn in. `aria-busy` adds a spinner but
+does not stop a click, so a busy button that must not be pressed twice carries
+`aria-disabled` as well; under `prefers-reduced-motion` the spinner stands
+still, because `base/_reset.scss` collapses every animation to one 1ms
+iteration.
 
 `:focus-visible` is deliberately **not** a rule of this component. The ring is
 global, in `base/_reset.scss`, so every focusable thing on the page carries the
 same one and a new component cannot forget it.
 
 `.theme-button-group` lays out a row of them with the standard gap and wraps
-rather than overflowing:
+rather than overflowing. `--attached` makes the row one control in several
+parts — edges joined, only the outer corners round, no wrapping — and lifts the
+button whose border means something right now (hovered, focused, pressed) over
+the shared edge with `position: relative` alone, not with a `z-index` outside
+the named stacking layers:
 
 ```html
 <div class="theme-button-group">…</div>
+<div class="theme-button-group theme-button-group--attached" role="group" aria-label="…">…</div>
+```
+
+Close button — a component of its own rather than a button modifier: no fill,
+no border, no label, and a negative margin that lines up the glyph, not the
+44px target around it, with the content edge. The cross is two borders, which
+forced colours mode keeps where it would drop a background. Its name is
+`aria-label`, and inside a `<form method="dialog">` it carries
+`value="cancel"` instead of `type="button"`:
+
+```html
+<button class="theme-close" type="button" aria-label="Close"></button>
 ```
 
 Card. Modifier `--linked` for a card whose whole surface is the link target;
@@ -349,12 +408,53 @@ in, stacking below `bp.$md` the same as `theme-hero--media`:
 </article>
 ```
 
+Panel. Header, aside and footer are optional; the body is the panel. A
+`section` with an accessible name is a region landmark, so a panel that is not
+a destination of its own takes a `div` instead. Not a card: a card is a teaser
+for content that lives elsewhere — an optional image, a title, a summary and one
+link, with `--linked` making the whole surface that link — while a panel is
+content that lives here, grouped under a heading. It has no media slot, it is
+never a link as a whole, and its footer holds controls rather than a "read
+more":
+
+```html
+<section class="theme-panel" aria-labelledby="p-instance-title">
+    <header class="theme-panel__header">
+        <h3 class="theme-panel__title" id="p-instance-title">…</h3>
+        <div class="theme-panel__aside">…</div>
+    </header>
+    <div class="theme-panel__body">…</div>
+    <footer class="theme-panel__footer">…</footer>
+</section>
+```
+
+Text roles — the three roles of the type table in
+[`DESIGN.md`](../../DESIGN.md#roles) that no element carries by itself: a
+heading level says where something sits in the outline, not how loud it is.
+Each is a class on whatever element the outline asks for, and they live in a
+component file rather than in `base/`, because a class — unlike a bare element
+— has something to re-theme and so carries a token layer:
+
+```html
+<p class="theme-eyebrow">…</p>
+<h1 class="theme-display">…</h1>
+<p class="theme-lead">…</p>
+```
+
+A title that a component selects by class, on whatever level the editor picked
+— `.theme-hero__title` and `.theme-teaser__title` follow `header_layout` from
+h1 to h5 — states `text-transform: none`. The element baseline sets `h5` and
+`h6` in capitals, and a title class that does not mention the property would
+pick that up on level five.
+`Tests/Unit/ComponentLibraryTest::aTitleOnAnyHeadingLevelKeepsItsOwnCase`
+holds both to it.
+
 ### Forms
 
-All three `forms/` partials style one contract between them —
-`_controls.scss` the native controls, `_field.scss` the label/hint/required
-chrome and vertical rhythm, `_validation.scss` the error/success repaint of
-both:
+The `forms/` partials style one contract between them — `_controls.scss` the
+native controls, `_field.scss` the label/hint/required chrome and vertical
+rhythm, `_choice-group.scss` and `_input-group.scss` two arrangements of
+controls, `_validation.scss` the error/success repaint of all of it:
 
 ```html
 <form class="theme-form">
@@ -475,7 +575,7 @@ server defaults the `data-theme-default-*` attributes carry:
         </fieldset>
         <div class="theme-settings__footer">
             <label class="theme-switch"><input type="checkbox" role="switch" name="theme-settings-content-outline" value="on" data-theme-setting="content-outline" checked> <span>…</span></label>
-            <button class="theme-button theme-button--ghost theme-button--small" type="button" data-theme-settings-reset>…</button>
+            <button class="theme-button theme-button--link theme-button--small" type="button" data-theme-settings-reset>…</button>
         </div>
     </div>
 </div>
@@ -597,6 +697,172 @@ attribute CSS renders from cannot drift apart.
 asserts the compiled rule stays gated behind `[data-js]` — inverting it is a
 one-character change with no visible symptom on a desktop check.
 
+## Components that need the script
+
+Three components are the only ones in the library that depend on
+`Resources/Public/JavaScript/theme.js`, and each is written so that the page is
+still usable without it — with JavaScript switched off, and with JavaScript on
+but `theme.js` failing to load, which are two different pages. The dialog
+opener follows the [`data-js` marker](#the-data-js-marker) like the navigation
+toggle does; the tabs follow a marker of their own that only `theme.js` sets,
+because what they hide has to stay reachable until the script that switches
+them has actually run.
+
+| Component | With the script                                                                                                                          | Without it                                                                                         | Gate in the stylesheet                                  |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|---------------------------------------------------------|
+| Tabs      | WAI-ARIA tabs with automatic activation: arrow keys (mirrored right-to-left), Home, End, a roving tab stop; the panels become tab panels | No tab list; every panel shown, stacked, in its own frame under its heading, with no tab semantics | `.theme-tabs[data-theme-tabs-bound]`, set by `theme.js` |
+| Dialog    | `data-theme-dialog-open` calls `showModal()`; a click on the backdrop closes it; focus returns to the opener                             | The opener is hidden and the dialog stays closed                                                   | `:root:not([data-js]) [data-theme-dialog-open]`         |
+| Tooltip   | Escape sets `data-theme-tooltip-dismissed` until pointer and focus have both left                                                        | Hover and focus still show it; Escape does not hide it                                             | none — the CSS behaviour is the fallback                |
+
+**Tabs.** The markup keeps three rules that the stylesheet and the script both
+depend on: the first tab is the selected one and every other tab carries
+`tabindex="-1"`; a panel carries nothing but its class and its id — no
+`hidden`, because a panel hidden in the markup is a panel nobody can read
+without the script, and no `role`, `aria-labelledby` or `tabindex`, which the
+script adds when it binds the group, so a page without it has no tab panels
+labelled by tabs nobody can see and no extra tab stop per panel; and every
+panel repeats its tab's label as a `.theme-tabs__heading`, which labels it
+while there are no tabs:
+
+```html
+<div class="theme-tabs">
+    <div class="theme-tabs__list" role="tablist" aria-label="…">
+        <button class="theme-tabs__tab" type="button" role="tab" id="t-set" aria-selected="true" aria-controls="t-set-panel">…</button>
+        <button class="theme-tabs__tab" type="button" role="tab" id="t-static" aria-selected="false" aria-controls="t-static-panel" tabindex="-1">…</button>
+    </div>
+    <div class="theme-tabs__panel" id="t-set-panel">
+        <h3 class="theme-tabs__heading">…</h3>
+        …
+    </div>
+    <div class="theme-tabs__panel" id="t-static-panel">
+        <h3 class="theme-tabs__heading">…</h3>
+        …
+    </div>
+</div>
+```
+
+The gate is the group's own `data-theme-tabs-bound`, which `theme.js` sets once
+it has bound that group, and not `data-js`, which only says that the inline
+head script ran. Gated on `data-js`, a page whose `theme.js` failed to load
+would show tab buttons that do nothing and hide every panel but the first —
+content out of reach, where the undecorated state has to be the usable one.
+The price is one reflow: the footer module binds the group after first paint,
+and the panels that are not selected disappear then. The script hides a panel
+with the `hidden` attribute, which is why `.theme-tabs__panel` has no `display`
+of its own — any author `display` on the class would beat the user agent's
+`[hidden] { display: none }`.
+
+Folder tabs, per the Frame variant: the selected tab takes the panel's surface
+and border and opens into it. The rule under the list is an inset `box-shadow`,
+not elevation — it is the one way to draw a line the selected tab's own
+background can cover.
+
+**Dialog.** A native `<dialog>` opened with `showModal()`: focus kept inside,
+the inert page, Escape and the `::backdrop` are the browser's, and a
+`<form method="dialog">` closes it with the pressed button's `value` as its
+`returnValue`. Only opening needs the script. Invoker commands would do that
+declaratively, but they arrived long after the browser floor
+[`DESIGN.md`](../../DESIGN.md#one-declaration-both-appearances) writes the
+stylesheet against:
+
+```html
+<button class="theme-button" type="button" aria-haspopup="dialog" data-theme-dialog-open="d-reseed">…</button>
+
+<dialog class="theme-dialog" id="d-reseed" aria-labelledby="d-reseed-title">
+    <form method="dialog">
+        <div class="theme-dialog__header">
+            <h2 class="theme-dialog__title" id="d-reseed-title">…</h2>
+            <button class="theme-close" value="cancel" aria-label="Close"></button>
+        </div>
+        <div class="theme-dialog__body">…</div>
+        <div class="theme-dialog__footer">
+            <button class="theme-button theme-button--ghost" value="cancel" autofocus>…</button>
+            <button class="theme-button theme-button--danger" value="confirm">…</button>
+        </div>
+    </form>
+</dialog>
+```
+
+It is flat, on `--theme-color-border-strong` over the scrim, with no elevation
+token: on top of a scrim the border is the only edge the box has. The opener's
+rule is a negation, because an opener is any element and a rule showing it
+again would have to know its `display`. Content a page cannot do without does
+not belong in a dialog.
+
+`autofocus` sits on the least destructive action: without it `showModal()`
+focuses the first focusable element, which is the close button, and the
+WAI-ARIA dialog pattern starts a confirmation on the action that does no harm
+when Enter is pressed by reflex. A click closes the dialog only when the press
+started on the backdrop as well: a click goes to the nearest element the press
+and the release share, so a press on the text dragged out over the scrim
+arrives as a click on the dialog outside its box — a text selection, not a
+dismissal.
+
+**Tooltip.** Shown on `:hover` and `:focus-within` with CSS alone; the trigger
+names the bubble in `aria-describedby`, so a screen reader announces the text
+whether it is on screen or not. Of WCAG 1.4.13, *hoverable* is CSS — the bubble
+takes the pointer while visible, and a transparent strip bridges the gap to the
+trigger — and *dismissible* is the script. The bubble sits above the trigger,
+anchored at its inline start edge and opening towards the inline end: centred
+on a 44px trigger, a 15rem bubble stuck out past the edge of a 400px viewport
+(WCAG 1.4.10), and opening one way it stays on screen for any trigger in the
+first two thirds of a phone's line. There is no collision handling beyond
+that — keeping the bubble inside the viewport whatever the trigger is what CSS
+anchor positioning is for, and that is outside the browser floor — so a trigger
+at the inline end of a narrow viewport is a placement to avoid:
+
+```html
+<span class="theme-tooltip">
+    <button class="theme-button theme-button--ghost theme-button--icon" type="button" aria-label="…" aria-describedby="tt-outline">…</button>
+    <span class="theme-tooltip__bubble" role="tooltip" id="tt-outline">…</span>
+</span>
+```
+
+Escape acts on a tooltip only while the pointer or focus is inside it, and it
+never moves focus. Nothing is needed to close it when focus leaves: the bubble
+is shown by `:focus-within`, so it goes with the focus, and it never sits over
+whatever takes the focus next (WCAG 2.4.11).
+
+`Tests/Unit/ComponentLibraryTest` holds the two gates on the compiled file;
+`Tests/Acceptance/styleguide.spec.ts` drives all three components in a browser
+on `/styleguide`, and loads the page once with JavaScript switched off and once
+with `theme.js` blocked — see [Acceptance tests](../testing/acceptance-tests.md).
+
+## Forced colours
+
+A convention for every component: **a state carried by colour alone gets a
+rule under `@media (forced-colors: active)`**, in the component's own file.
+Forced colours — Windows contrast themes, and Chromium's emulation of them —
+repaint every background to the canvas colour and every text and border to
+the system text colour, drop every `box-shadow` and every gradient, and paint
+a transparent border side solid. A state that is only a fill therefore looks
+exactly like its neighbours, and a shape made of one coloured border side
+turns into a block.
+
+The rule uses system colours, never palette tokens: `Highlight` with
+`HighlightText` for a selected or pressed state — with
+`forced-color-adjust: none` on that element, so the pair is painted as written
+instead of being repainted in turn — and `CanvasText`, `ButtonText` and
+`ButtonBorder` for edges. Measured in Chromium with forced colours emulated:
+
+| Component   | Lost under forced colours                                 | Rule                                         |
+|-------------|-----------------------------------------------------------|----------------------------------------------|
+| Tabs        | the selected tab's fill; the inset rule under the list    | highlight pair; a real bottom border         |
+| Button      | the fill of `[aria-pressed='true']`; the spinner's gap    | highlight pair; the spinner's colours stated |
+| Tooltip     | the inverted bubble's edge; the arrow turns into a square | a `CanvasText` border; the arrow is dropped  |
+| Alert       | the tint, so only the leading rule is left                | an edge all round, the leading side strong   |
+| Dialog      | —                                                         | the strong border width                      |
+| Input group | nothing — the lifted edge is position, not colour         | none                                         |
+
+The `::backdrop` needs no rule: forced colours keep the alpha of its
+background, so the scrim stays a translucent canvas over the page. The alert
+kinds are told apart by their glyph once the accents are gone, which is what
+the alert contract already relies on.
+`Tests/Acceptance/styleguide.spec.ts` loads the styleguide with
+`forcedColors: 'active'` and asserts the selected tab and the pressed toggle
+against the browser's own `Highlight`, the spinner's gap, and the tooltip,
+alert and dialog edges.
+
 ## Breakpoints
 
 There is exactly one: `bp.$md`, `48rem` (768px), declared in
@@ -620,13 +886,16 @@ CSS, but **moving a breakpoint means recompiling the SCSS**.
 documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 (colour, light/dark) separately:
 
-| Test                                                 | Guards                                                                                                                                                                                                             |
-|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `everyComponentIsPartOfTheBundle`                    | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.                |
-| `collapsingTheMainNavigationRequiresTheScriptMarker` | The `[data-js]` gate on the navigation collapse still holds — see [the `data-js` marker](#the-data-js-marker).                                                                                                     |
-| `theContentElementOutlineSwitchesOffCompletely`      | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                          |
-| `everyPaletteHasASwatchWithItsOwnColours`            | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours). |
-| `noComponentReferencesAnUndeclaredToken`             | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.         |
+| Test                                                 | Guards                                                                                                                                                                                                                             |
+|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `everyComponentIsPartOfTheBundle`                    | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.                                |
+| `collapsingTheMainNavigationRequiresTheScriptMarker` | The `[data-js]` gate on the navigation collapse still holds — see [the `data-js` marker](#the-data-js-marker).                                                                                                                     |
+| `theContentElementOutlineSwitchesOffCompletely`      | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                                          |
+| `everyPaletteHasASwatchWithItsOwnColours`            | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).                 |
+| `tabsShowEveryPanelUntilTheScriptHasBoundThem`       | The tab list is hidden and the panel headings shown until the group carries `data-theme-tabs-bound`, and nothing about the tabs is gated on `[data-js]` — see [Components that need the script](#components-that-need-the-script). |
+| `aDialogOpenerIsHiddenWithoutTheScriptMarker`        | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                    |
+| `aTitleOnAnyHeadingLevelKeepsItsOwnCase`             | `.theme-hero__title` and `.theme-teaser__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                                                                             |
+| `noComponentReferencesAnUndeclaredToken`             | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                         |
 
 The last one strips comments before scanning, which matters here specifically:
 the comment documenting why a breakpoint cannot be a custom property spells
