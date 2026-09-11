@@ -24,9 +24,11 @@ parameters:
     - ../../../Tests
     - ../../../packages-dev/dev-site/Classes
     - ../../../packages-dev/dev-site/Configuration
-    # The script that builds and deletes instance state. The other scripts of
-    # "Build/Scripts/" are not analysed; this one removes files.
+    # The scripts that delete files: the one that builds and deletes instance
+    # state, and the one that replaces the fixtures of the visual suite. The
+    # other scripts of "Build/Scripts/" are not analysed.
     - ../../../Build/Scripts/instance.php
+    - ../../../Build/Scripts/renderStyleguideFixtures.php
 
   excludePaths:
     - ../../../Tests/Acceptance/node_modules/*

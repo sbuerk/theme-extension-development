@@ -38,12 +38,18 @@ no `composerUpdate` is needed before it.
    pinned in `runTests.sh` to the exact version of `@playwright/test` in
    `Tests/Acceptance/package.json` — the image carries the browser builds of one
    release, and a different library version refuses to start them. Update both
-   together.
+   together, and rebaseline `-s visual` (`-- --update-snapshots`) in the same
+   commit — the browser build decides the pixels of every
+   [visual baseline](visual-tests.md#baselines).
 
 The suite has a `package.json` of its own rather than a dependency in the root
 one. The root `package.json` ships with the extension, because an integrator
 rebuilding the stylesheet needs it; `Tests/` does not ship, and a test runner
 has no business in a stylesheet rebuild.
+
+The [visual suite](visual-tests.md) shares that package, its lockfile and so the
+one Playwright pin; its specs and configuration are in `Visual/`, which
+`playwright.config.ts` of this suite ignores.
 
 The committed instances are never touched, and a DDEV instance can run beside
 it. The run writes below `.Build/acceptance/` — the instance, `test-results/`

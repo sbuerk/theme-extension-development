@@ -65,6 +65,7 @@ Build/Scripts/runTests.sh -s checkMarkdownTables
 Build/Scripts/runTests.sh -s checkTestMethodsPrefix
 Build/Scripts/runTests.sh -t 12 -s acceptance  # a built instance, in a browser
 Build/Scripts/runTests.sh -s checkCssBuild   # committed CSS matches its SCSS
+Build/Scripts/runTests.sh -s visual          # screenshots and axe of the styleguide
 ```
 
 PHPStan is configured per core version and has a baseline per core version. A
