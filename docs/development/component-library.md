@@ -22,43 +22,50 @@ against, and the rename was cheap while only one template depended on it.
 
 ## Component reference
 
-| Component               | Root class                   | File                                   |
-|-------------------------|------------------------------|----------------------------------------|
-| Accordion               | `.theme-accordion`           | `components/_accordion.scss`           |
-| Alert                   | `.theme-alert`               | `components/_alert.scss`               |
-| Appearance switcher     | `.theme-appearance-switcher` | `components/_appearance-switcher.scss` |
-| Author                  | `.theme-author`              | `components/_author.scss`              |
-| Badge                   | `.theme-badge`               | `components/_badge.scss`               |
-| Breadcrumb              | `.theme-breadcrumb`          | `components/_breadcrumb.scss`          |
-| Button                  | `.theme-button`              | `components/_button.scss`              |
-| Card                    | `.theme-card`                | `components/_card.scss`                |
-| Content element wrapper | `.theme-content-element`     | `components/_content-element.scss`     |
-| Content menu            | `.theme-content-menu`        | `components/_content-menu.scss`        |
-| Gallery                 | `.theme-gallery`             | `components/_gallery.scss`             |
-| Hero                    | `.theme-hero`                | `components/_hero.scss`                |
-| Main navigation         | `.theme-nav-main`            | `components/_nav-main.scss`            |
-| Sub navigation          | `.theme-nav-sub`             | `components/_nav-sub.scss`             |
-| Pagination              | `.theme-pagination__list`    | `components/_pagination.scss`          |
-| Quote                   | `.theme-quote`               | `components/_quote.scss`               |
-| Skip link               | `.theme-skip-link`           | `components/_skip-link.scss`           |
-| Table                   | `.theme-table-wrapper`       | `components/_table.scss`               |
-| Teaser                  | `.theme-teaser`              | `components/_teaser.scss`              |
-| Form controls           | `.theme-input`               | `forms/_controls.scss`                 |
-| Form field wrapper      | `.theme-field`               | `forms/_field.scss`                    |
-| Form validation         | `.theme-field--invalid`      | `forms/_validation.scss`               |
-| Page frame              | `.theme-page`                | `layout/_page.scss`                    |
-| Site header             | `.theme-site-header`         | `layout/_site-header.scss`             |
-| Site footer             | `.theme-site-footer`         | `layout/_site-footer.scss`             |
-| Styleguide page         | `.theme-styleguide`          | `layout/_styleguide.scss`              |
+| Component               | Root class                | File                               |
+|-------------------------|---------------------------|------------------------------------|
+| Accordion               | `.theme-accordion`        | `components/_accordion.scss`       |
+| Alert                   | `.theme-alert`            | `components/_alert.scss`           |
+| Author                  | `.theme-author`           | `components/_author.scss`          |
+| Badge                   | `.theme-badge`            | `components/_badge.scss`           |
+| Breadcrumb              | `.theme-breadcrumb`       | `components/_breadcrumb.scss`      |
+| Button                  | `.theme-button`           | `components/_button.scss`          |
+| Card                    | `.theme-card`             | `components/_card.scss`            |
+| Content element wrapper | `.theme-content-element`  | `components/_content-element.scss` |
+| Content menu            | `.theme-content-menu`     | `components/_content-menu.scss`    |
+| Display settings        | `.theme-settings`         | `components/_settings.scss`        |
+| Gallery                 | `.theme-gallery`          | `components/_gallery.scss`         |
+| Hero                    | `.theme-hero`             | `components/_hero.scss`            |
+| Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`        |
+| Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`         |
+| Pagination              | `.theme-pagination__list` | `components/_pagination.scss`      |
+| Quote                   | `.theme-quote`            | `components/_quote.scss`           |
+| Segmented control       | `.theme-segmented`        | `components/_settings.scss`        |
+| Palette swatch          | `.theme-swatch`           | `components/_settings.scss`        |
+| Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`       |
+| Table                   | `.theme-table-wrapper`    | `components/_table.scss`           |
+| Teaser                  | `.theme-teaser`           | `components/_teaser.scss`          |
+| Form controls           | `.theme-input`            | `forms/_controls.scss`             |
+| Form switch             | `.theme-switch`           | `forms/_controls.scss`             |
+| Form field wrapper      | `.theme-field`            | `forms/_field.scss`                |
+| Form validation         | `.theme-field--invalid`   | `forms/_validation.scss`           |
+| Page frame              | `.theme-page`             | `layout/_page.scss`                |
+| Site header             | `.theme-site-header`      | `layout/_site-header.scss`         |
+| Site footer             | `.theme-site-footer`      | `layout/_site-footer.scss`         |
+| Styleguide page         | `.theme-styleguide`       | `layout/_styleguide.scss`          |
 
 `.theme-pagination` has no rule of its own — only `__list`, `__link` and
 `__ellipsis` are styled, current-page state comes from `[aria-current="page"]`
 rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
-asserts every one of the twenty-six selectors above is actually compiled into
-`Resources/Public/Css/theme.css`. The appearance switcher is covered twice over,
-because its swatches duplicate colour that lives in `abstracts/_palettes.scss` —
-see [Appearance switching](appearance-switching.md#what-the-tests-guard).
+asserts every one of the twenty-nine selectors above is actually compiled into
+`Resources/Public/Css/theme.css`. The palette swatch is covered twice over,
+because it duplicates colour that lives in `abstracts/_palettes.scss` and
+`abstracts/_tokens.scss` — see
+[Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).
+The segmented control and the swatch are blocks of their own in
+`components/_settings.scss`: nothing about them depends on sitting in the
+settings panel, but that panel is their only consumer so far.
 
 ## Markup contracts
 
@@ -366,9 +373,23 @@ both:
     <fieldset class="theme-fieldset">
         <legend class="theme-fieldset__legend">…</legend>
         <label class="theme-check"><input type="checkbox"> …</label>
+        <label class="theme-switch"><input type="checkbox" role="switch"> <span>…</span></label>
     </fieldset>
 </form>
 ```
+
+`.theme-switch` is the native checkbox drawn as a track and a thumb
+(`appearance: none`, the thumb a radial gradient on the input, since
+`::before` is not rendered on an input in every engine). It is for a setting
+that takes effect the moment it is flipped — the element outlines in the
+[display settings](#display-settings) — and carries `role="switch"` in the
+markup, so a screen reader announces "on"/"off" rather than "checked"; the
+rule does not depend on the role. A choice that is only submitted with the
+rest of a form stays a `.theme-check`. Under `forced-colors: active` the
+browser would drop the thumb and paint the track `Canvas` in both states, so
+the input opts out with `forced-color-adjust: none` and paints itself with
+system colours — `CanvasText` on `Canvas` when off, `HighlightText` on
+`Highlight` when on.
 
 `.theme-input` is the one class for every native input type that resolves to
 the same box (text, email, url, tel, number, password, search, and the
@@ -413,6 +434,68 @@ height on every scroll position:
     </div>
 </header>
 ```
+
+`__actions` holds the [display settings](#display-settings). Brand,
+navigation and actions share one row at every width: above `bp.$md` the
+navigation does not shrink, so the brand wraps first; below it the expanded
+navigation drops down under the header as a full-width band, behind
+`data-js` like the collapse itself.
+
+### Display settings
+
+The cog at the end of the site header and the panel it discloses —
+appearance, palette, the content-element outline and a reset. See
+[Appearance switching](appearance-switching.md) for the behaviour and the
+server defaults the `data-theme-default-*` attributes carry:
+
+```html
+<div class="theme-settings" data-theme-default-appearance="auto" data-theme-default-palette="neutral" data-theme-default-content-outline="on">
+    <button class="theme-settings__trigger" type="button" aria-expanded="false" aria-controls="theme-settings-panel">
+        <svg class="theme-settings__icon" aria-hidden="true">…</svg>
+        <span class="theme-settings__label">…</span>
+    </button>
+    <div class="theme-settings__panel" id="theme-settings-panel" hidden>
+        <fieldset class="theme-settings__group">
+            <legend class="theme-settings__legend">…</legend>
+            <div class="theme-segmented">
+                <label class="theme-segmented__option">
+                    <input type="radio" name="theme-settings-appearance" value="auto" data-theme-setting="appearance" checked>
+                    <span class="theme-segmented__label"><svg class="theme-segmented__icon" aria-hidden="true">…</svg>…</span>
+                </label>
+            </div>
+        </fieldset>
+        <fieldset class="theme-settings__group">
+            <legend class="theme-settings__legend">…</legend>
+            <div class="theme-swatch-list">
+                <label class="theme-swatch-option">
+                    <input type="radio" name="theme-settings-palette" value="neutral" data-theme-setting="palette" checked>
+                    <span class="theme-swatch theme-swatch--neutral" aria-hidden="true"></span>…
+                </label>
+            </div>
+        </fieldset>
+        <div class="theme-settings__footer">
+            <label class="theme-switch"><input type="checkbox" role="switch" name="theme-settings-content-outline" value="on" data-theme-setting="content-outline" checked> <span>…</span></label>
+            <button class="theme-button theme-button--ghost theme-button--small" type="button" data-theme-settings-reset>…</button>
+        </div>
+    </div>
+</div>
+```
+
+The whole control is hidden until `data-js`, like the navigation toggle. It is
+a disclosure holding native radios and a switch, not an ARIA menu: the radios
+stay in the document, stretched over their labels at zero opacity, and the
+labels draw their state off the input with `:has()`. The panel is flat —
+`--theme-color-surface-raised` inside a `--theme-color-border-strong` border,
+stacked with `--theme-z-overlay` — and never wider than the viewport less a
+gutter on either side. Under `forced-colors: active` the segment labels and
+the swatches opt out of forced colours, so the checked segment stays
+distinguishable (`Highlight`) and the swatches keep their colours — see
+[Appearance switching § Forced colours](appearance-switching.md#forced-colours).
+
+The id and the radio names above are the defaults. The partial derives both
+from its optional `idPrefix` argument (`theme-settings` when not given), so a
+page can carry a second instance with a prefix of its own; the script binds
+every `.theme-settings` and keeps them all in step.
 
 Site footer:
 
@@ -537,12 +620,13 @@ CSS, but **moving a breakpoint means recompiling the SCSS**.
 documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 (colour, light/dark) separately:
 
-| Test                                                 | Guards                                                                                                                                                                                                     |
-|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `everyComponentIsPartOfTheBundle`                    | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.        |
-| `collapsingTheMainNavigationRequiresTheScriptMarker` | The `[data-js]` gate on the navigation collapse still holds — see [the `data-js` marker](#the-data-js-marker).                                                                                             |
-| `theContentElementOutlineSwitchesOffCompletely`      | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                  |
-| `noComponentReferencesAnUndeclaredToken`             | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable. |
+| Test                                                 | Guards                                                                                                                                                                                                             |
+|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `everyComponentIsPartOfTheBundle`                    | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.                |
+| `collapsingTheMainNavigationRequiresTheScriptMarker` | The `[data-js]` gate on the navigation collapse still holds — see [the `data-js` marker](#the-data-js-marker).                                                                                                     |
+| `theContentElementOutlineSwitchesOffCompletely`      | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                          |
+| `everyPaletteHasASwatchWithItsOwnColours`            | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours). |
+| `noComponentReferencesAnUndeclaredToken`             | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.         |
 
 The last one strips comments before scanning, which matters here specifically:
 the comment documenting why a breakpoint cannot be a custom property spells

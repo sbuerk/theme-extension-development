@@ -1,0 +1,470 @@
+// Display settings - appearance, palette and the content-element outline
+// behind one cog button at the end of the site header.
+//
+// Markup contract:
+//
+//     <div class="theme-settings" data-theme-default-appearance="auto" data-theme-default-palette="neutral" data-theme-default-content-outline="on">
+//         <button class="theme-settings__trigger" type="button" aria-expanded="false" aria-controls="theme-settings-panel">
+//             <svg class="theme-settings__icon" aria-hidden="true">…</svg>
+//             <span class="theme-settings__label">…</span>
+//         </button>
+//         <div class="theme-settings__panel" id="theme-settings-panel" hidden>
+//             <fieldset class="theme-settings__group">
+//                 <legend class="theme-settings__legend">…</legend>
+//                 <div class="theme-segmented">
+//                     <label class="theme-segmented__option">
+//                         <input type="radio" name="theme-settings-appearance" value="auto" data-theme-setting="appearance" checked>
+//                         <span class="theme-segmented__label"><svg class="theme-segmented__icon" aria-hidden="true">…</svg>…</span>
+//                     </label>
+//                 </div>
+//             </fieldset>
+//             <fieldset class="theme-settings__group">
+//                 <legend class="theme-settings__legend">…</legend>
+//                 <div class="theme-swatch-list">
+//                     <label class="theme-swatch-option">
+//                         <input type="radio" name="theme-settings-palette" value="neutral" data-theme-setting="palette" checked>
+//                         <span class="theme-swatch theme-swatch--neutral" aria-hidden="true"></span>…
+//                     </label>
+//                 </div>
+//             </fieldset>
+//             <div class="theme-settings__footer">
+//                 <label class="theme-switch"><input type="checkbox" role="switch" name="theme-settings-content-outline" value="on" data-theme-setting="content-outline" checked> <span>…</span></label>
+//                 <button class="theme-button theme-button--ghost theme-button--small" type="button" data-theme-settings-reset>…</button>
+//             </div>
+//         </div>
+//     </div>
+//
+// ".theme-settings" is the disclosure. ".theme-segmented" (a radio group
+// drawn as one segmented control), ".theme-swatch-list"/".theme-swatch-option"
+// (a radio group drawn as a list with a check mark) and ".theme-swatch" (one
+// palette's colour pair) are the controls inside it - blocks of their own,
+// because nothing about them depends on sitting in this panel, but kept in
+// this file for as long as the panel is their only consumer. The switch is a
+// general form control and lives in "forms/_controls.scss". See
+// "Partials/Page/Settings.html" and "Resources/Public/JavaScript/theme.js".
+// The id and the radio names shown are the defaults; the partial derives both
+// from its "idPrefix" argument, so a page can carry more than one instance.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- Hidden until "data-js" -------------------------------------------------
+//
+// The whole control is hidden until a script has announced itself on the
+// root, exactly the gate "components/_nav-main.scss" writes for the
+// navigation toggle and for the same reason: the cog discloses nothing and
+// no choice applies without the module script, so showing it before that
+// script has run would be a visible promise the page cannot keep. The
+// undecorated state is "not there at all", not "there but inert".
+//
+// --- The radios stay in the document ----------------------------------------
+//
+// Each radio is stretched over its own label at zero opacity rather than
+// hidden. It stays the element that is focused, checked and announced, so
+// the arrow keys within a group, the checked state a screen reader reads and
+// the pointer target are all the browser's own; the label next to it only
+// draws that state, read off the input with ":has()", the way
+// "_nav-main.scss" reads "[aria-expanded]" instead of a class the script
+// would have to keep in step.
+//
+// --- Flat, like everything else ---------------------------------------------
+//
+// The panel floats over the page and still carries no shadow: "DESIGN.md"
+// has no elevation token, and a raised surface is drawn with
+// "--theme-color-surface-raised" inside a "--theme-color-border-strong"
+// border instead, the same way the second level of the main menu is.
+//
+// --- The swatch colours: why they cannot be tokens ---------------------------
+//
+// A palette option's swatch has to show *that palette's* colours, not the ones
+// currently active. But every palette lives entirely inside its own
+// "[data-palette='…']" selector in "abstracts/_palettes.scss" - a custom
+// property only ever holds the value of whichever selector currently matches
+// the root, and CSS has no mechanism to ask what "--theme-color-primary"
+// would resolve to under a different attribute value.
+//
+// So each swatch modifier carries literal copies of its palette's
+// "--theme-color-primary" and "--theme-color-secondary" pairs ("--neutral"
+// from "abstracts/_tokens.scss", the rest from "abstracts/_palettes.scss").
+// This is the one place in the component library that does not read a colour
+// through a token. Nothing in the language links the copy to the original;
+// "Tests/Unit/ComponentLibraryTest" does - it fails when a palette has no
+// swatch, or when a swatch's colours differ from its palette's.
+
+@use '../abstracts/mixins' as mixins;
+
+.theme-settings {
+    --theme-settings-trigger-size: var(--theme-tap-target-min, 44px);
+    --theme-settings-trigger-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-settings-trigger-foreground-active: var(--theme-color-primary, #0b57d0);
+    --theme-settings-trigger-border-color: var(--theme-color-border, #d6dce6);
+    --theme-settings-trigger-border-color-hover: var(--theme-color-border-strong, #828d9f);
+    --theme-settings-trigger-background-active: var(--theme-color-surface, #f4f6fa);
+    --theme-settings-trigger-radius: var(--theme-radius-sm, 5px);
+    --theme-settings-icon-size: var(--theme-space-5, 1.5625rem);
+    --theme-settings-panel-width: 19rem;
+    --theme-settings-panel-gutter: var(--theme-space-4, 1.25rem);
+    --theme-settings-panel-offset: var(--theme-space-2, 0.625rem);
+    --theme-settings-panel-padding: var(--theme-space-4, 1.25rem);
+    --theme-settings-panel-gap: var(--theme-space-4, 1.25rem);
+    --theme-settings-panel-background: var(--theme-color-surface-raised, #ffffff);
+    --theme-settings-panel-foreground: var(--theme-color-text-primary, #14181f);
+    --theme-settings-panel-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-settings-panel-radius: var(--theme-radius-md, 10px);
+    --theme-settings-panel-z-index: var(--theme-z-overlay, 200);
+    --theme-settings-legend-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-settings-divider-color: var(--theme-color-border, #d6dce6);
+
+    // The anchor of the panel below.
+    position: relative;
+    flex: none;
+
+    // See "Hidden until 'data-js'" above.
+    display: none;
+
+    [data-js] & {
+        display: inline-flex;
+    }
+}
+
+.theme-settings__trigger {
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--theme-settings-trigger-size);
+    block-size: var(--theme-settings-trigger-size);
+    padding: 0;
+
+    border: var(--theme-border-width) solid var(--theme-settings-trigger-border-color);
+    border-radius: var(--theme-settings-trigger-radius);
+    background-color: transparent;
+    color: var(--theme-settings-trigger-foreground);
+
+    cursor: pointer;
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        border-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        border-color: var(--theme-settings-trigger-border-color-hover);
+        color: var(--theme-settings-trigger-foreground-active);
+    }
+
+    // The open state, read off the attribute a screen reader announces.
+    &[aria-expanded='true'] {
+        border-color: var(--theme-settings-trigger-foreground-active);
+        background-color: var(--theme-settings-trigger-background-active);
+        color: var(--theme-settings-trigger-foreground-active);
+    }
+}
+
+.theme-settings__icon {
+    inline-size: var(--theme-settings-icon-size);
+    block-size: var(--theme-settings-icon-size);
+    transition: transform var(--theme-duration-base) var(--theme-easing-standard);
+
+    .theme-settings__trigger[aria-expanded='true'] & {
+        transform: rotate(45deg);
+    }
+}
+
+// The trigger shows only the cog. Its name is real text rather than an
+// "aria-label", so it is translated with the rest of the page - by the
+// language file and by a browser's own page translation alike.
+.theme-settings__label {
+    @include mixins.visually-hidden;
+}
+
+// Right aligned under the cog, which sits at the end of the header, so the
+// panel grows towards the page rather than out of it. Never wider than the
+// viewport less a gutter on either side: at 360px that still leaves the full
+// 19rem, below it the panel narrows instead of overflowing.
+.theme-settings__panel {
+    position: absolute;
+    inset-block-start: calc(100% + var(--theme-settings-panel-offset));
+    inset-inline-end: 0;
+    z-index: var(--theme-settings-panel-z-index);
+
+    display: grid;
+    gap: var(--theme-settings-panel-gap);
+    inline-size: min(var(--theme-settings-panel-width), calc(100vw - 2 * var(--theme-settings-panel-gutter)));
+    padding: var(--theme-settings-panel-padding);
+
+    border: var(--theme-border-width) solid var(--theme-settings-panel-border-color);
+    border-radius: var(--theme-settings-panel-radius);
+    background-color: var(--theme-settings-panel-background);
+    color: var(--theme-settings-panel-foreground);
+
+    // "display: grid" above would otherwise outrank the user agent's own
+    // "[hidden] { display: none }", and the panel would never close.
+    &[hidden] {
+        display: none;
+    }
+}
+
+// A fieldset carries a "min-inline-size: min-content" of its own in every
+// engine, which would stop the panel from narrowing below its widest row.
+.theme-settings__group {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+// A rendered legend is not laid out like the fieldset's other children - no
+// gap of the parent reaches it - so the space below it is its own margin.
+.theme-settings__legend {
+    margin-block-end: var(--theme-space-2, 0.625rem);
+    padding: 0;
+    color: var(--theme-settings-legend-color);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-bold, 800);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    text-transform: uppercase;
+}
+
+.theme-settings__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--theme-space-2, 0.625rem);
+    padding-block-start: var(--theme-space-3, 0.9375rem);
+    border-block-start: var(--theme-border-width) solid var(--theme-settings-divider-color);
+}
+
+// See "The radios stay in the document" above.
+.theme-segmented__option,
+.theme-swatch-option {
+    position: relative;
+
+    input {
+        position: absolute;
+        inset: 0;
+        inline-size: 100%;
+        block-size: 100%;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+}
+
+// --- Segmented control --------------------------------------------------------
+
+.theme-segmented {
+    --theme-segmented-background: var(--theme-color-surface, #f4f6fa);
+    --theme-segmented-border-color: var(--theme-color-border, #d6dce6);
+    --theme-segmented-radius: var(--theme-radius-sm, 5px);
+    --theme-segmented-inset: var(--theme-border-width-strong, 2px);
+    --theme-segmented-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-segmented-foreground-hover: var(--theme-color-text-primary, #14181f);
+    --theme-segmented-background-checked: var(--theme-color-primary, #0b57d0);
+    --theme-segmented-foreground-checked: var(--theme-color-on-primary, #ffffff);
+
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    gap: var(--theme-segmented-inset);
+    padding: var(--theme-segmented-inset);
+    border: var(--theme-border-width) solid var(--theme-segmented-border-color);
+    border-radius: var(--theme-segmented-radius);
+    background-color: var(--theme-segmented-background);
+}
+
+.theme-segmented__option {
+    display: grid;
+
+    &:hover .theme-segmented__label {
+        color: var(--theme-segmented-foreground-hover);
+    }
+
+    &:has(input:checked) .theme-segmented__label {
+        background-color: var(--theme-segmented-background-checked);
+        color: var(--theme-segmented-foreground-checked);
+    }
+
+    // The input is invisible, so the focus indicator of "base/_reset.scss"
+    // is drawn on the label it covers instead.
+    &:has(input:focus-visible) .theme-segmented__label {
+        outline: var(--theme-border-width-strong) solid var(--theme-color-primary);
+        outline-offset: 2px;
+        box-shadow: var(--theme-focus-ring);
+    }
+}
+
+.theme-segmented__label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--theme-space-1, 0.3125rem);
+    min-height: var(--theme-tap-target-min);
+    padding: var(--theme-space-1, 0.3125rem);
+
+    // Inset by the padding of the track, so the corners stay concentric.
+    border-radius: calc(var(--theme-segmented-radius) - var(--theme-segmented-inset));
+    color: var(--theme-segmented-foreground);
+
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-medium, 500);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-tight, 1.1);
+
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard);
+}
+
+.theme-segmented__icon {
+    inline-size: var(--theme-space-4, 1.25rem);
+    block-size: var(--theme-space-4, 1.25rem);
+}
+
+// --- Swatch list ------------------------------------------------------------------
+
+.theme-swatch-list {
+    display: grid;
+    gap: var(--theme-border-width-strong, 2px);
+}
+
+.theme-swatch-option {
+    --theme-swatch-option-foreground: var(--theme-color-text-primary, #14181f);
+    --theme-swatch-option-background-hover: var(--theme-color-surface, #f4f6fa);
+    --theme-swatch-option-background-checked: var(--theme-color-surface, #f4f6fa);
+    --theme-swatch-option-check-color: var(--theme-color-primary, #0b57d0);
+    --theme-swatch-option-radius: var(--theme-radius-sm, 5px);
+
+    display: flex;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+    min-height: var(--theme-tap-target-min);
+    padding-inline: var(--theme-space-2, 0.625rem);
+
+    border-radius: var(--theme-swatch-option-radius);
+    color: var(--theme-swatch-option-foreground);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--theme-swatch-option-background-hover);
+    }
+
+    &:has(input:checked) {
+        background-color: var(--theme-swatch-option-background-checked);
+        font-weight: var(--theme-font-weight-medium, 500);
+
+        // The check mark: two borders of a narrow box, turned. Physical
+        // "right" and "bottom" on purpose - a check mark is not mirrored in a
+        // right-to-left script, and the logical properties would mirror it.
+        &::after {
+            content: '';
+            flex: none;
+            inline-size: var(--theme-space-1, 0.3125rem);
+            block-size: var(--theme-space-2, 0.625rem);
+            margin-inline: auto var(--theme-space-2, 0.625rem);
+            border-right: var(--theme-border-width-strong) solid var(--theme-swatch-option-check-color);
+            border-bottom: var(--theme-border-width-strong) solid var(--theme-swatch-option-check-color);
+            transform: translateY(-15%) rotate(45deg);
+        }
+    }
+
+    // Drawn inside the row, since the row is as wide as the panel.
+    &:has(input:focus-visible) {
+        outline: var(--theme-border-width-strong) solid var(--theme-color-primary);
+        outline-offset: calc(-1 * var(--theme-border-width-strong));
+        box-shadow: var(--theme-focus-ring);
+    }
+}
+
+// One palette as its colour pair, primary first. Without a modifier it shows
+// the palette currently active.
+.theme-swatch {
+    --theme-swatch-primary: var(--theme-color-primary, #0b57d0);
+    --theme-swatch-secondary: var(--theme-color-secondary, #0f766e);
+    --theme-swatch-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-swatch-inline-size: var(--theme-space-6, 1.875rem);
+    --theme-swatch-block-size: var(--theme-space-3, 0.9375rem);
+
+    display: inline-block;
+    flex: none;
+    inline-size: var(--theme-swatch-inline-size);
+    block-size: var(--theme-swatch-block-size);
+    border-radius: var(--theme-radius-full, 9999px);
+    background: linear-gradient(90deg, var(--theme-swatch-primary) 50%, var(--theme-swatch-secondary) 50%);
+
+    // An outline rather than a border, so the ring sits off the colours
+    // instead of eating into them - and a swatch whose colour matches the
+    // panel behind it still has an edge.
+    outline: var(--theme-border-width) solid var(--theme-swatch-border-color);
+    outline-offset: var(--theme-border-width);
+}
+
+// One modifier per palette, each a literal copy of that palette's
+// "--theme-color-primary" and "--theme-color-secondary" pairs - the justified
+// exception, see the header comment. "--neutral" copies
+// "abstracts/_tokens.scss"; the rest copy "abstracts/_palettes.scss".
+.theme-swatch--neutral {
+    --theme-swatch-primary: light-dark(#0b57d0, #82abff);
+    --theme-swatch-secondary: light-dark(#0f766e, #4fd1c5);
+}
+
+.theme-swatch--ember {
+    --theme-swatch-primary: light-dark(#9a4212, #f0a882);
+    --theme-swatch-secondary: light-dark(#7c5310, #e8c16a);
+}
+
+.theme-swatch--ocean {
+    --theme-swatch-primary: light-dark(#00629a, #7cc4ee);
+    --theme-swatch-secondary: light-dark(#0d6d76, #63cfd8);
+}
+
+.theme-swatch--moss {
+    --theme-swatch-primary: light-dark(#2f6a26, #8fd782);
+    --theme-swatch-secondary: light-dark(#5c6218, #cbd06a);
+}
+
+.theme-swatch--violet {
+    --theme-swatch-primary: light-dark(#6a3ba8, #c2a4f2);
+    --theme-swatch-secondary: light-dark(#a03270, #f090c0);
+}
+
+// --- Forced colours -------------------------------------------------------------
+//
+// In a forced colours mode - Windows' contrast themes - the browser replaces
+// every author colour with a system colour and drops gradients. Left alone,
+// the checked segment computes to the same "Canvas" as every other segment,
+// so nothing tells which appearance is chosen, and every swatch - two
+// gradient halves - disappears.
+//
+// The segment labels therefore opt out with "forced-color-adjust: none" and
+// paint with system colours themselves - "Highlight" and "HighlightText" for
+// the checked one, "CanvasText" on the track for the rest - so the result
+// follows the reader's own contrast theme, not this theme's palette. Their
+// focus outline is re-pointed at "Highlight" for the same reason: opted out,
+// it would keep the palette's primary colour.
+//
+// The swatch keeps its literal colours: it is a sample of a palette, the one
+// thing in this panel whose colour is the information, and the palette's name
+// is next to it anyway. The check mark of the palette list needs nothing - a
+// border survives with a system colour - and neither does its focus outline;
+// only the ring's shadow is dropped, and the outline is the indicator.
+@media (forced-colors: active) {
+    .theme-segmented {
+        --theme-segmented-foreground: CanvasText;
+        --theme-segmented-foreground-hover: CanvasText;
+        --theme-segmented-background-checked: Highlight;
+        --theme-segmented-foreground-checked: HighlightText;
+    }
+
+    .theme-segmented__label {
+        forced-color-adjust: none;
+    }
+
+    .theme-segmented__option:has(input:focus-visible) .theme-segmented__label {
+        outline-color: Highlight;
+    }
+
+    .theme-swatch {
+        forced-color-adjust: none;
+    }
+}

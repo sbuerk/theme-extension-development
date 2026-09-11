@@ -14,17 +14,17 @@ Documentation for people **using** the extension lives in
 
 ## [Development](development/Index.md)
 
-| Page                                                        | Contents                                                                               |
-|-------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| [Development environment](development/environment.md)       | `runTests.sh`, container runtimes, suites and options.                                 |
-| [Dual core setup](development/dual-core-setup.md)           | Running against TYPO3 v13 and v14, and the rule that avoids false positives.           |
-| [Quality gates](development/quality-gates.md)               | Every gate and its configuration, PHPStan per core version, CI.                        |
-| [Frontend assets](development/frontend-assets.md)           | The SCSS build, the node image, the `checkCssBuild` gate, design tokens.               |
-| [Component library](development/component-library.md)       | Every component's markup contract, the two switches, what the tests guard.             |
-| [Styleguide page](development/styleguide.md)                | The page that renders the library from Fluid, why it ignores content, its tests.       |
-| [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher.    |
-| [Development instances](development/instances.md)           | Setup, reseed and refresh, the accounts, why `settings.php` is not committed.          |
-| [Seeding](development/seeding.md)                           | The `theme-demo` and `theme-instance` sets of data-factory, the demo tree, the mirror. |
+| Page                                                        | Contents                                                                                    |
+|-------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| [Development environment](development/environment.md)       | `runTests.sh`, container runtimes, suites and options.                                      |
+| [Dual core setup](development/dual-core-setup.md)           | Running against TYPO3 v13 and v14, and the rule that avoids false positives.                |
+| [Quality gates](development/quality-gates.md)               | Every gate and its configuration, PHPStan per core version, CI.                             |
+| [Frontend assets](development/frontend-assets.md)           | The SCSS build, the node image, the `checkCssBuild` gate, design tokens.                    |
+| [Component library](development/component-library.md)       | Every component's markup contract, the two switches, what the tests guard.                  |
+| [Styleguide page](development/styleguide.md)                | The page that renders the library from Fluid, why it ignores content, its tests.            |
+| [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the display settings. |
+| [Development instances](development/instances.md)           | Setup, reseed and refresh, the accounts, why `settings.php` is not committed.               |
+| [Seeding](development/seeding.md)                           | The `theme-demo` and `theme-instance` sets of data-factory, the demo tree, the mirror.      |
 
 ## [Architecture](architecture/Index.md)
 
