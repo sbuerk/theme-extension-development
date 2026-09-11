@@ -23,6 +23,7 @@
    Build/Scripts/runTests.sh -s checkMarkdownTables
    Build/Scripts/runTests.sh -s checkTestMethodsPrefix
    Build/Scripts/runTests.sh -s checkCssBuild
+   Build/Scripts/runTests.sh -s visual
    Build/Scripts/runTests.sh -s renderDocumentation
    ```
 

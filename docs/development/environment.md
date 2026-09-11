@@ -58,6 +58,7 @@ hosted runners, not of this repository.
 | `unitRandom`                 | Unit tests in random order.                                                                                |
 | `functional`                 | PHP functional tests.                                                                                      |
 | `acceptance`                 | Playwright against an instance built from nothing, see [Acceptance tests](../testing/acceptance-tests.md). |
+| `visual`                     | Screenshots and axe of the styleguide partials, see [Visual tests](../testing/visual-tests.md).            |
 | `cgl`                        | Coding guidelines, fix in place or check with `-n`.                                                        |
 | `phpstan`                    | Static analysis.                                                                                           |
 | `phpstanGenerateBaseline`    | Regenerate the PHPStan baseline of the selected core version.                                              |

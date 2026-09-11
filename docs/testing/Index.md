@@ -12,6 +12,7 @@ and must pass for **both** supported TYPO3 versions.
 | [Site based tests](site-based-tests.md)           | Site configuration with several languages and frontend sub-requests.                                                      |
 | [Environment state](environment-state.md)         | Application type and language context for functional tests.                                                               |
 | [Acceptance tests](acceptance-tests.md)           | Playwright against a development instance built from nothing: what a run does, the router, the specs, CI.                 |
+| [Visual tests](visual-tests.md)                   | Screenshots and axe of the styleguide partials rendered without TYPO3: fixtures, the matrix, baselines, rebaselining.     |
 
 ## Quick start
 
@@ -30,6 +31,9 @@ Build/Scripts/runTests.sh -s functional -d sqlite -- --filter ExtensionLoadedTes
 
 # Acceptance tests in a browser, against a freshly built instance.
 Build/Scripts/runTests.sh -t 13 -s acceptance
+
+# Screenshots and axe of the styleguide partials, no instance needed.
+Build/Scripts/runTests.sh -s visual
 ```
 
 ## The two tests that must never be dropped

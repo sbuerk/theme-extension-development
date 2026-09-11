@@ -204,6 +204,7 @@ cleanTestFiles() {
     rm -rf \
         .Build/Web/typo3temp/var/tests/ \
         .Build/acceptance/ \
+        .Build/visual/ \
         Tests/Acceptance/node_modules/
     echo "done"
 }
@@ -253,6 +254,9 @@ Options:
             - setVersion: apply a version across the repository, "-- <version> <type>"
             - unit (default): PHP unit tests
             - unitRandom: PHP unit tests in random order, "-o <number>" to use a specific seed
+            - visual: screenshots and axe of the styleguide partials, rendered without TYPO3,
+              needs composerUpdate, "-- <arguments>" go to "playwright test",
+              "-- --update-snapshots" rewrites the baselines - only after looking at the diff
             - watchCss: compile the SCSS and re-compile it on every change
             - watchDocumentation: render the documentation and re-render it on every change,
               served on port 1337, a different port as first argument
@@ -548,7 +552,9 @@ IMAGE_NODEJS="ghcr.io/typo3/core-testing-nodejs24:latest"
 # The browsers of the acceptance suite. Pinned to the exact "@playwright/test"
 # version of "Tests/Acceptance/package.json": the image carries the browser
 # builds of one Playwright release, and a different library version refuses to
-# start them.
+# start them. Change both together, and rebaseline "-s visual"
+# ("-- --update-snapshots") in the same commit: the browser build decides the
+# pixels of every baseline.
 IMAGE_PLAYWRIGHT="mcr.microsoft.com/playwright:v1.63.0-noble"
 IMAGE_MARIADB="docker.io/mariadb:${DBMS_VERSION}"
 IMAGE_MYSQL="docker.io/mysql:${DBMS_VERSION}"
@@ -860,6 +866,43 @@ case ${TEST_SUITE} in
         COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-core-${CORE_VERSION} --order-by=random ${PHPUNIT_RANDOM} "$@")
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name unit-random-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${IMAGE_PHP} "${COMMAND[@]}"
         SUITE_EXIT_CODE=$?
+        ;;
+    visual)
+        # Screenshots and axe of the styleguide partials, without a TYPO3 instance.
+        # "Build/Scripts/renderStyleguideFixtures.php" renders every partial below
+        # "Resources/Private/Partials/Styleguide/" with the standalone Fluid of the installed
+        # dependency set - so "composerUpdate" has to have run, for either core version - into one
+        # static page per appearance and palette below ".Build/visual/". The PHP built-in server
+        # serves those pages and the committed stylesheet they link through
+        # "Tests/Acceptance/Visual/router.php", in a container of its own, and Playwright tests
+        # them from a third one, on the network of this run.
+        #
+        # Arguments after "--" go to "playwright test": "-- --grep buttons". A changed baseline is
+        # written by "-- --update-snapshots", and only after looking at the diff.
+        # See "docs/testing/visual-tests.md".
+        VISUAL_ROOT=".Build/visual"
+        rm -rf "${VISUAL_ROOT}"
+        mkdir -p "${VISUAL_ROOT}/home"
+        COMMAND="php -dxdebug.mode=off Build/Scripts/renderStyleguideFixtures.php"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name visual-fixtures-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
+        SUITE_EXIT_CODE=$?
+        if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+            ${CONTAINER_BIN} run -d ${CONTAINER_COMMON_PARAMS} --name visual-web-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "exec php -dxdebug.mode=off -S 0.0.0.0:8000 -t ${ROOT_DIR} ${ROOT_DIR}/Tests/Acceptance/Visual/router.php > ${VISUAL_ROOT}/php-server.log 2>&1" >/dev/null
+            SUITE_EXIT_CODE=$?
+            # Quoted one by one, as for "acceptance".
+            PLAYWRIGHT_ARGUMENTS=""
+            [[ $# -gt 0 ]] && PLAYWRIGHT_ARGUMENTS=$(printf ' %q' "$@")
+            # The baselines are the rendering of the pinned image on x86_64. The same image on
+            # another architecture renders differently, so it is said up front rather than left to
+            # a wall of screenshot failures - a warning, not a failure, as axe still applies.
+            # Asked inside the container, as that is what renders.
+            ARCH_WARNING="if [ \"\$(uname -m)\" != x86_64 ]; then echo \"WARNING: the visual baselines were written on x86_64, this is \$(uname -m). Expect screenshot differences that are not regressions, and do not rebaseline from here.\" >&2; fi"
+            COMMAND="${ARCH_WARNING}; cd Tests/Acceptance && npm ci --no-audit --no-fund && npx playwright test -c Visual/playwright.config.ts${PLAYWRIGHT_ARGUMENTS}"
+            if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+                ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name visual-playwright-${SUFFIX} -e BASE_URL="http://visual-web-${SUFFIX}:8000/${VISUAL_ROOT}/" -e HOME="${ROOT_DIR}/${VISUAL_ROOT}/home" -e npm_config_cache="${ROOT_DIR}/.cache/npm" -e CI="${CI:-}" ${IMAGE_PLAYWRIGHT} /bin/sh -c "${COMMAND}"
+                SUITE_EXIT_CODE=$?
+            fi
+        fi
         ;;
     watchCss)
         # A writing aid like "watchDocumentation", never a gate: it blocks until
