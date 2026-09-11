@@ -103,6 +103,15 @@ and justified in
 [Class design](../architecture/class-design.md#the-two-phpstan-ignores-on-injected-readonly-properties);
 nothing else may be silenced.
 
+## Byte order marks
+
+`checkBom` compares the first three bytes of every file against `EF BB BF`
+instead of grepping the output of `file`. That wording is not stable: `file`
+5.47, which the PHP images ship, prints `Unicode text, UTF-8 (with BOM) text`,
+and the grep for the older `UTF-8 Unicode (with BOM)` passed on every file with
+a BOM. The compiled `Resources/Public/Css/theme.css` is in scope, see
+[Frontend assets](frontend-assets.md#no-byte-order-mark).
+
 ## Exception codes
 
 TYPO3 exception codes are unix timestamps taken at the moment the exception is

@@ -20,7 +20,8 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  * that both appearances ship for every colour, that the `data-theme` override
  * exists in both directions, and that a palette varies accents only. A theme
  * silently shipping one appearance looks perfectly fine until someone views it
- * in the other.
+ * in the other. Next to it, that the file survives being inlined: it starts
+ * without a byte order mark.
  */
 final class StylesheetTest extends UnitTestCase
 {
@@ -66,6 +67,21 @@ final class StylesheetTest extends UnitTestCase
     public function compiledStylesheetCarriesTheAppearanceSelectors(string $needle): void
     {
         $this->assertStringContainsString($needle, $this->stylesheet());
+    }
+
+    /**
+     * dart-sass starts compressed output that contains non-ASCII characters
+     * with a byte order mark, and this stylesheet does - the typographic
+     * quotes and the validation glyphs. Linked, the mark is consumed by the
+     * decoder. Inlined or concatenated - `includeCSS.*.inline`, critical CSS,
+     * a shadow root - it becomes part of the first selector, `U+FEFF:root`
+     * matches nothing, and the whole token block is gone. Built with
+     * `--no-charset`, see "package.json".
+     */
+    #[Test]
+    public function compiledStylesheetStartsWithoutAByteOrderMark(): void
+    {
+        $this->assertStringStartsNotWith("\u{FEFF}", $this->stylesheet());
     }
 
     /**
