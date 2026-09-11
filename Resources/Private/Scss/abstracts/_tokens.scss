@@ -87,7 +87,10 @@
 
     --theme-color-text-primary: light-dark(#14181f, #e9edf4);
     --theme-color-text-secondary: light-dark(#4a5567, #a9b4c5);
-    --theme-color-text-muted: light-dark(#616b80, #808b9d);
+    // Muted is the one text colour close to 4.5:1, and in dark the raised
+    // surface is the lightest background it sits on - held to 4.5:1 there,
+    // see "DESIGN.md".
+    --theme-color-text-muted: light-dark(#616b80, #848fa1);
 
     // "border" is decorative separation; "border-strong" is the one that
     // reaches 3:1 and belongs on anything delimiting a control.
