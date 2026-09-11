@@ -10,10 +10,10 @@
     itself, including its own empty guard, so it is rendered unconditionally
     here the same way the brand link is - the partial decides whether
     anything actually appears. ".theme-site-header__actions" is the slot at
-    the end of the header the contract documents; it holds the
-    appearance/palette switcher, "Partials/Page/AppearanceSwitcher.html",
-    which is hidden by its own CSS until a script has run - see that
-    partial's header comment.
+    the end of the header the contract documents; it holds the display
+    settings, "Partials/Page/Settings.html" - one cog button, so the brand
+    and the main navigation keep the width of the row - which is hidden by
+    its own CSS until a script has run - see that partial's header comment.
 </f:comment>
 <header class="theme-site-header">
     <div class="theme-site-header__inner">
@@ -22,7 +22,7 @@
         </a>
         <f:render partial="Navigation/Main" arguments="{_all}" />
         <div class="theme-site-header__actions">
-            <f:render partial="Page/AppearanceSwitcher" arguments="{_all}" />
+            <f:render partial="Page/Settings" arguments="{_all}" />
         </div>
     </div>
 </header>

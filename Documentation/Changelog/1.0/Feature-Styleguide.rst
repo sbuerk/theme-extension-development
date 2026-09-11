@@ -104,7 +104,7 @@ Importing the showcase with
 ``/styleguide`` answers with the whole component library. It is the only place
 the design tokens can be seen *resolved* rather than read as values, and
 because of that it doubles as a live test of the appearance and palette
-switchers: flip either control in the header, and every swatch and every
+settings: change either one behind the cog in the header, and every swatch and every
 specimen on the page has to move together. One that does not is a colour that
 escaped the token layer.
 

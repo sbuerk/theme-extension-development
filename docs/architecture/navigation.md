@@ -136,8 +136,9 @@ them unconditionally and lets the partial decide.
 aria-controls="nav-main">`, paired with `id="nav-main"` on the list it
 controls. That pairing is everything this step ships for the toggle: the
 script that flips `aria-expanded` and the `data-js` marker that
-`_nav-main.scss` gates collapsing behind both come with the appearance
-switcher, not with navigation. Until then the button is inert, and
+`_nav-main.scss` gates collapsing behind both come with the theme script of
+[Appearance switching](../development/appearance-switching.md), not with
+navigation. Without that script the button is inert, and
 `_nav-main.scss` hides it entirely in the absence of `data-js` — the menu is
 simply always expanded, which is the intended, working state rather than a
 degraded one. See [Component library § The `data-js`

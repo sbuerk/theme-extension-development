@@ -1,0 +1,8 @@
+# Every appearance constant on a value other than its default, so what is
+# rendered from them cannot pass for a hard coded default. Included after the
+# static constants of the theme by "ConfiguredAppearanceRenderingTest".
+theme.appearance {
+    default = dark
+    palette = ember
+    contentOutline = off
+}

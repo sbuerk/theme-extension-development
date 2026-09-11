@@ -41,7 +41,6 @@ final class ComponentLibraryTest extends UnitTestCase
         foreach ([
             'accordion' => '.theme-accordion',
             'alert' => '.theme-alert',
-            'appearance switcher' => '.theme-appearance-switcher',
             'author' => '.theme-author',
             'badge' => '.theme-badge',
             'breadcrumb' => '.theme-breadcrumb',
@@ -55,11 +54,15 @@ final class ComponentLibraryTest extends UnitTestCase
             'sub navigation' => '.theme-nav-sub',
             'pagination' => '.theme-pagination',
             'quote' => '.theme-quote',
+            'display settings' => '.theme-settings',
+            'segmented control' => '.theme-segmented',
+            'palette swatch' => '.theme-swatch',
             'skip link' => '.theme-skip-link',
             'table' => '.theme-table',
             'teaser' => '.theme-teaser',
             'form field' => '.theme-field',
             'form input' => '.theme-input',
+            'form switch' => '.theme-switch',
             'form validation summary' => '.theme-form-summary',
             'page' => '.theme-page',
             'site header' => '.theme-site-header',
@@ -129,43 +132,112 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
-     * Every palette can be chosen, and every choice shows the right colour.
+     * Every palette can be chosen, and every choice shows its own colours.
      *
-     * The switcher's swatches cannot read a palette they are not inside -
-     * a custom property only ever holds the value of the selector that
-     * currently matches, and CSS cannot ask what it *would* resolve to under a
-     * different attribute. So each swatch carries its palette's primary colour
-     * as a literal, copied from "abstracts/_palettes.scss".
+     * The swatches of the display settings cannot read a palette they are not
+     * inside - a custom property only ever holds the value of the selector
+     * that currently matches, and CSS cannot ask what it *would* resolve to
+     * under a different attribute. So each swatch carries its palette's
+     * primary and secondary colour as literals, copied from
+     * "abstracts/_palettes.scss" and, for "neutral", "abstracts/_tokens.scss".
      *
      * That copy is the only duplicated colour in the stylesheet, and nothing in
      * the language links the two: adding a palette leaves its swatch missing,
-     * and the button then renders with no colour at all rather than failing.
-     * This test is that link.
+     * and changing one leaves the swatch showing the old colours - both
+     * without an error. This test is that link, for the names and for every
+     * value.
      */
     #[Test]
-    public function everyPaletteHasASwatchInTheSwitcher(): void
+    public function everyPaletteHasASwatchWithItsOwnColours(): void
     {
         $scss = dirname(__DIR__, 2) . '/Resources/Private/Scss';
 
+        $palettes = [];
         preg_match_all(
-            "/:root\[data-palette='([a-z]+)'\]/",
-            (string)file_get_contents($scss . '/abstracts/_palettes.scss'),
-            $palettes,
+            "/:root\[data-palette='([a-z]+)'\]\s*\{(.*?)\}/s",
+            $this->withoutComments((string)file_get_contents($scss . '/abstracts/_palettes.scss')),
+            $blocks,
+            PREG_SET_ORDER,
         );
-        $this->assertNotEmpty($palettes[1], 'No alternate palette was found at all.');
+        $this->assertNotEmpty($blocks, 'No alternate palette was found at all.');
+        foreach ($blocks as [, $name, $declarations]) {
+            $palettes[$name] = $this->colourPair($declarations, '--theme-color-primary', '--theme-color-secondary', $name);
+        }
 
         // "neutral" is the default and lives in the token file rather than
         // behind a selector, so it is never in the match above.
-        $expected = [...$palettes[1], 'neutral'];
-        sort($expected);
+        $palettes['neutral'] = $this->colourPair(
+            $this->withoutComments((string)file_get_contents($scss . '/abstracts/_tokens.scss')),
+            '--theme-color-primary',
+            '--theme-color-secondary',
+            'neutral',
+        );
 
-        $switcher = (string)file_get_contents($scss . '/components/_appearance-switcher.scss');
-        preg_match_all('/\.theme-appearance__swatch--([a-z]+)/', $switcher, $swatches);
+        $swatches = [];
+        preg_match_all(
+            '/\.theme-swatch--([a-z]+)\s*\{(.*?)\}/s',
+            $this->withoutComments((string)file_get_contents($scss . '/components/_settings.scss')),
+            $blocks,
+            PREG_SET_ORDER,
+        );
+        foreach ($blocks as [, $name, $declarations]) {
+            $swatches[$name] = $this->colourPair($declarations, '--theme-swatch-primary', '--theme-swatch-secondary', $name);
+        }
 
-        $actual = array_values(array_unique($swatches[1]));
-        sort($actual);
+        ksort($palettes);
+        ksort($swatches);
 
-        $this->assertSame($expected, $actual, 'A palette and its swatch have drifted apart.');
+        $this->assertSame(
+            array_keys($palettes),
+            array_keys($swatches),
+            'A palette has no swatch, or a swatch has no palette.',
+        );
+        $this->assertSame($palettes, $swatches, 'A swatch shows other colours than its palette.');
+    }
+
+    private function withoutComments(string $scss): string
+    {
+        $scss = (string)preg_replace('#/\*.*?\*/#s', '', $scss);
+
+        return (string)preg_replace('#//.*$#m', '', $scss);
+    }
+
+    /**
+     * The values of two declarations in a block, whitespace normalised and
+     * lower-cased, so only a different colour counts as a difference.
+     *
+     * Each property has to be declared exactly once in the block: a second
+     * declaration would make "the value" ambiguous, and picking either one
+     * would let the other drift unnoticed.
+     *
+     * The array is written out rather than filled in a loop: PHPStan 1.x, the
+     * line the v12 dependency set resolves, infers a loop-filled array as
+     * `non-empty-array<'primary'|'secondary', string>` and not as the shape.
+     *
+     * @return array{primary: string, secondary: string}
+     */
+    private function colourPair(string $declarations, string $primary, string $secondary, string $palette): array
+    {
+        return [
+            'primary' => $this->declaredValue($declarations, $primary, $palette),
+            'secondary' => $this->declaredValue($declarations, $secondary, $palette),
+        ];
+    }
+
+    private function declaredValue(string $declarations, string $property, string $palette): string
+    {
+        preg_match_all(
+            '/(?:^|[;{\s])' . preg_quote($property, '/') . '\s*:\s*([^;]+);/',
+            $declarations,
+            $values,
+        );
+        $this->assertCount(
+            1,
+            $values[1],
+            sprintf('"%s" is not declared exactly once for the "%s" palette.', $property, $palette),
+        );
+
+        return strtolower((string)preg_replace('/\s+/', '', $values[1][0]));
     }
 
     /**

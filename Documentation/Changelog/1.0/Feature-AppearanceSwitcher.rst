@@ -115,9 +115,15 @@ primary colour. The swatch colour is the one duplicated colour in the
 stylesheet: every palette lives entirely inside its own
 :css:`[data-palette='…']` selector, and CSS has no mechanism to ask what a
 custom property *would* resolve to under a different attribute value, so the
-swatch cannot reference the token live. :php:`ComponentLibraryTest::everyPaletteHasASwatchInTheSwitcher`
+swatch cannot reference the token live. :php:`ComponentLibraryTest::everyPaletteHasASwatchWithItsOwnColours`
 is what keeps the copy from drifting out of step with
 :file:`abstracts/_palettes.scss`.
+
+..  seealso::
+
+    :ref:`feature-display-settings` replaces the two button groups of this
+    switcher with one settings button, adds a switch for the content-element
+    outline and a reset to the defaults of the site.
 
 Impact
 ======

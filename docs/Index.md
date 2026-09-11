@@ -22,7 +22,7 @@ Documentation for people **using** the extension lives in
 | [Frontend assets](development/frontend-assets.md)           | The SCSS build, the node image, the `checkCssBuild` gate, design tokens.                           |
 | [Component library](development/component-library.md)       | Every component's markup contract, the two switches, what the tests guard.                         |
 | [Styleguide page](development/styleguide.md)                | The page that renders the library from Fluid, why it ignores content, its tests.                   |
-| [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher.                |
+| [Appearance switching](development/appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the display settings.        |
 | [Development instances](development/instances.md)           | Setup, reseed and refresh, the accounts, why `settings.php` is not committed.                      |
 | [Seeding](development/seeding.md)                           | The `theme-demo` and `theme-instance` sets of data-factory, the demo tree, the mirror.             |
 
