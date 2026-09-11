@@ -186,6 +186,11 @@ frontend sub-request against `Fixtures/Database/StyleguidePage.csv`:
 | `everyColourTokenHasASwatch`                                | Every `--theme-color-*` token declared in `abstracts/_tokens.scss` has a swatch.              |
 | `noSpecimenLandmarkSharesItsNameWithThePageChrome`          | No two `<nav>` landmarks on the page share an `aria-label`.                                   |
 | `everyIdOnThePageIsUnique`                                  | No `id` appears twice.                                                                        |
+| `everySectionRendersWithoutTypo3AsItDoesOnThePage`          | Each partial renders without TYPO3 exactly as on the page, which the visual suite relies on.  |
+
+What the stylesheet makes of the markup — pixels and colour contrast, in every
+appearance and palette — is the [visual suite](../testing/visual-tests.md)'s,
+which renders these partials without TYPO3 and picks up a new one by itself.
 
 Two of them derive their expectations from the repository rather than from a
 list written next to the assertion, and that is the point of both:

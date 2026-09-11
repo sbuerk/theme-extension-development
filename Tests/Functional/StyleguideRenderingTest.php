@@ -204,6 +204,58 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * The visual suite tests the markup TYPO3 renders.
+     *
+     * `-s visual` renders every styleguide partial with standalone Fluid,
+     * without TYPO3 (`Build/Scripts/renderStyleguideFixtures.php`), and takes
+     * its screenshots of that. They are only worth something while it is the
+     * markup this page carries for the same partial - which stops being true
+     * the day a partial starts to depend on a ViewHelper, a variable or a
+     * setting only TYPO3 provides. The script refuses a ViewHelper it cannot
+     * render, but a variable it cannot see at all: Fluid renders one that is
+     * not set as an empty string. This test is the only guard against a
+     * partial that starts to expect one.
+     *
+     * The script is run rather than included, like in
+     * `GeneratedLegacyScenarioTest`, so the rendering compared is exactly the
+     * one the fixtures are made of. Whitespace runs are collapsed on both
+     * sides, as the page places each partial at an indentation of its own.
+     */
+    #[Test]
+    public function everySectionRendersWithoutTypo3AsItDoesOnThePage(): void
+    {
+        $script = dirname(__DIR__, 2) . '/Build/Scripts/renderStyleguideFixtures.php';
+        $output = [];
+        $status = 0;
+        exec(
+            sprintf('%s %s --sections 2>&1', escapeshellarg(PHP_BINARY), escapeshellarg($script)),
+            $output,
+            $status,
+        );
+        $this->assertSame(0, $status, 'The styleguide partials do not render without TYPO3: ' . implode("\n", $output));
+
+        $sections = json_decode(implode("\n", $output), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertIsArray($sections);
+        $this->assertNotEmpty($sections, 'The script rendered no section at all.');
+
+        $collapse = static fn(string $html): string => (string)preg_replace('/\s+/', ' ', trim($html));
+        $page = $collapse($this->render());
+        $different = [];
+        foreach ($sections as $id => $html) {
+            if (!str_contains($page, $collapse((string)$html))) {
+                $different[] = $id;
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $different,
+            'These sections render differently without TYPO3 than on the page, so the visual suite'
+            . ' does not test what the page shows: ' . implode(', ', $different),
+        );
+    }
+
+    /**
      * No element on the page may claim an id twice.
      *
      * The specimens duplicate markup that already exists as page chrome, and

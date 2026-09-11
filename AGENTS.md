@@ -137,6 +137,7 @@ Nothing below `.agent/` is ever committed.
 | Symfony DI attributes, stateless services           | [Dependency injection](docs/architecture/dependency-injection.md)       |
 | `readonly` properties, injected abstracts, DTOs     | [Class design](docs/architecture/class-design.md)                       |
 | Both test suites and their strictness               | [Testing](docs/testing/Index.md)                                        |
+| Screenshots, axe, and rebaselining                  | [Visual tests](docs/testing/visual-tests.md)                            |
 | Design tokens, and the light/dark contract          | [Design tokens](DESIGN.md)                                              |
 | Commit message conventions                          | [Commit messages](docs/workflow/commit-messages.md)                     |
 
@@ -279,6 +280,7 @@ Build/Scripts/runTests.sh -t 12 -s checkExceptionCodes
 Build/Scripts/runTests.sh -t 12 -s checkMarkdownTables
 Build/Scripts/runTests.sh -t 12 -s checkTestMethodsPrefix
 Build/Scripts/runTests.sh -t 12 -s checkCssBuild
+Build/Scripts/runTests.sh -t 12 -s visual
 Build/Scripts/runTests.sh -t 12 -s acceptance
 
 # Then the same for TYPO3 v13, starting with composerUpdate again.
@@ -317,8 +319,29 @@ Further:
   test of the instance tooling as well. `@playwright/test` in
   `Tests/Acceptance/package.json` - not the root `package.json`, which ships -
   and the Playwright image in `runTests.sh` are pinned to the same version:
-  change both together.
+  change both together and rebaseline `-s visual` (`-- --update-snapshots`)
+  in the same commit.
   → [Acceptance tests](docs/testing/acceptance-tests.md)
+- `-s visual` renders every `Resources/Private/Partials/Styleguide/*.html`
+  with standalone Fluid into static pages below `.Build/visual/`, one per
+  appearance and palette, and runs axe (WCAG 2.2 AA) on all of them and a
+  screenshot comparison on a reduced matrix, in the same pinned Playwright
+  image as `-s acceptance`. It needs a prior `composerUpdate` for either core
+  version. Run it after any change below `Resources/Private/Scss/` (after
+  `-s buildCss`) or `Resources/Private/Partials/Styleguide/`. A new partial is
+  picked up by itself and fails its first run for want of a baseline.
+  → [Visual tests](docs/testing/visual-tests.md)
+- **Never rebaseline without looking at the diff.** A failing screenshot is
+  never fixed by `-s visual -- --update-snapshots` alone: open the diff image
+  below `.Build/visual/test-results/`, decide whether the change is intended,
+  and only then rebaseline — then name the intended visual change in the
+  commit body and commit the new baselines in the same commit as the change
+  that caused them. An unintended diff is a defect to fix, exactly like a
+  diagnostic is never silenced. Baselines are written by the suite in its
+  container only, never by a browser on the host, and a Playwright bump
+  rebaselines in the same commit. Fixture pages **link** the committed
+  `theme.css` — never inline it, never import it through a bundler; both
+  change what is under test.
 - Arguments for PHPUnit go after `--`:
   `-s functional -d sqlite -- --filter SomeTest`.
 - A **growing PHPStan baseline is a defect.** Fix the finding.
@@ -415,6 +438,9 @@ Before reporting a change as complete:
       `composerUpdate`.
 - [ ] New behaviour has a test, and the test was shown to fail without the
       change.
+- [ ] `-s visual` green. A change that is meant to look different commits
+      its new baselines with it, after the diff was looked at, and says what
+      changed visually in the commit body.
 - [ ] [`docs/`](docs/Index.md) updated in the same change — new concepts get a
       page or a section, and it is linked from the section index.
 - [ ] [`Documentation/`](Documentation) updated when the change is user or

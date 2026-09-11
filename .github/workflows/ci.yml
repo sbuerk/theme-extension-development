@@ -11,7 +11,7 @@ name: "CI"
 #
 # Staging, cheapest and most likely to fail first:
 #
-#   quality ─┐
+#   quality ─┬─> visual (the styleguide partials: screenshots and axe)
 #   phpstan ─┤         ┌─> acceptance (a built instance, in a browser)
 #   lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
 #            │
@@ -394,6 +394,65 @@ jobs:
             .Build/acceptance/report/
             .Build/acceptance/test-results/
             .Build/acceptance/instance/var/log/
+          if-no-files-found: "ignore"
+          retention-days: 5
+
+  # Screenshots and axe of the styleguide partials, rendered into static pages
+  # without TYPO3 - see "docs/testing/visual-tests.md". One job rather than a
+  # matrix: the stylesheet depends on neither PHP nor the core version, the
+  # partials render to identical pages with the Fluid of either dependency set,
+  # and the browser is the one pinned image - a second job would compare the
+  # same pixels again. It installs the set "quality" installs, which shares its
+  # composer cache, and needs nothing but the gates of the files it renders.
+  visual:
+    name: "visual (v${{ matrix.typo3 }})"
+    runs-on: ubuntu-latest
+    needs: [ "quality" ]
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2" ]
+        typo3: [ "12" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Cache npm downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/npm"
+          key: "npm-visual-${{ hashFiles('Tests/Acceptance/package-lock.json') }}"
+          restore-keys: "npm-visual-"
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "Render the styleguide partials and test them in a browser"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s visual"
+
+      # The diff images are in "test-results/", next to the actual and the
+      # expected screenshot; the fixtures make a failure reproducible from the
+      # artifact alone.
+      - name: "Upload the Playwright report"
+        if: "failure()"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "visual-report"
+          path: |
+            .Build/visual/report/
+            .Build/visual/test-results/
+            .Build/visual/fixtures/
+            .Build/visual/php-server.log
           if-no-files-found: "ignore"
           retention-days: 5
 

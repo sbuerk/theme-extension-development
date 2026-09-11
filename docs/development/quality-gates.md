@@ -167,7 +167,7 @@ gate behaves identically in CI and on a developer machine.
 The jobs are staged, cheapest and most likely to fail first:
 
 ```
-quality ─┐
+quality ─┬─> visual
 phpstan ─┤         ┌─> acceptance
 lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
          │
@@ -183,6 +183,7 @@ docs ────┘
 | `functional-sqlite` | the four edge pairs below — 4 jobs                 | `functional -d sqlite`                                                                    |
 | `functional-dbms`   | the four edge pairs × 4 DBMS — 16 jobs             | `functional` against each database                                                        |
 | `acceptance`        | PHP 8.2 × v12, v13 — 2 jobs                        | `acceptance`: an instance built from nothing, in a browser; uploads the report on failure |
+| `visual`            | PHP 8.2 × v12 — one job                            | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure    |
 | `documentation`     | —                                                  | `renderDocumentation`, uploads the artifact                                               |
 
 The "edge pairs" are `{v12, 8.1}`, `{v12, 8.4}`, `{v13, 8.2}`, `{v13, 8.4}` —
@@ -207,7 +208,11 @@ Three decisions are worth knowing:
   version.** They inspect source files rather than the installed core, so
   repeating them tests the same files again. `quality` therefore runs against
   the **lowest** supported set, v12 — which is also why `-t` defaults to `12`.
-  Only `phpstan` is genuinely per core version.
+  Only `phpstan` is genuinely per core version. `visual` is one job for the
+  same reason, on the v12 set `quality` installs: the partials render
+  identically with Fluid 2 of the v12 set and Fluid 4 of the v13 set, and the
+  stylesheet and the browser image are the same — see
+  [Visual tests](../testing/visual-tests.md#in-ci).
 
 ### Why CI passes `-b docker`
 
