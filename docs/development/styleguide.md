@@ -153,8 +153,8 @@ theme's public API for a site package, and there is nowhere else to see them
 *resolved*. `DESIGN.md` lists their values; this page shows what they actually
 render as, under the palette and appearance currently selected.
 
-That makes the page a **live test of the two switchers**. Flip the appearance
-control or the palette control in the header, and every swatch, every specimen
+That makes the page a **live test of the display settings**. Change the
+appearance or the palette behind the cog in the header, and every swatch, every specimen
 and every border on the page has to move together. One that does not is a
 colour declared outside `light-dark()` or outside the palette selector — see
 [Appearance switching](appearance-switching.md) and
@@ -203,7 +203,8 @@ list written next to the assertion, and that is the point of both:
   the link between the two, so a component added to the library without a
   specimen fails here. Five entries are satisfied by the page frame rather than
   by a specimen — `.theme-page`, `.theme-site-header`, `.theme-site-footer`,
-  `.theme-skip-link`, `.theme-appearance-switcher` — which is correct: they
+  `.theme-skip-link`, and `.theme-settings` with the `.theme-segmented` and
+  `.theme-swatch` controls inside it — which is correct: they
   *are* demonstrated on the page, as its own chrome.
 - **The swatch check reads the tokens out of `abstracts/_tokens.scss`**, strips
   comments (the file names tokens while explaining its decisions) and asserts a
@@ -277,8 +278,8 @@ exposed all three, and the styleguide is now the place that condition exists.
   is copied from.
 - [Frontend assets](frontend-assets.md) — the SCSS build and the
   `checkCssBuild` gate that holds the compiled stylesheet to it.
-- [Appearance switching](appearance-switching.md) — the two switchers this page
-  is a live test of.
+- [Appearance switching](appearance-switching.md) — the display settings this
+  page is a live test of.
 - [Seeding](seeding.md) — the demo tree the page is part of.
 - [Page rendering](../architecture/page-rendering.md) — backend layouts and
   template resolution.

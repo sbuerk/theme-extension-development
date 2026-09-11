@@ -3,17 +3,17 @@
 Setting up a working copy, running the tooling and keeping both supported TYPO3
 versions green.
 
-| Page                                            | Contents                                                                                                               |
-|-------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| [Development environment](environment.md)       | `runTests.sh`, container runtimes, the full suite and option list, passing arguments to PHPUnit.                       |
-| [Dual core setup](dual-core-setup.md)           | Why the installed dependency set must match `-t`, how to verify a change against both core versions, test grouping.    |
-| [Quality gates](quality-gates.md)               | Every gate and its configuration, PHPStan per core version, the CI staging and why it runs the containers with docker. |
-| [Frontend assets](frontend-assets.md)           | The SCSS build, the node image, why the compiled CSS is committed, the `checkCssBuild` gate.                           |
-| [Component library](component-library.md)       | Every component's markup contract, the two switches that change behaviour, what the tests guard.                       |
-| [Styleguide page](styleguide.md)                | The page rendering the library straight from Fluid, why it ignores content elements, and what it is a live test of.    |
-| [Development instances](instances.md)           | Setup, reseed and refresh of the two instances, their accounts, SQLite, the `theme` symlink.                           |
-| [Seeding](seeding.md)                           | The `theme-demo` and `theme-instance` seed sets, the uid rule, the demo tree, the `/legacy/` mirror, the tests.        |
-| [Appearance switching](appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the switcher, and why there is no cookie.        |
+| Page                                            | Contents                                                                                                                |
+|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| [Development environment](environment.md)       | `runTests.sh`, container runtimes, the full suite and option list, passing arguments to PHPUnit.                        |
+| [Dual core setup](dual-core-setup.md)           | Why the installed dependency set must match `-t`, how to verify a change against both core versions, test grouping.     |
+| [Quality gates](quality-gates.md)               | Every gate and its configuration, PHPStan per core version, the CI staging and why it runs the containers with docker.  |
+| [Frontend assets](frontend-assets.md)           | The SCSS build, the node image, why the compiled CSS is committed, the `checkCssBuild` gate.                            |
+| [Component library](component-library.md)       | Every component's markup contract, the two switches that change behaviour, what the tests guard.                        |
+| [Styleguide page](styleguide.md)                | The page rendering the library straight from Fluid, why it ignores content elements, and what it is a live test of.     |
+| [Development instances](instances.md)           | Setup, reseed and refresh of the two instances, their accounts, SQLite, the `theme` symlink.                            |
+| [Seeding](seeding.md)                           | The `theme-demo` and `theme-instance` seed sets, the uid rule, the demo tree, the `/legacy/` mirror, the tests.         |
+| [Appearance switching](appearance-switching.md) | The three constants, server-rendered attributes, the no-flash script, the display settings, and why there is no cookie. |
 
 ## Quick start
 

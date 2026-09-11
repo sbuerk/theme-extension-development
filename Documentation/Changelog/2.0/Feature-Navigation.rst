@@ -100,7 +100,8 @@ The main menu's toggle button ships without its script. The markup - the
 :html:`<button aria-expanded="false" aria-controls="nav-main">` and the
 matching :html:`id` on the list - is in place, but the script that flips
 :html:`aria-expanded` and the :html:`data-js` marker the stylesheet gates
-collapsing behind both arrive with the appearance switcher. Until then the
+collapsing behind both arrive with the script of
+:ref:`feature-appearance-switcher`. Until then the
 button is inert and hidden by CSS, and the menu is simply always expanded -
 the intended, working state without JavaScript, not a degraded one. See
 :ref:`Feature: Component library <feature-component-library>` for the

@@ -105,9 +105,9 @@ Appearance and palette
 ======================
 
 The theme renders in a light and a dark appearance and carries five colour
-palettes. What is rendered server side — before the frontend switcher can
-restore a visitor's choice from ``localStorage`` — is configured with three
-constants:
+palettes. What is rendered server side — before the display settings in the
+header can restore a visitor's choice from ``localStorage`` — is configured
+with three constants:
 
 ..  list-table::
     :header-rows: 1
@@ -137,7 +137,16 @@ and ``data-theme-content-outline``. Two of those are worth knowing exactly:
     is a development and staging affordance — a site package rendering for real
     visitors sets it to ``off``.
 
-See :ref:`feature-appearance-switcher` for the switcher itself and
+All three are defaults. A visitor can change each of them behind the cog at
+the end of the header - the outline with the :guilabel:`Element outlines`
+switch - and the choice is kept in that browser. :guilabel:`Reset` in the same
+panel returns to the values configured here: they are also handed to the page
+template as ``settings.appearance.default``, ``settings.appearance.palette``
+and ``settings.appearance.contentOutline``, and rendered next to the control
+for exactly that purpose.
+
+See :ref:`feature-display-settings` for the display settings,
+:ref:`feature-appearance-switcher` for the mechanism behind them and
 :ref:`feature-design-tokens` for what the palettes are built from.
 
 Backend layouts and page templates

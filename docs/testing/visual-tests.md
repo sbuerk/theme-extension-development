@@ -29,7 +29,7 @@ Build/Scripts/runTests.sh -s visual -- --update-snapshots --grep "screenshot but
 
 A run takes about 40 seconds of specs for 119 tests. It is **not** a
 replacement for `/styleguide`, which remains the interactive reference with the
-real switchers inside a real TYPO3.
+real display settings inside a real TYPO3.
 
 ## What a run does
 
@@ -75,8 +75,8 @@ combination is a document, not a region of one. The generator writes
 (`Appearance.typoscript`; `neutral` is rendered too, like the constant does), so
 every page is right on its first paint and no script runs. `data-js` is
 therefore absent: of what reacts to it, the collapsing main navigation is below
-the viewport of the suite and the appearance switcher is page chrome, not a
-specimen.
+the viewport of the suite and the display settings of the header are page
+chrome, not a specimen.
 
 **The page frame is the real one.** The section is placed in the structure
 `Layouts/Default.html` and `Templates/Page/Styleguide.html` produce —
@@ -242,8 +242,8 @@ server log — see [Quality gates](../development/quality-gates.md#continuous-in
 - The `auto` appearance — no `data-theme`, the operating system decides. It
   resolves to one of the two tested ones through `color-scheme`.
 - Other viewports, other browsers: one desktop viewport, Chromium only.
-- Behaviour: the switchers, the navigation toggle and everything else that
-  needs the theme's script are the acceptance suite's.
+- Behaviour: the display settings, the navigation toggle and everything else
+  that needs the theme's script are the acceptance suite's.
 - The real `/styleguide` page in a browser. An axe pass over it per core
   version in the acceptance suite would add page context a fragment cannot
   have; it is not part of this suite.

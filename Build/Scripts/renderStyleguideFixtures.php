@@ -29,9 +29,9 @@ declare(strict_types=1);
  * the way TYPO3 renders them ("Appearance.typoscript"), so the stylesheet
  * resolves each combination on the first paint and no script has to run. No
  * script runs at all: "data-js" is not set, which only the collapsing main
- * navigation below its breakpoint and the appearance switcher react to - the
- * former is not reached at the viewport of the suite, the latter is page
- * chrome rather than a specimen.
+ * navigation below its breakpoint and the display settings of the header react
+ * to - the former is not reached at the viewport of the suite, the latter is
+ * page chrome rather than a specimen.
  *
  * WHY THE STYLESHEET IS LINKED
  *

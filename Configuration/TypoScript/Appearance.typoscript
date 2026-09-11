@@ -36,6 +36,25 @@ config.htmlTag.attributes.data-theme-content-outline = {$theme.appearance.conten
     config.htmlTag.attributes.data-theme = {$theme.appearance.default}
 [END]
 
+# --- The same three values, for the settings control ---------------------
+#
+# "Partials/Page/Settings.html" checks its initial options from these and
+# renders them as "data-theme-default-*" for the "Reset" action. Handed to the
+# template as FLUIDTEMPLATE "settings" rather than read back off the html tag
+# by the script: once the no-flash script below has applied a stored choice,
+# the server default is no longer on the tag, and a reset reading the tag
+# would restore the visitor's own choice.
+#
+# The FLUIDTEMPLATE itself is set up in "Page.typoscript", which
+# "setup.typoscript" imports after this file. That is harmless:
+# "page.10 = FLUIDTEMPLATE" there assigns the object type and leaves the
+# properties assigned here in place.
+page.10.settings.appearance {
+    default = {$theme.appearance.default}
+    palette = {$theme.appearance.palette}
+    contentOutline = {$theme.appearance.contentOutline}
+}
+
 # --- The no-flash script -------------------------------------------------
 #
 # Inline, in the document head, before first paint - through "page.headerData"
@@ -47,18 +66,20 @@ config.htmlTag.attributes.data-theme-content-outline = {$theme.appearance.conten
 #
 #   1. sets "data-js" on the root, unconditionally and first. This is what
 #      switches the main navigation from "always expanded" to "collapsible"
-#      (see "components/_nav-main.scss") and reveals the appearance switcher,
+#      (see "components/_nav-main.scss") and reveals the settings control,
 #      and it has to survive everything below throwing - a page with a broken
 #      "localStorage" read must still get a working collapsible navigation
-#      and a hidden (not inert-looking) switcher, not an inert one.
-#   2. reads the stored appearance and palette from "localStorage" and applies
-#      them, each wrapped in its own "try"/"catch": "localStorage" throws
-#      rather than returning null in Safari's private mode and when cookies
-#      are blocked, and an uncaught throw here would abort the script before
-#      step 1 ran if it came first - which is exactly why it does not.
+#      and a working settings control, not an inert one.
+#   2. reads the stored appearance, palette and content outline from
+#      "localStorage" and applies them, each wrapped in its own
+#      "try"/"catch": "localStorage" throws rather than returning null in
+#      Safari's private mode and when cookies are blocked, and an uncaught
+#      throw here would abort the script before step 1 ran if it came first -
+#      which is exactly why it does not.
 #
-# "Resources/Public/JavaScript/theme.js" is what operates the switcher and the
-# menu toggle from here on; this script only prepares the root for it.
+# "Resources/Public/JavaScript/theme.js" is what operates the settings control
+# and the menu toggle from here on, and writes the three keys read here; this
+# script only prepares the root for it.
 page.headerData.10 = TEXT
 page.headerData.10 {
     value (
@@ -93,6 +114,15 @@ page.headerData.10 {
                 }
             } catch (e) {
                 // The server-rendered "theme.appearance.palette" stands.
+            }
+
+            try {
+                var outline = window.localStorage.getItem('theme-content-outline');
+                if (outline === 'on' || outline === 'off') {
+                    root.setAttribute('data-theme-content-outline', outline);
+                }
+            } catch (e) {
+                // The server-rendered "theme.appearance.contentOutline" stands.
             }
         })();
         </script>

@@ -84,6 +84,15 @@
 			<trans-unit id="theme.paletteViolet">
 				<source>Violet</source>
 			</trans-unit>
+			<trans-unit id="theme.settingsLabel">
+				<source>Display settings</source>
+			</trans-unit>
+			<trans-unit id="theme.settingsContentOutline">
+				<source>Element outlines</source>
+			</trans-unit>
+			<trans-unit id="theme.settingsReset">
+				<source>Reset</source>
+			</trans-unit>
 			<trans-unit id="theme.styleguideHeading">
 				<source>Styleguide</source>
 			</trans-unit>
