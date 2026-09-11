@@ -74,16 +74,20 @@
     color: var(--theme-color-primary, #0b57d0);
     font-size: var(--theme-font-size-xs, 0.75rem);
     font-weight: var(--theme-font-weight-medium, 500);
-    letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+    letter-spacing: var(--theme-letter-spacing-caps, 0.08em);
     text-transform: uppercase;
 }
 
+// The level follows "header_layout" (h1 to h5), and "h5" is set in capitals
+// by "base/_elements.scss" - so the case is stated here, and the title looks
+// the same on every level the editor can pick.
 .theme-hero__title {
     margin: 0;
     font-size: var(--theme-hero-title-font-size);
     font-weight: var(--theme-font-weight-bold, 800);
     letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
     line-height: var(--theme-line-height-heading, 1.5);
+    text-transform: none;
 }
 
 // Constrained to the reading measure even though the panel itself may be much

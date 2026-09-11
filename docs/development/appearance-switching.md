@@ -340,6 +340,12 @@ while styling all of them is a mismatch that only shows on a narrow viewport of
 a page nobody tested, which is where it was found. Each toggle is bound scoped
 to the nav it sits in, so two menus on one page cannot close each other.
 
+The same module also carries the behaviour of the three components of the
+library that need a script — tabs, the dialog opener and tooltip dismissal —
+bound by the same rule: every instance, each scoped to itself. They are not
+part of the appearance switching and are documented with the components, in
+[Component library § Components that need the script](component-library.md#components-that-need-the-script).
+
 ## Palette swatches carry literal colours
 
 ```scss

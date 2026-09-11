@@ -1,4 +1,6 @@
-// Display settings and main menu toggle.
+// Display settings, main menu toggle - and the behaviour of the three
+// components that need a script: tabs, the dialog opener and tooltip
+// dismissal.
 //
 // Loaded as `type="module"` from "Configuration/TypoScript/Appearance.typoscript"
 // - see that file for where and why. A module is deferred by specification, so
@@ -361,3 +363,246 @@ function bindOneMainMenuToggle(toggle) {
 }
 
 bindMainMenuToggle();
+
+/**
+ * Tabs - the WAI-ARIA tabs pattern with automatic activation: a click or an
+ * arrow key selects a tab and shows its panel in one step.
+ *
+ * "components/_tabs.scss" documents the contract this relies on: the first
+ * tab is selected in the markup, and a panel carries nothing but its class and
+ * its id there, so a page this script never ran on shows every panel, with no
+ * tab panel semantics pointing at tabs nobody can see. Everything that turns
+ * the panels into tab panels happens here - the role, the label, the tab stop,
+ * and hiding the ones not selected - and once it has, the group is marked
+ * `data-theme-tabs-bound`, the one marker the stylesheet shows the tabs on.
+ *
+ * Every group is bound, and every lookup is scoped to its own group, for the
+ * reason the main menu toggle above gives: a tab group inside another group's
+ * panel has to answer its own keys and nobody else's.
+ */
+function bindTabs() {
+    document.querySelectorAll('.theme-tabs').forEach(bindOneTabGroup);
+}
+
+function bindOneTabGroup(group) {
+    const list = Array.prototype.find.call(group.children, function (element) {
+        return element.classList.contains('theme-tabs__list');
+    });
+    if (!list) {
+        return;
+    }
+
+    const tabs = Array.prototype.filter.call(list.children, function (element) {
+        return element.getAttribute('role') === 'tab';
+    });
+    if (tabs.length === 0) {
+        return;
+    }
+
+    function panelOf(tab) {
+        const id = tab.getAttribute('aria-controls');
+        return id ? document.getElementById(id) : null;
+    }
+
+    function select(selected) {
+        tabs.forEach(function (tab) {
+            const isSelected = tab === selected;
+            tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            // The roving tab stop: only the selected tab is in the tab
+            // sequence, so Tab moves from the list straight into the panel.
+            tab.setAttribute('tabindex', isSelected ? '0' : '-1');
+            const panel = panelOf(tab);
+            if (panel) {
+                panel.hidden = !isSelected;
+            }
+        });
+    }
+
+    tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            select(tab);
+        });
+    });
+
+    list.addEventListener('keydown', function (event) {
+        const index = tabs.indexOf(event.target);
+        if (index === -1) {
+            return;
+        }
+
+        // "Next" follows the reading direction: in a right-to-left page the
+        // next tab is the one to the left, and that is the key a reader
+        // reaches for.
+        const rightToLeft = window.getComputedStyle(list).direction === 'rtl';
+        const nextKey = rightToLeft ? 'ArrowLeft' : 'ArrowRight';
+        const previousKey = rightToLeft ? 'ArrowRight' : 'ArrowLeft';
+
+        let target = null;
+        if (event.key === nextKey) {
+            target = tabs[(index + 1) % tabs.length];
+        } else if (event.key === previousKey) {
+            target = tabs[(index - 1 + tabs.length) % tabs.length];
+        } else if (event.key === 'Home') {
+            target = tabs[0];
+        } else if (event.key === 'End') {
+            target = tabs[tabs.length - 1];
+        }
+        if (target === null) {
+            return;
+        }
+
+        // Without this, Home and End would also scroll the page.
+        event.preventDefault();
+        select(target);
+        target.focus();
+    });
+
+    // Only now do the panels become tab panels: the role, the tab that labels
+    // each one, and a tab stop of its own, so that Tab moves from the list into
+    // the panel. The markup carries none of the three, which is what keeps a
+    // page this never ran on free of tab panels labelled by tabs nobody can
+    // see, and of one extra tab stop per panel.
+    tabs.forEach(function (tab) {
+        const panel = panelOf(tab);
+        if (!panel) {
+            return;
+        }
+        panel.setAttribute('role', 'tabpanel');
+        if (tab.id) {
+            panel.setAttribute('aria-labelledby', tab.id);
+        }
+        panel.setAttribute('tabindex', '0');
+    });
+
+    // The contract has the markup select the first tab. Honouring whichever
+    // tab it did select costs one lookup, and keeps a template that selects
+    // another one from ending up with the wrong panel on screen.
+    const initial = tabs.find(function (tab) {
+        return tab.getAttribute('aria-selected') === 'true';
+    }) || tabs[0];
+    select(initial);
+    group.setAttribute('data-theme-tabs-bound', '');
+}
+
+/**
+ * The dialog. "components/_dialog.scss" documents why the opener is a
+ * `data-theme-dialog-open` attribute naming the dialog's id rather than an
+ * invoker command, and hides every opener until the root carries "data-js".
+ *
+ * Closing is the browser's - Escape, and the `<form method="dialog">` around
+ * the content. Two things are added on top: a click on the backdrop closes
+ * the dialog too, and focus is put back on the opener explicitly whichever
+ * way it was closed, rather than left to how each browser restores it.
+ */
+function bindDialogs() {
+    document.querySelectorAll('dialog.theme-dialog').forEach(bindOneDialog);
+    document.querySelectorAll('[data-theme-dialog-open]').forEach(bindOneDialogOpener);
+}
+
+function bindOneDialog(dialog) {
+    // A click on the backdrop is dispatched to the dialog element itself - and
+    // so is a click on the dialog's own border, which only the position tells
+    // apart. A click also goes to the nearest element the press and the
+    // release have in common: a press on the body text, dragged out and let go
+    // over the scrim, arrives as a click on the dialog at a point outside it.
+    // That is someone selecting text, not dismissing the dialog, so the press
+    // has to have started on the backdrop as well.
+    let pressedOnBackdrop = false;
+
+    function isOnBackdrop(event) {
+        if (event.target !== dialog) {
+            return false;
+        }
+        const box = dialog.getBoundingClientRect();
+        return event.clientX < box.left || event.clientX > box.right
+            || event.clientY < box.top || event.clientY > box.bottom;
+    }
+
+    dialog.addEventListener('pointerdown', function (event) {
+        pressedOnBackdrop = isOnBackdrop(event);
+    });
+
+    dialog.addEventListener('click', function (event) {
+        const close = pressedOnBackdrop && isOnBackdrop(event);
+        pressedOnBackdrop = false;
+        if (close) {
+            dialog.close('cancel');
+        }
+    });
+}
+
+function bindOneDialogOpener(opener) {
+    const dialog = document.getElementById(opener.getAttribute('data-theme-dialog-open'));
+    if (!dialog || typeof dialog.showModal !== 'function') {
+        return;
+    }
+
+    opener.addEventListener('click', function () {
+        if (dialog.open) {
+            return;
+        }
+        // Registered per opening, and only once: with two openers for the
+        // same dialog, focus has to go back to the one that opened it.
+        dialog.addEventListener('close', function () {
+            opener.focus();
+        }, { once: true });
+        dialog.showModal();
+    });
+}
+
+/**
+ * Tooltip dismissal. WCAG 1.4.13 asks that a tooltip can be hidden without
+ * moving the pointer or focus; "components/_tooltip.scss" shows the bubble on
+ * hover and focus with CSS alone and keeps it hidden while the wrapper carries
+ * `data-theme-tooltip-dismissed`. This sets that on Escape - only on a
+ * tooltip the pointer or focus is inside, and without moving focus anywhere -
+ * and takes it off again once pointer and focus have both left, so the next
+ * hover or focus shows the tooltip as usual.
+ *
+ * One Escape listener on the document serves every tooltip on the page; each
+ * tooltip adds only the two listeners that restore it. It neither stops the
+ * event nor prevents its default, and neither does the display settings'
+ * listener above: one Escape closes an open settings panel, a modal dialog and
+ * a tooltip under the pointer alike, each handler minding only its own.
+ */
+function bindTooltips() {
+    const tooltips = document.querySelectorAll('.theme-tooltip');
+    if (tooltips.length === 0) {
+        return;
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+        tooltips.forEach(function (tooltip) {
+            if (tooltip.matches(':hover') || tooltip.matches(':focus-within')) {
+                tooltip.setAttribute('data-theme-tooltip-dismissed', '');
+            }
+        });
+    });
+
+    tooltips.forEach(bindOneTooltip);
+}
+
+function bindOneTooltip(tooltip) {
+    function restore() {
+        tooltip.removeAttribute('data-theme-tooltip-dismissed');
+    }
+
+    tooltip.addEventListener('mouseleave', function () {
+        if (!tooltip.matches(':focus-within')) {
+            restore();
+        }
+    });
+
+    tooltip.addEventListener('focusout', function (event) {
+        if (!tooltip.contains(event.relatedTarget) && !tooltip.matches(':hover')) {
+            restore();
+        }
+    });
+}
+
+bindTabs();
+bindDialogs();
+bindTooltips();

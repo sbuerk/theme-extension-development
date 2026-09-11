@@ -5,8 +5,17 @@
 //     <a class="theme-button" href="…">Label</a>
 //     <button class="theme-button theme-button--secondary" type="button">…</button>
 //     <button class="theme-button theme-button--danger theme-button--small">…</button>
+//     <a class="theme-button theme-button--link" href="…">…</a>
+//     <button class="theme-button theme-button--icon" type="button" aria-label="…"><svg aria-hidden="true" focusable="false" …>…</svg></button>
+//     <button class="theme-button theme-button--secondary" type="button" aria-pressed="false">…</button>
+//     <button class="theme-button" type="button" aria-busy="true" aria-disabled="true">…</button>
 //
-// Modifiers: --secondary, --ghost, --danger, --small, --large.
+//     <div class="theme-button-group">…</div>
+//     <div class="theme-button-group theme-button-group--attached" role="group" aria-label="…">…</div>
+//
+// Modifiers: --secondary, --ghost, --danger, --link, --icon, --small, --large.
+// States are read off attributes, never off a class: ":disabled" and
+// "[aria-disabled='true']", "[aria-pressed='true']", "[aria-busy='true']".
 //
 // --- The token layer ------------------------------------------------------
 //
@@ -129,6 +138,97 @@
     --theme-button-font-size: var(--theme-font-size-md, 1rem);
 }
 
+// A text link with a button's hit area - for an action that sits among real
+// controls without competing with them, a "Reset" beside a form's buttons.
+// Underlined, because with neither fill nor border the underline is what
+// still says that this can be activated.
+.theme-button--link {
+    --theme-button-background: transparent;
+    --theme-button-foreground: var(--theme-color-primary, #0b57d0);
+    --theme-button-border-color: transparent;
+    --theme-button-background-hover: transparent;
+    --theme-button-foreground-hover: var(--theme-color-primary-hover, #0a4bb4);
+    --theme-button-padding-inline: var(--theme-space-1, 0.3125rem);
+
+    text-decoration: underline;
+}
+
+// Square, for a control whose label is a glyph. The glyph is decoration -
+// "aria-hidden" - and the name is "aria-label" on the button: an icon button
+// with neither has no accessible name at all. Combines with every variant and
+// every size, and stays the 44px square with all of them: the block size is
+// pinned as well as the inline size, because "--large" pads the block
+// direction and would otherwise make it taller than wide.
+.theme-button--icon {
+    --theme-button-padding-inline: 0;
+    --theme-button-icon-size: var(--theme-space-4, 1.25rem);
+
+    inline-size: var(--theme-tap-target-min);
+    block-size: var(--theme-tap-target-min);
+
+    > svg {
+        flex: none;
+        inline-size: var(--theme-button-icon-size);
+        block-size: var(--theme-button-icon-size);
+    }
+}
+
+// A toggle that is on. It takes the filled default, which shows on
+// "--secondary" and "--ghost" - the variants a toggle button is drawn in -
+// and not on a button that is already filled: that one has no further step to
+// show, and should not be a toggle.
+//
+// An attribute rather than a modifier class, the same as the disabled state
+// above: "aria-pressed" is what a screen reader announces, and a class kept
+// in step with it by the same script would be a second copy that can drift.
+.theme-button[aria-pressed='true'] {
+    --theme-button-background: var(--theme-color-primary, #0b57d0);
+    --theme-button-foreground: var(--theme-color-on-primary, #ffffff);
+    --theme-button-border-color: var(--theme-color-primary, #0b57d0);
+    --theme-button-background-hover: var(--theme-color-primary-hover, #0a4bb4);
+    --theme-button-foreground-hover: var(--theme-color-on-primary, #ffffff);
+
+    // "--secondary" draws its hover border in the hover text colour, which on
+    // a filled button is the colour of the text on the fill.
+    &:hover {
+        border-color: var(--theme-button-background-hover);
+    }
+}
+
+// Working. "aria-busy" does not stop a click, so a busy button that must not
+// be pressed twice also carries "disabled" or "aria-disabled='true'", and its
+// label says what is happening: the spinner is decoration and tells a screen
+// reader nothing.
+//
+// The spinner is a round border with one side left out, turning. Under
+// "prefers-reduced-motion: reduce", "base/_reset.scss" collapses every
+// animation to a single iteration of 1ms, so it stands still as a ring with a
+// gap - still a busy marker, no longer moving. No second, local query, for
+// the reason "_accordion.scss" gives.
+.theme-button[aria-busy='true'] {
+    --theme-button-spinner-size: 1em;
+    --theme-button-spinner-duration: 800ms;
+
+    cursor: progress;
+
+    &::before {
+        content: '';
+        flex: none;
+        inline-size: var(--theme-button-spinner-size);
+        block-size: var(--theme-button-spinner-size);
+        border: var(--theme-border-width-strong, 2px) solid currentColor;
+        border-inline-end-color: transparent;
+        border-radius: var(--theme-radius-full, 9999px);
+        animation: theme-button-spin var(--theme-button-spinner-duration) linear infinite;
+    }
+}
+
+@keyframes theme-button-spin {
+    to {
+        rotate: 1turn;
+    }
+}
+
 // A row of buttons. Wraps rather than overflowing, because the labels are
 // translated and a German label is routinely half again as long.
 .theme-button-group {
@@ -136,4 +236,66 @@
     flex-wrap: wrap;
     gap: var(--theme-space-3);
     align-items: center;
+}
+
+// One control in several parts - a set of "aria-pressed" toggles, a
+// segmented choice. The buttons join edge to edge and only the outer corners
+// stay round, so the row reads as one shape. It does not wrap, because a
+// segmented control broken over two lines is two controls: keep it to a few
+// short labels.
+//
+// The shared edges overlap by one border width. The button whose border
+// means something right now - hovered, focused, pressed - is lifted over its
+// neighbours by "position: relative" alone: a positioned box paints above the
+// non-positioned ones around it, so no "z-index" is needed, and a literal one
+// would be a stacking value outside the named layers in
+// "abstracts/_tokens.scss".
+.theme-button-group--attached {
+    flex-wrap: nowrap;
+    gap: 0;
+
+    > .theme-button:not(:first-child) {
+        margin-inline-start: calc(-1 * var(--theme-border-width, 1px));
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+    }
+
+    > .theme-button:not(:last-child) {
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+    }
+
+    > .theme-button:is(:hover, :focus-visible, [aria-pressed='true']) {
+        position: relative;
+    }
+}
+
+// --- Forced colours -----------------------------------------------------------
+//
+// See "Forced colours" in docs/development/component-library.md. A pressed
+// toggle is a fill, and forced colours repaint every fill to the button face,
+// so "on" and "off" would look the same: it takes the system highlight pair
+// instead, hover and focus included, since opting out of the repaint also
+// opts out of it for the focus outline. The spinner is a border with one side
+// left transparent; its colours are stated so that the gap is still a gap.
+// Everything else here is drawn with borders and text, which forced colours
+// keep.
+@media (forced-colors: active) {
+    .theme-button[aria-pressed='true'],
+    .theme-button[aria-pressed='true']:hover {
+        forced-color-adjust: none;
+        border-color: Highlight;
+        background-color: Highlight;
+        color: HighlightText;
+    }
+
+    .theme-button[aria-pressed='true']:focus-visible {
+        outline-color: CanvasText;
+    }
+
+    .theme-button[aria-busy='true']::before {
+        forced-color-adjust: none;
+        border-color: ButtonText;
+        border-inline-end-color: transparent;
+    }
 }

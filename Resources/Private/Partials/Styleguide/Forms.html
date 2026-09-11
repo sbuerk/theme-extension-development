@@ -84,6 +84,17 @@
         153    a:hover
         159  .theme-form-summary--success
 
+      Resources/Private/Scss/forms/_input-group.scss
+        43   .theme-input-group
+        58     > .theme-input, > .theme-select              take the room left over
+        65     > :not(:first-child), > :not(:last-child)    the joined edges
+        77     > :is(:hover, :focus-visible, …)             the lifted edge, shown invalid
+        82   .theme-input-group__addon
+
+      Resources/Private/Scss/forms/_choice-group.scss
+        31   .theme-choice-group
+        40   .theme-choice-group--inline
+
     Two things in that list are not shown on the page, and both are stated
     here rather than left to be noticed:
 
@@ -432,6 +443,137 @@
                     <input type="checkbox" role="switch" id="sg-form-switch-sync" name="sg-form-switch-sync" disabled="disabled">
                     <span>Sync across devices (currently unavailable)</span>
                 </label>
+            </fieldset>
+        </form>
+    </div>
+
+    <h3>Input group and choice group</h3>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>.theme-input-group</code> joins a control to text or a button
+            on either side, edge to edge, and rounds only the outer corners. An
+            addon is visible text the label does not contain, so where it
+            changes what the value means &mdash; a prefix that is not typed, a
+            unit &mdash; the control points at it with
+            <code>aria-describedby</code>. The invalid field at the end shows
+            which border takes a shared edge: the one that means something, so
+            the thicker danger border is not half covered by the addon.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-extension-key">Extension key</label>
+                <div class="theme-input-group">
+                    <span class="theme-input-group__addon" id="sg-form-extension-key-prefix">EXT:</span>
+                    <input class="theme-input"
+                           id="sg-form-extension-key"
+                           name="sg-form-extension-key"
+                           type="text"
+                           value="news"
+                           aria-describedby="sg-form-extension-key-prefix sg-form-extension-key-hint">
+                </div>
+                <p class="theme-field__hint" id="sg-form-extension-key-hint">
+                    The key alone; the prefix is shown, not typed.
+                </p>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-gallery-width">Gallery width</label>
+                <div class="theme-input-group">
+                    <input class="theme-input"
+                           id="sg-form-gallery-width"
+                           name="sg-form-gallery-width"
+                           type="number"
+                           value="1200"
+                           aria-describedby="sg-form-gallery-width-unit">
+                    <span class="theme-input-group__addon" id="sg-form-gallery-width-unit">px</span>
+                </div>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-form-group-search">Search the documentation</label>
+                <div class="theme-input-group">
+                    <input class="theme-input"
+                           id="sg-form-group-search"
+                           name="sg-form-group-search"
+                           type="search"
+                           placeholder="Site set, constants, palettes">
+                    <button class="theme-button" type="button">Search</button>
+                </div>
+            </div>
+
+            <div class="theme-field theme-field--invalid">
+                <label class="theme-field__label" for="sg-form-group-host">Site base</label>
+                <div class="theme-input-group">
+                    <span class="theme-input-group__addon" id="sg-form-group-host-scheme">https://</span>
+                    <input class="theme-input"
+                           id="sg-form-group-host"
+                           name="sg-form-group-host"
+                           type="text"
+                           value="theme example"
+                           aria-invalid="true"
+                           aria-describedby="sg-form-group-host-error sg-form-group-host-scheme">
+                </div>
+                <p class="theme-field__error" id="sg-form-group-host-error">
+                    Enter a host name without spaces
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>.theme-choice-group</code> is the set of checkboxes or radio
+            buttons that answers one question, and the question is the
+            fieldset's legend. The choices stack with no gap of their own,
+            because every one of them already carries the 44 pixel target
+            floor; <code>--inline</code> sets them in a row that wraps.
+        </p>
+
+        <form class="theme-form" method="dialog">
+            <fieldset class="theme-fieldset">
+                <legend class="theme-fieldset__legend">Appearance to test in</legend>
+                <div class="theme-choice-group theme-choice-group--inline">
+                    <label class="theme-check">
+                        <input type="radio" id="sg-form-choice-light" name="sg-form-choice-appearance" value="light">
+                        Light
+                    </label>
+                    <label class="theme-check">
+                        <input type="radio" id="sg-form-choice-dark" name="sg-form-choice-appearance" value="dark">
+                        Dark
+                    </label>
+                    <label class="theme-check">
+                        <input type="radio" id="sg-form-choice-both" name="sg-form-choice-appearance" value="both" checked="checked">
+                        Both
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset class="theme-fieldset">
+                <legend class="theme-fieldset__legend">Palettes to test in</legend>
+                <div class="theme-choice-group">
+                    <label class="theme-check">
+                        <input type="checkbox" id="sg-form-choice-neutral" name="sg-form-choice-neutral" checked="checked">
+                        Neutral
+                    </label>
+                    <label class="theme-check">
+                        <input type="checkbox" id="sg-form-choice-ember" name="sg-form-choice-ember">
+                        Ember
+                    </label>
+                    <label class="theme-check">
+                        <input type="checkbox" id="sg-form-choice-ocean" name="sg-form-choice-ocean">
+                        Ocean
+                    </label>
+                    <label class="theme-check">
+                        <input type="checkbox" id="sg-form-choice-moss" name="sg-form-choice-moss">
+                        Moss
+                    </label>
+                    <label class="theme-check">
+                        <input type="checkbox" id="sg-form-choice-violet" name="sg-form-choice-violet">
+                        Violet
+                    </label>
+                </div>
             </fieldset>
         </form>
     </div>

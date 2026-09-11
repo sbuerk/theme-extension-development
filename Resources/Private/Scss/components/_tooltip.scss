@@ -1,0 +1,138 @@
+// Tooltip.
+//
+// Markup contract:
+//
+//     <span class="theme-tooltip">
+//         <button class="theme-button theme-button--ghost theme-button--icon" type="button" aria-label="…" aria-describedby="tt-outline">…</button>
+//         <span class="theme-tooltip__bubble" role="tooltip" id="tt-outline">…</span>
+//     </span>
+//
+// A short description of a control that already has a name. The trigger is
+// something focusable, and it points at the bubble with "aria-describedby":
+// that is what makes a screen reader announce the text, whether the bubble is
+// on screen or not. The bubble never holds the only copy of anything - a
+// touch screen has no hover, and a keyboard only gets it on focus.
+//
+// It shows on ":hover" and on ":focus-within" of the wrapper, which is pure
+// CSS, and it goes when focus leaves for the same reason. What CSS cannot do
+// is WCAG 1.4.13 "dismissible": Escape has to hide it without moving the
+// pointer or focus, so "Resources/Public/JavaScript/theme.js" sets
+// "data-theme-tooltip-dismissed" on a wrapper that has the pointer or focus
+// inside it when Escape is pressed, and removes it again once pointer and
+// focus have both left. Without the script the tooltip still works and cannot
+// be dismissed that way, which is the one part of 1.4.13 it then misses.
+//
+// "Hoverable", the second part of 1.4.13, is CSS: the bubble takes the pointer
+// while it is visible, and a transparent strip bridges the gap to the trigger,
+// so moving onto the bubble to read it does not close it.
+//
+// --- Placement ------------------------------------------------------------------
+//
+// Above the trigger, anchored at the trigger's inline start edge and opening
+// towards the inline end - logical properties, so a right-to-left page mirrors
+// it with no rule of its own. Centred on the trigger, a 15rem bubble on a 44px
+// button sticks out by more than 5rem to either side, and at 400px wide a
+// trigger at the start of the content column pushed it past the edge of the
+// viewport (WCAG 1.4.10). Opening towards the inline end, it stays on screen
+// for any trigger in the first two thirds of a phone's line.
+//
+// There is no collision handling beyond that. Keeping the bubble inside the
+// viewport whatever the trigger is what CSS anchor positioning is for, and
+// that is outside the browser floor DESIGN.md writes this stylesheet against,
+// so a trigger at the inline end of a narrow viewport is a placement to avoid.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-tooltip {
+    --theme-tooltip-background: var(--theme-color-text-primary, #14181f);
+    --theme-tooltip-foreground: var(--theme-color-background, #ffffff);
+    --theme-tooltip-radius: var(--theme-radius-sm, 5px);
+    --theme-tooltip-offset: var(--theme-space-2, 0.625rem);
+    --theme-tooltip-arrow-size: var(--theme-space-1, 0.3125rem);
+    --theme-tooltip-max-width: 15rem;
+
+    // Centres the arrow over a trigger of the minimum target size - an icon
+    // button - and keeps it over the start of any wider one.
+    --theme-tooltip-arrow-inset: calc(var(--theme-tap-target-min, 44px) / 2 - var(--theme-tooltip-arrow-size));
+
+    position: relative;
+    display: inline-flex;
+}
+
+// Inverted - the primary text colour as the fill, the background as the ink -
+// which is the pair DESIGN.md checked at 17.79 light and 15.86 dark. It is
+// flat like everything else: the inversion is what lifts it off the page.
+.theme-tooltip__bubble {
+    position: absolute;
+    inset-block-end: calc(100% + var(--theme-tooltip-offset));
+    inset-inline-start: 0;
+    z-index: var(--theme-z-tooltip);
+
+    inline-size: max-content;
+    max-inline-size: var(--theme-tooltip-max-width);
+    padding: var(--theme-space-1, 0.3125rem) var(--theme-space-2, 0.625rem);
+
+    border-radius: var(--theme-tooltip-radius);
+    background-color: var(--theme-tooltip-background);
+    color: var(--theme-tooltip-foreground);
+
+    font-size: var(--theme-font-size-xs);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-none);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+
+    opacity: 0;
+    visibility: hidden;
+
+    // "visibility" is switched after the fade on the way out and at once on
+    // the way in, so the text is never unreadable while it is still hoverable.
+    transition:
+        opacity var(--theme-duration-fast) var(--theme-easing-standard),
+        visibility 0s linear var(--theme-duration-fast);
+
+    // The bridge across the gap to the trigger - see "Hoverable" above.
+    &::before {
+        content: '';
+        position: absolute;
+        inset-block-start: 100%;
+        inset-inline: 0;
+        block-size: var(--theme-tooltip-offset);
+    }
+
+    // The arrow: one visible side of a transparent box, the same technique as
+    // the accordion chevron, so no asset.
+    &::after {
+        content: '';
+        position: absolute;
+        inset-block-start: 100%;
+        inset-inline-start: var(--theme-tooltip-arrow-inset);
+        border: var(--theme-tooltip-arrow-size) solid transparent;
+        border-block-start-color: var(--theme-tooltip-background);
+    }
+}
+
+.theme-tooltip:is(:hover, :focus-within):not([data-theme-tooltip-dismissed]) > .theme-tooltip__bubble {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+}
+
+// --- Forced colours -----------------------------------------------------------
+//
+// See "Forced colours" in docs/development/component-library.md. The bubble
+// is told apart from the page by its inverted colours alone, and forced
+// colours paint it canvas on canvas: the text stays, the box around it goes.
+// It gets a border instead. The arrow is one coloured side of a transparent
+// box, which forced colours may paint solid - a square hanging off the
+// bubble - so it is dropped; the border says where the bubble is.
+@media (forced-colors: active) {
+    .theme-tooltip__bubble {
+        border: var(--theme-border-width, 1px) solid CanvasText;
+
+        &::after {
+            content: none;
+        }
+    }
+}

@@ -1,0 +1,95 @@
+// Input group: a control joined to text or a button on either side.
+//
+// Markup contract (one field of the form contract in "_controls.scss"):
+//
+//     <div class="theme-field">
+//         <label class="theme-field__label" for="f-ext">…</label>
+//         <div class="theme-input-group">
+//             <span class="theme-input-group__addon" id="f-ext-prefix">EXT:</span>
+//             <input class="theme-input" id="f-ext" type="text" aria-describedby="f-ext-prefix">
+//             <button class="theme-button theme-button--secondary" type="button">…</button>
+//         </div>
+//     </div>
+//
+// Any number of addons and controls, in any order: the group joins whatever
+// it holds, edge to edge, and rounds only the outer corners.
+//
+// An addon is visible text the label does not contain. Where it changes what
+// the value means - a unit, a prefix that is not typed - the control points
+// at it with "aria-describedby"; a sighted reader sees "px" next to the field
+// and a screen reader user has to be told.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+//
+// --- Which border is on top ---------------------------------------------------
+//
+// Joined edges overlap by one border width, so each shared edge is drawn by
+// one of its two neighbours - by default the later one in source order. A
+// neighbour whose border means something right now takes the edge instead:
+// the one under the pointer, the focused one, and an invalid one, whose
+// thicker danger border from "_validation.scss" would otherwise be half
+// covered by the addon next to it.
+//
+// That needs no "z-index". A positioned box paints above the non-positioned
+// boxes around it, so "position: relative" alone lifts it - and a literal
+// "z-index" would be a stacking value outside the named layers in
+// "abstracts/_tokens.scss".
+//
+// It is also why the group needs no rule for forced colours (see "Forced
+// colours" in docs/development/component-library.md): which border is on top
+// is decided by position, not by colour, and the borders themselves are kept.
+
+.theme-input-group {
+    --theme-input-group-border-width: var(--theme-border-width, 1px);
+    --theme-input-group-addon-background: var(--theme-color-surface, #f4f6fa);
+    --theme-input-group-addon-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-input-group-addon-border-color: var(--theme-color-border, #d6dce6);
+    --theme-input-group-addon-radius: var(--theme-radius-sm, 5px);
+    --theme-input-group-addon-padding-inline: var(--theme-space-3, 0.9375rem);
+
+    display: flex;
+    align-items: stretch;
+    min-width: 0;
+
+    // A control takes the room left over; an addon or a button keeps its own
+    // width. ".theme-input" is "width: 100%" on its own, which inside a row
+    // would push everything else out.
+    > .theme-input,
+    > .theme-select {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+    }
+
+    > :not(:first-child) {
+        margin-inline-start: calc(-1 * var(--theme-input-group-border-width));
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+    }
+
+    > :not(:last-child) {
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+    }
+
+    // See "Which border is on top" above.
+    > :is(:hover, :focus-visible, [aria-invalid='true'], :user-invalid) {
+        position: relative;
+    }
+}
+
+.theme-input-group__addon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    padding-inline: var(--theme-input-group-addon-padding-inline);
+
+    border: var(--theme-input-group-border-width) solid var(--theme-input-group-addon-border-color);
+    border-radius: var(--theme-input-group-addon-radius);
+    background-color: var(--theme-input-group-addon-background);
+    color: var(--theme-input-group-addon-foreground);
+
+    font-size: var(--theme-font-size-sm);
+    white-space: nowrap;
+}

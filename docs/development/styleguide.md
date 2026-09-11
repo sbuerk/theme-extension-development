@@ -9,7 +9,7 @@ selected.
 
 The implementation is
 [`Resources/Private/Templates/Page/Styleguide.html`](../../Resources/Private/Templates/Page/Styleguide.html),
-the seven partials below
+the eight partials below
 [`Resources/Private/Partials/Styleguide/`](../../Resources/Private/Partials/Styleguide),
 the page furniture in
 [`Resources/Private/Scss/layout/_styleguide.scss`](../../Resources/Private/Scss/layout/_styleguide.scss)
@@ -66,36 +66,47 @@ is `999` because that is a value nothing renders. Its label is a distinct
 module does not suggest it behaves like the main column of the other layouts.
 
 **The template contains no `f:cObject`.** Not in
-`Templates/Page/Styleguide.html`, not in any of the seven partials — not even
+`Templates/Page/Styleguide.html`, not in any of the eight partials — not even
 for `main`. A single one would quietly make this a content page again, and the
 difference would surface only the first time somebody happened to place an
 element on it. The absence is asserted, not reviewed
 ([below](#what-the-tests-guard)).
 
-## Seven sections, seven partials
+## Eight sections, eight partials
 
 `Templates/Page/Styleguide.html` renders a heading, an intro, a section index
 and then one `f:render partial` per section, in this order:
 
-| Partial           | Section `id` | Demonstrates                                                                                                                                      |
-|-------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Tokens.html`     | `tokens`     | All 27 colour tokens as swatches, the type scale, weight and family, spacing, radius, shadow, focus ring.                                         |
-| `Typography.html` | `typography` | The element baseline of `base/_elements.scss` — headings, running text, inline elements, lists, quotes, `pre`/`code`, `hr` — plus `.theme-table`. |
-| `Buttons.html`    | `buttons`    | `.theme-button` with every modifier and state its SCSS defines, `.theme-button-group`, `.theme-badge` on both axes.                               |
-| `Boxes.html`      | `boxes`      | `.theme-card`, `.theme-teaser`, `.theme-hero`, `.theme-quote`, `.theme-alert`, `.theme-accordion`, `.theme-author`.                               |
-| `Forms.html`      | `forms`      | The whole `forms/` contract, selector by selector, including the validation states.                                                               |
-| `Navigation.html` | `navigation` | `.theme-nav-main`, `.theme-nav-sub`, `.theme-breadcrumb`, `.theme-pagination`, `.theme-content-menu`.                                             |
-| `Media.html`      | `media`      | `.theme-gallery` in one, two and three columns, and `.theme-content-element` with its outline switch.                                             |
+| Partial            | Section `id`  | Demonstrates                                                                                                                                                                                |
+|--------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Tokens.html`      | `tokens`      | All 27 colour tokens as swatches, the type scale, weight and family, spacing, radius, shadow, focus ring.                                                                                   |
+| `Typography.html`  | `typography`  | The element baseline of `base/_elements.scss` — headings, running text, inline elements, lists, quotes, `pre`/`code`, `hr` — the text roles of `components/_text.scss`, and `.theme-table`. |
+| `Buttons.html`     | `buttons`     | `.theme-button` with every modifier and state its SCSS defines, `.theme-close`, `.theme-button-group` and its `--attached` variant, `.theme-badge` on both axes.                            |
+| `Boxes.html`       | `boxes`       | `.theme-card`, `.theme-panel`, `.theme-teaser`, `.theme-hero`, `.theme-quote`, `.theme-alert` in all six kinds, `.theme-accordion`, `.theme-author`.                                        |
+| `Interactive.html` | `interactive` | The three components that need the theme's script — `.theme-tabs`, `.theme-dialog`, `.theme-tooltip` — and what each does without it.                                                       |
+| `Forms.html`       | `forms`       | The whole `forms/` contract, selector by selector, including the validation states, `.theme-input-group` and `.theme-choice-group`.                                                         |
+| `Navigation.html`  | `navigation`  | `.theme-nav-main`, `.theme-nav-sub`, `.theme-breadcrumb`, `.theme-pagination`, `.theme-content-menu`.                                                                                       |
+| `Media.html`       | `media`       | `.theme-gallery` in one, two and three columns, and `.theme-content-element` with its outline switch.                                                                                       |
 
 Each partial is a single `<section class="theme-styleguide__section" id="…">`
 and nothing else — no `f:layout`, no `f:section`, no wrapper. The page template
-is what places them, and the index at the top is built from the same seven ids.
+is what places them, and the index at the top is built from the same eight ids.
 
 The split follows the same rule as the rest of the theme: a site package that
 wants its own forms section overrides **one file**,
-`Partials/Styleguide/Forms.html`, and keeps the other six. Overriding the page
-template instead would mean re-stating all seven renders and the index to
+`Partials/Styleguide/Forms.html`, and keeps the other seven. Overriding the page
+template instead would mean re-stating all eight renders and the index to
 change one section.
+
+`Interactive.html` is a section of its own rather than three more specimens in
+`Boxes.html` because what it demonstrates is not a shape but a behaviour, and
+the behaviour has two states: the page with the script, and the page without
+it. Keeping the three components that depend on `theme.js` together is what
+makes "switch JavaScript off and reload" one check instead of three. A dialog
+is only ever drawn in the top layer — closed it renders nothing, open it covers
+the page — so the section also carries a still picture of it on
+`.theme-styleguide__stage`, a scrim-coloured box in the flow. The stage is
+`inert`: its buttons are part of the picture, not controls.
 
 The index itself reuses `.theme-content-menu` rather than introducing an index
 component. It is exactly what that component is — a flat list of links — so an
@@ -110,7 +121,9 @@ comment deliberately, each with the reason at the specimen: heading levels are
 lowered so the page keeps one document outline instead of restarting it per
 component, the alert's `role` differs per severity, and images are inline SVG
 data URIs because a specimen has no FAL record to reference and the theme has
-to render with no network.
+to render with no network. `Interactive.html` adds the two that follow from a
+dialog being read on its own — its title is an `h2`, and the still picture of it
+carries its title on a `p` — and states them in its own header comment.
 
 ### The page furniture is not a card
 
@@ -177,16 +190,25 @@ static page.
 `Tests/Functional/StyleguideRenderingTest` renders `/styleguide` through a
 frontend sub-request against `Fixtures/Database/StyleguidePage.csv`:
 
-| Test                                                        | Guards                                                                                        |
-|-------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| `everyComponentOfTheLibraryIsShownOnTheStyleguide`          | Every component of the library appears on the page. Data provider, one case per component.    |
-| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the seven ids renders **and** is linked from the index — no dead anchor.              |
-| `contentPlacedOnTheStyleguidePageIsNotRendered`             | Neither the element in `colPos 999` nor the one in `colPos 0` reaches the frontend.           |
-| `theFormsSectionShowsTheInvalidState`                       | `.theme-field--invalid`, `aria-invalid="true"`, `.theme-field__error`, `.theme-form-summary`. |
-| `everyColourTokenHasASwatch`                                | Every `--theme-color-*` token declared in `abstracts/_tokens.scss` has a swatch.              |
-| `noSpecimenLandmarkSharesItsNameWithThePageChrome`          | No two `<nav>` landmarks on the page share an `aria-label`.                                   |
-| `everyIdOnThePageIsUnique`                                  | No `id` appears twice.                                                                        |
-| `everySectionRendersWithoutTypo3AsItDoesOnThePage`          | Each partial renders without TYPO3 exactly as on the page, which the visual suite relies on.  |
+| Test                                                        | Guards                                                                                                                    |
+|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `everyComponentOfTheLibraryIsShownOnTheStyleguide`          | Every component of the library appears on the page. Data provider, one case per component.                                |
+| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the eight ids renders **and** is linked from the index — no dead anchor.                                          |
+| `contentPlacedOnTheStyleguidePageIsNotRendered`             | Neither the element in `colPos 999` nor the one in `colPos 0` reaches the frontend.                                       |
+| `theFormsSectionShowsTheInvalidState`                       | `.theme-field--invalid`, `aria-invalid="true"`, `.theme-field__error`, `.theme-form-summary`.                             |
+| `everyColourTokenHasASwatch`                                | Every `--theme-color-*` token declared in `abstracts/_tokens.scss` has a swatch.                                          |
+| `noSpecimenLandmarkSharesItsNameWithThePageChrome`          | No two `<nav>` landmarks on the page share an `aria-label`.                                                               |
+| `everyIdOnThePageIsUnique`                                  | No `id` appears twice.                                                                                                    |
+| `everyIdReferenceOnThePageResolves`                         | Every `for`, `aria-controls`, `aria-labelledby`, `aria-describedby` and `data-theme-dialog-open` names an id that exists. |
+| `everySectionRendersWithoutTypo3AsItDoesOnThePage`          | Each partial renders without TYPO3 exactly as on the page, which the visual suite relies on.                              |
+
+The last one is the other half of the uniqueness test, and it exists for the
+interactive section: a tab pointing at a misspelt panel id still renders, a
+dialog opener naming the wrong id is still a button, and a tooltip described by
+a missing id is simply never announced. None of the three breaks visibly. What
+the three components *do* in a browser is the job of
+`Tests/Acceptance/styleguide.spec.ts` — see
+[Acceptance tests](../testing/acceptance-tests.md).
 
 What the stylesheet makes of the markup — pixels and colour contrast, in every
 appearance and palette — is the [visual suite](../testing/visual-tests.md)'s,
@@ -211,7 +233,8 @@ list written next to the assertion, and that is the point of both:
   swatch for each. A token added without a swatch is otherwise invisible, and
   the token section is the only place the palette can be looked at at all.
 
-The last two tests exist because the specimens **duplicate real page chrome**.
+The landmark test and the uniqueness test exist because the specimens
+**duplicate real page chrome**.
 `.theme-nav-main`, `.theme-nav-sub` and `.theme-breadcrumb` are on this page
 twice: once as the site's own navigation, once as a specimen. Two navigation
 landmarks with the same accessible name is a defect that no visual check can
