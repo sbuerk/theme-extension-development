@@ -29,7 +29,7 @@
 //             </fieldset>
 //             <div class="theme-settings__footer">
 //                 <label class="theme-switch"><input type="checkbox" role="switch" name="theme-settings-content-outline" value="on" data-theme-setting="content-outline" checked> <span>…</span></label>
-//                 <button class="theme-button theme-button--ghost theme-button--small" type="button" data-theme-settings-reset>…</button>
+//                 <button class="theme-button theme-button--link theme-button--small" type="button" data-theme-settings-reset>…</button>
 //             </div>
 //         </div>
 //     </div>
@@ -219,7 +219,7 @@
     color: var(--theme-settings-legend-color);
     font-size: var(--theme-font-size-xs, 0.75rem);
     font-weight: var(--theme-font-weight-bold, 800);
-    letter-spacing: var(--theme-letter-spacing-wide);
+    letter-spacing: var(--theme-letter-spacing-caps, 0.08em);
     text-transform: uppercase;
 }
 

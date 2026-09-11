@@ -1,0 +1,183 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section "Interactive": the three components of the library
+    that need "Resources/Public/JavaScript/theme.js" - tabs, the dialog and
+    the tooltip - each with what it does when the script never runs.
+
+    The rules of every other section apply: literal markup copied from the
+    markup contract in the component's own SCSS header comment, nothing driven
+    by a record, a data processor or an "f:cObject", and literal English copy.
+    Ids are prefixed "sg-tabs-", "sg-dialog-" and "sg-tooltip-" so they cannot
+    collide with the page chrome or with another section.
+
+    "Tests/Acceptance/styleguide.spec.ts" drives these specimens in a browser:
+    the arrow keys on the tabs, the dialog opening as a modal and giving focus
+    back, Escape on the tooltip, and the page loaded with JavaScript switched
+    off and once with "theme.js" blocked. It finds them by the ids and the
+    labels below, so changing one of those is a change to that spec as well.
+
+    Three deliberate departures from the header comments:
+
+    1. The panel headings of the tabs are "h4", for the outline reason given
+       in "Boxes.html": the page already owns h1 to h3.
+    2. The dialog's title is "h2". A modal dialog is read on its own while the
+       page behind it is inert, and a closed one is not rendered at all, so it
+       starts its own outline rather than continuing this one.
+    3. The still picture of the dialog carries its title on a "p", because it
+       is a picture of the component rather than a dialog, and a heading in it
+       would add a stray level to the page outline. The stage around it is
+       "inert" for the same reason: its buttons are part of the picture, and
+       inert takes them out of the tab sequence and out of the accessibility
+       tree.
+</f:comment>
+<section class="theme-styleguide__section" id="interactive">
+    <h2 class="theme-styleguide__heading">Interactive</h2>
+
+    <p>
+        The three components in this section are the only ones in the library
+        that need the theme's script. Each one says what it does without it,
+        and this page is the place to check that claim: switch JavaScript off in
+        the browser and reload.
+    </p>
+
+    <h3>Tabs</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_tabs.scss. The first
+            tab is the selected one, the other two carry tabindex=-1, and a
+            panel carries nothing but its class and its id - no "hidden", no
+            role, no label and no tab stop; the script adds those three when it
+            binds the group. The three rules that contract states.
+        </f:comment>
+        <p>
+            The tabs pattern of the WAI-ARIA authoring practices, with automatic
+            activation: the arrow keys move between the tabs and show each
+            panel on the way, Home and End jump to the first and the last tab,
+            and Tab leaves the list straight for the panel, because only the
+            selected tab is in the tab sequence. Without the script there are
+            no tabs to press: the list is not rendered, every panel is shown in
+            a frame of its own, and the heading each panel repeats is what
+            labels it. That holds with JavaScript switched on, too, whenever the
+            theme's script fails to load: the tabs appear only once it has
+            bound the group.
+        </p>
+        <div class="theme-tabs">
+            <div class="theme-tabs__list" role="tablist" aria-label="Specimen: TypoScript delivery">
+                <button class="theme-tabs__tab" type="button" role="tab" id="sg-tabs-set" aria-selected="true" aria-controls="sg-tabs-set-panel">Site set</button>
+                <button class="theme-tabs__tab" type="button" role="tab" id="sg-tabs-static" aria-selected="false" aria-controls="sg-tabs-static-panel" tabindex="-1">Static include</button>
+                <button class="theme-tabs__tab" type="button" role="tab" id="sg-tabs-legacy" aria-selected="false" aria-controls="sg-tabs-legacy-panel" tabindex="-1">Legacy tree</button>
+            </div>
+            <div class="theme-tabs__panel" id="sg-tabs-set-panel">
+                <h4 class="theme-tabs__heading">Site set</h4>
+                <p>A site depends on the theme's site set in its configuration, and constants, page TSconfig and setup arrive together. This is the first panel, the one the markup selects.</p>
+            </div>
+            <div class="theme-tabs__panel" id="sg-tabs-static-panel">
+                <h4 class="theme-tabs__heading">Static include</h4>
+                <p>An installation without site sets includes the static TypoScript in a template record instead: the same files, read the same way. No panel carries the hidden attribute in the markup, nor a role or a tab stop. The script adds all of them when it binds the group.</p>
+            </div>
+            <div class="theme-tabs__panel" id="sg-tabs-legacy-panel">
+                <h4 class="theme-tabs__heading">Legacy tree</h4>
+                <p>The mirror below /legacy/ renders the showcase through a template record, so the two delivery paths can be compared page by page. This is the last tab: End jumps here, and the arrow key past it wraps round to the first.</p>
+            </div>
+        </div>
+    </div>
+
+    <h3>Dialog</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_dialog.scss. The close
+            button and "Cancel" both carry value=cancel, so "returnValue"
+            cannot tell them apart - which is what that contract asks for - and
+            "Cancel" carries "autofocus", so the dialog opens on the action that
+            does no harm.
+        </f:comment>
+        <p>
+            A native dialog, opened as a modal: the browser keeps focus inside
+            it, makes the page behind it inert and draws the scrim, and the
+            form around its content closes it again with no script. Opening it
+            is the one step that needs the script, so without JavaScript the
+            button below is not rendered and the dialog stays closed &mdash; a
+            dialog is for content the page can do without. It opens with focus
+            on Cancel, the action that does no harm when Enter is pressed by
+            reflex. It is flat like every other component: the scrim and a
+            strong border set it apart, not a shadow.
+        </p>
+        <div class="theme-button-group">
+            <button class="theme-button theme-button--danger" type="button" aria-haspopup="dialog" data-theme-dialog-open="sg-dialog-reseed">Reseed the instance</button>
+            <span class="theme-styleguide__label">Opens the dialog as a modal. Escape, the close button, Cancel and a click on the scrim all close it again and put focus back on this button - a drag from the text out onto the scrim does not. Nothing is reseeded either way.</span>
+        </div>
+        <dialog class="theme-dialog" id="sg-dialog-reseed" aria-labelledby="sg-dialog-reseed-title">
+            <form method="dialog">
+                <div class="theme-dialog__header">
+                    <h2 class="theme-dialog__title" id="sg-dialog-reseed-title">Reseed the instance?</h2>
+                    <button class="theme-close" value="cancel" aria-label="Close"></button>
+                </div>
+                <div class="theme-dialog__body">
+                    <p>The instance is rebuilt from nothing: the database is dropped, the seed is imported again, and every backend session ends. On this page the button below only closes the dialog.</p>
+                </div>
+                <div class="theme-dialog__footer">
+                    <button class="theme-button theme-button--ghost" value="cancel" autofocus="autofocus">Cancel</button>
+                    <button class="theme-button theme-button--danger" value="confirm">Reseed</button>
+                </div>
+            </form>
+        </dialog>
+    </div>
+    <div class="theme-styleguide__specimen">
+        <p class="theme-styleguide__label">The same dialog as a still picture on the scrim, because a closed dialog renders nothing and an open one covers everything else on the page. The picture is inert: its buttons are part of it, not controls.</p>
+        <div class="theme-styleguide__stage" inert="inert">
+            <div class="theme-dialog">
+                <div class="theme-dialog__header">
+                    <p class="theme-dialog__title">Reseed the instance?</p>
+                    <button class="theme-close" type="button" aria-label="Close"></button>
+                </div>
+                <div class="theme-dialog__body">
+                    <p>The instance is rebuilt from nothing: the database is dropped, the seed is imported again, and every backend session ends.</p>
+                </div>
+                <div class="theme-dialog__footer">
+                    <button class="theme-button theme-button--ghost" type="button">Cancel</button>
+                    <button class="theme-button theme-button--danger" type="button">Reseed</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Tooltip</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_tooltip.scss. Two
+            triggers, an icon button and a link, because the bubble has to work
+            on anything focusable. Each bubble opens from its own trigger's
+            inline start edge towards the inline end, so on a phone both stay
+            inside the viewport - the acceptance spec checks that at 400px.
+        </f:comment>
+        <p>
+            A short description of a control that already has a name. It shows
+            on hover and on focus with no script at all, goes again when focus
+            leaves, and the trigger points at it with
+            <code>aria-describedby</code>, which is what a screen reader
+            announces whether the bubble is on screen or not. Escape hides it
+            without moving focus &mdash; the one part that needs the script.
+            The pointer can move onto the bubble to read it without closing it.
+        </p>
+        <div class="theme-button-group">
+            <span class="theme-tooltip">
+                <button class="theme-button theme-button--ghost theme-button--icon" type="button" aria-label="Element outlines" aria-describedby="sg-tooltip-outline">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.4"/>
+                        <path d="M12 16.9v.2"/>
+                    </svg>
+                </button>
+                <span class="theme-tooltip__bubble" role="tooltip" id="sg-tooltip-outline">Draws a dashed frame and the CType around every content element.</span>
+            </span>
+            <span class="theme-tooltip">
+                <a class="theme-button theme-button--secondary" href="#interactive" aria-describedby="sg-tooltip-section">Back to the section</a>
+                <span class="theme-tooltip__bubble" role="tooltip" id="sg-tooltip-section">Jumps to the heading of this section.</span>
+            </span>
+        </div>
+    </div>
+</section>
+
+</html>

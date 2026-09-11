@@ -11,23 +11,27 @@
 //     </div>
 //
 // The "role" is a markup concern this file does not style, but it is not the
-// same for all four severities and the contract should not suggest otherwise:
+// same for every kind and the contract should not suggest otherwise:
 // "--info" and "--success" take "role='status'", a polite live region that
 // waits for a pause before announcing; "--warning" and "--danger" take
-// "role='alert'", which interrupts. Copying one role onto all four is how an
-// assertive message ends up announced politely, or a decorative one interrupts
-// whatever the reader was listening to.
+// "role='alert'", which interrupts. "--note" and "--tip" are not messages at
+// all but asides to the text around them: they take "role='note'", or no role,
+// and never a live region - nothing about them changes, so there is nothing to
+// announce. Copying one role onto all of them is how an assertive message ends
+// up announced politely, or a decorative one interrupts whatever the reader
+// was listening to.
 //
-// Modifiers: --info (the default, and the appearance of the bare class),
-// --success, --warning, --danger. "role" is fixed by the contract above and is
-// a markup concern, not a styling one - this file does not touch it.
+// Modifiers: the four severities --info (the default, and the appearance of
+// the bare class), --success, --warning, --danger, and the two asides --note
+// and --tip. "role" is fixed by the contract above and is a markup concern,
+// not a styling one - this file does not touch it.
 //
 // See "components/_button.scss" for why every component declares its own
 // token layer with a fallback.
 //
 // --- Colour is not the only signal ----------------------------------------
 //
-// The four modifiers differ in nothing but colour: the tint, the leading
+// The modifiers differ in nothing but colour: the tint, the leading
 // border and the icon accent all repoint to the same semantic trio. A reader
 // who cannot distinguish those colours - low vision, colour blindness, a
 // black-and-white printout - is left with nothing if colour is the only
@@ -38,8 +42,10 @@
 //
 // Body text is deliberately left out of the repointing. "--theme-alert-text"
 // stays "--theme-color-text-primary" in every modifier because that colour
-// was contrast-checked against all four tints - re-deriving it per severity
-// would reopen a check that has already been done once for good.
+// was contrast-checked against every tint - the four semantic surfaces, the
+// note's surface and the tip's mix in all five palettes, see DESIGN.md -
+// and re-deriving it per kind would reopen a check that has already been done
+// once for good.
 
 .theme-alert {
     --theme-alert-background: var(--theme-color-info-surface, #e7effc);
@@ -114,4 +120,42 @@
 .theme-alert--danger {
     --theme-alert-background: var(--theme-color-danger-surface, #fbeae9);
     --theme-alert-accent: var(--theme-color-danger, #b3261e);
+}
+
+// An aside - a remark next to the text rather than a message about the page.
+// Neutral on purpose: the surface panels and cards already sit on, with the
+// secondary ink as its accent, so it reads as part of the page and not as
+// something that happened.
+.theme-alert--note {
+    --theme-alert-background: var(--theme-color-surface, #f4f6fa);
+    --theme-alert-accent: var(--theme-color-text-secondary, #4a5567);
+}
+
+// A recommendation, and the one kind that follows the palette: the accent is
+// the palette's secondary, and the tint is mixed from that accent here rather
+// than read from a "--theme-color-secondary-surface" token. A palette varies
+// accents only - "Tests/Unit/StylesheetTest" holds it to that - so a surface
+// token would have been one more colour for every palette to author, and a
+// second copy of the accent that could drift away from it. 12% of the accent
+// into the background, mixed in Oklab, lands close to the lightness of the
+// semantic surfaces in both appearances. The contrast of every palette in
+// both appearances is in DESIGN.md.
+.theme-alert--tip {
+    --theme-alert-background: color-mix(in oklab, var(--theme-color-secondary, #0f766e) 12%, var(--theme-color-background, #ffffff));
+    --theme-alert-accent: var(--theme-color-secondary, #0f766e);
+}
+
+// --- Forced colours -----------------------------------------------------------
+//
+// See "Forced colours" in docs/development/component-library.md. The tint
+// is repainted to the canvas and every accent to the text colour, so the six
+// kinds become one - which is exactly the case "Colour is not the only
+// signal" above plans for: the glyph in "theme-alert__icon" still tells them
+// apart. What would go is the box itself, leaving a leading rule floating on
+// the page, so the alert keeps an edge all round.
+@media (forced-colors: active) {
+    .theme-alert {
+        border: var(--theme-border-width, 1px) solid CanvasText;
+        border-inline-start-width: var(--theme-border-width-strong, 2px);
+    }
 }

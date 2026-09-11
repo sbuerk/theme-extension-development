@@ -21,6 +21,7 @@
 //             <h3>Buttons</h3>
 //             <div class="theme-styleguide__specimen">…the specimen markup…</div>
 //             <div class="theme-styleguide__specimen">…another example…</div>
+//             <div class="theme-styleguide__stage">…a dialog, drawn in the flow…</div>
 //         </section>
 //     </div>
 //
@@ -56,6 +57,8 @@
     --theme-styleguide-label-color: var(--theme-color-text-secondary, #4a5567);
     --theme-styleguide-label-font-family: var(--theme-font-family-mono, ui-monospace, monospace);
     --theme-styleguide-label-font-size: var(--theme-font-size-xs, 0.75rem);
+    --theme-styleguide-stage-background: var(--theme-color-overlay, rgb(20 24 31 / 55%));
+    --theme-styleguide-stage-padding: var(--theme-space-6, 1.875rem);
 }
 
 .theme-styleguide__section {
@@ -126,6 +129,19 @@
     block-size: var(--theme-styleguide-swatch-height);
     border: var(--theme-styleguide-swatch-border-width) solid var(--theme-styleguide-swatch-border-color);
     border-radius: var(--theme-styleguide-swatch-radius);
+}
+
+// A still picture of a component that is only ever drawn in the top layer -
+// the dialog. A closed "dialog" renders nothing, and an open modal one covers
+// the page, so neither can be looked at next to the other specimens; the
+// stage draws the component in the flow instead, on the same scrim token the
+// "::backdrop" uses. It positions what it holds and styles nothing about it.
+.theme-styleguide__stage {
+    display: grid;
+    place-items: center;
+    padding: var(--theme-styleguide-stage-padding);
+    border-radius: var(--theme-styleguide-swatch-radius);
+    background-color: var(--theme-styleguide-stage-background);
 }
 
 // Token names are long, unspaced and set in mono so they can be copied by eye

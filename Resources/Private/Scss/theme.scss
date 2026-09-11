@@ -18,7 +18,8 @@
 //               "mixins" emits nothing at all.
 //   base        the reset, then bare element selectors.
 //   forms       native controls, which are elements but need enough rules to
-//               be worth their own layer.
+//               be worth their own layer. Validation comes last in it,
+//               because it repaints everything before it.
 //   components  single-purpose blocks, alphabetical. None of them depends on
 //               another, so the order inside this group carries no meaning.
 //   layout      page chrome. Last, because it positions components rather than
@@ -51,6 +52,8 @@
 
 @use 'forms/controls';
 @use 'forms/field';
+@use 'forms/choice-group';
+@use 'forms/input-group';
 @use 'forms/validation';
 
 @use 'components/accordion';
@@ -60,18 +63,24 @@
 @use 'components/breadcrumb';
 @use 'components/button';
 @use 'components/card';
+@use 'components/close';
 @use 'components/content-element';
 @use 'components/content-menu';
+@use 'components/dialog';
 @use 'components/gallery';
 @use 'components/hero';
 @use 'components/nav-main';
 @use 'components/nav-sub';
 @use 'components/pagination';
+@use 'components/panel';
 @use 'components/quote';
 @use 'components/settings';
 @use 'components/skip-link';
 @use 'components/table';
+@use 'components/tabs';
 @use 'components/teaser';
+@use 'components/text';
+@use 'components/tooltip';
 
 @use 'layout/page';
 @use 'layout/site-header';

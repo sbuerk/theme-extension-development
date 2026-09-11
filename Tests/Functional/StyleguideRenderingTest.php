@@ -110,7 +110,7 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
      */
     public static function everySection(): \Generator
     {
-        foreach (['tokens', 'typography', 'buttons', 'boxes', 'forms', 'navigation', 'media'] as $id) {
+        foreach (['tokens', 'typography', 'buttons', 'boxes', 'interactive', 'forms', 'navigation', 'media'] as $id) {
             yield $id => ['id' => $id];
         }
     }
@@ -290,5 +290,41 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
         sort($duplicates);
 
         $this->assertSame([], $duplicates, 'These ids appear more than once: ' . implode(', ', $duplicates));
+    }
+
+    /**
+     * Every id reference on the page points at an id that exists.
+     *
+     * The uniqueness test above catches an id used twice; this catches the
+     * other half - a `for`, `aria-controls`, `aria-labelledby`,
+     * `aria-describedby` or `data-theme-dialog-open` naming an id nothing
+     * carries. The interactive specimens are wired together by nothing else,
+     * and none of the three breaks visibly: a tab pointing at a misspelt panel
+     * id still renders, a dialog opener naming the wrong id is still a button,
+     * and a tooltip described by a missing id is simply never announced.
+     */
+    #[Test]
+    public function everyIdReferenceOnThePageResolves(): void
+    {
+        $body = $this->render();
+
+        preg_match_all('#\sid="([^"]+)"#', $body, $ids);
+        preg_match_all(
+            '#\s(?:for|aria-controls|aria-labelledby|aria-describedby|data-theme-dialog-open)="([^"]+)"#',
+            $body,
+            $references,
+        );
+        $this->assertNotEmpty($references[1], 'No id reference was rendered at all.');
+
+        // "aria-labelledby" and "aria-describedby" take a list of ids.
+        $referenced = [];
+        foreach ($references[1] as $value) {
+            $referenced = [...$referenced, ...(preg_split('/\s+/', trim($value)) ?: [])];
+        }
+
+        $missing = array_values(array_unique(array_diff($referenced, $ids[1])));
+        sort($missing);
+
+        $this->assertSame([], $missing, 'These ids are referenced, but no element carries them: ' . implode(', ', $missing));
     }
 }

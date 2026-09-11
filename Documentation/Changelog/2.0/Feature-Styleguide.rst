@@ -20,7 +20,7 @@ menu. It is set to :guilabel:`Page not enabled in menus` rather than disabled: a
 disabled page answers 404 in the frontend and needs a backend preview link,
 which defeats the point of a page that exists to be opened.
 
-Seven sections, each its own partial:
+Eight sections, each its own partial:
 
 ..  list-table::
     :header-rows: 1
@@ -40,12 +40,16 @@ Seven sections, each its own partial:
     *   -   :file:`Styleguide/Buttons.html`
         -   Buttons
         -   :css:`.theme-button` with every modifier, size and state it ships,
-            the button group, and :css:`.theme-badge` in both severities and
-            fills.
+            the close button, the button group, and :css:`.theme-badge` in both
+            severities and fills.
     *   -   :file:`Styleguide/Boxes.html`
         -   Boxes
-        -   Card, teaser, hero, quote, alert, accordion and author, each with
-            every modifier its stylesheet defines.
+        -   Card, panel, teaser, hero, quote, alert, accordion and author, each
+            with every modifier its stylesheet defines.
+    *   -   :file:`Styleguide/Interactive.html`
+        -   Interactive
+        -   Tabs, dialog and tooltip - the components that need JavaScript -
+            and what each of them does without it.
     *   -   :file:`Styleguide/Forms.html`
         -   Forms
         -   The complete form contract: the field wrapper, every input type,
@@ -88,7 +92,7 @@ Overriding a section
 Each section is a partial of its own under
 :file:`EXT:theme_extension_development/Resources/Private/Partials/Styleguide/`,
 so a site package that wants its own forms section overrides
-:file:`Styleguide/Forms.html` and keeps the other six. That is the same
+:file:`Styleguide/Forms.html` and keeps the other seven. That is the same
 fine-grained override the rest of the theme follows.
 
 Specimen copy is literal English and is not routed through
