@@ -15,7 +15,7 @@
         "build:dev": "sass --load-path=Resources/Private/Scss --no-charset --style=expanded --source-map --embed-sources Resources/Private/Scss/theme.scss:Resources/Public/Css/theme.css",
         "build:verify": "sass --load-path=Resources/Private/Scss --no-charset --style=compressed --no-source-map Resources/Private/Scss/theme.scss:.Build/css-verify/theme.css && diff -u Resources/Public/Css/theme.css .Build/css-verify/theme.css",
         "watch": "npm run build:dev -- --watch",
-        "build:icons": "rm -rf Resources/Public/Icons/FontAwesome/Solid && mkdir -p Resources/Public/Icons/FontAwesome/Solid && cp node_modules/@fortawesome/fontawesome-free/svgs/solid/*.svg Resources/Public/Icons/FontAwesome/Solid/ && cp node_modules/@fortawesome/fontawesome-free/LICENSE.txt Resources/Public/Icons/FontAwesome/LICENSE.txt",
-        "build:icons:verify": "diff -r node_modules/@fortawesome/fontawesome-free/svgs/solid Resources/Public/Icons/FontAwesome/Solid && diff -u node_modules/@fortawesome/fontawesome-free/LICENSE.txt Resources/Public/Icons/FontAwesome/LICENSE.txt"
+        "build:icons": "rm -rf Resources/Public/Icons/FontAwesome/Solid && mkdir -p Resources/Public/Icons/FontAwesome/Solid && cp node_modules/@fortawesome/fontawesome-free/svgs/solid/*.svg Resources/Public/Icons/FontAwesome/Solid/ && cp node_modules/@fortawesome/fontawesome-free/LICENSE.txt Resources/Public/Icons/FontAwesome/LICENSE.txt && cp node_modules/@fortawesome/fontawesome-free/metadata/categories.yml Resources/Public/Icons/FontAwesome/categories.yml",
+        "build:icons:verify": "diff -r node_modules/@fortawesome/fontawesome-free/svgs/solid Resources/Public/Icons/FontAwesome/Solid && diff -u node_modules/@fortawesome/fontawesome-free/LICENSE.txt Resources/Public/Icons/FontAwesome/LICENSE.txt && diff -u node_modules/@fortawesome/fontawesome-free/metadata/categories.yml Resources/Public/Icons/FontAwesome/categories.yml"
     }
 }
