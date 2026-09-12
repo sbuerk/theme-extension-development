@@ -67,10 +67,11 @@ Between them the pages use every backend layout the extension registers and
 carry every content type it renders, so a single seeded instance answers what
 the theme does with each. Two of the pages are deliberate special cases:
 :guilabel:`Empty page` selects no backend layout at all, which is the only way
-to see the default fallback, and :guilabel:`Styleguide` is set to
-:guilabel:`Page not enabled in menus` rather than disabled - a disabled page
-returns 404 in the frontend and is only reachable through a preview link, which
-defeats the point of seeding a page that exists to be opened.
+to see the default fallback. :guilabel:`Styleguide` and :guilabel:`Forms` are
+in the main navigation, see :ref:`feature-showcase-sections`; neither is
+disabled - a disabled page returns 404 in the frontend and is only reachable
+through a preview link, which defeats the point of seeding a page that exists
+to be opened.
 
 Known limitation
 ================
@@ -87,8 +88,8 @@ Impact
 exercises the theme end to end, so a development or test instance needs no
 pages built by hand to see what an element looks like.
 
-The set declares the uid of every record it writes - pages 1 to 10, content
-elements from 101 - because the records point at each other by uid: the links
+The set declares the uid of every record it writes - pages 1 to 10 and the
+pages of :ref:`feature-showcase-sections`, content elements from 101 - because the records point at each other by uid: the links
 name ``t3://page?uid=2``, the :guilabel:`Insert records` element names
 ``tt_content_601``, and a site configuration names its root page. The import
 therefore needs an installation where those uids are free, and refuses rather
