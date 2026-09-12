@@ -188,6 +188,424 @@ entities:
                       the <a href="t3://page?uid=1">link to the start page</a> as well.
                       The space after the element is "extra large".</p>
 
+          # The typography section: the rich text path, from records. The
+          # styleguide (uid 9) shows the same components as literal markup;
+          # these pages prove that a record reaches them. Seeded "bodytext" is
+          # written through DataHandler like a backend save, so the RTE
+          # processing of the installation applies to it - with the theme's
+          # preset, everything below survives - but it never went through
+          # CKEditor, which is why it holds more than the toolbar offers.
+          # The first element of each page says so.
+          children:
+            - self:
+                  id: 52
+                  title: 'Text'
+                  slug: '/typography/text'
+                  backend_layout: 'content'
+              entities:
+                content:
+                  - self:
+                        id: 5201
+                        CType: 'header'
+                        header: 'Text'
+                        header_layout: 1
+                  - self:
+                        id: 5202
+                        CType: 'text'
+                        bodytext: |
+                          <p class="theme-lead">Running text, headings inside it, the inline
+                          semantics and the alignments of the rich text editor - all from
+                          one text element each.</p>
+                          <p>The rich text of these pages is written into the database the
+                          way a backend save writes it, so the processing of the rich text
+                          preset has run over it. It has not been typed into the editor:
+                          several things here need its source view.</p>
+                  - self:
+                        id: 5203
+                        CType: 'text'
+                        header: 'Headings inside the text'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The header of the element is its heading 2. The rich text
+                          continues the outline below it.</p>
+                          <h3>A heading 3 inside the text</h3>
+                          <p>The editor offers heading 2 and heading 3, so a text can carry
+                          sections of its own without an element per section.</p>
+                          <h3>A second heading 3, long enough to wrap onto a second line at
+                          the width of the content column</h3>
+                          <p>A long heading is balanced over its lines, so the last line is
+                          not a single orphaned word.</p>
+                  - self:
+                        id: 5204
+                        CType: 'text'
+                        header: 'Inline semantics'
+                        header_layout: 2
+                        bodytext: |
+                          <p><strong>Strong importance</strong> and <em>stress emphasis</em>,
+                          <mark>a marked passage</mark>, <small>small print</small>,
+                          <s>no longer accurate</s>, <del>deleted</del> and <ins>inserted</ins>
+                          text, H<sub>2</sub>O and E = mc<sup>2</sup>.</p>
+                          <p>An <abbr title="Rich Text Editor">RTE</abbr> writes
+                          <code>&lt;p&gt;</code> around a paragraph; <kbd>Ctrl</kbd> +
+                          <kbd>B</kbd> makes a word strong. A <dfn>content element</dfn> is
+                          a record rendered into a column of a page. <q>A quotation inside
+                          a sentence</q>, as <cite>the style guide</cite> puts it, gets its
+                          quotation marks from the language.</p>
+                  - self:
+                        id: 5205
+                        CType: 'text'
+                        header: 'Alignment'
+                        header_layout: 2
+                        bodytext: |
+                          <p class="theme-text--start">Aligned to the start of the line, which
+                          is where every paragraph starts anyway.</p>
+                          <p class="theme-text--center">Centred, for a short line that stands
+                          on its own.</p>
+                          <p class="theme-text--end">Aligned to the end of the line.</p>
+                          <p class="theme-text--justify">Justified: both edges of the column
+                          are straight, and the spaces between the words stretch to make them
+                          so. Without hyphenation the gaps grow on a narrow column, which is
+                          why the theme leaves justification to the paragraph that asks for
+                          it.</p>
+                  - self:
+                        id: 5206
+                        CType: 'text'
+                        header: 'Language and direction'
+                        header_layout: 2
+                        bodytext: |
+                          <p lang="de">Ein deutscher Absatz mit langen Zusammensetzungen wie
+                          Inhaltselementdarstellung und Seitenbaumkonfigurationsdatei: mit der
+                          Sprache am Absatz trennt der Browser sie am Zeilenende.</p>
+                          <p dir="rtl" lang="ar">هذه فقرة قصيرة باللغة العربية، تبدأ من
+                          اليمين وتنتهي في اليسار.</p>
+
+            - self:
+                  id: 53
+                  title: 'Lists'
+                  slug: '/typography/lists'
+                  backend_layout: 'content'
+              entities:
+                content:
+                  - self:
+                        id: 5301
+                        CType: 'header'
+                        header: 'Lists'
+                        header_layout: 1
+                  - self:
+                        id: 5302
+                        CType: 'text'
+                        header: 'Lists inside the text'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The lists of the rich text keep the markers of the element
+                          baseline, nested lists included:</p>
+                          <ul>
+                            <li>A first item</li>
+                            <li>A second item, holding a list of its own
+                              <ul>
+                                <li>A nested item</li>
+                                <li>A second nested item
+                                  <ul><li>A third level</li></ul>
+                                </li>
+                              </ul>
+                            </li>
+                            <li>A last item</li>
+                          </ul>
+                          <ol>
+                            <li>A first step</li>
+                            <li>A second step, with sub steps
+                              <ol><li>A sub step</li><li>Another sub step</li></ol>
+                            </li>
+                            <li>A last step</li>
+                          </ol>
+                  - self:
+                        id: 5303
+                        CType: 'text'
+                        header: 'The list component inside the text'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The class of a list is kept by the rich text processing, so a
+                          list in the source view can be one of the list component:</p>
+                          <ul class="theme-list theme-list--check">
+                            <li>Check marks, from the source view</li>
+                            <li>The same component the bullet list element renders</li>
+                          </ul>
+                          <ul class="theme-list theme-list--columns-2">
+                            <li>Header</li><li>Text</li><li>Text &amp; Images</li>
+                            <li>Text &amp; Media</li><li>Images</li><li>Bullet list</li>
+                            <li>Table</li><li>File links</li>
+                          </ul>
+                  # The element, rather than rich text: see "/elements/core/bullets"
+                  # (uid 35) for every layout.
+                  - self:
+                        id: 5304
+                        CType: 'bullets'
+                        header: 'A definition list from the bullet list element'
+                        header_layout: 2
+                        bullets_type: 2
+                        bodytext: |
+                          Unstyled|No marker and no indent
+                          Check|A check mark in front of every item
+                          Icon|An icon of the set in front of every item
+                          Columns|The items flow into two or three columns
+                          Divided|A hairline between the rows
+                  - self:
+                        id: 5305
+                        CType: 'text'
+                        bodytext: '<p>Every layout of the bullet list element is on its <a href="t3://page?uid=35">own page</a>.</p>'
+
+            - self:
+                  id: 54
+                  title: 'Tables'
+                  slug: '/typography/tables'
+                  backend_layout: 'content'
+              entities:
+                content:
+                  - self:
+                        id: 5401
+                        CType: 'header'
+                        header: 'Tables'
+                        header_layout: 1
+                  # A table of the rich text keeps its classes through the
+                  # parsing function of the frontend, but is not wrapped in the
+                  # scroll region the table element renders - which is why the
+                  # table element is the way to a wide table.
+                  - self:
+                        id: 5402
+                        CType: 'text'
+                        header: 'A table inside the text'
+                        header_layout: 2
+                        bodytext: |
+                          <p>A table of the rich text, with the classes of the table
+                          component written in the source view. It has no scroll region of
+                          its own, so it has to fit the column.</p>
+                          <table class="theme-table theme-table--striped">
+                            <caption>The two appearances</caption>
+                            <thead><tr><th scope="col">Appearance</th><th scope="col">Background</th><th scope="col">Text</th></tr></thead>
+                            <tbody>
+                              <tr><th scope="row">Light</th><td>A near white</td><td>A near black</td></tr>
+                              <tr><th scope="row">Dark</th><td>A near black</td><td>A near white</td></tr>
+                            </tbody>
+                          </table>
+                  - self:
+                        id: 5403
+                        CType: 'table'
+                        header: 'The table element, with a header column and a footer'
+                        header_layout: 2
+                        table_class: 'compact'
+                        table_caption: 'Contrast of the text colours on the page background'
+                        table_delimiter: 124
+                        table_enclosure: 0
+                        table_header_position: 2
+                        table_tfoot: 1
+                        bodytext: |
+                          Primary text|The body copy|at least 7:1
+                          Secondary text|Leads and captions|at least 4.5:1
+                          Muted text|Dates and hints|at least 4.5:1
+                          Every text colour|Holds AA on its surface|4.5:1
+                  - self:
+                        id: 5404
+                        CType: 'text'
+                        bodytext: '<p>Every class of the table element is on its <a href="t3://page?uid=36">own page</a>.</p>'
+
+            - self:
+                  id: 55
+                  title: 'Quotes and code'
+                  slug: '/typography/quotes-and-code'
+                  backend_layout: 'content'
+              entities:
+                content:
+                  - self:
+                        id: 5501
+                        CType: 'header'
+                        header: 'Quotes and code'
+                        header_layout: 1
+                  - self:
+                        id: 5502
+                        CType: 'text'
+                        header: 'A quotation inside the text'
+                        header_layout: 2
+                        bodytext: |
+                          <p>A block quotation of the rich text, set apart from the running
+                          text around it:</p>
+                          <blockquote><p>Programs must be written for people to read, and only
+                          incidentally for machines to execute.</p></blockquote>
+                          <p>- <cite>Abelson and Sussman, Structure and Interpretation of
+                          Computer Programs</cite></p>
+                  # The testimonial element renders the quote component with its
+                  # attribution; the name is "header", the role "subheader".
+                  - self:
+                        id: 5503
+                        CType: 'theme_testimonial'
+                        header: 'Harold Abelson and Gerald Jay Sussman'
+                        subheader: 'Preface to the first edition, 1985'
+                        bodytext: '<p>Programs must be written for people to read, and only incidentally for machines to execute.</p>'
+                  - self:
+                        id: 5504
+                        CType: 'text'
+                        header: 'Preformatted text inside the text'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The editor offers "Pre-Formatted Text" as a heading option. It
+                          keeps line breaks and spaces, and scrolls rather than wraps:</p>
+                          <pre><code>tt_content.bullets =&lt; lib.contentElement
+                          tt_content.bullets.templateName = ContentElements/Bullets</code></pre>
+                  # The code block component needs a figure, a caption and a
+                  # scroll region with a label - markup for the HTML element,
+                  # which renders it untouched.
+                  - self:
+                        id: 5505
+                        CType: 'html'
+                        header: 'A code block with its file name (name only, not rendered)'
+                        bodytext: |
+                          <h2 class="theme-content-element__heading">A code block with its file name</h2>
+                          <figure class="theme-code">
+                              <figcaption class="theme-code__caption">
+                                  <span class="theme-code__filename">config/sites/demo/config.yaml</span>
+                                  <span class="theme-code__language">YAML</span>
+                              </figcaption>
+                              <pre class="theme-code__block" role="region" tabindex="0" aria-label="config/sites/demo/config.yaml"><code>base: 'https://theme.example.com/'
+                          rootPageId: 1
+                          dependencies:
+                            - sbuerk/theme-extension-development</code></pre>
+                          </figure>
+
+            # A long form article: every component of the section in one
+            # reading flow, the way a page of a site uses them.
+            - self:
+                  id: 56
+                  title: 'Article'
+                  slug: '/typography/article'
+                  backend_layout: 'content'
+              entities:
+                content:
+                  - self:
+                        id: 5601
+                        CType: 'header'
+                        header: 'How a content element reaches the page'
+                        header_layout: 1
+                  - self:
+                        id: 5602
+                        CType: 'text'
+                        bodytext: |
+                          <p class="theme-lead">An editor fills in a form and saves it. A
+                          moment later a visitor reads a paragraph. Between the two lie a
+                          database row, a few lines of configuration and a template - and
+                          each of them decides something about what the visitor sees.</p>
+                          <p>This article follows one element along that way. It is also a
+                          specimen: a long text, set with the components a site package gets
+                          from the theme, so the rhythm of headings, paragraphs, lists,
+                          figures, tables and code can be read as a whole rather than one
+                          specimen at a time.</p>
+                  - self:
+                        id: 5603
+                        CType: 'text'
+                        header: 'The record'
+                        header_layout: 2
+                        bodytext: |
+                          <p>Everything starts as a row of the table <code>tt_content</code>.
+                          Its type, the CType, decides which fields the form shows and which
+                          rendering the frontend picks. The fields an editor fills in are
+                          plain columns of that row: a header, a text, a layout, a frame.</p>
+                          <h3>What the form does not show</h3>
+                          <p>Some columns are there without a field in the form. The page the
+                          element belongs to, its position in the column and its language are
+                          written by the backend itself. They matter just as much: a content
+                          element is rendered because a page asks for the content of one of
+                          its columns, not because the element exists.</p>
+                  - self:
+                        id: 5604
+                        CType: 'textpic'
+                        header: 'The frame'
+                        header_layout: 2
+                        imageorient: 17
+                        imagecols: 1
+                        bodytext: |
+                          <p>Every element is rendered through one frame, the layout
+                          <code>ContentElement</code> of the theme. It writes the wrapper
+                          with the anchor of the element, the CType as a modifier and as an
+                          attribute, and the modifiers of the appearance fields: the band of
+                          the frame, the space before and after.</p>
+                          <p>The frame is also what the outlines of the development mode
+                          draw. Switch them on in the display settings, and every element
+                          of this article shows its boundary and its CType - the image
+                          beside this text belongs to the same element as the text itself.</p>
+                          <p>The image is placed in the text, at the end of the line. The
+                          gallery processor of the core computes its width from the column
+                          and the number of columns, and the theme floats it, so this text
+                          flows around it and continues under it once it is past.</p>
+                  - self:
+                        id: 5605
+                        CType: 'bullets'
+                        header: 'What the frame reads'
+                        header_layout: 2
+                        bullets_type: 0
+                        layout: 1
+                        bodytext: |
+                          The frame: default, no frame, or one of four bands
+                          The space before and after the element
+                          The alignment and the look of the header
+                          The CType, for the modifier and the outline
+                  - self:
+                        id: 5606
+                        CType: 'text'
+                        header: 'The template'
+                        header_layout: 2
+                        bodytext: |
+                          <p>Inside the frame, the template of the CType renders what is
+                          particular to it. A text element renders its header and its rich
+                          text; a table element renders a table from the lines of its text
+                          field, split by a data processor before the template sees them.</p>
+                          <blockquote><p>A template receives data it can render and never
+                          computes what a processor could hand it.</p></blockquote>
+                          <p>That division is the reason a table element and a table of the
+                          rich text look the same: both end in the same component, one from
+                          a processor, the other from the source view of the editor.</p>
+                  - self:
+                        id: 5607
+                        CType: 'table'
+                        header: 'The fields of a table element'
+                        header_layout: 3
+                        table_class: 'striped'
+                        table_caption: 'What the table element reads, and what it does with it'
+                        table_delimiter: 124
+                        table_enclosure: 0
+                        table_header_position: 1
+                        bodytext: |
+                          Field|Holds|Read by
+                          bodytext|The rows, one per line|TableProcessor
+                          table_delimiter|The character code of the column separator|TableProcessor
+                          table_header_position|Header row, header column, or none|TableProcessor
+                          table_class|The look of the table|Table.html
+                  - self:
+                        id: 5608
+                        CType: 'html'
+                        header: 'The TypoScript of the bullet list (name only, not rendered)'
+                        bodytext: |
+                          <figure class="theme-code">
+                              <figcaption class="theme-code__caption">
+                                  <span class="theme-code__filename">Configuration/TypoScript/ContentElements.typoscript</span>
+                                  <span class="theme-code__language">TypoScript</span>
+                              </figcaption>
+                              <pre class="theme-code__block" role="region" tabindex="0" aria-label="Configuration/TypoScript/ContentElements.typoscript"><code>tt_content.bullets =&lt; lib.contentElement
+                          tt_content.bullets {
+                              templateName = ContentElements/Bullets
+                          }</code></pre>
+                          </figure>
+                  - self:
+                        id: 5609
+                        CType: 'text'
+                        header: 'What is left to the editor'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The editor chooses the type, fills in the fields and picks from
+                          the values the form offers. The theme offers only values it
+                          renders: a frame it does not draw is not in the list, and a field
+                          it does not read is not in the form.</p>
+                          <p>Everything else - the markup, the spacing, the colours in both
+                          appearances - follows from the theme, which is what lets a page of
+                          many elements read as one page.</p>
+
         - self:
               id: 3
               title: 'Media'
