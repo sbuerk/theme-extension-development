@@ -386,7 +386,8 @@ jobs:
   # Independent of PHP and of the core version: the stylesheet is compiled from
   # SCSS and depends on neither, so this is a single job rather than a matrix
   # dimension. It also needs no "composerUpdate", which is what makes it the
-  # cheapest job in the workflow.
+  # cheapest job in the workflow. The vendored icons are checked here as well:
+  # the same node image, the same "npm ci" of the same lockfile.
   css:
     name: "css"
     runs-on: ubuntu-latest
@@ -404,6 +405,9 @@ jobs:
 
       - name: "Ensure the committed CSS matches its SCSS sources"
         run: "Build/Scripts/runTests.sh -b docker -s checkCssBuild"
+
+      - name: "Ensure the committed icons equal the pinned Font Awesome Free"
+        run: "Build/Scripts/runTests.sh -b docker -s checkIconsBuild"
 
   documentation:
     name: "documentation"

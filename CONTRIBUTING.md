@@ -59,6 +59,7 @@ Build/Scripts/runTests.sh -s checkMarkdownTables
 Build/Scripts/runTests.sh -s checkTestMethodsPrefix
 Build/Scripts/runTests.sh -t 13 -s acceptance  # a built instance, in a browser
 Build/Scripts/runTests.sh -s checkCssBuild   # committed CSS matches its SCSS
+Build/Scripts/runTests.sh -s checkIconsBuild # committed icons equal the pinned package
 Build/Scripts/runTests.sh -s visual          # screenshots and axe of the styleguide
 ```
 

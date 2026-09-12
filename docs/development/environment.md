@@ -70,6 +70,8 @@ hosted runners, not of this repository.
 | `buildCss`                   | Compile the SCSS into `Resources/Public/Css`.                                                              |
 | `checkCssBuild`              | The committed CSS must match its SCSS sources.                                                             |
 | `watchCss`                   | Compile the SCSS, re-compiling on every change.                                                            |
+| `buildIcons`                 | Copy the solid icons of the pinned Font Awesome Free into `Resources/Public/Icons`, see [Icons](icons.md). |
+| `checkIconsBuild`            | The committed icons must equal the pinned Font Awesome Free package.                                       |
 | `npm`                        | `npm` with all remaining arguments dispatched.                                                             |
 | `composer`                   | `composer` with all remaining arguments dispatched.                                                        |
 | `composerInstall`            | `composer install`.                                                                                        |
