@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     "theme_accordion" - one native "details" per row of "tx_theme_list_items",
@@ -19,8 +20,9 @@
     The summary is the item's title as text, not a heading inside the
     "summary": the element is exposed as a button, and a heading within a
     button is flattened into its name by most assistive technology anyway.
-    "item.data.text" is rich text on this relation (see
-    "tt_content_theme_accordion.php"), hence "f:format.html".
+    The chevron after it is the "chevron-down" icon, decoration the stylesheet
+    turns when the item opens. "item.data.text" is rich text on this relation
+    (see "tt_content_theme_accordion.php"), hence "f:format.html".
 </f:comment>
 <f:layout name="ContentElement" />
 
@@ -31,7 +33,7 @@
         <div class="theme-accordion">
             <f:for each="{listItems}" as="item">
                 <details class="theme-accordion__item" name="c{data.uid}-accordion">
-                    <summary class="theme-accordion__summary">{item.data.header}</summary>
+                    <summary class="theme-accordion__summary">{item.data.header}<theme:icon name="chevron-down" class="theme-accordion__marker" /></summary>
                     <div class="theme-accordion__panel">
                         <f:if condition="{item.data.text}">
                             <f:format.html>{item.data.text}</f:format.html>

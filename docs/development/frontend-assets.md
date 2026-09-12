@@ -156,9 +156,10 @@ Partials are pulled in with `@use` and `@forward`, **never** with `@import`:
 
 Every sass script in `package.json` passes `--no-charset`. Without it, dart-sass
 marks output that contains non-ASCII characters, and this stylesheet does: the
-typographic `quotes` in `base/_elements.scss` and the glyphs in
-`forms/_validation.scss`. Compressed output starts with a BOM, expanded output
-with `@charset "UTF-8";`.
+typographic `quotes` in `base/_elements.scss`. Compressed output starts with a
+BOM, expanded output with `@charset "UTF-8";`. The validation glyphs of
+`forms/_validation.scss` were the second source until they became icons in the
+markup, see [Icons](icons.md).
 
 A linked stylesheet loses the BOM in the decoder, but an inlined or concatenated
 one keeps it as the character U+FEFF. `includeCSS.*.inline` reads the file
@@ -166,9 +167,9 @@ verbatim into a `<style>`, and so does critical CSS or a shadow root. The first
 selector then reads `U+FEFF:root`, which matches nothing, and the whole token
 block is gone without an error.
 
-Escaping the characters in the SCSS (`content: '\26A0'`) does not help: sass
-1.102.0 writes the literal character for the escape and adds the BOM all the
-same.
+Escaping the characters in the SCSS (`content: '\26A0'`, tried on the warning
+glyph the stylesheet had then) does not help: sass 1.102.0 writes the literal
+character for the escape and adds the BOM all the same.
 
 Without the mark, the stylesheet still decodes as UTF-8:
 

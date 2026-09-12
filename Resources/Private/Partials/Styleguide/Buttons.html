@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     Styleguide section D1 "buttons": ".theme-button" with every modifier it
@@ -24,11 +25,11 @@
         125  .theme-button--small
         135  .theme-button--large
         145  .theme-button--link           underlined, no fill, no border
-        162  .theme-button--icon           square, glyph only, in every size
-        184  [aria-pressed='true']         a toggle that is on, plus its :hover
-        208  [aria-busy='true']            the spinner, and its keyframes at 226
-        234  .theme-button-group           the row wrapper
-        253  .theme-button-group--attached one control in several parts
+        163  .theme-button--icon           square, glyph only, in every size
+        180  [aria-pressed='true']         a toggle that is on, plus its :hover
+        204  [aria-busy='true']            the spinner, and its keyframes at 222
+        230  .theme-button-group           the row wrapper
+        249  .theme-button-group--attached one control in several parts
 
       Resources/Private/Scss/components/_close.scss
         .theme-close                       the close button, its own component
@@ -46,7 +47,7 @@
     _reset.scss:58, so a button that styled its own would be overriding a
     global accessibility decision rather than implementing one.
 
-    The rows below are ".theme-button-group" (_button.scss:234) so that each
+    The rows below are ".theme-button-group" (_button.scss:230) so that each
     specimen sits next to the class that produced it - which demonstrates that
     component as a side effect rather than needing a row of its own.
 </f:comment>
@@ -98,33 +99,22 @@
         <p><code>.theme-button--icon</code> is square: the 44 pixel target in both directions, with a glyph as its only content. The glyph is decoration and hidden from assistive technology, and the name is <code>aria-label</code> on the button — an icon button with neither has no accessible name at all. It combines with every variant.</p>
         <div class="theme-button-group">
             <button class="theme-button theme-button--icon" type="button" aria-label="Search the styleguide">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                    <circle cx="11" cy="11" r="6"/>
-                    <path d="M15.5 15.5 20 20"/>
-                </svg>
+                <theme:icon name="magnifying-glass" />
             </button>
             <button class="theme-button theme-button--secondary theme-button--icon" type="button" aria-label="Copy the link to this section">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                    <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/>
-                    <path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/>
-                </svg>
+                <theme:icon name="link" />
             </button>
             <button class="theme-button theme-button--ghost theme-button--icon" type="button" aria-label="Show more actions">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true" focusable="false">
-                    <path d="M6 12h.01M12 12h.01M18 12h.01"/>
-                </svg>
+                <theme:icon name="ellipsis" />
             </button>
             <button class="theme-button theme-button--secondary theme-button--icon theme-button--large" type="button" aria-label="Search the styleguide, the large size">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                    <circle cx="11" cy="11" r="6"/>
-                    <path d="M15.5 15.5 20 20"/>
-                </svg>
+                <theme:icon name="magnifying-glass" />
             </button>
             <span class="theme-styleguide__label">In order: the default, <code>--secondary</code> and <code>--ghost</code>, each combined with <code>--icon</code>, and <code>--secondary</code> once more with <code>--large</code> as well, which stays the same square: the size modifiers change the padding, and the icon button pins its box.</span>
         </div>
         <div class="theme-button-group">
-            <button class="theme-close" type="button" aria-label="Close the specimen"></button>
-            <span class="theme-styleguide__label"><code>.theme-close</code> — a component of its own rather than one more button modifier: no fill, no border, no label, and a negative margin that lines up the glyph, not the invisible target around it, with the content edge. The cross is two borders, so it survives forced colours mode. It belongs in a dialog or panel header; the Interactive section shows it in the dialog.</span>
+            <button class="theme-close" type="button" aria-label="Close the specimen"><theme:icon name="xmark" /></button>
+            <span class="theme-styleguide__label"><code>.theme-close</code> — a component of its own rather than one more button modifier: no fill, no border, no label, and a negative margin that lines up the glyph, not the invisible target around it, with the content edge. The cross is the <code>xmark</code> icon, filled with the text colour, so it follows the hover colour and forced colours mode alike. It belongs in a dialog or panel header; the Interactive section shows it in the dialog.</span>
         </div>
     </div>
 

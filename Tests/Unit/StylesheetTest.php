@@ -72,7 +72,7 @@ final class StylesheetTest extends UnitTestCase
     /**
      * dart-sass starts compressed output that contains non-ASCII characters
      * with a byte order mark, and this stylesheet does - the typographic
-     * quotes and the validation glyphs. Linked, the mark is consumed by the
+     * quotes. Linked, the mark is consumed by the
      * decoder. Inlined or concatenated - `includeCSS.*.inline`, critical CSS,
      * a shadow root - it becomes part of the first selector, `U+FEFF:root`
      * matches nothing, and the whole token block is gone. Built with

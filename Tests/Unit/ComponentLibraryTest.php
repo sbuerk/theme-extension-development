@@ -52,6 +52,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'dialog' => '.theme-dialog',
             'gallery' => '.theme-gallery',
             'hero' => '.theme-hero',
+            'icon' => '.theme-icon',
             'main navigation' => '.theme-nav-main',
             'sub navigation' => '.theme-nav-sub',
             'pagination' => '.theme-pagination',

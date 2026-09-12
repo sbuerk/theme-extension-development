@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\Test;
+use SBUERK\ThemeExtensionDevelopment\Icon\IconSet;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
@@ -85,6 +86,36 @@ final class AppearanceRenderingTest extends AbstractFunctionalTestCase
         $this->assertCount(1, $triggers, 'Expected exactly one display settings button.');
 
         return $triggers[0];
+    }
+
+    /**
+     * The cog, the three appearance options and the check mark of the chosen
+     * palette are icons of the shipped set, rendered through TYPO3's Fluid:
+     * the markup of each file as shipped, attribution comment included, with
+     * the attributes and the component class the ViewHelper adds. The glyphs
+     * drawn in the template before - stroked circles, a dashed ring for the
+     * cog - are gone.
+     */
+    #[Test]
+    public function theDisplaySettingsDrawTheirIconsFromTheShippedSet(): void
+    {
+        $body = $this->render();
+        $icons = new IconSet();
+
+        foreach (['gear' => 'theme-settings__icon', 'desktop' => 'theme-segmented__icon', 'sun' => 'theme-segmented__icon', 'moon' => 'theme-segmented__icon', 'check' => 'theme-swatch-option__check'] as $name => $class) {
+            $this->assertStringContainsString(
+                sprintf('<svg class="theme-icon %s" aria-hidden="true" focusable="false"%s', $class, substr($icons->markup($name), 4)),
+                $body,
+                sprintf('The icon "%s" is not rendered from the shipped set.', $name),
+            );
+        }
+        // One check mark per palette; the stylesheet shows the checked one.
+        $this->assertSame(5, substr_count($body, 'class="theme-icon theme-swatch-option__check"'));
+        $this->assertStringNotContainsString('stroke-dasharray', $body);
+        $this->assertStringNotContainsString('stroke="currentColor"', $body);
+        // The licence asks that the attribution comment is not removed, and a
+        // public page shares the icons: it travels with every one of them.
+        $this->assertStringContainsString('<!--! Font Awesome Free ', $body, 'The attribution comment of the icon set is missing from the page.');
     }
 
     /**

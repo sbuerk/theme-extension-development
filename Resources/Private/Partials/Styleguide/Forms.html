@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     Styleguide section D1 - "forms". The specimens are literal markup copied
@@ -68,21 +69,19 @@
         79     .theme-field__hint                          spans both columns
 
       Resources/Private/Scss/forms/_validation.scss
-        45   .theme-field--invalid
-        55   .theme-field--valid
-        67   :user-invalid on input/textarea/select         the automatic one
-        75   .theme-field__error, .theme-field__success
-        85   .theme-field__error
-        91     &::before                                    the warning glyph
-        97   .theme-field__success
-        100    &::before                                    the check glyph
-        106  .theme-field--inline .theme-field__error
-        113  .theme-form-summary
-        132  .theme-form-summary__title
-        138  .theme-form-summary__list
-        148    a
-        153    a:hover
-        159  .theme-form-summary--success
+        59   .theme-field--invalid
+        69   .theme-field--valid
+        81   :user-invalid on input/textarea/select         the automatic one
+        93   .theme-field__error, .theme-field__success     the icon is markup
+        103  .theme-field__error
+        107  .theme-field__success
+        111  .theme-field--inline .theme-field__error
+        118  .theme-form-summary
+        137  .theme-form-summary__title
+        143  .theme-form-summary__list
+        153    a
+        158    a:hover
+        179  .theme-form-summary--success
 
       Resources/Private/Scss/forms/_input-group.scss
         47   .theme-input-group
@@ -104,8 +103,8 @@
       - ".theme-form-summary--error" appears in all three markup contracts
         and in docs/development/component-library.md, but no rule anywhere
         under "forms/" selects it: the base ".theme-form-summary"
-        (_validation.scss:113) already carries the danger palette, and only
-        "--success" (159) re-points it. The modifier is written here anyway,
+        (_validation.scss:118) already carries the danger palette, and only
+        "--success" (179) re-points it. The modifier is written here anyway,
         because the contract is what a site package copies and a later
         "--warning" variant would want the error case named rather than
         implied.
@@ -305,8 +304,9 @@
 
     <div class="theme-styleguide__specimen">
         <p>
-            The select keeps the native arrow: replacing it needs an icon asset
-            and this library ships none, so only the box around the indicator is
+            The select keeps the native arrow: an icon of the theme's set would
+            have to be markup next to the control, or a background image the
+            text colour cannot reach, so only the box around the indicator is
             themed. <code>optgroup</code> is set in the secondary text colour and
             bold rather than the browser's italic. A
             <code>select[multiple]</code> is made tall enough to show a handful
@@ -516,6 +516,7 @@
                            aria-describedby="sg-form-group-host-error sg-form-group-host-scheme">
                 </div>
                 <p class="theme-field__error" id="sg-form-group-host-error">
+                    <theme:icon name="circle-exclamation" />
                     Enter a host name without spaces
                 </p>
             </div>
@@ -596,9 +597,11 @@
         </p>
         <p>
             No rule signals a state by colour alone. An invalid border also gets
-            thicker, and the error message is prefixed with a warning glyph that
-            is real content rather than a decorative background image, so both
-            survive greyscale printing and a colour vision deficiency.
+            thicker, and every message starts with an icon of the theme's set
+            &mdash; <code>circle-exclamation</code> for an error,
+            <code>circle-check</code> for a success &mdash; so both survive
+            greyscale printing and a colour vision deficiency. The icon is
+            markup in the message, not generated content.
         </p>
 
         <form class="theme-form" method="dialog">
@@ -626,6 +629,7 @@
                        aria-invalid="true"
                        aria-describedby="sg-form-mail-error sg-form-mail-hint">
                 <p class="theme-field__error" id="sg-form-mail-error">
+                    <theme:icon name="circle-exclamation" />
                     Enter an email address in the format name@example.org
                 </p>
                 <p class="theme-field__hint" id="sg-form-mail-hint">
@@ -646,6 +650,7 @@
                        aria-invalid="true"
                        aria-describedby="sg-form-postcode-error">
                 <p class="theme-field__error" id="sg-form-postcode-error">
+                    <theme:icon name="circle-exclamation" />
                     Enter a postcode of five digits
                 </p>
             </div>
@@ -659,6 +664,7 @@
                           aria-invalid="true"
                           aria-describedby="sg-form-message-error">Too short.</textarea>
                 <p class="theme-field__error" id="sg-form-message-error">
+                    <theme:icon name="circle-exclamation" />
                     Enter at least 20 characters
                 </p>
             </div>
@@ -674,6 +680,7 @@
                        aria-invalid="true"
                        aria-describedby="sg-form-quantity-error">
                 <p class="theme-field__error" id="sg-form-quantity-error">
+                    <theme:icon name="circle-exclamation" />
                     Enter a quantity of at least 1
                 </p>
             </div>
@@ -686,6 +693,7 @@
                     <option value="ch">Switzerland</option>
                 </select>
                 <p class="theme-field__success" id="sg-form-country-success">
+                    <theme:icon name="circle-check" />
                     Delivery is available to this country
                 </p>
             </div>
