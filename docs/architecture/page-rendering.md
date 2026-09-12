@@ -72,6 +72,7 @@ TypoScript itself.
 | `content_sidebar` | Content page with sidebar | `Page/ContentSidebar.html` |
 | `start`           | Start page                | `Page/Start.html`          |
 | `styleguide`      | Styleguide                | `Page/Styleguide.html`     |
+| `forms`           | Form showcase             | `Page/Forms.html`          |
 
 `default` is also the literal fallback identifier
 `PageLayoutResolver::getLayoutIdentifierForPage()` returns when neither a
@@ -86,7 +87,7 @@ two themes:
 
 | Slot         | colPos | In layouts                            |
 |--------------|--------|---------------------------------------|
-| `main`       | 0      | all except `styleguide`               |
+| `main`       | 0      | all except `styleguide` and `forms`   |
 | `sidebar`    | 1      | `content_sidebar`                     |
 | `stage`      | 2      | `content`, `content_sidebar`, `start` |
 | `footermeta` | 10     | `content`, `content_sidebar`, `start` |
@@ -104,7 +105,9 @@ from the backend layout selector entirely by
 "new content element" affordance anywhere. Both are worse than a column
 nothing ever renders; the `styleguide` layout's own tsconfig comment spells
 this out. `identifier = unused` rather than reusing `main`, because reusing
-`main` would suggest the column behaves like every other layout's.
+`main` would suggest the column behaves like every other layout's. `forms`,
+the [form showcase](../development/form-showcase.md), is built the same way
+for the same reason.
 
 ## Template name resolution
 

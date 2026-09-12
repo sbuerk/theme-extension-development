@@ -23,3 +23,4 @@
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/ContentSidebar.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Start.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Styleguide.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Forms.tsconfig'

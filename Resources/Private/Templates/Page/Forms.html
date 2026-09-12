@@ -1,0 +1,398 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The form showcase, rendered from the backend layout "forms"
+    (Configuration/PageTsConfig/BackendLayouts/Forms.tsconfig).
+
+    One realistic form, put together from the form contract of the component
+    library (docs/development/component-library.md, "Forms") and nothing else:
+    fieldsets, every control a request form reaches for, an input group on
+    either side, choice groups inline and stacked, a switch, a hint on the
+    fields that need one, and the same form a second time as a server would
+    return it after a failed submission - the error summary linking to each
+    invalid field, the invalid and the valid state - followed by the summary
+    of a successful one.
+
+    Where the styleguide's forms section shows the contract selector by
+    selector, this shows it composed: whether the pieces work together in the
+    order a form actually needs them, which no specimen asks.
+
+    Like the styleguide it is literal markup, not driven by a record, and it
+    ignores anything placed on the page: there is no "f:cObject" in this file,
+    and the layout's only column is the inert colPos 999. A form content
+    element was the alternative and was rejected: its output would not depend
+    on its record at all, and it would be one more CType in the wizard, in the
+    editor group's grants and in every list that holds the showcase complete,
+    for a record with nothing to configure.
+
+    THE FORMS SEND NOTHING, AND SAY SO
+    Both forms carry method="dialog" and no "action". The submit buttons are
+    real submit buttons, so pressing one runs the browser's own constraint
+    validation - the required fields, the email and URL syntax, "minlength" -
+    and ":user-invalid" repaints what fails. What follows validation is where
+    the method comes in: a form whose method is "dialog" and that has no
+    "dialog" ancestor ends the submission at that point, so nothing is sent
+    and the page does not navigate. The reset button is a real reset. The page
+    copy says the same to a reader, and "Tests/Acceptance/forms.spec.ts" holds
+    the page to it.
+
+    Ids carry the prefix "form-request-" in the first form and
+    "form-returned-" in the second, so they cannot collide with each other or
+    with the ids of the page chrome ("content", "nav-main",
+    "theme-settings-panel"). Copy is literal English, for the reason given in
+    docs/development/styleguide.md: it exists to be set in a typeface.
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <h1><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.formShowcaseHeading" /></h1>
+
+    <p class="theme-lead">
+        A request form of the kind a site built on this theme would carry, put
+        together from the form components of the library alone.
+    </p>
+    <p>
+        Nothing on this page is sent anywhere. Pressing the submit button runs
+        the browser's own validation, and a field that fails it is marked the
+        way the second form below shows it. After that the form stops: its
+        method is <code>dialog</code>, and a form with that method outside a
+        dialog ends its submission once it is valid, without a request and
+        without leaving the page. Every control is still a real one, the reset
+        button included.
+    </p>
+
+    <h2 id="form-request-title">Request a development instance</h2>
+
+    <form class="theme-form" method="dialog" aria-labelledby="form-request-title">
+        <fieldset class="theme-fieldset">
+            <legend class="theme-fieldset__legend">About you</legend>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="form-request-name">
+                    Full name <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <input class="theme-input" id="form-request-name" name="name" type="text" autocomplete="name" required="required">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="form-request-email">
+                    Email <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <input class="theme-input"
+                       id="form-request-email"
+                       name="email"
+                       type="email"
+                       autocomplete="email"
+                       required="required"
+                       aria-describedby="form-request-email-hint">
+                <p class="theme-field__hint" id="form-request-email-hint">
+                    The access data of the instance is sent to this address.
+                </p>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="form-request-organisation">Organisation</label>
+                <input class="theme-input" id="form-request-organisation" name="organisation" type="text" autocomplete="organization">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="form-request-phone">Telephone</label>
+                <input class="theme-input" id="form-request-phone" name="phone" type="tel" autocomplete="tel">
+            </div>
+        </fieldset>
+
+        <fieldset class="theme-fieldset">
+            <legend class="theme-fieldset__legend">The instance</legend>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="form-request-base">
+                    Site base <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <div class="theme-input-group">
+                    <span class="theme-input-group__addon" id="form-request-base-scheme">https://</span>
+                    <input class="theme-input"
+                           id="form-request-base"
+                           name="base"
+                           type="text"
+                           required="required"
+                           pattern="[a-z0-9.\-]+"
+                           placeholder="theme.example.org"
+                           aria-describedby="form-request-base-scheme form-request-base-hint">
+                </div>
+                <p class="theme-field__hint" id="form-request-base-hint">
+                    A host name in lower case, without the scheme - that is shown, not typed.
+                </p>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="form-request-extension">Extension under development</label>
+                <div class="theme-input-group">
+                    <span class="theme-input-group__addon" id="form-request-extension-prefix">EXT:</span>
+                    <input class="theme-input"
+                           id="form-request-extension"
+                           name="extension"
+                           type="text"
+                           placeholder="news"
+                           aria-describedby="form-request-extension-prefix">
+                </div>
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="form-request-core">
+                    TYPO3 version <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <select class="theme-select" id="form-request-core" name="core" required="required">
+                    <option value="">Please choose …</option>
+                    <option value="13">TYPO3 v13.4</option>
+                    <option value="14">TYPO3 v14.3</option>
+                </select>
+            </div>
+
+            <div class="theme-field theme-field--inline">
+                <label class="theme-field__label" for="form-request-editors">Editors</label>
+                <div class="theme-input-group">
+                    <input class="theme-input"
+                           id="form-request-editors"
+                           name="editors"
+                           type="number"
+                           min="1"
+                           max="50"
+                           value="3"
+                           aria-describedby="form-request-editors-unit">
+                    <span class="theme-input-group__addon" id="form-request-editors-unit">accounts</span>
+                </div>
+            </div>
+
+            <div class="theme-field theme-field--inline">
+                <label class="theme-field__label" for="form-request-start">Needed from</label>
+                <input class="theme-input" id="form-request-start" name="start" type="date">
+            </div>
+
+            <div class="theme-field theme-field--inline">
+                <label class="theme-field__label" for="form-request-accent">Accent colour</label>
+                <input class="theme-input" id="form-request-accent" name="accent" type="color" value="#0b57d0">
+            </div>
+
+            <div class="theme-field">
+                <label class="theme-field__label" for="form-request-pages">Sample pages</label>
+                <input class="theme-input"
+                       id="form-request-pages"
+                       name="pages"
+                       type="range"
+                       min="0"
+                       max="20"
+                       step="1"
+                       value="10"
+                       aria-describedby="form-request-pages-hint">
+                <p class="theme-field__hint" id="form-request-pages-hint">
+                    Pages seeded next to the showcase. Starting value: <output for="form-request-pages" name="pages-output">10</output>
+                </p>
+            </div>
+        </fieldset>
+
+        <fieldset class="theme-fieldset">
+            <legend class="theme-fieldset__legend">PHP version</legend>
+            <div class="theme-choice-group theme-choice-group--inline">
+                <label class="theme-check"><input type="radio" id="form-request-php-82" name="php" value="8.2"> 8.2</label>
+                <label class="theme-check"><input type="radio" id="form-request-php-83" name="php" value="8.3" checked="checked"> 8.3</label>
+                <label class="theme-check"><input type="radio" id="form-request-php-84" name="php" value="8.4"> 8.4</label>
+                <label class="theme-check"><input type="radio" id="form-request-php-85" name="php" value="8.5"> 8.5</label>
+            </div>
+        </fieldset>
+
+        <fieldset class="theme-fieldset">
+            <legend class="theme-fieldset__legend">What the instance should demonstrate</legend>
+            <div class="theme-choice-group">
+                <label class="theme-check"><input type="checkbox" id="form-request-show-elements" name="show[]" value="elements" checked="checked"> The content elements</label>
+                <label class="theme-check"><input type="checkbox" id="form-request-show-menus" name="show[]" value="menus"> The menus</label>
+                <label class="theme-check"><input type="checkbox" id="form-request-show-login" name="show[]" value="login"> A frontend login</label>
+                <label class="theme-check"><input type="checkbox" id="form-request-show-legacy" name="show[]" value="legacy" disabled="disabled"> A second tree without site sets (always part of it)</label>
+            </div>
+        </fieldset>
+
+        <div class="theme-field">
+            <label class="theme-field__label" for="form-request-message">
+                What are you building? <span class="theme-field__required" aria-hidden="true">*</span>
+            </label>
+            <textarea class="theme-textarea"
+                      id="form-request-message"
+                      name="message"
+                      rows="4"
+                      required="required"
+                      minlength="20"
+                      aria-describedby="form-request-message-hint"></textarea>
+            <p class="theme-field__hint" id="form-request-message-hint">
+                At least 20 characters.
+            </p>
+        </div>
+
+        <div class="theme-field">
+            <label class="theme-field__label" for="form-request-attachment">Design files</label>
+            <input class="theme-input" id="form-request-attachment" name="attachment" type="file" multiple="multiple">
+        </div>
+
+        <div class="theme-field">
+            <label class="theme-field__label" for="form-request-password">
+                Backend password <span class="theme-field__required" aria-hidden="true">*</span>
+            </label>
+            <input class="theme-input"
+                   id="form-request-password"
+                   name="password"
+                   type="password"
+                   autocomplete="new-password"
+                   required="required"
+                   minlength="12"
+                   aria-describedby="form-request-password-hint">
+            <p class="theme-field__hint" id="form-request-password-hint">
+                At least 12 characters, for the administrator of the instance.
+            </p>
+        </div>
+
+        <fieldset class="theme-fieldset">
+            <legend class="theme-fieldset__legend">Your account</legend>
+            <label class="theme-switch">
+                <input type="checkbox" role="switch" id="form-request-notify" name="notify" value="1" checked="checked">
+                <span>Email me whenever one of my instances is rebuilt</span>
+            </label>
+            <label class="theme-check">
+                <input type="checkbox" id="form-request-terms" name="terms" value="1" required="required">
+                I understand that the instance is deleted after 30 days
+            </label>
+        </fieldset>
+
+        <div class="theme-button-group">
+            <button class="theme-button" type="submit">Request the instance</button>
+            <button class="theme-button theme-button--ghost" type="reset">Clear the form</button>
+        </div>
+    </form>
+
+    <h2 id="form-returned-title">The same form, returned with errors</h2>
+
+    <p>
+        What a server sends back after a failed submission: a summary at the
+        top, which a returned page moves focus to, and which links to every field it names, each of
+        those fields marked invalid with its message, and a field the server
+        did accept marked as such. The fields not involved are left out here.
+    </p>
+
+    <form class="theme-form" method="dialog" aria-labelledby="form-returned-title">
+        <div class="theme-form-summary theme-form-summary--error" role="alert" tabindex="-1">
+            <p class="theme-form-summary__title">The request has 4 errors</p>
+            <ul class="theme-form-summary__list">
+                <li><a href="#form-returned-email">Enter an email address in the format name@example.org</a></li>
+                <li><a href="#form-returned-base">Enter a host name without spaces</a></li>
+                <li><a href="#form-returned-message">Enter at least 20 characters</a></li>
+                <li><a href="#form-returned-terms">Confirm that the instance is deleted after 30 days</a></li>
+            </ul>
+        </div>
+
+        <fieldset class="theme-fieldset">
+            <legend class="theme-fieldset__legend">About you</legend>
+
+            <div class="theme-field theme-field--valid">
+                <label class="theme-field__label" for="form-returned-name">
+                    Full name <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <input class="theme-input"
+                       id="form-returned-name"
+                       name="name"
+                       type="text"
+                       autocomplete="name"
+                       required="required"
+                       value="Ada Lovelace"
+                       aria-describedby="form-returned-name-success">
+                <p class="theme-field__success" id="form-returned-name-success">
+                    Looks good
+                </p>
+            </div>
+
+            <div class="theme-field theme-field--invalid">
+                <label class="theme-field__label" for="form-returned-email">
+                    Email <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <input class="theme-input"
+                       id="form-returned-email"
+                       name="email"
+                       type="email"
+                       autocomplete="email"
+                       required="required"
+                       value="ada@example"
+                       aria-invalid="true"
+                       aria-describedby="form-returned-email-error form-returned-email-hint">
+                <p class="theme-field__error" id="form-returned-email-error">
+                    Enter an email address in the format name@example.org
+                </p>
+                <p class="theme-field__hint" id="form-returned-email-hint">
+                    The access data of the instance is sent to this address.
+                </p>
+            </div>
+        </fieldset>
+
+        <fieldset class="theme-fieldset">
+            <legend class="theme-fieldset__legend">The instance</legend>
+
+            <div class="theme-field theme-field--invalid">
+                <label class="theme-field__label" for="form-returned-base">
+                    Site base <span class="theme-field__required" aria-hidden="true">*</span>
+                </label>
+                <div class="theme-input-group">
+                    <span class="theme-input-group__addon" id="form-returned-base-scheme">https://</span>
+                    <input class="theme-input"
+                           id="form-returned-base"
+                           name="base"
+                           type="text"
+                           required="required"
+                           value="theme example"
+                           aria-invalid="true"
+                           aria-describedby="form-returned-base-error form-returned-base-scheme">
+                </div>
+                <p class="theme-field__error" id="form-returned-base-error">
+                    Enter a host name without spaces
+                </p>
+            </div>
+        </fieldset>
+
+        <div class="theme-field theme-field--invalid">
+            <label class="theme-field__label" for="form-returned-message">
+                What are you building? <span class="theme-field__required" aria-hidden="true">*</span>
+            </label>
+            <textarea class="theme-textarea"
+                      id="form-returned-message"
+                      name="message"
+                      rows="4"
+                      required="required"
+                      aria-invalid="true"
+                      aria-describedby="form-returned-message-error">A theme.</textarea>
+            <p class="theme-field__error" id="form-returned-message-error">
+                Enter at least 20 characters
+            </p>
+        </div>
+
+        <fieldset class="theme-fieldset">
+            <legend class="theme-fieldset__legend">Your account</legend>
+            <label class="theme-check">
+                <input type="checkbox" id="form-returned-terms" name="terms" value="1" required="required" aria-invalid="true" aria-describedby="form-returned-terms-error">
+                I understand that the instance is deleted after 30 days
+            </label>
+            <p class="theme-field__error" id="form-returned-terms-error">
+                Confirm that the instance is deleted after 30 days
+            </p>
+        </fieldset>
+
+        <div class="theme-button-group">
+            <button class="theme-button" type="submit">Request the instance</button>
+        </div>
+    </form>
+
+    <h2 id="form-sent-title">After a successful submission</h2>
+
+    <div class="theme-form-summary theme-form-summary--success" role="status">
+        <p class="theme-form-summary__title">Your request was sent</p>
+        <ul class="theme-form-summary__list">
+            <li><a href="#form-request-title">Request another instance</a></li>
+        </ul>
+    </div>
+</f:section>
+
+</html>

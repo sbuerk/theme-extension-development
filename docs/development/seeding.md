@@ -69,7 +69,7 @@ the `table` element need nothing from the tool.
 
 | Table                | Uids                                                             |
 |----------------------|------------------------------------------------------------------|
-| `pages`              | 1 to 9                                                           |
+| `pages`              | 1 to 10                                                          |
 | `tt_content`         | its page times 100 plus its position: the third of page 6 is 603 |
 | `tx_theme_list_item` | 1 to 18 on page 8, in declaration order                          |
 
@@ -134,7 +134,7 @@ scenario that seeds less than it says. Only `page` is a node here.
 ## The demo tree
 
 Not a sample of the format — the frontend this extension is developed against.
-Nine pages, and between them every backend layout the extension registers and
+Ten pages, and between them every backend layout the extension registers and
 every `CType` it renders:
 
 | uid | Title          | Slug              | `backend_layout`  | What it is for                              |
@@ -148,6 +148,7 @@ every `CType` it renders:
 | 7   | Menu elements  | `/elements/menu`  | `content_sidebar` | The eleven `menu_*` elements.               |
 | 8   | Theme elements | `/elements/theme` | `content`         | The thirteen `theme_*` elements.            |
 | 9   | Styleguide     | `/styleguide`     | `styleguide`      | The component library, straight from Fluid. |
+| 10  | Forms          | `/forms`          | `forms`           | The form showcase, straight from Fluid.     |
 
 Four properties of that tree are deliberate, and are asserted by
 `Tests/Functional/ShowcaseTreeTest.php` rather than left to a reader to
@@ -160,7 +161,7 @@ preserve:
 - **Pages 6 and 7 use `content_sidebar` and their sibling 8 does not.** Two
   pages under one parent rendering with and without the sub navigation is what
   proves the layout is resolved per page rather than inherited down the branch.
-- **The styleguide page uses `nav_hide`, never `hidden`.** A hidden page returns
+- **The styleguide and the form showcase use `nav_hide`, never `hidden`.** A hidden page returns
   404 in the frontend and is only reachable through a backend preview link
   carrying a valid hash, which defeats the point of seeding a page that exists
   to be opened.

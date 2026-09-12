@@ -284,6 +284,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             '/elements/menu' => 'content_sidebar',
             '/elements/theme' => 'content',
             '/styleguide' => 'styleguide',
+            '/forms' => 'forms',
         ] as $path => $layout) {
             yield $path => ['path' => $path, 'layout' => $layout];
         }
@@ -342,6 +343,8 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         $menu = $this->navigation($this->render('/'), 'theme-nav-main');
 
         $this->assertStringNotContainsString('/styleguide', $menu);
+        // The form showcase is kept out of the menu the same way.
+        $this->assertStringNotContainsString('/forms', $menu);
         // The other new pages are in it, so this is not passing because the
         // menu came back empty.
         $this->assertStringContainsString('/elements', $menu);

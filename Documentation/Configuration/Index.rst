@@ -152,7 +152,7 @@ See :ref:`feature-display-settings` for the display settings,
 Backend layouts and page templates
 ==================================
 
-The theme ships five backend layouts through page TSconfig, and the layout an
+The theme ships six backend layouts through page TSconfig, and the layout an
 editor selects picks the Fluid template the page is rendered with:
 
 ..  list-table::
@@ -183,6 +183,10 @@ editor selects picks the Fluid template the page is rendered with:
         -   :guilabel:`Styleguide`
         -   unused (999)
         -   :file:`Page/Styleguide.html`
+    *   -   ``forms``
+        -   :guilabel:`Form showcase`
+        -   unused (999)
+        -   :file:`Page/Forms.html`
 
 The ``colPos`` numbers are a contract, not an implementation detail: the same
 number means the same slot in every layout, which is what lets an editor change

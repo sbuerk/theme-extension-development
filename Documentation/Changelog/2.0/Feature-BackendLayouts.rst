@@ -9,7 +9,7 @@ Feature: Backend layouts decide the page template
 Description
 ===========
 
-The theme ships **five backend layouts**, and the layout selected on a page now
+The theme ships **six backend layouts**, and the layout selected on a page now
 decides which template renders it. Until now every page rendered the same file.
 
 ..  list-table::
@@ -33,6 +33,9 @@ decides which template renders it. Until now every page rendered the same file.
     *   -   Styleguide
         -   :file:`Page/Styleguide.html`
         -   none - it renders components directly
+    *   -   Form showcase
+        -   :file:`Page/Forms.html`
+        -   none - it renders a form directly, see :ref:`feature-form-showcase`
 
 The column numbers are the ones :composer:`typo3/theme-camino` uses, so content
 is portable between the two themes.
