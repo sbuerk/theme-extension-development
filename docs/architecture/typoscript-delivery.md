@@ -149,6 +149,14 @@ though the CType it renders is gone on v14.
 Every classic CType `EXT:frontend` registers is now covered — see
 [Content elements](content-elements.md) for the full table.
 
+The theme's own `theme_*` elements are not built on `lib.contentElement`, but on
+`lib.themeContentElement`, an object with the same root paths. `fluid_styled_content`
+clears `lib.contentElement` before defining it, so a name the theme shares with
+that extension is the wrong place for elements only the theme can render — see
+[Content elements](content-elements.md#libthemecontentelement-their-own-frame-not-libcontentelement).
+Both delivery paths read the same `ContentElements.typoscript`, so neither needs
+anything of its own for it.
+
 ## Plugins, and the static include as a content rendering template
 
 `ExtensionUtility::configurePlugin()` adds the rendering of every plugin
@@ -207,17 +215,18 @@ had deliberately hidden.
 
 ## What the tests cover
 
-| Test                                           | Proves                                                                               |
-|------------------------------------------------|--------------------------------------------------------------------------------------|
-| `SiteSetRenderingTest`                         | A page renders through the set, with **no** `sys_template`.                          |
-| `StaticTypoScriptFallbackRenderingTest`        | A page renders through the static include, with no set.                              |
-| `StaticTypoScriptIncludeTest`                  | The static include is registered in the TCA at all.                                  |
-| `ContentElementRenderingTest`                  | `header` and `text` render, and the core error notice does not appear.               |
-| `ImageElementRenderingTest`                    | The `image` element renders, and its backend fields reach the output.                |
-| `ExtbasePluginStaticIncludeRenderingTest`      | An Extbase plugin renders through the static include, not only through the set.      |
-| `FeloginRenderingTest`                         | The login form renders on the form contract, through the set and the static include. |
-| `DevelopmentInstance/LegacyDeliveryTest`       | The seeded showcase renders the same markup through both mechanisms.                 |
-| `DevelopmentInstance/DeliveryRegistrationTest` | Every static include of the seeded `sys_template` root resolves and is registered.   |
+| Test                                           | Proves                                                                                 |
+|------------------------------------------------|----------------------------------------------------------------------------------------|
+| `SiteSetRenderingTest`                         | A page renders through the set, with **no** `sys_template`.                            |
+| `StaticTypoScriptFallbackRenderingTest`        | A page renders through the static include, with no set.                                |
+| `StaticTypoScriptIncludeTest`                  | The static include is registered in the TCA at all.                                    |
+| `ContentElementRenderingTest`                  | `header` and `text` render, and the core error notice does not appear.                 |
+| `ThemeContentElementObjectTest`                | Every `theme_*` element renders the same with `lib.contentElement` cleared, both ways. |
+| `ImageElementRenderingTest`                    | The `image` element renders, and its backend fields reach the output.                  |
+| `ExtbasePluginStaticIncludeRenderingTest`      | An Extbase plugin renders through the static include, not only through the set.        |
+| `FeloginRenderingTest`                         | The login form renders on the form contract, through the set and the static include.   |
+| `DevelopmentInstance/LegacyDeliveryTest`       | The seeded showcase renders the same markup through both mechanisms.                   |
+| `DevelopmentInstance/DeliveryRegistrationTest` | Every static include of the seeded `sys_template` root resolves and is registered.     |
 
 The first two cover the two branches of the guard condition. Both were shown to
 fail: renaming the set breaks the first, inverting the condition breaks the
