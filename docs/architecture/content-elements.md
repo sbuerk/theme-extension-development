@@ -1072,6 +1072,24 @@ static include, and asserts the theme's markup and the absence of felogin's own;
 `DevelopmentInstance/LoginPageTest` and `Tests/Acceptance/frontend-login.spec.ts`
 log in and out on the seeded instance.
 
+## Not yet: EXT:form
+
+EXT:form is installed in neither instance nor in the root dependency set, so
+the theme has no form content element, and [the form showcase](../development/form-showcase.md)
+is a page of literal markup. Theming EXT:form is a step of its own. What is
+known about it for the two core versions of this branch:
+
+- **Templates.** EXT:form renders its Bootstrap 5 compatible templates with
+  `renderingOptions.templateVariant: version2` (Feature #94868, v11.5); the
+  legacy templates are deprecated since v12.0 (Deprecation #95456, "Deprecate
+  legacy form templates"), which covers both v12 and v13.
+- **Registration.** How the form YAML is registered has to be read in the
+  EXT:form of both dependency sets once it is added to them. Nothing of it can
+  be verified from this checkout today, so nothing about it is stated here.
+- **Class mapping or partials.** The class names are YAML properties of the
+  form elements, so most of the contract can be mapped without a template; the
+  checkbox, radio and summary structure need partial overrides.
+
 ## See also
 
 - [Page rendering](page-rendering.md)

@@ -127,7 +127,7 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
 
     /**
      * The brief called out form error handling specifically, and it is the one
-     * part of the library nothing else exercises: no content element renders a
+     * part of the library no content element exercises: no content element renders a
      * form, so without this section `forms/_validation.scss` would ship
      * unrendered.
      */

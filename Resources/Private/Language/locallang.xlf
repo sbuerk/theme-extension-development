@@ -111,6 +111,9 @@
 			<trans-unit id="backendLayout.styleguide.title">
 				<source>Styleguide</source>
 			</trans-unit>
+			<trans-unit id="backendLayout.forms.title">
+				<source>Form showcase</source>
+			</trans-unit>
 			<trans-unit id="backendLayout.colPos.main.name">
 				<source>Main content</source>
 			</trans-unit>
@@ -143,6 +146,9 @@
 			</trans-unit>
 			<trans-unit id="theme.menuCategorizedContentLabel">
 				<source>Categorized content</source>
+			</trans-unit>
+			<trans-unit id="theme.formShowcaseHeading">
+				<source>Form showcase</source>
 			</trans-unit>
 			<trans-unit id="theme.tabsLabel">
 				<source>Tabs</source>
