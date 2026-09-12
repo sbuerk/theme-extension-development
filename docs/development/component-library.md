@@ -504,6 +504,20 @@ different UA widget and get an explicit `[type='…']` override in
 counterparts of `:user-invalid` — deliberately not `:invalid`, which would
 paint every empty required field red before the reader has typed anything.
 
+**A control boundary uses `--theme-color-border-strong`; `--theme-color-border`
+is decorative only.** The edge of an empty text field is the only thing that
+identifies it, and WCAG 1.4.11 holds it to 3:1 — which the decorative border,
+at about 1.4:1, does not reach. So `--theme-input-border-color`, the addon
+border of `.theme-input-group` and the switch track default to the strong
+border; hover moves the input's border to `--theme-color-text-secondary`, and
+the validation states re-point the same tokens over both. Tabs, pagination,
+the segmented control and the fieldset keep the decorative border: their
+labels identify them, and their borders frame. The reasoning per control, and
+the contrast of the token against every background, are in
+[`DESIGN.md`](../../DESIGN.md#control-boundaries);
+`ComponentLibraryTest::aControlDrawsItsBoundaryInTheStrongBorderColour` and
+`StylesheetTest::theControlBorderReachesThreeToOneOnEveryBackground` hold both.
+
 ### Layout
 
 Page frame — `.theme-skip-link` precedes `.theme-page` as a sibling, not a
@@ -901,6 +915,8 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 | `aDialogOpenerIsHiddenWithoutTheScriptMarker`        | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                    |
 | `aTitleOnAnyHeadingLevelKeepsItsOwnCase`             | `.theme-hero__title` and `.theme-teaser__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                                                                             |
 | `noComponentReferencesAnUndeclaredToken`             | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                         |
+| `aControlDrawsItsBoundaryInTheStrongBorderColour`    | The text input, the input group addon and the switch track default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                                                           |
+| `aHoveredTextInputChangesItsBorder`                  | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                    |
 
 The last one strips comments before scanning, which matters here specifically:
 the comment documenting why a breakpoint cannot be a custom property spells

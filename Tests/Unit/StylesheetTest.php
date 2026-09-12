@@ -185,6 +185,100 @@ final class StylesheetTest extends UnitTestCase
     }
 
     /**
+     * @return \Generator<string, array{appearance: 'light'|'dark', background: string}>
+     */
+    public static function controlBoundaryBackgrounds(): \Generator
+    {
+        foreach (['light', 'dark'] as $appearance) {
+            foreach (['--theme-color-background', '--theme-color-surface', '--theme-color-surface-raised'] as $background) {
+                yield sprintf('%s %s', $appearance, $background) => ['appearance' => $appearance, 'background' => $background];
+            }
+        }
+    }
+
+    /**
+     * The border of a control is the only thing that identifies an empty text
+     * field, and WCAG 1.4.11 holds it to 3:1 against the colours next to it.
+     * `--theme-color-border-strong` is that border, so it has to reach 3:1 on
+     * every background a control sits on, in both appearances - including the
+     * raised surface, which is the background of a control itself and, in
+     * dark, the lightest of the three.
+     *
+     * axe checks text contrast only, so nothing else reports a border that
+     * falls below it. Computed from the sources, where the two values of each
+     * token are still readable, with the formula of WCAG 2.2.
+     *
+     * @param 'light'|'dark' $appearance
+     */
+    #[DataProvider('controlBoundaryBackgrounds')]
+    #[Test]
+    public function theControlBorderReachesThreeToOneOnEveryBackground(string $appearance, string $background): void
+    {
+        $border = $this->tokenColour('--theme-color-border-strong', $appearance);
+        $ground = $this->tokenColour($background, $appearance);
+
+        $ratio = $this->contrastRatio($border, $ground);
+
+        $this->assertGreaterThanOrEqual(
+            3.0,
+            $ratio,
+            sprintf(
+                '--theme-color-border-strong %s reaches only %.2f:1 on %s %s in %s, WCAG 1.4.11 needs 3:1.',
+                $border,
+                $ratio,
+                $background,
+                $ground,
+                $appearance,
+            ),
+        );
+    }
+
+    /**
+     * One half of a `light-dark()` token as declared in "_tokens.scss".
+     *
+     * @param 'light'|'dark' $appearance
+     */
+    private function tokenColour(string $token, string $appearance): string
+    {
+        $file = dirname(__DIR__, 2) . '/Resources/Private/Scss/abstracts/_tokens.scss';
+        $scss = (string)preg_replace('#//.*$#m', '', (string)file_get_contents($file));
+
+        $matched = preg_match_all(
+            '/(?:^|[;{\s])' . preg_quote($token, '/') . '\s*:\s*light-dark\(\s*(#[0-9a-f]{6})\s*,\s*(#[0-9a-f]{6})\s*\)\s*;/i',
+            $scss,
+            $values,
+        );
+        $this->assertSame(1, $matched, sprintf('"%s" is not declared exactly once as a light-dark() pair of hex colours.', $token));
+
+        return strtolower($values[$appearance === 'light' ? 1 : 2][0]);
+    }
+
+    /**
+     * The contrast ratio of WCAG 2.2: relative luminance from the linearised
+     * sRGB channels, then (L1 + 0.05) / (L2 + 0.05) with the lighter first.
+     */
+    private function contrastRatio(string $first, string $second): float
+    {
+        $luminance = static function (string $hex): float {
+            $channels = array_map(
+                static function (string $channel): float {
+                    $value = hexdec($channel) / 255;
+
+                    return $value <= 0.04045 ? $value / 12.92 : (($value + 0.055) / 1.055) ** 2.4;
+                },
+                str_split(ltrim($hex, '#'), 2),
+            );
+
+            return 0.2126 * $channels[0] + 0.7152 * $channels[1] + 0.0722 * $channels[2];
+        };
+
+        $lighter = max($luminance($first), $luminance($second));
+        $darker = min($luminance($first), $luminance($second));
+
+        return ($lighter + 0.05) / ($darker + 0.05);
+    }
+
+    /**
      * "light-dark()" takes colours, not shadows, so the focus ring is declared
      * as a colour plus a composite built around it. Collapsing the two back
      * into one declaration is what breaks the dark appearance of the ring.

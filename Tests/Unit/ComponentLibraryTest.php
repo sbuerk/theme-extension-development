@@ -284,6 +284,88 @@ final class ComponentLibraryTest extends UnitTestCase
         $this->assertSame($palettes, $swatches, 'A swatch shows other colours than its palette.');
     }
 
+    /**
+     * @return \Generator<string, array{file: string, token: string}>
+     */
+    public static function controlBoundaryTokens(): \Generator
+    {
+        // The component tokens that draw the resting edge of a control - the
+        // one visual cue that identifies an empty field or an unset switch.
+        yield 'text input, textarea and select' => ['file' => 'forms/_controls.scss', 'token' => '--theme-input-border-color'];
+        yield 'input group addon' => ['file' => 'forms/_input-group.scss', 'token' => '--theme-input-group-addon-border-color'];
+        yield 'switch track' => ['file' => 'forms/_controls.scss', 'token' => '--theme-switch-track-border-color'];
+    }
+
+    /**
+     * A control boundary uses `--theme-color-border-strong`; the decorative
+     * `--theme-color-border` reaches about 1.4:1, and WCAG 1.4.11 needs 3:1
+     * for the edge that identifies a control. `StylesheetTest` holds the
+     * token itself to 3:1 - this holds the controls to the token.
+     *
+     * The fallback literal is asserted as well: it is what a control shows
+     * where the token file is absent, and it has to be the light value of the
+     * same token rather than a leftover of the decorative one.
+     *
+     * The default is the first declaration in the file - the token layer
+     * opens the component's block. It is not the only one: the switch
+     * re-points its track border to `CanvasText` under `forced-colors`, which
+     * is a system colour and no default.
+     */
+    #[DataProvider('controlBoundaryTokens')]
+    #[Test]
+    public function aControlDrawsItsBoundaryInTheStrongBorderColour(string $file, string $token): void
+    {
+        $scss = dirname(__DIR__, 2) . '/Resources/Private/Scss';
+
+        preg_match(
+            '/--theme-color-border-strong\s*:\s*light-dark\(\s*(#[0-9a-f]{6})\s*,/i',
+            $this->withoutComments((string)file_get_contents($scss . '/abstracts/_tokens.scss')),
+            $strong,
+        );
+        $this->assertArrayHasKey(1, $strong, '"--theme-color-border-strong" was not found in the token file.');
+
+        preg_match_all(
+            '/(?:^|[;{\s])' . preg_quote($token, '/') . '\s*:\s*([^;]+);/',
+            $this->withoutComments((string)file_get_contents($scss . '/' . $file)),
+            $values,
+        );
+        $this->assertNotEmpty($values[1], sprintf('"%s" is not declared in "%s".', $token, $file));
+
+        $this->assertSame(
+            sprintf('var(--theme-color-border-strong,%s)', strtolower($strong[1])),
+            strtolower((string)preg_replace('/\s+/', '', $values[1][0])),
+            sprintf('"%s" has to default to "--theme-color-border-strong" - the decorative border is not a control boundary.', $token),
+        );
+    }
+
+    /**
+     * Hover has to stay visible once the resting border is the strong one:
+     * a hover colour equal to the default is no hover at all.
+     */
+    #[Test]
+    public function aHoveredTextInputChangesItsBorder(): void
+    {
+        $scss = $this->withoutComments(
+            (string)file_get_contents(dirname(__DIR__, 2) . '/Resources/Private/Scss/forms/_controls.scss'),
+        );
+
+        $declared = [];
+        foreach (['--theme-input-border-color', '--theme-input-border-color-hover'] as $token) {
+            preg_match_all('/(?:^|[;{\s])' . preg_quote($token, '/') . '\s*:\s*([^;]+);/', $scss, $values);
+            $this->assertCount(1, $values[1], sprintf('"%s" is not declared exactly once.', $token));
+            $declared[$token] = (string)preg_replace('/\s+/', '', $values[1][0]);
+        }
+
+        $this->assertNotSame($declared['--theme-input-border-color'], $declared['--theme-input-border-color-hover']);
+        // A hover that falls back to the decorative border would differ from
+        // the resting colour and still drop the boundary below 3:1 again.
+        $this->assertDoesNotMatchRegularExpression(
+            '/var\(--theme-color-border[,)]/',
+            $declared['--theme-input-border-color-hover'],
+            'The hover border of a text input must not be the decorative "--theme-color-border".',
+        );
+    }
+
     private function withoutComments(string $scss): string
     {
         $scss = (string)preg_replace('#/\*.*?\*/#s', '', $scss);
