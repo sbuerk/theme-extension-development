@@ -1050,6 +1050,32 @@ include, and asserts the theme's markup and the absence of felogin's own;
 `DevelopmentInstance/LoginPageTest` and `Tests/Acceptance/frontend-login.spec.ts`
 log in and out on the seeded instance.
 
+## Not yet: EXT:form
+
+EXT:form is installed in neither instance nor in the root dependency set, so
+the theme has no form content element, and [the form showcase](../development/form-showcase.md)
+is a page of literal markup. Theming EXT:form is a step of its own, and what it
+needs is known:
+
+- **Registration differs per core version.** TYPO3 v14.2 discovers
+  `Configuration/Form/<Name>/config.yaml` of every extension
+  (Feature #109412, "Form YAML auto discovery"). TYPO3 v13.4 needs
+  `plugin.tx_form.settings.yamlConfigurations` and
+  `module.tx_form.settings.yamlConfigurations` in TypoScript — which on v14.2
+  raises a deprecation (Deprecation #109412), and this repository's suites fail
+  on one. The TypoScript registration therefore has to be v13 only, a
+  configuration difference with a `@todo` naming the removal with v13 support.
+- **`templateVariant` is an open question.** v13 renders the Bootstrap style
+  templates only with `renderingOptions.templateVariant: version2`; v14 removed
+  the legacy templates and the option with them (Breaking #106596). Whether an
+  unknown `renderingOptions` key is inert on v14 is not established — a v14
+  functional test has to prove it, or the key goes into a YAML file only the v13
+  registration reads.
+- **Class mapping or partials.** The class names are YAML properties of the
+  form elements, so most of the contract can be mapped without a template; the
+  checkbox, radio and summary structure need partial overrides, with the plain
+  `.html` extension for the resolution reason given above (Feature #108166).
+
 ## See also
 
 - [Page rendering](page-rendering.md)

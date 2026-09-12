@@ -28,9 +28,9 @@
 identifier: theme-demo
 title: 'Theme showcase page tree'
 description: >-
-  Nine pages carrying every backend layout the theme registers, every content
-  element it renders and the styleguide - the frontend the theme is developed
-  against.
+  Ten pages carrying every backend layout the theme registers, every content
+  element it renders, the styleguide and the form showcase - the frontend the
+  theme is developed against.
 
 scenarios:
   - 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Scenario.yaml'

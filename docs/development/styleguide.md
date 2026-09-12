@@ -266,8 +266,11 @@ the styleguide stays green, because the styleguide never asks the template
 anything. Conversely a stylesheet change that breaks a modifier no content
 element happens to use — most of `forms/`, half the button modifiers — is
 invisible on `/elements` and obvious here. The forms section is the clearest
-case: no content element renders a form at all, so without this page
-`forms/_validation.scss` would ship never having been rendered.
+case: no content element renders a form at all. The
+[form showcase](form-showcase.md) on `/forms` composes the same contract into
+one form, and the login form of EXT:felogin is drawn on it; the invalid and the
+valid state, though, are only ever on screen on the two pages that show them
+on purpose.
 
 ## Three defects the page turned up
 

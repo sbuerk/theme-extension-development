@@ -1,0 +1,18 @@
+# The form showcase renders a static form from its own Fluid template
+# ("Templates/Page/Forms.html") and ignores anything editors place on the
+# page - the same arrangement as the styleguide, for the same reason, and
+# with the same one inert column: see "Styleguide.tsconfig" for why the layout
+# cannot simply declare no column at all, and why the column is colPos 999,
+# which no "lib.content.*" object reads.
+mod.web_layout.BackendLayouts.forms {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.forms.title
+    config.backend_layout {
+        colCount = 1
+        rowCount = 1
+        rows.1.columns.1 {
+            name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.unused.name
+            identifier = unused
+            colPos = 999
+        }
+    }
+}

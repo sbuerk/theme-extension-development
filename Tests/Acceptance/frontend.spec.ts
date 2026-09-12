@@ -18,6 +18,7 @@ const showcase = [
     '/elements/menu',
     '/elements/theme',
     '/styleguide',
+    '/forms',
 ];
 
 const trees = [
@@ -76,7 +77,7 @@ for (const tree of trees) {
             await page.goto(`${tree.prefix}/`);
             const navigation = page.locator('nav.theme-nav-main');
             await expect(navigation.getByRole('link', { name: 'Elements', exact: true })).toHaveCount(1);
-            for (const hidden of ['Styleguide', 'Login', 'Members', 'Frontend users']) {
+            for (const hidden of ['Styleguide', 'Forms', 'Login', 'Members', 'Frontend users']) {
                 await expect(navigation.getByRole('link', { name: hidden, exact: true })).toHaveCount(0);
             }
         });

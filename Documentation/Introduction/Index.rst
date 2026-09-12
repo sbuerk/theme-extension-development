@@ -45,7 +45,7 @@ in a frontend rather than only in a test assertion:
     :file:`EXT:frontend` registers, the eleven menu elements, thirteen elements
     of its own, and third-party Extbase plugins, none of which requires
     :file:`fluid_styled_content` — that extension is not a dependency here, and
-    on TYPO3 v14 it is not installed at all. It ships five backend layouts, a
+    on TYPO3 v14 it is not installed at all. It ships six backend layouts, a
     main menu, a section menu and a breadcrumb, and a light/dark appearance
     switch. A seeded ``/styleguide`` page renders the whole component library
     on one page, so the theme can be looked at without building content for it

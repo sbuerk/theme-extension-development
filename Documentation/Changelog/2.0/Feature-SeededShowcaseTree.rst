@@ -58,6 +58,10 @@ The tree demonstrates the whole theme rather than a handful of pages:
     *   -   :guilabel:`Styleguide` (``/styleguide``)
         -   :guilabel:`Styleguide`
         -   The component library, rendered from Fluid rather than from content.
+    *   -   :guilabel:`Forms` (``/forms``)
+        -   :guilabel:`Form showcase`
+        -   A request form built from the form components, see
+            :ref:`feature-form-showcase`.
 
 Between them the pages use every backend layout the extension registers and
 carry every content type it renders, so a single seeded instance answers what
@@ -83,7 +87,7 @@ Impact
 exercises the theme end to end, so a development or test instance needs no
 pages built by hand to see what an element looks like.
 
-The set declares the uid of every record it writes - pages 1 to 9, content
+The set declares the uid of every record it writes - pages 1 to 10, content
 elements from 101 - because the records point at each other by uid: the links
 name ``t3://page?uid=2``, the :guilabel:`Insert records` element names
 ``tt_content_601``, and a site configuration names its root page. The import
