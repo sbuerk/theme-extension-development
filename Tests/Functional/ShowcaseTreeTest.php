@@ -8,6 +8,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use Symfony\Component\Yaml\Yaml;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
@@ -32,9 +36,62 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
 
     private const SCENARIO = 'Configuration/DataFactory/theme-demo/Scenario.yaml';
 
+    /**
+     * The instances require rte_ckeditor, so the rich text of the showcase is
+     * written through the processing of the theme's preset there. Loaded
+     * here for the same reason as in `AbstractInstanceSeedTestCase`: the
+     * seed goes through the same processing it goes through in an instance,
+     * rather than through the core's short default list of tags.
+     */
+    protected array $coreExtensionsToLoad = [
+        'typo3/cms-rte-ckeditor',
+    ];
+
     protected array $testExtensionsToLoad = [
         'sbuerk/theme-extension-development',
         'sbuerk/data-factory',
+    ];
+
+    /**
+     * The page every classic CType has below it, as `/elements/core/<CType>`.
+     */
+    private const CORE_ELEMENTS_PAGE = 6;
+
+    /**
+     * The fields whose values change how a classic CType looks, per CType.
+     * The values themselves are read from the form - see `offeredValues()` -
+     * so a value added to the TCA or the page TSconfig without an element
+     * showing it fails here.
+     *
+     * The CTypes left out have no such field: `text`, `textmedia` (the
+     * orientations are the ones of `textpic`, shown there), `div`, `html`
+     * and `shortcut`.
+     */
+    private const VARIANT_FIELDS = [
+        'header' => ['header_layout', 'header_position'],
+        'textpic' => ['imageorient'],
+        'image' => ['imagecols'],
+        'bullets' => ['layout', 'bullets_type'],
+        'table' => ['table_class'],
+        'uploads' => ['uploads_type'],
+    ];
+
+    /**
+     * `imagecols` offers one to eight columns. At the gallery width of the
+     * theme a fifth column is a row of thumbnails, so the page shows the
+     * counts up to four - a stated limit, not a value that was forgotten.
+     */
+    private const VARIANT_MAXIMUM = ['imagecols' => 4];
+
+    /**
+     * The appearance fields every CType carries, all shown on `/elements/frames`.
+     */
+    private const APPEARANCE_FIELDS = [
+        'frame_class',
+        'space_before_class',
+        'space_after_class',
+        'header_position',
+        'tx_theme_header_style',
     ];
 
     /**
@@ -463,22 +520,260 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     /**
      * The showcase pages exist to be looked at, so none of them may carry the
      * core's "no rendering definition" notice - which is what a `CType` with no
-     * TypoScript renders instead of failing.
+     * TypoScript renders instead of failing - and every one of them renders
+     * through the theme at all.
      */
     #[DataProvider('showcasePages')]
     #[Test]
     public function aShowcasePageRendersEveryElementOnIt(string $path): void
     {
-        $this->assertStringNotContainsString('has no rendering definition', $this->render($path));
+        $body = $this->render($path);
+
+        $this->assertStringContainsString('data-theme-page-layout=', $body, sprintf('"%s" did not render through the theme.', $path));
+        $this->assertStringNotContainsString('has no rendering definition', $body);
     }
 
     /**
+     * Every page the scenario declares, by its slug - read from the scenario,
+     * so a page added to it is covered without being listed here.
+     *
      * @return \Generator<string, array{path: string}>
      */
     public static function showcasePages(): \Generator
     {
-        foreach (['/elements/core', '/elements/menu', '/elements/theme'] as $path) {
-            yield $path => ['path' => $path];
+        $scenario = Yaml::parseFile(self::extensionPath(self::SCENARIO));
+        $slugs = [];
+        $walk = static function (array $pages) use (&$walk, &$slugs): void {
+            foreach ($pages as $page) {
+                $slugs[] = (string)($page['self']['slug'] ?? '');
+                $walk(is_array($page['children'] ?? null) ? $page['children'] : []);
+            }
+        };
+        $walk($scenario['entities']['page'] ?? []);
+
+        foreach ($slugs as $slug) {
+            yield $slug => ['path' => $slug];
         }
+    }
+
+    /**
+     * The classic CTypes: every type the TypoScript renders that is neither a
+     * menu nor one of the theme's own - the set `/elements/core` shows.
+     *
+     * @return list<string>
+     */
+    private static function classicContentTypes(): array
+    {
+        return array_values(array_filter(
+            self::renderedContentTypes(),
+            static fn(string $type): bool => !str_starts_with($type, 'menu_') && !str_starts_with($type, 'theme_'),
+        ));
+    }
+
+    /**
+     * @return array{uid: int, pid: int}|null The page with that slug.
+     */
+    private function pageBySlug(string $slug): ?array
+    {
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('pages');
+        $queryBuilder->getRestrictions()->removeAll();
+        $row = $queryBuilder
+            ->select('uid', 'pid')
+            ->from('pages')
+            ->where($queryBuilder->expr()->eq('slug', $queryBuilder->createNamedParameter($slug)))
+            ->executeQuery()
+            ->fetchAssociative();
+
+        return is_array($row) ? ['uid' => (int)$row['uid'], 'pid' => (int)$row['pid']] : null;
+    }
+
+    /**
+     * @return list<array<string, mixed>> The content elements of one CType on one page.
+     */
+    private function elementsOn(int $pageUid, string $type): array
+    {
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('tt_content');
+        $queryBuilder->getRestrictions()->removeAll();
+
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $queryBuilder
+            ->select('*')
+            ->from('tt_content')
+            ->where(
+                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter($pageUid, Connection::PARAM_INT)),
+                $queryBuilder->expr()->eq('CType', $queryBuilder->createNamedParameter($type)),
+            )
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        return $rows;
+    }
+
+    /**
+     * The values the form offers for a field of a CType on a page: the items
+     * of the TCA, with the `removeItems` and `addItems` of the page TSconfig
+     * applied - the type specific part merged over the field, the way
+     * `PageTsConfigMerged` does it for the form.
+     *
+     * @return list<string>
+     */
+    private static function offeredValues(int $pageUid, string $type, string $field): array
+    {
+        $values = [];
+        foreach ($GLOBALS['TCA']['tt_content']['columns'][$field]['config']['items'] ?? [] as $item) {
+            $value = (string)($item['value'] ?? '');
+            if ($value !== '--div--') {
+                $values[] = $value;
+            }
+        }
+
+        $configuration = BackendUtility::getPagesTSconfig($pageUid)['TCEFORM.']['tt_content.'][$field . '.'] ?? [];
+        $typeSpecific = $configuration['types.'][$type . '.'] ?? [];
+        unset($configuration['types.']);
+        if (is_array($typeSpecific)) {
+            ArrayUtility::mergeRecursiveWithOverrule($configuration, $typeSpecific);
+        }
+
+        $removed = GeneralUtility::trimExplode(',', (string)($configuration['removeItems'] ?? ''), true);
+        $added = array_map('strval', array_keys(is_array($configuration['addItems.'] ?? null) ? $configuration['addItems.'] : []));
+        $values = array_values(array_unique(array_merge(array_diff($values, $removed), $added)));
+
+        $maximum = self::VARIANT_MAXIMUM[$field] ?? null;
+        if ($maximum !== null) {
+            $values = array_values(array_filter($values, static fn(string $value): bool => (int)$value <= $maximum));
+        }
+        sort($values);
+
+        return $values;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $elements
+     * @return list<string> The values the form offers that no element shows.
+     */
+    private static function unshownValues(array $elements, int $pageUid, string $type, string $field): array
+    {
+        $shown = array_map(static fn(array $element): string => (string)($element[$field] ?? ''), $elements);
+
+        return array_values(array_diff(self::offeredValues($pageUid, $type, $field), $shown));
+    }
+
+    /**
+     * Every classic CType has a page of its own below "Core elements", named
+     * after it, which renders every element of that CType seeded on it.
+     *
+     * The CTypes are read from the TypoScript, like the completeness check
+     * above: a classic type the theme starts rendering fails here until it
+     * has its page.
+     */
+    #[Test]
+    public function everyClassicContentTypeHasAPageOfItsOwn(): void
+    {
+        $types = self::classicContentTypes();
+        $this->assertContains('textpic', $types, 'The classic CTypes were not found - the derivation is wrong.');
+
+        $missing = [];
+        foreach ($types as $type) {
+            $slug = '/elements/core/' . $type;
+            $page = $this->pageBySlug($slug);
+            if ($page === null || $page['pid'] !== self::CORE_ELEMENTS_PAGE) {
+                $missing[] = $slug;
+                continue;
+            }
+            $elements = $this->elementsOn($page['uid'], $type);
+            $this->assertNotSame([], $elements, sprintf('"%s" shows no "%s" element.', $slug, $type));
+            $this->assertSame(
+                count($elements),
+                substr_count($this->render($slug), sprintf('data-ctype="%s"', $type)),
+                sprintf('"%s" does not render every "%s" element seeded on it.', $slug, $type),
+            );
+        }
+
+        $this->assertSame([], $missing, 'These classic CTypes have no page below "Core elements": ' . implode(', ', $missing));
+    }
+
+    /**
+     * @return \Generator<string, array{type: string, field: string}>
+     */
+    public static function classicVariantFields(): \Generator
+    {
+        foreach (self::VARIANT_FIELDS as $type => $fields) {
+            foreach ($fields as $field) {
+                yield $type . ', ' . $field => ['type' => $type, 'field' => $field];
+            }
+        }
+    }
+
+    /**
+     * The page of a CType shows every value of the fields that change how it
+     * looks - textpic in every orientation, the table in every class the
+     * form offers, including those the page TSconfig adds.
+     */
+    #[DataProvider('classicVariantFields')]
+    #[Test]
+    public function thePageOfAClassicContentTypeShowsEveryVariant(string $type, string $field): void
+    {
+        $page = $this->pageBySlug('/elements/core/' . $type);
+        $this->assertNotNull($page, sprintf('"%s" has no page.', $type));
+        $this->assertNotSame([], self::offeredValues($page['uid'], $type, $field), sprintf('The form offers no value for "%s" - the field is wrong.', $field));
+
+        $elements = $this->elementsOn($page['uid'], $type);
+        if ($type === 'bullets' && $field === 'layout') {
+            // The layout applies to the two lists; the definition list ignores it.
+            $elements = array_values(array_filter($elements, static fn(array $element): bool => (int)$element['bullets_type'] !== 2));
+        }
+
+        $this->assertSame(
+            [],
+            self::unshownValues($elements, $page['uid'], $type, $field),
+            sprintf('No "%s" element on its page shows these values of "%s".', $type, $field),
+        );
+    }
+
+    /**
+     * The layout "Icons" is only an icon list with an icon picked - without
+     * one it renders the markers of layout 0 - so the seeded element picks
+     * one, and the page shows the component rather than a plain list.
+     */
+    #[Test]
+    public function theSeededIconListShowsThePickedIcon(): void
+    {
+        $body = $this->render('/elements/core/bullets');
+
+        $this->assertStringContainsString('<ul class="theme-list theme-list--icon">', $body);
+        $this->assertMatchesRegularExpression(
+            '#<li><span class="theme-list__icon" aria-hidden="true"><svg\b[^>]*\bclass="theme-icon"#',
+            $body,
+            'The seeded icon list renders no icon in its slot.',
+        );
+    }
+
+    /**
+     * @return \Generator<string, array{field: string}>
+     */
+    public static function appearanceFields(): \Generator
+    {
+        foreach (self::APPEARANCE_FIELDS as $field) {
+            yield $field => ['field' => $field];
+        }
+    }
+
+    /**
+     * `/elements/frames` shows every value of the appearance fields the form
+     * offers - the bands `ContentElementAppearance.tsconfig` adds to
+     * `frame_class` included, the frames it removes excluded.
+     */
+    #[DataProvider('appearanceFields')]
+    #[Test]
+    public function theFramesPageShowsEveryAppearanceValue(string $field): void
+    {
+        $page = $this->pageBySlug('/elements/frames');
+        $this->assertNotNull($page, 'The Frames page is missing.');
+
+        $this->assertSame(
+            [],
+            self::unshownValues($this->elementsOn($page['uid'], 'text'), $page['uid'], 'text', $field),
+            sprintf('No text element on the Frames page shows these values of "%s".', $field),
+        );
     }
 }
