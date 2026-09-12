@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\ThemeExtensionDevelopment\Icon\IconCatalogue;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
@@ -26,10 +27,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * have to come out as the headings of the list; and every item's icon has to
  * be the image of its file.
  *
- * The theme adds icon columns only where an element renders the icon, so the
- * column compiled here is the one of the fixture extension
+ * The picker itself is compiled for the column of the fixture extension
  * `tests/icon-picker-fixture`, declared with `IconItems::selectConfig()`
- * exactly as such a column is.
+ * exactly as any such column is, and narrowed by page TSconfig of the test
+ * page. The icon fields of the theme are compiled with the page TSconfig the
+ * theme ships, "Configuration/PageTsConfig/IconPicker.tsconfig".
  */
 final class IconPickerFormEngineTest extends AbstractFunctionalTestCase
 {
@@ -95,6 +97,17 @@ final class IconPickerFormEngineTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * @return list<string> Every name of the catalogue, sorted.
+     */
+    private function catalogueNames(): array
+    {
+        $names = array_column((new IconCatalogue())->icons(), 'name');
+        sort($names);
+
+        return $names;
+    }
+
+    /**
      * "keepItems" narrows the icons the "itemsProcFunc" added, and the empty
      * entry its value starts with keeps "No icon". Were "keepItems" applied
      * before the "itemsProcFunc", every icon would still be offered.
@@ -119,12 +132,10 @@ final class IconPickerFormEngineTest extends AbstractFunctionalTestCase
     {
         $values = $this->values($this->items($this->compile('tt_content', 20), self::FIELD));
 
-        $expected = array_column((new IconCatalogue())->icons(), 'name');
         $offered = array_slice($values, 1);
-        sort($expected);
         sort($offered);
         $this->assertSame('', $values[0] ?? null);
-        $this->assertSame($expected, $offered);
+        $this->assertSame($this->catalogueNames(), $offered);
         $this->assertNotContains('arrow-circle-right', $offered, 'The alias of a renamed icon is offered.');
     }
 
@@ -181,5 +192,54 @@ final class IconPickerFormEngineTest extends AbstractFunctionalTestCase
             $checked++;
         }
         $this->assertSame(3, $checked);
+    }
+
+    /**
+     * The icon fields of the theme: on page 1 with the page TSconfig the theme
+     * ships, on page 3 with the curated list removed.
+     *
+     * @return \Generator<string, array{table: string, curated: int, every: int, field: string}>
+     */
+    public static function themeIconFields(): \Generator
+    {
+        yield 'content element link icon' => ['table' => 'tt_content', 'curated' => 30, 'every' => 40, 'field' => 'tx_theme_link_icon'];
+        yield 'list item link icon' => ['table' => 'tx_theme_list_item', 'curated' => 1, 'every' => 2, 'field' => 'link_icon'];
+    }
+
+    /**
+     * The shipped list reaches every icon field of the theme, keeps "No icon",
+     * narrows rather than renames the whole set, and names only icons the
+     * catalogue has - a name it does not have would silently not be offered.
+     */
+    #[DataProvider('themeIconFields')]
+    #[Test]
+    public function theIconFieldsOfTheThemeOfferTheCuratedIcons(string $table, int $curated, int $every, string $field): void
+    {
+        $result = $this->compile($table, $curated);
+        $values = $this->values($this->items($result, $field));
+        $keepItems = $result['pageTsConfig']['TCEFORM.'][$table . '.'][$field . '.']['keepItems'] ?? null;
+        $this->assertIsString($keepItems, sprintf('The theme ships no "keepItems" for %s.%s.', $table, $field));
+        $kept = GeneralUtility::trimExplode(',', $keepItems, true);
+        sort($kept);
+
+        $this->assertSame('', $values[0] ?? null, 'The "No icon" item is gone, and the first icon would be stored instead.');
+        $offered = array_slice($values, 1);
+        sort($offered);
+        $this->assertSame([], array_values(array_diff($kept, $this->catalogueNames())), 'The curated list names icons the catalogue does not offer.');
+        $this->assertSame($kept, $offered);
+        $this->assertGreaterThan(50, count($offered));
+        $this->assertLessThan(200, count($offered));
+    }
+
+    #[DataProvider('themeIconFields')]
+    #[Test]
+    public function withoutTheCuratedListTheIconFieldsOfTheThemeOfferTheCatalogue(string $table, int $curated, int $every, string $field): void
+    {
+        $values = $this->values($this->items($this->compile($table, $every), $field));
+
+        $offered = array_slice($values, 1);
+        sort($offered);
+        $this->assertSame('', $values[0] ?? null);
+        $this->assertSame($this->catalogueNames(), $offered);
     }
 }

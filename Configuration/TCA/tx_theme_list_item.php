@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use SBUERK\ThemeExtensionDevelopment\Tca\IconItems;
+
 // The child table of the "tx_theme_list_items" inline relation registered in
 // Configuration/TCA/Overrides/tt_content.php, shared by theme_linklist,
 // theme_sociallinks, theme_media_teaser_grid, theme_author, theme_tabs and
@@ -110,11 +112,26 @@ return [
                 'max' => 255,
             ],
         ],
+        // An icon before the label of the item's link, from the shipped set -
+        // the picker is "Classes/Tca/IconItems.php", the icons it offers by
+        // default are "Configuration/PageTsConfig/IconPicker.tsconfig". Part
+        // of the "theme_link" palette, so every relation that shows the link
+        // shows it too, and every template that renders the link renders the
+        // icon: "Partials/ContentElement/LinkList.html" and
+        // "Templates/ContentElements/ThemeMediaTeaserGrid.html".
+        //
+        // A "selectSingle" of string values: "DefaultTcaSchema" derives a
+        // "VARCHAR(255) DEFAULT ''" column from it on v13.4 and v14.3, so like
+        // every other column here it needs no "ext_tables.sql".
+        'link_icon' => [
+            'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.link_icon',
+            'config' => IconItems::selectConfig(),
+        ],
     ],
     'palettes' => [
         'theme_link' => [
             'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.palette.theme_link',
-            'showitem' => 'link, link_label',
+            'showitem' => 'link, link_label, --linebreak--, link_icon',
         ],
     ],
     // The default shown when a child record is edited outside of one of the

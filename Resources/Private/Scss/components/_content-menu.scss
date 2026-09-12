@@ -71,9 +71,12 @@
     gap: var(--theme-space-1, 0.3125rem);
 }
 
+// "gap" spaces an icon an editor gave the link from its label - the icon is a
+// flex item, the label an anonymous one - and does nothing for a label alone.
 .theme-content-menu__link {
     display: inline-flex;
     align-items: center;
+    gap: var(--theme-space-2);
     min-height: var(--theme-tap-target-min);
     color: var(--theme-content-menu-link-color);
     text-decoration: none;

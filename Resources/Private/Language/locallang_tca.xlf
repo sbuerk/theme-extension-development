@@ -44,6 +44,12 @@
 			<trans-unit id="tt_content.tx_theme_link_variant.I.ghost">
 				<source>Ghost</source>
 			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_link_variant.I.link">
+				<source>Link</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_link_icon">
+				<source>Link icon</source>
+			</trans-unit>
 			<trans-unit id="tt_content.tx_theme_list_items">
 				<source>List items</source>
 			</trans-unit>
@@ -302,6 +308,9 @@
 			</trans-unit>
 			<trans-unit id="tx_theme_list_item.palette.theme_link">
 				<source>Link</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.link_icon">
+				<source>Link icon</source>
 			</trans-unit>
 
 			<!-- The icon picker, shared by every icon column -->

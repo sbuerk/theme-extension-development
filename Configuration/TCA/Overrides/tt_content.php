@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use SBUERK\ThemeExtensionDevelopment\Tca\IconItems;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 defined('TYPO3') or die();
@@ -29,10 +30,9 @@ ExtensionManagementUtility::addTcaSelectItemGroup(
 // that happens to prefix its own fields "theme_" - accepted for the same
 // reason camino accepts it.
 //
-// Note this deliberately does *not* reuse camino's own field names 1:1:
-// camino ships a "link_icon" field backed by its own icon font. This theme
-// ships no icon assets (see Configuration/TCA/tx_theme_list_item.php and the
-// step-5c contract), so there is no equivalent field here.
+// camino ships a "link_icon" field backed by an icon font of its own. The
+// equivalent here is "tx_theme_link_icon", an icon of the Font Awesome Free
+// solid set the theme ships - picked by name, rendered inline as SVG.
 $additionalColumns = [
     // The call-to-action link shared by the hero and teaser variants.
     'tx_theme_link' => [
@@ -52,8 +52,13 @@ $additionalColumns = [
     ],
     // Maps directly onto the button modifiers the component library actually
     // ships (Resources/Private/Scss/components/_button.scss: --secondary,
-    // --ghost, ... - see docs/development/component-library.md). No option is
-    // offered here that the CSS does not implement.
+    // --ghost, --link - see docs/development/component-library.md). No option
+    // is offered here that the CSS does not implement, and "--danger" is left
+    // out on purpose: a call to action is not a destructive action.
+    //
+    // The column keeps its name, although the form calls it "Link style":
+    // release 1.x ships it with the three values before "link", and a rename
+    // would lose what installations stored.
     'tx_theme_link_variant' => [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_link_variant',
         'config' => [
@@ -73,8 +78,20 @@ $additionalColumns = [
                     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_link_variant.I.ghost',
                     'value' => 'ghost',
                 ],
+                [
+                    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_link_variant.I.link',
+                    'value' => 'link',
+                ],
             ],
         ],
+    ],
+    // An icon before the label of the link, from the shipped set - the picker
+    // is "Classes/Tca/IconItems.php", the icons it offers by default are
+    // "Configuration/PageTsConfig/IconPicker.tsconfig". Rendered by
+    // "Partials/ContentElement/LinkButton.html".
+    'tx_theme_link_icon' => [
+        'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_link_icon',
+        'config' => IconItems::selectConfig(),
     ],
     // The kind of a theme_notice. Maps directly onto the six ".theme-alert"
     // modifiers (Resources/Private/Scss/components/_alert.scss), and the
@@ -222,5 +239,5 @@ ExtensionManagementUtility::addFieldsToPalette('tt_content', 'header', 'tx_theme
 
 $GLOBALS['TCA']['tt_content']['palettes']['theme_link'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_link',
-    'showitem' => 'tx_theme_link, tx_theme_link_label, --linebreak--, tx_theme_link_variant',
+    'showitem' => 'tx_theme_link, tx_theme_link_label, --linebreak--, tx_theme_link_variant, tx_theme_link_icon',
 ];
