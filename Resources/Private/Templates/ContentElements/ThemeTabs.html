@@ -1,0 +1,70 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_tabs" - one tab per row of "tx_theme_list_items", on ".theme-tabs".
+
+    The markup keeps the three rules of the tabs contract
+    (Resources/Private/Scss/components/_tabs.scss) that the stylesheet and
+    "Resources/Public/JavaScript/theme.js" both depend on:
+
+      1. The first tab is selected, every other one carries tabindex=-1.
+      2. A panel carries its class and its id and nothing else - no "hidden",
+         no "role", no "aria-labelledby", no "tabindex". The script adds them
+         when it binds the group; without the script every panel is shown.
+      3. Every panel repeats its tab's label as ".theme-tabs__heading", which
+         labels the panel while there are no tabs.
+
+    Ids are derived from the element's own anchor, "c{data.uid}", and the
+    position of the row: unique per element because the uid is, and unique
+    within it because the position is. Not from the uid of the child row -
+    the anchor is the one identifier of an element the rest of the theme
+    already treats as its name on the page (and "LegacyDeliveryTest" as the
+    one thing a mirrored element may differ in).
+
+    The tab list is named after the element's header, which is also rendered
+    as its heading above the group; without a header it falls back to a
+    generic label, because a tab list needs a name of its own.
+
+    The panel heading is one level below the element's heading, so the outline
+    continues rather than restarting: h3 under the default h2, and h2 when the
+    element renders no heading at all. The level only matters without the
+    script - bound, the stylesheet hides the heading and the tab labels the
+    panel. "item.data.text" is rich text on this relation (see
+    "tt_content_theme_tabs.php"), hence "f:format.html".
+
+    "item.data.*" and not "item.*": "DatabaseQueryProcessor" wraps every row,
+    see "ThemeMediaTeaserGrid.html".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <f:variable name="label" value="{data.header}" />
+        <f:if condition="!{label}">
+            <f:variable name="label" value="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.tabsLabel')}" />
+        </f:if>
+        <div class="theme-tabs">
+            <div class="theme-tabs__list" role="tablist" aria-label="{label}">
+                <f:for each="{listItems}" as="item" iteration="iteration">
+                    <f:if condition="{iteration.isFirst}">
+                        <f:then><button class="theme-tabs__tab" type="button" role="tab" id="c{data.uid}-tab-{iteration.cycle}" aria-selected="true" aria-controls="c{data.uid}-tab-{iteration.cycle}-panel">{item.data.header}</button></f:then>
+                        <f:else><button class="theme-tabs__tab" type="button" role="tab" id="c{data.uid}-tab-{iteration.cycle}" aria-selected="false" aria-controls="c{data.uid}-tab-{iteration.cycle}-panel" tabindex="-1">{item.data.header}</button></f:else>
+                    </f:if>
+                </f:for>
+            </div>
+            <f:for each="{listItems}" as="item" iteration="iteration">
+                <div class="theme-tabs__panel" id="c{data.uid}-tab-{iteration.cycle}-panel">
+                    <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-tabs__heading', title: item.data.header}" />
+                    <f:if condition="{item.data.text}">
+                        <f:format.html>{item.data.text}</f:format.html>
+                    </f:if>
+                </div>
+            </f:for>
+        </div>
+    </f:if>
+</f:section>
+
+</html>

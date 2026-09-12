@@ -53,8 +53,8 @@ The tree demonstrates the whole theme rather than a handful of pages:
             tree so they are told apart by what they list.
     *   -   :guilabel:`Theme elements` (``/elements/theme``)
         -   :guilabel:`Content page`
-        -   All ten elements the extension registers itself, with their inline
-            children filled in.
+        -   All thirteen elements the extension registers itself, with their
+            inline children filled in.
     *   -   :guilabel:`Styleguide` (``/styleguide``)
         -   :guilabel:`Styleguide`
         -   The component library, rendered from Fluid rather than from content.

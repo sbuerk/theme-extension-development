@@ -76,9 +76,52 @@ $additionalColumns = [
             ],
         ],
     ],
+    // The kind of a theme_notice. Maps directly onto the six ".theme-alert"
+    // modifiers (Resources/Private/Scss/components/_alert.scss), and the
+    // template derives the "role" from it - see
+    // docs/development/component-library.md for which kind takes which.
+    //
+    // The default is "note", not "info", although "info" is what the bare
+    // class looks like: "info" is a live region ("role=status"), and a notice
+    // whose kind nobody chose should be the one kind that never is.
+    'tx_theme_notice_kind' => [
+        'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_notice_kind',
+        'config' => [
+            'type' => 'select',
+            'renderType' => 'selectSingle',
+            'default' => 'note',
+            'items' => [
+                [
+                    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_notice_kind.I.note',
+                    'value' => 'note',
+                ],
+                [
+                    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_notice_kind.I.info',
+                    'value' => 'info',
+                ],
+                [
+                    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_notice_kind.I.tip',
+                    'value' => 'tip',
+                ],
+                [
+                    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_notice_kind.I.success',
+                    'value' => 'success',
+                ],
+                [
+                    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_notice_kind.I.warning',
+                    'value' => 'warning',
+                ],
+                [
+                    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_notice_kind.I.danger',
+                    'value' => 'danger',
+                ],
+            ],
+        ],
+    ],
     // One inline (IRRE) relation to tx_theme_list_item, shared by
-    // theme_linklist, theme_sociallinks, theme_media_teaser_grid and
-    // theme_author - the alternative is three near-identical child tables,
+    // theme_linklist, theme_sociallinks, theme_media_teaser_grid,
+    // theme_author, theme_tabs and theme_accordion - the alternative is
+    // several near-identical child tables,
     // which the step-5c contract explicitly rejects. "foreign_match_fields"
     // tells the four record types apart on the same child table.
     //

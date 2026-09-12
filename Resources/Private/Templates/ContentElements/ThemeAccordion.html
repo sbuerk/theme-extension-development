@@ -1,0 +1,46 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_accordion" - one native "details" per row of "tx_theme_list_items",
+    on ".theme-accordion" (Resources/Private/Scss/components/_accordion.scss).
+
+    Every "details" of one element shares one "name", which is what makes the
+    group exclusive: the browser closes the open item when another one opens,
+    with no script. The name is derived from the element's anchor,
+    "c{data.uid}", for the same reason the tab ids of "ThemeTabs.html" are -
+    two accordions on one page with the same name would close each other's
+    items, because the browser groups by name across the whole document.
+
+    No item is open initially, and there is no field to open one: an open
+    first item is a choice about what a reader sees first, which the order of
+    the items already expresses.
+
+    The summary is the item's title as text, not a heading inside the
+    "summary": the element is exposed as a button, and a heading within a
+    button is flattened into its name by most assistive technology anyway.
+    "item.data.text" is rich text on this relation (see
+    "tt_content_theme_accordion.php"), hence "f:format.html".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <div class="theme-accordion">
+            <f:for each="{listItems}" as="item">
+                <details class="theme-accordion__item" name="c{data.uid}-accordion">
+                    <summary class="theme-accordion__summary">{item.data.header}</summary>
+                    <div class="theme-accordion__panel">
+                        <f:if condition="{item.data.text}">
+                            <f:format.html>{item.data.text}</f:format.html>
+                        </f:if>
+                    </div>
+                </details>
+            </f:for>
+        </div>
+    </f:if>
+</f:section>
+
+</html>

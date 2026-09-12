@@ -105,4 +105,11 @@
     color: var(--theme-color-text-secondary);
     font-size: var(--theme-font-size-sm);
     line-height: var(--theme-line-height-base);
+
+    // Rich text in the accordion content element: its last paragraph's
+    // margin would add to the padding above, which is the panel's bottom edge.
+    // The same rule ".theme-tabs__panel" carries.
+    > :last-child {
+        margin-block-end: 0;
+    }
 }

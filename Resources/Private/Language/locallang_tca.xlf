@@ -161,6 +161,66 @@
 				<source>Social links</source>
 			</trans-unit>
 
+			<!-- tt_content: CType theme_notice -->
+			<trans-unit id="tt_content.CType.theme_notice.label">
+				<source>Notice</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_notice.description">
+				<source>A note, tip, information, success, warning or danger box.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.header.types.theme_notice.label">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_notice_kind">
+				<source>Kind</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_notice_kind.I.note">
+				<source>Note - an aside to the text around it</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_notice_kind.I.info">
+				<source>Information</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_notice_kind.I.tip">
+				<source>Tip - a recommendation</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_notice_kind.I.success">
+				<source>Success - something finished</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_notice_kind.I.warning">
+				<source>Warning - needs attention, announced at once</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_notice_kind.I.danger">
+				<source>Danger - something failed, announced at once</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_tabs -->
+			<trans-unit id="tt_content.CType.theme_tabs.label">
+				<source>Tabs</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_tabs.description">
+				<source>Content in tabs, one panel at a time. Without JavaScript every panel is shown.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.tabs">
+				<source>Tabs</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_tabs.label">
+				<source>Tabs</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_accordion -->
+			<trans-unit id="tt_content.CType.theme_accordion.label">
+				<source>Accordion</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_accordion.description">
+				<source>Collapsible items, of which one is open at a time.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.items">
+				<source>Items</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_accordion.label">
+				<source>Items</source>
+			</trans-unit>
+
 			<!-- tx_theme_list_item -->
 			<trans-unit id="tx_theme_list_item">
 				<source>Theme: List item</source>
