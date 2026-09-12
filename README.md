@@ -143,3 +143,6 @@ Everything has to pass for **both** TYPO3 v13 and v14, each after the matching
 ## License
 
 This extension is published under the [GPL-2.0-or-later](LICENSE) license.
+The Font Awesome Free icons in `Resources/Public/Icons/FontAwesome/` are
+licensed under CC BY 4.0 (npm: `CC-BY-4.0 AND OFL-1.1 AND MIT`) — see
+[`ATTRIBUTION.txt`](Resources/Public/Icons/FontAwesome/ATTRIBUTION.txt).
