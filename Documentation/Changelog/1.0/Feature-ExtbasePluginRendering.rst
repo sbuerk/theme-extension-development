@@ -54,6 +54,19 @@ a plugin registered as its own :guilabel:`CType` never reaches this branch.
 See :file:`docs/architecture/content-elements.md` in the developer
 documentation for how the two registrations resolve to the same template.
 
+Both delivery paths
+===================
+
+The rendering the core generates for a plugin is added to a site using site
+sets unconditionally, but to a site configured through a :sql:`sys_template`
+record only right after a static include that is registered as a content
+rendering template - the role ``fluid_styled_content`` plays for the
+installations that use it. On TYPO3 v12, which has no site sets, the theme's
+static include has always been registered as one. It now is on TYPO3 v13 as
+well, so a plugin renders on a v13 site using the static include too. Before,
+such a site rendered every other content element and showed the "no rendering
+definition" notice for plugins alone.
+
 Impact
 ======
 

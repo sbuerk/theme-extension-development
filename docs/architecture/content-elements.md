@@ -908,6 +908,12 @@ overrides what `configurePlugin()` generates (see that extension's own
 `Configuration/TypoScript/setup.typoscript`) — so the only thing that can make
 it render is this theme's `lib.contentElement` and `Generic.html`.
 
+That holds for a site using the site set. On the static include path, the
+TypoScript `configurePlugin()` generates reaches the page only because
+`ext_localconf.php` registers the static include as a content rendering
+template — without it every plugin rendered the core notice there, see
+[TypoScript delivery](typoscript-delivery.md#plugins-and-the-static-include-as-a-content-rendering-template).
+
 ### `tt_content.list`
 
 One CType still reaches `configurePlugin()`'s *other* branch: `list`, the

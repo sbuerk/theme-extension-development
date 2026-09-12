@@ -7,11 +7,71 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 defined('TYPO3') or die();
 
-// This file exists for TYPO3 v12 only. On v13 it does nothing at all, and it is
-// meant to disappear with v12 support.
+// -----------------------------------------------------------------------------
+// The static include of the theme is a content rendering template.
+// -----------------------------------------------------------------------------
 //
-// Both blocks below repair something the core does for us on v13 and not on
-// v12. Neither can be solved the way this extension solves version differences
+// "ExtensionUtility::configurePlugin()" adds the rendering of every Extbase
+// plugin CType - "tt_content.<signature> =< lib.contentElement" and its
+// "20 = EXTBASEPLUGIN" - with "addTypoScript(..., 'defaultContentRendering')",
+// and so does every extension adding a plugin the classic way. It lands in
+// $GLOBALS['TYPO3_CONF_VARS']['FE']['defaultTypoScript_setup.']['defaultContentRendering'].
+//
+// For a site using site sets that TypoScript is always added
+// ("SysTemplateTreeBuilder::createSiteTemplateInclude()" calls
+// "addContentRenderingFromGlobals()" with no lookup anywhere near it). For a
+// "sys_template" site it is added only directly after a static include listed
+// here ("addStaticMagicFromGlobals()", which asks
+// "in_array($identifier, ...['FE']['contentRenderingTemplates'], true)" first).
+// That array is empty by default ("EXT:core/Configuration/DefaultConfiguration.php":
+// 'contentRenderingTemplates' => []) and is normally filled by
+// "fluid_styled_content", which this theme deliberately does not depend on.
+//
+// Without this entry the theme's static include renders every classic CType
+// and every "theme_*" one, while EXT:felogin's login form, and every other
+// plugin, falls through to the core's "no rendering definition" notice on the
+// static include path. That path is the only one on TYPO3 v12, which has no
+// site sets, and the one every "sys_template" site takes on v13 - the
+// "/legacy/" tree of the development instance among them. This entry was
+// registered for v12 only before, on the reasoning that v13 delivers through
+// the site set; that left a v13 site using the static include without plugin
+// rendering. "ExtbasePluginRenderingTest" holds it on v12, where
+// "ThemeSiteTrait" arranges the static include,
+// "ExtbasePluginStaticIncludeRenderingTest" on both core versions, and
+// "FeloginRenderingTest" the login form on both paths.
+//
+// The identifier is not a free label. The core builds it from the static
+// include the "sys_template" record selects and compares the built string with
+// the entries of this array. "handleSingleIncludeStaticFile()" splits
+// "EXT:theme_extension_development/Configuration/TypoScript/Static" - the value
+// registered by "Configuration/TCA/Overrides/sys_template.php" - into extension
+// key and path, then looks up
+// "str_replace('_', '', $extensionKey) . '/' . rtrim($path) . '/'". That is:
+//
+//   "theme_extension_development" -> "themeextensiondevelopment"
+//   + "/" + "Configuration/TypoScript/Static" + "/"
+//
+// Underscores removed, trailing slash added - the same shape
+// "fluid_styled_content" registers for itself as
+// "fluidstyledcontent/Configuration/TypoScript/", and the shape
+// "ExtensionManagementUtility::addTypoScript()" documents as
+// "[reduced extension_key]/[local path]". The lookup is the same in
+// "SysTemplateTreeBuilder" of v12.4 and of v13.4.
+//
+// Consequence worth naming: this declares the theme to be the content
+// rendering definition of the installation, which it is - it defines
+// "tt_content" for every element it ships plus "lib.contentElement". An
+// installation that also installs "fluid_styled_content" then has two, and the
+// later static include wins per object path. That is the same trade every site
+// package makes.
+$GLOBALS['TYPO3_CONF_VARS']['FE']['contentRenderingTemplates'][] = 'themeextensiondevelopment/Configuration/TypoScript/Static/';
+
+// -----------------------------------------------------------------------------
+// "lib.parseFunc" and "lib.parseFunc_RTE", for TYPO3 v12 only.
+// -----------------------------------------------------------------------------
+//
+// The block below repairs something the core does for us on v13 and not on
+// v12. It cannot be solved the way this extension solves version differences
 // everywhere else - one class per core version below "Core12/" and "Core13/",
 // selected by the container (see "docs/architecture/core-version-aware-code.md").
 // "ext_localconf.php" is loaded by TYPO3 from a fixed path, long before a
@@ -36,15 +96,11 @@ defined('TYPO3') or die();
 // the same reading that keeps working if this file ever has to answer for an
 // older core as well.
 //
-// The major version alone is precise enough for both blocks even though the
-// first one describes a v13.2 change: "composer.json" requires
-// "typo3/cms-core: ^12.4.22 || ^13.4", so a running v13 is at least 13.4 and
-// there is no reachable v13.0 or v13.1 for the major to be wrong about.
+// The major version alone is precise enough even though the block describes a
+// v13.2 change: "composer.json" requires "typo3/cms-core: ^12.4.22 || ^13.4",
+// so a running v13 is at least 13.4 and there is no reachable v13.0 or v13.1
+// for the major to be wrong about.
 if ((new Typo3Version())->getMajorVersion() < 13) {
-    // -----------------------------------------------------------------------
-    // 1) "lib.parseFunc" and "lib.parseFunc_RTE"
-    // -----------------------------------------------------------------------
-    //
     // "EXT:frontend" provides both objects from TYPO3 v13.2 on - changelog
     // "Important: #103485 - Provide lib.parseFunc via ext:frontend". Before
     // that they came from a content rendering definition, in practice
@@ -103,77 +159,4 @@ if ((new Typo3Version())->getMajorVersion() < 13) {
         );
     }
     ExtensionManagementUtility::addTypoScriptSetup($parseFuncTypoScript);
-
-    // -----------------------------------------------------------------------
-    // 2) TypoScript registered as "defaultContentRendering"
-    // -----------------------------------------------------------------------
-    //
-    // "ExtensionUtility::configurePlugin()" registers the TypoScript that makes
-    // an Extbase plugin renderable - "tt_content.<signature> =< lib.contentElement"
-    // - through "ExtensionManagementUtility::addTypoScript(..., 'defaultContentRendering')".
-    // It lands in
-    // $GLOBALS['TYPO3_CONF_VARS']['FE']['defaultTypoScript_setup.']['defaultContentRendering'],
-    // and it is only ever included next to a static template that has declared
-    // itself to be *the* content rendering definition of the installation.
-    //
-    // On v12 that declaration is the only way in. Every path into that array
-    // goes through the same gate - "SysTemplateTreeBuilder::addStaticMagicFromGlobals()"
-    // (.Build/vendor/typo3/cms-core/Classes/TypoScript/IncludeTree/SysTemplateTreeBuilder.php:462),
-    // "TreeFromLineStreamBuilder" (:557), and the legacy "TemplateService" (:862)
-    // - and each of them asks "in_array($identifier, ...['FE']['contentRenderingTemplates'], true)"
-    // first. That array is empty by default
-    // ("EXT:core/Configuration/DefaultConfiguration.php": 'contentRenderingTemplates' => []),
-    // it is normally filled by "fluid_styled_content", and this theme does not
-    // depend on that. So on v12, without the line below, no Extbase plugin in
-    // the installation has a rendering definition: measured on the v12 leg,
-    // "Tests/Functional/ExtbasePluginRenderingTest" failed all three of its
-    // tests, the third one on the yellow "has no rendering definition" notice
-    // the core prints for an unrendered CType.
-    //
-    // On v13 the line is not needed, and that is a code path difference rather
-    // than a default: a site set does not go through
-    // "addStaticMagicFromGlobals()" at all. "SysTemplateTreeBuilder::createSiteTemplateInclude()"
-    // calls "addContentRenderingFromGlobals()" unconditionally
-    // (instance-core-13/vendor/typo3/cms-core/Classes/TypoScript/IncludeTree/SysTemplateTreeBuilder.php:199),
-    // with no "contentRenderingTemplates" lookup anywhere near it, so every
-    // "defaultContentRendering" contribution is included for every set based
-    // site. The site set is how the theme is delivered on v13.
-    //
-    // That path arrived with "Feature: #103437 - Introduce Site Sets" in TYPO3
-    // v13.1, which is also why the difference has no changelog of its own:
-    // neither #103437 nor "Feature: #103439 - TypoScript provider for sites and
-    // sets" mentions "defaultContentRendering" at all. The two source positions
-    // above are the whole evidence, and they were read, not inferred.
-    //
-    // ## The identifier
-    //
-    // It is not a free label. The core builds it from the static include the
-    // "sys_template" record selects, and compares the built string with the
-    // entries of this array, so the entry has to be the string the core will
-    // build. "handleSingleIncludeStaticFile()" splits
-    // "EXT:theme_extension_development/Configuration/TypoScript/Static" - the
-    // value registered by "Configuration/TCA/Overrides/sys_template.php" and
-    // written by "Tests/Functional/Core12/ThemeDelivery" - into extension key
-    // and path, then looks up
-    // "str_replace('_', '', $extensionKey) . '/' . rtrim($path) . '/'"
-    // (SysTemplateTreeBuilder.php:318 and :353-354). That is:
-    //
-    //   "theme_extension_development" -> "themeextensiondevelopment"
-    //   + "/" + "Configuration/TypoScript/Static" + "/"
-    //
-    // Underscores removed, trailing slash added - the same shape
-    // "fluid_styled_content" registers for itself as
-    // "fluidstyledcontent/Configuration/TypoScript/", and the shape
-    // "ExtensionManagementUtility::addTypoScript()" documents as
-    // "[reduced extension_key]/[local path]".
-    //
-    // Consequence worth naming: this declares the theme to be the content
-    // rendering definition of the installation, which it is - it defines
-    // "tt_content" for every element it ships plus "lib.contentElement". An
-    // installation that also installs "fluid_styled_content" then has two, and
-    // the later static include wins per object path. That is the same trade
-    // every site package makes and it is not v12 specific.
-    //
-    // @todo Remove this block as soon as support for TYPO3 v12 is dropped.
-    $GLOBALS['TYPO3_CONF_VARS']['FE']['contentRenderingTemplates'][] = 'themeextensiondevelopment/Configuration/TypoScript/Static/';
 }
