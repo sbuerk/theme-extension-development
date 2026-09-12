@@ -1,0 +1,18 @@
+# "beta" is listed twice and belongs to the first category that lists it,
+# "second". "gamma" and "delta" are listed by none: "delta" draws the glyph of
+# "alpha" and is dropped as its alias, "gamma" draws its own and is kept.
+# "empty" places no icon of the fixture set.
+second:
+  icons:
+    - beta
+  label: Second
+first:
+  icons:
+    - alpha
+    - beta
+    - missing
+  label: First
+empty:
+  icons:
+    - missing
+  label: Empty

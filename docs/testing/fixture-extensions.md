@@ -5,11 +5,12 @@ A *fixture extension* is a minimal TYPO3 extension that exists only inside
 and is loaded by functional tests to provide test doubles, additional TCA,
 service overrides or a plugin to render.
 
-| Fixture                | Package                      | Loaded by                                                |
-|------------------------|------------------------------|----------------------------------------------------------|
-| `example-fixture`      | `tests/example-fixture`      | proves the mechanism, and is the template for a new one  |
-| `plugin-fixture`       | `tests/plugin-fixture`       | `ExtbasePluginRenderingTest`, a plugin with no rendering |
-| `data-factory-fixture` | `tests/data-factory-fixture` | `ImageElementRenderingTest`, which imports its seed set  |
+| Fixture                | Package                      | Loaded by                                                 |
+|------------------------|------------------------------|-----------------------------------------------------------|
+| `example-fixture`      | `tests/example-fixture`      | proves the mechanism, and is the template for a new one   |
+| `plugin-fixture`       | `tests/plugin-fixture`       | `ExtbasePluginRenderingTest`, a plugin with no rendering  |
+| `data-factory-fixture` | `tests/data-factory-fixture` | `ImageElementRenderingTest`, which imports its seed set   |
+| `icon-picker-fixture`  | `tests/icon-picker-fixture`  | `IconPickerFormEngineTest`, a column with the icon picker |
 
 `data-factory-fixture` holds no code, only
 `Configuration/DataFactory/image-element/`. A seed set is found by discovery in
