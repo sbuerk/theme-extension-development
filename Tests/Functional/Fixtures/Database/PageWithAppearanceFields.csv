@@ -1,0 +1,34 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,frame_class,space_before_class,space_after_class,header_position,tx_theme_header_style
+,10,1,0,0,0,10,text,Surface,2,<p>Band.</p>,surface,,,,
+,20,1,0,0,0,20,text,Raised,2,<p>Band.</p>,raised,,,,
+,30,1,0,0,0,30,text,Accent,2,<p>Band.</p>,accent,,,,
+,40,1,0,0,0,40,text,Inverse,2,<p>Band.</p>,inverse,,,,
+,50,1,0,0,0,50,text,No frame,2,<p>Band.</p>,none,,,,
+,60,1,0,0,0,60,text,Default frame,2,<p>Band.</p>,default,,,,
+,70,1,0,0,0,70,text,Removed frame,2,<p>Band.</p>,ruler-before,,,,
+,100,1,0,0,0,100,text,Before extra small,2,<p>Space.</p>,default,extra-small,,,
+,110,1,0,0,0,110,text,Before small,2,<p>Space.</p>,default,small,,,
+,120,1,0,0,0,120,text,Before medium,2,<p>Space.</p>,default,medium,,,
+,130,1,0,0,0,130,text,Before large,2,<p>Space.</p>,default,large,,,
+,140,1,0,0,0,140,text,Before extra large,2,<p>Space.</p>,default,extra-large,,,
+,150,1,0,0,0,150,text,After extra small,2,<p>Space.</p>,default,,extra-small,,
+,160,1,0,0,0,160,text,After small,2,<p>Space.</p>,default,,small,,
+,170,1,0,0,0,170,text,After medium,2,<p>Space.</p>,default,,medium,,
+,180,1,0,0,0,180,text,After large,2,<p>Space.</p>,default,,large,,
+,190,1,0,0,0,190,text,After extra large,2,<p>Space.</p>,default,,extra-large,,
+,195,1,0,0,0,195,text,Unknown space,2,<p>Space.</p>,default,huge,huge,,
+,200,1,0,0,0,200,text,Centred,2,<p>Header.</p>,default,,,center,
+,210,1,0,0,0,210,text,Right,2,<p>Header.</p>,default,,,right,
+,220,1,0,0,0,220,text,Left,2,<p>Header.</p>,default,,,left,
+,230,1,0,0,0,230,text,No position,2,<p>Header.</p>,default,,,,
+,300,1,0,0,0,300,text,Display,2,<p>Look.</p>,default,,,,display
+,310,1,0,0,0,310,text,Like h1,3,<p>Look.</p>,default,,,,h1
+,320,1,0,0,0,320,text,Like h2,3,<p>Look.</p>,default,,,,h2
+,330,1,0,0,0,330,text,Like h3,2,<p>Look.</p>,default,,,,h3
+,340,1,0,0,0,340,text,Like h4,2,<p>Look.</p>,default,,,,h4
+,350,1,0,0,0,350,text,Like h5,2,<p>Look.</p>,default,,,,h5
+,360,1,0,0,0,360,text,Unknown look,2,<p>Look.</p>,default,,,,huge

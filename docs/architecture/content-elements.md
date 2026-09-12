@@ -982,6 +982,105 @@ throws (`Exception`, code `1437425804`, "Icon with identifier … is not
 registered") the moment something tries to resolve it — there is no silent
 fallback icon to lean on if a future addition typos one.
 
+## Appearance fields
+
+The core `Appearance` tab and the header palette carry fields an editor sets
+per element. All of them used to be ignored: the layout rendered the wrapper and
+nothing else. Each field is now either rendered or taken out of the form. None
+is left in the form with no effect.
+
+| Field                   | Rendered as                                                                              | Where                                 |
+|-------------------------|------------------------------------------------------------------------------------------|---------------------------------------|
+| `frame_class`           | `--frame-surface`, `--frame-raised`, `--frame-accent`, `--frame-inverse`, `--frame-none` | `Layouts/ContentElement.html`         |
+| `space_before_class`    | `--space-before-{extra-small … extra-large}`                                             | `Layouts/ContentElement.html`         |
+| `space_after_class`     | `--space-after-{extra-small … extra-large}`                                              | `Layouts/ContentElement.html`         |
+| `header_position`       | `__header--center`, `--end` for `right`, `--start` for `left`                            | `Partials/ContentElement/Header.html` |
+| `tx_theme_header_style` | `.theme-display`, or `__heading--h1` … `--h5`                                            | `Partials/ContentElement/Header.html` |
+| `layout`                | disabled                                                                                 | page TSconfig                         |
+| `sectionIndex`          | disabled                                                                                 | page TSconfig                         |
+| `linkToTop`             | disabled                                                                                 | page TSconfig                         |
+
+Every value is matched by an `f:case`, and anything else renders no modifier:
+the default, a value the page TSconfig removed that an older record still
+carries, and a value nothing ever offered. A class written whatever the field
+holds would be a class no rule matches.
+
+**`frame_class`** keeps the core values `default` and `none`.
+[`ContentElementAppearance.tsconfig`](../../Configuration/PageTsConfig/ContentElementAppearance.tsconfig)
+adds four bands with `addItems` and removes the rulers and indents the theme
+does not draw with `removeItems`. `none` keeps the development outline and
+drops the inner padding, for an element with a box of its own. How the bands
+are drawn, and why the inverse band turns the colour scheme instead of
+re-pointing tokens, is in
+[Component library](../development/component-library.md#content-element-appearance);
+their contrast is in [`DESIGN.md`](../../DESIGN.md#content-element-bands).
+
+**`space_*_class`** take the five values of the core select, which are the same
+on v13.4 and v14.3 (`EXT:frontend/Configuration/TCA/tt_content.php`, read on
+both). They map onto `--theme-space-2`, `-4`, `-6`, `-7` and `-8`.
+
+**`header_position`** maps the core's `left` and `right` onto the logical
+edges. The stylesheet is written in logical properties, and an end-aligned
+header stays at the end of the line in a right-to-left language.
+
+**`tx_theme_header_style`** is the one new column: a `select` in
+`Configuration/TCA/Overrides/tt_content.php`, placed after `header_layout` in
+the core palettes `headers` and `header`. Like every column of this extension
+it has no `ext_tables.sql`, because `DefaultTcaSchema` derives a `varchar` from
+a select with string values on both cores. The level stays the level: an `h3`
+in the look of heading 1 is still an `h3` in the outline. `display` reuses the
+text role `.theme-display` instead of repeating its metrics.
+
+**Disabled, not rendered.** `layout` has no rendering yet. The later list,
+table and column layouts will re-enable it per type. `sectionIndex` and
+`linkToTop` wait for a table of contents and a link back to the top.
+`sectionIndex` keeps its TCA default of `1`, so elements created meanwhile
+are already part of that index. `header_position` and `tx_theme_header_style`
+are disabled per type for the CTypes that render their title outside the
+shared partial: the three heroes, `theme_media_teaser` and
+`theme_testimonial`.
+
+The page TSconfig lives in `Configuration/page.tsconfig`, the file the core
+loads from every active package, next to the backend layouts. The page TSconfig
+of the site set would reach set sites only, and the static include delivers no
+page TSconfig at all. The price is that it applies to every page tree of the
+installation, a site that does not use the theme included — the same
+trade-off the backend layouts make.
+
+Page TSconfig is assembled in a fixed order (`TsConfigTreeBuilder`, read on
+v13.4 and v14.3): the `Configuration/page.tsconfig` of every package first,
+then that of the site — its sets and `config/sites/<site>/page.tsconfig` — then
+the `TSconfig` field of every page down the rootline. Later wins, so a foreign
+site restores the core form in any of the later three:
+
+```typoscript
+TCEFORM.tt_content {
+    frame_class.removeItems >
+    frame_class.addItems >
+    layout.disabled = 0
+    sectionIndex.disabled = 0
+    linkToTop.disabled = 0
+}
+```
+
+A site package using the theme adds a removed frame back the same way, and then
+styles the class itself.
+
+The theme's own `theme_*` types have no `Appearance` tab in their `showitem`,
+so an editor sets these fields on the classic types only. The layout renders
+the modifiers for any CType whose record carries them.
+
+| Test                                                          | Guards                                                                                              |
+|---------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `Tests/Functional/ContentElementAppearanceRenderingTest.php`  | every value renders its modifier, and an unknown value none, through the set and the static include |
+| `Tests/Functional/ContentElementAppearanceFormEngineTest.php` | the form offers the bands and the looks, and disables the fields above, per type where it should    |
+| `Tests/Unit/ContentElementContractTest.php`                   | every class the two templates can write is a selector of the compiled stylesheet                    |
+
+Breaking the `inverse` case of the layout and the `right` case of the header
+partial fails four cases of the rendering test, one for each field on each
+path. Dropping the TSconfig import fails six of the seven form cases. Renaming
+one written class fails the contract test.
+
 ## Extbase plugins, and `tt_content.list`
 
 Everything above is a `CType` this theme's own TypoScript branch is written

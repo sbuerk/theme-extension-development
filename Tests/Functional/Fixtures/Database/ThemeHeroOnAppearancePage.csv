@@ -1,0 +1,3 @@
+tt_content,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext
+,900,1,0,0,0,900,theme_hero,A hero,1,<p>The hero renders its own title.</p>

@@ -3,12 +3,30 @@
 // Markup contract:
 //
 //     <div class="theme-content-element theme-content-element--text" id="c123" data-ctype="text">
-//         <div class="theme-content-element__inner">…</div>
+//         <div class="theme-content-element__inner">
+//             <header class="theme-content-element__header theme-content-element__header--center">
+//                 <h2 class="theme-content-element__heading theme-content-element__heading--h4">…</h2>
+//             </header>
+//             …
+//         </div>
 //     </div>
 //
 // Every rendered content element is wrapped in ".theme-content-element"; the
 // "--{CType}" modifier and "data-ctype" both carry the CType, one for styling
 // hooks and one for the diagnostic label below.
+//
+// The appearance fields of the record add modifiers, written by
+// "Layouts/ContentElement.html" and "Partials/ContentElement/Header.html":
+//
+//     --frame-surface, --frame-raised, --frame-accent, --frame-inverse   frame_class, a band
+//     --frame-none                                                       frame_class, no inner padding
+//     --space-before-{extra-small|small|medium|large|extra-large}        space_before_class
+//     --space-after-{extra-small|small|medium|large|extra-large}         space_after_class
+//     __header--start, __header--center, __header--end                   header_position
+//     __heading--h1 … __heading--h5                                      tx_theme_header_style
+//
+// "tx_theme_header_style = display" adds the text role ".theme-display"
+// instead of a modifier of its own - see "components/_text.scss".
 //
 // --- Why this component exists --------------------------------------------
 //
@@ -56,10 +74,13 @@
     --theme-content-element-outline-width: var(--theme-border-width, 1px);
     --theme-content-element-radius: var(--theme-radius-sm, 5px);
     --theme-content-element-spacing: var(--theme-space-6, 1.875rem);
+    --theme-content-element-space-after: 0;
+    --theme-content-element-inner-padding: var(--theme-space-4, 1.25rem);
     --theme-content-element-label-background: var(--theme-color-background, #ffffff);
     --theme-content-element-label-color: var(--theme-color-text-muted, #616b80);
 
     position: relative;
+    margin-block-end: var(--theme-content-element-space-after);
     border-radius: var(--theme-content-element-radius);
 
     // The frame is an outline, not a border: an outline is not part of the
@@ -137,5 +158,216 @@
 }
 
 .theme-content-element__inner {
-    padding: var(--theme-space-4, 1.25rem);
+    padding: var(--theme-content-element-inner-padding);
+}
+
+// --- Bands: "frame_class" --------------------------------------------------
+//
+// A band is the Frame language applied to one element: a fill, the hairline
+// and the 5px radius the component already has. It is a property of the
+// element, not of the column around it, so no element has to know which band
+// it sits in - the architectural cost DESIGN.md held against the "Band"
+// variant does not arise.
+//
+// The development outline and the chip are untouched by it. The outline sits
+// on top of the hairline - the same 1px, pulled inside by "outline-offset" -
+// so the dashes show between the solid line, and the global switch above
+// still takes both outline and chip away and leaves the band, which is
+// content rather than a development aid.
+//
+//   surface  the surface fill. Every text colour is contrast checked against
+//            it in DESIGN.md already.
+//   raised   the raised surface: white in light, the lightest of the three
+//            backgrounds in dark. Where it equals the page, the hairline
+//            is what draws it.
+//   accent   a tint of the primary accent, mixed like the tip alert mixes the
+//            secondary one, at 5%. A solid accent fill was rejected: the text,
+//            surface and semantic tokens of everything inside it - alerts,
+//            cards, inputs - would have to be re-pointed to a second complete
+//            palette per accent, and a component that is not re-pointed fails
+//            silently. At 5% every text colour, link and button keeps its
+//            contrast unchanged; see "Content element bands" in DESIGN.md.
+//   inverse  the page in the other appearance - see below.
+.theme-content-element--frame-surface,
+.theme-content-element--frame-raised,
+.theme-content-element--frame-accent,
+.theme-content-element--frame-inverse {
+    --theme-content-element-band-border-color: var(--theme-color-border, #d6dce6);
+
+    border: var(--theme-border-width, 1px) solid var(--theme-content-element-band-border-color);
+    background-color: var(--theme-content-element-band-background);
+    color: var(--theme-color-text-primary, #14181f);
+}
+
+.theme-content-element--frame-surface {
+    --theme-content-element-band-background: var(--theme-color-surface, #f4f6fa);
+}
+
+.theme-content-element--frame-raised {
+    --theme-content-element-band-background: var(--theme-color-surface-raised, #ffffff);
+}
+
+.theme-content-element--frame-accent {
+    --theme-content-element-band-background: color-mix(in oklab, var(--theme-color-primary, #0b57d0) 5%, var(--theme-color-background, #ffffff));
+}
+
+// The inverse band re-points no token at all. Every colour token is a
+// "light-dark()" held by an unregistered custom property, which inherits as
+// written and resolves wherever a property reads it - against the
+// "color-scheme" of *that* element. Setting the opposite scheme on the band
+// therefore turns every token inside it to its other appearance: the text,
+// the surfaces, the accents of the active palette, the semantic colours, the
+// form controls the browser draws. Whatever component sits in the band is
+// then exactly as readable as it is on a page in the other appearance, which
+// "DESIGN.md" has computed for every token and palette already.
+//
+// "The opposite" depends on what the page resolves to, which CSS cannot read
+// back, so the three ways the page can get its scheme are answered one by one:
+// an explicit "data-theme" in either direction, and the operating system when
+// there is none. Dark is the inverse of the default light; the two rules
+// below it switch to light wherever the page itself is dark.
+.theme-content-element--frame-inverse {
+    --theme-content-element-band-background: var(--theme-color-background, #0f1319);
+
+    color-scheme: dark;
+}
+
+:root[data-theme='dark'] .theme-content-element--frame-inverse {
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .theme-content-element--frame-inverse {
+        color-scheme: light;
+    }
+}
+
+// The development chip keeps the scheme of the page. It straddles the top
+// edge of the band, half of it on the page, and inherited the band's turned
+// scheme with everything else - a dark chip on a light page. The three rules
+// are those above, inverted, on the pseudo-element alone: its tokens resolve
+// against its own "color-scheme", the band's content keeps the turned one.
+.theme-content-element--frame-inverse::before {
+    color-scheme: light;
+}
+
+:root[data-theme='dark'] .theme-content-element--frame-inverse::before {
+    color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .theme-content-element--frame-inverse::before {
+        color-scheme: dark;
+    }
+}
+
+// No frame: the element keeps its outline, which is a development aid, and
+// loses the inner padding that keeps its content off that outline - for an
+// element that brings a box of its own, such as a hero, whose padding would
+// otherwise double.
+.theme-content-element--frame-none {
+    --theme-content-element-inner-padding: 0;
+}
+
+// --- Spacing: "space_before_class" and "space_after_class" -----------------
+//
+// The five values of the core select, on the spacing scale. "medium" is the
+// gap every element already has before it.
+//
+// Space before re-points the gap token the element reads for its own top
+// margin, like "--spaced-loose" does, and states the margin as well: the
+// first element of a column has no predecessor, and an editor who asked for
+// space before it gets that space. Space after is a bottom margin. Both are
+// ordinary margins of neighbouring blocks, so the space after one element and
+// the space before the next collapse into the larger of the two rather than
+// adding up: "space after" means "at least this much".
+// Written out rather than generated: every token is then a literal name the
+// token scan of "ComponentLibraryTest" can read, and every class one a search
+// for it finds.
+.theme-content-element--space-before-extra-small {
+    --theme-content-element-spacing: var(--theme-space-2, 0.625rem);
+
+    margin-block-start: var(--theme-content-element-spacing);
+}
+
+.theme-content-element--space-before-small {
+    --theme-content-element-spacing: var(--theme-space-4, 1.25rem);
+
+    margin-block-start: var(--theme-content-element-spacing);
+}
+
+.theme-content-element--space-before-medium {
+    --theme-content-element-spacing: var(--theme-space-6, 1.875rem);
+
+    margin-block-start: var(--theme-content-element-spacing);
+}
+
+.theme-content-element--space-before-large {
+    --theme-content-element-spacing: var(--theme-space-7, 2.5rem);
+
+    margin-block-start: var(--theme-content-element-spacing);
+}
+
+.theme-content-element--space-before-extra-large {
+    --theme-content-element-spacing: var(--theme-space-8, 3.75rem);
+
+    margin-block-start: var(--theme-content-element-spacing);
+}
+
+.theme-content-element--space-after-extra-small {
+    --theme-content-element-space-after: var(--theme-space-2, 0.625rem);
+}
+
+.theme-content-element--space-after-small {
+    --theme-content-element-space-after: var(--theme-space-4, 1.25rem);
+}
+
+.theme-content-element--space-after-medium {
+    --theme-content-element-space-after: var(--theme-space-6, 1.875rem);
+}
+
+.theme-content-element--space-after-large {
+    --theme-content-element-space-after: var(--theme-space-7, 2.5rem);
+}
+
+.theme-content-element--space-after-extra-large {
+    --theme-content-element-space-after: var(--theme-space-8, 3.75rem);
+}
+
+// --- Header: "header_position" and "tx_theme_header_style" -----------------
+//
+// The core values "left" and "right" arrive as "--start" and "--end": the
+// stylesheet is written in logical properties, and the side an editor chose
+// stays that side of the line in a right-to-left language.
+.theme-content-element__header--start {
+    text-align: start;
+}
+
+.theme-content-element__header--center {
+    text-align: center;
+}
+
+.theme-content-element__header--end {
+    text-align: end;
+}
+
+// The look of a heading level on a heading of any level. The values are the
+// ones "base/_elements.scss" gives the elements, row for row DESIGN.md's role
+// table - kept in step by hand, the same way the component tokens restate
+// their fallbacks. Every declaration a level can differ in is stated, so an
+// "h5" set in the look of an "h1" loses its capitals and its caps tracking.
+$heading-looks: (
+    'h1': (font-size: var(--theme-font-size-2xl), font-weight: var(--theme-font-weight-bold), line-height: var(--theme-line-height-heading), letter-spacing: var(--theme-letter-spacing-wide), text-transform: none),
+    'h2': (font-size: var(--theme-font-size-xl), font-weight: var(--theme-font-weight-bold), line-height: var(--theme-line-height-snug), letter-spacing: var(--theme-letter-spacing-wide), text-transform: none),
+    'h3': (font-size: var(--theme-font-size-lg), font-weight: var(--theme-font-weight-medium), line-height: var(--theme-line-height-snug), letter-spacing: var(--theme-letter-spacing-wide), text-transform: none),
+    'h4': (font-size: var(--theme-font-size-md), font-weight: var(--theme-font-weight-bold), line-height: var(--theme-line-height-snug), letter-spacing: var(--theme-letter-spacing-wide), text-transform: none),
+    'h5': (font-size: var(--theme-font-size-sm), font-weight: var(--theme-font-weight-bold), line-height: var(--theme-line-height-snug), letter-spacing: var(--theme-letter-spacing-caps), text-transform: uppercase),
+);
+
+@each $look, $declarations in $heading-looks {
+    .theme-content-element__heading--#{$look} {
+        @each $property, $value in $declarations {
+            #{$property}: $value;
+        }
+    }
 }
