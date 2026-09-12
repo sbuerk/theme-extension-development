@@ -40,6 +40,37 @@ lib.contentElement {
     layoutRootPaths.10 = {$theme.layoutRootPath}
 }
 
+# The frame of the theme's own content elements - every "theme_*" CType below
+# is "=< lib.themeContentElement", never "=< lib.contentElement".
+#
+# "lib.contentElement" is a name this theme shares with "fluid_styled_content",
+# and that extension does not add to it: its "Helper/ContentElement.typoscript"
+# starts with "lib.contentElement >" and rebuilds the object from nothing, on
+# v13.4 and v14.3 alike. Loaded after the theme, it would take the theme's root
+# paths with it, and every "theme_*" element would look for
+# "ContentElements/Theme…" in the templates of fluid_styled_content and fail to
+# find it. An object of the theme's own name is one nothing else clears, so
+# these thirteen elements render the same whether or not fluid_styled_content
+# is installed, and whichever of the two is loaded first.
+#
+# The classic CTypes stay on "lib.contentElement" on purpose: they are the ones
+# fluid_styled_content renders itself, and a bridge to it only has to add root
+# paths to that object - at an index between its own "0" and the "10" of its
+# "styles.templates.*" constants - instead of moving elements back and forth.
+#
+# Two objects rather than "lib.contentElement =< lib.themeContentElement": the
+# three root paths are the whole definition, and a reference would make
+# "lib.contentElement" depend on this one for the day it is cleared, which is
+# the dependency this object exists to cut.
+# "ThemeContentElementObjectTest" renders every "theme_*" element with
+# "lib.contentElement" cleared after the theme, on both delivery paths.
+lib.themeContentElement = FLUIDTEMPLATE
+lib.themeContentElement {
+    templateRootPaths.10 = {$theme.templateRootPath}
+    partialRootPaths.10 = {$theme.partialRootPath}
+    layoutRootPaths.10 = {$theme.layoutRootPath}
+}
+
 # Extbase plugins, and the "list" CType historical plugins still use.
 #
 # "ExtensionUtility::configurePlugin()"
@@ -810,7 +841,7 @@ tt_content.menu_related_pages {
 # comment for why: the one interpolated value, "{field:uid}", is the current
 # record's own integer primary key, not editor input, so no further
 # escaping concern applies. The other two comparisons are fixed literals.
-tt_content.theme_author =< lib.contentElement
+tt_content.theme_author =< lib.themeContentElement
 tt_content.theme_author {
     templateName = ContentElements/ThemeAuthor
 
@@ -846,7 +877,7 @@ tt_content.theme_author {
 
 # A list of links. See the section comment above for how "listItems" is
 # resolved.
-tt_content.theme_linklist =< lib.contentElement
+tt_content.theme_linklist =< lib.themeContentElement
 tt_content.theme_linklist {
     templateName = ContentElements/ThemeLinklist
 
@@ -874,7 +905,7 @@ tt_content.theme_linklist {
 # ThemeSociallinks.html". The child table's "link" restriction
 # ("allowedTypes") is the only difference the TCA makes between the two; the
 # resolution here is identical.
-tt_content.theme_sociallinks =< lib.contentElement
+tt_content.theme_sociallinks =< lib.themeContentElement
 tt_content.theme_sociallinks {
     templateName = ContentElements/ThemeSociallinks
 
@@ -905,7 +936,7 @@ tt_content.theme_sociallinks {
 # (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/
 # ContentDataProcessor.php"): the processor configuration passed to it is
 # exactly this "10." block, "dataProcessing." included, once per row.
-tt_content.theme_media_teaser_grid =< lib.contentElement
+tt_content.theme_media_teaser_grid =< lib.themeContentElement
 tt_content.theme_media_teaser_grid {
     templateName = ContentElements/ThemeMediaTeaserGrid
 
@@ -966,7 +997,7 @@ tt_content.theme_media_teaser_grid {
 # structure. theme_hero_text_only, theme_teaser and theme_testimonial are
 # deliberately left out of this dataProcessing: none of the three has an
 # "image" field at all.
-tt_content.theme_hero =< lib.contentElement
+tt_content.theme_hero =< lib.themeContentElement
 tt_content.theme_hero {
     templateName = ContentElements/ThemeHero
 
@@ -979,7 +1010,7 @@ tt_content.theme_hero {
     }
 }
 
-tt_content.theme_hero_small =< lib.contentElement
+tt_content.theme_hero_small =< lib.themeContentElement
 tt_content.theme_hero_small {
     templateName = ContentElements/ThemeHeroSmall
 
@@ -995,15 +1026,15 @@ tt_content.theme_hero_small {
 # No "image" field on this CType's TCA at all - see the comment on
 # "tt_content.theme_hero" above for why no dataProcessing is wired here
 # either.
-tt_content.theme_hero_text_only =< lib.contentElement
+tt_content.theme_hero_text_only =< lib.themeContentElement
 tt_content.theme_hero_text_only.templateName = ContentElements/ThemeHeroTextOnly
 
 # No "image" field on this CType's TCA at all - same reasoning as
 # "tt_content.theme_hero_text_only" above.
-tt_content.theme_teaser =< lib.contentElement
+tt_content.theme_teaser =< lib.themeContentElement
 tt_content.theme_teaser.templateName = ContentElements/ThemeTeaser
 
-tt_content.theme_media_teaser =< lib.contentElement
+tt_content.theme_media_teaser =< lib.themeContentElement
 tt_content.theme_media_teaser {
     templateName = ContentElements/ThemeMediaTeaser
 
@@ -1019,14 +1050,14 @@ tt_content.theme_media_teaser {
 # No dataProcessing: this element has no media. See the comment in
 # "Templates/ContentElements/ThemeTestimonial.html" for why the field it once
 # had was removed rather than left inert.
-tt_content.theme_testimonial =< lib.contentElement
+tt_content.theme_testimonial =< lib.themeContentElement
 tt_content.theme_testimonial.templateName = ContentElements/ThemeTestimonial
 
 # A notice on ".theme-alert". No data processing: the kind, the title and the
 # text are all fields of the record itself, and the template derives the
 # modifier and the "role" from "tx_theme_notice_kind" - see
 # "Templates/ContentElements/ThemeNotice.html".
-tt_content.theme_notice =< lib.contentElement
+tt_content.theme_notice =< lib.themeContentElement
 tt_content.theme_notice.templateName = ContentElements/ThemeNotice
 
 # Tabs and an accordion. Both read "tx_theme_list_items" exactly the way the

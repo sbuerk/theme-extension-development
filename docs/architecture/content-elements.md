@@ -680,6 +680,44 @@ markup in `Partials/ContentElement/Hero.html` and `Teaser.html` — this table
 only records which component backs which `CType`, not the shared-partial
 reasoning already written there.
 
+### `lib.themeContentElement`: their own frame, not `lib.contentElement`
+
+All thirteen are `=< lib.themeContentElement`, a `FLUIDTEMPLATE` with the same
+three root paths `lib.contentElement` has — the `theme.*RootPath` constants at
+index `10` — and nothing else. The classic set above stays on
+`lib.contentElement`.
+
+The reason is `fluid_styled_content`. Its
+`Configuration/TypoScript/Helper/ContentElement.typoscript` starts with
+`lib.contentElement >` and builds the object again from its own root paths
+(verified at the tags `v13.4.35` and `v14.3.7`). An installation that loads it
+after the theme therefore loses every root path the theme set on that object,
+and an element of the theme's own would look for `ContentElements/Theme…` in
+fluid_styled_content's templates and fail. Nothing clears an object of the
+theme's own name, so these elements render the same whether that extension is
+installed or not, and in whichever order the two are loaded.
+
+The split also decides what a later bridge to fluid_styled_content has to do:
+add root paths to `lib.contentElement` at an index between its own `0` and the
+`10` of its `styles.templates.*` constants, for the classic set only. It never
+has to touch a `theme_*` element.
+
+Two objects rather than `lib.contentElement =< lib.themeContentElement`: the
+root paths are the whole definition, and a reference would make one object
+depend on the other for exactly the case where one of them is cleared.
+
+For an integrator this is one change: root paths added to `lib.contentElement`
+reach the classic set only. The `theme.*RootPath` constants set both objects,
+as before.
+
+`Tests/Functional/ThemeContentElementObjectTest.php` renders the page of all
+thirteen with `lib.contentElement >` loaded after the theme — through the set
+and through the static include — and requires the markup to be identical to
+the page without it. A core element on a second page, rendered with the same
+TypoScript, has to lose its rendering, which is what shows that the clearing
+took effect. Pointing `theme_notice` back at `lib.contentElement` fails the
+comparison on both paths.
+
 ### Naming: `theme_*`, `tx_theme_*`, `tx_theme_list_item`
 
 CTypes are prefixed `theme_`, columns `tx_theme_`, and the shared inline child
