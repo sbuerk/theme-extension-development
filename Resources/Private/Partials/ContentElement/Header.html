@@ -7,16 +7,53 @@
     "header_layout" carries the heading level, and the value 100 means "do not
     display" - the convention of the core TCA offered in the backend, so a theme
     ignoring it would render headers an editor had hidden.
+
+    Two fields decide how the header looks rather than where it sits in the
+    outline, and both become modifiers:
+
+      header_position        center  ".theme-content-element__header--center"
+                             right   ".theme-content-element__header--end"
+                             left    ".theme-content-element__header--start"
+      tx_theme_header_style  display ".theme-display", the text role
+                             h1-h5   ".theme-content-element__heading--h1" ...
+
+    "right" and "left" are the values of the core select and map to the
+    logical edges: the stylesheet is written in logical properties, and a
+    header an editor put at the end of the line stays at the end of it in a
+    right-to-left language.
+
+    The visual size is independent of the level on purpose: the level says
+    where the heading sits in the outline, the style how loud it is. The
+    display size reuses the text role ".theme-display" rather than repeating
+    its metrics.
+
+    Values outside those lists render no modifier, the same rule as the frame
+    modifiers of "Layouts/ContentElement.html".
 </f:comment>
 <f:if condition="{data.header} && {data.header_layout} != 100">
-    <header class="theme-content-element__header">
+    <f:switch expression="{data.header_position}">
+        <f:case value="center"><f:variable name="position" value=" theme-content-element__header--center" /></f:case>
+        <f:case value="right"><f:variable name="position" value=" theme-content-element__header--end" /></f:case>
+        <f:case value="left"><f:variable name="position" value=" theme-content-element__header--start" /></f:case>
+        <f:defaultCase><f:variable name="position" value="" /></f:defaultCase>
+    </f:switch>
+    <f:switch expression="{data.tx_theme_header_style}">
+        <f:case value="display"><f:variable name="look" value=" theme-display" /></f:case>
+        <f:case value="h1"><f:variable name="look" value=" theme-content-element__heading--h1" /></f:case>
+        <f:case value="h2"><f:variable name="look" value=" theme-content-element__heading--h2" /></f:case>
+        <f:case value="h3"><f:variable name="look" value=" theme-content-element__heading--h3" /></f:case>
+        <f:case value="h4"><f:variable name="look" value=" theme-content-element__heading--h4" /></f:case>
+        <f:case value="h5"><f:variable name="look" value=" theme-content-element__heading--h5" /></f:case>
+        <f:defaultCase><f:variable name="look" value="" /></f:defaultCase>
+    </f:switch>
+    <header class="theme-content-element__header{position}">
         <f:switch expression="{data.header_layout}">
-            <f:case value="1"><h1 class="theme-content-element__heading">{data.header}</h1></f:case>
-            <f:case value="2"><h2 class="theme-content-element__heading">{data.header}</h2></f:case>
-            <f:case value="3"><h3 class="theme-content-element__heading">{data.header}</h3></f:case>
-            <f:case value="4"><h4 class="theme-content-element__heading">{data.header}</h4></f:case>
-            <f:case value="5"><h5 class="theme-content-element__heading">{data.header}</h5></f:case>
-            <f:defaultCase><h2 class="theme-content-element__heading">{data.header}</h2></f:defaultCase>
+            <f:case value="1"><h1 class="theme-content-element__heading{look}">{data.header}</h1></f:case>
+            <f:case value="2"><h2 class="theme-content-element__heading{look}">{data.header}</h2></f:case>
+            <f:case value="3"><h3 class="theme-content-element__heading{look}">{data.header}</h3></f:case>
+            <f:case value="4"><h4 class="theme-content-element__heading{look}">{data.header}</h4></f:case>
+            <f:case value="5"><h5 class="theme-content-element__heading{look}">{data.header}</h5></f:case>
+            <f:defaultCase><h2 class="theme-content-element__heading{look}">{data.header}</h2></f:defaultCase>
         </f:switch>
     </header>
 </f:if>

@@ -429,6 +429,87 @@ baseline closes `thead` and `tfoot`.
 `--theme-color-overlay` is the scrim behind a modal or an off-canvas panel:
 `rgb(20 24 31 / 55%)` light, `rgb(0 0 0 / 65%)` dark.
 
+### Content element bands
+
+An editor picks a band in the `frame_class` field of a content element;
+`components/_content-element.scss` draws it with the Frame language — a fill,
+the hairline, the 5px radius.
+
+| Band      | Fill                                                                                |
+|-----------|-------------------------------------------------------------------------------------|
+| `surface` | `--theme-color-surface`                                                             |
+| `raised`  | `--theme-color-surface-raised`                                                      |
+| `accent`  | `color-mix(in oklab, var(--theme-color-primary) 5%, var(--theme-color-background))` |
+| `inverse` | `--theme-color-background` of the **other** appearance                              |
+
+**Inverse re-points no token.** Every colour token is a `light-dark()` held
+by an unregistered custom property. It inherits as written and resolves
+wherever a property reads it, against the `color-scheme` of that element. The
+band sets the opposite scheme, so everything inside it takes the other
+appearance: text, surfaces, the accents of the active palette, the semantic
+colours and the controls the browser draws. On a light page an inverse band is
+the dark column of every table in this file, and on a dark page the light one.
+The opposite scheme is answered for each way the page gets its own:
+`data-theme="dark"`, `data-theme="light"`, and the operating system when
+neither is set.
+
+**Accent is a tint, not a solid fill.** A solid primary fill would need a
+second, complete set of text, surface and semantic tokens per palette and
+appearance. Every component inside the band — an alert on its tint, a card on
+its raised surface, an input — would have to be re-pointed to it, and a
+component that was not re-pointed would fail silently. As a tint nothing
+inside the band changes colour. The tint is mixed like the tip alert's, from
+the accent, so it follows the palette.
+
+Computed, not estimated. The accent mix is done in Oklab and converted to
+sRGB; the script reproduces the tip tint table above to ±0.02. "Link" is the
+primary accent, which is also the fill of a primary button: as a boundary it
+has to clear 3:1, and as link text 4.5:1. The label of that button is
+`on-primary` on its own fill, which no band touches. "Control" is
+`--theme-color-border-strong`, the resting edge of every control (see
+[Control boundaries](#control-boundaries)), against the band.
+
+Surface, raised and inverse, lowest link value of the five palettes:
+
+| Band      | Page  | Band fill | Text  | Secondary | Muted | Link | Control |
+|-----------|-------|-----------|-------|-----------|-------|------|---------|
+| `surface` | light | `#f4f6fa` | 16.45 | 6.97      | 4.95  | 5.90 | 3.10    |
+| `surface` | dark  | `#161c25` | 14.58 | 8.17      | 5.24  | 7.51 | 3.44    |
+| `raised`  | light | `#ffffff` | 17.79 | 7.54      | 5.35  | 6.39 | 3.35    |
+| `raised`  | dark  | `#1d2531` | 13.14 | 7.36      | 4.72  | 6.77 | 3.10    |
+| `inverse` | light | `#0f1319` | 15.86 | 8.89      | 5.70  | 8.18 | 3.74    |
+| `inverse` | dark  | `#ffffff` | 17.79 | 7.54      | 5.35  | 6.39 | 3.35    |
+
+Accent, per palette:
+
+| Palette | Page  | Tint      | Text  | Secondary | Muted | Link  | Link hover | Control |
+|---------|-------|-----------|-------|-----------|-------|-------|------------|---------|
+| neutral | light | `#f3f7fe` | 16.56 | 7.01      | 4.98  | 5.94  | 7.30       | 3.12    |
+| neutral | dark  | `#141922` | 15.01 | 8.41      | 5.39  | 7.73  | 9.43       | 3.54    |
+| ember   | light | `#fbf5f3` | 16.49 | 6.98      | 4.96  | 6.15  | 8.15       | 3.11    |
+| ember   | dark  | `#18191e` | 14.95 | 8.37      | 5.37  | 8.88  | 10.88      | 3.53    |
+| ocean   | light | `#f3f7fa` | 16.52 | 7.00      | 4.97  | 6.07  | 8.22       | 3.11    |
+| ocean   | dark  | `#141a22` | 14.90 | 8.35      | 5.35  | 9.15  | 10.95      | 3.52    |
+| moss    | light | `#f4f7f4` | 16.49 | 6.98      | 4.96  | 6.06  | 8.23       | 3.11    |
+| moss    | dark  | `#141b1e` | 14.84 | 8.31      | 5.33  | 10.13 | 11.81      | 3.50    |
+| violet  | light | `#f7f5fb` | 16.45 | 6.97      | 4.95  | 6.92  | 9.08       | 3.10    |
+| violet  | dark  | `#161922` | 14.95 | 8.38      | 5.37  | 8.26  | 10.28      | 3.53    |
+
+Every text colour clears 4.5:1 on every band (lowest: muted text on the raised
+band in dark, 4.72). Every link and primary fill clears 4.5:1 (lowest 5.90).
+
+**A control inside a band** has two neighbours: its own fill, the raised
+surface, and the band. Against its fill, `border-strong` reaches 3.35 in light
+and 3.10 in dark. Against the band it is the "Control" column: lowest 3.10, on
+the light surface band, the dark raised band and the violet light accent. In
+an inverse band both neighbours are those of the other appearance.
+
+**Why 5%.** 5% is the largest mix that keeps the control edge at the margin
+it has on the light surface, 3.10, in all ten tints. At 7% the lowest is
+exactly 3.00, with no margin. At 8% it is 2.95 and fails, and the muted text
+falls to 4.71. `ContentElementContractTest` holds the stylesheet to 5%. A
+different mix is a different table, and it has to be computed again.
+
 ### Palettes
 
 The neutral palette above is the **default**. Four alternates ship, and each

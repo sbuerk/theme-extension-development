@@ -1,8 +1,56 @@
 <html data-namespace-typo3-fluid="true"
       xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
 
+<f:comment>
+    The frame every content element renders through - the core set on
+    "lib.contentElement", the theme's own on "lib.themeContentElement", both
+    with this layout.
+
+    The appearance fields of the record become modifiers of
+    ".theme-content-element" (components/_content-element.scss):
+
+      frame_class          surface, raised, accent, inverse   --frame-{value}
+                           none                              --frame-none
+      space_before_class   extra-small ... extra-large        --space-before-{value}
+      space_after_class    extra-small ... extra-large        --space-after-{value}
+
+    Each field is matched against the values the theme styles, one "f:case"
+    per value, and anything else renders no modifier at all: the default
+    ("default", an empty spacing), a value the page TSconfig removed from the
+    select ("ruler-before", "indent", ...) that an older record still carries,
+    and a value nothing ever offered. A modifier that is written whatever the
+    field holds is a class no rule matches - the defect the component contract
+    exists to rule out, and "ContentElementContractTest" holds this file to it.
+
+    "header_position" and "tx_theme_header_style" belong to the heading and are
+    read by "Partials/ContentElement/Header.html", not here.
+</f:comment>
+<f:switch expression="{data.frame_class}">
+    <f:case value="surface"><f:variable name="frame" value=" theme-content-element--frame-surface" /></f:case>
+    <f:case value="raised"><f:variable name="frame" value=" theme-content-element--frame-raised" /></f:case>
+    <f:case value="accent"><f:variable name="frame" value=" theme-content-element--frame-accent" /></f:case>
+    <f:case value="inverse"><f:variable name="frame" value=" theme-content-element--frame-inverse" /></f:case>
+    <f:case value="none"><f:variable name="frame" value=" theme-content-element--frame-none" /></f:case>
+    <f:defaultCase><f:variable name="frame" value="" /></f:defaultCase>
+</f:switch>
+<f:switch expression="{data.space_before_class}">
+    <f:case value="extra-small"><f:variable name="spaceBefore" value=" theme-content-element--space-before-extra-small" /></f:case>
+    <f:case value="small"><f:variable name="spaceBefore" value=" theme-content-element--space-before-small" /></f:case>
+    <f:case value="medium"><f:variable name="spaceBefore" value=" theme-content-element--space-before-medium" /></f:case>
+    <f:case value="large"><f:variable name="spaceBefore" value=" theme-content-element--space-before-large" /></f:case>
+    <f:case value="extra-large"><f:variable name="spaceBefore" value=" theme-content-element--space-before-extra-large" /></f:case>
+    <f:defaultCase><f:variable name="spaceBefore" value="" /></f:defaultCase>
+</f:switch>
+<f:switch expression="{data.space_after_class}">
+    <f:case value="extra-small"><f:variable name="spaceAfter" value=" theme-content-element--space-after-extra-small" /></f:case>
+    <f:case value="small"><f:variable name="spaceAfter" value=" theme-content-element--space-after-small" /></f:case>
+    <f:case value="medium"><f:variable name="spaceAfter" value=" theme-content-element--space-after-medium" /></f:case>
+    <f:case value="large"><f:variable name="spaceAfter" value=" theme-content-element--space-after-large" /></f:case>
+    <f:case value="extra-large"><f:variable name="spaceAfter" value=" theme-content-element--space-after-extra-large" /></f:case>
+    <f:defaultCase><f:variable name="spaceAfter" value="" /></f:defaultCase>
+</f:switch>
 <div id="c{data.uid}"
-     class="theme-content-element theme-content-element--{data.CType}"
+     class="theme-content-element theme-content-element--{data.CType}{frame}{spaceBefore}{spaceAfter}"
      data-ctype="{data.CType}">
     <div class="theme-content-element__inner">
         <f:render section="Main" />

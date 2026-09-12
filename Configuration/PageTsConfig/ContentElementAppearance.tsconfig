@@ -1,0 +1,59 @@
+# The appearance fields of a content element: what the theme renders, and
+# nothing it does not.
+#
+# "Layouts/ContentElement.html" and "Partials/ContentElement/Header.html"
+# turn "frame_class", "space_before_class", "space_after_class",
+# "header_position" and "tx_theme_header_style" into modifiers. What is left of
+# the core "Appearance" tab would be a field an editor sets and nothing
+# happens - so it is taken out of the form rather than left inert.
+#
+# The same syntax on TYPO3 v13.4 and v14.3; "Configuration/page.tsconfig"
+# imports this file, so it applies whether the theme is delivered by the site
+# set or by the static include.
+TCEFORM.tt_content {
+    # The core offers rulers and indents, which the theme does not draw. It
+    # draws four bands, and "none": the element without its inner padding.
+    # "default" stays. Records still carrying one of the removed values render
+    # as "default" - the layout matches known values only.
+    frame_class {
+        removeItems = ruler-before, ruler-after, indent, indent-left, indent-right
+        addItems {
+            surface = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.frame_class.surface
+            raised = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.frame_class.raised
+            accent = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.frame_class.accent
+            inverse = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.frame_class.inverse
+        }
+    }
+
+    # "layout" has no rendering in the theme yet. The content elements that
+    # will give it one - lists, tables, text in columns - re-enable it per type
+    # when they do.
+    layout.disabled = 1
+
+    # The section index and the link to the top of the page are a later
+    # addition: a table of contents built from "sectionIndex" and a "back to
+    # top" link behind "linkToTop". Until then both would be switches that
+    # switch nothing. The "sectionIndex" column keeps its TCA default of 1, so
+    # every element created meanwhile is part of the index once there is one.
+    sectionIndex.disabled = 1
+    linkToTop.disabled = 1
+
+    # These CTypes carry the core "headers" palette but render their title in
+    # a component of their own, outside the shared header partial, so neither
+    # the position nor the look of the header reaches the page.
+    header_position.types {
+        theme_hero.disabled = 1
+        theme_hero_small.disabled = 1
+        theme_hero_text_only.disabled = 1
+        theme_media_teaser.disabled = 1
+        theme_testimonial.disabled = 1
+    }
+
+    tx_theme_header_style.types {
+        theme_hero.disabled = 1
+        theme_hero_small.disabled = 1
+        theme_hero_text_only.disabled = 1
+        theme_media_teaser.disabled = 1
+        theme_testimonial.disabled = 1
+    }
+}

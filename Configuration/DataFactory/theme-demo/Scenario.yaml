@@ -112,6 +112,64 @@ entities:
                       <em>emphasised</em> words and a <a href="t3://page?uid=1">link</a>, which are
                       the three inline cases a stylesheet has to answer for.</p>
 
+              # The appearance fields of the core "Appearance" tab and of the
+              # header palette, one band each, so the four bands the theme
+              # adds to "frame_class" can be looked at next to plain running
+              # text. "frame_class", "space_*_class", "header_position" and
+              # "tx_theme_header_style" become modifiers in
+              # "Layouts/ContentElement.html" and
+              # "Partials/ContentElement/Header.html"; the page TSconfig in
+              # "Configuration/PageTsConfig/ContentElementAppearance.tsconfig"
+              # offers exactly these values in the form.
+              - self:
+                    id: 203
+                    CType: 'text'
+                    header: 'A surface band, header centred'
+                    header_layout: 2
+                    header_position: 'center'
+                    frame_class: 'surface'
+                    space_before_class: 'large'
+                    bodytext: |
+                      <p>The frame "Surface band" fills the element with the surface
+                      colour and draws the hairline around it. The header is centred,
+                      and the space before the element is "large".</p>
+              - self:
+                    id: 204
+                    CType: 'text'
+                    header: 'A raised band, header at the end, looking like heading 4'
+                    header_layout: 2
+                    header_position: 'right'
+                    tx_theme_header_style: 'h4'
+                    frame_class: 'raised'
+                    bodytext: |
+                      <p>The raised surface is white in the light appearance, so the
+                      hairline is what draws this band there. The header is an h2 set
+                      in the look of heading 4.</p>
+              - self:
+                    id: 205
+                    CType: 'text'
+                    header: 'An accent band, header in the display size'
+                    header_layout: 2
+                    tx_theme_header_style: 'display'
+                    frame_class: 'accent'
+                    bodytext: |
+                      <p>A tint of the primary accent of the active palette, with a
+                      <a href="t3://page?uid=3">link to the media page</a> in it:
+                      switch the palette, and the tint follows it.</p>
+              - self:
+                    id: 206
+                    CType: 'text'
+                    header: 'An inverse band, header at the start'
+                    header_layout: 2
+                    header_position: 'left'
+                    frame_class: 'inverse'
+                    space_after_class: 'extra-large'
+                    bodytext: |
+                      <p>The page in the other appearance: dark on a light page, light
+                      on a dark one, with every colour of the theme turned with it -
+                      the <a href="t3://page?uid=1">link to the start page</a> as well.
+                      The space after the element is "extra large".</p>
+
         - self:
               id: 3
               title: 'Media'
