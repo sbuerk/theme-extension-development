@@ -191,6 +191,11 @@ nothing a live region could announce:
 </div>
 ```
 
+`.theme-alert__text` is selected by class, so it may just as well be a `div` of
+paragraphs — the notice content element renders its rich text there — and its
+last child drops its bottom margin so the padding stays even.
+`.theme-accordion__panel` does the same, as `.theme-tabs__panel` already did.
+
 `--tip` takes the palette's secondary accent, and its tint is mixed from that
 accent in the stylesheet — `color-mix(in oklab, secondary 12%, background)` —
 rather than read from a surface token: a palette varies accents only, and a

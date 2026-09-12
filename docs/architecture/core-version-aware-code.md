@@ -131,12 +131,12 @@ properties.
 
 TYPO3 v13.0 builds the "new content element" wizard from the TCA (#102834,
 "Auto-registration of New Content Element Wizard via TCA"): every `CType` item
-becomes a wizard entry, so the ten registrations in
+becomes a wizard entry, so the thirteen registrations in
 `Configuration/TCA/Overrides/tt_content_theme_*.php` produce the wizard as a
 side effect. v12 has none of that — its
 `NewContentElementController::getWizards()` reads
 `mod.wizards.newContentElement.wizardItems` out of page TSconfig and nothing
-else. Without the file the ten theme types are selectable in the `CType`
+else. Without the file the thirteen theme types are selectable in the `CType`
 dropdown of an existing element but cannot be *created*, which is the only way
 an editor ever reaches them.
 
@@ -176,7 +176,7 @@ Two further rules follow from experience rather than from the mechanism:
   repository exist because of that rule:
   - [`Classes/Compatibility/ContentTypeRegistration.php`](../../Classes/Compatibility/ContentTypeRegistration.php)
     replaces `ExtensionManagementUtility::addRecordType()`, which v12.4 does not
-    have, at all ten theme content type registrations — and it contains **no
+    have, at all thirteen theme content type registrations — and it contains **no
     version switch at all**. It reproduces what v13's method does using
     `SelectItem` and `addTcaSelectItem()`, both of which exist unchanged on both
     versions, so each core produces the array that core would have produced. A
@@ -224,7 +224,7 @@ extended by #104311 in 13.3 for the `ctrl` derived columns). v12.4's
 `DefaultTcaSchema` does not — it only derives the management columns, the
 `category|datetime|slug|json|uuid` types and MM tables, with no branch for
 `input`, `text`, `link`, `file` or `inline`. Without an explicit definition the
-`tx_theme_list_item` table and the four `tx_theme_*` columns on `tt_content` are
+`tx_theme_list_item` table and the five `tx_theme_*` columns on `tt_content` are
 simply never created on v12, and every theme element using them fails.
 
 #101553 states that an explicit `ext_tables.sql` definition takes precedence

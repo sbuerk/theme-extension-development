@@ -240,8 +240,9 @@ development and test instances do not install it. What that covers:
     :guilabel:`File Links`, :guilabel:`Insert Records`, :guilabel:`Divider` and
     :guilabel:`Plain HTML` — see :ref:`feature-core-content-elements`.
 *   All eleven menu elements — see :ref:`feature-menu-content-elements`.
-*   Ten content elements of the theme's own, in a :guilabel:`Theme` group —
-    see :ref:`feature-theme-content-elements`.
+*   Thirteen content elements of the theme's own, in a :guilabel:`Theme`
+    group — see :ref:`feature-theme-content-elements` and
+    :ref:`feature-notice-tabs-accordion-elements`.
 *   Third-party Extbase plugins, which render through a generic template
     without any per-plugin configuration — see
     :ref:`feature-extbase-plugin-rendering` — on both delivery paths, the

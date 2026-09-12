@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 // The child table of the "tx_theme_list_items" inline relation registered in
 // Configuration/TCA/Overrides/tt_content.php, shared by theme_linklist,
-// theme_sociallinks, theme_media_teaser_grid and theme_author. Ships no
+// theme_sociallinks, theme_media_teaser_grid, theme_author, theme_tabs and
+// theme_accordion. "text" is plain text here, and rich text only through the
+// "overrideChildTca" of the last two - see "tt_content_theme_tabs.php". Ships no
 // ext_tables.sql - see the comment above the "fieldname" column for the one
 // field that would silently fail to get a database column without it.
 //

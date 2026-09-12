@@ -98,6 +98,13 @@
     margin: 0;
     font-size: var(--theme-font-size-sm);
     line-height: var(--theme-line-height-base);
+
+    // A "div" of rich text rather than one "p" - the notice content element
+    // renders it that way. The last paragraph's own margin would otherwise
+    // add to the alert's padding at the bottom edge only.
+    > :last-child {
+        margin-block-end: 0;
+    }
 }
 
 // Neutral, and the appearance of ".theme-alert" with no modifier - listed

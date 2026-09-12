@@ -44,8 +44,8 @@ in a frontend rather than only in a test assertion:
     set on TYPO3 v13, or through a :sql:`sys_template` record selecting the
     classic static include, which is the only way on TYPO3 v12. See
     :ref:`configuration`. It covers **every classic content element**
-    :file:`EXT:frontend` registers, the eleven menu elements, ten elements of
-    its own, and third-party Extbase plugins, none of which requires
+    :file:`EXT:frontend` registers, the eleven menu elements, thirteen elements
+    of its own, and third-party Extbase plugins, none of which requires
     :file:`fluid_styled_content` — that extension is not a dependency here, and
     the development and test instances do not install it. It ships five backend
     layouts, a main menu, a section menu and a breadcrumb, and a light/dark

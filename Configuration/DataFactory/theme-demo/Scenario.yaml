@@ -9,7 +9,7 @@
 #   pages               1-9, the tree below
 #   tt_content          the uid of its page times 100, plus its position on
 #                       that page: the third element of page 6 is 603
-#   tx_theme_list_item  1-12 on page 8, numbered in the order they are
+#   tx_theme_list_item  1-18 on page 8, numbered in the order they are
 #                       declared - the link list's four deliberately not in
 #                       the order they render in, see there
 #
@@ -166,7 +166,7 @@ entities:
                     bodytext: |
                       <p>Three pages, one per family: the classic types
                       <em>EXT:frontend</em> registers without supplying a rendering,
-                      the eleven menu types, and the ten this extension adds itself.
+                      the eleven menu types, and the thirteen this extension adds itself.
                       Every one of them appears exactly once, so a single branch of the
                       tree answers what the theme does with each.</p>
           children:
@@ -656,9 +656,9 @@ entities:
                         selected_categories: 0
                         category_field: 'categories'
 
-            # Every content element this extension registers itself, so the ten
-            # "theme_*" CTypes can be looked at side by side rather than one
-            # fixture at a time.
+            # Every content element this extension registers itself, so the
+            # thirteen "theme_*" CTypes can be looked at side by side rather than
+            # one fixture at a time.
             #
             # No "content_sidebar" here, unlike its two siblings 6 and 7: the
             # layout is resolved per page, not inherited down the branch, and
@@ -670,7 +670,7 @@ entities:
                   backend_layout: 'content'
                   # As on page 6: the abstract and the keyword are read by the
                   # two menu elements on page 7, not by anything on this page.
-                  abstract: 'The ten content elements this extension registers itself, from the hero down to the card grid.'
+                  abstract: 'The thirteen content elements this extension registers itself, from the hero down to the accordion.'
                   keywords: 'content elements, theme'
               entities:
                 content:
@@ -828,6 +828,68 @@ entities:
                           <p>Every card is one row of the shared child table. The
                           lead-in above is the element's own heading and body.</p>
                         tx_theme_list_items: '10,11,12'
+                  # theme_notice - the six kinds of ".theme-alert", one element
+                  # each. The kind decides the modifier and the "role" together
+                  # ("Templates/ContentElements/ThemeNotice.html"): "status" for
+                  # info and success, "alert" for warning and danger, "note" for
+                  # note and tip. "header" is the title inside the component,
+                  # not a content heading, and "bodytext" is rich text on this
+                  # CType, so it is written as a paragraph.
+                  - self:
+                        id: 811
+                        CType: 'theme_notice'
+                        tx_theme_notice_kind: 'note'
+                        header: 'A note'
+                        bodytext: '<p>An aside to the text around it. It takes the note role and is never a live region, because nothing about it ever changes. It is also the kind a notice gets when nobody chose one.</p>'
+                  - self:
+                        id: 812
+                        CType: 'theme_notice'
+                        tx_theme_notice_kind: 'info'
+                        header: 'Information'
+                        bodytext: '<p>The neutral kind, and the look of the bare class. It takes the status role, a polite live region that waits for a pause before it is read.</p>'
+                  - self:
+                        id: 813
+                        CType: 'theme_notice'
+                        tx_theme_notice_kind: 'tip'
+                        header: 'A tip'
+                        bodytext: '<p>A recommendation, and the one kind that follows the palette: switch the palette in the display settings, and this is the only notice that changes colour.</p>'
+                  - self:
+                        id: 814
+                        CType: 'theme_notice'
+                        tx_theme_notice_kind: 'success'
+                        header: 'Something finished'
+                        bodytext: '<p>Confirms that something went through. It takes the status role, like the information.</p>'
+                  - self:
+                        id: 815
+                        CType: 'theme_notice'
+                        tx_theme_notice_kind: 'warning'
+                        header: 'A warning'
+                        bodytext: '<p>Something needs attention before it becomes a problem. It takes the alert role, the assertive one.</p>'
+                  - self:
+                        id: 816
+                        CType: 'theme_notice'
+                        tx_theme_notice_kind: 'danger'
+                        header: 'Something failed'
+                        bodytext: '<p>Assertive like the warning, with a glyph of its own: once colours are forced, the glyph is what tells the six kinds apart.</p>'
+                  # theme_tabs - one tab per child. The ids of the tabs and
+                  # panels are derived from the anchor of the element, "c817",
+                  # so a second tab group on the page cannot collide with this
+                  # one. The children's "text" is rich text on this relation
+                  # only; the second one links to the start page to show it.
+                  - self:
+                        id: 817
+                        CType: 'theme_tabs'
+                        header: 'Three tabs'
+                        header_layout: 2
+                        tx_theme_list_items: '13,14,15'
+                  # theme_accordion - native "details" sharing one "name",
+                  # "c818-accordion", so opening one item closes the others.
+                  - self:
+                        id: 818
+                        CType: 'theme_accordion'
+                        header: 'An accordion'
+                        header_layout: 2
+                        tx_theme_list_items: '16,17,18'
 
                 # The children of the four relations above. A relation is not a
                 # containment: a child is an ordinary record on this page, and
@@ -915,6 +977,38 @@ entities:
                           The link is optional on this relation only.
                           A card without one is a plain block of text.
 
+                  # theme_tabs, uid 817. Title and rich text, nothing else: the
+                  # relation is narrowed to those two on that CType. The text is
+                  # stored as written - "overrideChildTca" enables the editor in
+                  # the form only, and DataHandler runs no rich text
+                  # transformation for it (see "tt_content_theme_tabs.php").
+                  - self:
+                        id: 13
+                        header: 'Site set'
+                        text: '<p>A site depends on the site set of the theme, and constants, page TSconfig and setup arrive together. This is the first tab, the one the markup selects.</p>'
+                  - self:
+                        id: 14
+                        header: 'Static include'
+                        text: '<p>An installation without site sets includes the static TypoScript in a template record instead: the same files, read the same way. The <a href="t3://page?uid=1">start page</a> of the second tree of a development instance is delivered like that.</p>'
+                  - self:
+                        id: 15
+                        header: 'Without the script'
+                        text: '<p>Switch JavaScript off and reload: the tab list is gone, and every panel is shown in a frame of its own, under a heading repeating its tab.</p>'
+
+                  # theme_accordion, uid 818.
+                  - self:
+                        id: 16
+                        header: 'What makes the items exclusive?'
+                        text: '<p>One <em>name</em> shared by every item of this element. Open another item and this one closes, with no script involved.</p>'
+                  - self:
+                        id: 17
+                        header: 'Why is the name derived from the element?'
+                        text: '<p>The browser groups items by name across the whole page, so two accordions sharing one would close each other. The name is the anchor of the element with a suffix.</p>'
+                  - self:
+                        id: 18
+                        header: 'Is anything open at first?'
+                        text: '<p>No. Which item a reader meets first is what the order of the items already says.</p>'
+
         # The styleguide. Not a showcase of content elements: the "styleguide"
         # backend layout declares no usable content column at all, and
         # "Templates/Page/Styleguide.html" renders the component library
@@ -931,3 +1025,4 @@ entities:
               slug: '/styleguide'
               backend_layout: 'styleguide'
               nav_hide: 1
+

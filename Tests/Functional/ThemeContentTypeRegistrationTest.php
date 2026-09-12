@@ -10,7 +10,7 @@ use TYPO3\CMS\Backend\Controller\ContentElement\NewContentElementController;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 
 /**
- * The theme's ten content types are registered, and creatable.
+ * The theme's thirteen content types are registered, and creatable.
  *
  * Registration is spread over two mechanisms that differ per core version, and
  * a failure of either is silent: the element simply is not offered, and nothing
@@ -41,6 +41,7 @@ final class ThemeContentTypeRegistrationTest extends AbstractFunctionalTestCase
      * @var list<string>
      */
     private const THEME_CONTENT_TYPES = [
+        'theme_accordion',
         'theme_author',
         'theme_hero',
         'theme_hero_small',
@@ -48,7 +49,9 @@ final class ThemeContentTypeRegistrationTest extends AbstractFunctionalTestCase
         'theme_linklist',
         'theme_media_teaser',
         'theme_media_teaser_grid',
+        'theme_notice',
         'theme_sociallinks',
+        'theme_tabs',
         'theme_teaser',
         'theme_testimonial',
     ];
@@ -114,7 +117,7 @@ final class ThemeContentTypeRegistrationTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * The ten types are creatable, not merely selectable.
+     * The thirteen types are creatable, not merely selectable.
      *
      * This is the assertion that covers the v12 half of the wizard problem
      * (contract item C3-D): on v13 the wizard entries are derived from the CType

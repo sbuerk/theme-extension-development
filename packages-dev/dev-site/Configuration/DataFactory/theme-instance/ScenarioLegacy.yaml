@@ -129,7 +129,7 @@ entities:
                 self:
                   id: 1502
                   CType: text
-                  bodytext: "<p>Three pages, one per family: the classic types\n<em>EXT:frontend</em> registers without supplying a rendering,\nthe eleven menu types, and the ten this extension adds itself.\nEvery one of them appears exactly once, so a single branch of the\ntree answers what the theme does with each.</p>"
+                  bodytext: "<p>Three pages, one per family: the classic types\n<em>EXT:frontend</em> registers without supplying a rendering,\nthe eleven menu types, and the thirteen this extension adds itself.\nEvery one of them appears exactly once, so a single branch of the\ntree answers what the theme does with each.</p>"
           children:
             -
               self:
@@ -326,7 +326,7 @@ entities:
                 title: 'Theme elements'
                 slug: /elements/theme
                 backend_layout: content
-                abstract: 'The ten content elements this extension registers itself, from the hero down to the card grid.'
+                abstract: 'The thirteen content elements this extension registers itself, from the hero down to the accordion.'
                 keywords: 'content elements, theme'
               entities:
                 content:
@@ -412,6 +412,62 @@ entities:
                       header: 'Three cards in a grid'
                       bodytext: "<p>Every card is one row of the shared child table. The\nlead-in above is the element's own heading and body.</p>\n"
                       tx_theme_list_items: '1010,1011,1012'
+                  -
+                    self:
+                      id: 1811
+                      CType: theme_notice
+                      tx_theme_notice_kind: note
+                      header: 'A note'
+                      bodytext: '<p>An aside to the text around it. It takes the note role and is never a live region, because nothing about it ever changes. It is also the kind a notice gets when nobody chose one.</p>'
+                  -
+                    self:
+                      id: 1812
+                      CType: theme_notice
+                      tx_theme_notice_kind: info
+                      header: Information
+                      bodytext: '<p>The neutral kind, and the look of the bare class. It takes the status role, a polite live region that waits for a pause before it is read.</p>'
+                  -
+                    self:
+                      id: 1813
+                      CType: theme_notice
+                      tx_theme_notice_kind: tip
+                      header: 'A tip'
+                      bodytext: '<p>A recommendation, and the one kind that follows the palette: switch the palette in the display settings, and this is the only notice that changes colour.</p>'
+                  -
+                    self:
+                      id: 1814
+                      CType: theme_notice
+                      tx_theme_notice_kind: success
+                      header: 'Something finished'
+                      bodytext: '<p>Confirms that something went through. It takes the status role, like the information.</p>'
+                  -
+                    self:
+                      id: 1815
+                      CType: theme_notice
+                      tx_theme_notice_kind: warning
+                      header: 'A warning'
+                      bodytext: '<p>Something needs attention before it becomes a problem. It takes the alert role, the assertive one.</p>'
+                  -
+                    self:
+                      id: 1816
+                      CType: theme_notice
+                      tx_theme_notice_kind: danger
+                      header: 'Something failed'
+                      bodytext: '<p>Assertive like the warning, with a glyph of its own: once colours are forced, the glyph is what tells the six kinds apart.</p>'
+                  -
+                    self:
+                      id: 1817
+                      CType: theme_tabs
+                      header: 'Three tabs'
+                      header_layout: 2
+                      tx_theme_list_items: '1013,1014,1015'
+                  -
+                    self:
+                      id: 1818
+                      CType: theme_accordion
+                      header: 'An accordion'
+                      header_layout: 2
+                      tx_theme_list_items: '1016,1017,1018'
                 listItem:
                   -
                     self:
@@ -476,6 +532,36 @@ entities:
                       id: 1012
                       header: 'A card without a link'
                       text: "The link is optional on this relation only.\nA card without one is a plain block of text.\n"
+                  -
+                    self:
+                      id: 1013
+                      header: 'Site set'
+                      text: '<p>A site depends on the site set of the theme, and constants, page TSconfig and setup arrive together. This is the first tab, the one the markup selects.</p>'
+                  -
+                    self:
+                      id: 1014
+                      header: 'Static include'
+                      text: '<p>An installation without site sets includes the static TypoScript in a template record instead: the same files, read the same way. The <a href="t3://page?uid=1001">start page</a> of the second tree of a development instance is delivered like that.</p>'
+                  -
+                    self:
+                      id: 1015
+                      header: 'Without the script'
+                      text: '<p>Switch JavaScript off and reload: the tab list is gone, and every panel is shown in a frame of its own, under a heading repeating its tab.</p>'
+                  -
+                    self:
+                      id: 1016
+                      header: 'What makes the items exclusive?'
+                      text: '<p>One <em>name</em> shared by every item of this element. Open another item and this one closes, with no script involved.</p>'
+                  -
+                    self:
+                      id: 1017
+                      header: 'Why is the name derived from the element?'
+                      text: '<p>The browser groups items by name across the whole page, so two accordions sharing one would close each other. The name is the anchor of the element with a suffix.</p>'
+                  -
+                    self:
+                      id: 1018
+                      header: 'Is anything open at first?'
+                      text: '<p>No. Which item a reader meets first is what the order of the items already says.</p>'
         -
           self:
             id: 1009
