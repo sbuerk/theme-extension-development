@@ -1,0 +1,32 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The heading of one item inside a content element, one level below the
+    element's own heading.
+
+    "Partials/ContentElement/Header.html" renders the element's heading at
+    "header_layout" 1 to 5, h2 for 0, and nothing at all for 100 or an empty
+    header. An item heading continues that outline: the level after the
+    element's, and h2 when the element shows no heading - the item then sits
+    directly below whatever heads the page. Level 5 has h6 below it, which is
+    as deep as HTML goes.
+
+    Arguments: "data" (the content element record), "class", "title".
+</f:comment>
+<f:if condition="{data.header} && {data.header_layout} != 100">
+    <f:then>
+        <f:switch expression="{data.header_layout}">
+            <f:case value="1"><h2 class="{class}">{title}</h2></f:case>
+            <f:case value="3"><h4 class="{class}">{title}</h4></f:case>
+            <f:case value="4"><h5 class="{class}">{title}</h5></f:case>
+            <f:case value="5"><h6 class="{class}">{title}</h6></f:case>
+            <f:defaultCase><h3 class="{class}">{title}</h3></f:defaultCase>
+        </f:switch>
+    </f:then>
+    <f:else>
+        <h2 class="{class}">{title}</h2>
+    </f:else>
+</f:if>
+
+</html>

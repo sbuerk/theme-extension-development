@@ -6,7 +6,7 @@
 # items and their "itemGroups" -
 # "NewContentElementController::loadAvailableWizards()" turns every item of the
 # type field into a wizard entry, keyed "<group>_<value>", with the item's
-# label, description and icon. The ten calls in
+# label, description and icon. The thirteen calls in
 # "Configuration/TCA/Overrides/tt_content_theme_*.php" therefore already produce
 # the wizard entries there.
 #
@@ -17,9 +17,9 @@
 # (".Build/vendor/typo3/cms-backend/Configuration/page.tsconfig" and
 # ".Build/vendor/typo3/cms-frontend/Configuration/page.tsconfig" with a v12
 # dependency set installed; no such file exists in either sysext on v13).
-# Without this file the ten types are selectable in the CType dropdown of an
-# existing element but cannot be created, which is the only way an editor ever
-# reaches them.
+# Without this file the thirteen types are selectable in the CType dropdown of
+# an existing element but cannot be created, which is the only way an editor
+# ever reaches them.
 #
 # The entries are deliberately not left switched on for v13 as well. They would
 # not duplicate anything there - v13's
@@ -55,6 +55,14 @@
         theme.before = common
 
         theme.elements {
+            theme_accordion {
+                iconIdentifier = content-accordion
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_accordion.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_accordion.description
+                tt_content_defValues {
+                    CType = theme_accordion
+                }
+            }
             theme_author {
                 iconIdentifier = content-user
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_author.label
@@ -111,12 +119,28 @@
                     CType = theme_media_teaser_grid
                 }
             }
+            theme_notice {
+                iconIdentifier = content-message
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_notice.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_notice.description
+                tt_content_defValues {
+                    CType = theme_notice
+                }
+            }
             theme_sociallinks {
                 iconIdentifier = content-listgroup
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_sociallinks.label
                 description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_sociallinks.description
                 tt_content_defValues {
                     CType = theme_sociallinks
+                }
+            }
+            theme_tabs {
+                iconIdentifier = content-tab
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_tabs.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_tabs.description
+                tt_content_defValues {
+                    CType = theme_tabs
                 }
             }
             theme_teaser {

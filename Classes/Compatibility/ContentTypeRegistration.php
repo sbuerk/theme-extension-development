@@ -20,9 +20,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * `1725997543` in v13, which dates it to September 2024, i.e. v13.4, and no
  * changelog entry ships for it at all.
  *
- * This class is the single place where that difference is resolved, so the ten
- * `Configuration/TCA/Overrides/tt_content_theme_*.php` files keep exactly one
- * registration call each.
+ * This class is the single place where that difference is resolved, so the
+ * thirteen `Configuration/TCA/Overrides/tt_content_theme_*.php` files keep
+ * exactly one registration call each.
  *
  * ## Why this is in `Classes/` and not split into `Core12/` / `Core13/`
  *
@@ -68,7 +68,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * is the gate that holds it to that on both versions.
  *
  * @todo Delete this class and call
- *       `ExtensionManagementUtility::addRecordType()` directly in the ten
+ *       `ExtensionManagementUtility::addRecordType()` directly in the thirteen
  *       `Configuration/TCA/Overrides/tt_content_theme_*.php` files as soon as
  *       support for TYPO3 v12 is dropped.
  */

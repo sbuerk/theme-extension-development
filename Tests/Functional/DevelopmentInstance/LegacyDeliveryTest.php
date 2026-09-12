@@ -367,11 +367,17 @@ final class LegacyDeliveryTest extends AbstractInstanceSeedTestCase
         // the offset. Translated back on the mirror side only, and only this
         // pattern - an image width or a column count that differed would be a
         // real difference, and stays one.
+        //
+        // The same anchor also starts the identifiers an element derives from
+        // it - "c801-tab-1" and its panel "c801-tab-1-panel" of the tabs, in
+        // "id" and "aria-controls", and "c801-accordion", the "name" grouping
+        // an accordion's items - so a "c<uid>" followed by "-" is translated
+        // back as well, in those two attributes too.
         if ($isMirror) {
             $markup = (string)preg_replace_callback(
-                '/(id="|#)c(\d+)"/',
+                '/(id="|#|aria-controls="|name=")c(\d+)(["-])/',
                 fn(array $match): string => isset($this->mirroredContentUids[(int)$match[2]])
-                    ? $match[1] . 'c' . ((int)$match[2] - self::OFFSET) . '"'
+                    ? $match[1] . 'c' . ((int)$match[2] - self::OFFSET) . $match[3]
                     : $match[0],
                 $markup,
             );

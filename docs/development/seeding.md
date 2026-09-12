@@ -77,7 +77,7 @@ the `table` element need nothing from the tool.
 |----------------------|------------------------------------------------------------------|
 | `pages`              | 1 to 9                                                           |
 | `tt_content`         | its page times 100 plus its position: the third of page 6 is 603 |
-| `tx_theme_list_item` | 1 to 12 on page 8, in declaration order                          |
+| `tx_theme_list_item` | 1 to 18 on page 8, in declaration order                          |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -152,7 +152,7 @@ every `CType` it renders:
 | 5   | Elements       | `/elements`       | `content`         | The showcase branch, parent of 6 to 8.      |
 | 6   | Core elements  | `/elements/core`  | `content_sidebar` | Every classic `CType` the theme renders.    |
 | 7   | Menu elements  | `/elements/menu`  | `content_sidebar` | The eleven `menu_*` elements.               |
-| 8   | Theme elements | `/elements/theme` | `content`         | The ten `theme_*` elements.                 |
+| 8   | Theme elements | `/elements/theme` | `content`         | The thirteen `theme_*` elements.            |
 | 9   | Styleguide     | `/styleguide`     | `styleguide`      | The component library, straight from Fluid. |
 
 Four properties of that tree are deliberate, and are asserted by
