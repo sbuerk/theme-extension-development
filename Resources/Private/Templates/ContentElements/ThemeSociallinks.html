@@ -10,12 +10,13 @@
     "Configuration/TCA/Overrides/tt_content_theme_sociallinks.php") and the
     "aria-label" below, not in shape.
 
-    This theme ships no icon assets and no icon component (see the step-5c
-    contract and the comment above the CType's own TCA registration) - every
-    entry renders as a text label, "link_label" standing in for what would
-    otherwise be a platform icon ("Mastodon", "LinkedIn", ...). Recorded here
-    as the gap it is: an icon-driven variant is not something this template
-    approximates with a Unicode glyph or similar, it is simply not rendered.
+    Every entry renders as a text label, "link_label" standing in for what
+    would otherwise be a platform icon ("Mastodon", "LinkedIn", ...). The
+    theme's icons are the solid style of Font Awesome Free, and platform logos
+    are in its brands style, which is deliberately not vendored - see
+    "docs/development/icons.md". Recorded here as the gap it is: an icon-driven
+    variant is not something this template approximates with a Unicode glyph
+    or a look-alike solid icon, it is simply not rendered.
 </f:comment>
 <f:layout name="ContentElement" />
 

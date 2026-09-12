@@ -522,9 +522,16 @@ from, and a glyph drawn for one component is not.
 The rule is the one [the typeface](#the-typeface-is-not-shipped) follows: no
 webfont, no CDN, no request. The solid SVGs of a pinned package version are
 committed below `Resources/Public/Icons/FontAwesome/` together with their
-licence (CC BY 4.0 for the icons) and an attribution. An icon has no colour of
-its own — every file fills with `currentColor` — so it takes the colour of the
-text around it, and no token is needed for it.
+licence (CC BY 4.0 for the icons) and an attribution, and a page gets the few
+it uses inline, through the ViewHelper `<theme:icon>`, attribution comment
+included. Never an SVG drawn by hand, never a glyph in CSS generated content,
+never a webfont. What the stylesheet still draws itself is component
+geometry, not an icon — the tooltip arrow, the busy spinner, the switch thumb
+— and is listed as such in [Icons](docs/development/icons.md#the-rule). An icon has no
+colour of its own — every file fills with `currentColor` — so it takes the
+colour of the text around it, and no colour token is needed for it. Its size is
+one em, or the size of the slot a component gives it through
+`--theme-icon-size`; that token has no global value.
 
 How the set is built, checked and updated: [Icons](docs/development/icons.md).
 

@@ -128,10 +128,10 @@
     min-height: calc(var(--theme-tap-target-min) * 2);
 }
 
-// No custom arrow: replacing the native indicator needs an icon asset, and
-// this library ships none - see "base/_reset.scss" on carrying no CSS
-// dependency. The UA arrow is left in place and only the box around it is
-// themed.
+// No custom arrow. An icon of the theme's set would have to be markup next to
+// every select, or a background image the text colour cannot reach - forced
+// colours included - while the native indicator already follows both. The UA
+// arrow is left in place and only the box around it is themed.
 .theme-select {
     &[multiple] {
         // Tall enough to show a handful of options at once rather than

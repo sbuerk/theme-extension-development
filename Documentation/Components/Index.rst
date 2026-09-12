@@ -36,6 +36,8 @@ What the library contains
     *   -   Actions
         -   Button - with a link and an icon variant, pressed and busy states,
             and an attached button group - and the close button
+    *   -   Icons
+        -   The solid icons of Font Awesome Free, inline, see :ref:`icons`
     *   -   Interactive
         -   Tabs, dialog, tooltip
     *   -   Forms
@@ -44,6 +46,44 @@ What the library contains
         -   Main and sub navigation, breadcrumb, pagination, content menu,
             skip link, gallery, the content element wrapper, site header and
             site footer
+
+..  _icons:
+
+Icons
+=====
+
+The theme ships the complete solid style of Font Awesome Free 7.3.1 - 2001
+icons - below :file:`Resources/Public/Icons/FontAwesome/Solid/`, and draws every
+icon of its own from it. A template renders one with the ViewHelper
+:html:`<theme:icon>`, by the file name of the icon without :file:`.svg`:
+
+..  code-block:: html
+
+    <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+          xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers"
+          data-namespace-typo3-fluid="true">
+
+    <theme:icon name="circle-info" />
+    <theme:icon name="circle-info" label="Information" />
+
+The icon is inlined as SVG: no webfont, no CDN and no request is involved. It is
+as large as the text around it and takes the colour of that text. Without
+:html:`label` it is decoration and hidden from screen readers - the right choice
+next to text or inside a button that has a name of its own. With
+:html:`label` it is an image with that name. An icon name that does not exist
+stops the rendering with an exception rather than leaving a gap.
+
+The optional :html:`class` argument adds classes to :css:`theme-icon`. A
+component that gives icons a fixed size sets the custom property
+:css:`--theme-icon-size` on the element around them.
+
+The icons are licensed under CC BY 4.0; the npm package they come from declares
+``CC-BY-4.0 AND OFL-1.1 AND MIT``, of which only the icons ship here. The
+licence of the package and an attribution ship next to them, in
+:file:`Resources/Public/Icons/FontAwesome/LICENSE.txt` and
+:file:`Resources/Public/Icons/FontAwesome/ATTRIBUTION.txt`. Every icon file
+keeps the attribution comment it comes with, and so does every icon on a
+rendered page. The extension itself stays GPL-2.0-or-later.
 
 Components that need JavaScript
 ===============================
@@ -125,7 +165,7 @@ confirmation for an action that needs the script anyway.
         <form method="dialog">
             <div class="theme-dialog__header">
                 <h2 class="theme-dialog__title" id="d-reseed-title">Reseed the instance?</h2>
-                <button class="theme-close" value="cancel" aria-label="Close"></button>
+                <button class="theme-close" value="cancel" aria-label="Close"><theme:icon name="xmark" /></button>
             </div>
             <div class="theme-dialog__body">…</div>
             <div class="theme-dialog__footer">

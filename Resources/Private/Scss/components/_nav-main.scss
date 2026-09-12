@@ -3,7 +3,7 @@
 // Markup contract, from "MenuProcessor" two levels deep:
 //
 //     <nav class="theme-nav-main" aria-label="Main">
-//         <button class="theme-nav-main__toggle" aria-expanded="false" aria-controls="nav-main">…</button>
+//         <button class="theme-nav-main__toggle" aria-expanded="false" aria-controls="nav-main"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg> …</button>
 //         <ul class="theme-nav-main__list" id="nav-main">
 //             <li class="theme-nav-main__item theme-nav-main__item--active">
 //                 <a class="theme-nav-main__link" href="…" aria-current="page">…</a>
@@ -85,11 +85,15 @@
 }
 
 // Never shown unless a script is there to operate it, and never above the
-// breakpoint, where there is nothing left to disclose.
+// breakpoint, where there is nothing left to disclose. The "bars" icon comes
+// before the label, which stays visible text: a menu button that is only the
+// icon would need an "aria-label", and one that is only the word loses the
+// shape everyone recognises.
 .theme-nav-main__toggle {
     display: none;
     align-items: center;
     justify-content: center;
+    gap: var(--theme-space-2);
     min-height: var(--theme-tap-target-min);
     min-width: var(--theme-tap-target-min);
     padding: var(--theme-space-2) var(--theme-space-3);

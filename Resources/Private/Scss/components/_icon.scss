@@ -1,0 +1,57 @@
+// Icon.
+//
+// Markup contract - written by "<theme:icon name="…" />", never by hand, see
+// "Classes/ViewHelpers/IconViewHelper.php" and "docs/development/icons.md":
+//
+//     <svg class="theme-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free … --><path fill="currentColor" d="…"/></svg>
+//     <svg class="theme-icon" role="img" aria-label="…" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">…</svg>
+//
+// One icon of the vendored Font Awesome Free solid set, inline. The first form
+// is decoration next to text or inside a named control, the second an image
+// of its own with a name. The ViewHelper adds the class and those attributes
+// and nothing else; the "viewBox", the attribution comment and the path are
+// the file's.
+//
+// --- One em, or the size of its slot ----------------------------------------
+//
+// An icon is a square as large as the text around it, so an icon next to a
+// label, in a heading or in a hint needs no rule at all. A component that
+// gives icons a slot of their own - the alert, the close button, the icon
+// button - sets "--theme-icon-size" on the slot, and every icon inside it
+// follows.
+//
+// That is why this block reads "--theme-icon-size" with a fallback and does
+// not declare it, unlike the token layer of every other component: declared
+// on ".theme-icon", it would win over the value a slot passes down, and could
+// only be set on the icon itself - the one element a template never styles.
+//
+// The box is square although the set is not: every icon is 512 units high,
+// and 631 of the 2001 are 576 or 640 wide. The default "preserveAspectRatio"
+// scales those to the width and centres them, so they come out lower than a
+// square icon. Font Awesome's own stylesheet makes the box 1.25em wide for
+// that ("svg-with-js.css"), which would not fit the square slots above.
+//
+// --- Overflow, alignment and colour -------------------------------------------
+//
+// "overflow: visible", as in Font Awesome's own stylesheet: some paths reach
+// past the "viewBox" by a few units - the teeth of "gear" do - and a nested
+// "svg" clips at its box by default.
+//
+// "vertical-align: -0.125em" is the offset Font Awesome uses for an icon in a
+// line of text, which sits it on the text rather than on the baseline. It has
+// no effect on an icon that is a flex item.
+//
+// Every path of the set fills with "currentColor", and "fill" repeats it on
+// the root. The icon therefore takes the colour of the text it sits in - the
+// accent of an alert, the hover colour of a button, the system text colour of
+// forced colours mode - and has no colour token of its own.
+
+.theme-icon {
+    display: inline-block;
+    flex: none;
+    inline-size: var(--theme-icon-size, 1em);
+    block-size: var(--theme-icon-size, 1em);
+    overflow: visible;
+    vertical-align: -0.125em;
+    fill: currentColor;
+}

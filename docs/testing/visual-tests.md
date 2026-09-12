@@ -27,7 +27,7 @@ Build/Scripts/runTests.sh -s visual -- --update-snapshots
 Build/Scripts/runTests.sh -s visual -- --update-snapshots --grep "screenshot buttons"
 ```
 
-A run takes about 40 seconds of specs for 119 tests. It is **not** a
+A run takes about 40 seconds of specs for 143 tests. It is **not** a
 replacement for `/styleguide`, which remains the interactive reference with the
 real display settings inside a real TYPO3.
 
@@ -96,6 +96,9 @@ from `abstracts/_palettes.scss`, and the section id is taken from the one
 does not start with that section, two partials rendering the same id, and a
 ViewHelper standalone Fluid cannot render — `f:translate`, `f:uri.resource` or
 `f:image` need TYPO3 — stop the run rather than producing a broken fixture.
+The one ViewHelper of the extension the partials use, `<theme:icon>`, is plain
+Fluid and declared by its URL namespace, so it renders here without being
+registered — see [Icons](../development/icons.md#plain-fluid-for-the-standalone-renderer).
 
 A **variable** cannot be caught there: Fluid renders one that is not set, and a
 property path on one, as an empty string rather than as the literal `{name}`.
@@ -126,8 +129,8 @@ opened it rather than a screenshot much later.
 
 | Check                  | Combinations                                                                                                                                        | Today |
 |------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| axe, WCAG 2.2 AA       | every section × light, dark × every palette                                                                                                         | 70    |
-| Screenshot, clipped    | every section × light, dark in `neutral`; the accent swatches and the focus ring of `tokens` and the whole of `buttons` × light, dark × four others | 38    |
+| axe, WCAG 2.2 AA       | every section × light, dark × every palette                                                                                                         | 90    |
+| Screenshot, clipped    | every section × light, dark in `neutral`; the accent swatches and the focus ring of `tokens` and the whole of `buttons` × light, dark × four others | 42    |
 | Info follows primary   | the `info` swatch of `tokens` shows the primary accent, every appearance and palette                                                                | 10    |
 | Palette sections exist | `tokens` and `buttons` are sections of the manifest                                                                                                 | 1     |
 
@@ -171,7 +174,7 @@ the viewport had arrived is not timing.
 The baselines are the PNGs in
 [`Tests/Acceptance/Visual/Baselines/`](../../Tests/Acceptance/Visual/Baselines),
 named `<section>-<appearance>-<palette>.png`, the two clipped specimens of
-`tokens` as `tokens-accents-…` and `tokens-focus-…` — 9.7 MB for the 38 today.
+`tokens` as `tokens-accents-…` and `tokens-focus-…` — 13.0 MB for the 42 today.
 `Tests/` is `export-ignore`, so they never ship. Growth of the repository on
 every intended visual change is the main ongoing cost of the suite.
 

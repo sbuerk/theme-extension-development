@@ -1,0 +1,109 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    Styleguide section "icons": the icons the theme itself draws, by name,
+    and the sizes an icon takes. Contract: "components/_icon.scss" and
+    "Classes/ViewHelpers/IconViewHelper.php".
+
+    Every icon on this page comes out of "<theme:icon>", like everywhere else
+    in the theme. The ViewHelper is plain Fluid, which is why this section
+    renders in the visual suite as well - see "docs/development/icons.md".
+
+    The list below is the set the templates use, not the set that ships: the
+    whole Font Awesome Free solid set is there, and a gallery of it comes with
+    the editor's icon picker. "IconUsageTest" holds this list to the icons the
+    templates actually render, and the number below to the number of files
+    shipped.
+
+    The icons in the table are decoration: the name next to each is the
+    content. The one labelled icon further down is the exception it
+    demonstrates.
+</f:comment>
+<section class="theme-styleguide__section" id="icons">
+    <h2 class="theme-styleguide__heading">Icons</h2>
+
+    <p>
+        Every icon is one of the <strong>2001</strong> icons of Font Awesome Free
+        in the solid style that ship with the theme, inlined as SVG by
+        <code>&lt;theme:icon name="…" /&gt;</code>. None is drawn by hand, none
+        comes from a webfont or over the network. Pick an icon by its name, the
+        file name below <code>Resources/Public/Icons/FontAwesome/Solid/</code>.
+    </p>
+
+    <h3>The icons the theme uses</h3>
+    <div class="theme-styleguide__specimen">
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Specimen: the icons the theme uses">
+            <table class="theme-table">
+                <caption class="theme-table__caption">Every icon a template of the theme renders, by name</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Icon</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Where</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><theme:icon name="gear" /></td><td><code>gear</code></td><td>The display settings button in the site header</td></tr>
+                    <tr><td><theme:icon name="desktop" /></td><td><code>desktop</code></td><td>Appearance: auto, in the display settings</td></tr>
+                    <tr><td><theme:icon name="sun" /></td><td><code>sun</code></td><td>Appearance: light</td></tr>
+                    <tr><td><theme:icon name="moon" /></td><td><code>moon</code></td><td>Appearance: dark</td></tr>
+                    <tr><td><theme:icon name="check" /></td><td><code>check</code></td><td>The chosen palette, in the display settings</td></tr>
+                    <tr><td><theme:icon name="bars" /></td><td><code>bars</code></td><td>The main navigation toggle</td></tr>
+                    <tr><td><theme:icon name="chevron-down" /></td><td><code>chevron-down</code></td><td>The accordion marker, turned when an item opens</td></tr>
+                    <tr><td><theme:icon name="xmark" /></td><td><code>xmark</code></td><td>The close button</td></tr>
+                    <tr><td><theme:icon name="circle-info" /></td><td><code>circle-info</code></td><td>Alert and notice: info</td></tr>
+                    <tr><td><theme:icon name="circle-check" /></td><td><code>circle-check</code></td><td>Alert and notice: success; a field accepted</td></tr>
+                    <tr><td><theme:icon name="triangle-exclamation" /></td><td><code>triangle-exclamation</code></td><td>Alert and notice: warning</td></tr>
+                    <tr><td><theme:icon name="circle-xmark" /></td><td><code>circle-xmark</code></td><td>Alert and notice: danger</td></tr>
+                    <tr><td><theme:icon name="note-sticky" /></td><td><code>note-sticky</code></td><td>Alert and notice: note, and an unknown kind</td></tr>
+                    <tr><td><theme:icon name="lightbulb" /></td><td><code>lightbulb</code></td><td>Alert and notice: tip</td></tr>
+                    <tr><td><theme:icon name="circle-exclamation" /></td><td><code>circle-exclamation</code></td><td>A field error message</td></tr>
+                    <tr><td><theme:icon name="circle-question" /></td><td><code>circle-question</code></td><td>The tooltip trigger of the styleguide</td></tr>
+                    <tr><td><theme:icon name="magnifying-glass" /></td><td><code>magnifying-glass</code></td><td>The icon button specimens</td></tr>
+                    <tr><td><theme:icon name="link" /></td><td><code>link</code></td><td>The icon button specimens</td></tr>
+                    <tr><td><theme:icon name="ellipsis" /></td><td><code>ellipsis</code></td><td>The icon button specimens</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h3>Sizes</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            An icon is a square one em wide, so it is as large as the text it sits
+            in and needs no size of its own. A component that gives icons a slot
+            &mdash; the alert, the close button, the icon button &mdash; sets
+            <code>--theme-icon-size</code> on the slot instead. The same icon, in
+            the text roles of the theme:
+        </p>
+        <p class="theme-eyebrow"><theme:icon name="lightbulb" /> Eyebrow, 12 pixels</p>
+        <p><theme:icon name="lightbulb" /> Body text, 16 pixels</p>
+        <p class="theme-lead"><theme:icon name="lightbulb" /> Lead text, 20 pixels</p>
+        <p class="theme-display"><theme:icon name="lightbulb" /> Display</p>
+        <p class="theme-styleguide__label">
+            Wider icons keep the square: <theme:icon name="sun" /> <code>sun</code>
+            is 576 units wide against 512 high and is scaled to the width, so it
+            comes out a little lower than <theme:icon name="moon" /> <code>moon</code>.
+        </p>
+    </div>
+
+    <h3>Decoration, or an image with a name</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Without a <code>label</code> an icon is decoration, rendered with
+            <code>aria-hidden="true"</code>: the text next to it, or the
+            <code>aria-label</code> of the button around it, is what a screen
+            reader announces. With <code>label="…"</code> it becomes
+            <code>role="img"</code> named by that label &mdash; for the rare icon
+            that is the only thing telling a reader something.
+        </p>
+        <p>
+            <theme:icon name="circle-info" label="Information" />
+            The icon before this sentence carries the label "Information".
+        </p>
+    </div>
+</section>
+
+</html>

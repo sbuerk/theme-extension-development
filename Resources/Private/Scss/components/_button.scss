@@ -6,7 +6,7 @@
 //     <button class="theme-button theme-button--secondary" type="button">…</button>
 //     <button class="theme-button theme-button--danger theme-button--small">…</button>
 //     <a class="theme-button theme-button--link" href="…">…</a>
-//     <button class="theme-button theme-button--icon" type="button" aria-label="…"><svg aria-hidden="true" focusable="false" …>…</svg></button>
+//     <button class="theme-button theme-button--icon" type="button" aria-label="…"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></button>
 //     <button class="theme-button theme-button--secondary" type="button" aria-pressed="false">…</button>
 //     <button class="theme-button" type="button" aria-busy="true" aria-disabled="true">…</button>
 //
@@ -158,19 +158,15 @@
 // with neither has no accessible name at all. Combines with every variant and
 // every size, and stays the 44px square with all of them: the block size is
 // pinned as well as the inline size, because "--large" pads the block
-// direction and would otherwise make it taller than wide.
+// direction and would otherwise make it taller than wide. The icon takes its
+// size from "--theme-icon-size", see "components/_icon.scss".
 .theme-button--icon {
     --theme-button-padding-inline: 0;
     --theme-button-icon-size: var(--theme-space-4, 1.25rem);
+    --theme-icon-size: var(--theme-button-icon-size);
 
     inline-size: var(--theme-tap-target-min);
     block-size: var(--theme-tap-target-min);
-
-    > svg {
-        flex: none;
-        inline-size: var(--theme-button-icon-size);
-        block-size: var(--theme-button-icon-size);
-    }
 }
 
 // A toggle that is on. It takes the filled default, which shows on
