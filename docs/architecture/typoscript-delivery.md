@@ -250,10 +250,15 @@ definition" notice.
 
 It only takes effect for an `include_static_file` entry. A test that imports the
 two static files directly into a `sys_template` renders the theme without any
-plugin rendering, which is why `ExtbasePluginStaticIncludeRenderingTest` sets
-`include_static_file`. It runs on both core versions; `ExtbasePluginRenderingTest`
-covers the set path on v13 and the static include on v12, through
+plugin rendering, which is why `ExtbasePluginStaticIncludeRenderingTest` and the
+static case of `FeloginRenderingTest` set `include_static_file`. Both run on
+both core versions; `ExtbasePluginRenderingTest` and the other case of
+`FeloginRenderingTest` cover the set path on v13 and the static include on v12,
+through
 [`ThemeSiteTrait`](../testing/site-based-tests.md#arranging-the-theme-themesitetrait).
+
+`Felogin.typoscript` adds the theme's templates for the login form above
+felogin's own — see [Content elements](content-elements.md#extfelogin).
 
 The `image` element is rendered through two core data processors, both in
 EXT:frontend: `FilesProcessor` resolves the references of the `image` field and
@@ -355,6 +360,7 @@ site package makes it.
 | `ContentElementRenderingTest`                     | `header` and `text` render, and the core error notice does not appear.                                | both     |
 | `ImageElementRenderingTest`                       | The `image` element renders, and its backend fields reach the output.                                 | both     |
 | `ExtbasePluginStaticIncludeRenderingTest`         | An Extbase plugin renders through the `include_static_file` field, not only through the set.          | both     |
+| `FeloginRenderingTest`                            | The login form renders on the form contract, through the theme delivery and the static include.       | both     |
 | `DevelopmentInstance/LegacyDeliveryTest`          | The seeded showcase renders the same markup in its two trees, page by page.                           | both     |
 | `DevelopmentInstance/DeliveryRegistrationTest`    | Every static include of every seeded `sys_template` root resolves and is registered.                  | both     |
 | `Core12/DevelopmentInstance/InstanceDeliveryTest` | Both tree roots of the v12 instance carry the `sys_template` record, and no site declares a set.      | v12 only |

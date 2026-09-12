@@ -1,0 +1,50 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<f:comment>
+    The logout form of EXT:felogin on the form contract of the theme - the
+    counterpart of "Login.html" next to it, see there and
+    "Configuration/TypoScript/Felogin.typoscript".
+
+    It sends what felogin's own template sends: "logintype=logout" and, when
+    redirects are disabled, "noredirect".
+
+    "actionUri" is passed through as felogin's own template passes it: on
+    TYPO3 v12 and v13 alike the logout action assigns the logout redirect
+    target there, and the form posts to it. One template for both, with no
+    condition.
+
+    felogin labels the user name with a "label" pointing at the submit button,
+    which names the button "Username" for a screen reader. The name is a
+    fact about the session, not a field, so it is a paragraph here, and the
+    button keeps its own label "Logout".
+</f:comment>
+
+<h3><f:render section="LabelOrMessage" arguments="{key: 'status_header', settings: settings}" /></h3>
+<p><f:render section="LabelOrMessage" arguments="{key: 'status_message', settings: settings}" /></p>
+
+<f:form class="theme-form" action="login" actionUri="{actionUri}" target="_top" fieldNamePrefix="">
+    <fieldset class="theme-fieldset">
+        <legend class="theme-fieldset__legend"><f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:logout" /></legend>
+        <p>
+            <f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:username" />:
+            <strong>{user.username}</strong>
+        </p>
+        <div>
+            <f:form.button class="theme-button theme-button--secondary" type="submit" id="tx-felogin-input-logout" name="submit" value="logout"><f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:logout" /></f:form.button>
+        </div>
+
+        <f:form.hidden name="logintype" value="logout" />
+        <f:if condition="{noRedirect} != ''">
+            <f:form.hidden name="noredirect" value="1" />
+        </f:if>
+    </fieldset>
+</f:form>
+
+<f:section name="LabelOrMessage"><f:spaceless>
+    <f:if condition="{settings.{key}}">
+        <f:then>{settings.{key}}</f:then>
+        <f:else><f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:{key}" /></f:else>
+    </f:if>
+</f:spaceless></f:section>
+
+</html>

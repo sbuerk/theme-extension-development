@@ -158,7 +158,9 @@ grants — except *Plain HTML*, which an editor should not get by default.
 Every page of the seed belongs to the group with full rights.
 
 The **frontend users** live on the folder *Frontend users* (uid 20). The login
-form is on `/login` (uid 21), rendered by EXT:felogin through the theme, and
+form is on `/login` (uid 21), rendered by EXT:felogin through the theme and
+drawn on its form contract (see
+[Content elements](../architecture/content-elements.md#extfelogin)), and
 `/members` (uid 22) is restricted to the group *Members*. On TYPO3 v13 the
 `demo` site depends on the set `typo3/felogin` for it: felogin registers its
 TypoScript with `addTypoScriptSetup(…, false)`, for `sys_template` sites only,
