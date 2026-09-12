@@ -37,10 +37,18 @@
     "components/_table.scss" does not style.
 
     Deliberately not demonstrated here, each because another section owns it:
-    "a:has(img)" needs an image and belongs to Media; "details"/"summary" are
-    the "theme-accordion" case in Boxes; "progress", "meter", "dialog",
-    "iframe"/"audio"/"video" are not typography. "::selection" cannot be
-    demonstrated in markup at all - it needs a text selection.
+    "a:has(img)" needs an image and belongs to Media; the styled disclosure is
+    the "theme-accordion" case in Boxes - the bare "details" below is the
+    element baseline an editor gets without a class; "progress", "meter",
+    "dialog", "iframe"/"audio"/"video" are not typography. "::selection" cannot
+    be demonstrated in markup at all - it needs a text selection, so the
+    specimen asks the reader to make one.
+
+    Language and direction. Specimens in another language carry their own
+    "lang", and the right-to-left ones their own "dir", on the element that
+    holds them - the page stays English and left-to-right. The measure
+    specimens use the page furniture "theme-styleguide__measure" of
+    "layout/_styleguide.scss", which draws the inline end of each paragraph.
 </f:comment>
 <section class="theme-styleguide__section" id="typography">
     <h2 class="theme-styleguide__heading">Typography</h2>
@@ -68,13 +76,34 @@
         <h6 role="presentation">Heading level six, 12 pixels, in capitals and secondary ink</h6>
     </div>
 
+    <h3>Headings with secondary text, and long headings</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A qualifier that belongs to the same outline entry as its heading
+            goes into a <code>small</code> inside it rather than into a second
+            heading. It is set at 0.7 of the heading, regular weight and in
+            secondary ink - 24 pixels under a first level, 14 under a third -
+            and never below the caption size.
+        </p>
+        <h1 role="presentation">Release notes <small>for version 2.0</small></h1>
+        <h3 role="presentation">Tables <small>and their modifiers</small></h3>
+        <p>
+            A heading that wraps is balanced: the browser evens out the lines
+            instead of filling the first one and leaving an orphan on the
+            last. The heading below is long enough to wrap at this width, and
+            its lines end up close to the same length.
+        </p>
+        <h2 role="presentation">A heading long enough to wrap over more than one line shows what balancing the lines does to it</h2>
+    </div>
+
     <h3>Text roles</h3>
     <div class="theme-styleguide__specimen">
         <f:comment>
             Contract: Resources/Private/Scss/components/_text.scss. Three
-            classes, no modifiers. All three sit on a "p" here, so the display
-            sample adds no heading to the page outline - the class is what
-            carries the role, and the element is the template's choice.
+            classes; the display size has three modifiers. All of them sit on a
+            "p" here, so the display samples add no heading to the page outline
+            - the class is what carries the role, and the element is the
+            template's choice.
         </f:comment>
         <p>
             Three roles no element carries by itself, each a class on whatever
@@ -85,6 +114,20 @@
         <p class="theme-eyebrow">The eyebrow, 12 pixels in the primary accent</p>
         <p class="theme-display">The display size, 34 to 54 pixels</p>
         <p class="theme-lead">The lead paragraph is set at 20 pixels in secondary ink and held to the reading measure, so the body copy after it still reads as the text and this as the introduction to it.</p>
+    </div>
+
+    <h3>Display sizes</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Three sizes of the display role. The middle one is the measured
+            size and the one the bare class has; the other two are half its
+            step above and below it. All three start at 34 pixels, the size of
+            a page title, on a narrow window and grow as it widens, so on a
+            phone they are the same size and on a desktop they are not.
+        </p>
+        <p class="theme-display theme-display--1">Display one, 34 to 68</p>
+        <p class="theme-display theme-display--2">Display two, 34 to 54</p>
+        <p class="theme-display theme-display--3">Display three, 34 to 43</p>
     </div>
 
     <h3>Running text</h3>
@@ -103,16 +146,140 @@
             A second paragraph makes the vertical rhythm visible: every prose
             block in the baseline ends with the same 20 pixel bottom margin and
             has no top margin, so the gap between two blocks is one value and
-            never the sum of two. Long unbroken strings wrap instead of
-            widening the page - a URL such as
+            never the sum of two. Paragraphs wrap with
+            <code>text-wrap: pretty</code>, which keeps a single word from
+            ending up alone on the last line.
+        </p>
+        <p>
+            Long unbroken strings wrap instead of widening the page. A URL such
+            as
             https://docs.typo3.org/permalink/t3coreapi:frontend-typoscript-typoscript
             breaks mid-token rather than pushing a horizontal scrollbar onto
-            the whole document.
+            the whole document; a linked one, such as
+            <a href="#typography">https://docs.typo3.org/<wbr />permalink/<wbr />t3coreapi:<wbr />frontend-typoscript-typoscript</a>,
+            also stops asking its container for its full width, and the
+            <code>wbr</code> elements after each slash give it the break points
+            a reader expects.
         </p>
+        <p>
+            Select a few words of this paragraph: a selection is drawn in the
+            primary accent with the text in the colour that sits on it, the
+            same pair a primary button uses, so it reads in both appearances
+            and in every palette.
+        </p>
+    </div>
+
+    <h3>Measure</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The same paragraph at three line lengths, the inline end of each
+            drawn as a dashed line. The middle one is the theme's measure,
+            <code>--theme-measure</code>, which the lead paragraph is held to
+            and which running text in a site package should be held to too.
+        </p>
+        <div class="theme-styleguide__measure theme-styleguide__measure--narrow">
+            <p class="theme-styleguide__label">45 characters - too short, the eye jumps back more often than it reads</p>
+            <p>
+                A line that is too short breaks the sentence into fragments, and
+                the reader spends the time on returning to the next line that
+                should have gone into reading it. A line that is too long loses
+                the reader on the way back instead.
+            </p>
+        </div>
+        <div class="theme-styleguide__measure">
+            <p class="theme-styleguide__label">68 characters - --theme-measure <span class="theme-badge theme-badge--success">Recommended</span></p>
+            <p>
+                A line that is too short breaks the sentence into fragments, and
+                the reader spends the time on returning to the next line that
+                should have gone into reading it. A line that is too long loses
+                the reader on the way back instead.
+            </p>
+        </div>
+        <div class="theme-styleguide__measure theme-styleguide__measure--wide">
+            <p class="theme-styleguide__label">90 characters - too long, the start of the next line is hard to find</p>
+            <p>
+                A line that is too short breaks the sentence into fragments, and
+                the reader spends the time on returning to the next line that
+                should have gone into reading it. A line that is too long loses
+                the reader on the way back instead.
+            </p>
+        </div>
+    </div>
+
+    <h3>Language and direction</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Hyphenation needs to know the language, so it is switched on only
+            where the language is German, whose compounds outgrow a narrow
+            column. The paragraph below carries <code>lang="de"</code> and sits
+            at the short measure; whether it is hyphenated depends on the
+            browser shipping a German dictionary, and one that does not simply
+            wraps the words whole.
+        </p>
+        <div class="theme-styleguide__measure theme-styleguide__measure--narrow">
+            <p lang="de">
+                Die Donaudampfschifffahrtsgesellschaft ist das bekannteste
+                Beispiel dafür, dass zusammengesetzte Wörter eine schmale
+                Spalte sprengen. Mit Silbentrennung bricht der Browser sie an
+                den Silbengrenzen seines Wörterbuchs um.
+            </p>
+        </div>
+        <p>
+            A right-to-left paragraph and list. Every spacing and border in the
+            theme is written in logical properties - inline start and end
+            rather than left and right - so the indent, the list markers and
+            the rule of the quotation move to the other side without a rule of
+            their own.
+        </p>
+        <p lang="ar" dir="rtl">
+            هذه فقرة مكتوبة من اليمين إلى اليسار، والخصائص المنطقية تجعل
+            مسافاتها وحدودها تنعكس تلقائيًا.
+        </p>
+        <ul lang="ar" dir="rtl">
+            <li>العنصر الأول</li>
+            <li>العنصر الثاني</li>
+        </ul>
+        <blockquote lang="ar" dir="rtl">
+            اقتباس من اليمين إلى اليسار، والخط على جانب البداية.
+        </blockquote>
+        <p>
+            Inside left-to-right text, a name in another script is isolated
+            with <code>bdi</code>, so its direction cannot reorder the
+            punctuation around it: the user <bdi lang="ar">إيمان</bdi> scored
+            90 points, the user <bdi>Stefan</bdi> scored 85. <code>bdo</code>
+            overrides the direction outright:
+            <bdo dir="rtl">this text is drawn right to left</bdo>, although its
+            characters stay in their stored order.
+        </p>
+    </div>
+
+    <h3>Address, time and a bare disclosure</h3>
+    <div class="theme-styleguide__specimen">
         <address>
             Contact blocks are set upright, not italic as the browser default
             has them, and in secondary ink.
         </address>
+        <address>
+            Example Organisation<br />
+            Stefan Example, editor<br />
+            <a href="mailto:editor@example.com">editor@example.com</a><br />
+            <a href="tel:+49301234567">+49 30 1234567</a>
+        </address>
+        <p>
+            A date is a <code>time</code> with a machine-readable
+            <code>datetime</code>:
+            <time datetime="2026-09-12T10:30">12 September 2026, 10:30</time>,
+            in muted ink and tabular figures.
+        </p>
+        <details>
+            <summary>A disclosure without a class</summary>
+            <p>
+                The element baseline of <code>details</code> and
+                <code>summary</code>: a hairline frame, the native marker and a
+                row that is at least a tap target high. The accordion in Boxes
+                is the same element with a component on it.
+            </p>
+        </details>
     </div>
 
     <h3>Inline elements</h3>
@@ -135,17 +302,28 @@
             a dotted underline rather than a box, because a box already means
             a cell or a badge here. Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to
             insert <a href="#typography">a link</a>, which takes the primary
-            colour and shifts to the hover colour on pointer over. A shell
-            answers <samp>Nothing to commit, working tree clean</samp>, an
-            identifier such as <var>maxWidth</var> is italic, and
+            colour and shifts to the hover colour on pointer over. A key
+            combination is one <code>kbd</code> holding one per key -
+            <kbd><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></kbd> - and
+            only the keys are framed. A shell answers
+            <samp>Nothing to commit, working tree clean</samp>, an identifier
+            such as <var>maxWidth</var> is italic, and
             <code>--theme-font-size-md</code> is set in the mono family on the
             surface tint.
         </p>
         <p>
+            A <dfn>design token</dfn> is a named value a component reads
+            instead of a literal - the defining instance of a term is italic
+            and a step heavier, so it does not read as plain emphasis.
+        </p>
+        <p>
             Quotation marks are set explicitly rather than left to the browser,
-            which picks a different pair per engine and per document language:
+            which picks a different pair per engine:
             <q>an outer quotation contains <q>an inner one</q> and both marks
-            are this theme's own</q>. A date such as
+            are this theme's own</q>. The language of the quotation still
+            decides which pair: <q lang="de">ein deutsches Zitat mit
+            <q>innerem Zitat</q></q>, <q lang="fr">une citation française avec
+            une <q>citation intérieure</q></q>. A date such as
             <time datetime="2026-08-16">16 August 2026</time> is set in
             tabular figures, so a column of dated items lines up.
         </p>

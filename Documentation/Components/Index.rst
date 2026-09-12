@@ -211,11 +211,29 @@ element the document outline asks for:
         -   For
     *   -   :css:`.theme-display`
         -   The one heading on a landing page that is set larger than a page
-            title.
+            title. Three sizes: :css:`--1`, :css:`--2` - the size of the bare
+            class - and :css:`--3`. All three are the size of a page title on a
+            phone and grow to 68, 54 and 43 pixels on a wide window.
     *   -   :css:`.theme-lead`
         -   The paragraph that opens a page.
     *   -   :css:`.theme-eyebrow`
         -   The short label above a heading.
+
+Rich text needs no class for the rest of the typography:
+
+*   A :html:`<small>` inside a heading is a secondary line, set smaller and
+    lighter than the heading: :html:`<h2>Release notes <small>for 2.0</small></h2>`.
+*   Headings balance their lines when they wrap, paragraphs avoid a single word
+    on the last line.
+*   A key combination is a :html:`<kbd>` holding one :html:`<kbd>` per key;
+    only the keys are framed.
+*   Quotation marks follow the language of the quotation: English by default,
+    the German and the French pairs for :html:`lang="de"` and
+    :html:`lang="fr"`.
+*   German text is hyphenated, where the browser has a German dictionary.
+    Other languages are not.
+*   Text set right to left with :html:`dir="rtl"` mirrors its indents, list
+    markers and quotation rule.
 
 Alerts
 ======
