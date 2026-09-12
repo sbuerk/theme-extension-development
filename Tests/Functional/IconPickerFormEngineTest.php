@@ -204,6 +204,7 @@ final class IconPickerFormEngineTest extends AbstractFunctionalTestCase
     {
         yield 'content element link icon' => ['table' => 'tt_content', 'curated' => 30, 'every' => 40, 'field' => 'tx_theme_link_icon'];
         yield 'list item link icon' => ['table' => 'tx_theme_list_item', 'curated' => 1, 'every' => 2, 'field' => 'link_icon'];
+        yield 'bullet list icon' => ['table' => 'tt_content', 'curated' => 70, 'every' => 80, 'field' => 'tx_theme_icon'];
     }
 
     /**

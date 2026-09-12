@@ -93,6 +93,17 @@ $additionalColumns = [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_link_icon',
         'config' => IconItems::selectConfig(),
     ],
+    // The icon of an element as a whole, from the same picker. A column of its
+    // own rather than "tx_theme_link_icon", which belongs to the link and is
+    // shown with it: the bullet list renders this one in front of every item
+    // in its layout "Icons" ("Templates/ContentElements/Bullets.html"). Added
+    // to "bullets" only, below; a later core layout that shows one icon for
+    // the element adds it to its CType the same way.
+    'tx_theme_icon' => [
+        'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon',
+        'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon.description',
+        'config' => IconItems::selectConfig(),
+    ],
     // The kind of a theme_notice. Maps directly onto the six ".theme-alert"
     // modifiers (Resources/Private/Scss/components/_alert.scss), and the
     // template derives the "role" from it - see
@@ -227,6 +238,11 @@ $additionalColumns['tx_theme_header_style'] = [
 ];
 
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
+
+// The icon of the layout "Icons" of the bullet list, next to the list type.
+// "bullets" is registered by EXT:frontend, whose TCA overrides run before
+// this extension's, so its type exists here.
+ExtensionManagementUtility::addToAllTCAtypes('tt_content', 'tx_theme_icon', 'bullets', 'after:bullets_type');
 
 // Next to "header_layout" in both header palettes of the core, so every CType
 // offering a heading level also offers its look. The CTypes of this extension

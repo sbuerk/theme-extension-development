@@ -50,6 +50,12 @@
 			<trans-unit id="tt_content.tx_theme_link_icon">
 				<source>Link icon</source>
 			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon">
+				<source>Icon</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon.description">
+				<source>Shown in front of every item when the layout is "Icons". Without an icon the list keeps its markers.</source>
+			</trans-unit>
 			<trans-unit id="tt_content.tx_theme_list_items">
 				<source>List items</source>
 			</trans-unit>
@@ -285,6 +291,20 @@
 			</trans-unit>
 			<trans-unit id="tt_content.frame_class.inverse">
 				<source>Inverse band</source>
+			</trans-unit>
+
+			<!-- tt_content: layout items of the bullet list, relabelled by page TSconfig -->
+			<trans-unit id="tt_content.layout.bullets.I.0">
+				<source>Bullets or numbers</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.bullets.I.1">
+				<source>Check marks</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.bullets.I.2">
+				<source>Icons</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.bullets.I.3">
+				<source>Inline</source>
 			</trans-unit>
 
 			<!-- tx_theme_list_item -->

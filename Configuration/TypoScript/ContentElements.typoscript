@@ -208,6 +208,15 @@ tt_content.image {
 # The "Bullet List" element. "bodytext" is one item per line, which is
 # exactly what the core's own "SplitProcessor" is for - see "Bullets.html"
 # for why no processor of this extension's own was needed here.
+#
+# The definition list ("bullets_type" 2) is one "term|description" pair per
+# line instead, split by the core's "CommaSeparatedValueProcessor". That is
+# fluid_styled_content's own wiring of this CType, condition for condition
+# (its "Configuration/TypoScript/ContentElement/Bullets.typoscript"), so a
+# record renders the same pairs whichever of the two renders it. Exactly one
+# of the two processors runs: "isLessThan" is false when the field is 2 or
+# more, "equals" only when it is 2. The CSV processor keeps its default
+# enclosure '"', as fluid_styled_content does.
 tt_content.bullets =< lib.contentElement
 tt_content.bullets {
     templateName = ContentElements/Bullets
@@ -215,8 +224,23 @@ tt_content.bullets {
     dataProcessing {
         10 = TYPO3\CMS\Frontend\DataProcessing\SplitProcessor
         10 {
+            if {
+                value = 2
+                isLessThan.field = bullets_type
+            }
             fieldName = bodytext
             removeEmptyEntries = 1
+            as = bullets
+        }
+
+        20 = TYPO3\CMS\Frontend\DataProcessing\CommaSeparatedValueProcessor
+        20 {
+            if {
+                value = 2
+                equals.field = bullets_type
+            }
+            fieldName = bodytext
+            fieldDelimiter = |
             as = bullets
         }
     }
