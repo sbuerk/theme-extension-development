@@ -36,6 +36,13 @@ contain, and the :file:`/styleguide` page shows all of it.
     and media elements now floats beside the text when its position is "In
     text", and keeps the text beside it for "In text, no wrap".
 
+*   **Table**, :css:`.theme-table`: striped rows or columns, a highlighted
+    row under the pointer, column rules, no rules, compact cells, a header
+    row that stays in view, a caption below the table, groups of rows and a
+    totals row. The :guilabel:`Table class` of the table content element offers
+    every one of them: the core's :guilabel:`Striped` and
+    :guilabel:`Bordered`, and five more the theme adds through page TSconfig.
+
 See :ref:`components`.
 
 Impact
@@ -50,3 +57,7 @@ The gallery of a text and image or text and media element positioned "In text"
 used to sit above the text; it now floats beside it on a viewport of the
 medium breakpoint and wider. Every gallery item carries the additional class
 :html:`theme-figure`, and its caption :html:`theme-figure__caption`.
+
+A table content element with the default table class is no longer striped -
+see :ref:`important-tables-no-longer-striped-by-default`. A table with a
+footer row shows it as a totals row.

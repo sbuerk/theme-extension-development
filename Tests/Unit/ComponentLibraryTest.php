@@ -220,6 +220,44 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * Every table class an editor can pick has a modifier in the bundle.
+     *
+     * `Templates/ContentElements/Table.html` turns the `table_class` of the
+     * element into `.theme-table--<value>` without a list, so a value that
+     * has no rule renders a table that looks exactly like the default one -
+     * the editor picked "striped" and nothing tells anyone it did nothing.
+     *
+     * The values are the core's two TCA items, which are the same on v13.4
+     * and v14.3 and cannot be read here without TYPO3, and the `addItems` of
+     * the theme's page TSconfig, read from the file.
+     * `Tests/Functional/TableClassRenderingTest` holds the same list against
+     * the TCA and the TSconfig a running instance actually loads.
+     */
+    #[Test]
+    public function everyTableClassAnEditorCanPickIsStyled(): void
+    {
+        $tsConfig = (string)file_get_contents(
+            dirname(__DIR__, 2) . '/Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig',
+        );
+        preg_match('/addItems\s*\{(.*?)\}/s', $tsConfig, $block);
+        $this->assertArrayHasKey(1, $block, 'The "addItems" block of the table class TSconfig was not found.');
+        preg_match_all('/^\s*([a-z0-9-]+)\s*=/m', $block[1], $added);
+        $this->assertNotEmpty($added[1], 'The table class TSconfig adds no item.');
+
+        $css = $this->stylesheet();
+        $unstyled = [];
+        foreach (['striped', 'bordered', ...$added[1]] as $value) {
+            // Anchored at the end: "striped" is a prefix of "striped-columns",
+            // and a plain substring search would find the one in the other.
+            if (preg_match('/\.theme-table--' . preg_quote($value, '/') . '(?![\w-])/', $css) !== 1) {
+                $unstyled[] = $value;
+            }
+        }
+
+        $this->assertSame([], $unstyled, 'These table classes can be picked but match no rule: ' . implode(', ', $unstyled));
+    }
+
+    /**
      * @return \Generator<string, array{selector: string}>
      */
     public static function titlesRenderedOnAnyHeadingLevel(): \Generator

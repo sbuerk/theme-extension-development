@@ -1,0 +1,262 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section "tables" - ".theme-table" and its modifiers.
+
+    Contract: "Resources/Private/Scss/components/_table.scss". Every specimen
+    is the wrapper of that contract - "tabindex=0" plus "role=region" plus an
+    "aria-label", the W3C APG scrollable-region-focusable pattern - around a
+    ".theme-table". Each wrapper carries a label of its own, so the regions of
+    this section can be told apart when tabbing through them.
+
+    The table without a class, the one rich text produces, stays in
+    Typography: it is the element baseline, and this section is what the
+    component adds to it.
+
+    "--hover" cannot be shown in a still picture; its specimen says so, and
+    its colour is recorded in DESIGN.md "Table rows". "--sticky-header" needs a
+    table taller than the wrapper, so its specimen has enough rows to scroll.
+</f:comment>
+<section class="theme-styleguide__section" id="tables">
+    <h2 class="theme-styleguide__heading">Tables</h2>
+
+    <h3>The component</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The component adds the frame and the scrolling region around the
+            table. The wrapper is focusable and labelled as a region: it
+            scrolls horizontally so the page never has to, and a box that
+            scrolls without a tab stop of its own cannot be reached by keyboard
+            at all. Focus it and the arrow keys scroll it, with no script
+            involved. Header cells sit on the surface tint above a strong rule,
+            rows are separated by a hairline, a row header is set at the medium
+            weight, and a cell holding a number takes the one helper class
+            there is, which aligns it to the end and sets it in figures of
+            equal width.
+        </p>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Heading scale of the element baseline">
+            <table class="theme-table">
+                <caption class="theme-table__caption">Size, weight and line height of each heading level</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Level</th>
+                        <th scope="col" class="theme-table__cell--numeric">Size</th>
+                        <th scope="col" class="theme-table__cell--numeric">Weight</th>
+                        <th scope="col" class="theme-table__cell--numeric">Line height</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Heading 1</th>
+                        <td class="theme-table__cell--numeric">34</td>
+                        <td class="theme-table__cell--numeric">800</td>
+                        <td class="theme-table__cell--numeric">1.5</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Heading 2</th>
+                        <td class="theme-table__cell--numeric">24</td>
+                        <td class="theme-table__cell--numeric">800</td>
+                        <td class="theme-table__cell--numeric">1.3</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Heading 3</th>
+                        <td class="theme-table__cell--numeric">20</td>
+                        <td class="theme-table__cell--numeric">500</td>
+                        <td class="theme-table__cell--numeric">1.3</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Body copy</th>
+                        <td class="theme-table__cell--numeric">16</td>
+                        <td class="theme-table__cell--numeric">400</td>
+                        <td class="theme-table__cell--numeric">1.6</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h3>Striped rows, striped columns</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--striped</code> puts every other row on the surface tint,
+            <code>--striped-columns</code> every other column. Both stripe by
+            position, so a row added or removed keeps the pattern. A stripe is
+            a reading aid rather than a state: under forced colours it goes
+            with every other fill.
+        </p>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Striped rows">
+            <table class="theme-table theme-table--striped">
+                <caption class="theme-table__caption">Striped rows</caption>
+                <thead>
+                    <tr><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th scope="row">Background</th><td><code>#ffffff</code></td><td><code>#0f1319</code></td></tr>
+                    <tr><th scope="row">Surface</th><td><code>#f4f6fa</code></td><td><code>#161c25</code></td></tr>
+                    <tr><th scope="row">Raised surface</th><td><code>#ffffff</code></td><td><code>#1d2531</code></td></tr>
+                    <tr><th scope="row">Primary text</th><td><code>#14181f</code></td><td><code>#e9edf4</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Striped columns">
+            <table class="theme-table theme-table--striped-columns">
+                <caption class="theme-table__caption">Striped columns</caption>
+                <thead>
+                    <tr><th scope="col">Palette</th><th scope="col">Primary, light</th><th scope="col">Primary, dark</th><th scope="col">Secondary, light</th><th scope="col">Secondary, dark</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th scope="row">Neutral</th><td><code>#0b57d0</code></td><td><code>#82abff</code></td><td><code>#0f766e</code></td><td><code>#4fd1c5</code></td></tr>
+                    <tr><th scope="row">Ember</th><td><code>#9a4212</code></td><td><code>#f0a882</code></td><td><code>#7c5310</code></td><td><code>#e8c16a</code></td></tr>
+                    <tr><th scope="row">Ocean</th><td><code>#00629a</code></td><td><code>#7cc4ee</code></td><td><code>#0d6d76</code></td><td><code>#63cfd8</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h3>Hover</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--hover</code> tints the row under the pointer with the
+            primary accent, mixed into the background - move the pointer over
+            the rows below; a still picture of this page cannot show it. Under
+            forced colours the hovered row is drawn in the system highlight
+            colour, because a fill alone would be repainted away.
+        </p>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Rows highlighted on hover">
+            <table class="theme-table theme-table--hover theme-table--striped">
+                <caption class="theme-table__caption">Hover, combined with stripes</caption>
+                <thead>
+                    <tr><th scope="col">Suite</th><th scope="col">Runs against</th><th scope="col" class="theme-table__cell--numeric">Tests</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th scope="row">Unit</th><td>The compiled stylesheet and the sources</td><td class="theme-table__cell--numeric">105</td></tr>
+                    <tr><th scope="row">Functional</th><td>A TYPO3 instance per test case</td><td class="theme-table__cell--numeric">400</td></tr>
+                    <tr><th scope="row">Visual</th><td>The styleguide partials, without TYPO3</td><td class="theme-table__cell--numeric">150</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h3>Bordered, borderless, compact</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--bordered</code> adds a hairline between the columns,
+            <code>--borderless</code> removes every rule - the header, the rows
+            and the groups - and leaves the header's tint to set it apart.
+            <code>--compact</code> halves the padding of every cell.
+        </p>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Bordered">
+            <table class="theme-table theme-table--bordered">
+                <caption class="theme-table__caption">Bordered</caption>
+                <thead>
+                    <tr><th scope="col">Step</th><th scope="col">Token</th><th scope="col" class="theme-table__cell--numeric">Pixels</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th scope="row">1</th><td><code>--theme-space-1</code></td><td class="theme-table__cell--numeric">5</td></tr>
+                    <tr><th scope="row">2</th><td><code>--theme-space-2</code></td><td class="theme-table__cell--numeric">10</td></tr>
+                    <tr><th scope="row">3</th><td><code>--theme-space-3</code></td><td class="theme-table__cell--numeric">15</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Borderless">
+            <table class="theme-table theme-table--borderless">
+                <caption class="theme-table__caption">Borderless</caption>
+                <thead>
+                    <tr><th scope="col">Step</th><th scope="col">Token</th><th scope="col" class="theme-table__cell--numeric">Pixels</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th scope="row">4</th><td><code>--theme-space-4</code></td><td class="theme-table__cell--numeric">20</td></tr>
+                    <tr><th scope="row">5</th><td><code>--theme-space-5</code></td><td class="theme-table__cell--numeric">25</td></tr>
+                    <tr><th scope="row">6</th><td><code>--theme-space-6</code></td><td class="theme-table__cell--numeric">30</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Compact">
+            <table class="theme-table theme-table--compact">
+                <caption class="theme-table__caption">Compact</caption>
+                <thead>
+                    <tr><th scope="col">Step</th><th scope="col">Token</th><th scope="col" class="theme-table__cell--numeric">Pixels</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th scope="row">7</th><td><code>--theme-space-7</code></td><td class="theme-table__cell--numeric">40</td></tr>
+                    <tr><th scope="row">8</th><td><code>--theme-space-8</code></td><td class="theme-table__cell--numeric">60</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h3>Groups and totals</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A second <code>tbody</code> starts a group and opens with the strong
+            rule the header closes on. A <code>tfoot</code> holds the totals, on
+            the header's tint and in its weight.
+        </p>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Files of the component library by group">
+            <table class="theme-table">
+                <caption class="theme-table__caption">Files of the component library, by group</caption>
+                <thead>
+                    <tr><th scope="col">Group</th><th scope="col">File</th><th scope="col" class="theme-table__cell--numeric">Components</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th scope="row">Forms</th><td><code>forms/_controls.scss</code></td><td class="theme-table__cell--numeric">2</td></tr>
+                    <tr><th scope="row">Forms</th><td><code>forms/_field.scss</code></td><td class="theme-table__cell--numeric">1</td></tr>
+                </tbody>
+                <tbody>
+                    <tr><th scope="row">Content</th><td><code>components/_list.scss</code></td><td class="theme-table__cell--numeric">1</td></tr>
+                    <tr><th scope="row">Content</th><td><code>components/_table.scss</code></td><td class="theme-table__cell--numeric">1</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr><th scope="row" colspan="2">Total</th><td class="theme-table__cell--numeric">5</td></tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <h3>Sticky header, caption below</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--sticky-header</code> keeps the header row in view while the
+            wrapper scrolls through a table taller than it - the wrapper gets a
+            height for that, and it is still the one focusable region, so the
+            arrow keys scroll it both ways. <code>--caption-bottom</code> moves
+            the caption below the table.
+        </p>
+        <p>
+            Combined with <code>--bordered</code>, groups and totals, as below,
+            every rule is drawn once: separated borders do not merge where two
+            cells meet, so the sticky header takes the column rule from one
+            side of it and the hairline from above a group or totals rule.
+        </p>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Spacing and radius tokens, with a sticky header">
+            <table class="theme-table theme-table--sticky-header theme-table--bordered theme-table--caption-bottom">
+                <caption class="theme-table__caption">Spacing and radius tokens, scroll the table to see the header stay</caption>
+                <thead>
+                    <tr><th scope="col">Token</th><th scope="col" class="theme-table__cell--numeric">Value</th><th scope="col">Origin</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th scope="row"><code>--theme-space-0</code></th><td class="theme-table__cell--numeric">0</td><td>-</td></tr>
+                    <tr><th scope="row"><code>--theme-space-1</code></th><td class="theme-table__cell--numeric">5</td><td>measured</td></tr>
+                    <tr><th scope="row"><code>--theme-space-2</code></th><td class="theme-table__cell--numeric">10</td><td>measured</td></tr>
+                </tbody>
+                <tbody>
+                    <tr><th scope="row"><code>--theme-space-3</code></th><td class="theme-table__cell--numeric">15</td><td>measured</td></tr>
+                    <tr><th scope="row"><code>--theme-space-4</code></th><td class="theme-table__cell--numeric">20</td><td>measured</td></tr>
+                    <tr><th scope="row"><code>--theme-space-5</code></th><td class="theme-table__cell--numeric">25</td><td>measured</td></tr>
+                    <tr><th scope="row"><code>--theme-space-6</code></th><td class="theme-table__cell--numeric">30</td><td>measured</td></tr>
+                    <tr><th scope="row"><code>--theme-space-7</code></th><td class="theme-table__cell--numeric">40</td><td>measured</td></tr>
+                    <tr><th scope="row"><code>--theme-space-8</code></th><td class="theme-table__cell--numeric">60</td><td>extended</td></tr>
+                    <tr><th scope="row"><code>--theme-radius-none</code></th><td class="theme-table__cell--numeric">0</td><td>-</td></tr>
+                    <tr><th scope="row"><code>--theme-radius-sm</code></th><td class="theme-table__cell--numeric">5</td><td>measured</td></tr>
+                    <tr><th scope="row"><code>--theme-radius-md</code></th><td class="theme-table__cell--numeric">10</td><td>extended</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr><th scope="row">Tokens</th><td class="theme-table__cell--numeric">12</td><td></td></tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>
+
+</html>

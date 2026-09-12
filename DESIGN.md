@@ -379,6 +379,53 @@ body text are `--theme-color-text-primary` on the tint (lowest: moss dark,
 and both appearances and compares the pixel with the tint recorded here, which
 is what holds this table to the formula in `components/_alert.scss`.
 
+### Table rows
+
+`.theme-table` introduces two row fills and no colour token. `--striped` and
+`--striped-columns` put every other row or column on `--theme-color-surface`,
+the tint the header row already sits on; text on it is the neutral table's
+figure, 16.45 light and 14.58 dark for primary text, 6.97 and 8.17 for
+secondary. `--hover` tints the row under the pointer with the primary accent
+mixed into the background, the formula of the tip alert:
+
+```css
+color-mix(in oklab, var(--theme-color-primary) 12%, var(--theme-color-background))
+```
+
+It follows the palette, and nothing has to be authored per palette.
+Computed like every other figure here, the mix in Oklab converted to sRGB:
+
+| Palette | Appearance | Tint      | Primary text on tint | vs background | vs surface | vs surface-raised |
+|---------|------------|-----------|----------------------|---------------|------------|-------------------|
+| neutral | light      | `#e2ecfc` | 14.94                | 1.19          | 1.10       | 1.19              |
+| neutral | dark       | `#1b2230` | 13.57                | 1.17          | 1.07       | 1.03              |
+| ember   | light      | `#f4e8e2` | 14.82                | 1.20          | 1.11       | 1.20              |
+| ember   | dark       | `#252225` | 13.40                | 1.18          | 1.09       | 1.02              |
+| ocean   | light      | `#e3ecf3` | 14.88                | 1.20          | 1.11       | 1.20              |
+| ocean   | dark       | `#1b252e` | 13.24                | 1.20          | 1.10       | 1.01              |
+| moss    | light      | `#e5ece4` | 14.79                | 1.20          | 1.11       | 1.20              |
+| moss    | dark       | `#1c2725` | 13.09                | 1.21          | 1.11       | 1.00              |
+| violet  | light      | `#ece7f6` | 14.68                | 1.21          | 1.12       | 1.21              |
+| violet  | dark       | `#21222f` | 13.40                | 1.18          | 1.09       | 1.02              |
+
+Text on the tint clears 4.5:1 everywhere (lowest: moss dark, 13.09). The
+tint itself is faint against its surroundings on purpose, and the three right
+columns say how faint: it is a pointer affordance, not a state WCAG holds to
+3:1, and a stronger fill would compete with the stripes it sits among. Of the
+three, only "vs background" and "vs surface" occur: the table wrapper paints
+`--theme-color-background` under every row, and a stripe is the surface. The
+raised surface never sits under a hovered row, and in dark the tint and the
+raised surface are close to identical (1.00–1.03) — a table wrapper that is
+re-pointed to the raised surface loses the hover in dark, which is the reason
+to re-point `--theme-table-hover-background` with it. Under forced colours the
+hovered row is drawn in `Highlight`/`HighlightText` instead.
+
+The table's rules are not control boundaries (see
+[Control boundaries](#control-boundaries)): the rows are separated in the
+decorative `--theme-color-border`, and the header, a group and the totals are
+closed in `--theme-color-border-strong` at the strong width, as the element
+baseline closes `thead` and `tfoot`.
+
 `--theme-color-overlay` is the scrim behind a modal or an off-canvas panel:
 `rgb(20 24 31 / 55%)` light, `rgb(0 0 0 / 65%)` dark.
 

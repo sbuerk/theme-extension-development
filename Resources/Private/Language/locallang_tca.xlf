@@ -8,6 +8,23 @@
 				<source>Theme</source>
 			</trans-unit>
 
+			<!-- tt_content: table_class items added by page TSconfig -->
+			<trans-unit id="tt_content.table_class.I.striped-columns">
+				<source>Striped columns</source>
+			</trans-unit>
+			<trans-unit id="tt_content.table_class.I.hover">
+				<source>Highlight the row under the pointer</source>
+			</trans-unit>
+			<trans-unit id="tt_content.table_class.I.borderless">
+				<source>Without rules</source>
+			</trans-unit>
+			<trans-unit id="tt_content.table_class.I.compact">
+				<source>Compact</source>
+			</trans-unit>
+			<trans-unit id="tt_content.table_class.I.sticky-header">
+				<source>Header row stays in view</source>
+			</trans-unit>
+
 			<!-- tt_content: shared columns -->
 			<trans-unit id="tt_content.tx_theme_link">
 				<source>Link</source>

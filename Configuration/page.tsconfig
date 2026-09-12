@@ -24,3 +24,8 @@
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Start.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Styleguide.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Forms.tsconfig'
+
+# The table modifiers an editor can pick beyond the two the core offers. Here
+# for the same reason as the layouts: it applies through the site set and the
+# static include alike.
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig'
