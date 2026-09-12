@@ -36,6 +36,9 @@ TCEFORM.tt_content.tx_theme_link_icon.keepItems (
     truck, plane, car, bicycle, train, utensils, mug-hot
 )
 
-# The same list for the link of a list item. "<" copies the value as it stands
-# at this point: an integrator changing the list above changes not the copy.
+# The same list for the link of a list item, and for the icon of a content
+# element - the bullet list in its layout "Icons". "<" copies the value as it
+# stands at this point: an integrator changing the list above changes not the
+# copies.
 TCEFORM.tx_theme_list_item.link_icon.keepItems < TCEFORM.tt_content.tx_theme_link_icon.keepItems
+TCEFORM.tt_content.tx_theme_icon.keepItems < TCEFORM.tt_content.tx_theme_link_icon.keepItems

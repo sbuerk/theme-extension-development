@@ -25,10 +25,25 @@ TCEFORM.tt_content {
         }
     }
 
-    # "layout" has no rendering in the theme yet. The content elements that
-    # will give it one - lists, tables, text in columns - re-enable it per type
-    # when they do.
+    # "layout" has a rendering only where a content element gives it one, and
+    # is re-enabled for that CType alone - "PageTsConfigMerged" merges
+    # "types.<CType>" over the field, so "disabled = 0" there wins over the
+    # "1" here for that type and no other.
+    #
+    # "bullets" maps it onto the modifiers of ".theme-list"
+    # ("Templates/ContentElements/Bullets.html"). The core labels its four
+    # values "Default" and "Layout 1" to "Layout 3", which says nothing about
+    # a list, so they are relabelled for this CType.
     layout.disabled = 1
+    layout.types.bullets {
+        disabled = 0
+        altLabels {
+            0 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.bullets.I.0
+            1 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.bullets.I.1
+            2 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.bullets.I.2
+            3 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.bullets.I.3
+        }
+    }
 
     # The section index and the link to the top of the page are a later
     # addition: a table of contents built from "sectionIndex" and a "back to
