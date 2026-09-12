@@ -56,7 +56,7 @@ entities:
               CType: text
               header: 'What this is'
               header_layout: 2
-              bodytext: "<p>This page tree is seeded from a definition in the repository, so a\ndevelopment instance can be rebuilt from nothing without clicking a\npage tree together by hand.</p>"
+              bodytext: "<p>This page tree is seeded from a definition in the repository, so a\ndevelopment instance can be rebuilt from nothing without clicking a\npage tree together by hand.</p>\n<p>Two of its pages are not in the navigation: the\n<a href=\"t3://page?uid=1009\">styleguide</a>, which renders every\ncomponent of the library, and the\n<a href=\"t3://page?uid=1010\">form showcase</a>, a request form put\ntogether from the form components alone.</p>"
       children:
         -
           self:
@@ -568,4 +568,11 @@ entities:
             title: Styleguide
             slug: /styleguide
             backend_layout: styleguide
+            nav_hide: 1
+        -
+          self:
+            id: 1010
+            title: Forms
+            slug: /forms
+            backend_layout: forms
             nav_hide: 1

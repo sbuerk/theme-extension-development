@@ -6,7 +6,7 @@
 # Every record declares its uid, and the numbering is a rule rather than a
 # sequence:
 #
-#   pages               1-9, the tree below
+#   pages               1-10, the tree below
 #   tt_content          the uid of its page times 100, plus its position on
 #                       that page: the third element of page 6 is 603
 #   tx_theme_list_item  1-18 on page 8, numbered in the order they are
@@ -22,7 +22,7 @@
 # configurations of the development instances name root page 1, the file
 # references in "config.yml" name the records they hang on, the "shortcut"
 # element names "tt_content_601", the link fields name "t3://page?uid=2", and
-# the functional tests assert against pages 1 to 9.
+# the functional tests assert against pages 1 to 10.
 #
 # RELATIONS
 #
@@ -83,6 +83,11 @@ entities:
                   <p>This page tree is seeded from a definition in the repository, so a
                   development instance can be rebuilt from nothing without clicking a
                   page tree together by hand.</p>
+                  <p>Two of its pages are not in the navigation: the
+                  <a href="t3://page?uid=9">styleguide</a>, which renders every
+                  component of the library, and the
+                  <a href="t3://page?uid=10">form showcase</a>, a request form put
+                  together from the form components alone.</p>
       children:
         - self:
               id: 2
@@ -1026,3 +1031,14 @@ entities:
               backend_layout: 'styleguide'
               nav_hide: 1
 
+        # The form showcase. A request form built from the form contract of the
+        # component library, rendered by "Templates/Page/Forms.html" from the
+        # "forms" backend layout - which, like "styleguide", declares no usable
+        # content column: the form is the page. "nav_hide" for the reason given
+        # above; the start page links to both.
+        - self:
+              id: 10
+              title: 'Forms'
+              slug: '/forms'
+              backend_layout: 'forms'
+              nav_hide: 1
