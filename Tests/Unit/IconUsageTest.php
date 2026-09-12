@@ -68,6 +68,35 @@ final class IconUsageTest extends UnitTestCase
     }
 
     /**
+     * The icons a stylesheet paints as a mask - the check list marker of
+     * "components/_list.scss", the markers of a decorated link in
+     * "components/_link.scss" - by the file name they reference. That each is
+     * a file of the set, by its relative path, is
+     * "aStylesheetReferencesOnlyFilesOfTheIconSet()"; this only names them.
+     *
+     * @return list<string>
+     */
+    private function iconsTheStylesheetsMask(): array
+    {
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(self::ROOT . '/Resources/Private/Scss', \FilesystemIterator::SKIP_DOTS),
+        );
+        $icons = [];
+        foreach ($files as $file) {
+            if (!$file instanceof \SplFileInfo || $file->getExtension() !== 'scss') {
+                continue;
+            }
+            $source = (string)preg_replace('#//.*$#m', '', (string)file_get_contents($file->getPathname()));
+            preg_match_all('#url\(\s*([\'"]?)[^)\'"]*Icons/FontAwesome/Solid/([^)\'"/]+)\.svg\1\s*\)#', $source, $matches);
+            array_push($icons, ...$matches[2]);
+        }
+        $icons = array_values(array_unique($icons));
+        sort($icons);
+
+        return $icons;
+    }
+
+    /**
      * A name read from a record is rendered with "optional": the set of a later
      * version may no longer have the name an editor picked, and that has to
      * cost the icon, not the page.
@@ -214,7 +243,7 @@ final class IconUsageTest extends UnitTestCase
         sort($listed);
 
         unset($icons[$path]);
-        $used = array_unique(array_merge(...array_values($icons)));
+        $used = array_unique(array_merge($this->iconsTheStylesheetsMask(), ...array_values($icons)));
         sort($used);
 
         $this->assertSame($used, $listed, 'The icon table of the styleguide does not list the icons the templates use.');
