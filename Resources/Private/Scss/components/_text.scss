@@ -76,6 +76,39 @@
     line-height: var(--theme-line-height-base);
 }
 
+// Alignment of a block of text, as the rich text editor writes it:
+//
+//     <p class="theme-text--center">…</p>
+//
+// The alignment plugin of CKEditor sets exactly one class per alignment on the
+// block it aligns, which is why these are modifiers that stand on their own
+// rather than on a ".theme-text" block - there is no second class to put
+// beside them. They exist for "Configuration/RTE/Theme.yaml" and are the only
+// alignment the theme offers: the core preset writes Bootstrap's
+// "text-center", which nothing here styles.
+.theme-text--start {
+    text-align: start;
+}
+
+.theme-text--center {
+    text-align: center;
+}
+
+.theme-text--end {
+    text-align: end;
+}
+
+// Justified text, with hyphenation: a justified column in the reading measure
+// without it opens rivers between the words. "hyphens: auto" hyphenates in the
+// language of the element, which TYPO3 writes onto "<html lang>" from the site
+// language. It is offered because rte_ckeditor always offers "justify", and
+// would write Bootstrap's "text-justify" for it otherwise - see
+// "Configuration/RTE/Theme.yaml".
+.theme-text--justify {
+    text-align: justify;
+    hyphens: auto;
+}
+
 // The short label above a heading. Uppercase at the caption size, so it takes
 // the caps tracking that "h5" and "h6" use rather than the +0.05em mixed case
 // is set at.
