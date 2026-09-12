@@ -1,0 +1,27 @@
+# The login form of EXT:felogin, drawn on the form contract of the theme.
+#
+# One template root path is added above felogin's own, which sits at key 10 in
+# both core versions ("EXT:felogin/Configuration/TypoScript/setup.typoscript").
+# Fluid looks a template up path by path from the highest key down, so the two
+# templates the theme ships - "Login/Login" and "Login/Logout", below
+# "Resources/Private/Extensions/Felogin/Templates/" - win, and everything it
+# does not ship (the overview, the password recovery) still comes from
+# felogin. The files carry the plain ".html" extension: TYPO3 v14 renamed the
+# core templates to ".fluid.html", and Fluid 5 tries both extensions within
+# one path before it moves on to the next, so an ".html" file in a higher path
+# overrides a ".fluid.html" file in a lower one - and it is the only name
+# TYPO3 v13 reads at all.
+#
+# Nothing here depends on felogin being installed: without it the object is
+# configuration nobody reads. It reaches the page on both delivery paths, like
+# everything else "setup.typoscript" imports, and merges with felogin's own
+# TypoScript in either order because the two never set the same key.
+#
+# The theme's own partial root path is added the same way, so the two
+# templates can draw the glyph of an alert from "ContentElement/AlertIcon" -
+# the one set of glyphs the notice content element uses as well - instead of a
+# copy. felogin's own partials ("RenderLabelOrMessage", "ValidationErrors")
+# share no name with a partial of the theme, so nothing of felogin's is
+# shadowed by it.
+plugin.tx_felogin_login.view.templateRootPaths.20 = EXT:theme_extension_development/Resources/Private/Extensions/Felogin/Templates/
+plugin.tx_felogin_login.view.partialRootPaths.20 = {$theme.partialRootPath}

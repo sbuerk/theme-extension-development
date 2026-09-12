@@ -1013,6 +1013,43 @@ applied in its simplest form: the difference needs no condition at all, only
 evidence that leaving it unconditional does not do anything on the newer
 version.
 
+## EXT:felogin
+
+The login form is a plugin, `felogin_login`, and renders through `Generic.html`
+like any other. Its markup is felogin's templates, and the theme replaces two
+of them — `Login/Login` and `Login/Logout`, below
+`Resources/Private/Extensions/Felogin/Templates/` — by adding its path above
+felogin's own at `plugin.tx_felogin_login.view.templateRootPaths.20`
+(`Configuration/TypoScript/Felogin.typoscript`). Fluid looks a template up path
+by path from the highest key down, and within one path tries `.fluid.html`
+before `.html` (`TemplatePaths::resolveFileInPaths()`), so the theme's `.html`
+file wins over felogin's `.fluid.html` on v14 and over its `.html` on v13. The
+password recovery templates are not replaced.
+
+The templates keep every field felogin sends and change the markup around
+them: `.theme-form`, a `.theme-fieldset` with its legend, `.theme-field` with
+the required marker, `.theme-input`, the permanent login as a `.theme-check`,
+and a `.theme-button`. The status message becomes an alert of the kind it is:
+a failed login is `--danger` with `role=alert`, a logout `--success` with
+`role=status`; the welcome text stays a heading and a paragraph. The glyph comes
+from the same `ContentElement/AlertIcon` partial the notice uses, which is why
+the theme's partial root path is added to the plugin as well.
+
+One template serves both core versions. The labels are full `LLL:` references
+rather than the translation domain `felogin.messages` of felogin's v14
+templates, which v13's `f:translate` does not know, and felogin's
+`RenderLabelOrMessage` partial is repeated as a section of each template for
+the same reason. The logout form passes `actionUri` through: v13 assigns the
+logout redirect target there, v14 removed the variable and redirects through an
+event (Breaking #103910), and an unset argument makes the form ViewHelper build
+the action itself — so the same line keeps the v13 redirect and is inert on
+v14.
+
+`FeloginRenderingTest` renders the form through the set and through the static
+include, and asserts the theme's markup and the absence of felogin's own;
+`DevelopmentInstance/LoginPageTest` and `Tests/Acceptance/frontend-login.spec.ts`
+log in and out on the seeded instance.
+
 ## See also
 
 - [Page rendering](page-rendering.md)
