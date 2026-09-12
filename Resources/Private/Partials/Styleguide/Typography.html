@@ -6,8 +6,9 @@
 
     What it shows is the element baseline of "base/_elements.scss" - the
     styling every tag gets without a class, because "bodytext" out of the RTE
-    is markup the theme did not choose - plus the one component that belongs
-    with it, the table from "components/_table.scss".
+    is markup the theme did not choose - plus the text components that belong
+    with it: the text roles, the code block and the divider. The table
+    component has a section of its own, "Tables.html".
 
     The file is a single "<section>" and nothing else: no layout, no section
     definition, no "f:cObject". "Templates/Page/Styleguide.html" places it.
@@ -25,16 +26,9 @@
     "<h1>" and four stray levels into the outline of a page whose whole job
     is to be read as a reference.
 
-    The table specimen is copied from the markup contract in the header of
-    "components/_table.scss": "tabindex=0" plus "role=region" plus an
-    "aria-label" on the wrapper - the W3C APG scrollable-region-focusable
-    pattern, because a box that scrolls but carries no tab stop cannot be
-    reached by keyboard - a "<caption>" carrying "theme-table__caption",
-    "<thead>"/"<tbody>", and the one helper class
-    "theme-table__cell--numeric". The bare table above it carries no class at
-    all and is the RTE case: same element, element-baseline styling only, and
-    the only specimen on this page with a "<tfoot>", which
-    "components/_table.scss" does not style.
+    The table here carries no class at all and is the RTE case: element
+    baseline styling only, footer row included. What ".theme-table" adds to
+    it is in "Tables.html".
 
     Deliberately not demonstrated here, each because another section owns it:
     "a:has(img)" needs an image and belongs to Media; the styled disclosure is
@@ -490,8 +484,8 @@ typoscript: 'EXT:theme_extension_development/Configuration/TypoScript/'</code></
             from the tags alone. Collapsed borders let a row rule and a cell
             rule sit on one line instead of doubling, cells align to the top so
             a wrapped cell keeps every row's first line level, and the caption
-            starts at the inline edge rather than centred. It is also the only
-            specimen on this page with a footer row.
+            starts at the inline edge rather than centred. The component with
+            its frame, scrolling region and modifiers is in Tables.
         </p>
         <table>
             <caption>Bottom margin of each prose block in the element baseline</caption>
@@ -529,78 +523,6 @@ typoscript: 'EXT:theme_extension_development/Configuration/TypoScript/'</code></
                 </tr>
             </tfoot>
         </table>
-    </div>
-
-    <h3>Table, as a component</h3>
-    <div class="theme-styleguide__specimen">
-        <p>
-            The component adds the frame and the scrolling region around the
-            same element. The wrapper is focusable and labelled as a region:
-            it scrolls horizontally so the page never has to, and a box that
-            scrolls without a tab stop of its own cannot be reached by
-            keyboard at all. Focus it and the arrow keys scroll it, with no
-            script involved. Header rows sit on the surface tint, body rows
-            are striped by position rather than by a class, and a cell holding
-            a number takes the one helper class there is, which aligns it to
-            the end and sets it in figures of equal width.
-        </p>
-        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Heading scale of the element baseline">
-            <table class="theme-table">
-                <caption class="theme-table__caption">Size, weight and line height of each heading level</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Level</th>
-                        <th scope="col" class="theme-table__cell--numeric">Size</th>
-                        <th scope="col" class="theme-table__cell--numeric">Weight</th>
-                        <th scope="col" class="theme-table__cell--numeric">Line height</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">Heading 1</th>
-                        <td class="theme-table__cell--numeric">34</td>
-                        <td class="theme-table__cell--numeric">800</td>
-                        <td class="theme-table__cell--numeric">1.5</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Heading 2</th>
-                        <td class="theme-table__cell--numeric">24</td>
-                        <td class="theme-table__cell--numeric">800</td>
-                        <td class="theme-table__cell--numeric">1.3</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Heading 3</th>
-                        <td class="theme-table__cell--numeric">20</td>
-                        <td class="theme-table__cell--numeric">500</td>
-                        <td class="theme-table__cell--numeric">1.3</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Heading 4</th>
-                        <td class="theme-table__cell--numeric">16</td>
-                        <td class="theme-table__cell--numeric">800</td>
-                        <td class="theme-table__cell--numeric">1.3</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Heading 5, in capitals</th>
-                        <td class="theme-table__cell--numeric">14</td>
-                        <td class="theme-table__cell--numeric">800</td>
-                        <td class="theme-table__cell--numeric">1.3</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Heading 6, in capitals</th>
-                        <td class="theme-table__cell--numeric">12</td>
-                        <td class="theme-table__cell--numeric">800</td>
-                        <td class="theme-table__cell--numeric">1.3</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Body copy</th>
-                        <td class="theme-table__cell--numeric">16</td>
-                        <td class="theme-table__cell--numeric">400</td>
-                        <td class="theme-table__cell--numeric">1.6</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 </section>
 

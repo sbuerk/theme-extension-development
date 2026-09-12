@@ -522,16 +522,39 @@ carries no tab stop is unreachable by keyboard:
 
 ```html
 <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="…">
-    <table class="theme-table">
+    <table class="theme-table theme-table--striped">
         <caption class="theme-table__caption">…</caption>
-        <thead>…</thead><tbody>…</tbody>
+        <thead>…</thead>
+        <tbody>…</tbody>
+        <tbody>…</tbody>
+        <tfoot>…</tfoot>
     </table>
 </div>
 ```
 
-`<thead>`/`<tbody>`/`<th>`/`<td>` are styled through plain element selectors
-scoped under `.theme-table`, not a BEM class each; the one helper class is
-`theme-table__cell--numeric` on a cell holding a number.
+`<thead>`/`<tbody>`/`<tfoot>`/`<th>`/`<td>` are styled through plain element
+selectors scoped under `.theme-table`, not a BEM class each; the one helper
+class is `theme-table__cell--numeric` on a cell holding a number. A
+`<th scope="row">` in the body is set at the medium weight, a second `<tbody>`
+opens with the strong rule the header closes on, and a `<tfoot>` is a totals
+row on the header's tint.
+
+Modifiers: `--striped`, `--striped-columns`, `--hover`, `--bordered`,
+`--borderless`, `--compact`, `--sticky-header` and `--caption-bottom`. Every
+one re-points a token of the table's own layer — rule widths, cell padding,
+fills — rather than restating a rule, so `--borderless` removes the header and
+group rules as well without a selector for each. The default rows are no
+longer striped; that is `--striped`, so that the core's "Striped" table class
+changes something. `--hover` mixes the primary accent 12% into the background
+and is the one state here, so it is drawn in `Highlight` under forced colours;
+its contrast is in [`DESIGN.md`](../../DESIGN.md#table-rows).
+`--sticky-header` switches to separated borders — a collapsed border belongs to
+the table and stays behind when the cell sticks — draws every rule two cells
+share only once, since separated borders no longer merge (a column rule from
+the end edge only, no hairline above a group or totals rule), and gives the wrapper a
+maximum height through `:has()`, so the wrapper stays the one scrolling,
+focusable region. The table content element maps `table_class` onto these one
+to one; see [Content elements](../architecture/content-elements.md#table_class-the-modifier-of-the-same-name).
 
 Teaser. Modifier `--reversed` swaps media and body once the row layout kicks
 in, stacking below `bp.$md` the same as `theme-hero--media`:
@@ -1078,6 +1101,7 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 | `aListItemHoldingAFloatKeepsItsMarker`               | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                            |
 | `aControlDrawsItsBoundaryInTheStrongBorderColour`    | The text input, the input group addon and the switch track default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                                                           |
 | `aHoveredTextInputChangesItsBorder`                  | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                    |
+| `everyTableClassAnEditorCanPickIsStyled`             | Every `table_class` an editor can pick — the core's `striped` and `bordered` and the `addItems` of `Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig` — has a compiled `.theme-table--<value>` rule.                         |
 
 The last one strips comments before scanning, which matters here specifically:
 the comment documenting why a breakpoint cannot be a custom property spells

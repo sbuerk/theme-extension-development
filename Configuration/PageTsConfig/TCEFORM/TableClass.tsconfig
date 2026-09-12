@@ -1,0 +1,26 @@
+# The table modifiers of the theme an editor can pick for the "table" element.
+#
+# The core's "table_class" field offers "striped" and "bordered" itself
+# (EXT:frontend "Configuration/TCA/Overrides/240-tt_content-content_type-table.php",
+# identical on v13.4 and v14.3), and "Templates/ContentElements/Table.html"
+# maps every value onto ".theme-table--<value>". The rest of what
+# "components/_table.scss" styles is added here.
+#
+# Page TSconfig "addItems" rather than a TCA override, because it is the route
+# the core documents for exactly this field ("Edit predefined options" in
+# Feature #79622 "Introducing Table Class for Fluid Styled Content"), and a
+# site package can "removeItems" what it does not want in the same place.
+# DataHandler stores a static select value without checking it against the
+# items on either core version ("checkValueForGroupFolderSelect()"), so a
+# value added here saves like one from TCA. The field is a single select: one
+# modifier per element.
+#
+# "--caption-bottom" is not offered: the caption position is not a table
+# style, and "table_caption" has no position field to map it from.
+TCEFORM.tt_content.table_class.addItems {
+    striped-columns = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.table_class.I.striped-columns
+    hover = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.table_class.I.hover
+    borderless = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.table_class.I.borderless
+    compact = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.table_class.I.compact
+    sticky-header = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.table_class.I.sticky-header
+}
