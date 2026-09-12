@@ -125,11 +125,12 @@ with the URL form and names the icon by its file name:
 <theme:icon name="circle-info" label="Information" />
 ```
 
-| Argument | Required | Does                                                                                                   |
-|----------|----------|--------------------------------------------------------------------------------------------------------|
-| `name`   | yes      | The icon: a file name below `Solid/` without `.svg`. `a-z`, `0-9` and `-` only.                        |
-| `label`  | no       | An accessible name. With one the icon is `role="img"` with `aria-label`; without, it is `aria-hidden`. |
-| `class`  | no       | Classes added after `theme-icon`, for the slot a component gives it.                                   |
+| Argument   | Required | Does                                                                                                   |
+|------------|----------|--------------------------------------------------------------------------------------------------------|
+| `name`     | yes      | The icon: a file name below `Solid/` without `.svg`. `a-z`, `0-9` and `-` only.                        |
+| `label`    | no       | An accessible name. With one the icon is `role="img"` with `aria-label`; without, it is `aria-hidden`. |
+| `class`    | no       | Classes added after `theme-icon`, for the slot a component gives it.                                   |
+| `optional` | no       | Render nothing for an empty name or a name the set does not have. For a name read from a record.       |
 
 It renders the file as shipped, attribution comment included, with three
 attributes added to the root element and nothing else changed:
@@ -156,7 +157,19 @@ written into the template, `label="Tom &amp; Jerry"`, arrives in the page as
 `aria-label="Tom &amp;amp; Jerry"` and is read out with the entity spelled.
 Write the character itself, `label="Tom & Jerry"`, or pass a variable.
 
-A name that is malformed or not in the set throws an `\InvalidArgumentException`
+A name an editor picked is the exception, and is rendered with `optional`:
+the field offered only names of the set when the record was saved, but a later
+Font Awesome version may rename or drop one, and that has to cost the icon,
+not the page. With `optional` an empty name, a name the set does not have and a
+malformed name render nothing: a record holds whatever was written into its
+column, by an import as well as by the picker, and a malformed name is refused
+before it becomes part of a path either way.
+`IconUsageTest::aNameAnEditorPickedIsRenderedAsOptional` requires `optional`
+on every `name` that is or contains a variable — a `{` anywhere in it — and
+leaves those names out of the check against the set, which is for names written
+into a template.
+
+Otherwise a name that is malformed or not in the set throws an `\InvalidArgumentException`
 — code `1789218001` and `1789218002` — rather than rendering nothing, and a file
 that does not start and end as an `<svg>` element throws
 `\UnexpectedValueException` `1789218003`: the attributes go in right after
@@ -233,6 +246,18 @@ is work an editor does for nothing.
 | `items.group`   | The first category of `categories.yml` that lists the name.                                                       |
 | `itemGroups`    | Every category, in the order of the file, with Font Awesome's English label; empty ones are left out by the core. |
 | `fieldWizard`   | `selectIcons` switched on.                                                                                        |
+
+The icon fields of the theme:
+
+| Column                          | Shown in                                                       | Rendered by                                  |
+|---------------------------------|----------------------------------------------------------------|----------------------------------------------|
+| `tx_theme_list_item.link_icon`  | The `theme_link` palette of the child, so every link relation. | `LinkList.html`, `ThemeMediaTeaserGrid.html` |
+| `tt_content.tx_theme_link_icon` | The `theme_link` palette of the hero and teaser elements.      | `LinkButton.html`                            |
+
+The stored value is the name, and a template renders it with
+`<theme:icon name="{…}" optional="1" />` — see
+[Rendering an icon](#rendering-an-icon) for why a name from a record is
+optional.
 
 Five decisions, each read in the core rather than assumed:
 

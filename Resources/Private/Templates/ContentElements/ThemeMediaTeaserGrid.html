@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     "theme_media_teaser_grid" - several media teasers in a grid, rendered
@@ -37,7 +38,8 @@
     why a plain "href" would be wrong here. A card without a usable link
     renders its title and text but no ".theme-card__link" - "link" is not
     required on this relation's own "overrideChildTca", unlike the other
-    three.
+    three. Its "link_icon" goes before the label, as in
+    "Partials/ContentElement/LinkButton.html".
 </f:comment>
 <f:layout name="ContentElement" />
 
@@ -68,6 +70,7 @@
                         </f:if>
                         <f:if condition="{item.data.link}">
                             <f:link.typolink parameter="{item.data.link}" class="theme-card__link">
+                                <f:if condition="{item.data.link_icon}"><theme:icon name="{item.data.link_icon}" optional="1" /></f:if>
                                 <f:if condition="{item.data.link_label}">
                                     <f:then>{item.data.link_label}</f:then>
                                     <f:else><f:uri.typolink parameter="{item.data.link}" /></f:else>

@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     Shared list rendering for every content element that resolves its own
@@ -44,6 +45,11 @@
     "link_label" is not required, so a row without one falls back to the
     resolved URL itself via "f:uri.typolink" - visible and honest about where
     the link goes, rather than an empty or generic label.
+
+    "link_icon" is part of the child's "theme_link" palette, so every relation
+    that reaches this partial offers it. It goes before the label, like the
+    icon of "LinkButton.html", and ".theme-content-menu__link" spaces it with
+    its "gap"; "optional" for the reason given there.
 </f:comment>
 
 <f:if condition="{items}">
@@ -52,6 +58,7 @@
             <f:if condition="{item.data.link}">
                 <li class="theme-content-menu__item">
                     <f:link.typolink parameter="{item.data.link}" class="theme-content-menu__link">
+                        <f:if condition="{item.data.link_icon}"><theme:icon name="{item.data.link_icon}" optional="1" /></f:if>
                         <f:if condition="{item.data.link_label}">
                             <f:then>{item.data.link_label}</f:then>
                             <f:else><f:uri.typolink parameter="{item.data.link}" /></f:else>

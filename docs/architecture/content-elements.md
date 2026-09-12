@@ -777,6 +777,40 @@ as an explicit exception — it renders through `ContentObjectRenderer::typoLink
 rather than building a tag itself — so no version split was needed for either
 partial to keep working on both v13.4 and v14.3.
 
+### The link of a theme element: a style and an icon
+
+The `theme_link` palette carries two choices besides the link and its label,
+and so does the link of an inline list item, as far as it applies there:
+
+| Column                             | On                            | Renders as                                                        |
+|------------------------------------|-------------------------------|-------------------------------------------------------------------|
+| `tt_content.tx_theme_link_variant` | hero and teaser elements      | `''` `.theme-button`, `secondary`, `ghost`, `link` its modifier   |
+| `tt_content.tx_theme_link_icon`    | hero and teaser elements      | `<theme:icon>` before the label, in `LinkButton.html`             |
+| `tx_theme_list_item.link_icon`     | every relation showing a link | `<theme:icon>` before the label, in `LinkList.html` and the cards |
+
+The style is `tx_theme_link_variant`, labelled "Link style" in the form, and
+keeps its column name: release 1.x ships it with the first three values, and a
+rename would lose what installations stored. `--danger` is not offered — a call
+to action is not a destructive action. `ThemeLinkRenderingTest` holds the
+items of the column and the cases of `LinkButton.html` to each other, in both
+directions.
+
+A list item has no style. Its link is a row of `.theme-content-menu` in three
+of the four relations, where a button would break the list, and the card link
+of the fourth is the card's own affordance.
+
+The icon goes **before** the label, in every place: it says what the link leads
+to, and leaves the end of the link to what says how it opens. It is
+decoration; the label names the link. Each link spaces it with a `gap` — the
+button already had one, `.theme-content-menu__link` and `.theme-card__link`
+got one — so the icon is a flex item in reading order, first in a
+right-to-left page as well, and no margin names a physical side. Rendered with
+`optional`, because the stored name may be one a later Font Awesome version no
+longer has — see [Icons](../development/icons.md#rendering-an-icon).
+
+The picker and the icons it offers by default are documented in
+[Icons § Picking an icon in the backend](../development/icons.md#picking-an-icon-in-the-backend).
+
 ### Inline children: `DatabaseQueryProcessor`, and its `item.data.*` trap
 
 No core data processor resolves a generic database relation the way
@@ -926,12 +960,13 @@ which exist.
 
 ### Gaps, stated as gaps
 
-- **No icons at all.** This theme ships no icon assets and no icon component
-  — unlike camino, which ships both an icon set and a `link_icon` field.
-  `theme_sociallinks` therefore renders the same text-label list as
-  `theme_linklist`; `link_label` stands in for what would otherwise be a
-  platform icon ("Mastodon", "LinkedIn", …), not a Unicode glyph or any other
-  approximation of one.
+- **No platform logos.** The theme ships the solid set of Font Awesome Free,
+  and a link can carry an icon of it — see
+  [above](#the-link-of-a-theme-element-a-style-and-an-icon). The logos of
+  platforms are Font Awesome's *brands* set, which is not shipped: they are
+  trademarks with rules of their own, not symbols. `theme_sociallinks`
+  therefore renders the same text-label list as `theme_linklist`, and
+  `link_label` carries the platform name ("Mastodon", "LinkedIn", …).
 - **`.theme-hero__eyebrow` has CSS but no TCA field behind it.** The class is
   part of `_hero.scss`'s own markup contract (and the reference markup in
   [Component library](../development/component-library.md#content)), but none

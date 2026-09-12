@@ -45,19 +45,50 @@ final class IconUsageTest extends UnitTestCase
     }
 
     /**
-     * @return array<string, list<string>> The icon names each template renders, by path.
+     * The icon names each template renders, by path.
+     *
+     * A name that is a variable - "{data.tx_theme_link_icon}" - is not one of
+     * them: it is whatever an editor picked, from a field that offers only
+     * names of the set. It is held to "optional" by
+     * "aNameAnEditorPickedIsRenderedAsOptional()" instead.
+     *
+     * @return array<string, list<string>>
      */
     private function iconsByTemplate(): array
     {
         $icons = [];
         foreach ($this->templates() as $path => $source) {
-            preg_match_all('#<theme:icon\b[^>]*?\bname="([^"]*)"#', $source, $matches);
+            preg_match_all('#<theme:icon\b[^>]*?\bname="([^"{]*)"#', $source, $matches);
             if ($matches[1] !== []) {
                 $icons[$path] = $matches[1];
             }
         }
 
         return $icons;
+    }
+
+    /**
+     * A name read from a record is rendered with "optional": the set of a later
+     * version may no longer have the name an editor picked, and that has to
+     * cost the icon, not the page.
+     */
+    #[Test]
+    public function aNameAnEditorPickedIsRenderedAsOptional(): void
+    {
+        $found = 0;
+        $strict = [];
+        foreach ($this->templates() as $path => $source) {
+            preg_match_all('#<theme:icon\b[^>]*?\bname="[^"]*\{[^"]*"[^>]*>#', $source, $matches);
+            foreach ($matches[0] as $tag) {
+                $found++;
+                if (preg_match('#\boptional="(1|true)"#', $tag) !== 1) {
+                    $strict[] = $path . ': ' . $tag;
+                }
+            }
+        }
+
+        $this->assertGreaterThan(0, $found, 'No template renders an icon an editor picked - the pattern is wrong.');
+        $this->assertSame([], $strict, 'These icons come from a record and are not optional: ' . implode(', ', $strict));
     }
 
     /**
