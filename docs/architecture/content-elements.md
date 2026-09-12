@@ -585,7 +585,7 @@ appears raw in 24 places and escaped in none.
 
 Everything above registers no TCA of its own — `EXT:frontend` already made
 every classic type and every `menu_*` type creatable, and this theme only
-supplied a rendering. The ten types below are different: their TCA is this
+supplied a rendering. The thirteen types below are different: their TCA is this
 extension's own, in
 [`Configuration/TCA/Overrides/tt_content_theme_*.php`](../../Configuration/TCA/Overrides/)
 and [`Configuration/TCA/tx_theme_list_item.php`](../../Configuration/TCA/tx_theme_list_item.php),
@@ -597,18 +597,21 @@ to get right: an inline relation that resolves to nothing renders a correct,
 empty wrapper — indistinguishable from "the editor added no entries" — and a
 `link` field read as a plain URL still looks correct until someone clicks it.
 
-| `CType`                   | Is                                       | Renders through                                         |
-|---------------------------|------------------------------------------|---------------------------------------------------------|
-| `theme_hero`              | Full hero: heading, text, media, actions | `.theme-hero` (`Partials/ContentElement/Hero.html`)     |
-| `theme_hero_small`        | The same, reduced                        | `.theme-hero--compact`, same partial                    |
-| `theme_hero_text_only`    | The same, no media                       | `.theme-hero` with no `--media`, same partial           |
-| `theme_teaser`            | Text teaser, no media                    | `.theme-teaser` (`Partials/ContentElement/Teaser.html`) |
-| `theme_media_teaser`      | Text beside a single image               | `.theme-teaser` with media, same partial                |
-| `theme_media_teaser_grid` | Several media teasers in a grid          | `.theme-card-grid` of `.theme-card` items               |
-| `theme_testimonial`       | A quotation with an attribution          | `.theme-quote`                                          |
-| `theme_author`            | A person: portrait, name, role, links    | `.theme-author` + `.theme-content-menu`                 |
-| `theme_linklist`          | A list of links                          | `.theme-content-menu`                                   |
-| `theme_sociallinks`       | The same, labelled instead of iconed     | `.theme-content-menu`                                   |
+| `CType`                   | Is                                                       | Renders through                                         |
+|---------------------------|----------------------------------------------------------|---------------------------------------------------------|
+| `theme_hero`              | Full hero: heading, text, media, actions                 | `.theme-hero` (`Partials/ContentElement/Hero.html`)     |
+| `theme_hero_small`        | The same, reduced                                        | `.theme-hero--compact`, same partial                    |
+| `theme_hero_text_only`    | The same, no media                                       | `.theme-hero` with no `--media`, same partial           |
+| `theme_teaser`            | Text teaser, no media                                    | `.theme-teaser` (`Partials/ContentElement/Teaser.html`) |
+| `theme_media_teaser`      | Text beside a single image                               | `.theme-teaser` with media, same partial                |
+| `theme_media_teaser_grid` | Several media teasers in a grid                          | `.theme-card-grid` of `.theme-card` items               |
+| `theme_testimonial`       | A quotation with an attribution                          | `.theme-quote`                                          |
+| `theme_author`            | A person: portrait, name, role, links                    | `.theme-author` + `.theme-content-menu`                 |
+| `theme_linklist`          | A list of links                                          | `.theme-content-menu`                                   |
+| `theme_sociallinks`       | The same, labelled instead of iconed                     | `.theme-content-menu`                                   |
+| `theme_notice`            | A note, tip, information, success, warning or danger box | `.theme-alert`, the modifier and `role` of its kind     |
+| `theme_tabs`              | Items in tabs, one panel at a time                       | `.theme-tabs`                                           |
+| `theme_accordion`         | Collapsible items, one open at a time                    | `.theme-accordion`                                      |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -744,6 +747,86 @@ goes through the shared header partial like every other content element, so
 the name is the content element's heading, sitting above `.theme-author`
 rather than inside it (`Resources/Private/Scss/components/_author.scss`).
 
+### Notice, tabs and accordion
+
+`theme_notice`, `theme_tabs` and `theme_accordion` put the three content
+components of the library into an editor's hands that had no content element:
+`.theme-alert`, `.theme-tabs` and `.theme-accordion`. bootstrap_package ships
+the same three as `panel`, `tab` and `accordion`; camino has none of them.
+
+**The notice** has a kind, `tx_theme_notice_kind`, one of the six
+`.theme-alert` modifiers. `ThemeNotice.html` derives the modifier and the
+`role` from it in one `f:switch`, so the two cannot disagree — the role is a
+property of the kind, not a second field an editor could set against it:
+
+| Kind                | `role`   |
+|---------------------|----------|
+| `info`, `success`   | `status` |
+| `warning`, `danger` | `alert`  |
+| `note`, `tip`       | `note`   |
+
+The TCA default is `note`, not `info` — `info` is the look of the bare class,
+but it is a live region, and a notice whose kind nobody chose should be the one
+kind that never is. A value outside the six renders as a note, and a notice
+with neither title nor text renders nothing inside its wrapper — an empty
+live region announces nothing, and an empty alert would interrupt a reader for
+it. `header` is the
+title inside the component, `.theme-alert__title`, not a content heading.
+`bodytext` is rich text through `columnsOverrides` of the type, so DataHandler
+runs the RTE transformation on save as it does for `text`; `.theme-alert__text`
+is therefore a `div` of paragraphs, and `_alert.scss` drops the bottom margin
+of its last child.
+
+**Tabs and accordion** reuse `tx_theme_list_items`, narrowed by
+`overrideChildTca` to the child's `header` — required: it is the name of the
+tab, and the summary of the item — and `text`. Their TypoScript copies
+`tt_content.theme_linklist`: the query is the same, the template is not.
+
+The child's `text` is rich text for these two relations only, through
+`overrideChildTca` too. Set on the column, it would make the plain text of the
+four other relations rich text as well — `theme_media_teaser_grid` renders it
+through `nl2br()` and would print markup as text.
+`ThemeContentElementRenderingTest::theListItemTextIsRichTextForTabsAndAccordionOnly`
+holds both halves in the TCA, and `ListItemRichTextFormEngineTest` holds them in
+the form: it compiles a parent with the `tcaDatabaseRecord` group and reads
+`richtextConfiguration` off the child's `text` - `TcaText` sees the override
+only because it is registered after `InlineOverrideChildTca`, and nothing
+declares that dependency. `overrideChildTca` is a FormEngine setting, though:
+DataHandler resolves the configuration of a field from the TCA of the table and
+the `columnsOverrides` of the record's own type
+(`resolveFieldConfigurationAndRespectColumnsOverrides()` in `DataHandler.php`,
+read on v13.4 and v14.3), and `tx_theme_list_item` has no type field. **No RTE
+transformation runs on save for this column**; the value is stored as the
+editor submitted it. The frontend does not depend on the transformation:
+`f:format.html` renders through `lib.parseFunc_RTE`, and `parseFunc` sanitises
+its result unless `htmlSanitize` is switched off
+(`ContentObjectRenderer::_parseFunc()`, `$conf['htmlSanitize'] ?? true`). The
+alternative, a type field on the child table so the relation could use
+`columnsOverrides`, would change the child table of four existing relations for
+one flag.
+
+The ids of the tabs are derived from the element's anchor and the position of
+the item — `c817-tab-1`, its panel `c817-tab-1-panel` — and the `name` of the
+accordion's items from the anchor alone, `c818-accordion`: unique per element
+because the uid is, and the browser groups `details` by name across the whole
+document, so two accordions sharing one would close each other's items. The
+uid of the child row was not used: the anchor is the one identifier of an
+element the theme already treats as its name on the page, and the one
+difference `DevelopmentInstance/LegacyDeliveryTest` normalises between the two
+trees — its rule now covers a `c<uid>` followed by `-` in `id`,
+`aria-controls` and `name` as well.
+
+The panel of a tab carries its class and its id and nothing else, as the tabs
+contract requires; its `.theme-tabs__heading` is one level below the element's
+heading (`Partials/ContentElement/ItemHeading.html`), h2 when the element shows
+none. The accordion's summary is the item's title as text: a `summary` is
+exposed as a button, and a heading inside it is flattened into its name.
+
+Not added: `theme_panel`. `.theme-panel` is content grouped under a heading
+with a footer of controls; a content element has no controls to put there, and
+without them it is a notice of kind `note` or a teaser without a link, both of
+which exist.
+
 ### Gaps, stated as gaps
 
 - **No icons at all.** This theme ships no icon assets and no icon component
@@ -777,7 +860,7 @@ longer offers the field to an editor at all.)
 
 ### The wizard group, and what an unresolved icon identifier does
 
-Every one of the ten types carries a `label`, a `description` and an `icon` on
+Every one of the thirteen types carries a `label`, a `description` and an `icon` on
 its `addRecordType()`/`addTcaSelectItemGroup()` call, all under one wizard
 group ("Theme",
 `tt_content.group.theme` in `locallang_tca.xlf`, inserted `before:default`).
@@ -789,9 +872,11 @@ generated from exactly those TCA keys, which replaced the former
 therefore never needed to write.
 
 The core requires an icon identifier, and none of this theme's own is
-invented — all eight reused identifiers (`content-header`,
+invented — all eleven reused identifiers (`content-header`,
 `content-text-teaser`, `content-beside-text-img-left`, `content-card-group`,
-`content-quote`, `content-user`, `content-bullets`, `content-listgroup`) are
+`content-quote`, `content-user`, `content-bullets`, `content-listgroup`, and
+`content-message`, `content-tab`, `content-accordion` for the three added
+last) are
 verified present in the core's own icon registry
 (`.Build/vendor/typo3/cms-core/Resources/Public/Icons/T3Icons/icons.json`),
 not shipped as image files of this extension's own. An identifier that is

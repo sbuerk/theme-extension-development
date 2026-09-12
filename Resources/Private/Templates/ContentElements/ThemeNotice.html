@@ -1,0 +1,63 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_notice" - a notice on ".theme-alert", in one of the six kinds of
+    "tx_theme_notice_kind" (Configuration/TCA/Overrides/tt_content.php).
+
+    The kind decides the modifier and the "role", and the two are decided
+    together here so they cannot disagree. The role follows the alert contract
+    in docs/development/component-library.md: "info" and "success" are polite
+    live regions ("status"), "warning" and "danger" assertive ones ("alert"),
+    and "note" and "tip" are asides to the text around them and take "note" -
+    never a live region. The modifier is written for "info" as well, although
+    it is the look of the bare class: the contract lists it so a template can
+    name it rather than rely on the default.
+
+    A value outside the six - an import, a value from before a kind was
+    removed - renders as a note, the kind the TCA defaults to, rather than as
+    a modifier the stylesheet does not know next to a role nobody chose.
+
+    "header" is the notice's title and renders as ".theme-alert__title" inside
+    the component rather than through the shared header partial: it names the
+    notice, it does not open a section of the page. "bodytext" is rich text,
+    so ".theme-alert__text" is a "div" rather than the "p" the contract shows -
+    "f:format.html" wraps its lines in paragraphs of its own, and a paragraph
+    inside a paragraph is invalid. The class is selected by class, not by tag.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:switch expression="{data.tx_theme_notice_kind}">
+        <f:case value="info"><f:variable name="kind" value="info" /><f:variable name="role" value="status" /></f:case>
+        <f:case value="success"><f:variable name="kind" value="success" /><f:variable name="role" value="status" /></f:case>
+        <f:case value="warning"><f:variable name="kind" value="warning" /><f:variable name="role" value="alert" /></f:case>
+        <f:case value="danger"><f:variable name="kind" value="danger" /><f:variable name="role" value="alert" /></f:case>
+        <f:case value="tip"><f:variable name="kind" value="tip" /><f:variable name="role" value="note" /></f:case>
+        <f:defaultCase><f:variable name="kind" value="note" /><f:variable name="role" value="note" /></f:defaultCase>
+    </f:switch>
+
+    <f:comment>
+        A notice with neither a title nor a text renders nothing inside its
+        wrapper: an empty box with "role=status" or "role=alert" is a live
+        region announcing nothing, and the assertive kinds would interrupt a
+        reader for it.
+    </f:comment>
+    <f:if condition="{data.header} || {data.bodytext}">
+        <div class="theme-alert theme-alert--{kind}" role="{role}">
+            <span class="theme-alert__icon" aria-hidden="true"><f:render partial="ContentElement/AlertIcon" arguments="{kind: kind}" /></span>
+            <div class="theme-alert__body">
+                <f:if condition="{data.header}">
+                    <p class="theme-alert__title">{data.header}</p>
+                </f:if>
+                <f:if condition="{data.bodytext}">
+                    <div class="theme-alert__text">
+                        <f:format.html>{data.bodytext}</f:format.html>
+                    </div>
+                </f:if>
+            </div>
+        </div>
+    </f:if>
+</f:section>
+
+</html>

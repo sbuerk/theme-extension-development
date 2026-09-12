@@ -1021,3 +1021,23 @@ tt_content.theme_media_teaser {
 # had was removed rather than left inert.
 tt_content.theme_testimonial =< lib.contentElement
 tt_content.theme_testimonial.templateName = ContentElements/ThemeTestimonial
+
+# A notice on ".theme-alert". No data processing: the kind, the title and the
+# text are all fields of the record itself, and the template derives the
+# modifier and the "role" from "tx_theme_notice_kind" - see
+# "Templates/ContentElements/ThemeNotice.html".
+tt_content.theme_notice =< lib.contentElement
+tt_content.theme_notice.templateName = ContentElements/ThemeNotice
+
+# Tabs and an accordion. Both read "tx_theme_list_items" exactly the way the
+# link list does - the same "DatabaseQueryProcessor" on the same relation
+# triple, see the section comment above "tt_content.theme_author" - so both
+# are copies of "tt_content.theme_linklist" with a template of their own
+# rather than a third and a fourth spelling of the same query. What differs
+# between the relations is the child's form ("overrideChildTca" in their TCA),
+# not how its rows are fetched.
+tt_content.theme_tabs =< tt_content.theme_linklist
+tt_content.theme_tabs.templateName = ContentElements/ThemeTabs
+
+tt_content.theme_accordion =< tt_content.theme_linklist
+tt_content.theme_accordion.templateName = ContentElements/ThemeAccordion
