@@ -1,0 +1,16 @@
+# Marks a link by what it leads to - another site, a file, an email address,
+# a phone number - with a class, a glyph after its text and, for a new window
+# or a download, a hint for a screen reader.
+#
+# The marking is done by a PSR-14 listener for every link TYPO3 builds from a
+# link reference ("Classes/EventListener/LinkDecoration.php"), and a listener
+# is registered for every site of an installation. This line is how it knows
+# the page is one the theme renders: it acts only where "config." carries it.
+# "config." rather than a key of the theme's own, because the listener reads
+# the "config." of the request - the one part of the setup every page
+# rendering sets up - and "tx_theme" keeps the key in the theme's namespace,
+# the way "config.tx_extbase" is Extbase's.
+#
+# Switched by the constant "theme.linkDecoration"; "0" leaves every link as
+# TYPO3 builds it.
+config.tx_theme.linkDecoration = {$theme.linkDecoration}

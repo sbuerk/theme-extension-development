@@ -18,6 +18,12 @@
 			<trans-unit id="theme.navMainToggle">
 				<source>Menu</source>
 			</trans-unit>
+			<trans-unit id="link.hint.newWindow">
+				<source>(opens in a new window)</source>
+			</trans-unit>
+			<trans-unit id="link.hint.download">
+				<source>(download)</source>
+			</trans-unit>
 			<trans-unit id="theme.navSubLabel">
 				<source>Section</source>
 			</trans-unit>

@@ -237,6 +237,23 @@ Nothing an editor can create is left without a rendering definition, and a test
 asserts exactly that: it walks the content types registered in TCA and fails if
 the core's "no rendering definition" notice appears for any of them.
 
+Links
+=====
+
+The link of a theme content element has a style and an optional icon - see
+:ref:`feature-theme-link-icon-and-style`. The icon fields offer about a
+hundred icons by default; page TSconfig widens the list - see
+:ref:`feature-icon-picker`.
+
+A link to another site, a file, an email address or a phone number is marked
+with a glyph after its text, and a new window or a download is announced to
+screen readers - see :ref:`feature-link-decoration`. A constant switches that
+off:
+
+..  code-block:: typoscript
+
+    theme.linkDecoration = 0
+
 Demo content
 ============
 
