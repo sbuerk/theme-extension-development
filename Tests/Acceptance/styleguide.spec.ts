@@ -250,6 +250,44 @@ test.describe('the styleguide with JavaScript', () => {
     });
 });
 
+/**
+ * The section index of the styleguide ("Templates/Page/Styleguide.html",
+ * "layout/_styleguide.scss"): a link jumps to its section, and on a wide
+ * screen the index stays in view while the sections scroll past it. Only a
+ * browser lays out "position: sticky"; the functional tests prove no more
+ * than that every link has its section.
+ */
+test.describe('the styleguide index', () => {
+    const index = (page: import('@playwright/test').Page) => page.getByRole('navigation', { name: 'Styleguide sections', exact: true });
+
+    test('a link jumps to its section and the index stays in view beside it', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.goto('/styleguide');
+
+        await index(page).getByRole('link', { name: 'Media', exact: true }).click();
+        await expect(page).toHaveURL(/#media$/);
+        await expect(page.locator('#media')).toBeInViewport();
+        // The last section is thousands of pixels below the index's place in
+        // the flow: it is only still on screen because it sticks.
+        await expect(index(page)).toBeInViewport();
+        expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(2000);
+
+        await index(page).getByRole('link', { name: 'Tokens', exact: true }).click();
+        await expect(page).toHaveURL(/#tokens$/);
+        await expect(page.locator('#tokens')).toBeInViewport();
+    });
+
+    test('on a phone the index is a list above the sections and scrolls away', async ({ page }) => {
+        await page.setViewportSize({ width: 400, height: 800 });
+        await page.goto('/styleguide');
+
+        await index(page).getByRole('link', { name: 'Media', exact: true }).click();
+        await expect(page.locator('#media')).toBeInViewport();
+        // Sticky on a phone, it would cover the section it just jumped to.
+        await expect(index(page)).not.toBeInViewport();
+    });
+});
+
 test.describe('the styleguide in forced colours', () => {
     test.use({ forcedColors: 'active' });
 

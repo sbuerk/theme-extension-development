@@ -46,33 +46,45 @@
             anything that does not is a colour that escaped the token layer.
         </p>
 
-        <nav class="theme-content-menu" aria-label="Styleguide sections">
-            <ul class="theme-content-menu__list">
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#tokens">Tokens</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#typography">Typography</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#lists">Lists</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#tables">Tables</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#buttons">Buttons</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#icons">Icons</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#boxes">Boxes</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#interactive">Interactive</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#forms">Forms</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#navigation">Navigation</a></li>
-                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#media">Media</a></li>
-            </ul>
-        </nav>
+        <f:comment>
+            The index and the sections side by side from "bp.$md" up, the
+            index sticky in its column so it stays in view while the sections
+            scroll past; stacked below that, the index a list above the
+            sections - "layout/_styleguide.scss". The partials stay single
+            sections: the visual suite renders each of them without this
+            template.
+        </f:comment>
+        <div class="theme-styleguide__layout">
+            <nav class="theme-content-menu theme-styleguide__toc" aria-label="Styleguide sections">
+                <ul class="theme-content-menu__list">
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#tokens">Tokens</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#typography">Typography</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#lists">Lists</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#tables">Tables</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#buttons">Buttons</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#icons">Icons</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#boxes">Boxes</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#interactive">Interactive</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#forms">Forms</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#navigation">Navigation</a></li>
+                    <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#media">Media</a></li>
+                </ul>
+            </nav>
 
-        <f:render partial="Styleguide/Tokens" />
-        <f:render partial="Styleguide/Typography" />
-        <f:render partial="Styleguide/Lists" />
-        <f:render partial="Styleguide/Tables" />
-        <f:render partial="Styleguide/Buttons" />
-        <f:render partial="Styleguide/Icons" />
-        <f:render partial="Styleguide/Boxes" />
-        <f:render partial="Styleguide/Interactive" />
-        <f:render partial="Styleguide/Forms" />
-        <f:render partial="Styleguide/Navigation" />
-        <f:render partial="Styleguide/Media" />
+            <div class="theme-styleguide__sections">
+                <f:render partial="Styleguide/Tokens" />
+                <f:render partial="Styleguide/Typography" />
+                <f:render partial="Styleguide/Lists" />
+                <f:render partial="Styleguide/Tables" />
+                <f:render partial="Styleguide/Buttons" />
+                <f:render partial="Styleguide/Icons" />
+                <f:render partial="Styleguide/Boxes" />
+                <f:render partial="Styleguide/Interactive" />
+                <f:render partial="Styleguide/Forms" />
+                <f:render partial="Styleguide/Navigation" />
+                <f:render partial="Styleguide/Media" />
+            </div>
+        </div>
     </div>
 </f:section>
 

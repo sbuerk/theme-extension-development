@@ -170,7 +170,7 @@ classic `CType` in its variants, and every appearance value:
 | 2         | Typography              | `/typography`            | `content`         | Running text, the four bands with header positions, looks and spacing; parent of 52 to 56. |
 | 52–56     | Text … Article          | `/typography/<page>`     | `content`         | Text, lists, tables, quotes and code, and a long article — rich text and elements.         |
 | 3         | Media                   | `/media`                 | `content`         | One image, and a two column gallery.                                                       |
-| 4         | Empty page              | `/empty`                 | *(none)*          | The `default` layout fallback.                                                             |
+| 4         | Empty page              | `/empty`                 | *(none)*          | The `default` layout fallback; `nav_hide`, reached by URL and from page 8.                 |
 | 5         | Elements                | `/elements`              | `content`         | The showcase branch, parent of 6 to 8 and 51.                                              |
 | 6         | Core elements           | `/elements/core`         | `content_sidebar` | Every classic `CType` the theme renders, once each; parent of 30 to 39 and 50.             |
 | 30–39, 50 | Header … Insert records | `/elements/core/<CType>` | `content_sidebar` | One page per classic `CType`, every value of the fields that change how it looks.          |
@@ -191,10 +191,11 @@ preserve:
 - **Pages 6 and 7 use `content_sidebar` and their sibling 8 does not.** Two
   pages under one parent rendering with and without the sub navigation is what
   proves the layout is resolved per page rather than inherited down the branch.
-- **The styleguide and the form showcase use `nav_hide`, never `hidden`.** A hidden page returns
-  404 in the frontend and is only reachable through a backend preview link
-  carrying a valid hash, which defeats the point of seeding a page that exists
-  to be opened.
+- **The three showcase sections are in the main navigation** — `/elements`,
+  `/typography`, and `/styleguide` with `/forms` — and no page is `hidden`. A
+  hidden page returns 404 in the frontend and is only reachable through a
+  backend preview link carrying a valid hash, which defeats the point of
+  seeding a page that exists to be opened.
 - **The two lists that hold the tree complete are read from the repository, not
   from the test.** `ShowcaseTreeTest` derives the backend layouts from
   `Configuration/PageTsConfig/BackendLayouts/` and the content types from the

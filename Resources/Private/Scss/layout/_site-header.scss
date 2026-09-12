@@ -129,6 +129,15 @@
 }
 
 // The menu keeps its row above the breakpoint - see "One row" above.
+//
+// @todo From "bp.$md" up the navigation does not shrink, so the site title
+//       takes up whatever the row lacks: with a long title, a sixth top level
+//       entry already wraps the title onto a second line at 1280 pixels (the
+//       showcase keeps its layout fallback fixture out of the menu for that
+//       reason). The header needs a layout that tolerates more top level
+//       entries - letting the list wrap, or moving it below the title - before
+//       the showcase gains its planned Examples section, which is a sixth
+//       entry again.
 @media (min-width: bp.$md) {
     .theme-site-header .theme-nav-main {
         flex-shrink: 0;

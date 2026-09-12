@@ -40,6 +40,19 @@ grows from one page per family of content elements to one page per element:
             lists and tables of the rich text next to the elements, quotations,
             code blocks, and a long article that uses all of them.
 
+Three sections are in the main navigation: :guilabel:`Elements`,
+:guilabel:`Typography`, and the component library on :guilabel:`Styleguide`
+with the form showcase on :guilabel:`Forms`, which used to be left out of every
+menu. The pages of a section are its sub pages, two levels deep in the main
+navigation and in the sub navigation of the section. :guilabel:`Empty page`,
+which exists to show the default layout, left the menus instead: it is reached
+by its URL and from the theme elements, and as a sixth top level entry it
+pushed the site title of the header onto a second line on a wide screen.
+
+On a wide screen the section index of the styleguide stands beside the
+sections and stays in view while they scroll past; on a narrow one it is the
+list of links above them.
+
 The rich text of the typography pages is written into the database the way a
 backend save writes it, so the processing of the installation's rich text
 preset applies to it. With the preset of the theme everything on the pages

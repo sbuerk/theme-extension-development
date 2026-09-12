@@ -24,11 +24,14 @@ backend layout `styleguide`. After
 `vendor/bin/typo3 data-factory:import theme-demo` it is at
 `https://<instance>/styleguide` — see [Seeding](seeding.md).
 
-It is **`nav_hide`, not `hidden`**. A hidden page answers 404 in the frontend
-and is reachable only through a backend preview link carrying a valid hash,
-which defeats the point of seeding a page whose entire purpose is to be opened
-and looked at. `nav_hide` keeps it reachable by URL and out of every menu the
-theme renders, which is what "not part of the site" actually meant here.
+It is **in the main navigation**, next to the form showcase on `/forms`. Both
+used to be `nav_hide` - reachable by URL, out of every menu - on the reasoning
+that they are not part of a site. The showcase is what a reviewer of the theme
+navigates, though, and a page no menu leads to is a page nobody finds; the
+maintainer chose the three showcase sections - elements, typography, and the
+styleguide with the forms - visible in the navigation. Neither page was ever
+`hidden`: a hidden page answers 404 in the frontend and is reachable only
+through a backend preview link carrying a valid hash.
 
 The page is not privileged in any other way: it is a normal `doktype 1` page
 with a backend layout, so it resolves its template through the same mechanism
@@ -122,6 +125,21 @@ The index itself reuses `.theme-content-menu` rather than introducing an index
 component. It is exactly what that component is — a flat list of links — so an
 own component would have been a second stylesheet rule doing the same job, and
 rendering it here demonstrates the component as a side effect.
+
+From `bp.$md` up the index is a column of its own beside the sections and
+**sticks** to the top of the viewport while they scroll past, so every section
+is one link away wherever the reader is. `.theme-styleguide__layout` sets the
+two side by side, `.theme-styleguide__toc` makes the index sticky — page
+furniture in `layout/_styleguide.scss`, like the rest of this page. Below
+`bp.$md` the index is the list above the sections it always was and scrolls
+away with them: sticky on a phone, it would cover the section it just jumped
+to. The theme's one breakpoint rather than a second one for this page — the
+index column is narrow, and the specimens that need width scroll in their own
+regions already. The sections stay single partials inside
+`.theme-styleguide__sections`, so the visual suite, which renders each partial
+without the page template, is unaffected. `Tests/Acceptance/styleguide.spec.ts`
+clicks an index link on a wide and on a narrow viewport and holds the index to
+staying in view on the one and scrolling away on the other.
 
 Every specimen is copied from the markup contract in the component's own SCSS
 header comment, which is the authoritative source; where a header comment and
