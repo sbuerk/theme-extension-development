@@ -1,0 +1,188 @@
+// List.
+//
+// Markup contract:
+//
+//     <ul class="theme-list theme-list--check">
+//         <li>…</li>
+//     </ul>
+//
+//     <ul class="theme-list theme-list--icon">
+//         <li><span class="theme-list__icon" aria-hidden="true"><theme:icon name="…" /></span>…</li>
+//     </ul>
+//
+// Modifiers: "--unstyled" (no marker, no indent), "--inline" (one row, a
+// hairline between items), "--check" (a check mark per item), "--icon" (an
+// icon per item, from the "__icon" slot), "--columns-2" and "--columns-3" (the
+// items flow into columns), "--divided" (no marker, a hairline between rows).
+// "--columns-*" combines with a marker modifier; "--inline" combines with
+// nothing but itself.
+//
+// Works on "<ul>" and "<ol>" alike. The items are bare "<li>", selected as
+// direct children, the way ".theme-table" selects its cells: a list comes out
+// of a template or rich text with nothing but the class on the list, and a
+// list nested inside an item keeps the element baseline - the modifier
+// describes one list, not every list below it.
+//
+// --- The icon slot --------------------------------------------------------
+//
+// "__icon" holds an icon of the set, rendered by "<theme:icon>" like every
+// icon of the theme (see "docs/development/icons.md"). The slot sets
+// "--theme-icon-size" to one em, the size "components/_icon.scss" reads, and
+// centres it on the first line of its item, so an item that wraps keeps its
+// text aligned past the icon. The slot is decorative - "aria-hidden" on the
+// span, the item's text is its content. An item without an icon leaves the
+// span out and keeps its indent.
+//
+// --- The check mark is the set's "check", as a mask ------------------------
+//
+// "--check" is one marker for every item and has no markup per item, so it is
+// the stylesheet's to draw - but not as a character: a "✓" is drawn by
+// whichever installed font covers it, and its size, weight and baseline change
+// with it. The generated box instead takes the vendored "check.svg" of the set
+// as a CSS mask and paints it in the success accent: the shape is the file's,
+// the same one "<theme:icon name="check" />" renders, and "checkIconsBuild"
+// covers it like every other file of the set. The URL is relative to the
+// compiled "Resources/Public/Css/theme.css". Under forced colours the
+// background would be repainted to the canvas colour and the mark would
+// disappear, so the box opts out and paints itself "CanvasText". A check mark
+// is not mirrored in a right-to-left text; only its position is, through
+// "inset-inline-start".
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-list {
+    --theme-list-item-gap: var(--theme-space-1, 0.3125rem);
+    --theme-list-marker-size: 1em;
+    --theme-list-marker-gap: var(--theme-space-2, 0.625rem);
+    --theme-list-check-color: var(--theme-color-success, #146c43);
+    --theme-list-icon-color: var(--theme-color-primary, #0b57d0);
+    --theme-list-rule-color: var(--theme-color-border, #d6dce6);
+    --theme-list-separator-color: var(--theme-color-border-strong, #828d9f);
+    --theme-list-inline-gap: var(--theme-space-3, 0.9375rem);
+    --theme-list-divided-padding: var(--theme-space-2, 0.625rem);
+    --theme-list-column-gap: var(--theme-space-7, 2.5rem);
+    --theme-list-column-min-width: 12rem;
+
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+
+    > li {
+        margin-block-end: var(--theme-list-item-gap);
+
+        &:last-child {
+            margin-block-end: 0;
+        }
+    }
+}
+
+// Every modifier that replaces the marker also gives up the indent the marker
+// sat in.
+.theme-list--unstyled,
+.theme-list--inline,
+.theme-list--check,
+.theme-list--icon,
+.theme-list--divided {
+    padding-inline-start: 0;
+    list-style: none;
+}
+
+// One row that wraps. The hairline is the separator rather than a glyph
+// between the items: it survives forced colours, it reads the same in every
+// font, and it says nothing a screen reader would have to skip. At a wrap the
+// first item of the new line keeps its hairline - CSS cannot tell which item
+// starts a line.
+.theme-list--inline {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: var(--theme-list-item-gap);
+
+    > li {
+        margin-block-end: 0;
+    }
+
+    > li + li {
+        margin-inline-start: var(--theme-list-inline-gap);
+        padding-inline-start: var(--theme-list-inline-gap);
+        border-inline-start: var(--theme-border-width, 1px) solid var(--theme-list-separator-color);
+    }
+}
+
+// The check mark and the icon share one geometry: the item makes room for a
+// one-em marker and the gap after it, and the marker sits in that room on the
+// first line.
+.theme-list--check,
+.theme-list--icon {
+    > li {
+        position: relative;
+        padding-inline-start: calc(var(--theme-list-marker-size) + var(--theme-list-marker-gap));
+    }
+}
+
+.theme-list--check > li::before {
+    content: '';
+    position: absolute;
+    inset-block-start: calc((1lh - var(--theme-list-marker-size)) / 2);
+    inset-inline-start: 0;
+    inline-size: var(--theme-list-marker-size);
+    block-size: var(--theme-list-marker-size);
+    background-color: var(--theme-list-check-color);
+    mask: url('../Icons/FontAwesome/Solid/check.svg') no-repeat center / contain;
+}
+
+.theme-list__icon {
+    --theme-icon-size: var(--theme-list-marker-size);
+
+    position: absolute;
+    inset-block-start: calc((1lh - var(--theme-list-marker-size)) / 2);
+    inset-inline-start: 0;
+    display: flex;
+    inline-size: var(--theme-list-marker-size);
+    block-size: var(--theme-list-marker-size);
+    color: var(--theme-list-icon-color);
+}
+
+@media (forced-colors: active) {
+    .theme-list--check > li::before {
+        forced-color-adjust: none;
+        background-color: CanvasText;
+    }
+}
+
+// "columns" takes a count and a width together, and treats the count as a
+// maximum and the width as a minimum: two or three columns where there is room
+// for them at 12rem each, fewer where there is not, one on a phone. The column
+// gap is the indent of a list, so the markers of the second column have the
+// same room as those of the first.
+.theme-list--columns-2,
+.theme-list--columns-3 {
+    column-gap: var(--theme-list-column-gap);
+
+    > li {
+        break-inside: avoid;
+    }
+}
+
+.theme-list--columns-2 {
+    columns: 2 var(--theme-list-column-min-width);
+}
+
+.theme-list--columns-3 {
+    columns: 3 var(--theme-list-column-min-width);
+}
+
+.theme-list--divided {
+    > li {
+        margin-block-end: 0;
+        padding-block: var(--theme-list-divided-padding);
+        border-block-end: var(--theme-border-width, 1px) solid var(--theme-list-rule-color);
+
+        &:first-child {
+            padding-block-start: 0;
+        }
+
+        &:last-child {
+            padding-block-end: 0;
+            border-block-end: 0;
+        }
+    }
+}

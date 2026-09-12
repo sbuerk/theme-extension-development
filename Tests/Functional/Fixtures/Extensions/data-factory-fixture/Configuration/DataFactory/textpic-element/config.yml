@@ -1,0 +1,40 @@
+# The page tree of "TextPicElementRenderingTest".
+#
+# Seeded rather than imported from a CSV data set for the same reason as
+# "image-element": a gallery only renders for a real file reference, and the
+# import writes the storage record, the "sys_file" and the reference together.
+#
+# A set of its own, so the counts "ImageElementRenderingTest" asserts on its
+# page stay what they are.
+identifier: tests-textpic-element
+title: 'Text and image element test tree'
+
+scenarios:
+  - Scenario.yaml
+
+files:
+  - identifier: landscape
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder.svg'
+    folder: 'test-images'
+
+references:
+  - file: landscape
+    table: tt_content
+    uid: 21
+    field: image
+  - file: landscape
+    table: tt_content
+    uid: 22
+    field: image
+  - file: landscape
+    table: tt_content
+    uid: 23
+    field: image
+  - file: landscape
+    table: tt_content
+    uid: 24
+    field: image
+  - file: landscape
+    table: tt_content
+    uid: 25
+    field: assets
