@@ -481,8 +481,28 @@ component file rather than in `base/`, because a class — unlike a bare element
 ```html
 <p class="theme-eyebrow">…</p>
 <h1 class="theme-display">…</h1>
+<h1 class="theme-display theme-display--1">…</h1>
 <p class="theme-lead">…</p>
 ```
+
+The display role has three sizes: `--1` grows from 34 to 68px, `--2` from 34
+to 54px — the measured one, and the size of the bare class — and `--3` from 34
+to 43px. All three start at the first-level heading size on a narrow viewport
+and differ only in how far they grow; the two that were not measured are
+derived from the one that was, see [`DESIGN.md`](../../DESIGN.md#display-sizes).
+A modifier re-points `--theme-display-font-size` rather than restating
+`font-size`, and `--2` exists although it changes nothing, so a template that
+maps an editor's choice onto a class never special-cases the middle one.
+
+The element baseline carries the rest of the typography, without a class,
+because rich text is markup the theme cannot add one to: a `small` inside a
+heading as a secondary line at 0.7 of the heading; `text-wrap: balance` on
+headings and `pretty` on paragraphs; `dfn`; a key combination as a `kbd` of
+`kbd`s, only the keys framed; quotation marks per `:lang()` — English by
+default, German and French pairs; `hyphens: auto` for German only; and
+`overflow-wrap: anywhere` on links in prose blocks, so a written-out URL stops
+widening its container. Captions and cells align to `start`, not `left`, like
+every other declaration of the file.
 
 A title that a component selects by class, on whatever level the editor picked
 — `.theme-hero__title` and `.theme-teaser__title` follow `header_layout` from

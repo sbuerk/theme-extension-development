@@ -4,7 +4,15 @@
 //
 //     <p class="theme-eyebrow">…</p>
 //     <h1 class="theme-display">…</h1>
+//     <h1 class="theme-display theme-display--1">…</h1>
 //     <p class="theme-lead">…</p>
+//
+// Display sizes: "--1" (34 to 68px), "--2" (34 to 54px, the measured one and
+// the size of the bare class), "--3" (34 to 43px). Every one starts at the
+// size of a first level heading on a narrow viewport, so a display heading is
+// never smaller than a page title and never larger than one on a phone; they
+// differ in how far they grow. Where the two added sizes come from is
+// recorded in DESIGN.md "Display sizes".
 //
 // Three roles of DESIGN.md's type table that no element carries by itself: a
 // heading level says where something sits in the outline, not how loud it is,
@@ -32,6 +40,24 @@
     line-height: var(--theme-line-height-heading);
     text-transform: none;
     text-wrap: balance;
+}
+
+// A modifier re-points the size token rather than restating "font-size", so a
+// site package that re-themes "--theme-display-font-size" on one element still
+// wins over the modifier it carries.
+.theme-display--1 {
+    --theme-display-font-size: var(--theme-font-size-display-1, clamp(2.125rem, 1.0625rem + 5.1vw, 4.25rem));
+}
+
+// The bare class already is this size. The modifier exists so a template that
+// maps an editor's choice of one, two or three onto a class never has to
+// special-case the middle one.
+.theme-display--2 {
+    --theme-display-font-size: var(--theme-font-size-display, clamp(2.125rem, 1.5rem + 3vw, 3.375rem));
+}
+
+.theme-display--3 {
+    --theme-display-font-size: var(--theme-font-size-display-3, clamp(2.125rem, 1.84375rem + 1.35vw, 2.6875rem));
 }
 
 // The paragraph that opens a page. Held to the reading measure like the hero's
