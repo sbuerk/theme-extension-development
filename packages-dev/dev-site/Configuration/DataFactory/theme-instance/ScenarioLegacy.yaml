@@ -168,7 +168,7 @@ entities:
                 self:
                   id: 1502
                   CType: text
-                  bodytext: "<p>Three pages, one per family: the classic types\n<em>EXT:frontend</em> registers without supplying a rendering,\nthe eleven menu types, and the thirteen this extension adds itself.\nEvery one of them appears exactly once, so a single branch of the\ntree answers what the theme does with each.</p>"
+                  bodytext: "<p>Three pages, one per family: the classic types\n<em>EXT:frontend</em> registers without supplying a rendering,\nthe eleven menu types, and the thirteen this extension adds itself.\nEvery one of them appears exactly once, so a single branch of the\ntree answers what the theme does with each.</p>\n<p>Below the classic types, each has a page of its own with its\nvariants, and the <a href=\"t3://page?uid=1051\">Frames</a> page shows\nevery value of the Appearance tab, one element each.</p>"
           children:
             -
               self:
@@ -192,7 +192,7 @@ entities:
                       CType: text
                       header: 'What this page is'
                       header_layout: 2
-                      bodytext: "<p>Every classic content type this theme renders is on this\npage exactly once, so a single URL answers what each one\nlooks like and which of its fields the theme actually reads.\nThe copy of each element describes that element.</p>\n<p>The rendering is defined in\n<em>Configuration/TypoScript/ContentElements.typoscript</em>.\nThis theme does not depend on <em>fluid_styled_content</em>,\nso a content type without a branch in that file would render\nthe core's <strong>\"no rendering definition\"</strong> notice\ninstead of anything at all.</p>\n"
+                      bodytext: "<p>Every classic content type this theme renders is on this\npage exactly once, so a single URL answers what each one\nlooks like and which of its fields the theme actually reads.\nThe copy of each element describes that element.</p>\n<p>The rendering is defined in\n<em>Configuration/TypoScript/ContentElements.typoscript</em>.\nThis theme does not depend on <em>fluid_styled_content</em>,\nso a content type without a branch in that file would render\nthe core's <strong>\"no rendering definition\"</strong> notice\ninstead of anything at all.</p>\n<p>Each of them also has a page of its own below this one, in the\nsub navigation, showing its variants: every orientation of\n<a href=\"t3://page?uid=1032\">Text &amp; Images</a>, every layout of\nthe <a href=\"t3://page?uid=1035\">bullet list</a>, every class of the\n<a href=\"t3://page?uid=1036\">table</a> and so on.</p>\n"
                   -
                     self:
                       id: 1603
@@ -265,6 +265,632 @@ entities:
                       CType: shortcut
                       header: 'Insert records (name only, not rendered)'
                       records: tt_content_1601
+              children:
+                -
+                  self:
+                    id: 1030
+                    title: Header
+                    slug: /elements/core/header
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4001
+                          CType: header
+                          header: Header
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4002
+                          CType: text
+                          header: 'Levels and positions'
+                          header_layout: 2
+                          bodytext: "<p>The element is a heading and nothing else. Its level is the\nvalue of \"Layout\" in the header palette, heading 1 to heading 5;\n\"Default\" is a heading 2, and \"Hidden\" keeps the record and\nrenders nothing. The alignment moves the heading to the start,\nthe centre or the end of the line - the logical edges, so it\nfollows a right-to-left language.</p>"
+                      -
+                        self:
+                          id: 4003
+                          CType: header
+                          header: 'Heading level 2'
+                          header_layout: 2
+                      -
+                        self:
+                          id: 4004
+                          CType: header
+                          header: 'Heading level 3'
+                          header_layout: 3
+                      -
+                        self:
+                          id: 4005
+                          CType: header
+                          header: 'Heading level 4'
+                          header_layout: 4
+                      -
+                        self:
+                          id: 4006
+                          CType: header
+                          header: 'Heading level 5'
+                          header_layout: 5
+                      -
+                        self:
+                          id: 4007
+                          CType: header
+                          header: 'The default level, rendered as heading 2'
+                          header_layout: 0
+                      -
+                        self:
+                          id: 4008
+                          CType: header
+                          header: 'Hidden, and not displayed'
+                          header_layout: 100
+                      -
+                        self:
+                          id: 4009
+                          CType: header
+                          header: Centred
+                          header_layout: 2
+                          header_position: center
+                      -
+                        self:
+                          id: 4010
+                          CType: header
+                          header: 'At the end of the line'
+                          header_layout: 2
+                          header_position: right
+                      -
+                        self:
+                          id: 4011
+                          CType: header
+                          header: 'At the start of the line'
+                          header_layout: 2
+                          header_position: left
+                      -
+                        self:
+                          id: 4012
+                          CType: header
+                          header: 'No alignment chosen'
+                          header_layout: 2
+                          header_position: ''
+                -
+                  self:
+                    id: 1031
+                    title: Text
+                    slug: /elements/core/text
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4101
+                          CType: header
+                          header: Text
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4102
+                          CType: text
+                          header: 'Running text'
+                          header_layout: 2
+                          bodytext: "<p>The text element renders its header and its rich text, and\nthe rich text goes through the parsing function of the frontend,\nso a <a href=\"t3://page?uid=1035\">link to another page</a> is\nresolved and <strong>strong</strong> and <em>emphasised</em>\nwords keep their meaning.</p>\n<p>A second paragraph, so the space between two of them is on\nthe page as well.</p>"
+                      -
+                        self:
+                          id: 4103
+                          CType: text
+                          header: 'A list and a quotation inside the text'
+                          header_layout: 2
+                          bodytext: "<p>Rich text holds lists and quotations of its own:</p>\n<ul><li>an unordered list,</li><li>with a second item,</li></ul>\n<ol><li>an ordered one,</li><li>numbered by the browser.</li></ol>\n<blockquote><p>A quotation set apart from the text around it.</p></blockquote>"
+                      -
+                        self:
+                          id: 4104
+                          CType: text
+                          bodytext: "<p>This element has no header, so it starts with its text.</p>\n"
+                -
+                  self:
+                    id: 1032
+                    title: 'Text & Images'
+                    slug: /elements/core/textpic
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4201
+                          CType: header
+                          header: 'Text & Images'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4202
+                          CType: textpic
+                          header: 'Above, centred (0)'
+                          header_layout: 2
+                          imageorient: 0
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4203
+                          CType: textpic
+                          header: 'Above, right (1)'
+                          header_layout: 2
+                          imageorient: 1
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4204
+                          CType: textpic
+                          header: 'Above, left (2)'
+                          header_layout: 2
+                          imageorient: 2
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4205
+                          CType: textpic
+                          header: 'Below, centred (8)'
+                          header_layout: 2
+                          imageorient: 8
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4206
+                          CType: textpic
+                          header: 'Below, right (9)'
+                          header_layout: 2
+                          imageorient: 9
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4207
+                          CType: textpic
+                          header: 'Below, left (10)'
+                          header_layout: 2
+                          imageorient: 10
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4208
+                          CType: textpic
+                          header: 'In text, right (17)'
+                          header_layout: 2
+                          imageorient: 17
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4209
+                          CType: textpic
+                          header: 'In text, left (18)'
+                          header_layout: 2
+                          imageorient: 18
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4210
+                          CType: textpic
+                          header: 'In text, right, no wrap (25)'
+                          header_layout: 2
+                          imageorient: 25
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4211
+                          CType: textpic
+                          header: 'In text, left, no wrap (26)'
+                          header_layout: 2
+                          imageorient: 26
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                -
+                  self:
+                    id: 1033
+                    title: 'Text & Media'
+                    slug: /elements/core/textmedia
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4301
+                          CType: header
+                          header: 'Text & Media'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4302
+                          CType: textmedia
+                          header: 'Two files above the text, two columns'
+                          header_layout: 2
+                          imageorient: 0
+                          imagecols: 2
+                          bodytext: "<p>The same gallery as \"Text &amp; Images\", read from the\n<em>assets</em> field, which also takes a video or an audio\nfile. Orientation and columns are the values in the heading.</p>"
+                      -
+                        self:
+                          id: 4303
+                          CType: textmedia
+                          header: 'One file in the text, right'
+                          header_layout: 2
+                          imageorient: 17
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4304
+                          CType: textmedia
+                          header: 'One file in the text, left, no wrap'
+                          header_layout: 2
+                          imageorient: 26
+                          imagecols: 1
+                          bodytext: "<p>The position of the image is the value of\n<em>imageorient</em> in the heading. The core's\n<strong>GalleryProcessor</strong> turns it into a vertical and a\nhorizontal position, and the gallery partial turns those into\nmodifier classes. This paragraph is long enough to run past an\nimage placed in the text, which is what tells the variants that\nlet the text flow back under the image from the ones that keep it\nbeside the image.</p>"
+                      -
+                        self:
+                          id: 4305
+                          CType: textmedia
+                          header: 'Three files below the text, three columns'
+                          header_layout: 2
+                          imageorient: 8
+                          imagecols: 3
+                          bodytext: "<p>The same gallery as \"Text &amp; Images\", read from the\n<em>assets</em> field, which also takes a video or an audio\nfile. Orientation and columns are the values in the heading.</p>"
+                -
+                  self:
+                    id: 1034
+                    title: Images
+                    slug: /elements/core/image
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4401
+                          CType: header
+                          header: Images
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4402
+                          CType: image
+                          header: 'One column'
+                          header_layout: 2
+                          imagecols: 1
+                      -
+                        self:
+                          id: 4403
+                          CType: image
+                          header: 'Two columns'
+                          header_layout: 2
+                          imagecols: 2
+                      -
+                        self:
+                          id: 4404
+                          CType: image
+                          header: 'Three columns'
+                          header_layout: 2
+                          imagecols: 3
+                      -
+                        self:
+                          id: 4405
+                          CType: image
+                          header: 'Four columns'
+                          header_layout: 2
+                          imagecols: 4
+                -
+                  self:
+                    id: 1035
+                    title: 'Bullet list'
+                    slug: /elements/core/bullets
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4501
+                          CType: header
+                          header: 'Bullet list'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4502
+                          CType: bullets
+                          header: 'Bullets or numbers'
+                          header_layout: 2
+                          bullets_type: 0
+                          layout: 0
+                          bodytext: "One item per line, typed into a plain text field\nEach line is escaped, so a typed tag stays text\nThe layout picks the marker of the whole list"
+                      -
+                        self:
+                          id: 4503
+                          CType: bullets
+                          header: 'Check marks'
+                          header_layout: 2
+                          bullets_type: 0
+                          layout: 1
+                          bodytext: "One item per line, typed into a plain text field\nEach line is escaped, so a typed tag stays text\nThe layout picks the marker of the whole list"
+                      -
+                        self:
+                          id: 4504
+                          CType: bullets
+                          header: Icons
+                          header_layout: 2
+                          bullets_type: 0
+                          layout: 2
+                          tx_theme_icon: star
+                          bodytext: "One item per line, typed into a plain text field\nEach line is escaped, so a typed tag stays text\nThe layout picks the marker of the whole list"
+                      -
+                        self:
+                          id: 4505
+                          CType: bullets
+                          header: Inline
+                          header_layout: 2
+                          bullets_type: 0
+                          layout: 3
+                          bodytext: "Header\nText\nBullet list\nTable\nFile links"
+                      -
+                        self:
+                          id: 4506
+                          CType: bullets
+                          header: Numbered
+                          header_layout: 2
+                          bullets_type: 1
+                          layout: 0
+                          bodytext: "Pick the list type \"Numbered list\"\nType one step per line\nSave, and the browser numbers the steps"
+                      -
+                        self:
+                          id: 4507
+                          CType: bullets
+                          header: 'Numbered, with check marks'
+                          header_layout: 2
+                          bullets_type: 1
+                          layout: 1
+                          bodytext: "The list stays ordered for a screen reader\nThe check mark replaces the number on screen"
+                      -
+                        self:
+                          id: 4508
+                          CType: bullets
+                          header: 'Definition list'
+                          header_layout: 2
+                          bullets_type: 2
+                          bodytext: "Bullets or numbers|The markers of the element baseline\nCheck marks|A check mark in front of every item\nIcons|One icon of the set in front of every item\nInline|The items on one line, a hairline between them\nA term without a description\n"
+                -
+                  self:
+                    id: 1036
+                    title: Table
+                    slug: /elements/core/table
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4601
+                          CType: header
+                          header: Table
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4602
+                          CType: table
+                          header: 'Default, with a header row and a footer'
+                          header_layout: 2
+                          table_class: ''
+                          table_caption: 'The spacing scale'
+                          table_delimiter: 124
+                          table_enclosure: 0
+                          table_header_position: 1
+                          table_tfoot: 1
+                          bodytext: "Value|Token|Used for\nextra-small|--theme-space-2|Tight groups\nsmall|--theme-space-4|Related elements\nmedium|--theme-space-6|The default gap\nlarge|--theme-space-8|A new topic\nextra-large|--theme-space-10|A new section"
+                      -
+                        self:
+                          id: 4603
+                          CType: table
+                          header: Striped
+                          header_layout: 2
+                          table_class: striped
+                          table_caption: 'The spacing scale, striped'
+                          table_delimiter: 124
+                          table_enclosure: 0
+                          table_header_position: 1
+                          bodytext: "Value|Token|Used for\nextra-small|--theme-space-2|Tight groups\nsmall|--theme-space-4|Related elements\nmedium|--theme-space-6|The default gap\nlarge|--theme-space-8|A new topic\nextra-large|--theme-space-10|A new section"
+                      -
+                        self:
+                          id: 4604
+                          CType: table
+                          header: Bordered
+                          header_layout: 2
+                          table_class: bordered
+                          table_caption: 'The spacing scale, bordered'
+                          table_delimiter: 124
+                          table_enclosure: 0
+                          table_header_position: 1
+                          bodytext: "Value|Token|Used for\nextra-small|--theme-space-2|Tight groups\nsmall|--theme-space-4|Related elements\nmedium|--theme-space-6|The default gap\nlarge|--theme-space-8|A new topic\nextra-large|--theme-space-10|A new section"
+                      -
+                        self:
+                          id: 4605
+                          CType: table
+                          header: 'Striped columns'
+                          header_layout: 2
+                          table_class: striped-columns
+                          table_caption: 'The spacing scale, striped columns'
+                          table_delimiter: 124
+                          table_enclosure: 0
+                          table_header_position: 1
+                          bodytext: "Value|Token|Used for\nextra-small|--theme-space-2|Tight groups\nsmall|--theme-space-4|Related elements\nmedium|--theme-space-6|The default gap\nlarge|--theme-space-8|A new topic\nextra-large|--theme-space-10|A new section"
+                      -
+                        self:
+                          id: 4606
+                          CType: table
+                          header: Hover
+                          header_layout: 2
+                          table_class: hover
+                          table_caption: 'The spacing scale, a tint on the row under the pointer'
+                          table_delimiter: 124
+                          table_enclosure: 0
+                          table_header_position: 1
+                          bodytext: "Value|Token|Used for\nextra-small|--theme-space-2|Tight groups\nsmall|--theme-space-4|Related elements\nmedium|--theme-space-6|The default gap\nlarge|--theme-space-8|A new topic\nextra-large|--theme-space-10|A new section"
+                      -
+                        self:
+                          id: 4607
+                          CType: table
+                          header: Borderless
+                          header_layout: 2
+                          table_class: borderless
+                          table_caption: 'The spacing scale, borderless'
+                          table_delimiter: 124
+                          table_enclosure: 0
+                          table_header_position: 1
+                          bodytext: "Value|Token|Used for\nextra-small|--theme-space-2|Tight groups\nsmall|--theme-space-4|Related elements\nmedium|--theme-space-6|The default gap\nlarge|--theme-space-8|A new topic\nextra-large|--theme-space-10|A new section"
+                      -
+                        self:
+                          id: 4608
+                          CType: table
+                          header: 'Compact, with a header column'
+                          header_layout: 2
+                          table_class: compact
+                          table_caption: 'The spacing scale, compact'
+                          table_delimiter: 124
+                          table_enclosure: 0
+                          table_header_position: 2
+                          bodytext: "Value|Token|Used for\nextra-small|--theme-space-2|Tight groups\nsmall|--theme-space-4|Related elements\nmedium|--theme-space-6|The default gap\nlarge|--theme-space-8|A new topic\nextra-large|--theme-space-10|A new section"
+                      -
+                        self:
+                          id: 4609
+                          CType: table
+                          header: 'Sticky header'
+                          header_layout: 2
+                          table_class: sticky-header
+                          table_caption: 'The spacing scale, the header row stays in view'
+                          table_delimiter: 124
+                          table_enclosure: 0
+                          table_header_position: 1
+                          bodytext: "Value|Token|Used for\nextra-small|--theme-space-2|Tight groups\nsmall|--theme-space-4|Related elements\nmedium|--theme-space-6|The default gap\nlarge|--theme-space-8|A new topic\nextra-large|--theme-space-10|A new section"
+                -
+                  self:
+                    id: 1037
+                    title: 'File links'
+                    slug: /elements/core/uploads
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4701
+                          CType: header
+                          header: 'File links'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4702
+                          CType: uploads
+                          header: 'Only the file name (0)'
+                          header_layout: 2
+                          uploads_type: 0
+                      -
+                        self:
+                          id: 4703
+                          CType: uploads
+                          header: 'File name and file type icon (1)'
+                          header_layout: 2
+                          uploads_type: 1
+                      -
+                        self:
+                          id: 4704
+                          CType: uploads
+                          header: 'File name and thumbnail, with size and description (2)'
+                          header_layout: 2
+                          uploads_type: 2
+                          filelink_size: 1
+                          uploads_description: 1
+                -
+                  self:
+                    id: 1038
+                    title: Divider
+                    slug: /elements/core/div
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4801
+                          CType: header
+                          header: Divider
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4802
+                          CType: text
+                          header: 'Before the divider'
+                          header_layout: 2
+                          bodytext: '<p>The divider below is an element of its own. Its only field is a name for the backend.</p>'
+                      -
+                        self:
+                          id: 4803
+                          CType: div
+                          header: 'The divider between the two texts'
+                      -
+                        self:
+                          id: 4804
+                          CType: text
+                          header: 'After the divider'
+                          header_layout: 2
+                          bodytext: '<p>A text element again, below the rule.</p>'
+                -
+                  self:
+                    id: 1039
+                    title: 'Plain HTML'
+                    slug: /elements/core/html
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 4901
+                          CType: header
+                          header: 'Plain HTML'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 4902
+                          CType: html
+                          header: 'Keyboard input and a disclosure (name only, not rendered)'
+                          bodytext: "<h2 class=\"theme-content-element__heading\">Keyboard input and a disclosure</h2>\n<p>Written as markup and rendered as written: press\n<kbd><kbd>Ctrl</kbd> + <kbd>K</kbd></kbd> to insert a link in the\nrich text editor. Nothing here was escaped, and no rich text\nprocessing ran over it.</p>\n<details>\n  <summary>Who may use this element?</summary>\n  <p>An administrator, and an editor whose backend group allows the\n  CType explicitly: the field carries \"authMode = explicitAllow\".</p>\n</details>\n"
+                -
+                  self:
+                    id: 1050
+                    title: 'Insert records'
+                    slug: /elements/core/shortcut
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 6001
+                          CType: header
+                          header: 'Insert records'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 6002
+                          CType: text
+                          header: 'What follows is not on this page'
+                          header_layout: 2
+                          bodytext: "<p>The two elements below this text reference elements of the\npages \"Bullet list\" and \"Table\". They are rendered here from the\nrecords on those pages, not copied: change one there, and it\nchanges here.</p>"
+                      -
+                        self:
+                          id: 6003
+                          CType: shortcut
+                          header: 'The check list of the bullet list page (name only, not rendered)'
+                          records: tt_content_4503
+                      -
+                        self:
+                          id: 6004
+                          CType: shortcut
+                          header: 'The inline list, then the striped table (name only, not rendered)'
+                          records: 'tt_content_4505,tt_content_4603'
             -
               self:
                 id: 1007
@@ -604,6 +1230,199 @@ entities:
                       id: 1018
                       header: 'Is anything open at first?'
                       text: '<p>No. Which item a reader meets first is what the order of the items already says.</p>'
+            -
+              self:
+                id: 1051
+                title: Frames
+                slug: /elements/frames
+                backend_layout: content
+                abstract: 'Every frame, every spacing and every header alignment and look of the Appearance tab, one element each.'
+                keywords: 'content elements, appearance'
+              entities:
+                content:
+                  -
+                    self:
+                      id: 6101
+                      CType: header
+                      header: Frames
+                      header_layout: 1
+                  -
+                    self:
+                      id: 6102
+                      CType: text
+                      header: 'The Appearance tab'
+                      header_layout: 2
+                      bodytext: "<p>Every content element carries the same appearance fields,\nwhatever it renders. The frame fills the element with a band, the\nspacing moves it away from its neighbours, and the header palette\naligns the heading and sets its look apart from its level. The\nelements below are text elements, one per value.</p>"
+                  -
+                    self:
+                      id: 6103
+                      CType: text
+                      header: 'Frame: Default'
+                      header_layout: 2
+                      frame_class: default
+                      bodytext: "<p>Running text in the frame of the heading, with\n<a href=\"t3://page?uid=1051\">a link</a> and <strong>strong</strong>\nwords, so the colours of the band are tested on more than one\nrole.</p>"
+                  -
+                    self:
+                      id: 6104
+                      CType: text
+                      header: 'Frame: No frame'
+                      header_layout: 2
+                      frame_class: none
+                      bodytext: "<p>Running text in the frame of the heading, with\n<a href=\"t3://page?uid=1051\">a link</a> and <strong>strong</strong>\nwords, so the colours of the band are tested on more than one\nrole.</p>"
+                  -
+                    self:
+                      id: 6105
+                      CType: text
+                      header: 'Frame: Surface band'
+                      header_layout: 2
+                      frame_class: surface
+                      bodytext: "<p>Running text in the frame of the heading, with\n<a href=\"t3://page?uid=1051\">a link</a> and <strong>strong</strong>\nwords, so the colours of the band are tested on more than one\nrole.</p>"
+                  -
+                    self:
+                      id: 6106
+                      CType: text
+                      header: 'Frame: Raised band'
+                      header_layout: 2
+                      frame_class: raised
+                      bodytext: "<p>Running text in the frame of the heading, with\n<a href=\"t3://page?uid=1051\">a link</a> and <strong>strong</strong>\nwords, so the colours of the band are tested on more than one\nrole.</p>"
+                  -
+                    self:
+                      id: 6107
+                      CType: text
+                      header: 'Frame: Accent band'
+                      header_layout: 2
+                      frame_class: accent
+                      bodytext: "<p>Running text in the frame of the heading, with\n<a href=\"t3://page?uid=1051\">a link</a> and <strong>strong</strong>\nwords, so the colours of the band are tested on more than one\nrole.</p>"
+                  -
+                    self:
+                      id: 6108
+                      CType: text
+                      header: 'Frame: Inverse band'
+                      header_layout: 2
+                      frame_class: inverse
+                      bodytext: "<p>Running text in the frame of the heading, with\n<a href=\"t3://page?uid=1051\">a link</a> and <strong>strong</strong>\nwords, so the colours of the band are tested on more than one\nrole.</p>"
+                  -
+                    self:
+                      id: 6109
+                      CType: text
+                      header: 'Space before and after: extra small'
+                      header_layout: 2
+                      frame_class: surface
+                      space_before_class: extra-small
+                      space_after_class: extra-small
+                      bodytext: '<p>The space before and after this element is the value in its heading.</p>'
+                  -
+                    self:
+                      id: 6110
+                      CType: text
+                      header: 'Space before and after: small'
+                      header_layout: 2
+                      frame_class: surface
+                      space_before_class: small
+                      space_after_class: small
+                      bodytext: '<p>The space before and after this element is the value in its heading.</p>'
+                  -
+                    self:
+                      id: 6111
+                      CType: text
+                      header: 'Space before and after: medium'
+                      header_layout: 2
+                      frame_class: surface
+                      space_before_class: medium
+                      space_after_class: medium
+                      bodytext: '<p>The space before and after this element is the value in its heading.</p>'
+                  -
+                    self:
+                      id: 6112
+                      CType: text
+                      header: 'Space before and after: large'
+                      header_layout: 2
+                      frame_class: surface
+                      space_before_class: large
+                      space_after_class: large
+                      bodytext: '<p>The space before and after this element is the value in its heading.</p>'
+                  -
+                    self:
+                      id: 6113
+                      CType: text
+                      header: 'Space before and after: extra large'
+                      header_layout: 2
+                      frame_class: surface
+                      space_before_class: extra-large
+                      space_after_class: extra-large
+                      bodytext: '<p>The space before and after this element is the value in its heading.</p>'
+                  -
+                    self:
+                      id: 6114
+                      CType: text
+                      header: 'Header centred'
+                      header_layout: 2
+                      header_position: center
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
+                  -
+                    self:
+                      id: 6115
+                      CType: text
+                      header: 'Header at the end of the line'
+                      header_layout: 2
+                      header_position: right
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
+                  -
+                    self:
+                      id: 6116
+                      CType: text
+                      header: 'Header at the start of the line'
+                      header_layout: 2
+                      header_position: left
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
+                  -
+                    self:
+                      id: 6117
+                      CType: text
+                      header: 'A heading 3 in the display size'
+                      header_layout: 3
+                      tx_theme_header_style: display
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
+                  -
+                    self:
+                      id: 6118
+                      CType: text
+                      header: 'A heading 3 like heading 1'
+                      header_layout: 3
+                      tx_theme_header_style: h1
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
+                  -
+                    self:
+                      id: 6119
+                      CType: text
+                      header: 'A heading 3 like heading 2'
+                      header_layout: 3
+                      tx_theme_header_style: h2
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
+                  -
+                    self:
+                      id: 6120
+                      CType: text
+                      header: 'A heading 3 like heading 3'
+                      header_layout: 3
+                      tx_theme_header_style: h3
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
+                  -
+                    self:
+                      id: 6121
+                      CType: text
+                      header: 'A heading 3 like heading 4'
+                      header_layout: 3
+                      tx_theme_header_style: h4
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
+                  -
+                    self:
+                      id: 6122
+                      CType: text
+                      header: 'A heading 3 like heading 5'
+                      header_layout: 3
+                      tx_theme_header_style: h5
+                      bodytext: '<p>The heading of this element is set as its heading says.</p>'
         -
           self:
             id: 1009
