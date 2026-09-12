@@ -26,3 +26,23 @@ defined('TYPO3') or die();
 // "Configuration/TCA/Overrides/sys_template.php", with a trailing slash - the
 // string "SysTemplateTreeBuilder" builds from an "include_static_file" entry.
 $GLOBALS['TYPO3_CONF_VARS']['FE']['contentRenderingTemplates'][] = 'themeextensiondevelopment/Configuration/TypoScript/Static/';
+
+// The rich text preset of the theme, "Configuration/RTE/Theme.yaml", selected
+// by "Configuration/PageTsConfig/Rte.tsconfig". The registration is the same on
+// TYPO3 v13.4 and v14.3 - "Richtext::loadConfigurationFromPreset()" reads this
+// array on both.
+//
+// Only while rte_ckeditor is loaded. The preset imports the processing and
+// editor files of that extension. An import that does not resolve is caught by
+// "YamlFileLoader::processImports()" and logged as an error (#1485784246), so
+// the preset would load without the core processing rules - and "Richtext"
+// resolves it whenever DataHandler saves a rich text field, with or without an
+// editor on screen: one error in the log per save, and a save processed by a
+// preset that has no processing of its own. Unregistered, the page TSconfig
+// names a preset that does not exist, and "Richtext" returns no configuration,
+// exactly as for the core's "default" without rte_ckeditor.
+//
+// "??=": a preset of that name registered before this file stays.
+if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('rte_ckeditor')) {
+    $GLOBALS['TYPO3_CONF_VARS']['RTE']['Presets']['theme'] ??= 'EXT:theme_extension_development/Configuration/RTE/Theme.yaml';
+}

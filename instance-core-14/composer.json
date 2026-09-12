@@ -10,6 +10,7 @@
         "tests/dev-site": "@dev",
         "typo3/cms-felogin": "^14",
         "typo3/cms-install": "^14",
+        "typo3/cms-rte-ckeditor": "^14",
         "typo3/minimal": "^14"
     },
     "config": {

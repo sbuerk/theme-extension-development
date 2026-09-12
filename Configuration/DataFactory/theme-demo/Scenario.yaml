@@ -281,14 +281,17 @@ entities:
                   #
                   # The markup available here is not free-form. This CType's
                   # "bodytext" is declared "enableRichtext", so DataHandler runs
-                  # the RTE "db" transformation over it ON SAVE, and that drops
-                  # every tag outside "RteHtmlParser::$defaultAllowedTagsList"
-                  # (typo3/cms-core, Classes/Html/RteHtmlParser.php) - which has
-                  # b, i, a, p, strong, em, ul, ol, li and so on, but no "code"
-                  # and no "kbd". Seeding one is not an error and reports
-                  # nothing; the tag is simply not in the row afterwards. The
-                  # "html" element further down is the one place on this page
-                  # where it survives, and its copy says so.
+                  # the RTE "db" transformation over it ON SAVE, and which tags
+                  # survive depends on the installation. With rte_ckeditor it is
+                  # the processing of the rich text preset - the theme's own
+                  # imports the core "Processing.yaml", which keeps "code" and
+                  # "kbd". Without it, it is "RteHtmlParser::$defaultAllowedTagsList"
+                  # (typo3/cms-core, Classes/Html/RteHtmlParser.php), which has
+                  # neither. Dropping a tag is not an error and reports nothing;
+                  # it is simply not in the row afterwards. So the copy of this
+                  # element uses neither, and the "html" element further down is
+                  # the one place on this page where they survive in every
+                  # installation - its copy says so.
                   - self:
                         id: 602
                         CType: 'text'
@@ -497,9 +500,11 @@ entities:
                           reached the page untouched. Nothing was escaped and no rich
                           text parsing ran, which is what separates this element from
                           "Text" further up - the <code>code</code> tags in this
-                          sentence survive here and are stripped there, because that
-                          element's field is declared <em>enableRichtext</em> and this
-                          one's is not. Access to raw HTML is not restricted by
+                          sentence survive here in every installation. That
+                          element's field is declared <em>enableRichtext</em>, so a
+                          save keeps only what the processing of the rich text preset
+                          allows: <code>code</code> with the theme's preset, nothing
+                          of the kind without the rich text editor installed. Access to raw HTML is not restricted by
                           anything in the frontend: the <code>CType</code> field
                           carries <code>authMode = explicitAllow</code>, so a
                           non-admin editor can only pick it if a backend group grants

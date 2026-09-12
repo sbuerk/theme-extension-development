@@ -35,3 +35,6 @@
 # this file for the same reason as the backend layouts - it reaches both
 # delivery paths, where the page TSconfig of a site set would reach only one.
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/ContentElementAppearance.tsconfig'
+
+# The rich text preset of the theme, for the same reason: both delivery paths.
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/Rte.tsconfig'
