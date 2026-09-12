@@ -59,6 +59,18 @@ the installed v14.3.6 core, not only argued from the changelog. See
 :file:`docs/architecture/content-elements.md` in the developer documentation
 for the full verification and the reasoning for leaving it unconditional.
 
+Both delivery paths
+===================
+
+The rendering the core generates for a plugin is added to a site using site
+sets unconditionally, but to a site configured through a :sql:`sys_template`
+record only right after a static include that is registered as a content
+rendering template - the role ``fluid_styled_content`` plays for the
+installations that use it. The theme's static include is registered as one,
+so a plugin renders there as well. Before, a site using the static include
+rendered every other content element and showed the "no rendering
+definition" notice for plugins alone.
+
 Impact
 ======
 

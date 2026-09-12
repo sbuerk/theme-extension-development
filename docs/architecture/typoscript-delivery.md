@@ -149,6 +149,34 @@ though the CType it renders is gone on v14.
 Every classic CType `EXT:frontend` registers is now covered — see
 [Content elements](content-elements.md) for the full table.
 
+## Plugins, and the static include as a content rendering template
+
+`ExtensionUtility::configurePlugin()` adds the rendering of every plugin
+`CType` with `addTypoScript(…, 'defaultContentRendering')`. The two delivery
+paths treat that key differently (`SysTemplateTreeBuilder`, read on v13.4 and
+v14.3):
+
+- a site using sets gets it unconditionally
+  (`createSiteTemplateInclude()`);
+- a `sys_template` site gets it only right after a static include listed in
+  `$GLOBALS['TYPO3_CONF_VARS']['FE']['contentRenderingTemplates']`
+  (`addStaticMagicFromGlobals()`) — the slot `fluid_styled_content` fills for
+  the installations that use it.
+
+The theme's static include was not listed, so on the static path every classic
+and every `theme_*` element rendered and every plugin — EXT:felogin's login
+form among them — fell through to the "no rendering definition" notice.
+`ext_localconf.php` now registers it, as
+`themeextensiondevelopment/Configuration/TypoScript/Static/`: the extension key
+without underscores and the registered path with a trailing slash, the string
+the tree builder derives from an `include_static_file` entry.
+
+It only takes effect for an `include_static_file` entry. A test that imports the
+two static files directly into a `sys_template` renders the theme without any
+plugin rendering, which is why `ExtbasePluginStaticIncludeRenderingTest` sets
+`include_static_file`.
+`ExtbasePluginRenderingTest` covers the set path.
+
 The `image` element is rendered through two core data processors, both in
 EXT:frontend: `FilesProcessor` resolves the references of the `image` field and
 `GalleryProcessor` turns `imagecols`, `imageorient`, `imagewidth`, `imageheight`
@@ -176,15 +204,16 @@ had deliberately hidden.
 
 ## What the tests cover
 
-| Test                                           | Proves                                                                             |
-|------------------------------------------------|------------------------------------------------------------------------------------|
-| `SiteSetRenderingTest`                         | A page renders through the set, with **no** `sys_template`.                        |
-| `StaticTypoScriptFallbackRenderingTest`        | A page renders through the static include, with no set.                            |
-| `StaticTypoScriptIncludeTest`                  | The static include is registered in the TCA at all.                                |
-| `ContentElementRenderingTest`                  | `header` and `text` render, and the core error notice does not appear.             |
-| `ImageElementRenderingTest`                    | The `image` element renders, and its backend fields reach the output.              |
-| `DevelopmentInstance/LegacyDeliveryTest`       | The seeded showcase renders the same markup through both mechanisms.               |
-| `DevelopmentInstance/DeliveryRegistrationTest` | Every static include of the seeded `sys_template` root resolves and is registered. |
+| Test                                           | Proves                                                                               |
+|------------------------------------------------|--------------------------------------------------------------------------------------|
+| `SiteSetRenderingTest`                         | A page renders through the set, with **no** `sys_template`.                          |
+| `StaticTypoScriptFallbackRenderingTest`        | A page renders through the static include, with no set.                              |
+| `StaticTypoScriptIncludeTest`                  | The static include is registered in the TCA at all.                                  |
+| `ContentElementRenderingTest`                  | `header` and `text` render, and the core error notice does not appear.               |
+| `ImageElementRenderingTest`                    | The `image` element renders, and its backend fields reach the output.                |
+| `ExtbasePluginStaticIncludeRenderingTest`      | An Extbase plugin renders through the static include, not only through the set.      |
+| `DevelopmentInstance/LegacyDeliveryTest`       | The seeded showcase renders the same markup through both mechanisms.                 |
+| `DevelopmentInstance/DeliveryRegistrationTest` | Every static include of the seeded `sys_template` root resolves and is registered.   |
 
 The first two cover the two branches of the guard condition. Both were shown to
 fail: renaming the set breaks the first, inverting the condition breaks the
