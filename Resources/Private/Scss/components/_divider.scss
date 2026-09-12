@@ -1,0 +1,86 @@
+// Divider.
+//
+// Markup contract:
+//
+//     <div class="theme-divider" role="separator" aria-label="Part two">
+//         <span class="theme-divider__label">Part two</span>
+//     </div>
+//
+//     <div class="theme-divider theme-divider--break" role="separator">
+//         <span class="theme-divider__glyph" aria-hidden="true">⁂</span>
+//     </div>
+//
+// A separator with a label, and a section break. Modifiers: "--start" puts the
+// label at the inline start instead of the middle; "--break" is the break
+// between two passages of the same section, an asterism rather than a rule.
+//
+// The asterism is text in the markup, not generated content: the stylesheet
+// draws no glyph (see "docs/development/icons.md"), and "__glyph" only sets
+// it. It is "aria-hidden" - the separator role says what it is.
+//
+// --- Why a "div" with "role=separator", and why "aria-label" ------------
+//
+// "<hr>" is the separator element, but it is a void element and cannot hold a
+// label. "role=separator" on a "div" is the same thing to assistive
+// technology. A separator's children are presentational, so the visible label
+// is not its name: the name is "aria-label", which repeats the label text. A
+// break without a label needs none - it separates, and says nothing more.
+//
+// The lines are borders of two generated boxes either side of the label, so
+// they survive forced colours, and the label is never struck through.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-divider {
+    --theme-divider-rule-color: var(--theme-color-border, #d6dce6);
+    --theme-divider-label-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-divider-gap: var(--theme-space-3, 0.9375rem);
+    --theme-divider-spacing: var(--theme-space-6, 1.875rem);
+    --theme-divider-start-rule: var(--theme-space-4, 1.25rem);
+
+    display: flex;
+    align-items: center;
+    gap: var(--theme-divider-gap);
+    margin: var(--theme-divider-spacing) 0;
+
+    &::before,
+    &::after {
+        content: '';
+        flex: 1 1 0;
+        border-block-start: var(--theme-border-width, 1px) solid var(--theme-divider-rule-color);
+    }
+}
+
+// Set like the eyebrow: capitals at the caption size, so a label between two
+// passages reads as a label and not as a line of text that lost its paragraph.
+.theme-divider__label {
+    color: var(--theme-divider-label-color);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-caps);
+    line-height: var(--theme-line-height-snug);
+    text-transform: uppercase;
+}
+
+.theme-divider--start::before {
+    flex: 0 0 var(--theme-divider-start-rule);
+}
+
+// A break has no rules either side of it, only the asterism of the markup.
+.theme-divider--break {
+    justify-content: center;
+
+    &::before,
+    &::after {
+        content: none;
+    }
+}
+
+// The asterism, U+2042, is small within its em; at the body sizes it reads as
+// a speck, so it is set at the size of a second level heading.
+.theme-divider__glyph {
+    color: var(--theme-divider-label-color);
+    font-size: var(--theme-font-size-xl, 1.5rem);
+    line-height: 1;
+}

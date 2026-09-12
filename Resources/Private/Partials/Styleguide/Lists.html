@@ -1,0 +1,180 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    Styleguide section "lists" - ".theme-list" and ".theme-dl".
+
+    Contracts: "Resources/Private/Scss/components/_list.scss" and
+    "components/_description-list.scss". The bare element lists without a
+    class stay in Typography; this section is what the two components add on
+    top of them. Literal markup only, specimen copy in English.
+
+    Icons. The "theme-list__icon" slot holds "<theme:icon>", as every icon of
+    the theme; the check list draws the set's "check" through a CSS mask. Both
+    are icons of the vendored set - see "docs/development/icons.md".
+</f:comment>
+<section class="theme-styleguide__section" id="lists">
+    <h2 class="theme-styleguide__heading">Lists</h2>
+
+    <h3>Unstyled, and a nested list</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--unstyled</code> drops the marker and the indent of the list
+            it sits on, and of that list only: a list nested in one of its
+            items keeps the element baseline, markers and all, unless it
+            carries the class itself.
+        </p>
+        <ul class="theme-list theme-list--unstyled">
+            <li>An item with neither marker nor indent.</li>
+            <li>
+                An item holding a nested list:
+                <ul>
+                    <li>The nested list is a plain one.</li>
+                    <li>It keeps its markers.</li>
+                </ul>
+            </li>
+            <li>The last item.</li>
+        </ul>
+    </div>
+
+    <h3>Inline</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            One row that wraps, with a hairline between the items - a border,
+            not a character, so there is nothing for a screen reader to read
+            out between them and nothing that changes with the font.
+        </p>
+        <ul class="theme-list theme-list--inline">
+            <li>Site set</li>
+            <li>Static include</li>
+            <li>Styleguide</li>
+            <li>Forms</li>
+        </ul>
+    </div>
+
+    <h3>Check marks</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            One marker for every item: the <code>check</code> of the icon set,
+            which the stylesheet paints through a CSS mask in the success
+            accent, so a list needs no markup per item. It has the same shape
+            in every font, and under forced colours it is drawn in the text
+            colour.
+        </p>
+        <ul class="theme-list theme-list--check">
+            <li>Every component reads its values through a token.</li>
+            <li>
+                An item long enough to wrap shows that the text of every line
+                stays aligned past the marker instead of running back under it,
+                which is what a hanging marker is for.
+            </li>
+            <li>Both appearances and every palette are tested.</li>
+        </ul>
+    </div>
+
+    <h3>Icons</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            An icon per item, from the <code>theme-list__icon</code> slot,
+            rendered by the icon ViewHelper: one em square and centred on the
+            first line, in the primary accent, and hidden from assistive
+            technology because the text of the item is its content.
+        </p>
+        <ul class="theme-list theme-list--icon">
+            <li><span class="theme-list__icon" aria-hidden="true"><theme:icon name="folder" /></span>Configuration below <code>Configuration/Sets/</code>.</li>
+            <li><span class="theme-list__icon" aria-hidden="true"><theme:icon name="file-code" /></span>Templates below <code>Resources/Private/</code>, the compiled stylesheet below <code>Resources/Public/</code>.</li>
+            <li><span class="theme-list__icon" aria-hidden="true"><theme:icon name="flask" /></span>Tests below <code>Tests/</code>.</li>
+        </ul>
+    </div>
+
+    <h3>Columns</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The items flow into two or three columns where each column gets at
+            least 12 rem, and into fewer where it does not - a phone gets one.
+            The order runs down the first column before the second, and no
+            item is split across two.
+        </p>
+        <ul class="theme-list theme-list--columns-3">
+            <li>Accordion</li>
+            <li>Alert</li>
+            <li>Author</li>
+            <li>Badge</li>
+            <li>Breadcrumb</li>
+            <li>Button</li>
+            <li>Card</li>
+            <li>Code block</li>
+            <li>Dialog</li>
+        </ul>
+        <ol class="theme-list theme-list--columns-2 theme-list--check">
+            <li>Install the dependencies.</li>
+            <li>Build the stylesheet.</li>
+            <li>Run the unit tests.</li>
+            <li>Run the functional tests.</li>
+        </ol>
+    </div>
+
+    <h3>Divided</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            No markers, and a hairline between the rows instead - for a list
+            whose items are records rather than points of an argument.
+        </p>
+        <ul class="theme-list theme-list--divided">
+            <li>Release 2.0.0 - <time datetime="2026-09-01">1 September 2026</time></li>
+            <li>Release 1.4.2 - <time datetime="2026-07-14">14 July 2026</time></li>
+            <li>Release 1.4.1 - <time datetime="2026-06-30">30 June 2026</time></li>
+        </ul>
+    </div>
+
+    <h3>Description list</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Stacked, the component differs from the element baseline in one
+            thing: a description is not indented. A term may carry several
+            descriptions.
+        </p>
+        <dl class="theme-dl">
+            <dt>Site set</dt>
+            <dd>The configuration a site depends on in its own configuration.</dd>
+            <dt>Static include</dt>
+            <dd>The same TypoScript, included through a template record.</dd>
+            <dd>Kept for installations that do not use site sets.</dd>
+        </dl>
+        <p>
+            Horizontal, the terms take a column of their own from the medium
+            breakpoint up. A description of several paragraphs and a nested
+            list stay in the second column.
+        </p>
+        <dl class="theme-dl theme-dl--horizontal">
+            <dt>Appearance</dt>
+            <dd>Light, dark, or whatever the operating system prefers.</dd>
+            <dt>Palette</dt>
+            <dd>
+                <p>One of five sets of accents; neutrals stay the same in all of them.</p>
+                <p>The last paragraph of a description drops its bottom margin to the rhythm of the grid.</p>
+            </dd>
+            <dt>Nested</dt>
+            <dd>
+                <dl class="theme-dl theme-dl--horizontal">
+                    <dt>Inner term</dt>
+                    <dd>A description list inside a description.</dd>
+                </dl>
+            </dd>
+        </dl>
+        <p>
+            <code>--truncate</code> keeps every term on one line and cuts it
+            with an ellipsis. It is opt-in, for terms that are identifiers or
+            paths - text cut off by default would be text nobody asked to hide.
+        </p>
+        <dl class="theme-dl theme-dl--horizontal theme-dl--truncate">
+            <dt title="Resources/Private/Scss/components/_description-list.scss">Resources/Private/Scss/components/_description-list.scss</dt>
+            <dd>The component this section demonstrates.</dd>
+            <dt>theme.css</dt>
+            <dd>The compiled stylesheet.</dd>
+        </dl>
+    </div>
+</section>
+
+</html>

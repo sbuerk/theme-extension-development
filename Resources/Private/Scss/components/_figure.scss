@@ -1,0 +1,110 @@
+// Figure.
+//
+// Markup contract:
+//
+//     <figure class="theme-figure theme-figure--float-start">
+//         <img class="theme-figure__media" src="…" alt="…" width="…" height="…">
+//         <figcaption class="theme-figure__caption">
+//             …
+//             <small class="theme-figure__credit">…</small>
+//         </figcaption>
+//     </figure>
+//
+// Modifiers: "--caption-end" aligns the caption to the inline end;
+// "--float-start" and "--float-end" float the figure to that side of the
+// running text around it, from "bp.$md" up - below it a figure takes the
+// full width, because text beside a half-width image on a phone is a column
+// of three words. "__media" is the "img", or a "picture" or a link around one.
+// "__credit" is optional and goes on a line of its own.
+//
+// ".theme-gallery" builds on this: every item of a gallery is a
+// ".theme-figure" with a ".theme-figure__caption", and the gallery keeps its
+// own layout rules, which follow this file in the cascade and win where the two
+// meet. See "components/_gallery.scss" for the gallery's own float, which
+// floats the whole gallery rather than one of its items.
+//
+// --- Floats are logical, and contained by whoever holds them --------------
+//
+// "float: inline-start" rather than "left": the editor's "left" in a
+// right-to-left page is the start of the line, which is its right side, like
+// every other position in this library. A floated figure hangs out of the
+// bottom of a box whose text is shorter than the image, into whatever comes
+// next; so any element that has one as a direct child becomes a block
+// formatting context and contains it. That is the rule at the end of this
+// file - wrapped in ":where()" so it adds no specificity, and keyed on the
+// child rather than on a class of the container, because the container is
+// whatever the template or the rich text put there.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-figure {
+    --theme-figure-caption-gap: var(--theme-space-2, 0.625rem);
+    --theme-figure-caption-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-figure-credit-color: var(--theme-color-text-muted, #616b80);
+    --theme-figure-float-width: 50%;
+    --theme-figure-float-gap: var(--theme-space-5, 1.5625rem);
+
+    // As wide as its image, not as the column: a caption aligned to the end
+    // belongs under the end of the image, not at the far edge of the column
+    // next to it. A caption longer than the image widens the figure up to the
+    // column, and wraps there.
+    inline-size: fit-content;
+    max-inline-size: 100%;
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+}
+
+.theme-figure__media {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+}
+
+.theme-figure__caption {
+    margin-block-start: var(--theme-figure-caption-gap);
+    color: var(--theme-figure-caption-color);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    text-align: start;
+}
+
+.theme-figure--caption-end .theme-figure__caption {
+    text-align: end;
+}
+
+// The caption role's small print, on a line of its own and one step quieter
+// than the caption it closes.
+.theme-figure__credit {
+    display: block;
+    margin-block-start: var(--theme-space-1, 0.3125rem);
+    color: var(--theme-figure-credit-color);
+}
+
+@media (min-width: bp.$md) {
+    .theme-figure--float-start,
+    .theme-figure--float-end {
+        max-inline-size: var(--theme-figure-float-width);
+        margin-block-end: var(--theme-space-3, 0.9375rem);
+    }
+
+    .theme-figure--float-start {
+        float: inline-start;
+        margin-inline-end: var(--theme-figure-float-gap);
+    }
+
+    .theme-figure--float-end {
+        float: inline-end;
+        margin-inline-start: var(--theme-figure-float-gap);
+    }
+}
+
+:where(:has(> .theme-figure--float-start, > .theme-figure--float-end)) {
+    display: flow-root;
+}
+
+// A list item stays a list item: "flow-root" alone would replace its
+// "list-item" display and drop its marker. The two-keyword value keeps both.
+:where(li:has(> .theme-figure--float-start, > .theme-figure--float-end)) {
+    display: flow-root list-item;
+}

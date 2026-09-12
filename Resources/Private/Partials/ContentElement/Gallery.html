@@ -13,14 +13,23 @@
     The width and height are rendered as attributes rather than left to CSS.
     They are what lets the browser reserve the box before the image has loaded,
     which is the difference between a page that settles and a page that jumps.
+
+    "intext" - the text flows around the gallery - is translated into a float:
+    "--float-start" for "In text, left", "--float-end" for "In text, right",
+    and "--nowrap" on top for the two "no wrap" variants. The processor's own
+    two positions stay on the wrapper as they were. See
+    "components/_gallery.scss" for why the modifiers are logical.
+
+    Every item is a ".theme-figure" as well, and its caption a
+    ".theme-figure__caption" - the figure component the gallery builds on.
 </f:comment>
 <f:if condition="{gallery.count.files}">
-    <div class="theme-gallery theme-gallery--{gallery.position.vertical} theme-gallery--{gallery.position.horizontal}"
+    <div class="theme-gallery theme-gallery--{gallery.position.vertical} theme-gallery--{gallery.position.horizontal}{f:render(section: 'FloatModifiers', arguments: {position: gallery.position})}"
          data-theme-gallery-columns="{gallery.count.columns}">
         <f:for each="{gallery.rows}" as="row">
             <div class="theme-gallery__row">
                 <f:for each="{row.columns}" as="column">
-                    <figure class="theme-gallery__item">
+                    <figure class="theme-gallery__item theme-figure">
                         <f:if condition="{data.image_zoom}">
                             <f:then>
                                 <f:comment>
@@ -39,7 +48,7 @@
                             </f:else>
                         </f:if>
                         <f:if condition="{column.media.description}">
-                            <figcaption class="theme-gallery__caption">{column.media.description}</figcaption>
+                            <figcaption class="theme-gallery__caption theme-figure__caption">{column.media.description}</figcaption>
                         </f:if>
                     </figure>
                 </f:for>
@@ -47,6 +56,12 @@
         </f:for>
     </div>
 </f:if>
+
+<f:comment>
+    One line on purpose: the output lands inside the "class" attribute, and a
+    line break there would be part of the attribute value.
+</f:comment>
+<f:section name="FloatModifiers"><f:if condition="{position.vertical} == 'intext'"><f:if condition="{position.horizontal} == 'left'"><f:then> theme-gallery--float-start</f:then><f:else> theme-gallery--float-end</f:else></f:if><f:if condition="{position.noWrap}"> theme-gallery--nowrap</f:if></f:if></f:section>
 
 <f:section name="Media">
     <f:comment>

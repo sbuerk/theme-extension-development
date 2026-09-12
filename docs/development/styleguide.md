@@ -9,7 +9,7 @@ selected.
 
 The implementation is
 [`Resources/Private/Templates/Page/Styleguide.html`](../../Resources/Private/Templates/Page/Styleguide.html),
-the nine partials below
+the ten partials below
 [`Resources/Private/Partials/Styleguide/`](../../Resources/Private/Partials/Styleguide),
 the page furniture in
 [`Resources/Private/Scss/layout/_styleguide.scss`](../../Resources/Private/Scss/layout/_styleguide.scss)
@@ -66,37 +66,38 @@ is `999` because that is a value nothing renders. Its label is a distinct
 module does not suggest it behaves like the main column of the other layouts.
 
 **The template contains no `f:cObject`.** Not in
-`Templates/Page/Styleguide.html`, not in any of the nine partials — not even
+`Templates/Page/Styleguide.html`, not in any of the ten partials — not even
 for `main`. A single one would quietly make this a content page again, and the
 difference would surface only the first time somebody happened to place an
 element on it. The absence is asserted, not reviewed
 ([below](#what-the-tests-guard)).
 
-## Nine sections, nine partials
+## Ten sections, ten partials
 
 `Templates/Page/Styleguide.html` renders a heading, an intro, a section index
 and then one `f:render partial` per section, in this order:
 
-| Partial            | Section `id`  | Demonstrates                                                                                                                                                                                                                                                                                                         |
-|--------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Tokens.html`      | `tokens`      | All 27 colour tokens as swatches, the type scale, weight and family, spacing, radius, shadow, focus ring.                                                                                                                                                                                                            |
-| `Typography.html`  | `typography`  | The element baseline of `base/_elements.scss` — headings with and without secondary text, running text, the measure, language and direction, inline elements, lists, quotes, `pre`/`code`, `hr`, address, time, a bare disclosure — the text roles and display sizes of `components/_text.scss`, and `.theme-table`. |
-| `Buttons.html`     | `buttons`     | `.theme-button` with every modifier and state its SCSS defines, `.theme-close`, `.theme-button-group` and its `--attached` variant, `.theme-badge` on both axes.                                                                                                                                                     |
-| `Icons.html`       | `icons`       | Every icon the theme uses, by name, where it is used, the sizes an icon takes, and a labelled icon next to the decorative ones.                                                                                                                                                                                      |
-| `Boxes.html`       | `boxes`       | `.theme-card`, `.theme-panel`, `.theme-teaser`, `.theme-hero`, `.theme-quote`, `.theme-alert` in all six kinds, `.theme-accordion`, `.theme-author`.                                                                                                                                                                 |
-| `Interactive.html` | `interactive` | The three components that need the theme's script — `.theme-tabs`, `.theme-dialog`, `.theme-tooltip` — and what each does without it.                                                                                                                                                                                |
-| `Forms.html`       | `forms`       | The whole `forms/` contract, selector by selector, including the validation states, `.theme-input-group` and `.theme-choice-group`.                                                                                                                                                                                  |
-| `Navigation.html`  | `navigation`  | `.theme-nav-main`, `.theme-nav-sub`, `.theme-breadcrumb`, `.theme-pagination`, `.theme-content-menu`.                                                                                                                                                                                                                |
-| `Media.html`       | `media`       | `.theme-gallery` in one, two and three columns, and `.theme-content-element` with its outline switch.                                                                                                                                                                                                                |
+| Partial            | Section `id`  | Demonstrates                                                                                                                                                                                                                                                                                                                                         |
+|--------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Tokens.html`      | `tokens`      | All 27 colour tokens as swatches, the type scale, weight and family, spacing, radius, shadow, focus ring.                                                                                                                                                                                                                                            |
+| `Typography.html`  | `typography`  | The element baseline of `base/_elements.scss` — headings with and without secondary text, running text, the measure, language and direction, inline elements, lists, quotes, `pre`/`code`, `hr`, address, time, a bare disclosure — the text roles and display sizes of `components/_text.scss`, `.theme-code`, `.theme-divider` and `.theme-table`. |
+| `Lists.html`       | `lists`       | `.theme-list` with every modifier, the `__icon` slot with icons of the set, and `.theme-dl` stacked, horizontal, nested and truncated.                                                                                                                                                                                                               |
+| `Buttons.html`     | `buttons`     | `.theme-button` with every modifier and state its SCSS defines, `.theme-close`, `.theme-button-group` and its `--attached` variant, `.theme-badge` on both axes.                                                                                                                                                                                     |
+| `Icons.html`       | `icons`       | Every icon the theme uses, by name, where it is used, the sizes an icon takes, and a labelled icon next to the decorative ones.                                                                                                                                                                                                                      |
+| `Boxes.html`       | `boxes`       | `.theme-card`, `.theme-panel`, `.theme-teaser`, `.theme-hero`, `.theme-quote`, `.theme-alert` in all six kinds, `.theme-accordion`, `.theme-author`.                                                                                                                                                                                                 |
+| `Interactive.html` | `interactive` | The three components that need the theme's script — `.theme-tabs`, `.theme-dialog`, `.theme-tooltip` — and what each does without it.                                                                                                                                                                                                                |
+| `Forms.html`       | `forms`       | The whole `forms/` contract, selector by selector, including the validation states, `.theme-input-group` and `.theme-choice-group`.                                                                                                                                                                                                                  |
+| `Navigation.html`  | `navigation`  | `.theme-nav-main`, `.theme-nav-sub`, `.theme-breadcrumb`, `.theme-pagination`, `.theme-content-menu`.                                                                                                                                                                                                                                                |
+| `Media.html`       | `media`       | `.theme-gallery` in one, two and three columns and floated in text, `.theme-figure` with its caption, credit and floats, and `.theme-content-element` with its outline switch.                                                                                                                                                                       |
 
 Each partial is a single `<section class="theme-styleguide__section" id="…">`
 and nothing else — no `f:layout`, no `f:section`, no wrapper. The page template
-is what places them, and the index at the top is built from the same nine ids.
+is what places them, and the index at the top is built from the same ten ids.
 
 The split follows the same rule as the rest of the theme: a site package that
 wants its own forms section overrides **one file**,
-`Partials/Styleguide/Forms.html`, and keeps the other eight. Overriding the page
-template instead would mean re-stating all nine renders and the index to
+`Partials/Styleguide/Forms.html`, and keeps the other nine. Overriding the page
+template instead would mean re-stating all ten renders and the index to
 change one section.
 
 `Icons.html` lists the icons the templates use, not the 2001 that ship: a
@@ -206,7 +207,7 @@ frontend sub-request against `Fixtures/Database/StyleguidePage.csv`:
 | Test                                                        | Guards                                                                                                                    |
 |-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `everyComponentOfTheLibraryIsShownOnTheStyleguide`          | Every component of the library appears on the page. Data provider, one case per component.                                |
-| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the nine ids renders **and** is linked from the index — no dead anchor.                                           |
+| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the ten ids renders **and** is linked from the index — no dead anchor.                                            |
 | `contentPlacedOnTheStyleguidePageIsNotRendered`             | Neither the element in `colPos 999` nor the one in `colPos 0` reaches the frontend.                                       |
 | `theFormsSectionShowsTheInvalidState`                       | `.theme-field--invalid`, `aria-invalid="true"`, `.theme-field__error`, `.theme-form-summary`.                             |
 | `everyColourTokenHasASwatch`                                | Every `--theme-color-*` token declared in `abstracts/_tokens.scss` has a swatch.                                          |

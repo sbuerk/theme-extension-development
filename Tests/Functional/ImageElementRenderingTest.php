@@ -88,7 +88,7 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         $body = $this->renderRootPage();
 
         // One, two, one and none: the fourth element references no file at all.
-        $this->assertSame(4, substr_count($body, '<figure class="theme-gallery__item">'));
+        $this->assertSame(4, substr_count($body, '<figure class="theme-gallery__item theme-figure">'));
     }
 
     #[Test]
@@ -161,7 +161,7 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
 
         $this->assertStringContainsString('alt="A placeholder image"', $body);
         $this->assertStringContainsString(
-            '<figcaption class="theme-gallery__caption">The caption of the image</figcaption>',
+            '<figcaption class="theme-gallery__caption theme-figure__caption">The caption of the image</figcaption>',
             $body,
         );
     }

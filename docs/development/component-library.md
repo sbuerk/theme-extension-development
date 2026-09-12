@@ -22,55 +22,61 @@ against, and the rename was cheap while only one template depended on it.
 
 ## Component reference
 
-| Component               | Root class                | File                               |
-|-------------------------|---------------------------|------------------------------------|
-| Accordion               | `.theme-accordion`        | `components/_accordion.scss`       |
-| Alert                   | `.theme-alert`            | `components/_alert.scss`           |
-| Author                  | `.theme-author`           | `components/_author.scss`          |
-| Badge                   | `.theme-badge`            | `components/_badge.scss`           |
-| Breadcrumb              | `.theme-breadcrumb`       | `components/_breadcrumb.scss`      |
-| Button                  | `.theme-button`           | `components/_button.scss`          |
-| Card                    | `.theme-card`             | `components/_card.scss`            |
-| Close button            | `.theme-close`            | `components/_close.scss`           |
-| Content element wrapper | `.theme-content-element`  | `components/_content-element.scss` |
-| Content menu            | `.theme-content-menu`     | `components/_content-menu.scss`    |
-| Display settings        | `.theme-settings`         | `components/_settings.scss`        |
-| Dialog                  | `.theme-dialog`           | `components/_dialog.scss`          |
-| Gallery                 | `.theme-gallery`          | `components/_gallery.scss`         |
-| Hero                    | `.theme-hero`             | `components/_hero.scss`            |
-| Icon                    | `.theme-icon`             | `components/_icon.scss`            |
-| Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`        |
-| Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`         |
-| Pagination              | `.theme-pagination__list` | `components/_pagination.scss`      |
-| Panel                   | `.theme-panel`            | `components/_panel.scss`           |
-| Quote                   | `.theme-quote`            | `components/_quote.scss`           |
-| Segmented control       | `.theme-segmented`        | `components/_settings.scss`        |
-| Palette swatch          | `.theme-swatch`           | `components/_settings.scss`        |
-| Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`       |
-| Table                   | `.theme-table-wrapper`    | `components/_table.scss`           |
-| Tabs                    | `.theme-tabs`             | `components/_tabs.scss`            |
-| Teaser                  | `.theme-teaser`           | `components/_teaser.scss`          |
-| Text: display           | `.theme-display`          | `components/_text.scss`            |
-| Text: eyebrow           | `.theme-eyebrow`          | `components/_text.scss`            |
-| Text: lead              | `.theme-lead`             | `components/_text.scss`            |
-| Tooltip                 | `.theme-tooltip`          | `components/_tooltip.scss`         |
-| Form controls           | `.theme-input`            | `forms/_controls.scss`             |
-| Form switch             | `.theme-switch`           | `forms/_controls.scss`             |
-| Form field wrapper      | `.theme-field`            | `forms/_field.scss`                |
-| Form choice group       | `.theme-choice-group`     | `forms/_choice-group.scss`         |
-| Form input group        | `.theme-input-group`      | `forms/_input-group.scss`          |
-| Form validation         | `.theme-field--invalid`   | `forms/_validation.scss`           |
-| Page frame              | `.theme-page`             | `layout/_page.scss`                |
-| Site header             | `.theme-site-header`      | `layout/_site-header.scss`         |
-| Site footer             | `.theme-site-footer`      | `layout/_site-footer.scss`         |
-| Styleguide page         | `.theme-styleguide`       | `layout/_styleguide.scss`          |
+| Component               | Root class                | File                                |
+|-------------------------|---------------------------|-------------------------------------|
+| Accordion               | `.theme-accordion`        | `components/_accordion.scss`        |
+| Alert                   | `.theme-alert`            | `components/_alert.scss`            |
+| Author                  | `.theme-author`           | `components/_author.scss`           |
+| Badge                   | `.theme-badge`            | `components/_badge.scss`            |
+| Breadcrumb              | `.theme-breadcrumb`       | `components/_breadcrumb.scss`       |
+| Button                  | `.theme-button`           | `components/_button.scss`           |
+| Card                    | `.theme-card`             | `components/_card.scss`             |
+| Close button            | `.theme-close`            | `components/_close.scss`            |
+| Code block              | `.theme-code`             | `components/_code.scss`             |
+| Content element wrapper | `.theme-content-element`  | `components/_content-element.scss`  |
+| Content menu            | `.theme-content-menu`     | `components/_content-menu.scss`     |
+| Description list        | `.theme-dl`               | `components/_description-list.scss` |
+| Display settings        | `.theme-settings`         | `components/_settings.scss`         |
+| Dialog                  | `.theme-dialog`           | `components/_dialog.scss`           |
+| Divider                 | `.theme-divider`          | `components/_divider.scss`          |
+| Figure                  | `.theme-figure`           | `components/_figure.scss`           |
+| Gallery                 | `.theme-gallery`          | `components/_gallery.scss`          |
+| Hero                    | `.theme-hero`             | `components/_hero.scss`             |
+| Icon                    | `.theme-icon`             | `components/_icon.scss`             |
+| List                    | `.theme-list`             | `components/_list.scss`             |
+| Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`         |
+| Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`          |
+| Pagination              | `.theme-pagination__list` | `components/_pagination.scss`       |
+| Panel                   | `.theme-panel`            | `components/_panel.scss`            |
+| Quote                   | `.theme-quote`            | `components/_quote.scss`            |
+| Segmented control       | `.theme-segmented`        | `components/_settings.scss`         |
+| Palette swatch          | `.theme-swatch`           | `components/_settings.scss`         |
+| Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`        |
+| Table                   | `.theme-table-wrapper`    | `components/_table.scss`            |
+| Tabs                    | `.theme-tabs`             | `components/_tabs.scss`             |
+| Teaser                  | `.theme-teaser`           | `components/_teaser.scss`           |
+| Text: display           | `.theme-display`          | `components/_text.scss`             |
+| Text: eyebrow           | `.theme-eyebrow`          | `components/_text.scss`             |
+| Text: lead              | `.theme-lead`             | `components/_text.scss`             |
+| Tooltip                 | `.theme-tooltip`          | `components/_tooltip.scss`          |
+| Form controls           | `.theme-input`            | `forms/_controls.scss`              |
+| Form switch             | `.theme-switch`           | `forms/_controls.scss`              |
+| Form field wrapper      | `.theme-field`            | `forms/_field.scss`                 |
+| Form choice group       | `.theme-choice-group`     | `forms/_choice-group.scss`          |
+| Form input group        | `.theme-input-group`      | `forms/_input-group.scss`           |
+| Form validation         | `.theme-field--invalid`   | `forms/_validation.scss`            |
+| Page frame              | `.theme-page`             | `layout/_page.scss`                 |
+| Site header             | `.theme-site-header`      | `layout/_site-header.scss`          |
+| Site footer             | `.theme-site-footer`      | `layout/_site-footer.scss`          |
+| Styleguide page         | `.theme-styleguide`       | `layout/_styleguide.scss`           |
 
 `.theme-pagination` has no rule of its own — only `__list`, `__link` and
 `__ellipsis` are styled, current-page state comes from `[aria-current="page"]`
 rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
-asserts every one of the forty selectors above is actually compiled into
-`Resources/Public/Css/theme.css`. The palette swatch is covered twice over,
+asserts every selector above is actually compiled into
+`Resources/Public/Css/theme.css`, and the two display sizes that are not the
+bare class besides. The palette swatch is covered twice over,
 because it duplicates colour that lives in `abstracts/_palettes.scss` and
 `abstracts/_tokens.scss` — see
 [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).
@@ -375,19 +381,89 @@ only coincidentally both draw a list of links:
 </nav>
 ```
 
+Code block — a `pre` of the element baseline with a file name above it, in
+one frame. The `pre` is the box that scrolls, so it carries the tab stop and
+the name of the scrollable-region pattern the table wrapper uses; the name
+repeats the file name, because the caption labels the figure and not the
+region inside it. `__language` is optional, the caption is not — a code block
+without a name is a bare `pre`:
+
+```html
+<figure class="theme-code">
+    <figcaption class="theme-code__caption">
+        <span class="theme-code__filename">Configuration/Services.php</span>
+        <span class="theme-code__language">PHP</span>
+    </figcaption>
+    <pre class="theme-code__block" role="region" tabindex="0" aria-label="Configuration/Services.php"><code>…</code></pre>
+</figure>
+```
+
+Description list. `--horizontal` sets terms and descriptions side by side from
+`bp.$md` up; `--truncate`, with it, keeps every term on one line and cuts it
+with an ellipsis. Truncation is opt-in because a cut term is text a sighted
+reader cannot read. `dt`/`dd` are bare direct children, and the bare class
+differs from the element baseline only in not indenting the description:
+
+```html
+<dl class="theme-dl theme-dl--horizontal">
+    <dt>…</dt>
+    <dd>…</dd>
+</dl>
+```
+
+Divider — a separator with a label, and a section break. `<hr>` is void and
+cannot hold a label, so it is a `div` with `role="separator"`; a separator's
+children are presentational, so the name is an `aria-label` repeating the
+label. `--start` moves the label to the inline start, `--break` is an
+asterism between two passages of one section, without a label. The asterism is
+text in the markup, `aria-hidden`, not generated content — the stylesheet draws
+no glyph:
+
+```html
+<div class="theme-divider" role="separator" aria-label="Part two">
+    <span class="theme-divider__label">Part two</span>
+</div>
+<div class="theme-divider theme-divider--break" role="separator">
+    <span class="theme-divider__glyph" aria-hidden="true">⁂</span>
+</div>
+```
+
+Figure. `--caption-end` aligns the caption to the end; `--float-start` and
+`--float-end` float the figure beside the running text from `bp.$md` up,
+capped at half the column — logical, so the start is the right side of a
+right-to-left line. Any element with a floated figure as a direct child becomes
+a block formatting context (`:where(:has(> …))`, no specificity), so an image
+never hangs out of a box whose text is shorter than it; a list item gets
+`flow-root list-item` instead, so it keeps its marker:
+
+```html
+<figure class="theme-figure theme-figure--float-start">
+    <img class="theme-figure__media" src="…" alt="…" width="…" height="…">
+    <figcaption class="theme-figure__caption">
+        …
+        <small class="theme-figure__credit">…</small>
+    </figcaption>
+</figure>
+```
+
 Gallery of the image content element. The wrapper always carries **two**
 position modifiers, not one: `GalleryProcessor` produces a vertical position
 (`above`, `intext`, `below`) and a horizontal one (`left`, `center`, `right`),
-and `Partials/ContentElement/Gallery.html` emits both. Only the horizontal
-three carry rules today — the vertical three are structural, and the `@todo` in
-`components/_gallery.scss` says so:
+and `Partials/ContentElement/Gallery.html` emits both. The horizontal three
+align the row; `above` and `below` are the order of the markup. `intext` is
+translated by the partial into `--float-start` (in text, left) or `--float-end`
+(in text, right), plus `--nowrap` for the two "no wrap" variants, which keeps
+the text beside the gallery from flowing back under it. The whole gallery
+floats, not one item of it. Every item is a `.theme-figure` with a
+`.theme-figure__caption`; the gallery's own rules follow the figure's in the
+cascade and win where they meet:
 
 ```html
-<div class="theme-gallery theme-gallery--below theme-gallery--center" data-theme-gallery-columns="2">
+<div class="theme-gallery theme-gallery--intext theme-gallery--left theme-gallery--float-start" data-theme-gallery-columns="2">
     <div class="theme-gallery__row">
-        <figure class="theme-gallery__item">
+        <figure class="theme-gallery__item theme-figure">
             <a class="theme-gallery__zoom" href="…"><img class="theme-gallery__image" …></a>
-            <figcaption class="theme-gallery__caption">…</figcaption>
+            <figcaption class="theme-gallery__caption theme-figure__caption">…</figcaption>
         </figure>
     </div>
 </div>
@@ -406,6 +482,26 @@ Hero. Modifiers: default (text only), `--media` (adds `theme-hero__media`),
         <div class="theme-hero__actions"><a class="theme-button" …>…</a></div>
     </div>
 </section>
+```
+
+List. Modifiers `--unstyled`, `--inline` (one row, a hairline between the
+items), `--check` (a check mark per item), `--icon` (an icon per item, from
+the `__icon` slot), `--columns-2`/`--columns-3` (CSS columns, at least 12rem
+each, so a phone gets one) and `--divided` (a hairline between rows). Works on
+`ul` and `ol`; the items are bare `li` selected as direct children, so a list
+nested in an item keeps the element baseline. The check mark is the set's
+`check`, referenced as a CSS `mask` and painted in the success accent — one
+marker for every item without markup per item, the same shape in every font,
+and `CanvasText` under forced colours, see [Icons](icons.md#the-rule).
+`__icon` holds an icon rendered by `<theme:icon>` and sets `--theme-icon-size`
+to one em, on the first line, `aria-hidden` because the item's text is its
+content:
+
+```html
+<ul class="theme-list theme-list--check"><li>…</li></ul>
+<ul class="theme-list theme-list--icon">
+    <li><span class="theme-list__icon" aria-hidden="true"><theme:icon name="…" /></span>…</li>
+</ul>
 ```
 
 Quote:
@@ -976,8 +1072,10 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 | `everyPaletteHasASwatchWithItsOwnColours`            | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).                 |
 | `tabsShowEveryPanelUntilTheScriptHasBoundThem`       | The tab list is hidden and the panel headings shown until the group carries `data-theme-tabs-bound`, and nothing about the tabs is gated on `[data-js]` — see [Components that need the script](#components-that-need-the-script). |
 | `aDialogOpenerIsHiddenWithoutTheScriptMarker`        | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                    |
+| `textIsAlignedToTheStartOrTheEndOfTheLine`           | No `text-align: left` or `right` is compiled — a physical alignment puts the text of a right-to-left page against the wrong edge, and the element baseline carried two until they were found.                                      |
 | `aTitleOnAnyHeadingLevelKeepsItsOwnCase`             | `.theme-hero__title` and `.theme-teaser__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                                                                             |
 | `noComponentReferencesAnUndeclaredToken`             | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                         |
+| `aListItemHoldingAFloatKeepsItsMarker`               | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                            |
 | `aControlDrawsItsBoundaryInTheStrongBorderColour`    | The text input, the input group addon and the switch track default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                                                           |
 | `aHoveredTextInputChangesItsBorder`                  | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                    |
 

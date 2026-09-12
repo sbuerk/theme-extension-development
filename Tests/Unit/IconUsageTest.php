@@ -132,6 +132,41 @@ final class IconUsageTest extends UnitTestCase
     }
 
     /**
+     * A stylesheet may reference an icon only as a file of the vendored set,
+     * the way the check list masks "check.svg" - never a "data:" URI, never an
+     * image of its own, never a file that is not shipped. The path is relative
+     * to the compiled stylesheet in "Resources/Public/Css/".
+     */
+    #[Test]
+    public function aStylesheetReferencesOnlyFilesOfTheIconSet(): void
+    {
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(self::ROOT . '/Resources/Private/Scss', \FilesystemIterator::SKIP_DOTS),
+        );
+        $found = 0;
+        $foreign = [];
+        foreach ($files as $file) {
+            if (!$file instanceof \SplFileInfo || $file->getExtension() !== 'scss') {
+                continue;
+            }
+            // Comments first, as above: prose may name a URL it does not use.
+            $source = (string)preg_replace('#//.*$#m', '', (string)file_get_contents($file->getPathname()));
+            preg_match_all('#url\(\s*([\'"]?)(.*?)\1\s*\)#', $source, $matches);
+            foreach ($matches[2] as $url) {
+                $found++;
+                $isShippedSetFile = preg_match('#^\.\./Icons/FontAwesome/Solid/[a-z0-9-]+\.svg$#', $url) === 1
+                    && is_file(self::ROOT . '/Resources/Public/Icons/FontAwesome/Solid/' . basename($url));
+                if (!$isShippedSetFile) {
+                    $foreign[] = $file->getFilename() . ': ' . $url;
+                }
+            }
+        }
+
+        $this->assertGreaterThan(0, $found, 'No "url()" was found - the pattern is wrong, or the check list lost its mask.');
+        $this->assertSame([], $foreign, 'These stylesheets reference something other than a file of the vendored icon set: ' . implode(', ', $foreign));
+    }
+
+    /**
      * The icon table of the styleguide lists exactly the icons the templates
      * render, and states the size of the set - both literals in a partial the
      * visual suite renders without TYPO3, so both are checked here.
