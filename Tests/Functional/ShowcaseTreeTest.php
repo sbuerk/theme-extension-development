@@ -557,6 +557,36 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * @return \Generator<string, array{path: string, markup: string}>
+     */
+    public static function typographyRichText(): \Generator
+    {
+        yield 'a lead paragraph' => ['path' => '/typography/text', 'markup' => '<p class="theme-lead">'];
+        yield 'a heading inside the text' => ['path' => '/typography/text', 'markup' => '<h3>A heading 3 inside the text</h3>'];
+        yield 'keyboard input' => ['path' => '/typography/text', 'markup' => '<kbd>Ctrl</kbd>'];
+        yield 'an alignment of the preset' => ['path' => '/typography/text', 'markup' => '<p class="theme-text--center">'];
+        yield 'the language of a paragraph' => ['path' => '/typography/text', 'markup' => '<p lang="de">'];
+        yield 'a list component' => ['path' => '/typography/lists', 'markup' => '<ul class="theme-list theme-list--check">'];
+        yield 'a table component' => ['path' => '/typography/tables', 'markup' => '<table class="theme-table theme-table--striped">'];
+        yield 'a block quotation' => ['path' => '/typography/quotes-and-code', 'markup' => '<blockquote>'];
+        yield 'code in a pre' => ['path' => '/typography/quotes-and-code', 'markup' => '<pre><code>'];
+    }
+
+    /**
+     * The typography pages say their rich text went through the processing
+     * of the theme's preset on the way into the database, and that the
+     * parsing function of the frontend kept it. Each case is one thing that
+     * a narrower processing - the core's default tag list, a preset without
+     * "class" in its allowed attributes - would drop without a word.
+     */
+    #[DataProvider('typographyRichText')]
+    #[Test]
+    public function aTypographyPageKeepsItsRichText(string $path, string $markup): void
+    {
+        $this->assertStringContainsString($markup, $this->render($path));
+    }
+
+    /**
      * The classic CTypes: every type the TypoScript renders that is neither a
      * menu nor one of the theme's own - the set `/elements/core` shows.
      *

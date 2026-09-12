@@ -167,14 +167,15 @@ classic `CType` in its variants, and every appearance value:
 | uid       | Title                   | Slug                     | `backend_layout`  | What it is for                                                                             |
 |-----------|-------------------------|--------------------------|-------------------|--------------------------------------------------------------------------------------------|
 | 1         | Theme demo              | `/`                      | `start`           | The site root, and the footer columns.                                                     |
-| 2         | Typography              | `/typography`            | `content`         | Running text, and the four content element bands with header positions, looks and spacing. |
+| 2         | Typography              | `/typography`            | `content`         | Running text, the four bands with header positions, looks and spacing; parent of 52 to 56. |
+| 52–56     | Text … Article          | `/typography/<page>`     | `content`         | Text, lists, tables, quotes and code, and a long article — rich text and elements.         |
 | 3         | Media                   | `/media`                 | `content`         | One image, and a two column gallery.                                                       |
 | 4         | Empty page              | `/empty`                 | *(none)*          | The `default` layout fallback.                                                             |
-| 5         | Elements                | `/elements`              | `content`         | The showcase branch, parent of 6 to 8.                                                     |
-| 6         | Core elements           | `/elements/core`         | `content_sidebar` | Every classic `CType` the theme renders.                                                   |
+| 5         | Elements                | `/elements`              | `content`         | The showcase branch, parent of 6 to 8 and 51.                                              |
+| 6         | Core elements           | `/elements/core`         | `content_sidebar` | Every classic `CType` the theme renders, once each; parent of 30 to 39 and 50.             |
+| 30–39, 50 | Header … Insert records | `/elements/core/<CType>` | `content_sidebar` | One page per classic `CType`, every value of the fields that change how it looks.          |
 | 7         | Menu elements           | `/elements/menu`         | `content_sidebar` | The eleven `menu_*` elements.                                                              |
 | 8         | Theme elements          | `/elements/theme`        | `content`         | The thirteen `theme_*` elements.                                                           |
-| 30–39, 50 | Header … Insert records | `/elements/core/<CType>` | `content_sidebar` | One page per classic `CType` below page 6, with its variants — see below.                  |
 | 51        | Frames                  | `/elements/frames`       | `content`         | Every frame, spacing, header alignment and header look of the Appearance tab.              |
 | 9         | Styleguide              | `/styleguide`            | `styleguide`      | The component library, straight from Fluid.                                                |
 | 10        | Forms                   | `/forms`                 | `forms`           | The form showcase, straight from Fluid.                                                    |
