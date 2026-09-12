@@ -221,6 +221,40 @@ both.
 Every classic CType `EXT:frontend` registers is now covered — see
 [Content elements](content-elements.md) for the full table.
 
+## Plugins, and the static include as a content rendering template
+
+`ExtensionUtility::configurePlugin()` adds the rendering of every plugin
+`CType` with `addTypoScript(…, 'defaultContentRendering')`. The two delivery
+paths treat that key differently (`SysTemplateTreeBuilder`, read on v12.4 and
+v13.4):
+
+- a site using sets gets it unconditionally
+  (`createSiteTemplateInclude()`) — v13 only, v12 has no sets;
+- a `sys_template` site gets it only right after a static include listed in
+  `$GLOBALS['TYPO3_CONF_VARS']['FE']['contentRenderingTemplates']`
+  (`addStaticMagicFromGlobals()`) — the slot `fluid_styled_content` fills for
+  the installations that use it.
+
+[`ext_localconf.php`](../../ext_localconf.php) registers the theme's static
+include there on both core versions, as
+`themeextensiondevelopment/Configuration/TypoScript/Static/`: the extension key
+without underscores and the registered path with a trailing slash, the string
+the tree builder derives from an `include_static_file` entry.
+
+It used to do that for v12 only, where the static include is the only delivery
+path, on the reasoning that v13 delivers through the set. A v13 site using the
+static include — the `/legacy/` tree of the development instance is one — then
+rendered every classic and every `theme_*` element and let every plugin,
+EXT:felogin's login form among them, fall through to the "no rendering
+definition" notice.
+
+It only takes effect for an `include_static_file` entry. A test that imports the
+two static files directly into a `sys_template` renders the theme without any
+plugin rendering, which is why `ExtbasePluginStaticIncludeRenderingTest` sets
+`include_static_file`. It runs on both core versions; `ExtbasePluginRenderingTest`
+covers the set path on v13 and the static include on v12, through
+[`ThemeSiteTrait`](../testing/site-based-tests.md#arranging-the-theme-themesitetrait).
+
 The `image` element is rendered through two core data processors, both in
 EXT:frontend: `FilesProcessor` resolves the references of the `image` field and
 `GalleryProcessor` turns `imagecols`, `imageorient`, `imagewidth`, `imageheight`
@@ -242,11 +276,12 @@ had deliberately hidden.
 
 ### What v12 does not give for free: `ext_localconf.php`
 
-Two of the things the theme relies on came into `EXT:frontend` after v12, and
-before that they came from `fluid_styled_content` — which this theme
-deliberately does not depend on. [`ext_localconf.php`](../../ext_localconf.php)
-supplies both, inside one `if ((new Typo3Version())->getMajorVersion() < 13)`
-block, and does nothing at all on v13.
+Two of the things the theme relies on are handled differently on v12, where
+they came from `fluid_styled_content` — which this theme deliberately does not
+depend on. [`ext_localconf.php`](../../ext_localconf.php) supplies the first
+inside one `if ((new Typo3Version())->getMajorVersion() < 13)` block. The
+second, the content rendering template, is registered on both core versions:
+v12 needs it for every site, v13 for every site using the static include.
 
 It is a **configuration exception**, not a rule violation: `ext_localconf.php`
 is loaded by TYPO3 from a fixed path, long before a container exists, so the
@@ -277,12 +312,14 @@ empty by default and is normally filled by `fluid_styled_content`. Without the
 registration, no Extbase plugin in the installation has a rendering definition
 on v12 at all — `ExtbasePluginRenderingTest` failed all three of its tests.
 
-v13 never reaches that gate: a site set goes through
+A v13 site set never reaches that gate: it goes through
 `SysTemplateTreeBuilder::createSiteTemplateInclude()`, which calls
 `addContentRenderingFromGlobals()` unconditionally with no lookup anywhere near
 it. The difference has no changelog of its own — neither #103437 nor #103439
 mentions `defaultContentRendering` — the two source positions are the whole
-evidence.
+evidence. A v13 `sys_template` site still goes through the gate, which is why
+the registration is not inside the v12 block — see
+[above](#plugins-and-the-static-include-as-a-content-rendering-template).
 
 The registered identifier is not a free label. The core builds it from the
 static include a `sys_template` selects, as
@@ -317,6 +354,7 @@ site package makes it.
 | `StaticTypoScriptIncludeTest`                     | The static include is registered in the TCA at all.                                                   | both     |
 | `ContentElementRenderingTest`                     | `header` and `text` render, and the core error notice does not appear.                                | both     |
 | `ImageElementRenderingTest`                       | The `image` element renders, and its backend fields reach the output.                                 | both     |
+| `ExtbasePluginStaticIncludeRenderingTest`         | An Extbase plugin renders through the `include_static_file` field, not only through the set.          | both     |
 | `DevelopmentInstance/LegacyDeliveryTest`          | The seeded showcase renders the same markup in its two trees, page by page.                           | both     |
 | `DevelopmentInstance/DeliveryRegistrationTest`    | Every static include of every seeded `sys_template` root resolves and is registered.                  | both     |
 | `Core12/DevelopmentInstance/InstanceDeliveryTest` | Both tree roots of the v12 instance carry the `sys_template` record, and no site declares a set.      | v12 only |

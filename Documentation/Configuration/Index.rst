@@ -244,7 +244,8 @@ development and test instances do not install it. What that covers:
     see :ref:`feature-theme-content-elements`.
 *   Third-party Extbase plugins, which render through a generic template
     without any per-plugin configuration — see
-    :ref:`feature-extbase-plugin-rendering`.
+    :ref:`feature-extbase-plugin-rendering` — on both delivery paths, the
+    site set and the static include.
 
 Nothing an editor can create is left without a rendering definition, and a test
 asserts exactly that: it walks the content types registered in TCA and fails if
