@@ -1,0 +1,147 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<f:comment>
+    The login form of EXT:felogin on the form contract of the theme
+    (docs/development/component-library.md, "Forms"), replacing felogin's own
+    "Login/Login" template - see "Configuration/TypoScript/Felogin.typoscript"
+    for how it takes precedence on both core versions.
+
+    It keeps everything felogin's own template sends: the field names "user",
+    "pass" and "permalogin", the hidden "logintype", "redirect_url",
+    "referer", "redirectReferrer" and "noredirect", the signed request token
+    and "target=_top". Only the markup around them changes. One template
+    serves TYPO3 v13 and v14: the variables it reads are the ones the login
+    action of both assigns, and the labels are full "LLL:" references, which
+    both resolve - v14's translation domains ("felogin.messages") do not exist
+    on v13.
+
+    The status message felogin assigns as "messageKey" becomes an alert of the
+    kind it is. "error" - a failed login - is the one message about something
+    that just went wrong and takes "role=alert", assertive, on the danger
+    kind; "logout" confirms something finished and takes "role=status" on the
+    success kind. "welcome", the default, is not a message about the page at
+    all but the form's introduction, and stays a heading and a paragraph.
+
+    The required marker is a sighted-user affordance with aria-hidden; what a
+    screen reader announces is the control's own "required" attribute. The
+    checkbox is a ".theme-check": the input inside its label, so the label is
+    the target, rather than felogin's label before a bare checkbox.
+</f:comment>
+
+<f:flashMessages />
+
+<f:if condition="{messageKey}">
+    <f:switch expression="{messageKey}">
+        <f:case value="error">
+            <div class="theme-alert theme-alert--danger" role="alert">
+                <span class="theme-alert__icon" aria-hidden="true"><f:render partial="ContentElement/AlertIcon" arguments="{kind: 'danger'}" /></span>
+                <div class="theme-alert__body">
+                    <p class="theme-alert__title"><f:render section="LabelOrMessage" arguments="{key: 'error_header', settings: settings}" /></p>
+                    <p class="theme-alert__text"><f:render section="LabelOrMessage" arguments="{key: 'error_message', settings: settings}" /></p>
+                </div>
+            </div>
+        </f:case>
+        <f:case value="logout">
+            <div class="theme-alert theme-alert--success" role="status">
+                <span class="theme-alert__icon" aria-hidden="true"><f:render partial="ContentElement/AlertIcon" arguments="{kind: 'success'}" /></span>
+                <div class="theme-alert__body">
+                    <p class="theme-alert__title"><f:render section="LabelOrMessage" arguments="{key: 'logout_header', settings: settings}" /></p>
+                    <p class="theme-alert__text"><f:render section="LabelOrMessage" arguments="{key: 'logout_message', settings: settings}" /></p>
+                </div>
+            </div>
+        </f:case>
+        <f:defaultCase>
+            <h3><f:render section="LabelOrMessage" arguments="{key: '{messageKey}_header', settings: settings}" /></h3>
+            <p><f:render section="LabelOrMessage" arguments="{key: '{messageKey}_message', settings: settings}" /></p>
+        </f:defaultCase>
+    </f:switch>
+</f:if>
+
+<f:form class="theme-form" target="_top" fieldNamePrefix="" action="login" requestToken="{requestToken}" spellcheck="false">
+    <fieldset class="theme-fieldset">
+        <legend class="theme-fieldset__legend"><f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:login" /></legend>
+
+        <div class="theme-field">
+            <label class="theme-field__label" for="tx-felogin-input-username">
+                <f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:username" />
+                <span class="theme-field__required" aria-hidden="true">*</span>
+            </label>
+            <f:form.textfield class="theme-input" name="user" required="true" autocomplete="username" id="tx-felogin-input-username" />
+        </div>
+
+        <div class="theme-field">
+            <label class="theme-field__label" for="tx-felogin-input-password">
+                <f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:password" />
+                <span class="theme-field__required" aria-hidden="true">*</span>
+            </label>
+            <f:form.password class="theme-input" name="pass" required="required" autocomplete="current-password" id="tx-felogin-input-password" />
+        </div>
+
+        <f:if condition="{permaloginStatus} > -1">
+            <f:comment>
+                The hidden "0" goes first so the checkbox overrides it when
+                ticked. When permanent login is the default it is disabled -
+                a disabled field is not submitted - and the ticked checkbox
+                alone decides, which is what felogin's own template does.
+            </f:comment>
+            <f:if condition="{permaloginStatus} == 1">
+                <f:then>
+                    <f:form.hidden name="permalogin" value="0" disabled="disabled" />
+                    <label class="theme-check">
+                        <f:form.checkbox name="permalogin" id="permalogin" value="1" checked="checked" />
+                        <f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:permalogin" />
+                    </label>
+                </f:then>
+                <f:else>
+                    <f:form.hidden name="permalogin" value="0" />
+                    <label class="theme-check">
+                        <f:form.checkbox name="permalogin" id="permalogin" value="1" />
+                        <f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:permalogin" />
+                    </label>
+                </f:else>
+            </f:if>
+        </f:if>
+
+        <div>
+            <f:form.button class="theme-button" type="submit" name="submit" value="login"><f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:login" /></f:form.button>
+        </div>
+
+        <f:form.hidden name="logintype" value="login" />
+        <f:if condition="{redirectURL} != ''">
+            <f:form.hidden name="redirect_url" value="{redirectURL}" />
+        </f:if>
+        <f:if condition="{referer} != ''">
+            <f:form.hidden name="referer" value="{referer}" />
+        </f:if>
+        <f:if condition="{redirectReferrer} != ''">
+            <f:form.hidden name="redirectReferrer" value="off" />
+        </f:if>
+        <f:if condition="{noRedirect} != ''">
+            <f:form.hidden name="noredirect" value="1" />
+        </f:if>
+    </fieldset>
+</f:form>
+
+<f:if condition="{settings.showForgotPassword}">
+    <p>
+        <f:link.action action="recovery" controller="PasswordRecovery">
+            <f:render section="LabelOrMessage" arguments="{key: 'forgot_header', settings: settings}" />
+        </f:link.action>
+    </p>
+</f:if>
+
+<f:comment>
+    felogin's "RenderLabelOrMessage" partial, as a section: a label may be
+    overridden by a setting of the same key, and falls back to felogin's own
+    language file. A section rather than a reuse of the partial, because the
+    partial resolves through felogin's partial root path, and its v14 version
+    passes a translation "domain" that v13's "f:translate" does not know.
+</f:comment>
+<f:section name="LabelOrMessage"><f:spaceless>
+    <f:if condition="{settings.{key}}">
+        <f:then>{settings.{key}}</f:then>
+        <f:else><f:translate key="LLL:EXT:felogin/Resources/Private/Language/locallang.xlf:{key}" /></f:else>
+    </f:if>
+</f:spaceless></f:section>
+
+</html>

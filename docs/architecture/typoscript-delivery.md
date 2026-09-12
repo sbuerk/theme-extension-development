@@ -173,9 +173,12 @@ the tree builder derives from an `include_static_file` entry.
 
 It only takes effect for an `include_static_file` entry. A test that imports the
 two static files directly into a `sys_template` renders the theme without any
-plugin rendering, which is why `ExtbasePluginStaticIncludeRenderingTest` sets
-`include_static_file`.
+plugin rendering, which is why `ExtbasePluginStaticIncludeRenderingTest` and the
+static case of `FeloginRenderingTest` set `include_static_file`.
 `ExtbasePluginRenderingTest` covers the set path.
+
+`Felogin.typoscript` adds the theme's templates for the login form above
+felogin's own — see [Content elements](content-elements.md#extfelogin).
 
 The `image` element is rendered through two core data processors, both in
 EXT:frontend: `FilesProcessor` resolves the references of the `image` field and
@@ -212,6 +215,7 @@ had deliberately hidden.
 | `ContentElementRenderingTest`                  | `header` and `text` render, and the core error notice does not appear.               |
 | `ImageElementRenderingTest`                    | The `image` element renders, and its backend fields reach the output.                |
 | `ExtbasePluginStaticIncludeRenderingTest`      | An Extbase plugin renders through the static include, not only through the set.      |
+| `FeloginRenderingTest`                         | The login form renders on the form contract, through the set and the static include. |
 | `DevelopmentInstance/LegacyDeliveryTest`       | The seeded showcase renders the same markup through both mechanisms.                 |
 | `DevelopmentInstance/DeliveryRegistrationTest` | Every static include of the seeded `sys_template` root resolves and is registered.   |
 
