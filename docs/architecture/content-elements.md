@@ -1038,6 +1038,40 @@ do — but records authored the old way still exist in real installations, and
 this branch is what renders them instead of leaving the core notice on the
 page. It costs one `=< lib.contentElement` and no version aware code at all.
 
+## EXT:felogin
+
+The login form is a plugin, `felogin_login`, and renders through `Generic.html`
+like any other. Its markup is felogin's templates, and the theme replaces two
+of them — `Login/Login` and `Login/Logout`, below
+`Resources/Private/Extensions/Felogin/Templates/` — by adding its path above
+felogin's own at `plugin.tx_felogin_login.view.templateRootPaths.20`
+(`Configuration/TypoScript/Felogin.typoscript`). Fluid looks a template up path
+by path from the highest key down (`TemplatePaths::resolveFileInPaths()`), so
+the theme's `Login/Login.html` wins over felogin's own of the same name on v12
+and v13 alike. The password recovery templates are not replaced.
+
+The templates keep every field felogin sends and change the markup around
+them: `.theme-form`, a `.theme-fieldset` with its legend, `.theme-field` with
+the required marker, `.theme-input`, the permanent login as a `.theme-check`,
+and a `.theme-button`. The status message becomes an alert of the kind it is:
+a failed login is `--danger` with `role=alert`, a logout `--success` with
+`role=status`; the welcome text stays a heading and a paragraph. The glyph comes
+from the same `ContentElement/AlertIcon` partial the notice uses, which is why
+the theme's partial root path is added to the plugin as well.
+
+One template serves both core versions. The labels are full `LLL:` references,
+and felogin's `RenderLabelOrMessage` partial is repeated as a section of each
+template, so the templates read nothing of felogin's but the variables its
+controller assigns. The logout form passes `actionUri` through, as felogin's
+own template does: the logout action of v12 and of v13 assigns the logout
+redirect target there, and the form posts to it.
+
+`FeloginRenderingTest` renders the form through the delivery of the running
+core version — the set on v13, the static include on v12 — and through the
+static include, and asserts the theme's markup and the absence of felogin's own;
+`DevelopmentInstance/LoginPageTest` and `Tests/Acceptance/frontend-login.spec.ts`
+log in and out on the seeded instance.
+
 ## See also
 
 - [Page rendering](page-rendering.md)
