@@ -6,8 +6,10 @@ use SBUERK\ThemeExtensionDevelopment\Tca\IconItems;
 
 // The child table of the "tx_theme_list_items" inline relation registered in
 // Configuration/TCA/Overrides/tt_content.php, shared by theme_linklist,
-// theme_sociallinks, theme_media_teaser_grid, theme_author, theme_tabs and
-// theme_accordion. "text" is plain text here, and rich text only through the
+// theme_sociallinks, theme_media_teaser_grid, theme_author, theme_tabs,
+// theme_accordion, theme_features, theme_stats and theme_steps - each narrows
+// the form to what its template renders through "overrideChildTca". "text" is
+// plain text here, and rich text only through the
 // "overrideChildTca" of the last two - see "tt_content_theme_tabs.php". Ships no
 // ext_tables.sql - see the comment above the "fieldname" column for the one
 // field that would silently fail to get a database column without it.
@@ -71,6 +73,19 @@ return [
         'header' => [
             'l10n_mode' => 'prefixLangTitle',
             'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.header',
+            'config' => [
+                'type' => 'input',
+                'size' => 50,
+                'max' => 255,
+            ],
+        ],
+        // A second, short line that goes with the header. Named for what it
+        // is on any item, not for one element: the stats element uses it for
+        // what a figure counts - its "header" is the figure - and relabels
+        // both through its "overrideChildTca". No other relation shows it.
+        'subheader' => [
+            'l10n_mode' => 'prefixLangTitle',
+            'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.subheader',
             'config' => [
                 'type' => 'input',
                 'size' => 50,
@@ -159,6 +174,8 @@ return [
         '0' => [
             'showitem' => '
                 header,
+                --linebreak--,
+                subheader,
                 --linebreak--,
                 text,
                 --linebreak--,

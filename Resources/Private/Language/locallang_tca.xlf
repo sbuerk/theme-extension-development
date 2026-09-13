@@ -329,6 +329,75 @@
 				<source>A heading, text and a link beside an icon - at the start, at the end or above, plain or on a tile.</source>
 			</trans-unit>
 
+			<!-- tt_content: theme_features -->
+			<trans-unit id="tt_content.CType.theme_features.label">
+				<source>Features</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_features.description">
+				<source>A group of features with an icon, a title, a text and a link each, in columns, with hanging icons, as tiles or beside an introduction.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.features">
+				<source>Features</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_features.label">
+				<source>Features</source>
+			</trans-unit>
+			<trans-unit id="tt_content.palette.theme_grid">
+				<source>Layout</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_features.I.0">
+				<source>Columns, the icon above</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_features.I.1">
+				<source>Hanging icons</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_features.I.2">
+				<source>Tiles</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_features.I.3">
+				<source>With an introduction beside</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_columns">
+				<source>Columns, at most</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_columns.I.2">
+				<source>Two</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_columns.I.3">
+				<source>Three</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_columns.I.4">
+				<source>Four</source>
+			</trans-unit>
+
+			<!-- tt_content: theme_stats -->
+			<trans-unit id="tt_content.CType.theme_stats.label">
+				<source>Figures</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_stats.description">
+				<source>A row of figures, each with what it counts and an optional sentence and icon.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.stats">
+				<source>Figures</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_stats.label">
+				<source>Figures</source>
+			</trans-unit>
+
+			<!-- tt_content: theme_steps -->
+			<trans-unit id="tt_content.CType.theme_steps.label">
+				<source>Steps</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_steps.description">
+				<source>The steps of a process, numbered, each with a title, a text and an optional icon.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.steps">
+				<source>Steps</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_steps.label">
+				<source>Steps</source>
+			</trans-unit>
+
 			<!-- tt_content: frame_class items added by page TSconfig -->
 			<trans-unit id="tt_content.frame_class.surface">
 				<source>Surface band</source>
@@ -384,6 +453,15 @@
 			</trans-unit>
 			<trans-unit id="tx_theme_list_item.icon">
 				<source>Icon</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.subheader">
+				<source>Subheader</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.header.types.theme_stats.label">
+				<source>Figure</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.subheader.types.theme_stats.label">
+				<source>What it counts</source>
 			</trans-unit>
 
 			<!-- The icon picker, shared by every icon column -->

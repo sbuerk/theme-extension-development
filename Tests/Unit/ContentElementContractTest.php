@@ -14,8 +14,10 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  * `Layouts/ContentElement.html` and `Partials/ContentElement/Header.html`
  * turn the appearance fields of a record into classes, one `f:variable` per
  * value, `Templates/ContentElements/Bullets.html` its `layout` the same
- * way, and `ThemeTextIcon.html` the three axes of its icon. A class written there and matched by no rule is an editor choice
- * that silently does nothing - the defect the component contract exists to
+ * way, `ThemeTextIcon.html` the three axes of its icon, `ThemeFeatures.html`
+ * its layout and columns and `ThemeSteps.html` the icon marker. A class
+ * written there and matched by no rule is an editor choice that silently
+ * does nothing - the defect the component contract exists to
  * rule out, and the one the core RTE preset has, whose `text-center` this
  * theme does not style. `ContentElementAppearanceRenderingTest` holds which
  * value writes which class; this holds every one of those classes to the
@@ -46,17 +48,23 @@ final class ContentElementContractTest extends UnitTestCase
      */
     public static function writtenClasses(): \Generator
     {
+        $seen = [];
         foreach ([
             'Resources/Private/Layouts/ContentElement.html',
             'Resources/Private/Partials/ContentElement/Header.html',
             'Resources/Private/Templates/ContentElements/Bullets.html',
             'Resources/Private/Templates/ContentElements/ThemeTextIcon.html',
+            'Resources/Private/Templates/ContentElements/ThemeFeatures.html',
+            'Resources/Private/Templates/ContentElements/ThemeSteps.html',
         ] as $template) {
             $source = (string)file_get_contents(self::root() . '/' . $template);
             preg_match_all('#<f:variable name="\w+" value="([^"]*)"\s*/>#', $source, $values);
             foreach ($values[1] as $value) {
                 foreach (preg_split('/\s+/', trim($value)) ?: [] as $class) {
-                    if ($class !== '') {
+                    // A class written in two cases - the feature layouts 1
+                    // and 3 share one - is one data set, not two of one name.
+                    if ($class !== '' && !isset($seen[$class])) {
+                        $seen[$class] = true;
                         yield $class => ['class' => $class];
                     }
                 }
@@ -70,10 +78,11 @@ final class ContentElementContractTest extends UnitTestCase
         $classes = array_keys(iterator_to_array(self::writtenClasses()));
 
         // Five frames, ten spacings, three positions, five looks, the text
-        // role, three bullet list layouts and the three times three axes of
-        // the text and icon element - fewer means a value lost its case, and
-        // the test below would pass on an empty list.
-        $this->assertCount(36, $classes, implode(', ', $classes));
+        // role, three bullet list layouts, the three times three axes of the
+        // text and icon element, three feature layouts and three column
+        // counts, and the icon marker of a step - fewer means a value lost its
+        // case, and the test below would pass on an empty list.
+        $this->assertCount(43, $classes, implode(', ', $classes));
     }
 
     #[DataProvider('writtenClasses')]

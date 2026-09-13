@@ -1,7 +1,29 @@
-tt_content,,,,,,,,,,,,,,,,,
-,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,tx_theme_icon,tx_theme_icon_position,tx_theme_icon_shape,tx_theme_icon_size,tx_theme_link,tx_theme_link_label,tx_theme_link_variant
-,1010,1,0,0,0,1010,theme_text_icon,Beside an icon,2,<p>Text with <strong>rich</strong> markup.</p>,lightbulb,start,square,md,t3://page?uid=1,Read on,secondary
-,1020,1,0,0,0,1020,theme_text_icon,At the end,2,<p>An icon at the end of the line.</p>,gear,end,circle,xl,,,
-,1030,1,0,0,0,1030,theme_text_icon,On top,2,<p>An icon above the text.</p>,rocket,top,plain,lg,,,
-,1040,1,0,0,0,1040,theme_text_icon,Unknown values,2,<p>No icon and values nothing offers.</p>,,bogus,bogus,bogus,,,
-,1050,1,0,0,0,1050,theme_text_icon,An icon the set does not have,2,<p>The name is gone from the set.</p>,no-such-icon,start,square,md,,,
+tt_content,,,,,,,,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,tx_theme_icon,tx_theme_icon_position,tx_theme_icon_shape,tx_theme_icon_size,tx_theme_link,tx_theme_link_label,tx_theme_link_variant,layout,tx_theme_columns,tx_theme_list_items
+,1010,1,0,0,0,1010,theme_text_icon,Beside an icon,2,<p>Text with <strong>rich</strong> markup.</p>,lightbulb,start,square,md,t3://page?uid=1,Read on,secondary,0,0,0
+,1020,1,0,0,0,1020,theme_text_icon,At the end,2,<p>An icon at the end of the line.</p>,gear,end,circle,xl,,,,0,0,0
+,1030,1,0,0,0,1030,theme_text_icon,On top,2,<p>An icon above the text.</p>,rocket,top,plain,lg,,,,0,0,0
+,1040,1,0,0,0,1040,theme_text_icon,Unknown values,2,<p>No icon and values nothing offers.</p>,,bogus,bogus,bogus,,,,0,0,0
+,1050,1,0,0,0,1050,theme_text_icon,An icon the set does not have,2,<p>The name is gone from the set.</p>,no-such-icon,start,square,md,,,,0,0,0
+,1110,1,0,0,0,1110,theme_features,Columns of features,2,<p>An introduction above the grid.</p>,,,,,,,,0,3,2
+,1120,1,0,0,0,1120,theme_features,Hanging features,2,,,,,,,,,1,2,1
+,1130,1,0,0,0,1130,theme_features,Feature tiles,2,,,,,,,,,2,4,1
+,1140,1,0,0,0,1140,theme_features,Features with an introduction,2,<p>The introduction beside the grid.</p>,,,,,,,,3,2,1
+,1150,1,0,0,0,1150,theme_features,Features of an unknown layout,2,,,,,,,,,9,0,1
+,1210,1,0,0,0,1210,theme_stats,Figures,2,,,,,,,,,0,0,5
+,1310,1,0,0,0,1310,theme_steps,A process,2,,,,,,,,,0,0,2
+tx_theme_list_item,,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,subheader,text,icon,link,link_label
+,101,1,0,0,1,1110,tt_content,tx_theme_list_items,Install,,Require the package.,gear,t3://page?uid=1,Read on
+,102,1,0,0,2,1110,tt_content,tx_theme_list_items,Configure,,Set the constants.,,,
+,103,1,0,0,1,1120,tt_content,tx_theme_list_items,A hanging feature,,Beside a framed tile.,link,,
+,104,1,0,0,1,1130,tt_content,tx_theme_list_items,A feature tile,,In a framed box.,star,,
+,105,1,0,0,1,1140,tt_content,tx_theme_list_items,Beside the introduction,,Next to the text of the element.,rocket,,
+,106,1,0,0,1,1150,tt_content,tx_theme_list_items,The default layout,,Columns of three.,code,,
+,111,1,0,0,1,1210,tt_content,tx_theme_list_items,2001,Icons shipped,The whole solid set.,image,,
+,112,1,0,0,2,1210,tt_content,tx_theme_list_items,5,Palettes,,,,
+,113,1,0,0,3,1210,tt_content,tx_theme_list_items,0,Open issues,,,,
+,114,1,0,0,4,1210,tt_content,tx_theme_list_items,7,,Nothing says what this counts.,,,
+,115,1,0,0,5,1210,tt_content,tx_theme_list_items,,Counted without a figure,,,,
+,121,1,0,0,1,1310,tt_content,tx_theme_list_items,Clone,,Clone the repository.,,,
+,122,1,0,0,2,1310,tt_content,tx_theme_list_items,Configure,,Set the constants.,gear,,

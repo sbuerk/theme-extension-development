@@ -723,6 +723,9 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_tabs`              | Items in tabs, one panel at a time                       | `.theme-tabs`                                           |
 | `theme_accordion`         | Collapsible items, one open at a time                    | `.theme-accordion`                                      |
 | `theme_text_icon`         | A heading, rich text and a link beside one icon          | `.theme-media-object`                                   |
+| `theme_features`          | A group of features with an icon each                    | `.theme-feature` in `.theme-feature-grid`               |
+| `theme_stats`             | Figures and what they count                              | `.theme-stat` in `.theme-stats`                         |
+| `theme_steps`             | The numbered steps of a process                          | `.theme-steps`                                          |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -1046,6 +1049,72 @@ has, is its text alone rather than an empty tile. The heading goes through the
 shared header partial **inside** the body, beside the icon, so
 `header_position` and `tx_theme_header_style` apply as for a text element.
 
+**`theme_features`, `theme_stats` and `theme_steps`** take their items from
+`tx_theme_list_items`, like the tabs and the accordion, and their TypoScript is
+a copy of `tt_content.theme_linklist` with a template of its own. Each shows the
+child's `icon` column - `tx_theme_list_item.icon`, the icon of an item, from the
+same picker - through the `showitem` of its `overrideChildTca`; no other
+relation shows it, so no editor is offered an icon nothing renders. The title of
+an item is required in all three.
+
+| `CType`          | Items                                                       | Renders through                           |
+|------------------|-------------------------------------------------------------|-------------------------------------------|
+| `theme_features` | title, text, icon, link                                     | `.theme-feature` in `.theme-feature-grid` |
+| `theme_stats`    | figure (`header`), what it counts (`subheader`), text, icon | `.theme-stat` in the `dl` `.theme-stats`  |
+| `theme_steps`    | title, text, icon                                           | `.theme-steps`, an `ol`                   |
+
+The features have a layout, the core `layout` re-enabled for this CType alone
+in `ContentElementAppearance.tsconfig` - as for the bullet list - with labels
+of its own, and a column count, `tt_content.tx_theme_columns`. Both are the
+palette `theme_grid`:
+
+| `layout` | Label                       | Item modifier                          |
+|----------|-----------------------------|----------------------------------------|
+| `0`      | Columns, the icon above     | `--column`                             |
+| `1`      | Hanging icons               | `--hanging`                            |
+| `2`      | Tiles                       | `--tile`                               |
+| `3`      | With an introduction beside | `--hanging`, in `.theme-feature-intro` |
+
+`tx_theme_columns` offers 2, 3 and 4, the `--columns-*` modifiers of the grid,
+each the most columns it takes. It is an integer select, and the two cores give
+such a column different database defaults: v14.3 the TCA default, v13.4 always
+0 (`DefaultTcaSchema`, read on both). A record written through the form carries
+3 on both; the template renders 0 and every value it does not know as three
+columns, and any `layout` it does not know as 0, so the difference never
+reaches the page. It is named for the grid, not for the element, and is meant
+for the next element that lays out a grid of items.
+
+**Four columns need a page without a sidebar.** Four tracks of the grid's
+12rem minimum and three gaps of 1.875rem take 53.625rem inside the element.
+The backend layout `content` gives an element up to 70rem - the 75rem content
+width less the page and element padding - and `content_sidebar` at most
+53.125rem, its 15rem aside and the gap taken off as well. On a page with a sub
+navigation the four-column grid therefore shows three columns at every
+viewport; nothing breaks, the grid only takes what fits. The showcase puts the
+features on `/elements/theme/features` with `content` for that reason, and
+`ShowcaseTreeTest::aFourColumnFeatureGridIsOnAPageWithoutASidebar` fails when
+a four-column features element lands on a page with an aside.
+
+The figures read the child's `header` as the figure and a new column,
+`tx_theme_list_item.subheader`, as what it counts. Both are required and
+relabelled "Figure" and "What it counts" on this relation - a `label` in
+`overrideChildTca.columns` reaches the form because
+`InlineOverrideChildTca::overrideColumns()` merges the whole column
+configuration with `array_replace_recursive()` (read on v14.3, and held on both
+cores by the form test). `subheader` is a short second line of any item; no
+other relation shows it yet. In the markup what it counts is the `dt` and the
+figure the `dd`, which a screen reader reads as "Icons shipped, 2001"; the
+stylesheet shows the figure first.
+
+The steps are an `ol`, and the marker of a step is empty: the stylesheet
+numbers it with a counter, so no number in the markup can disagree with the
+order. A step with an icon shows it in its marker instead, with
+`theme-steps__marker--icon`.
+
+Every item icon goes through the same "into a variable first" as the text and
+icon element, so an item without a usable icon renders no empty tile or marker
+icon.
+
 | Test                                                    | Guards                                                                                                                        |
 |---------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | `Tests/Functional/IconContentElementRenderingTest.php`  | every value of every axis, and one nothing offers, writes its modifier, through the set and the static include; no empty slot |
@@ -1102,8 +1171,9 @@ invented — every identifier is one the core registers (`content-header`,
 `content-text-teaser`, `content-beside-text-img-left`, `content-card-group`,
 `content-quote`, `content-user`, `content-bullets`, `content-listgroup`, and
 `content-message`, `content-tab`, `content-accordion` for the notice, the
-tabs and the accordion, and `content-idea` for the text and icon element),
-verified present in the core's own icon registry
+tabs and the accordion, `content-idea` for the text and icon element, and
+`content-widget-list`, `content-widget-number` and `content-target` for the
+features, the figures and the steps), verified present in the core's own icon registry
 (`.Build/vendor/typo3/cms-core/Resources/Public/Icons/T3Icons/icons.json`),
 not shipped as image files of this extension's own. An identifier that is
 *not* registered does not fail quietly: `IconRegistry::getIconConfigurationByIdentifier()`
