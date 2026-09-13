@@ -431,8 +431,9 @@ baseline closes `thead` and `tfoot`.
 
 ### Indicators
 
-The avatar, the tag, the progress bar and the meter add no colour token.
-Each colour they use, against the three backgrounds of its appearance.
+The avatar, the tag, the progress bar, the meter and the bar of the selected
+tab add no colour token. Each colour they use, against the three backgrounds
+of its appearance.
 Where a colour follows the palette, the figure is the lowest of the five
 palettes, which is the neutral one in every column:
 
@@ -445,6 +446,11 @@ palettes, which is the neutral one in every column:
 | Meter, suboptimum                | `--theme-color-warning`        | 5.93              | 5.48    | 5.93           | 11.16            | 10.25   | 9.24           |
 | Meter, even less good            | `--theme-color-danger`         | 6.54              | 6.04    | 6.54           | 8.16             | 7.50    | 6.76           |
 | Edge of the progress/meter track | `--theme-color-border-strong`  | 3.35              | 3.10    | 3.35           | 3.74             | 3.44    | 3.10           |
+| Bar of the selected tab          | `--theme-color-primary`        | 6.39              | 5.90    | 6.39           | 8.18             | 7.51    | 6.77           |
+
+The bar of the selected tab sits on the raised surface of the tab and on
+whatever the tab list is placed on; it is a graphical object and clears 3:1
+against all three backgrounds (lowest 5.90).
 
 The column that decides is not the same for every row. Text sits on the fill
 of its own component, the surface tint of the tag and the avatar, and clears
