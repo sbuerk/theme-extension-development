@@ -115,6 +115,11 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
         }
     }
 
+    /**
+     * The link is looked for in the index, and only there. A section may link
+     * to itself - the band specimens of "media" do - and a search of the whole
+     * page found those links and passed with the index link gone.
+     */
     #[DataProvider('everySection')]
     #[Test]
     public function everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex(string $id): void
@@ -122,7 +127,13 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
         $body = $this->render();
 
         $this->assertStringContainsString(sprintf('id="%s"', $id), $body);
-        $this->assertStringContainsString(sprintf('href="#%s"', $id), $body);
+        preg_match('#<nav class="theme-content-menu theme-styleguide__toc"[^>]*>(.*?)</nav>#s', $body, $index);
+        $this->assertArrayHasKey(1, $index, 'The styleguide renders no section index.');
+        $this->assertStringContainsString(
+            sprintf('href="#%s"', $id),
+            $index[1],
+            sprintf('The section index does not link the section "%s".', $id),
+        );
     }
 
     /**
