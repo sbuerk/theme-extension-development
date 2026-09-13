@@ -13,8 +13,8 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  *
  * `Layouts/ContentElement.html` and `Partials/ContentElement/Header.html`
  * turn the appearance fields of a record into classes, one `f:variable` per
- * value, and `Templates/ContentElements/Bullets.html` its `layout` the same
- * way. A class written there and matched by no rule is an editor choice
+ * value, `Templates/ContentElements/Bullets.html` its `layout` the same
+ * way, and `ThemeTextIcon.html` the three axes of its icon. A class written there and matched by no rule is an editor choice
  * that silently does nothing - the defect the component contract exists to
  * rule out, and the one the core RTE preset has, whose `text-center` this
  * theme does not style. `ContentElementAppearanceRenderingTest` holds which
@@ -50,6 +50,7 @@ final class ContentElementContractTest extends UnitTestCase
             'Resources/Private/Layouts/ContentElement.html',
             'Resources/Private/Partials/ContentElement/Header.html',
             'Resources/Private/Templates/ContentElements/Bullets.html',
+            'Resources/Private/Templates/ContentElements/ThemeTextIcon.html',
         ] as $template) {
             $source = (string)file_get_contents(self::root() . '/' . $template);
             preg_match_all('#<f:variable name="\w+" value="([^"]*)"\s*/>#', $source, $values);
@@ -69,9 +70,10 @@ final class ContentElementContractTest extends UnitTestCase
         $classes = array_keys(iterator_to_array(self::writtenClasses()));
 
         // Five frames, ten spacings, three positions, five looks, the text
-        // role and three bullet list layouts - fewer means a value lost its
-        // case, and the test below would pass on an empty list.
-        $this->assertCount(27, $classes, implode(', ', $classes));
+        // role, three bullet list layouts and the three times three axes of
+        // the text and icon element - fewer means a value lost its case, and
+        // the test below would pass on an empty list.
+        $this->assertCount(36, $classes, implode(', ', $classes));
     }
 
     #[DataProvider('writtenClasses')]

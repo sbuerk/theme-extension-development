@@ -50,8 +50,8 @@ lib.contentElement {
 # paths with it, and every "theme_*" element would look for
 # "ContentElements/Theme…" in the templates of fluid_styled_content and fail to
 # find it. An object of the theme's own name is one nothing else clears, so
-# these thirteen elements render the same whether or not fluid_styled_content
-# is installed, and whichever of the two is loaded first.
+# these elements render the same whether or not fluid_styled_content is
+# installed, and whichever of the two is loaded first.
 #
 # The classic CTypes stay on "lib.contentElement" on purpose: they are the ones
 # fluid_styled_content renders itself, and a bridge to it only has to add root
@@ -1096,3 +1096,9 @@ tt_content.theme_tabs.templateName = ContentElements/ThemeTabs
 
 tt_content.theme_accordion =< tt_content.theme_linklist
 tt_content.theme_accordion.templateName = ContentElements/ThemeAccordion
+
+# Text and icon, on ".theme-media-object". No data processing: the icon, its
+# position, shape and size, the text and the link are all fields of the record
+# itself - see "Templates/ContentElements/ThemeTextIcon.html".
+tt_content.theme_text_icon =< lib.themeContentElement
+tt_content.theme_text_icon.templateName = ContentElements/ThemeTextIcon

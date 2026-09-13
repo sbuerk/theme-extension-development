@@ -56,6 +56,48 @@
 			<trans-unit id="tt_content.tx_theme_icon.description">
 				<source>Shown in front of every item when the layout is "Icons". Without an icon the list keeps its markers.</source>
 			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon.types.theme_text_icon.description">
+				<source>Shown beside the text. Without an icon the element is its text alone.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.palette.theme_icon">
+				<source>Icon</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_position">
+				<source>Icon position</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_position.I.start">
+				<source>At the start of the line</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_position.I.end">
+				<source>At the end of the line</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_position.I.top">
+				<source>Above the text</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_shape">
+				<source>Icon shape</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_shape.I.plain">
+				<source>Plain</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_shape.I.square">
+				<source>On a square</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_shape.I.circle">
+				<source>On a circle</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_size">
+				<source>Icon size</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_size.I.md">
+				<source>Medium</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_size.I.lg">
+				<source>Large</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_icon_size.I.xl">
+				<source>Extra large</source>
+			</trans-unit>
 			<trans-unit id="tt_content.tx_theme_list_items">
 				<source>List items</source>
 			</trans-unit>
@@ -277,6 +319,14 @@
 			</trans-unit>
 			<trans-unit id="tt_content.tx_theme_header_style.I.h5">
 				<source>Like heading 5</source>
+			</trans-unit>
+
+			<!-- tt_content: theme_text_icon -->
+			<trans-unit id="tt_content.CType.theme_text_icon.label">
+				<source>Text and icon</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_text_icon.description">
+				<source>A heading, text and a link beside an icon - at the start, at the end or above, plain or on a tile.</source>
 			</trans-unit>
 
 			<!-- tt_content: frame_class items added by page TSconfig -->

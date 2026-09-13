@@ -1,0 +1,75 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    "theme_text_icon" - the heading, the rich text and the link of the element
+    beside one icon of the set, on ".theme-media-object"
+    (Resources/Private/Scss/components/_media-object.scss).
+
+    --- Three axes, one modifier each ----------------------------------------
+
+      tx_theme_icon_position   start, end, top    --start, --end, --top
+      tx_theme_icon_shape      plain, square, circle --plain, --square, --circle
+      tx_theme_icon_size       md, lg, xl         --md, --lg, --xl
+
+    Every value is matched by an "f:case", and anything else - an empty value,
+    an import, a value an older record carries - renders the first value of
+    its axis, which is also the TCA default. The modifier is always written, so
+    a block names its layout in full. "ContentElementContractTest" holds every
+    class written here to a rule of the compiled stylesheet.
+
+    --- The icon ---------------------------------------------------------------
+
+    "tx_theme_icon" is a name an editor picked, rendered with "optional": a
+    name a later version of the set no longer has costs the icon, not the page.
+    The icon is rendered into a variable first, and the slot only when that
+    produced markup, so an element without a usable icon is its text alone
+    rather than an empty tile. The variable holds what "<theme:icon>" renders -
+    the markup of a file of the set, never a value of the record - hence
+    "f:format.raw" on output. The slot is decoration and "aria-hidden": the
+    heading and the text say what the icon shows.
+
+    --- The body ---------------------------------------------------------------
+
+    The heading goes through the shared header partial inside the body, so it
+    sits beside the icon and "header_position" and "tx_theme_header_style"
+    apply. "bodytext" is rich text on this type, hence "f:format.html"; the
+    link is the "theme_link" palette, rendered by "LinkButton" as everywhere.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:switch expression="{data.tx_theme_icon_position}">
+        <f:case value="end"><f:variable name="position" value=" theme-media-object--end" /></f:case>
+        <f:case value="top"><f:variable name="position" value=" theme-media-object--top" /></f:case>
+        <f:defaultCase><f:variable name="position" value=" theme-media-object--start" /></f:defaultCase>
+    </f:switch>
+    <f:switch expression="{data.tx_theme_icon_shape}">
+        <f:case value="square"><f:variable name="shape" value=" theme-media-object--square" /></f:case>
+        <f:case value="circle"><f:variable name="shape" value=" theme-media-object--circle" /></f:case>
+        <f:defaultCase><f:variable name="shape" value=" theme-media-object--plain" /></f:defaultCase>
+    </f:switch>
+    <f:switch expression="{data.tx_theme_icon_size}">
+        <f:case value="lg"><f:variable name="size" value=" theme-media-object--lg" /></f:case>
+        <f:case value="xl"><f:variable name="size" value=" theme-media-object--xl" /></f:case>
+        <f:defaultCase><f:variable name="size" value=" theme-media-object--md" /></f:defaultCase>
+    </f:switch>
+    <f:variable name="icon"><f:if condition="{data.tx_theme_icon}"><theme:icon name="{data.tx_theme_icon}" optional="1" /></f:if></f:variable>
+    <div class="theme-media-object{position}{shape}{size}">
+        <f:if condition="{icon}">
+            <span class="theme-media-object__icon" aria-hidden="true">{icon -> f:format.raw()}</span>
+        </f:if>
+        <div class="theme-media-object__body">
+            <f:render partial="ContentElement/Header" arguments="{_all}" />
+            <f:if condition="{data.bodytext}">
+                <div class="theme-content-element__body">
+                    <f:format.html>{data.bodytext}</f:format.html>
+                </div>
+            </f:if>
+            <f:render partial="ContentElement/LinkButton" arguments="{data: data}" />
+        </div>
+    </div>
+</f:section>
+
+</html>
