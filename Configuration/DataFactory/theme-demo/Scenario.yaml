@@ -3004,6 +3004,20 @@ entities:
                               <p>A quotation that stands on its own between two sections of
                               a page, centred below its mark and never wider than the
                               reading measure.</p>
+                      # A portrait of the attributed person, next to the name.
+                      # The image is attached in "config.yml"; the template
+                      # renders it as a decorative avatar, because the name
+                      # beside it already says who is quoted.
+                      - self:
+                            id: 11206
+                            CType: 'theme_testimonial'
+                            tx_theme_quote_style: ''
+                            header: 'With a portrait'
+                            subheader: 'An avatar before the name'
+                            bodytext: |
+                              <p>A picture of the person quoted, as a round avatar at the
+                              start of the attribution. It stands beside the name, so it
+                              carries no text of its own.</p>
 
             # The appearance fields of a content element, every value once:
             # the frames, the space before and after, the alignment and the

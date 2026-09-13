@@ -180,6 +180,9 @@
 			<trans-unit id="tt_content.subheader.types.theme_testimonial.label">
 				<source>Attributed role</source>
 			</trans-unit>
+			<trans-unit id="tt_content.image.types.theme_testimonial.label">
+				<source>Portrait</source>
+			</trans-unit>
 			<trans-unit id="tt_content.bodytext.types.theme_testimonial.label">
 				<source>Quotation</source>
 			</trans-unit>

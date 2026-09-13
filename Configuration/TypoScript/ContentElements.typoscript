@@ -1018,9 +1018,8 @@ tt_content.theme_media_teaser_grid {
 #
 # The templates therefore read "files.0" directly - the first (and, given the
 # form above, in practice only) file reference - rather than a "gallery"
-# structure. theme_hero_text_only, theme_teaser and theme_testimonial are
-# deliberately left out of this dataProcessing: none of the three has an
-# "image" field at all.
+# structure. theme_hero_text_only and theme_teaser are deliberately left out of
+# this dataProcessing: neither has an "image" field at all.
 tt_content.theme_hero =< lib.themeContentElement
 tt_content.theme_hero {
     templateName = ContentElements/ThemeHero
@@ -1071,11 +1070,21 @@ tt_content.theme_media_teaser {
     }
 }
 
-# No dataProcessing: this element has no media. See the comment in
-# "Templates/ContentElements/ThemeTestimonial.html" for why the field it once
-# had was removed rather than left inert.
+# The portrait of the attributed person - the core "image" field, limited to
+# one file on this type - resolved with "FilesProcessor" alone, like the other
+# single-image elements above. See "Templates/ContentElements/ThemeTestimonial.html".
 tt_content.theme_testimonial =< lib.themeContentElement
-tt_content.theme_testimonial.templateName = ContentElements/ThemeTestimonial
+tt_content.theme_testimonial {
+    templateName = ContentElements/ThemeTestimonial
+
+    dataProcessing {
+        10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        10 {
+            references.fieldName = image
+            as = files
+        }
+    }
+}
 
 # A notice on ".theme-alert". No data processing: the kind, the title and the
 # text are all fields of the record itself, and the template derives the
