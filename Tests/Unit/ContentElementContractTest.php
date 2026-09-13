@@ -61,16 +61,16 @@ final class ContentElementContractTest extends UnitTestCase
             'Resources/Private/Partials/ContentElement/Hero.html',
             'Resources/Private/Templates/ContentElements/ThemeTestimonial.html',
             'Resources/Private/Templates/ContentElements/ThemeCta.html',
+            'Resources/Private/Templates/ContentElements/ThemeCardGroup.html',
         ] as $template) {
             $source = (string)file_get_contents(self::root() . '/' . $template);
             preg_match_all('#<f:variable name="\w+" value="([^"]*)"\s*/>#', $source, $values);
             foreach ($values[1] as $value) {
                 foreach (preg_split('/\s+/', trim($value)) ?: [] as $class) {
                     // A class written in two cases - the feature layouts 1
-                    // and 3 share one - is one data set, not two of one name.
-                    // A template may write one class for two values - the
-                    // hero writes "--centred" for a screenshot without an
-                    // image as well - and a data set name is unique.
+                    // and 3 share one, and the hero writes "--centred" for a
+                    // screenshot without an image as well - is one data set,
+                    // as a data set name is unique.
                     if ($class !== '' && !isset($seen[$class])) {
                         $seen[$class] = true;
                         yield $class => ['class' => $class];
@@ -85,12 +85,12 @@ final class ContentElementContractTest extends UnitTestCase
     {
         $classes = array_keys(iterator_to_array(self::writtenClasses()));
 
-        // Five frames, ten spacings, three positions, five looks, the text
         // One case per modifier the templates above write: the appearance
         // fields, the lists, the text and icon element, the features, the
-        // steps and the layouts and variants - fewer means a value lost its
-        // case, and the test below would pass on an empty list.
-        $this->assertCount(57, $classes, implode(', ', $classes));
+        // steps, the card group and the layouts and variants - fewer means
+        // a value lost its case, and the test below would pass on an empty
+        // list.
+        $this->assertCount(61, $classes, implode(', ', $classes));
     }
 
     #[DataProvider('writtenClasses')]

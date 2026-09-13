@@ -3,12 +3,29 @@
       xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
-    The "theme_link" palette (tx_theme_link + tx_theme_link_label +
-    tx_theme_link_variant + tx_theme_link_icon,
-    Configuration/TCA/Overrides/tt_content.php), rendered as a ".theme-button"
-    (Resources/Private/Scss/components/_button.scss). Shared by the three hero
-    variants, theme_teaser and theme_media_teaser - theme_testimonial does not
-    carry this palette at all, see its own template.
+    A link with its label, style and icon, rendered as a ".theme-button"
+    (Resources/Private/Scss/components/_button.scss). Arguments: "link",
+    "label", "variant" and "icon" - the "theme_link" palette of a content
+    element (tx_theme_link, tx_theme_link_label, tx_theme_link_variant,
+    tx_theme_link_icon, Configuration/TCA/Overrides/tt_content.php) for the
+    three hero variants, theme_teaser, theme_media_teaser, theme_text_icon
+    and both links of theme_cta, whose second link fills the same four
+    arguments from its own columns, and the
+    "theme_link_style" palette of an inline list item (link, link_label,
+    link_variant, link_icon) for a card of theme_card_group. The fields are
+    passed in rather than read off "data", so one partial and one set of cases
+    serves both. theme_testimonial does not carry a link at all, see its own
+    template.
+
+    A link without a label renders with no content at all, and the core
+    fills in its fallback text: the title of the page for a page link
+    ("PageLinkBuilder::parseFallbackLinkTextIfLinkTextIsEmpty()", read on
+    v13.4 and v14.3 - "f:link.typolink" hands its rendered children to
+    "typoLink()", so an empty tag is an empty link text), the address for an
+    email link, the URL otherwise. Never the stored link reference, which
+    would put "t3://page?uid=…" on the button. The icon is left out then: it
+    would make the content non-empty, and the core would keep a button with
+    an icon and no name.
 
     "tx_theme_link" is a TCA type=link field. Its stored value is already a
     stdWrap.typolink parameter string (the page/file/url/email/record syntax
@@ -24,34 +41,38 @@
     <f:link.typolink>, which uses TypoScript internally") - behaviour verified
     identical on v13.4 and v14.3, nothing here needs a version split.
 
-    "tx_theme_link_variant" - "Link style" in the form - only ever holds '',
+    The style - "Link style" in the form, "tx_theme_link_variant" and the
+    "link_variant" of the child, which carries the same configuration - only
+    ever holds '',
     'secondary', 'ghost' or 'link', read from the "items" of the column, not
     assumed. The switch covers exactly those values, one per modifier
     "_button.scss" ships; the empty default case renders the plain
     ".theme-button". "ThemeLinkRenderingTest" holds the items and the cases to
     each other.
 
-    "tx_theme_link_icon" is an icon of the shipped set an editor picked, and
+    The icon is an icon of the shipped set an editor picked, and
     goes before the label: it says what the link leads to, and leaves the end
     of the link to what says how it opens. It is decoration, hidden from assistive
     technology; the label names the link. The button's "gap" spaces it, in
     reading order, so it also comes first in a right-to-left page. "optional":
     a name a later Font Awesome version dropped loses the icon, not the page.
 </f:comment>
-<f:if condition="{data.tx_theme_link}">
-    <f:switch expression="{data.tx_theme_link_variant}">
+<f:if condition="{link}">
+    <f:switch expression="{variant}">
         <f:case value="secondary"><f:variable name="themeButtonClass" value="theme-button theme-button--secondary" /></f:case>
         <f:case value="ghost"><f:variable name="themeButtonClass" value="theme-button theme-button--ghost" /></f:case>
         <f:case value="link"><f:variable name="themeButtonClass" value="theme-button theme-button--link" /></f:case>
         <f:defaultCase><f:variable name="themeButtonClass" value="theme-button" /></f:defaultCase>
     </f:switch>
-    <f:link.typolink parameter="{data.tx_theme_link}" class="{themeButtonClass}">
-        <f:if condition="{data.tx_theme_link_icon}"><theme:icon name="{data.tx_theme_link_icon}" optional="1" /></f:if>
-        <f:if condition="{data.tx_theme_link_label}">
-            <f:then>{data.tx_theme_link_label}</f:then>
-            <f:else>{data.tx_theme_link}</f:else>
-        </f:if>
-    </f:link.typolink>
+    <f:if condition="{label}">
+        <f:then>
+            <f:link.typolink parameter="{link}" class="{themeButtonClass}">
+                <f:if condition="{icon}"><theme:icon name="{icon}" optional="1" /></f:if>
+                {label}
+            </f:link.typolink>
+        </f:then>
+        <f:else><f:link.typolink parameter="{link}" class="{themeButtonClass}" /></f:else>
+    </f:if>
 </f:if>
 
 </html>

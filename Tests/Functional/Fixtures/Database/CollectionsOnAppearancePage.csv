@@ -1,0 +1,4 @@
+tt_content,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,layout
+,970,1,0,0,0,970,theme_card_group,A card group,2,0
+,980,1,0,0,0,980,theme_timeline,A timeline,2,0

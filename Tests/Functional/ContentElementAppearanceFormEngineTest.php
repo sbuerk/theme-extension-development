@@ -49,6 +49,7 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/HeroesOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/TestimonialOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/CtaOnAppearancePage.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/CollectionsOnAppearancePage.csv');
         $backendUser = $this->setUpBackendUser(1);
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
     }
@@ -149,8 +150,9 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
     }
 
     /**
-     * `layout` is asserted on the header element: the text element and the
-     * bullet list render it, and re-enable it for their own type, below.
+     * `layout` is asserted on the header element: the text element, the
+     * bullet list and the card group render it, and re-enable it for their
+     * own type, below.
      *
      * @return \Generator<string, array{field: string, uid: int}>
      */
@@ -238,6 +240,44 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         // Still disabled on the header element beside it: the type specific
         // part applies to its type only.
         $this->assertTrue(self::isDisabled($this->compile(920), 'layout'));
+    }
+
+    /**
+     * `layout` is the arrangement of a card group - the grid or the scroller -
+     * and the form offers exactly those two, under names that say so. The
+     * core values 2 and 3 are removed for this type, and the field stays
+     * disabled for every type that does not render it, the timeline beside
+     * it included.
+     */
+    #[Test]
+    public function theCardGroupOffersItsTwoArrangementsUnderTheirOwnNames(): void
+    {
+        $result = $this->compile(970);
+
+        $this->assertFalse(self::isDisabled($result, 'layout'), '"layout" is missing from the card group.');
+        $this->assertSame(['0', '1'], self::itemValues($result, 'layout'));
+        $labels = array_values(array_map(
+            static fn(array $item): string => (string)$item['label'],
+            $result['processedTca']['columns']['layout']['config']['items'] ?? [],
+        ));
+        $expected = array_map(
+            static fn(int $value): string => $GLOBALS['LANG']->sL(
+                'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_card_group.I.' . $value,
+            ),
+            [0, 1],
+        );
+        $this->assertNotContains('', $expected, 'A label of the card group layouts is not translated.');
+        $this->assertSame($expected, $labels);
+        $this->assertSame(['2', '3', '4'], self::itemValues($result, 'tx_theme_columns'));
+
+        $form = $this->renderedForm(970);
+        $this->assertStringContainsString(self::inputName(970, 'layout'), $form);
+        $this->assertStringContainsString(self::inputName(970, 'tx_theme_columns'), $form);
+
+        $this->assertTrue(self::isDisabled($this->compile(980), 'layout'), '"layout" is offered on the timeline, which ignores it.');
+        $timeline = $this->renderedForm(980);
+        $this->assertStringContainsString(self::inputName(980, 'tx_theme_sort_direction'), $timeline);
+        $this->assertStringNotContainsString(self::inputName(980, 'layout'), $timeline);
     }
 
     /**

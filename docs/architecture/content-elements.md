@@ -827,6 +827,9 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_stats`             | Figures and what they count                              | `.theme-stat` in `.theme-stats`                         |
 | `theme_steps`             | The numbered steps of a process                          | `.theme-steps`                                          |
 | `theme_cta`               | A call to action: heading, text, icon, two links         | `.theme-cta`                                            |
+| `theme_card_group`        | Cards in a grid, or in one row that scrolls sideways     | `.theme-card-grid` of `.theme-card` items               |
+| `theme_timeline`          | Dated entries on a line, sorted by date                  | `.theme-timeline`                                       |
+| `theme_teaser_list`       | Rows of teasers, each row one link                       | `.theme-list-group`                                     |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -1152,11 +1155,11 @@ shared header partial **inside** the body, beside the icon, so
 
 **`theme_features`, `theme_stats` and `theme_steps`** take their items from
 `tx_theme_list_items`, like the tabs and the accordion, and their TypoScript is
-a copy of `tt_content.theme_linklist` with a template of its own. Each shows the
-child's `icon` column - `tx_theme_list_item.icon`, the icon of an item, from the
-same picker - through the `showitem` of its `overrideChildTca`; no other
-relation shows it, so no editor is offered an icon nothing renders. The title of
-an item is required in all three.
+a copy of `tt_content.theme_linklist` with a template of its own. Each shows
+the child's `icon` column - `tx_theme_list_item.icon`, the icon of an item,
+from the same picker - through the `showitem` of its `overrideChildTca`; apart
+from the timeline below, no other relation shows it, so no editor is offered an
+icon nothing renders. The title of an item is required in all three.
 
 | `CType`          | Items                                                       | Renders through                           |
 |------------------|-------------------------------------------------------------|-------------------------------------------|
@@ -1221,6 +1224,99 @@ icon.
 | `Tests/Functional/IconContentElementRenderingTest.php`  | every value of every axis, and one nothing offers, writes its modifier, through the set and the static include; no empty slot |
 | `Tests/Functional/IconContentElementFormEngineTest.php` | the form offers the values the component styles, the fields on this type only, and the description of the type                |
 | `Tests/Unit/ContentElementContractTest.php`             | every modifier the template writes is a selector of the compiled stylesheet                                                   |
+
+### Card group, timeline and teaser list
+
+Three elements that arrange several items of one kind, each on a component of
+its own: `theme_card_group` on the card grid, `theme_timeline` on
+`.theme-timeline`, `theme_teaser_list` on `.theme-list-group`. All three read
+`tx_theme_list_items` with the image of every row, which is the query and the
+nested `FilesProcessor` of `theme_media_teaser_grid`, so their TypoScript is a
+reference to it with a template of its own. Their items are the items of a
+list - an `ol` for the timeline, a `ul` for the other two - and their titles sit
+one level below the heading of the element (`ItemHeading.html`).
+
+The child table gains the columns only these three need, named for what they
+hold rather than for the element that shows them first. It also shows two
+columns of the icon elements above: `subheader` below the title of a card,
+and the item's `icon` on the line of the timeline.
+
+| Column         | Type                                         | Shown by                                      |
+|----------------|----------------------------------------------|-----------------------------------------------|
+| `date`         | `datetime`, `format` and `dbType` date       | timeline (required), teaser list              |
+| `meta`         | input                                        | teaser list, beside the date                  |
+| `link_variant` | the configuration of `tx_theme_link_variant` | card group, in the palette `theme_link_style` |
+
+`date` is a native `DATE` column: a timeline reaches back before 1970 as easily
+as past 2038, a calendar date has no time zone to shift it across midnight, and
+the database sorts it as it stands. `DefaultTcaSchema` derives the nullable
+column from `dbType` on both cores, and DataHandler stores an empty value as
+NULL (`checkValueForDatetime()`, read on v14.3). It is written out with the ICU
+pattern `d MMMM y` in the locale of the site language - `f:format.date`
+accepts `pattern` since Feature #100187 in TYPO3 12.3 - and marked up as
+`<time datetime="Y-m-d">`.
+
+`link_variant` takes its configuration from `tt_content.tx_theme_link_variant`
+in `Configuration/TCA/Overrides/tx_theme_list_item.php`, so the two lists of
+styles cannot drift apart, and the card renders its link through
+`LinkButton.html` like a hero does. The partial takes the link, the label, the
+style and the icon as arguments since then, instead of reading the `theme_link`
+palette off `data`. A link without a label renders with no content, and the
+core fills in its fallback text - the title of the page for a page link
+(`PageLinkBuilder::parseFallbackLinkTextIfLinkTextIsEmpty()`, read on v13.4
+and v14.3), the address for an email link, the URL otherwise - rather than the
+stored link reference. The icon is left out then: it would make the content
+non-empty, and the core would keep a button with an icon and no name.
+`overrideChildTca` accepts `types` and `columns` only (`InlineOverrideChildTca`),
+which is why the palette is part of the child's TCA and not of the relation.
+
+**The card group** arranges its cards by the core column `layout` and by
+`tx_theme_columns`. `layout` is disabled for every CType and re-enabled for
+this one by `ContentElementAppearance.tsconfig`, the way the bullet list does
+it, with the two values it renders relabelled - *Grid* and *Scroller* - and the
+other two removed; it is in the palette `theme_grid` with `tx_theme_columns`,
+on the tab of the cards, rather than on the *Appearance* tab the theme's
+elements do not show. `tx_theme_columns` is the column of the features, with
+the database default 0 on v13.4 described above, which is why the template
+reads 0, like any value it does not know, as three columns. Both map onto
+modifiers in one `f:switch` each, and a value the form does not offer renders
+the grid in three columns. The scroller is a `.theme-card-scroller` region
+named after the heading of the element, or *Cards* where there is none, so it
+is never nameless.
+
+**The timeline** sorts by date in the TypoScript, not in Fluid: `orderBy` goes
+through stdWrap (`ContentObjectRenderer::getQuery()`), so a `CASE` on
+`tx_theme_sort_direction` picks `date ASC, sorting_foreign` or `date DESC,
+sorting_foreign`. The direction only chooses between two fixed strings and
+never reaches the query, and the relation breaks a tie in both directions. The
+date is required in the form of this relation, but `required` is a check of the
+form only: an import, or a teaser list switched to a timeline, leaves entries
+without a date. Such an entry sorts as NULL, first on SQLite, MariaDB and MySQL
+and last on PostgreSQL in ascending order, and renders without its `time`. An
+entry may carry an icon, the item's `icon` of the icon elements with their
+curated list: the section `Marker` renders it into `.theme-timeline__icon` -
+into a variable first, so a name the set no longer has leaves the ring rather
+than an empty slot - and the stylesheet drops the ring for that entry.
+
+**The teaser list** makes the title the one link of a row: `ItemHeading.html`
+takes an optional `link` and `linkClass` and renders the title as
+`f:link.typolink` inside the heading, and the stylesheet stretches it over the
+row. The title is required, because it is the name of that link, and the
+relation shows `link` alone: a label, an icon or a style would have nowhere to
+go. Its image is a `.theme-avatar` in the decorative form, `alt=""`:
+the title beside it names the row, and the alternative text of the file
+reference would be read out next to it. The template writes the `img` with
+`f:uri.image`, so its attributes are exactly those of the avatar contract.
+
+`CollectionElementRenderingTest` renders all three through the site set and
+the static include: the column modifiers and the scroller region, the defaults
+for values the form does not offer, the date order with a tie in both
+directions, the date as `time`, the icon of an entry, and one link per
+row.
+`ContentElementAppearanceFormEngineTest` holds `layout` to the two
+arrangements of the card group and to no other type, and
+`ContentElementContractTest` every modifier the card group writes to a rule of
+the stylesheet.
 
 ### Gaps, stated as gaps
 
@@ -1394,7 +1490,8 @@ invented — every identifier is one the core registers (`content-header`,
 `content-message`, `content-tab`, `content-accordion` for the notice, the
 tabs and the accordion, `content-idea` for the text and icon element, and
 `content-widget-list`, `content-widget-number` and `content-target` for the
-features, the figures and the steps), verified present in the core's own icon registry
+features, the figures and the steps, and `content-timeline` for the
+timeline), verified present in the core's own icon registry
 (`.Build/vendor/typo3/cms-core/Resources/Public/Icons/T3Icons/icons.json`),
 not shipped as image files of this extension's own. An identifier that is
 *not* registered does not fail quietly: `IconRegistry::getIconConfigurationByIdentifier()`

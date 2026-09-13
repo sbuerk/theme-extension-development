@@ -82,13 +82,41 @@ return [
         // A second, short line that goes with the header. Named for what it
         // is on any item, not for one element: the stats element uses it for
         // what a figure counts - its "header" is the figure - and relabels
-        // both through its "overrideChildTca". No other relation shows it.
+        // both through its "overrideChildTca"; the card group shows it below
+        // the title of a card. No other relation shows it.
         'subheader' => [
             'l10n_mode' => 'prefixLangTitle',
             'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.subheader',
             'config' => [
                 'type' => 'input',
                 'size' => 50,
+                'max' => 255,
+            ],
+        ],
+        // The date of an entry of "theme_timeline", which is sorted by it, and
+        // of a row of "theme_teaser_list". A native "DATE" column ("dbType"):
+        // a timeline reaches back before 1970 as easily as forward past 2038,
+        // a calendar date has no time zone to shift it across midnight, and
+        // the database sorts it as it stands. "DefaultTcaSchema" derives the
+        // nullable column from "dbType" on v13.4 and v14.3, and DataHandler
+        // stores an empty value as NULL rather than as a date.
+        'date' => [
+            'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.date',
+            'config' => [
+                'type' => 'datetime',
+                'format' => 'date',
+                'dbType' => 'date',
+                'nullable' => true,
+            ],
+        ],
+        // Meta data at the end of a row of "theme_teaser_list" - a reading
+        // time, a place, a category. Plain text; the date has its own column.
+        'meta' => [
+            'l10n_mode' => 'prefixLangTitle',
+            'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.meta',
+            'config' => [
+                'type' => 'input',
+                'size' => 30,
                 'max' => 255,
             ],
         ],

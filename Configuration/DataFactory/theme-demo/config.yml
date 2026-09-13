@@ -267,3 +267,23 @@ references:
   - {file: placeholder-portrait, table: tt_content, uid: 11206, field: image, values: {alternative: 'A placeholder portrait'}}
   # Page 56, "Article": the image the text flows around.
   - {file: placeholder-portrait, table: tt_content, uid: 5604, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'Placed in the text, at the end of the line'}}
+
+  # Pages 90 to 92, below "Theme elements": the page media the card and
+  # thumbnail layouts of the page menus on page 7 show, and the images of the
+  # rows of the collection elements.
+  - {file: placeholder, table: pages, uid: 90, field: media, values: {alternative: 'A placeholder graphic standing in for the card group'}}
+  - {file: placeholder, table: pages, uid: 91, field: media, values: {alternative: 'A placeholder graphic standing in for the timeline'}}
+  - {file: placeholder, table: pages, uid: 92, field: media, values: {alternative: 'A placeholder graphic standing in for the teaser list'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 150, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 151, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 153, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder-portrait, table: tx_theme_list_item, uid: 154, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 159, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 160, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 161, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 162, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 163, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 166, field: image, values: {alternative: 'A placeholder graphic standing in for a screenshot of the prototype'}}
+  - {file: placeholder-portrait, table: tx_theme_list_item, uid: 173, field: image, values: {alternative: 'A placeholder portrait'}}
+  - {file: placeholder-portrait, table: tx_theme_list_item, uid: 174, field: image, values: {alternative: 'A placeholder portrait'}}
+  - {file: placeholder-portrait, table: tx_theme_list_item, uid: 175, field: image, values: {alternative: 'A placeholder portrait'}}

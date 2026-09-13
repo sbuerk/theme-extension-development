@@ -26,20 +26,26 @@ tt_content,,,,,,,,,,,,,,,
 ,210,1,0,0,0,210,theme_accordion,Second accordion,,,,,2,2,
 ,220,1,0,0,0,220,theme_notice,,,,,,0,0,warning
 ,230,1,0,0,0,230,theme_cta,A call to action,<p>Act now.</p>,t3://page?uid=1,Go,,0,0,
-tx_theme_list_item,,,,,,,,,,,,
-,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,text,link,link_label
-,1,1,0,0,1,70,tt_content,tx_theme_list_items,,,t3://page?uid=1,Profile
-,2,1,0,0,2,70,tt_content,tx_theme_list_items,,,https://example.com/,Homepage
-,3,1,0,0,1,80,tt_content,tx_theme_list_items,,,t3://page?uid=1,Documentation
-,4,1,0,0,2,80,tt_content,tx_theme_list_items,,,t3://page?uid=1,Changelog
-,5,1,0,0,1,90,tt_content,tx_theme_list_items,,,https://example.com/social,Somewhere social
-,6,1,0,0,1,100,tt_content,tx_theme_list_items,First teaser,<p>One.</p>,t3://page?uid=1,Open
-,7,1,0,0,2,100,tt_content,tx_theme_list_items,Second teaser,<p>Two.</p>,t3://page?uid=1,Open
-,8,1,0,0,1,180,tt_content,tx_theme_list_items,Alpha tab,<p>Alpha panel with <strong>rich</strong> text.</p>,,
-,9,1,0,0,2,180,tt_content,tx_theme_list_items,Beta tab,<p>Beta panel.</p>,,
-,10,1,0,0,1,190,tt_content,tx_theme_list_items,Gamma tab,<p>Gamma panel.</p>,,
-,11,1,0,0,2,190,tt_content,tx_theme_list_items,Delta tab,<p>Delta panel.</p>,,
-,12,1,0,0,1,200,tt_content,tx_theme_list_items,First question,<p>First answer with <em>rich</em> text.</p>,,
-,13,1,0,0,2,200,tt_content,tx_theme_list_items,Second question,<p>Second answer.</p>,,
-,14,1,0,0,1,210,tt_content,tx_theme_list_items,Third question,<p>Third answer.</p>,,
-,15,1,0,0,2,210,tt_content,tx_theme_list_items,Fourth question,<p>Fourth answer.</p>,,
+,240,1,0,0,0,240,theme_card_group,A card group,,,,,1,2,
+,250,1,0,0,0,250,theme_timeline,A timeline,,,,,1,2,
+,260,1,0,0,0,260,theme_teaser_list,A teaser list,,,,,1,2,
+tx_theme_list_item,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,text,link,link_label,date
+,1,1,0,0,1,70,tt_content,tx_theme_list_items,,,t3://page?uid=1,Profile,\NULL
+,2,1,0,0,2,70,tt_content,tx_theme_list_items,,,https://example.com/,Homepage,\NULL
+,3,1,0,0,1,80,tt_content,tx_theme_list_items,,,t3://page?uid=1,Documentation,\NULL
+,4,1,0,0,2,80,tt_content,tx_theme_list_items,,,t3://page?uid=1,Changelog,\NULL
+,5,1,0,0,1,90,tt_content,tx_theme_list_items,,,https://example.com/social,Somewhere social,\NULL
+,6,1,0,0,1,100,tt_content,tx_theme_list_items,First teaser,<p>One.</p>,t3://page?uid=1,Open,\NULL
+,7,1,0,0,2,100,tt_content,tx_theme_list_items,Second teaser,<p>Two.</p>,t3://page?uid=1,Open,\NULL
+,8,1,0,0,1,180,tt_content,tx_theme_list_items,Alpha tab,<p>Alpha panel with <strong>rich</strong> text.</p>,,,\NULL
+,9,1,0,0,2,180,tt_content,tx_theme_list_items,Beta tab,<p>Beta panel.</p>,,,\NULL
+,10,1,0,0,1,190,tt_content,tx_theme_list_items,Gamma tab,<p>Gamma panel.</p>,,,\NULL
+,11,1,0,0,2,190,tt_content,tx_theme_list_items,Delta tab,<p>Delta panel.</p>,,,\NULL
+,12,1,0,0,1,200,tt_content,tx_theme_list_items,First question,<p>First answer with <em>rich</em> text.</p>,,,\NULL
+,13,1,0,0,2,200,tt_content,tx_theme_list_items,Second question,<p>Second answer.</p>,,,\NULL
+,14,1,0,0,1,210,tt_content,tx_theme_list_items,Third question,<p>Third answer.</p>,,,\NULL
+,15,1,0,0,2,210,tt_content,tx_theme_list_items,Fourth question,<p>Fourth answer.</p>,,,\NULL
+,16,1,0,0,1,240,tt_content,tx_theme_list_items,A card,One card.,,,\NULL
+,17,1,0,0,1,250,tt_content,tx_theme_list_items,An entry,One entry.,,,2026-01-12
+,18,1,0,0,1,260,tt_content,tx_theme_list_items,A row,One row.,,,\NULL
