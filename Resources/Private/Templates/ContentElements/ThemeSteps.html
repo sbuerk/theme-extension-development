@@ -1,0 +1,49 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    "theme_steps" - one step per row of "tx_theme_list_items", on
+    ".theme-steps" (Resources/Private/Scss/components/_steps.scss): an ordered
+    list, because the order of the items is the content.
+
+    The marker of a step is empty and numbered by the stylesheet, so no number
+    in the markup can disagree with the order of the list. A step whose child
+    carries a usable "icon" shows the icon in its marker instead, with the
+    modifier "theme-steps__marker--icon"; the icon is rendered with "optional"
+    into a variable first - see "ThemeTextIcon.html". The marker is
+    "aria-hidden": the list says which item of how many a step is.
+
+    The title is one level below the element's heading
+    ("Partials/ContentElement/ItemHeading.html"), the text the child's plain
+    "text" through "f:format.nl2br". "item.data.*": "DatabaseQueryProcessor"
+    wraps every row, see "ThemeMediaTeaserGrid.html".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <ol class="theme-steps">
+            <f:for each="{listItems}" as="item">
+                <f:variable name="icon"><f:if condition="{item.data.icon}"><theme:icon name="{item.data.icon}" optional="1" /></f:if></f:variable>
+                <f:if condition="{icon}">
+                    <f:then><f:variable name="marker" value=" theme-steps__marker--icon" /></f:then>
+                    <f:else><f:variable name="marker" value="" /></f:else>
+                </f:if>
+                <li class="theme-steps__step">
+                    <span class="theme-steps__marker{marker}" aria-hidden="true">{icon -> f:format.raw()}</span>
+                    <div class="theme-steps__body">
+                        <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-steps__title', title: item.data.header}" />
+                        <f:if condition="{item.data.text}">
+                            <p class="theme-steps__text"><f:format.nl2br>{item.data.text}</f:format.nl2br></p>
+                        </f:if>
+                    </div>
+                </li>
+            </f:for>
+        </ol>
+    </f:if>
+</f:section>
+
+</html>

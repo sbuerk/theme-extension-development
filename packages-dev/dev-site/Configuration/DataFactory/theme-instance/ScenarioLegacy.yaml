@@ -1574,6 +1574,328 @@ entities:
                           tx_theme_icon_position: start
                           tx_theme_icon_shape: circle
                           tx_theme_icon_size: md
+                -
+                  self:
+                    id: 1071
+                    title: Features
+                    slug: /elements/theme/features
+                    backend_layout: content
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 8101
+                          CType: header
+                          header: Features
+                          header_layout: 1
+                      -
+                        self:
+                          id: 8102
+                          CType: text
+                          header: 'Four layouts, up to four columns'
+                          header_layout: 2
+                          bodytext: "<p>A group of features: an icon, a title, a sentence or two and a\nlink each. The layout sets the icon above the title, beside it on a\nframed tile, or frames the whole feature; the fourth sets the heading\nand the text of the element beside the grid. The grid takes two,\nthree or four columns at most, and fewer where a column would be too\nnarrow - one on a phone.</p>"
+                      -
+                        self:
+                          id: 8103
+                          CType: theme_features
+                          header: 'Why build against this theme'
+                          header_layout: 2
+                          bodytext: '<p>Three reasons, in columns of three, the icon on a tile above each title.</p>'
+                          layout: 0
+                          tx_theme_columns: 3
+                          tx_theme_list_items: '1100,1101,1102'
+                      -
+                        self:
+                          id: 8104
+                          CType: theme_features
+                          header: 'What every element brings'
+                          header_layout: 2
+                          layout: 1
+                          tx_theme_columns: 2
+                          tx_theme_list_items: '1103,1104,1105,1106'
+                      -
+                        self:
+                          id: 8105
+                          CType: theme_features
+                          header: 'The showcase at a glance'
+                          header_layout: 2
+                          layout: 2
+                          tx_theme_columns: 4
+                          tx_theme_list_items: '1107,1108,1109,1110'
+                      -
+                        self:
+                          id: 8106
+                          CType: theme_features
+                          header: 'Two ways to deliver the theme'
+                          header_layout: 2
+                          bodytext: "<p>A site takes the theme through its site set, an installation without\nsite sets through the static include. Both render the same pages, and\nthe tests hold them to it.</p>\n"
+                          layout: 3
+                          tx_theme_columns: 2
+                          tx_theme_list_items: '1111,1112,1113,1114'
+                    listItem:
+                      -
+                        self:
+                          id: 1100
+                          header: 'Neutral by design'
+                          text: 'An extension built against this theme shows its own structure, not a brand.'
+                          icon: lightbulb
+                          link: 't3://page?uid=1009'
+                          link_label: 'Open the styleguide'
+                          link_icon: arrow-right
+                      -
+                        self:
+                          id: 1101
+                          header: 'Tested on both cores'
+                          text: 'Every gate runs for TYPO3 v13 and for v14, each on its own dependency set.'
+                          icon: list-check
+                          link: 't3://page?uid=1006'
+                          link_label: 'See the core elements'
+                      -
+                        self:
+                          id: 1102
+                          header: 'Readable in every palette'
+                          text: 'Every colour is checked in both appearances and all five palettes.'
+                          icon: universal-access
+                      -
+                        self:
+                          id: 1103
+                          header: 'A form of its own'
+                          text: 'The backend form offers the fields the template renders, and no others.'
+                          icon: pen-to-square
+                      -
+                        self:
+                          id: 1104
+                          header: 'A template on a contract'
+                          text: 'One Fluid file per element, written against the markup of a component.'
+                          icon: code
+                      -
+                        self:
+                          id: 1105
+                          header: 'Rich text where it is prose'
+                          text: 'Headings and lists come from the rich text editor, with the classes of the theme.'
+                          icon: book-open
+                      -
+                        self:
+                          id: 1106
+                          header: 'Icons from one set'
+                          text: 'Every icon is one of Font Awesome Free, picked by name in the form.'
+                          icon: star
+                      -
+                        self:
+                          id: 1107
+                          header: Typography
+                          text: 'Running text, lists, tables, quotes and code.'
+                          icon: book
+                          link: 't3://page?uid=1002'
+                          link_label: Read
+                      -
+                        self:
+                          id: 1108
+                          header: Media
+                          text: 'Images and galleries.'
+                          icon: image
+                          link: 't3://page?uid=1003'
+                          link_label: Look
+                      -
+                        self:
+                          id: 1109
+                          header: 'Core elements'
+                          text: 'Every classic element, in its variants.'
+                          icon: list
+                          link: 't3://page?uid=1006'
+                          link_label: Browse
+                      -
+                        self:
+                          id: 1110
+                          header: Styleguide
+                          text: 'Every component, from its own markup.'
+                          icon: gear
+                          link: 't3://page?uid=1009'
+                          link_label: Open
+                      -
+                        self:
+                          id: 1111
+                          header: 'Site set'
+                          text: 'A dependency of the site; constants, page TSconfig and setup arrive together.'
+                          icon: server
+                      -
+                        self:
+                          id: 1112
+                          header: 'Static include'
+                          text: 'The same TypoScript, included through a template record.'
+                          icon: database
+                      -
+                        self:
+                          id: 1113
+                          header: 'Never both'
+                          text: 'A condition keeps the static include out of a site that names the set.'
+                          icon: shield-halved
+                      -
+                        self:
+                          id: 1114
+                          header: 'Compared page by page'
+                          text: 'The second tree of an instance is rendered through the other path.'
+                          icon: circle-check
+                -
+                  self:
+                    id: 1072
+                    title: Stats
+                    slug: /elements/theme/stats
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 8201
+                          CType: header
+                          header: Stats
+                          header_layout: 1
+                      -
+                        self:
+                          id: 8202
+                          CType: text
+                          header: 'A figure and what it counts'
+                          header_layout: 2
+                          bodytext: "<p>Each figure is a pair of a description list: what it counts is the\nterm, the figure its description, shown above it and larger, in digits\nof one width. An icon before the figure and a sentence below it are\noptional.</p>"
+                      -
+                        self:
+                          id: 8203
+                          CType: theme_stats
+                          header: 'The theme in figures'
+                          header_layout: 2
+                          tx_theme_list_items: '1115,1116,1117,1118'
+                      -
+                        self:
+                          id: 8204
+                          CType: theme_stats
+                          header: 'Without icons'
+                          header_layout: 2
+                          tx_theme_list_items: '1119,1120,1121'
+                    listItem:
+                      -
+                        self:
+                          id: 1115
+                          header: '2001'
+                          subheader: 'Icons shipped'
+                          text: 'The whole solid style of Font Awesome Free, inline.'
+                          icon: image
+                      -
+                        self:
+                          id: 1116
+                          header: '5'
+                          subheader: Palettes
+                          text: 'Each varies the accents only.'
+                          icon: star
+                      -
+                        self:
+                          id: 1117
+                          header: '2'
+                          subheader: 'Core versions'
+                          text: 'TYPO3 v13.4 and v14.3, from one branch.'
+                          icon: server
+                      -
+                        self:
+                          id: 1118
+                          header: '1'
+                          subheader: Breakpoint
+                          icon: desktop
+                      -
+                        self:
+                          id: 1119
+                          header: 44px
+                          subheader: 'Smallest tap target'
+                          text: 'The floor for anything clickable.'
+                      -
+                        self:
+                          id: 1120
+                          header: '4.5:1'
+                          subheader: 'Contrast of body text, at least'
+                      -
+                        self:
+                          id: 1121
+                          header: 5px
+                          subheader: 'Border radius'
+                          text: 'The single radius of the Frame.'
+                -
+                  self:
+                    id: 1073
+                    title: Steps
+                    slug: /elements/theme/steps
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 8301
+                          CType: header
+                          header: Steps
+                          header_layout: 1
+                      -
+                        self:
+                          id: 8302
+                          CType: text
+                          header: 'A process, in order'
+                          header_layout: 2
+                          bodytext: "<p>The steps are an ordered list, numbered by the stylesheet, down the\npage on a phone and across it from the medium breakpoint. A step may\nshow an icon in its marker instead of its number.</p>"
+                      -
+                        self:
+                          id: 8303
+                          CType: theme_steps
+                          header: 'Set up a development instance'
+                          header_layout: 2
+                          tx_theme_list_items: '1122,1123,1124,1125'
+                      -
+                        self:
+                          id: 8304
+                          CType: theme_steps
+                          header: 'Release a version'
+                          header_layout: 2
+                          tx_theme_list_items: '1126,1127,1128,1129'
+                    listItem:
+                      -
+                        self:
+                          id: 1122
+                          header: 'Clone the repository'
+                          text: 'One checkout holds both development instances.'
+                      -
+                        self:
+                          id: 1123
+                          header: 'Start the instance'
+                          text: 'ddev start sets it up and seeds this page tree.'
+                      -
+                        self:
+                          id: 1124
+                          header: 'Log in'
+                          text: 'The editor account and its password are documented.'
+                      -
+                        self:
+                          id: 1125
+                          header: 'Open the showcase'
+                          text: 'Every element has a page below Elements.'
+                      -
+                        self:
+                          id: 1126
+                          header: 'Run the gates'
+                          text: 'Both core versions, one after the other.'
+                          icon: list-check
+                      -
+                        self:
+                          id: 1127
+                          header: 'Set the version'
+                          text: 'In every file that carries one.'
+                          icon: pen
+                      -
+                        self:
+                          id: 1128
+                          header: 'Tag the release'
+                          text: 'The tag starts the publishing.'
+                          icon: tag
+                      -
+                        self:
+                          id: 1129
+                          header: 'Tell people'
+                          text: 'A step without an icon keeps its number.'
             -
               self:
                 id: 1051

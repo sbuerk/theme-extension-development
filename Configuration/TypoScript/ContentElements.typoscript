@@ -1102,3 +1102,17 @@ tt_content.theme_accordion.templateName = ContentElements/ThemeAccordion
 # itself - see "Templates/ContentElements/ThemeTextIcon.html".
 tt_content.theme_text_icon =< lib.themeContentElement
 tt_content.theme_text_icon.templateName = ContentElements/ThemeTextIcon
+
+# Features, stats and steps. Each reads "tx_theme_list_items" exactly the way
+# the link list does - see the section comment above "tt_content.theme_author"
+# - so each is a copy of "tt_content.theme_linklist" with a template of its
+# own, like the tabs and the accordion. The child's "icon" is a column of the
+# row, and needs no processor of its own.
+tt_content.theme_features =< tt_content.theme_linklist
+tt_content.theme_features.templateName = ContentElements/ThemeFeatures
+
+tt_content.theme_stats =< tt_content.theme_linklist
+tt_content.theme_stats.templateName = ContentElements/ThemeStats
+
+tt_content.theme_steps =< tt_content.theme_linklist
+tt_content.theme_steps.templateName = ContentElements/ThemeSteps

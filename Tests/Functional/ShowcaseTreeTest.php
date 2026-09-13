@@ -120,6 +120,9 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      */
     private const THEME_ELEMENT_PAGES = [
         'theme_text_icon' => 'text-icon',
+        'theme_features' => 'features',
+        'theme_stats' => 'stats',
+        'theme_steps' => 'steps',
     ];
 
     /**
@@ -128,6 +131,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      */
     private const THEME_VARIANT_FIELDS = [
         'theme_text_icon' => ['tx_theme_icon_position', 'tx_theme_icon_shape', 'tx_theme_icon_size'],
+        'theme_features' => ['layout', 'tx_theme_columns'],
     ];
 
     protected const LANGUAGE_PRESETS = [
@@ -853,6 +857,42 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
                 count($elements),
                 substr_count($this->render($slug), sprintf('data-ctype="%s"', $type)),
                 sprintf('"%s" does not render every "%s" element seeded on it.', $slug, $type),
+            );
+        }
+    }
+
+    /**
+     * A features element of four columns is on a page whose main column fits
+     * four. Four tracks of the grid's 12rem minimum and three gaps of 1.875rem
+     * need 53.625rem inside the element; beside the sub navigation of
+     * `content_sidebar` the main column has less, and the grid shows three
+     * columns at every viewport. The aside is what takes the width, so the
+     * page is asserted to render none.
+     */
+    #[Test]
+    public function aFourColumnFeatureGridIsOnAPageWithoutASidebar(): void
+    {
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('tt_content');
+        $queryBuilder->getRestrictions()->removeAll();
+        /** @var list<array<string, mixed>> $elements */
+        $elements = $queryBuilder
+            ->select('uid', 'pid')
+            ->from('tt_content')
+            ->where(
+                $queryBuilder->expr()->eq('CType', $queryBuilder->createNamedParameter('theme_features')),
+                $queryBuilder->expr()->eq('tx_theme_columns', $queryBuilder->createNamedParameter(4, Connection::PARAM_INT)),
+            )
+            ->executeQuery()
+            ->fetchAllAssociative();
+        $this->assertNotSame([], $elements, 'The showcase seeds no features element of four columns.');
+
+        foreach ($elements as $element) {
+            $page = BackendUtility::getRecord('pages', (int)$element['pid'], 'slug');
+            $this->assertIsArray($page);
+            $this->assertStringNotContainsString(
+                'theme-page__aside',
+                $this->render((string)$page['slug']),
+                sprintf('The four-column features element c%d is on "%s", beside a sidebar.', $element['uid'], $page['slug']),
             );
         }
     }
