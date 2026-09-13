@@ -72,6 +72,15 @@ TCEFORM.tt_content {
         }
     }
 
+    # The layouts of a hero ("tx_theme_hero_layout", rendered by
+    # "Partials/ContentElement/Hero.html"), narrowed to what each hero can
+    # show. The reduced hero has too little height for an image cut off at an
+    # edge; the hero without media has no image to place at all.
+    tx_theme_hero_layout.types {
+        theme_hero_small.removeItems = screenshot, bordered
+        theme_hero_text_only.removeItems = image-end, screenshot, bordered
+    }
+
     # The section index and the link to the top of the page are a later
     # addition: a table of contents built from "sectionIndex" and a "back to
     # top" link behind "linkToTop". Until then both would be switches that

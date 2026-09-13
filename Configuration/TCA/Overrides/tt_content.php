@@ -319,6 +319,57 @@ $additionalColumns['tx_theme_columns'] = [
     ],
 ];
 
+// The short label above the title of a hero, rendered as
+// ".theme-hero__eyebrow" by "Partials/ContentElement/Hero.html" - the class
+// the hero's markup contract always had and no field filled.
+$additionalColumns['tx_theme_eyebrow'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_eyebrow',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_eyebrow.description',
+    'config' => [
+        'type' => 'input',
+        'size' => 30,
+        'max' => 255,
+    ],
+];
+
+// How a hero arranges its text and its image. Every value but the default is
+// a modifier of ".theme-hero" (components/_hero.scss), mapped by
+// "Partials/ContentElement/Hero.html". The default is the hero as it always
+// rendered: the image beside the text, at the start of the line - which is why
+// there is no "image-start" value, it would be a second name for the default.
+// The three heroes offer what fits them, narrowed per type in
+// "Configuration/PageTsConfig/ContentElementAppearance.tsconfig".
+$additionalColumns['tx_theme_hero_layout'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_hero_layout',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => '',
+        'items' => [
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_hero_layout.I.default',
+                'value' => '',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_hero_layout.I.image-end',
+                'value' => 'image-end',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_hero_layout.I.centred',
+                'value' => 'centred',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_hero_layout.I.screenshot',
+                'value' => 'screenshot',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_hero_layout.I.bordered',
+                'value' => 'bordered',
+            ],
+        ],
+    ],
+];
+
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
 
 // The icon of the layout "Icons" of the bullet list, next to the list type.

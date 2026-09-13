@@ -434,6 +434,32 @@
 				<source>Columns</source>
 			</trans-unit>
 
+			<!-- tt_content: the heroes -->
+			<trans-unit id="tt_content.tx_theme_eyebrow">
+				<source>Eyebrow</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_eyebrow.description">
+				<source>A short label above the title, such as a category or a date.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_hero_layout">
+				<source>Layout</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_hero_layout.I.default">
+				<source>Image beside the text, at the start</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_hero_layout.I.image-end">
+				<source>Image beside the text, at the end</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_hero_layout.I.centred">
+				<source>Centred</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_hero_layout.I.screenshot">
+				<source>Screenshot: centred, the image below, cut off at the bottom edge</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_hero_layout.I.bordered">
+				<source>Cropped: the image at the end, cut off at the end and bottom edges</source>
+			</trans-unit>
+
 			<!-- tx_theme_list_item -->
 			<trans-unit id="tx_theme_list_item">
 				<source>Theme: List item</source>

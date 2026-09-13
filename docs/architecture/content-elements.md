@@ -1230,11 +1230,47 @@ icon.
   trademarks with rules of their own, not symbols. `theme_sociallinks`
   therefore renders the same text-label list as `theme_linklist`, and
   `link_label` carries the platform name ("Mastodon", "LinkedIn", …).
-- **`.theme-hero__eyebrow` has CSS but no TCA field behind it.** The class is
-  part of `_hero.scss`'s own markup contract (and the reference markup in
-  [Component library](../development/component-library.md#content)), but none
-  of the three hero CTypes' TCA offers an "eyebrow" field — only `header`,
-  `bodytext` and the `theme_link` palette. Omitted rather than invented.
+
+### The layouts of the heroes, and their eyebrow
+
+The three heroes carry two columns of their own, above the header palette:
+`tx_theme_eyebrow`, the short label rendered as `.theme-hero__eyebrow` — the
+class the hero's markup contract always had and no field filled — and
+`tx_theme_hero_layout`, which `Partials/ContentElement/Hero.html` maps onto a
+modifier of `.theme-hero`:
+
+| `tx_theme_hero_layout` | Renders                                                                 | Without an image | Offered on            |
+|------------------------|-------------------------------------------------------------------------|------------------|-----------------------|
+| *(empty)*, the default | the image beside the text, at the start — no modifier                   | the text alone   | all three             |
+| `image-end`            | `--image-end`: the image beside the text, at the end                    | the default      | full and reduced hero |
+| `centred`              | `--centred`: text, actions and image on one axis                        | `--centred`      | all three             |
+| `screenshot`           | `--screenshot`: centred, the image below, cut off by the bottom edge    | `--centred`      | full hero             |
+| `bordered`             | `--bordered`: the image at the end, cut off by the end and bottom edges | the default      | full hero             |
+
+The default is the hero as it always rendered, so every hero saved before the
+field existed renders unchanged, and there is no `image-start` value — it would
+be a second name for the default. The layouts that arrange an image fall back
+when there is none, rather than writing a modifier that positions nothing. A
+value nothing offers renders no modifier.
+
+`tx_theme_hero_layout.types.<CType>.removeItems` in
+`ContentElementAppearance.tsconfig` narrows the select per hero: the reduced
+hero has too little height for an image cut off at an edge, the hero without
+media has no image to place. One column for the three rather than one per
+type: the values mean the same wherever they are offered.
+
+`screenshot` is the one layout that changes the markup order: its image
+follows the text, so what a screen reader reads is what the page shows.
+`image-end` and `bordered` keep the image first and move it with
+`flex-direction: row-reverse`, the way `.theme-teaser--reversed` does. The
+eyebrow is a paragraph before the heading inside `.theme-hero__body`, not part
+of the heading, so the outline keeps the title alone.
+
+`HeroLayoutRenderingTest` holds every layout with and without an image, the
+reduced and the text-only hero, the unknown value, the order of the image and
+the eyebrow through both delivery paths; `ContentElementAppearanceFormEngineTest`
+holds the values each hero offers; `ShowcaseTreeTest` holds
+`/elements/theme/hero` to showing all of them.
 
 ### A field was removed: `theme_testimonial` lost its `image`
 

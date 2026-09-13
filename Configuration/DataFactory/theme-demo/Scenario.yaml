@@ -6,7 +6,8 @@
 # Every record declares its uid, and the numbering is a rule rather than a
 # sequence:
 #
-#   pages               1-10, the first tree, and 30-39, 50-56 and 70-79,
+#   pages               1-10, the first tree, and 30-39, 50-56, 70-79 and
+#                       110-119,
 #                       the pages added below its sections - see below for
 #                       why the new ones skip decades
 #   tt_content          the uid of its page times 100, plus its position on
@@ -2277,13 +2278,14 @@ entities:
                         header: 'Is anything open at first?'
                         text: '<p>No. Which item a reader meets first is what the order of the items already says.</p>'
 
-              # One page per theme element that shows icons of the set, named
-              # after it and showing its variants: every value of the fields
-              # that change how it looks. "ShowcaseTreeTest" reads the values
-              # from the TCA and holds these pages to them.
+              # One page per theme element with variants, named after it:
+              # every value of the fields that change how it looks, one element
+              # each. "ShowcaseTreeTest" reads the values from the TCA and the
+              # page TSconfig and holds these pages to them. The elements on
+              # page 8 above keep their default look.
               #
-              # "content_sidebar", so the sub navigation lists the sibling
-              # pages next to every one of them.
+              # "content_sidebar" where the element fits beside the sub
+              # navigation, so the sibling pages are listed next to them.
               children:
                 # "theme_text_icon" - every position, shape and size of the
                 # icon, and one element without an icon.
@@ -2715,6 +2717,148 @@ entities:
                             id: 129
                             header: 'Tell people'
                             text: 'A step without an icon keeps its number.'
+
+                # The layouts and the eyebrow of the three heroes. The images
+                # are attached in "config.yml". "header_layout" 2 throughout:
+                # the page heading is the h1.
+                - self:
+                      id: 110
+                      title: 'Hero layouts'
+                      slug: '/elements/theme/hero'
+                      backend_layout: 'content_sidebar'
+                  entities:
+                    content:
+                      - self:
+                            id: 11001
+                            CType: 'header'
+                            header: 'Hero layouts'
+                            header_layout: 1
+                      - self:
+                            id: 11002
+                            CType: 'theme_hero'
+                            tx_theme_hero_layout: ''
+                            tx_theme_eyebrow: 'The default layout'
+                            header: 'The image beside the text, at the start'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The hero as it always rendered: the image takes 45 per
+                              cent of the row on a wide screen and sits above the text on
+                              a narrow one. The short line above the title is the
+                              eyebrow, a field of its own.</p>
+                            tx_theme_link: 't3://page?uid=8'
+                            tx_theme_link_label: 'All theme elements'
+                            tx_theme_link_icon: 'arrow-left'
+                      - self:
+                            id: 11003
+                            CType: 'theme_hero'
+                            tx_theme_hero_layout: 'image-end'
+                            tx_theme_eyebrow: 'Image at the end'
+                            header: 'The image beside the text, at the end'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The image moves to the end of the row. In the markup it
+                              still comes first, so a screen reader meets the same order
+                              as in the default layout.</p>
+                            tx_theme_link: 't3://page?uid=31'
+                            tx_theme_link_label: 'Read about text in columns'
+                            tx_theme_link_variant: 'secondary'
+                      - self:
+                            id: 11004
+                            CType: 'theme_hero'
+                            tx_theme_hero_layout: 'centred'
+                            tx_theme_eyebrow: 'Centred'
+                            header: 'Everything on one axis'
+                            header_layout: 2
+                            bodytext: |
+                              <p>Title, lead, action and image centred, at every width.
+                              The image is no wider than the reading measure, so it never
+                              outgrows the text.</p>
+                            tx_theme_link: 't3://page?uid=2'
+                            tx_theme_link_label: 'Open the typography'
+                      - self:
+                            id: 11005
+                            CType: 'theme_hero'
+                            tx_theme_hero_layout: 'screenshot'
+                            tx_theme_eyebrow: 'Screenshot'
+                            header: 'An application that continues below'
+                            header_layout: 2
+                            bodytext: |
+                              <p>Centred text and the image below it, resting on the
+                              bottom edge of the panel, which cuts it off. This is the one
+                              layout that puts the image after the text in the markup as
+                              well.</p>
+                            tx_theme_link: 't3://page?uid=9'
+                            tx_theme_link_label: 'Open the styleguide'
+                      - self:
+                            id: 11006
+                            CType: 'theme_hero'
+                            tx_theme_hero_layout: 'bordered'
+                            tx_theme_eyebrow: 'Cropped'
+                            header: 'The image runs out of the panel'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The image sits at the end of the row and is cut off by the
+                              end and the bottom edges of the panel. A hairline frames the
+                              two edges that stay inside it.</p>
+                            tx_theme_link: 't3://page?uid=3'
+                            tx_theme_link_label: 'Look at the media page'
+                            tx_theme_link_variant: 'ghost'
+                      - self:
+                            id: 11007
+                            CType: 'theme_hero_small'
+                            tx_theme_hero_layout: 'image-end'
+                            tx_theme_eyebrow: 'Reduced, image at the end'
+                            header: 'The reduced hero offers three layouts'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The default, the image at the end, and centred. It has
+                              too little height for an image cut off at an edge.</p>
+                      - self:
+                            id: 11008
+                            CType: 'theme_hero_small'
+                            tx_theme_hero_layout: 'centred'
+                            tx_theme_eyebrow: 'Reduced, centred'
+                            header: 'A sub page header, centred'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The same panel with less air above and below, and its
+                              image above the text.</p>
+                      - self:
+                            id: 11009
+                            CType: 'theme_hero_text_only'
+                            tx_theme_hero_layout: 'centred'
+                            tx_theme_eyebrow: 'Without media, centred'
+                            header: 'No image, and two layouts'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The hero without media can be centred or not. There is no
+                              image to place, so the other layouts are not offered.</p>
+                            tx_theme_link: 't3://page?uid=5'
+                            tx_theme_link_label: 'Back to the elements'
+                            tx_theme_link_variant: 'link'
+                      # The default layout of the two smaller heroes, so each
+                      # hero shows every layout it offers on this page.
+                      - self:
+                            id: 11010
+                            CType: 'theme_hero_small'
+                            tx_theme_hero_layout: ''
+                            tx_theme_eyebrow: 'Reduced, the default'
+                            header: 'The reduced hero in its default layout'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The image at the start of the row, as on the page of the
+                              theme elements, now with an eyebrow above the title.</p>
+                      - self:
+                            id: 11011
+                            CType: 'theme_hero_text_only'
+                            tx_theme_hero_layout: ''
+                            tx_theme_eyebrow: 'Without media, the default'
+                            header: 'Text at the start of the line'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The hero without media in its default layout: the text
+                              starts at the start of the line and runs to the reading
+                              measure.</p>
 
             # The appearance fields of a content element, every value once:
             # the frames, the space before and after, the alignment and the

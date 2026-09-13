@@ -237,11 +237,9 @@
             variant carries no "theme-hero__media" element at all; the base
             rules lay its body out without a modifier of their own.
 
-            "theme-hero__eyebrow" appears here and nowhere else in the theme:
-            none of the three hero CTypes has a field to fill it from, so
-            Partials/ContentElement/Hero.html omits it rather than inventing
-            one. The class exists in the stylesheet, and this page is the only
-            place it can be seen.
+            "theme-hero__eyebrow" is filled by the field "tx_theme_eyebrow"
+            of the three hero CTypes. The layouts of those elements are the
+            specimens of "Variants.html".
         </f:comment>
         <section class="theme-hero">
             <div class="theme-hero__body">

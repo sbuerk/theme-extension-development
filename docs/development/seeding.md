@@ -67,11 +67,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                                                                         |
-|----------------------|--------------------------------------------------------------------------------------------------------------|
-| `pages`              | 1 to 10, then 30 to 39, 50 to 59 and 70 to 79 — every other decade, see [below](#why-new-pages-skip-decades) |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502              |
-| `tx_theme_list_item` | 1 to 18 on page 8, and 100 to 149 on the pages below it, in declaration order                                |
+| Table                | Uids                                                                                                                     |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39, 50 to 59, 70 to 79 and 110 to 119 — every other decade, see [below](#why-new-pages-skip-decades) |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                          |
+| `tx_theme_list_item` | 1 to 18 on page 8, and 100 to 149 on the pages below it, in declaration order                                            |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -113,10 +113,11 @@ them it decides which uids are free:
 | 30–39     | new pages; the mirror of their content is 4001–4999                                           |
 | 50–59     | new pages; the mirror of their content is 6001–6999                                           |
 | 70–79     | new pages; the mirror of their content is 8001–8999                                           |
+| 110–119   | new pages; the mirror of their content is 12001–12999                                         |
 
-So a new page takes a uid in an odd decade from 30 up — 30–39, 50–59, then
-70–79 and 90–99 — and the even decade after it stays free for its mirror. The
-rule is stated at the top of `Scenario.yaml` as well, and
+So a new page takes a uid in an odd decade from 30 up — 30–39, 50–59, 70–79,
+90–99, 110–119, 130–139 and so on — and the even decade after it stays free for
+its mirror. The rule is stated at the top of `Scenario.yaml` as well, and
 `Tests/Unit/GeneratedLegacyScenarioTest::theInstanceSetDeclaresNoUidTwice()`
 walks the composed set — showcase, mirror and accounts — and fails on any uid
 declared twice in one table, which is what a page in the wrong decade
@@ -178,6 +179,7 @@ classic `CType` in its variants, and every appearance value:
 | 7         | Menu elements           | `/elements/menu`         | `content_sidebar`               | The eleven `menu_*` elements.                                                                                                                 |
 | 8         | Theme elements          | `/elements/theme`        | `content`                       | The first thirteen `theme_*` elements; parent of 70 and up.                                                                                   |
 | 70–73     | Text and icon … Steps   | `/elements/theme/<name>` | `content_sidebar`, 71 `content` | One page per theme element with icons, every value of the fields that change its look; 71 without a sidebar, which four feature columns need. |
+| 110       | Hero layouts            | `/elements/theme/hero`   | `content_sidebar`               | Every layout of the three heroes, with an eyebrow each.                                                                                       |
 | 51        | Frames                  | `/elements/frames`       | `content`                       | Every frame, spacing, header alignment and header look of the Appearance tab.                                                                 |
 | 9         | Styleguide              | `/styleguide`            | `styleguide`                    | The component library, straight from Fluid.                                                                                                   |
 | 10        | Forms                   | `/forms`                 | `forms`                         | The form showcase, straight from Fluid.                                                                                                       |
