@@ -493,6 +493,13 @@ references:
   -
     file: placeholder-portrait
     table: tt_content
+    uid: 12206
+    field: image
+    values:
+      alternative: 'A placeholder portrait'
+  -
+    file: placeholder-portrait
+    table: tt_content
     uid: 6604
     field: image
     values:

@@ -302,6 +302,9 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
 
         $form = $this->renderedForm(903);
         $this->assertStringContainsString(self::inputName(903, 'tx_theme_quote_style'), $form);
+        // The portrait, one file at most.
+        $this->assertStringContainsString(self::inputName(903, 'image'), $form);
+        $this->assertSame(1, (int)($this->compile(903)['processedTca']['columns']['image']['config']['maxitems'] ?? 0));
         $this->assertStringNotContainsString(self::inputName(903, 'layout'), $form);
     }
 

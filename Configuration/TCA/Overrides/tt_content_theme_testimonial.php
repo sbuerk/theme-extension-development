@@ -19,19 +19,22 @@ ExtensionManagementUtility::addRecordType(
         'icon' => 'content-quote',
         'group' => 'theme',
     ],
-    // No image field, deliberately. The element renders through
-    // ".theme-quote", which has no media slot in its markup contract, and a
-    // portrait was not part of what this element is for. Offering the field
-    // anyway would let an editor attach an image that silently never appears -
-    // worse than not offering it, because the page looks finished and the work
-    // is gone. Add the slot to the component first if that changes.
-    //
     // "tx_theme_quote_style" first, as the kind comes first on a notice: it
     // decides how everything below it is set.
+    //
+    // "image" is the portrait of the attributed person, shown as a
+    // ".theme-avatar" in the media slot ".theme-quote__portrait" next to the
+    // name. One file: the slot holds one picture. The field was taken off this
+    // type once, while ".theme-quote" had no slot for it and an attached
+    // portrait would have silently never appeared; it is back with the slot.
+    // The template renders the portrait only next to a name, the one place it
+    // is decoration - see "Templates/ContentElements/ThemeTestimonial.html".
     '
         tx_theme_quote_style,
         bodytext,
         --palette--;;headers,
+        --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:images,
+        image,
     ',
     [
         'columnsOverrides' => [
@@ -45,6 +48,12 @@ ExtensionManagementUtility::addRecordType(
                 'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.bodytext.types.theme_testimonial.label',
                 'config' => [
                     'rows' => 4,
+                ],
+            ],
+            'image' => [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.image.types.theme_testimonial.label',
+                'config' => [
+                    'maxitems' => 1,
                 ],
             ],
         ],
