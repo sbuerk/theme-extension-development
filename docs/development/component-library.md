@@ -1192,6 +1192,15 @@ and border and opens into it. The rule under the list is an inset `box-shadow`,
 not elevation — it is the one way to draw a line the selected tab's own
 background can cover.
 
+The selected tab is told apart by more than its colour (WCAG 1.4.1): its frame
+is the decorative border, which hardly shows, so it carries a bar along its top
+edge, `--theme-tabs-indicator-width` thick — the strong border width, two
+pixels — in `--theme-tabs-indicator-color`, the primary accent. Every tab
+carries that edge, transparent until it is selected, so selecting a tab paints
+it and moves nothing. `Tests/Acceptance/styleguide.spec.ts` holds the bar to
+the selected tab. Under forced colours the tab keeps the highlight pair of the
+[forced colours](#forced-colours) rule.
+
 **Dialog.** A native `<dialog>` opened with `showModal()`: focus kept inside,
 the inert page, Escape and the `::backdrop` are the browser's, and a
 `<form method="dialog">` closes it with the pressed button's `value` as its
