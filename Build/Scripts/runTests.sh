@@ -46,6 +46,34 @@ printSummary() {
     exit $SUITE_EXIT_CODE
 }
 
+waitForServer() {
+    # Waits until a server started in a container of its own answers on its port, asked by its
+    # container name from a container on the network of this run, and aborts the whole run when
+    # it does not - the counterpart of "waitForDatabase()" below for a plain TCP server.
+    #
+    # The probe connects rather than resolving the name alone: a name that resolves belongs to a
+    # container whose server may not listen yet. "fsockopen()" does both, and the PHP image is the
+    # one the server itself runs in, so nothing is installed for the probe.
+    local HOST=${1}
+    local PORT=${2}
+    local TESTCOMMAND="
+        COUNT=0;
+        until php -r 'exit(@fsockopen(\"${HOST}\", ${PORT}) ? 0 : 1);'; do
+            if [ \"\${COUNT}\" -gt 30 ]; then
+              echo \"The server \\\"${HOST}:${PORT}\\\" did not answer within 30 seconds. Aborting.\";
+              exit 1;
+            fi;
+            sleep 1;
+            COUNT=\$((COUNT + 1));
+        done;
+    "
+    ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name wait-for-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "${TESTCOMMAND}"
+    if [[ $? -gt 0 ]]; then
+        cleanUp
+        exit 1
+    fi
+}
+
 waitForDatabase() {
     # Waits until the database server answers a query, and aborts the whole run
     # when it does not.
@@ -910,6 +938,24 @@ case ${TEST_SUITE} in
         if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
             ${CONTAINER_BIN} run -d ${CONTAINER_COMMON_PARAMS} --name visual-web-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "exec php -dxdebug.mode=off -S 0.0.0.0:8000 -t ${ROOT_DIR} ${ROOT_DIR}/Tests/Acceptance/Visual/router.php > ${VISUAL_ROOT}/php-server.log 2>&1" >/dev/null
             SUITE_EXIT_CODE=$?
+            # The browser reaches the server by a name that no DNS server knows, "fixture-server",
+            # pinned to the address of the server container in "/etc/hosts" of the Playwright
+            # container. Resolved by its container name, a page load failed now and then with
+            # "net::ERR_NAME_NOT_RESOLVED" on a busy host, although the global setup had reached
+            # the same name a moment before: a lookup of the network's DNS server that fails is a
+            # failed test, whenever it happens. With the address pinned no lookup of the run goes
+            # to DNS at all, and a pin that did not work would fail every test, not one in a
+            # hundred. The wait before it covers the start of the server; the address is known as
+            # soon as the container runs. See "docs/testing/visual-tests.md".
+            VISUAL_WEB_ADDRESS=""
+            if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+                waitForServer visual-web-${SUFFIX} 8000
+                VISUAL_WEB_ADDRESS=$(${CONTAINER_BIN} inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' visual-web-${SUFFIX})
+                if [[ -z "${VISUAL_WEB_ADDRESS}" ]]; then
+                    echo "The address of the fixture server container \"visual-web-${SUFFIX}\" could not be read." >&2
+                    SUITE_EXIT_CODE=1
+                fi
+            fi
             # Quoted one by one, as for "acceptance".
             PLAYWRIGHT_ARGUMENTS=""
             [[ $# -gt 0 ]] && PLAYWRIGHT_ARGUMENTS=$(printf ' %q' "$@")
@@ -920,7 +966,7 @@ case ${TEST_SUITE} in
             ARCH_WARNING="if [ \"\$(uname -m)\" != x86_64 ]; then echo \"WARNING: the visual baselines were written on x86_64, this is \$(uname -m). Expect screenshot differences that are not regressions, and do not rebaseline from here.\" >&2; fi"
             COMMAND="${ARCH_WARNING}; cd Tests/Acceptance && npm ci --no-audit --no-fund && npx playwright test -c Visual/playwright.config.ts${PLAYWRIGHT_ARGUMENTS}"
             if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
-                ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name visual-playwright-${SUFFIX} -e BASE_URL="http://visual-web-${SUFFIX}:8000/${VISUAL_ROOT}/" -e HOME="${ROOT_DIR}/${VISUAL_ROOT}/home" -e npm_config_cache="${ROOT_DIR}/.cache/npm" -e CI="${CI:-}" ${IMAGE_PLAYWRIGHT} /bin/sh -c "${COMMAND}"
+                ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name visual-playwright-${SUFFIX} --add-host fixture-server:${VISUAL_WEB_ADDRESS} -e BASE_URL="http://fixture-server:8000/${VISUAL_ROOT}/" -e HOME="${ROOT_DIR}/${VISUAL_ROOT}/home" -e npm_config_cache="${ROOT_DIR}/.cache/npm" -e CI="${CI:-}" ${IMAGE_PLAYWRIGHT} /bin/sh -c "${COMMAND}"
                 SUITE_EXIT_CODE=$?
             fi
         fi

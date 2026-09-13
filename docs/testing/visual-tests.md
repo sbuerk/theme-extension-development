@@ -46,9 +46,15 @@ real display settings inside a real TYPO3.
    [`Tests/Acceptance/Visual/router.php`](../../Tests/Acceptance/Visual/router.php)
    answers only below `/.Build/visual/` and `/Resources/Public/`, and 404 for
    everything else — the self referencing `theme` symlink included.
-3. **Runs Playwright** with
+3. **Waits for the server and pins its address.** A container on the network
+   of the run connects to the server by its container name until it answers,
+   30 seconds at most; the address of the server container is then written
+   into `/etc/hosts` of the Playwright container as `fixture-server` — see
+   [below](#the-address-of-the-fixture-server).
+4. **Runs Playwright** with
    [`Tests/Acceptance/Visual/playwright.config.ts`](../../Tests/Acceptance/Visual/playwright.config.ts)
-   in the same pinned image as the acceptance suite.
+   in the same pinned image as the acceptance suite, against
+   `http://fixture-server:8000/.Build/visual/`.
 
 The suite lives in `Tests/Acceptance/Visual/` and shares `package.json`, the
 lockfile and therefore the **one** Playwright pin of the acceptance suite; a
@@ -65,6 +71,25 @@ log of the server. `composerUpdate` and `-s cleanTests` remove it.
 The fixtures are **never committed**, so they cannot drift from the partials by
 construction. They double as a static styleguide: open
 `.Build/visual/index.html` in any browser.
+
+## The address of the fixture server
+
+The browser used to reach the server by its container name, resolved by the
+DNS server of the container network. On a busy host a page load failed now
+and then with `net::ERR_NAME_NOT_RESOLVED` — an axe test that took 100 ms and
+failed, a different one each time — although the global setup, which polls
+the server until it answers, had reached the same name a moment before. It was
+not the start of the server, then, but single lookups that failed, and every
+failed lookup was a failed test.
+
+So no lookup of the run goes to DNS. `runTests.sh` waits until the server
+answers — a container on the network connects to it by name, the start of the
+server is covered there — reads the address of the server container with
+`inspect`, and passes it to the Playwright container as
+`--add-host fixture-server:<address>`. `BASE_URL` names `fixture-server`, a
+host no DNS server knows: the address in `/etc/hosts` is the only way to it,
+so a pin that did not work would fail every test instead of one in a hundred.
+An address that cannot be read fails the run with a message saying so.
 
 ## How the fixtures are made
 
