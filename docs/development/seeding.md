@@ -30,7 +30,7 @@ This page documents the set, not the tool.
 Configuration/DataFactory/theme-demo/
 ├── config.yml      identifier, scenario files, files, file references
 ├── Scenario.yaml   the records, in the scenario format
-└── Files/          placeholder.svg, placeholder-portrait.svg
+└── Files/          two placeholder SVGs, a PDF, a text file and a zip archive
 ```
 
 The set ships **with the extension**, not with the development instances. That

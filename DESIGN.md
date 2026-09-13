@@ -466,6 +466,29 @@ The meter's three colours are not its message. Under forced colours all three
 are `Highlight`, and in every mode the value is written out in words next to
 it - see [Component library](docs/development/component-library.md#content).
 
+### File list
+
+`.theme-file-list` draws the icon of a file type in `--theme-color-text-secondary`,
+the size in `--theme-color-text-muted` and the description in
+`--theme-color-text-secondary`, on whatever the list sits on — the page, a
+surface band, a raised surface. The link is the primary accent, as everywhere.
+The icon is decoration next to a name that carries the extension, so it needs
+no ratio; it is held to the text ratio anyway, because it reads as part of the
+row. The values are those of the token tables above:
+
+| Part                    | Token            | Page  | vs background | vs surface | vs surface-raised |
+|-------------------------|------------------|-------|---------------|------------|-------------------|
+| Icon, description       | `text-secondary` | light | 7.54          | 6.97       | 7.54              |
+| Icon, description       | `text-secondary` | dark  | 8.89          | 8.17       | 7.36              |
+| Size                    | `text-muted`     | light | 5.35          | 4.95       | 5.35              |
+| Size                    | `text-muted`     | dark  | 5.70          | 5.24       | 4.72              |
+| Row rule, preview frame | `border`         | light | 1.38          | 1.27       | 1.38              |
+| Row rule, preview frame | `border`         | dark  | 1.42          | 1.30       | 1.18              |
+
+The rule between the rows and the frame of a thumbnail are decorative
+hairlines, like every `--theme-color-border` of the Frame language: the row
+and the image are what they separate, and nothing depends on seeing them.
+
 ### Content element bands
 
 An editor picks a band in the `frame_class` field of a content element;

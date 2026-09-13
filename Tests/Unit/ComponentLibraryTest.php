@@ -60,6 +60,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'feature grid' => '.theme-feature-grid',
             'feature introduction' => '.theme-feature-intro',
             'figure' => '.theme-figure',
+            'file list' => '.theme-file-list',
             'gallery' => '.theme-gallery',
             'hero' => '.theme-hero',
             'icon' => '.theme-icon',

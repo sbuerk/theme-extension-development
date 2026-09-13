@@ -50,6 +50,20 @@ files:
   - identifier: placeholder-portrait
     source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder-portrait.svg'
     folder: 'theme-demo'
+  # Three files that are not images, for the file type icons of the "File
+  # Links" element on page 37: a one-page PDF, the same notes as plain text,
+  # and the two placeholders as a zip archive. Each is detected as the MIME
+  # type of its extension, which the file consistency check of the core
+  # requires of a file placed through the storage API.
+  - identifier: release-notes-pdf
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/release-notes.pdf'
+    folder: 'theme-demo'
+  - identifier: release-notes-txt
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/release-notes.txt'
+    folder: 'theme-demo'
+  - identifier: placeholder-graphics
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder-graphics.zip'
+    folder: 'theme-demo'
 
 # Every file relation of the tree. "uid" is the uid the scenario declares as
 # the "id" of the record the reference hangs on - see the uid scheme at the top
@@ -232,5 +246,12 @@ references:
   - {file: placeholder-portrait, table: tt_content, uid: 3703, field: media, values: {title: 'Placeholder, portrait', description: 'A portrait SVG.'}}
   - {file: placeholder, table: tt_content, uid: 3704, field: media, values: {title: 'Placeholder, landscape', description: 'A landscape SVG, with its thumbnail.'}}
   - {file: placeholder-portrait, table: tt_content, uid: 3704, field: media, values: {title: 'Placeholder, portrait', description: 'A portrait SVG, with its thumbnail.'}}
+  - {file: release-notes-pdf, table: tt_content, uid: 3705, field: media, values: {title: 'Release notes'}}
+  - {file: release-notes-txt, table: tt_content, uid: 3705, field: media, values: {title: 'Release notes, plain text'}}
+  - {file: placeholder-graphics, table: tt_content, uid: 3705, field: media, values: {title: 'The placeholder graphics'}}
+  - {file: placeholder, table: tt_content, uid: 3705, field: media, values: {title: 'Placeholder, landscape'}}
+  - {file: placeholder, table: tt_content, uid: 3706, field: media, values: {title: 'Placeholder, landscape', description: 'An image, so the list shows a thumbnail of it.'}}
+  - {file: release-notes-pdf, table: tt_content, uid: 3706, field: media, values: {title: 'Release notes', description: 'A PDF: no thumbnail, so the icon of a PDF stands in its place.'}}
+  - {file: placeholder-graphics, table: tt_content, uid: 3706, field: media, values: {title: 'The placeholder graphics', description: 'A zip archive of the two placeholder graphics.'}}
   # Page 56, "Article": the image the text flows around.
   - {file: placeholder-portrait, table: tt_content, uid: 5604, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'Placed in the text, at the end of the line'}}

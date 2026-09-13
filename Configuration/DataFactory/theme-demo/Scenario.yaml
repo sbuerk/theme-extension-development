@@ -898,12 +898,13 @@ entities:
                   # The fields "Uploads.html" actually reads are all set here:
                   #
                   #   uploads_type          0 = name only, 1 = name and file type
-                  #                         icon, 2 = name and thumbnail. The
-                  #                         component library has no file type
-                  #                         icon, so 1 renders as 0; 2 renders a
-                  #                         thumbnail only for files FAL
-                  #                         classifies as an image, which an SVG
-                  #                         is (image/* maps to FileType::IMAGE).
+                  #                         icon, 2 = name and thumbnail, the
+                  #                         modifiers of ".theme-file-list". 2
+                  #                         renders a thumbnail only for files
+                  #                         FAL classifies as an image, which an
+                  #                         SVG is (image/* maps to
+                  #                         FileType::IMAGE), and the icon of the
+                  #                         file type for any other.
                   #   filelink_size         shows the byte count
                   #   uploads_description   shows the description of the file
                   #                         REFERENCE - which is why both
@@ -1598,9 +1599,9 @@ entities:
                             header: 'Only the file name (0)'
                             header_layout: 2
                             uploads_type: 0
-                      # The theme has no file type icon, so 1 renders as 0 -
-                      # see "Uploads.html". Seeded anyway, so the value is on
-                      # the page next to the one it renders like.
+                      # The icon of a file type in front of every file - both
+                      # files are SVG, so both get the image icon. Element
+                      # 3705 below shows the icons of other types.
                       - self:
                             id: 3703
                             CType: 'uploads'
@@ -1614,6 +1615,31 @@ entities:
                             header_layout: 2
                             uploads_type: 2
                             filelink_size: 1
+                            uploads_description: 1
+                      # The icons of four file types - a PDF, a text file, a
+                      # zip archive and an image - with the size of each. The
+                      # icon goes by the extension, see
+                      # "Partials/ContentElement/FileIcon.html"; the files
+                      # are declared in "config.yml". Sorted by name, so the
+                      # order does not depend on the order of the references.
+                      - self:
+                            id: 3705
+                            CType: 'uploads'
+                            header: 'The icon of each file type, with the size (1)'
+                            header_layout: 2
+                            uploads_type: 1
+                            filelink_size: 1
+                            filelink_sorting: 'name'
+                            filelink_sorting_direction: 'asc'
+                      # A thumbnail where FAL can make one, and the icon of the
+                      # file type in its square where it cannot: the image
+                      # first, then the PDF and the zip archive.
+                      - self:
+                            id: 3706
+                            CType: 'uploads'
+                            header: 'A thumbnail for the image, the icon for the rest (2)'
+                            header_layout: 2
+                            uploads_type: 2
                             uploads_description: 1
 
                 # "div" - a rule between two elements, and nothing else.
