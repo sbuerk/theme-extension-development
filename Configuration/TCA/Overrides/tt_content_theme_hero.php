@@ -28,6 +28,8 @@ ExtensionManagementUtility::addRecordType(
         'group' => 'theme',
     ],
     '
+        tx_theme_hero_layout,
+        tx_theme_eyebrow,
         --palette--;;headers,
         bodytext,
         --palette--;;theme_link,

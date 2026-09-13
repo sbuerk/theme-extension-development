@@ -435,6 +435,62 @@ references:
       title: 'The placeholder graphics'
       description: 'A zip archive of the two placeholder graphics.'
   -
+    file: placeholder
+    table: tt_content
+    uid: 12002
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12003
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12004
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 12005
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format, cut off at the bottom'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12006
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format, cut off at two edges'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12007
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12008
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12010
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
     file: placeholder-portrait
     table: tt_content
     uid: 6604

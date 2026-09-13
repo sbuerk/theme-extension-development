@@ -1,0 +1,4 @@
+tt_content,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout
+,901,1,0,0,0,901,theme_hero_small,A reduced hero,1
+,902,1,0,0,0,902,theme_hero_text_only,A hero without media,1

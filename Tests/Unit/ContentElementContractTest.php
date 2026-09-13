@@ -58,6 +58,7 @@ final class ContentElementContractTest extends UnitTestCase
             'Resources/Private/Templates/ContentElements/ThemeSteps.html',
             'Resources/Private/Templates/ContentElements/Text.html',
             'Resources/Private/Templates/ContentElements/Uploads.html',
+            'Resources/Private/Partials/ContentElement/Hero.html',
         ] as $template) {
             $source = (string)file_get_contents(self::root() . '/' . $template);
             preg_match_all('#<f:variable name="\w+" value="([^"]*)"\s*/>#', $source, $values);
@@ -65,6 +66,9 @@ final class ContentElementContractTest extends UnitTestCase
                 foreach (preg_split('/\s+/', trim($value)) ?: [] as $class) {
                     // A class written in two cases - the feature layouts 1
                     // and 3 share one - is one data set, not two of one name.
+                    // A template may write one class for two values - the
+                    // hero writes "--centred" for a screenshot without an
+                    // image as well - and a data set name is unique.
                     if ($class !== '' && !isset($seen[$class])) {
                         $seen[$class] = true;
                         yield $class => ['class' => $class];
@@ -84,7 +88,7 @@ final class ContentElementContractTest extends UnitTestCase
         // fields, the lists, the text and icon element, the features, the
         // steps and the layouts and variants - fewer means a value lost its
         // case, and the test below would pass on an empty list.
-        $this->assertCount(46, $classes, implode(', ', $classes));
+        $this->assertCount(50, $classes, implode(', ', $classes));
     }
 
     #[DataProvider('writtenClasses')]

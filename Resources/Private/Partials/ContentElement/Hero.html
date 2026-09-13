@@ -12,11 +12,36 @@
     handling, the same way "{data.tx_theme_link}" already does everywhere else
     in this extension for an unset field.
 
-    Markup contract: Resources/Private/Scss/components/_hero.scss. No
-    "theme-hero__eyebrow" is rendered - the class exists in that file's CSS,
-    but none of the three CTypes' TCA backs it with an "eyebrow" field, only
-    "header"/"bodytext" and the "theme_link" palette. Omitted rather than
-    invented.
+    Markup contract: Resources/Private/Scss/components/_hero.scss.
+
+    "tx_theme_eyebrow" is the short label above the title, as
+    ".theme-hero__eyebrow" - a paragraph before the heading, not part of it,
+    so the heading stays the text of the outline.
+
+    "tx_theme_hero_layout" picks a modifier:
+
+      (empty)     the image beside the text, at the start   no modifier
+      image-end   the image beside the text, at the end     "--image-end"
+      centred     centred, the image above the text        "--centred"
+      screenshot  centred, the image below the text,       "--screenshot"
+                  cut off at the bottom edge of the hero
+      bordered    the image at the end, cut off at the     "--bordered"
+                  end and bottom edges of the hero
+
+    The three that arrange an image need one. Without an image, "image-end"
+    and "bordered" render the default - there is nothing to move - and
+    "screenshot" renders "--centred", which is what it is without its image.
+    Any other value renders no modifier, the rule of the frame modifiers in
+    "Layouts/ContentElement.html"; "ContentElementContractTest" holds every
+    modifier written here to a rule of the stylesheet.
+
+    "screenshot" is the one layout that changes the order of the markup: the
+    image follows the text, so the order a screen reader reads is the order
+    on the screen - "mediaAfterText", set inline so that the component
+    contract test, which reads every "f:variable" tag of this file as classes,
+    does not take it for one. "image-end" and "bordered" keep the image first and move it
+    with the stylesheet, like ".theme-teaser--reversed": an image beside a
+    heading is not a sequence a reader depends on.
 
     The heading level follows "header_layout" the same way
     Partials/ContentElement/Header.html does for every other content element
@@ -30,13 +55,41 @@
     which is why Header.html itself is not reused here instead of switching
     independently: its own default is the wrong default for this component.
 </f:comment>
-<section class="theme-hero{f:if(condition: files.0, then: ' theme-hero--media')}{f:if(condition: compact, then: ' theme-hero--compact')}">
-    <f:if condition="{files.0}">
-        <div class="theme-hero__media">
-            <f:image image="{files.0}" />
-        </div>
+<f:switch expression="{data.tx_theme_hero_layout}">
+    <f:case value="centred"><f:variable name="heroLayout" value=" theme-hero--centred" /></f:case>
+    <f:case value="image-end">
+        <f:if condition="{files.0}">
+            <f:then><f:variable name="heroLayout" value=" theme-hero--image-end" /></f:then>
+            <f:else><f:variable name="heroLayout" value="" /></f:else>
+        </f:if>
+    </f:case>
+    <f:case value="screenshot">
+        <f:if condition="{files.0}">
+            <f:then>
+                <f:variable name="heroLayout" value=" theme-hero--screenshot" />
+                {f:variable(name: 'mediaAfterText', value: 1)}
+            </f:then>
+            <f:else><f:variable name="heroLayout" value=" theme-hero--centred" /></f:else>
+        </f:if>
+    </f:case>
+    <f:case value="bordered">
+        <f:if condition="{files.0}">
+            <f:then><f:variable name="heroLayout" value=" theme-hero--bordered" /></f:then>
+            <f:else><f:variable name="heroLayout" value="" /></f:else>
+        </f:if>
+    </f:case>
+    <f:defaultCase><f:variable name="heroLayout" value="" /></f:defaultCase>
+</f:switch>
+<f:if condition="{files.0}"><f:variable name="heroMedia"> theme-hero--media</f:variable></f:if>
+<f:if condition="{compact}"><f:variable name="heroCompact"> theme-hero--compact</f:variable></f:if>
+<section class="theme-hero{heroMedia}{heroCompact}{heroLayout}">
+    <f:if condition="{files.0} && {mediaAfterText} != 1">
+        <f:render section="Media" arguments="{file: files.0}" />
     </f:if>
     <div class="theme-hero__body">
+        <f:if condition="{data.tx_theme_eyebrow}">
+            <p class="theme-hero__eyebrow">{data.tx_theme_eyebrow}</p>
+        </f:if>
         <f:if condition="{data.header} && {data.header_layout} != 100">
             <f:switch expression="{data.header_layout}">
                 <f:case value="1"><h1 class="theme-hero__title">{data.header}</h1></f:case>
@@ -67,6 +120,15 @@
             </div>
         </f:if>
     </div>
+    <f:if condition="{mediaAfterText} == 1">
+        <f:render section="Media" arguments="{file: files.0}" />
+    </f:if>
 </section>
+
+<f:section name="Media">
+    <div class="theme-hero__media">
+        <f:image image="{file}" />
+    </div>
+</f:section>
 
 </html>

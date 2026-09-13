@@ -46,6 +46,7 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/ThemeHeroOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/BulletsOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/HeaderOnAppearancePage.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/HeroesOnAppearancePage.csv');
         $backendUser = $this->setUpBackendUser(1);
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
     }
@@ -255,6 +256,34 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $text = $this->renderedForm(10);
         $this->assertStringContainsString(self::inputName(10, 'frame_class'), $text);
         $this->assertStringNotContainsString(self::inputName(10, 'tx_theme_icon'), $text);
+    }
+
+    /**
+     * @return \Generator<string, array{uid: int, values: list<string>}>
+     */
+    public static function heroLayouts(): \Generator
+    {
+        yield 'the full hero, every layout' => ['uid' => 900, 'values' => ['', 'image-end', 'centred', 'screenshot', 'bordered']];
+        yield 'the reduced hero, no image cut off at an edge' => ['uid' => 901, 'values' => ['', 'image-end', 'centred']];
+        yield 'the hero without media, nothing to place' => ['uid' => 902, 'values' => ['', 'centred']];
+    }
+
+    /**
+     * Each hero offers the layouts it can show, and the eyebrow, in its own
+     * form: `tx_theme_hero_layout.types.<CType>.removeItems` narrows the
+     * select per type, and a key that is misspelt raises nothing.
+     *
+     * @param list<string> $values
+     */
+    #[DataProvider('heroLayouts')]
+    #[Test]
+    public function aHeroOffersTheLayoutsItCanShow(int $uid, array $values): void
+    {
+        $this->assertSame($values, self::itemValues($this->compile($uid), 'tx_theme_hero_layout'));
+
+        $form = $this->renderedForm($uid);
+        $this->assertStringContainsString(self::inputName($uid, 'tx_theme_hero_layout'), $form);
+        $this->assertStringContainsString(self::inputName($uid, 'tx_theme_eyebrow'), $form);
     }
 
     /**
