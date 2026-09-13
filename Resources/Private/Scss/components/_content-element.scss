@@ -78,6 +78,10 @@
     --theme-content-element-inner-padding: var(--theme-space-4, 1.25rem);
     --theme-content-element-label-background: var(--theme-color-background, #ffffff);
     --theme-content-element-label-color: var(--theme-color-text-muted, #616b80);
+    // How far the chip reaches into the element: half its line box, since it
+    // is centred on the top edge. "--frame-none" keeps its content that far
+    // down; the switches that remove the chip set it to 0.
+    --theme-content-element-chip-clearance: calc(var(--theme-font-size-xs, 0.75rem) * var(--theme-line-height-mono, 1.5) / 2);
 
     position: relative;
     margin-block-end: var(--theme-content-element-space-after);
@@ -130,6 +134,7 @@
 // at all instead of becoming a zero-width one that still occupies its corner.
 [data-theme-content-outline='off'] .theme-content-element {
     --theme-content-element-outline-style: none;
+    --theme-content-element-chip-clearance: 0;
 
     &::before {
         content: none;
@@ -140,6 +145,7 @@
 // except one embedded element (a hero, a plugin with its own visible chrome).
 .theme-content-element--plain {
     --theme-content-element-outline-style: none;
+    --theme-content-element-chip-clearance: 0;
 
     &::before {
         content: none;
@@ -265,8 +271,17 @@
 // loses the inner padding that keeps its content off that outline - for an
 // element that brings a box of its own, such as a hero, whose padding would
 // otherwise double.
+//
+// The chip of the outline straddles the top edge, so without padding its lower
+// half lay over the first line of the content. The content starts below it
+// instead, as long as there is a chip: the global switch and "--plain" set the
+// clearance to 0, and the element is flush again.
 .theme-content-element--frame-none {
     --theme-content-element-inner-padding: 0;
+
+    > .theme-content-element__inner {
+        padding-block-start: var(--theme-content-element-chip-clearance);
+    }
 }
 
 // --- Spacing: "space_before_class" and "space_after_class" -----------------
