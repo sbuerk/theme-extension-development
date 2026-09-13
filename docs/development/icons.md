@@ -97,8 +97,9 @@ rebuild path travels with the sources, as it does for the stylesheet.
 `ATTRIBUTION.txt` is not written by the build; it names the version and has to
 be changed by hand when the pin moves.
 
-In CI the gate is a step of the `css` job: it needs neither PHP nor a core
-version, and it uses the node image and the lockfile that job already uses.
+In CI the gate is a step of the `assets` job, next to `checkCssBuild`: it
+needs neither PHP nor a core version, and it uses the node image and the
+lockfile that job already uses.
 
 ### Why it is committed
 
