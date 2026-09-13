@@ -1,0 +1,96 @@
+// Stat.
+//
+// Markup contract:
+//
+//     <dl class="theme-stats">
+//         <div class="theme-stat">
+//             <dt class="theme-stat__label">…</dt>
+//             <dd class="theme-stat__value"><span class="theme-stat__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>2001</dd>
+//             <dd class="theme-stat__text">…</dd>
+//         </div>
+//     </dl>
+//
+// A figure and what it counts. A description list, because that is what the
+// pair is: the label is the term, the figure its description, and a sentence
+// about it a second description. Grouping each pair in a "div" is allowed
+// inside a "dl" and is what lets a stat be one box of the grid.
+//
+// --- The figure first, the term first ----------------------------------------
+//
+// The source reads "label, figure" - a screen reader says "Icons shipped,
+// 2001" - and the box shows the figure above the label, larger. "order" moves
+// the figure only visually. The meaning does not depend on the order, so
+// reading it in either is the same statement.
+//
+// The figure is set with "tabular-nums": the digits of every figure take the
+// same width, so a row of stats lines its figures up and a figure that changes
+// does not change its width. The icon, when there is one, sits before the
+// figure in the primary accent, three quarters of its size; it is decoration.
+//
+// The box is the Frame of the theme: the surface, a hairline, the 5px radius.
+// "--theme-stats-min" is the narrowest a box gets before the grid wraps it to
+// the next row.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-stats {
+    --theme-stats-min: 11rem;
+    --theme-stats-gap: var(--theme-space-4, 1.25rem);
+
+    display: grid;
+    gap: var(--theme-stats-gap);
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--theme-stats-min), 100%), 1fr));
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+}
+
+.theme-stat {
+    --theme-stat-background: var(--theme-color-surface, #f4f6fa);
+    --theme-stat-border-color: var(--theme-color-border, #d6dce6);
+    --theme-stat-padding: var(--theme-space-4, 1.25rem);
+    --theme-stat-radius: var(--theme-radius-sm, 5px);
+    --theme-stat-icon-color: var(--theme-color-primary, #0b57d0);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-1, 0.3125rem);
+    padding: var(--theme-stat-padding);
+
+    background-color: var(--theme-stat-background);
+    border: var(--theme-border-width, 1px) solid var(--theme-stat-border-color);
+    border-radius: var(--theme-stat-radius);
+}
+
+.theme-stat__label {
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    line-height: var(--theme-line-height-snug);
+}
+
+.theme-stat__value {
+    --theme-icon-size: 0.75em;
+
+    display: flex;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+    order: -1;
+    margin: 0;
+    color: var(--theme-color-text-primary);
+    font-size: var(--theme-font-size-2xl);
+    font-weight: var(--theme-font-weight-bold);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--theme-line-height-tight);
+}
+
+.theme-stat__icon {
+    display: flex;
+    flex: none;
+    color: var(--theme-stat-icon-color);
+}
+
+.theme-stat__text {
+    margin: 0;
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+}

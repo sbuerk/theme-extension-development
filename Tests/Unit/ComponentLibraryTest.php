@@ -56,12 +56,16 @@ final class ComponentLibraryTest extends UnitTestCase
             'divided description list' => '.theme-dl--divided',
             'dialog' => '.theme-dialog',
             'divider' => '.theme-divider',
+            'feature' => '.theme-feature',
+            'feature grid' => '.theme-feature-grid',
+            'feature introduction' => '.theme-feature-intro',
             'figure' => '.theme-figure',
             'gallery' => '.theme-gallery',
             'hero' => '.theme-hero',
             'icon' => '.theme-icon',
             'link decoration' => '.theme-link',
             'list' => '.theme-list',
+            'media object' => '.theme-media-object',
             'meter' => '.theme-meter',
             'main navigation' => '.theme-nav-main',
             'sub navigation' => '.theme-nav-sub',
@@ -73,6 +77,9 @@ final class ComponentLibraryTest extends UnitTestCase
             'segmented control' => '.theme-segmented',
             'palette swatch' => '.theme-swatch',
             'skip link' => '.theme-skip-link',
+            'stat' => '.theme-stat',
+            'stats' => '.theme-stats',
+            'steps' => '.theme-steps',
             'table' => '.theme-table',
             'tabs' => '.theme-tabs',
             'tag' => '.theme-tag',
@@ -302,6 +309,10 @@ final class ComponentLibraryTest extends UnitTestCase
         // h1 to h5, whichever "header_layout" asks for.
         yield 'hero title' => ['selector' => '.theme-hero__title'];
         yield 'teaser title' => ['selector' => '.theme-teaser__title'];
+        // "Partials/ContentElement/ItemHeading.html" puts these one level
+        // below the element's heading, h2 to h6.
+        yield 'feature title' => ['selector' => '.theme-feature__title'];
+        yield 'step title' => ['selector' => '.theme-steps__title'];
     }
 
     /**

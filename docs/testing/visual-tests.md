@@ -27,7 +27,7 @@ Build/Scripts/runTests.sh -s visual -- --update-snapshots
 Build/Scripts/runTests.sh -s visual -- --update-snapshots --grep "screenshot buttons"
 ```
 
-A run takes about 55 seconds of specs for 179 tests. It is **not** a
+A run takes about 55 seconds of specs for 191 tests. It is **not** a
 replacement for `/styleguide`, which remains the interactive reference with the
 real display settings inside a real TYPO3.
 
@@ -154,8 +154,8 @@ opened it rather than a screenshot much later.
 
 | Check                  | Combinations                                                                                                                                        | Today |
 |------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| axe, WCAG 2.2 AA       | every section × light, dark × every palette                                                                                                         | 120   |
-| Screenshot, clipped    | every section × light, dark in `neutral`; the accent swatches and the focus ring of `tokens` and the whole of `buttons` × light, dark × four others | 48    |
+| axe, WCAG 2.2 AA       | every section × light, dark × every palette                                                                                                         | 130   |
+| Screenshot, clipped    | every section × light, dark in `neutral`; the accent swatches and the focus ring of `tokens` and the whole of `buttons` × light, dark × four others | 50    |
 | Info follows primary   | the `info` swatch of `tokens` shows the primary accent, every appearance and palette                                                                | 10    |
 | Palette sections exist | `tokens` and `buttons` are sections of the manifest                                                                                                 | 1     |
 
@@ -199,7 +199,7 @@ the viewport had arrived is not timing.
 The baselines are the PNGs in
 [`Tests/Acceptance/Visual/Baselines/`](../../Tests/Acceptance/Visual/Baselines),
 named `<section>-<appearance>-<palette>.png`, the two clipped specimens of
-`tokens` as `tokens-accents-…` and `tokens-focus-…` — 48 files and about 17 MB
+`tokens` as `tokens-accents-…` and `tokens-focus-…` — 50 files and about 18 MB
 today.
 `Tests/` is `export-ignore`, so they never ship. Growth of the repository on
 every intended visual change is the main ongoing cost of the suite.

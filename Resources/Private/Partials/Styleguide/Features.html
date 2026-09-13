@@ -1,0 +1,287 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    Styleguide section "features" - the components of the icon content
+    elements: ".theme-media-object", ".theme-feature" with
+    ".theme-feature-grid" and ".theme-feature-intro", ".theme-stat" and
+    ".theme-steps".
+
+    Contracts: "Resources/Private/Scss/components/_media-object.scss",
+    "_feature.scss", "_stat.scss" and "_steps.scss". Literal markup only,
+    specimen copy in English. Headings inside a specimen are h4, one level
+    below the specimen's own h3, so the page keeps one outline.
+
+    Icons. Every icon here is one the templates of the theme already use and
+    "Icons.html" lists, so this section adds no row there. They are
+    decoration: each slot is "aria-hidden", and the text next to it says what
+    the icon shows.
+</f:comment>
+<section class="theme-styleguide__section" id="features">
+    <h2 class="theme-styleguide__heading">Features, stats and steps</h2>
+
+    <h3>Media object: position</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            An icon beside a block of text. <code>--start</code> and
+            <code>--end</code> are the edges of the line, so the icon of
+            <code>--start</code> is first in a right-to-left page as well;
+            <code>--top</code> sets it above the text.
+        </p>
+        <div class="theme-media-object theme-media-object--start theme-media-object--square theme-media-object--md">
+            <span class="theme-media-object__icon" aria-hidden="true"><theme:icon name="folder" /></span>
+            <div class="theme-media-object__body">
+                <h4>At the start</h4>
+                <p>Configuration lives below <code>Configuration/Sets/</code>, and a site depends on the set in its own configuration.</p>
+            </div>
+        </div>
+        <div class="theme-media-object theme-media-object--end theme-media-object--square theme-media-object--md">
+            <span class="theme-media-object__icon" aria-hidden="true"><theme:icon name="file-code" /></span>
+            <div class="theme-media-object__body">
+                <h4>At the end</h4>
+                <p>The templates live below <code>Resources/Private/</code>; the icon stays first in the markup and moves to the end of the row.</p>
+            </div>
+        </div>
+        <div class="theme-media-object theme-media-object--top theme-media-object--square theme-media-object--md">
+            <span class="theme-media-object__icon" aria-hidden="true"><theme:icon name="flask" /></span>
+            <div class="theme-media-object__body">
+                <h4>Above the text</h4>
+                <p>The tests live below <code>Tests/</code>, and every gate runs in a container.</p>
+            </div>
+        </div>
+    </div>
+
+    <h3>Media object: shape and size</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--plain</code> is the icon in the primary accent;
+            <code>--square</code> and <code>--circle</code> put it on a tile
+            of the accent, twice its size. <code>--md</code>,
+            <code>--lg</code> and <code>--xl</code> set the icon, and the tile
+            follows.
+        </p>
+        <div class="theme-media-object theme-media-object--start theme-media-object--plain theme-media-object--md">
+            <span class="theme-media-object__icon" aria-hidden="true"><theme:icon name="lightbulb" /></span>
+            <div class="theme-media-object__body"><p>Plain, medium.</p></div>
+        </div>
+        <div class="theme-media-object theme-media-object--start theme-media-object--square theme-media-object--lg">
+            <span class="theme-media-object__icon" aria-hidden="true"><theme:icon name="gear" /></span>
+            <div class="theme-media-object__body"><p>Square, large.</p></div>
+        </div>
+        <div class="theme-media-object theme-media-object--start theme-media-object--circle theme-media-object--xl">
+            <span class="theme-media-object__icon" aria-hidden="true"><theme:icon name="magnifying-glass" /></span>
+            <div class="theme-media-object__body"><p>Circle, extra large.</p></div>
+        </div>
+    </div>
+
+    <h3>Features</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A grid of features, three columns at most, fewer where a column
+            would be narrower than 12 rem. <code>--column</code> sets the icon
+            on a tile above the title.
+        </p>
+        <div class="theme-feature-grid theme-feature-grid--columns-3">
+            <div class="theme-feature theme-feature--column">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="download" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Install</h4>
+                    <p class="theme-feature__text">Require the package with Composer and activate the site set.</p>
+                    <a class="theme-feature__link" href="#features"><theme:icon name="arrow-right" />Read the installation guide</a>
+                </div>
+            </div>
+            <div class="theme-feature theme-feature--column">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="gear" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Configure</h4>
+                    <p class="theme-feature__text">Constants and site settings move colours, sizes and paths without a build.</p>
+                </div>
+            </div>
+            <div class="theme-feature theme-feature--column">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="circle-check" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Verify</h4>
+                    <p class="theme-feature__text">Both core versions, both appearances and five palettes are tested.</p>
+                </div>
+            </div>
+        </div>
+        <p>
+            <code>--hanging</code> sets a smaller, framed tile at the start of
+            the line, and the text hangs beside it.
+        </p>
+        <div class="theme-feature-grid theme-feature-grid--columns-2">
+            <div class="theme-feature theme-feature--hanging">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="link" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Links with a style</h4>
+                    <p class="theme-feature__text">A call to action is a button in one of four styles.</p>
+                </div>
+            </div>
+            <div class="theme-feature theme-feature--hanging">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="envelope" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Marked links</h4>
+                    <p class="theme-feature__text">A mail, a phone number or a file is marked after its text.</p>
+                </div>
+            </div>
+        </div>
+        <p>
+            <code>--tile</code> frames the whole feature; four columns at most.
+        </p>
+        <div class="theme-feature-grid theme-feature-grid--columns-4">
+            <div class="theme-feature theme-feature--tile">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="folder" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Sets</h4>
+                    <p class="theme-feature__text">One dependency of the site.</p>
+                </div>
+            </div>
+            <div class="theme-feature theme-feature--tile">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="file-code" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Templates</h4>
+                    <p class="theme-feature__text">Fluid, one file per element.</p>
+                </div>
+            </div>
+            <div class="theme-feature theme-feature--tile">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="flask" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Tests</h4>
+                    <p class="theme-feature__text">Unit, functional, visual.</p>
+                </div>
+            </div>
+            <div class="theme-feature theme-feature--tile">
+                <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="phone" /></span>
+                <div class="theme-feature__body">
+                    <h4 class="theme-feature__title">Phones</h4>
+                    <p class="theme-feature__text">One column on a small screen.</p>
+                </div>
+            </div>
+        </div>
+        <p>
+            <code>.theme-feature-intro</code> sets a block of text beside the
+            grid from the medium breakpoint up, and above it below.
+        </p>
+        <div class="theme-feature-intro">
+            <div class="theme-feature-intro__text">
+                <h4>Why a development theme</h4>
+                <p>An extension built against a neutral theme shows its own structure, not a brand.</p>
+            </div>
+            <div class="theme-feature-grid theme-feature-grid--columns-2">
+                <div class="theme-feature theme-feature--hanging">
+                    <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="lightbulb" /></span>
+                    <div class="theme-feature__body">
+                        <h4 class="theme-feature__title">Visible boundaries</h4>
+                        <p class="theme-feature__text">Every element carries an outline with its type.</p>
+                    </div>
+                </div>
+                <div class="theme-feature theme-feature--hanging">
+                    <span class="theme-feature__icon" aria-hidden="true"><theme:icon name="magnifying-glass" /></span>
+                    <div class="theme-feature__body">
+                        <h4 class="theme-feature__title">Nothing hard coded</h4>
+                        <p class="theme-feature__text">A colour that does not move with the palette stands out.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Stats</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A description list: the label is the term, the figure its
+            description, shown above it and larger. The digits are tabular, so
+            a row of figures lines up.
+        </p>
+        <dl class="theme-stats">
+            <div class="theme-stat">
+                <dt class="theme-stat__label">Icons shipped</dt>
+                <dd class="theme-stat__value"><span class="theme-stat__icon" aria-hidden="true"><theme:icon name="folder" /></span>2001</dd>
+                <dd class="theme-stat__text">The whole solid style of Font Awesome Free.</dd>
+            </div>
+            <div class="theme-stat">
+                <dt class="theme-stat__label">Palettes</dt>
+                <dd class="theme-stat__value">5</dd>
+                <dd class="theme-stat__text">Each varies the accents only.</dd>
+            </div>
+            <div class="theme-stat">
+                <dt class="theme-stat__label">Core versions</dt>
+                <dd class="theme-stat__value">2</dd>
+            </div>
+            <div class="theme-stat">
+                <dt class="theme-stat__label">Border radius</dt>
+                <dd class="theme-stat__value">5px</dd>
+                <dd class="theme-stat__text">The single radius of the Frame.</dd>
+            </div>
+        </dl>
+    </div>
+
+    <h3>Steps</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            An ordered list. The stylesheet numbers the markers, and a hairline
+            joins each marker to the next - down the page below the medium
+            breakpoint, across it above.
+        </p>
+        <ol class="theme-steps">
+            <li class="theme-steps__step">
+                <span class="theme-steps__marker" aria-hidden="true"></span>
+                <div class="theme-steps__body">
+                    <h4 class="theme-steps__title">Install</h4>
+                    <p class="theme-steps__text">Require the package.</p>
+                </div>
+            </li>
+            <li class="theme-steps__step">
+                <span class="theme-steps__marker" aria-hidden="true"></span>
+                <div class="theme-steps__body">
+                    <h4 class="theme-steps__title">Activate</h4>
+                    <p class="theme-steps__text">Add the site set to the site.</p>
+                </div>
+            </li>
+            <li class="theme-steps__step">
+                <span class="theme-steps__marker" aria-hidden="true"></span>
+                <div class="theme-steps__body">
+                    <h4 class="theme-steps__title">Seed</h4>
+                    <p class="theme-steps__text">Import the showcase tree.</p>
+                </div>
+            </li>
+        </ol>
+        <p>
+            <code>--icon</code> puts an icon into the marker instead of the
+            number.
+        </p>
+        <ol class="theme-steps">
+            <li class="theme-steps__step">
+                <span class="theme-steps__marker theme-steps__marker--icon" aria-hidden="true"><theme:icon name="download" /></span>
+                <div class="theme-steps__body">
+                    <h4 class="theme-steps__title">Download</h4>
+                    <p class="theme-steps__text">Fetch the release.</p>
+                </div>
+            </li>
+            <li class="theme-steps__step">
+                <span class="theme-steps__marker theme-steps__marker--icon" aria-hidden="true"><theme:icon name="gear" /></span>
+                <div class="theme-steps__body">
+                    <h4 class="theme-steps__title">Configure</h4>
+                    <p class="theme-steps__text">Set the constants.</p>
+                </div>
+            </li>
+            <li class="theme-steps__step">
+                <span class="theme-steps__marker theme-steps__marker--icon" aria-hidden="true"><theme:icon name="circle-check" /></span>
+                <div class="theme-steps__body">
+                    <h4 class="theme-steps__title">Check</h4>
+                    <p class="theme-steps__text">Run the gates.</p>
+                </div>
+            </li>
+            <li class="theme-steps__step">
+                <span class="theme-steps__marker" aria-hidden="true"></span>
+                <div class="theme-steps__body">
+                    <h4 class="theme-steps__title">Release</h4>
+                    <p class="theme-steps__text">A step without an icon keeps its number.</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+</section>
+
+</html>

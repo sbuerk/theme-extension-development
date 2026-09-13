@@ -41,12 +41,16 @@ against, and the rename was cheap while only one template depended on it.
 | Display settings        | `.theme-settings`         | `components/_settings.scss`         |
 | Dialog                  | `.theme-dialog`           | `components/_dialog.scss`           |
 | Divider                 | `.theme-divider`          | `components/_divider.scss`          |
+| Feature                 | `.theme-feature`          | `components/_feature.scss`          |
+| Feature grid            | `.theme-feature-grid`     | `components/_feature.scss`          |
+| Feature introduction    | `.theme-feature-intro`    | `components/_feature.scss`          |
 | Figure                  | `.theme-figure`           | `components/_figure.scss`           |
 | Gallery                 | `.theme-gallery`          | `components/_gallery.scss`          |
 | Hero                    | `.theme-hero`             | `components/_hero.scss`             |
 | Icon                    | `.theme-icon`             | `components/_icon.scss`             |
 | Link decoration         | `.theme-link`             | `components/_link.scss`             |
 | List                    | `.theme-list`             | `components/_list.scss`             |
+| Media object            | `.theme-media-object`     | `components/_media-object.scss`     |
 | Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`         |
 | Meter                   | `.theme-meter`            | `components/_meter.scss`            |
 | Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`          |
@@ -57,6 +61,9 @@ against, and the rename was cheap while only one template depended on it.
 | Segmented control       | `.theme-segmented`        | `components/_settings.scss`         |
 | Palette swatch          | `.theme-swatch`           | `components/_settings.scss`         |
 | Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`        |
+| Stat                    | `.theme-stat`             | `components/_stat.scss`             |
+| Stats                   | `.theme-stats`            | `components/_stat.scss`             |
+| Steps                   | `.theme-steps`            | `components/_steps.scss`            |
 | Table                   | `.theme-table-wrapper`    | `components/_table.scss`            |
 | Tabs                    | `.theme-tabs`             | `components/_tabs.scss`             |
 | Tag list                | `.theme-tag-list`         | `components/_tag.scss`              |
@@ -529,6 +536,36 @@ no glyph:
 </div>
 ```
 
+Feature — an icon, a title, a sentence or two and an optional link; a group of
+them is a `.theme-feature-grid`. Three item layouts: `--column` (the default,
+the icon on a tile of the primary accent above the title), `--hanging` (a
+smaller framed tile at the start of the line, the text beside it) and `--tile`
+(the whole feature framed, the icon above). `--columns-2`, `--columns-3` and
+`--columns-4` set the most columns the grid takes; each column is at least
+12rem wide, so a narrow column gets fewer, down to one, without a breakpoint.
+Four columns take 53.625rem: the full-width page layout gives a content
+element that much, the main column beside a sub navigation does not, and
+there the grid shows three.
+`.theme-feature-intro` sets a block of text beside a grid from `bp.$md` up.
+`.theme-feature__title` is selected by class on any heading level and states
+`text-transform: none`, like the hero title:
+
+```html
+<div class="theme-feature-intro">
+    <div class="theme-feature-intro__text">…</div>
+    <div class="theme-feature-grid theme-feature-grid--columns-3">
+        <div class="theme-feature theme-feature--column">
+            <span class="theme-feature__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>
+            <div class="theme-feature__body">
+                <h3 class="theme-feature__title">…</h3>
+                <p class="theme-feature__text">…</p>
+                <a class="theme-feature__link" href="…">…</a>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
 Figure. `--caption-end` aligns the caption to the end; `--float-start` and
 `--float-end` float the figure beside the running text from `bp.$md` up,
 capped at half the column — logical, so the start is the right side of a
@@ -605,6 +642,23 @@ content:
 </ul>
 ```
 
+Media object — an icon of the set beside a block of content. Three
+independent axes, one modifier each, the first value the default: position
+`--start`, `--end`, `--top`; shape `--plain`, `--square`, `--circle`; size
+`--md`, `--lg`, `--xl`. `--start` and `--end` are the edges of the line;
+`--end` reverses the row, not the source, so the icon stays first in the
+markup. `--plain` is the icon in the primary accent; `--square` and `--circle`
+put it on a tile twice its size, filled with the primary accent, the icon in
+`on-primary`. The tile follows the icon size through a token computed on the
+same element, so the modifiers combine in any order:
+
+```html
+<div class="theme-media-object theme-media-object--start theme-media-object--square theme-media-object--lg">
+    <span class="theme-media-object__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>
+    <div class="theme-media-object__body">…</div>
+</div>
+```
+
 Progress and meter — the native `<progress>` and `<meter>`, each labelled
 by a `label` in a `.theme-field` and followed by its value in words as a
 `.theme-field__hint`: a bar is read at a glance, a number exactly. A meter is
@@ -653,6 +707,49 @@ Quote:
         <cite class="theme-quote__source">…</cite>
     </figcaption>
 </figure>
+```
+
+Stat — a figure and what it counts, as a description list: the label is the
+term, the figure its description, a sentence about it a second one. Each pair
+is grouped in a `div`, which a `dl` allows, and is one box of the grid. The
+source reads label then figure; `order` shows the figure first and larger.
+The figure is set in `tabular-nums`, so a row of figures lines up, and an
+optional icon sits before it, three quarters of its size:
+
+```html
+<dl class="theme-stats">
+    <div class="theme-stat">
+        <dt class="theme-stat__label">…</dt>
+        <dd class="theme-stat__value"><span class="theme-stat__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>2001</dd>
+        <dd class="theme-stat__text">…</dd>
+    </div>
+</dl>
+```
+
+Steps — a process as an ordered list. The marker is empty in the markup and
+numbered by a CSS counter, so the source carries no number that could
+disagree with the order; `__marker--icon` holds an icon of the set instead.
+The markers are `aria-hidden`: the list already says which item of how many a
+step is. Below `bp.$md` the steps run down, from `bp.$md` up across - a list of
+up to five steps; one with a sixth stays down, through `:has()`, since a
+sixth of the column is narrower than a title - and a
+hairline rail - a border of an empty pseudo element - joins each marker to
+the next:
+
+```html
+<ol class="theme-steps">
+    <li class="theme-steps__step">
+        <span class="theme-steps__marker" aria-hidden="true"></span>
+        <div class="theme-steps__body">
+            <h3 class="theme-steps__title">…</h3>
+            <p class="theme-steps__text">…</p>
+        </div>
+    </li>
+    <li class="theme-steps__step">
+        <span class="theme-steps__marker theme-steps__marker--icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>
+        …
+    </li>
+</ol>
 ```
 
 Table. `tabindex="0"` plus `role="region"` plus `aria-label` on the wrapper is
@@ -1304,6 +1401,7 @@ instead of being repainted in turn — and `CanvasText`, `ButtonText` and
 | Input group | nothing — the lifted edge is position, not colour         | none                                         |
 | Progress    | the fill and the tint of the track                        | opt out: `Canvas`, `CanvasText`, `Highlight` |
 | Meter       | the fill and the tint of the track; the three regions     | as progress, every region `Highlight`        |
+| Icon tiles  | the fill of the media object and feature tiles            | none: a transparent border is painted solid  |
 
 The `::backdrop` needs no rule: forced colours keep the alpha of its
 background, so the scrim stays a translucent canvas over the page. The alert
@@ -1350,7 +1448,7 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 | `tabsShowEveryPanelUntilTheScriptHasBoundThem`         | The tab list is hidden and the panel headings shown until the group carries `data-theme-tabs-bound`, and nothing about the tabs is gated on `[data-js]` — see [Components that need the script](#components-that-need-the-script). |
 | `aDialogOpenerIsHiddenWithoutTheScriptMarker`          | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                    |
 | `textIsAlignedToTheStartOrTheEndOfTheLine`             | No `text-align: left` or `right` is compiled — a physical alignment puts the text of a right-to-left page against the wrong edge, and the element baseline carried two until they were found.                                      |
-| `aTitleOnAnyHeadingLevelKeepsItsOwnCase`               | `.theme-hero__title` and `.theme-teaser__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                                                                             |
+| `aTitleOnAnyHeadingLevelKeepsItsOwnCase`               | `.theme-hero__title`, `.theme-teaser__title`, `.theme-feature__title` and `.theme-steps__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                             |
 | `noComponentReferencesAnUndeclaredToken`               | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                         |
 | `aListItemHoldingAFloatKeepsItsMarker`                 | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                            |
 | `aControlDrawsItsBoundaryInTheStrongBorderColour`      | The text input, the input group addon, the switch track and the tracks of progress and meter default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                         |
