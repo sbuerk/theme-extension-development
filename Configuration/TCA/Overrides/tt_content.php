@@ -237,6 +237,56 @@ $additionalColumns['tx_theme_header_style'] = [
     ],
 ];
 
+// Where, on what and how large the icon of an element is drawn - the three
+// axes of ".theme-media-object" (components/_media-object.scss), one column
+// each, every value one modifier. The text and icon element offers them in the
+// "theme_icon" palette below, next to "tx_theme_icon"; they are named for the
+// icon rather than for that element, so a later element that shows one icon
+// the same way offers the same palette.
+//
+// "selectSingle" of string values: "DefaultTcaSchema" derives a VARCHAR(255)
+// from each on v13.4 and v14.3. The template maps every value it does not know
+// - an empty one included - to the default of its axis.
+$additionalColumns['tx_theme_icon_position'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_position',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => 'start',
+        'items' => [
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_position.I.start', 'value' => 'start'],
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_position.I.end', 'value' => 'end'],
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_position.I.top', 'value' => 'top'],
+        ],
+    ],
+];
+$additionalColumns['tx_theme_icon_shape'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_shape',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => 'plain',
+        'items' => [
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_shape.I.plain', 'value' => 'plain'],
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_shape.I.square', 'value' => 'square'],
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_shape.I.circle', 'value' => 'circle'],
+        ],
+    ],
+];
+$additionalColumns['tx_theme_icon_size'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_size',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => 'md',
+        'items' => [
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_size.I.md', 'value' => 'md'],
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_size.I.lg', 'value' => 'lg'],
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_icon_size.I.xl', 'value' => 'xl'],
+        ],
+    ],
+];
+
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
 
 // The icon of the layout "Icons" of the bullet list, next to the list type.
@@ -256,4 +306,11 @@ ExtensionManagementUtility::addFieldsToPalette('tt_content', 'header', 'tx_theme
 $GLOBALS['TCA']['tt_content']['palettes']['theme_link'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_link',
     'showitem' => 'tx_theme_link, tx_theme_link_label, --linebreak--, tx_theme_link_variant, tx_theme_link_icon',
+];
+
+// The icon of an element and how it is drawn, for an element that renders one
+// icon beside its text - see the three columns above.
+$GLOBALS['TCA']['tt_content']['palettes']['theme_icon'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_icon',
+    'showitem' => 'tx_theme_icon, --linebreak--, tx_theme_icon_position, tx_theme_icon_shape, tx_theme_icon_size',
 ];

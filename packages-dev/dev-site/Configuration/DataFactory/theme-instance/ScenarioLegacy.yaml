@@ -1476,6 +1476,104 @@ entities:
                       id: 1018
                       header: 'Is anything open at first?'
                       text: '<p>No. Which item a reader meets first is what the order of the items already says.</p>'
+              children:
+                -
+                  self:
+                    id: 1070
+                    title: 'Text and icon'
+                    slug: /elements/theme/text-icon
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 8001
+                          CType: header
+                          header: 'Text and icon'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 8002
+                          CType: text
+                          header: 'Where the icon goes'
+                          header_layout: 2
+                          bodytext: "<p>The heading, the text and the link of the element sit beside one\nicon of the set. The icon goes at the start of the line, at its end or\nabove the text; it is drawn plain in the accent, or on a square or a\nround tile of the accent; and it comes in three sizes. The elements\nbelow show every one of those values.</p>"
+                      -
+                        self:
+                          id: 8003
+                          CType: theme_text_icon
+                          header: 'Configure once, in the site'
+                          header_layout: 2
+                          bodytext: "<p>A site depends on the site set of the theme, and constants, page\nTSconfig and setup arrive together. Nothing is copied into the site\npackage.</p>\n"
+                          tx_theme_icon: gear
+                          tx_theme_icon_position: start
+                          tx_theme_icon_shape: square
+                          tx_theme_icon_size: md
+                          tx_theme_link: 't3://page?uid=1009'
+                          tx_theme_link_label: 'Open the styleguide'
+                          tx_theme_link_variant: ''
+                      -
+                        self:
+                          id: 8004
+                          CType: theme_text_icon
+                          header: 'Templates that stay readable'
+                          header_layout: 2
+                          bodytext: "<p>Every element is one Fluid template on the contract of a component.\nA site package overrides the one file it wants to change and keeps the\nrest.</p>\n"
+                          tx_theme_icon: code
+                          tx_theme_icon_position: end
+                          tx_theme_icon_shape: circle
+                          tx_theme_icon_size: lg
+                          tx_theme_link: 't3://page?uid=1006'
+                          tx_theme_link_label: 'See the core elements'
+                          tx_theme_link_variant: secondary
+                          tx_theme_link_icon: arrow-right
+                      -
+                        self:
+                          id: 8005
+                          CType: theme_text_icon
+                          header: 'Readable for everybody'
+                          header_layout: 2
+                          bodytext: "<p>Every colour of the theme is checked against the surfaces it sits\non, in both appearances and all five palettes. The icon beside this\ntext is decoration: the heading says the same.</p>\n"
+                          tx_theme_icon: universal-access
+                          tx_theme_icon_position: top
+                          tx_theme_icon_shape: plain
+                          tx_theme_icon_size: xl
+                      -
+                        self:
+                          id: 8006
+                          CType: theme_text_icon
+                          header: 'From a checkout to a running site'
+                          header_layout: 2
+                          bodytext: "<p>Both development instances start with one command and seed this very\npage tree, so a change is looked at in the backend and the frontend of\nTYPO3 v13 and v14 alike.</p>\n"
+                          tx_theme_icon: rocket
+                          tx_theme_icon_position: top
+                          tx_theme_icon_shape: square
+                          tx_theme_icon_size: lg
+                          tx_theme_link: 't3://page?uid=1002'
+                          tx_theme_link_label: 'Read the typography pages'
+                          tx_theme_link_variant: ghost
+                      -
+                        self:
+                          id: 8007
+                          CType: theme_text_icon
+                          header: 'An icon at the end, plain'
+                          header_layout: 2
+                          bodytext: "<p>At the end of the line the icon moves to the other side of the text,\nin a right-to-left page as well. It stays first in the markup.</p>\n"
+                          tx_theme_icon: shield-halved
+                          tx_theme_icon_position: end
+                          tx_theme_icon_shape: plain
+                          tx_theme_icon_size: md
+                      -
+                        self:
+                          id: 8008
+                          CType: theme_text_icon
+                          header: 'Without an icon'
+                          header_layout: 2
+                          bodytext: "<p>No icon was picked for this element, so it renders its text alone,\nwithout an empty tile where the icon would be.</p>\n"
+                          tx_theme_icon: ''
+                          tx_theme_icon_position: start
+                          tx_theme_icon_shape: circle
+                          tx_theme_icon_size: md
             -
               self:
                 id: 1051

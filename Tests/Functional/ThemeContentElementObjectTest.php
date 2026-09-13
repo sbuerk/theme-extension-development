@@ -15,8 +15,8 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  *
  * `fluid_styled_content` starts its `lib.contentElement` with
  * `lib.contentElement >` on v13.4 and v14.3, so an installation that loads it
- * after the theme loses every root path the theme put there. The thirteen
- * `theme_*` elements are therefore built on `lib.themeContentElement`, and
+ * after the theme loses every root path the theme put there. The `theme_*`
+ * elements are therefore built on `lib.themeContentElement`, and
  * this renders them with `lib.contentElement` cleared after the theme - the
  * line of `Fixtures/TypoScript/ClearContentElement.typoscript`, which is the
  * first line of fluid_styled_content's own definition - on both delivery
@@ -43,6 +43,7 @@ final class ThemeContentElementObjectTest extends AbstractFunctionalTestCase
         parent::setUp();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/PageWithThemeContentElements.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/IconContentElements.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/CoreHeaderSubpage.csv');
     }
 

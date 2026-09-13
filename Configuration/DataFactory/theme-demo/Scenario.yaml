@@ -6,9 +6,9 @@
 # Every record declares its uid, and the numbering is a rule rather than a
 # sequence:
 #
-#   pages               1-10, the first tree, and 30-39 and 50-56, the
-#                       pages added below its sections - see below for why
-#                       the new ones skip decades
+#   pages               1-10, the first tree, and 30-39, 50-56 and 70-79,
+#                       the pages added below its sections - see below for
+#                       why the new ones skip decades
 #   tt_content          the uid of its page times 100, plus its position on
 #                       that page: the third element of page 6 is 603, the
 #                       second of page 35 is 3502
@@ -2218,6 +2218,126 @@ entities:
                         id: 18
                         header: 'Is anything open at first?'
                         text: '<p>No. Which item a reader meets first is what the order of the items already says.</p>'
+
+              # One page per theme element that shows icons of the set, named
+              # after it and showing its variants: every value of the fields
+              # that change how it looks. "ShowcaseTreeTest" reads the values
+              # from the TCA and holds these pages to them.
+              #
+              # "content_sidebar", so the sub navigation lists the sibling
+              # pages next to every one of them.
+              children:
+                # "theme_text_icon" - every position, shape and size of the
+                # icon, and one element without an icon.
+                - self:
+                      id: 70
+                      title: 'Text and icon'
+                      slug: '/elements/theme/text-icon'
+                      backend_layout: 'content_sidebar'
+                  entities:
+                    content:
+                      - self:
+                            id: 7001
+                            CType: 'header'
+                            header: 'Text and icon'
+                            header_layout: 1
+                      - self:
+                            id: 7002
+                            CType: 'text'
+                            header: 'Where the icon goes'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The heading, the text and the link of the element sit beside one
+                              icon of the set. The icon goes at the start of the line, at its end or
+                              above the text; it is drawn plain in the accent, or on a square or a
+                              round tile of the accent; and it comes in three sizes. The elements
+                              below show every one of those values.</p>
+                      - self:
+                            id: 7003
+                            CType: 'theme_text_icon'
+                            header: 'Configure once, in the site'
+                            header_layout: 2
+                            bodytext: |
+                              <p>A site depends on the site set of the theme, and constants, page
+                              TSconfig and setup arrive together. Nothing is copied into the site
+                              package.</p>
+                            tx_theme_icon: 'gear'
+                            tx_theme_icon_position: 'start'
+                            tx_theme_icon_shape: 'square'
+                            tx_theme_icon_size: 'md'
+                            tx_theme_link: 't3://page?uid=9'
+                            tx_theme_link_label: 'Open the styleguide'
+                            tx_theme_link_variant: ''
+                      - self:
+                            id: 7004
+                            CType: 'theme_text_icon'
+                            header: 'Templates that stay readable'
+                            header_layout: 2
+                            bodytext: |
+                              <p>Every element is one Fluid template on the contract of a component.
+                              A site package overrides the one file it wants to change and keeps the
+                              rest.</p>
+                            tx_theme_icon: 'code'
+                            tx_theme_icon_position: 'end'
+                            tx_theme_icon_shape: 'circle'
+                            tx_theme_icon_size: 'lg'
+                            tx_theme_link: 't3://page?uid=6'
+                            tx_theme_link_label: 'See the core elements'
+                            tx_theme_link_variant: 'secondary'
+                            tx_theme_link_icon: 'arrow-right'
+                      - self:
+                            id: 7005
+                            CType: 'theme_text_icon'
+                            header: 'Readable for everybody'
+                            header_layout: 2
+                            bodytext: |
+                              <p>Every colour of the theme is checked against the surfaces it sits
+                              on, in both appearances and all five palettes. The icon beside this
+                              text is decoration: the heading says the same.</p>
+                            tx_theme_icon: 'universal-access'
+                            tx_theme_icon_position: 'top'
+                            tx_theme_icon_shape: 'plain'
+                            tx_theme_icon_size: 'xl'
+                      - self:
+                            id: 7006
+                            CType: 'theme_text_icon'
+                            header: 'From a checkout to a running site'
+                            header_layout: 2
+                            bodytext: |
+                              <p>Both development instances start with one command and seed this very
+                              page tree, so a change is looked at in the backend and the frontend of
+                              TYPO3 v13 and v14 alike.</p>
+                            tx_theme_icon: 'rocket'
+                            tx_theme_icon_position: 'top'
+                            tx_theme_icon_shape: 'square'
+                            tx_theme_icon_size: 'lg'
+                            tx_theme_link: 't3://page?uid=2'
+                            tx_theme_link_label: 'Read the typography pages'
+                            tx_theme_link_variant: 'ghost'
+                      - self:
+                            id: 7007
+                            CType: 'theme_text_icon'
+                            header: 'An icon at the end, plain'
+                            header_layout: 2
+                            bodytext: |
+                              <p>At the end of the line the icon moves to the other side of the text,
+                              in a right-to-left page as well. It stays first in the markup.</p>
+                            tx_theme_icon: 'shield-halved'
+                            tx_theme_icon_position: 'end'
+                            tx_theme_icon_shape: 'plain'
+                            tx_theme_icon_size: 'md'
+                      - self:
+                            id: 7008
+                            CType: 'theme_text_icon'
+                            header: 'Without an icon'
+                            header_layout: 2
+                            bodytext: |
+                              <p>No icon was picked for this element, so it renders its text alone,
+                              without an empty tile where the icon would be.</p>
+                            tx_theme_icon: ''
+                            tx_theme_icon_position: 'start'
+                            tx_theme_icon_shape: 'circle'
+                            tx_theme_icon_size: 'md'
 
             # The appearance fields of a content element, every value once:
             # the frames, the space before and after, the alignment and the

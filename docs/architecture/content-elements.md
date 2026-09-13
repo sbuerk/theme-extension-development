@@ -695,7 +695,7 @@ appears raw in 24 places and escaped in none.
 
 Everything above registers no TCA of its own — `EXT:frontend` already made
 every classic type and every `menu_*` type creatable, and this theme only
-supplied a rendering. The thirteen types below are different: their TCA is this
+supplied a rendering. The types below are different: their TCA is this
 extension's own, in
 [`Configuration/TCA/Overrides/tt_content_theme_*.php`](../../Configuration/TCA/Overrides/)
 and [`Configuration/TCA/tx_theme_list_item.php`](../../Configuration/TCA/tx_theme_list_item.php),
@@ -722,6 +722,7 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_notice`            | A note, tip, information, success, warning or danger box | `.theme-alert`, the modifier and `role` of its kind     |
 | `theme_tabs`              | Items in tabs, one panel at a time                       | `.theme-tabs`                                           |
 | `theme_accordion`         | Collapsible items, one open at a time                    | `.theme-accordion`                                      |
+| `theme_text_icon`         | A heading, rich text and a link beside one icon          | `.theme-media-object`                                   |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -733,7 +734,7 @@ reasoning already written there.
 
 ### `lib.themeContentElement`: their own frame, not `lib.contentElement`
 
-All thirteen are `=< lib.themeContentElement`, a `FLUIDTEMPLATE` with the same
+All of them are `=< lib.themeContentElement`, a `FLUIDTEMPLATE` with the same
 three root paths `lib.contentElement` has — the `theme.*RootPath` constants at
 index `10` — and nothing else. The classic set above stays on
 `lib.contentElement`.
@@ -761,8 +762,8 @@ For an integrator this is one change: root paths added to `lib.contentElement`
 reach the classic set only. The `theme.*RootPath` constants set both objects,
 as before.
 
-`Tests/Functional/ThemeContentElementObjectTest.php` renders the page of all
-thirteen with `lib.contentElement >` loaded after the theme — through the set
+`Tests/Functional/ThemeContentElementObjectTest.php` renders a page of all of
+them with `lib.contentElement >` loaded after the theme — through the set
 and through the static include — and requires the markup to be identical to
 the page without it. A core element on a second page, rendered with the same
 TypoScript, has to lose its rendering, which is what shows that the clearing
@@ -1009,6 +1010,48 @@ with a footer of controls; a content element has no controls to put there, and
 without them it is a notice of kind `note` or a teaser without a link, both of
 which exist.
 
+### Elements with icons
+
+The elements below show icons of the shipped set, picked by the editor with
+the theme's icon picker (`IconItems::selectConfig()`, the curated `keepItems`
+of `Configuration/PageTsConfig/IconPicker.tsconfig`) and rendered with
+`<theme:icon … optional="1" />` - see
+[Icons](../development/icons.md#picking-an-icon-in-the-backend). Each has a
+page of its own below `/elements/theme`, showing every value of the fields
+that change how it looks; `ShowcaseTreeTest` reads the values from the TCA and
+holds the page to them.
+
+**`theme_text_icon`** is the heading, the rich text and the link of the element
+beside one icon, on `.theme-media-object` - bootstrap_package's `texticon`. The
+icon is `tt_content.tx_theme_icon`, the column of the bullet list's icon, with
+a description of its own on this type. Three columns say how it is drawn, one
+per axis of the component:
+
+| Column                   | Values                      | Modifier                          |
+|--------------------------|-----------------------------|-----------------------------------|
+| `tx_theme_icon_position` | `start`, `end`, `top`       | `--start`, `--end`, `--top`       |
+| `tx_theme_icon_shape`    | `plain`, `square`, `circle` | `--plain`, `--square`, `--circle` |
+| `tx_theme_icon_size`     | `md`, `lg`, `xl`            | `--md`, `--lg`, `--xl`            |
+
+They are in the palette `theme_icon` with the icon, and are named for the icon,
+not for the element: a later element that shows one icon the same way offers
+the same palette. The template writes one modifier per axis, always, and maps
+every value it does not know - an empty one included - to the first value of
+the axis, which is also the TCA default; `ContentElementContractTest` holds the
+modifiers to the stylesheet.
+
+The icon is rendered into a variable first, and the slot only when that
+produced markup: an element without an icon, or with a name the set no longer
+has, is its text alone rather than an empty tile. The heading goes through the
+shared header partial **inside** the body, beside the icon, so
+`header_position` and `tx_theme_header_style` apply as for a text element.
+
+| Test                                                    | Guards                                                                                                                        |
+|---------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `Tests/Functional/IconContentElementRenderingTest.php`  | every value of every axis, and one nothing offers, writes its modifier, through the set and the static include; no empty slot |
+| `Tests/Functional/IconContentElementFormEngineTest.php` | the form offers the values the component styles, the fields on this type only, and the description of the type                |
+| `Tests/Unit/ContentElementContractTest.php`             | every modifier the template writes is a selector of the compiled stylesheet                                                   |
+
 ### Gaps, stated as gaps
 
 - **No platform logos.** The theme ships the solid set of Font Awesome Free,
@@ -1043,7 +1086,7 @@ longer offers the field to an editor at all.)
 
 ### The wizard group, and what an unresolved icon identifier does
 
-Every one of the thirteen types carries a `label`, a `description` and an `icon` on
+Every one of the theme's own types carries a `label`, a `description` and an `icon` on
 its `addRecordType()`/`addTcaSelectItemGroup()` call, all under one wizard
 group ("Theme",
 `tt_content.group.theme` in `locallang_tca.xlf`, inserted `before:default`).
@@ -1055,11 +1098,11 @@ generated from exactly those TCA keys, which replaced the former
 therefore never needed to write.
 
 The core requires an icon identifier, and none of this theme's own is
-invented — all eleven reused identifiers (`content-header`,
+invented — every identifier is one the core registers (`content-header`,
 `content-text-teaser`, `content-beside-text-img-left`, `content-card-group`,
 `content-quote`, `content-user`, `content-bullets`, `content-listgroup`, and
-`content-message`, `content-tab`, `content-accordion` for the three added
-last) are
+`content-message`, `content-tab`, `content-accordion` for the notice, the
+tabs and the accordion, and `content-idea` for the text and icon element),
 verified present in the core's own icon registry
 (`.Build/vendor/typo3/cms-core/Resources/Public/Icons/T3Icons/icons.json`),
 not shipped as image files of this extension's own. An identifier that is

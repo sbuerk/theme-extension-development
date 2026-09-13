@@ -61,6 +61,13 @@
     margin-block-end: var(--theme-space-4, 1.25rem);
 }
 
+// The first value of each axis is also what the bare block looks like. It is
+// stated as a rule of its own all the same, so a template can name it - the
+// text and icon element always writes one modifier per axis.
+.theme-media-object--start {
+    flex-direction: row;
+}
+
 .theme-media-object--end {
     flex-direction: row-reverse;
 }
@@ -111,6 +118,13 @@
 
 .theme-media-object--xl {
     --theme-media-object-icon-size: 3rem;
+}
+
+.theme-media-object--plain {
+    --theme-media-object-tile-size: var(--theme-media-object-icon-size);
+    --theme-media-object-color: var(--theme-color-primary, #0b57d0);
+    --theme-media-object-tile-background: transparent;
+    --theme-media-object-tile-radius: 0;
 }
 
 .theme-media-object--square,
