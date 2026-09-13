@@ -42,8 +42,8 @@ in a frontend rather than only in a test assertion:
 
     The theme renders a page once a site depends on its site set — see
     :ref:`configuration`. It covers **every classic content element**
-    :file:`EXT:frontend` registers, the eleven menu elements, thirteen elements
-    of its own, and third-party Extbase plugins, none of which requires
+    :file:`EXT:frontend` registers, the eleven menu elements, the elements of
+    its own, and third-party Extbase plugins, none of which requires
     :file:`fluid_styled_content` — that extension is not a dependency here, and
     on TYPO3 v14 it is not installed at all. It ships six backend layouts, a
     main menu, a section menu and a breadcrumb, and a light/dark appearance

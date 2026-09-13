@@ -1,0 +1,154 @@
+// Call to action.
+//
+// Markup contract:
+//
+//     <section class="theme-cta theme-cta--band theme-cta--accent">
+//         <span class="theme-cta__icon" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
+//         <h2 class="theme-cta__title">…</h2>
+//         <div class="theme-cta__text"><p>…</p></div>
+//         <div class="theme-cta__actions">
+//             <a class="theme-button" href="…">…</a>
+//             <a class="theme-button theme-button--secondary" href="…">…</a>
+//         </div>
+//     </section>
+//
+// Everything is optional but the section. The content is centred on one axis,
+// the text held to the reading measure.
+//
+// Width modifiers: "--boxed" (a box narrower than its column, centred in it)
+// and "--band" (across the whole column: no radius, no frame at the sides,
+// more air above and below). The bare class fills its column as a box.
+//
+// Tone modifiers - the bands of the content element frame, applied to the
+// component, so the contrast "DESIGN.md" computed for those bands holds:
+//
+//   (none)          the surface fill
+//   --accent        a 5% tint of the primary accent, mixed as the accent band
+//   --inverse       the other appearance: the colour scheme of the subtree is
+//                   turned, exactly as the inverse band turns it, so every
+//                   component inside - the buttons included - is as readable
+//                   as on a page in that appearance
+//   --placeholder   no fill and a dashed frame in the strong border colour,
+//                   for a call to action that stands in for content not there
+//                   yet ("No articles yet - write the first")
+//
+// Width and tone combine. The inverse tone needs three rules, for the three
+// ways the page gets its scheme; see "components/_content-element.scss" for
+// why it re-points no token.
+//
+// The icon is the element's picked icon, large, in the primary accent. It is
+// decoration next to the heading - "aria-hidden" on the slot.
+//
+// Structural variant: Frame - the hairline, the 5px radius, no shadow, as the
+// hero. See "components/_button.scss" for why every component declares its
+// own token layer with a fallback.
+
+.theme-cta {
+    --theme-cta-background: var(--theme-color-surface, #f4f6fa);
+    --theme-cta-border-color: var(--theme-color-border, #d6dce6);
+    --theme-cta-border-style: solid;
+    --theme-cta-radius: var(--theme-radius-sm, 5px);
+    --theme-cta-padding-block: var(--theme-space-7, 2.5rem);
+    --theme-cta-padding-inline: var(--theme-space-6, 1.875rem);
+    --theme-cta-gap: var(--theme-space-3, 0.9375rem);
+    --theme-cta-icon-size: 3rem;
+    --theme-cta-icon-color: var(--theme-color-primary, #0b57d0);
+    --theme-cta-title-font-size: var(--theme-font-size-2xl, 2.125rem);
+    --theme-cta-boxed-width: 48rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--theme-cta-gap);
+    padding: var(--theme-cta-padding-block) var(--theme-cta-padding-inline);
+
+    background-color: var(--theme-cta-background);
+    border: var(--theme-border-width, 1px) var(--theme-cta-border-style) var(--theme-cta-border-color);
+    border-radius: var(--theme-cta-radius);
+    color: var(--theme-color-text-primary, #14181f);
+    text-align: center;
+}
+
+.theme-cta__icon {
+    --theme-icon-size: var(--theme-cta-icon-size);
+
+    display: flex;
+    color: var(--theme-cta-icon-color);
+}
+
+// The level follows "header_layout", and "h5" is set in capitals by
+// "base/_elements.scss" - so the case is stated, and the title looks the same
+// on every level, like the title of the hero.
+.theme-cta__title {
+    margin: 0;
+    font-size: var(--theme-cta-title-font-size);
+    font-weight: var(--theme-font-weight-bold, 800);
+    letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+    line-height: var(--theme-line-height-heading, 1.5);
+    text-transform: none;
+    text-wrap: balance;
+}
+
+// Rich text: the paragraphs keep the gap between them and lose the one after
+// the last.
+.theme-cta__text {
+    max-inline-size: var(--theme-measure, 68ch);
+    color: var(--theme-color-text-secondary, #4a5567);
+    font-size: var(--theme-font-size-lg, 1.25rem);
+
+    > :last-child {
+        margin-block-end: 0;
+    }
+}
+
+.theme-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--theme-space-3, 0.9375rem);
+    margin-block-start: var(--theme-space-2, 0.625rem);
+}
+
+// --- Width ------------------------------------------------------------------
+
+.theme-cta--boxed {
+    max-inline-size: var(--theme-cta-boxed-width);
+    margin-inline: auto;
+}
+
+// Across the column: the band has no corners and no sides to frame, only the
+// hairline above and below it.
+.theme-cta--band {
+    --theme-cta-radius: 0;
+    --theme-cta-padding-block: var(--theme-space-8, 3.75rem);
+
+    border-inline: 0;
+}
+
+// --- Tone -------------------------------------------------------------------
+
+.theme-cta--accent {
+    --theme-cta-background: color-mix(in oklab, var(--theme-color-primary, #0b57d0) 5%, var(--theme-color-background, #ffffff));
+}
+
+.theme-cta--inverse {
+    --theme-cta-background: var(--theme-color-background, #0f1319);
+
+    color-scheme: dark;
+}
+
+:root[data-theme='dark'] .theme-cta--inverse {
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .theme-cta--inverse {
+        color-scheme: light;
+    }
+}
+
+.theme-cta--placeholder {
+    --theme-cta-background: transparent;
+    --theme-cta-border-style: dashed;
+    --theme-cta-border-color: var(--theme-color-border-strong, #828d9f);
+}

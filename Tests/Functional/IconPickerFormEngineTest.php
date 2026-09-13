@@ -208,6 +208,8 @@ final class IconPickerFormEngineTest extends AbstractFunctionalTestCase
         // The item compiled on its own, in the default type of the child
         // table, which shows the column.
         yield 'list item icon' => ['table' => 'tx_theme_list_item', 'curated' => 1, 'every' => 2, 'field' => 'icon'];
+        yield 'call to action icon' => ['table' => 'tt_content', 'curated' => 90, 'every' => 100, 'field' => 'tx_theme_icon'];
+        yield 'second link icon' => ['table' => 'tt_content', 'curated' => 90, 'every' => 100, 'field' => 'tx_theme_secondary_link_icon'];
     }
 
     /**

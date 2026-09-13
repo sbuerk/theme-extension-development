@@ -677,9 +677,12 @@ entities:
                     bodytext: |
                       <p>Three pages, one per family: the classic types
                       <em>EXT:frontend</em> registers without supplying a rendering,
-                      the eleven menu types, and the thirteen this extension adds itself.
-                      Every one of them appears exactly once, so a single branch of the
-                      tree answers what the theme does with each.</p>
+                      the eleven menu types, and the types this extension adds itself.
+                      Each of them appears on the page of its family, so a single branch
+                      of the tree answers what the theme does with it.</p>
+                      <p>The theme types with layouts of their own - the heroes, the call
+                      to action and the testimonial - also have a page each below the
+                      theme elements, showing every layout.</p>
                       <p>Below the classic types, each has a page of its own with its
                       variants, and the <a href="t3://page?uid=51">Frames</a> page shows
                       every value of the Appearance tab, one element each.</p>
@@ -1916,9 +1919,10 @@ entities:
                         selected_categories: 0
                         category_field: 'categories'
 
-            # Every content element this extension registers itself, so the
-            # thirteen "theme_*" CTypes can be looked at side by side rather than
-            # one fixture at a time.
+            # The content elements this extension registers itself, one each,
+            # so the "theme_*" CTypes can be looked at side by side rather than
+            # one fixture at a time. The layouts of the heroes, the call to
+            # action and the testimonial are on the pages below this one.
             #
             # No "content_sidebar" here, unlike its two siblings 6 and 7: the
             # layout is resolved per page, not inherited down the branch, and
@@ -1930,7 +1934,7 @@ entities:
                   backend_layout: 'content'
                   # As on page 6: the abstract and the keyword are read by the
                   # two menu elements on page 7, not by anything on this page.
-                  abstract: 'The thirteen content elements this extension registers itself, from the hero down to the accordion.'
+                  abstract: 'The content elements this extension registers itself, one each; the pages below show the layouts of the heroes, the call to action and the quotation.'
                   keywords: 'content elements, theme'
               entities:
                 content:
@@ -2859,6 +2863,90 @@ entities:
                               <p>The hero without media in its default layout: the text
                               starts at the start of the line and runs to the reading
                               measure.</p>
+
+                # The call to action in every tone and width: a box on the
+                # surface with an icon and both links, a band on the accent
+                # tint, a box in the other appearance, and a placeholder band
+                # for content that does not exist yet.
+                - self:
+                      id: 111
+                      title: 'Calls to action'
+                      slug: '/elements/theme/cta'
+                      backend_layout: 'content_sidebar'
+                  entities:
+                    content:
+                      - self:
+                            id: 11101
+                            CType: 'header'
+                            header: 'Calls to action'
+                            header_layout: 1
+                      - self:
+                            id: 11102
+                            CType: 'theme_cta'
+                            tx_theme_cta_tone: ''
+                            tx_theme_cta_width: 'boxed'
+                            tx_theme_icon: 'rocket'
+                            header: 'Build the next extension against this theme'
+                            header_layout: 2
+                            bodytext: |
+                              <p>Every content element, every component and both appearances
+                              are on these pages. Start with the elements, or read the
+                              component library first.</p>
+                            tx_theme_link: 't3://page?uid=5'
+                            tx_theme_link_label: 'See every element'
+                            tx_theme_link_icon: 'arrow-right'
+                            tx_theme_secondary_link: 't3://page?uid=9'
+                            tx_theme_secondary_link_label: 'Open the styleguide'
+                            tx_theme_secondary_link_variant: 'secondary'
+                      - self:
+                            id: 11103
+                            CType: 'theme_cta'
+                            tx_theme_cta_tone: 'accent'
+                            tx_theme_cta_width: 'band'
+                            tx_theme_icon: 'book-open'
+                            header: 'The TYPO3 documentation'
+                            header_layout: 2
+                            bodytext: |
+                              <p>A band across the column on the tint of the accent, the same
+                              tint as the accent band of the Appearance tab. It follows the
+                              palette chosen in the display settings.</p>
+                            tx_theme_link: 'https://docs.typo3.org/'
+                            tx_theme_link_label: 'Read the documentation'
+                            tx_theme_secondary_link: 't3://page?uid=51'
+                            tx_theme_secondary_link_label: 'Compare with the bands'
+                            tx_theme_secondary_link_variant: 'link'
+                      - self:
+                            id: 11104
+                            CType: 'theme_cta'
+                            tx_theme_cta_tone: 'inverse'
+                            tx_theme_cta_width: 'boxed'
+                            tx_theme_icon: 'moon'
+                            header: 'The other appearance, in a box'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The inverse tone turns the colour scheme of everything inside
+                              it: dark on a light page, light on a dark one. The buttons turn
+                              with it.</p>
+                            tx_theme_link: 't3://page?uid=2'
+                            tx_theme_link_label: 'Read the typography'
+                            tx_theme_secondary_link: 't3://page?uid=10'
+                            tx_theme_secondary_link_label: 'Try the forms'
+                            tx_theme_secondary_link_variant: 'ghost'
+                      - self:
+                            id: 11105
+                            CType: 'theme_cta'
+                            tx_theme_cta_tone: 'placeholder'
+                            tx_theme_cta_width: 'band'
+                            tx_theme_icon: 'newspaper'
+                            header: 'No articles yet'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The placeholder tone has no fill and a dashed frame. It
+                              stands in for content that is not there yet, and says what to
+                              do about it.</p>
+                            tx_theme_link: 't3://page?uid=56'
+                            tx_theme_link_label: 'Read the sample article'
+                            tx_theme_link_icon: 'pen'
 
                 # The three styles of the testimonial. The attributions are
                 # real people and what they are known for; the quotations are
