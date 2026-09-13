@@ -58,6 +58,20 @@ TCEFORM.tt_content {
         }
     }
 
+    # "text" maps "1" onto ".theme-text--columns"
+    # ("Templates/ContentElements/Text.html"). The text element has one look
+    # besides its default, so the two values it does not render are taken out
+    # of the select for this CType rather than offered as layouts that look
+    # like the default.
+    layout.types.text {
+        disabled = 0
+        removeItems = 2, 3
+        altLabels {
+            0 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.text.I.0
+            1 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.text.I.1
+        }
+    }
+
     # The section index and the link to the top of the page are a later
     # addition: a table of contents built from "sectionIndex" and a "back to
     # top" link behind "linkToTop". Until then both would be switches that

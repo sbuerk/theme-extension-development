@@ -630,6 +630,14 @@ entities:
                           id: 4104
                           CType: text
                           bodytext: "<p>This element has no header, so it starts with its text.</p>\n"
+                      -
+                        self:
+                          id: 4105
+                          CType: text
+                          header: 'Text in columns'
+                          header_layout: 2
+                          layout: 1
+                          bodytext: "<p>The layout Columns sets the rich text of the element in\ntwo columns wherever each of them can be at least thirty\ncharacters wide, and in one column where it cannot - on a\nphone, or in a narrow sidebar. The text itself is the same\nmarkup as in running text; only the block around it\nchanges.</p>\n<p>A hairline separates the columns. A paragraph keeps at\nleast two of its lines on either side of a break, so a\ncolumn never starts or ends with a single stranded\nline.</p>\n<h3>What stays in one piece</h3>\n<p>A heading moves with the paragraph it opens, and the\nblocks below are never cut in half by a column\nbreak:</p>\n<ul><li>a quotation,</li><li>a table or a code block,</li><li>every item of a list.</li></ul>\n<blockquote><p>Columns suit short, self-contained text: a\nnotice, a set of facts, an imprint. A long article reads\nbetter in one column at the measure.</p></blockquote>\n<p>The first element of the text starts at the top of the\nfirst column, level with the second.</p>\n"
                 -
                   self:
                     id: 1032

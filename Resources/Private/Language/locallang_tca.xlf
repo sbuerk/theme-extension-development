@@ -426,6 +426,14 @@
 				<source>Inline</source>
 			</trans-unit>
 
+			<!-- tt_content: layout items of the text element, relabelled by page TSconfig -->
+			<trans-unit id="tt_content.layout.text.I.0">
+				<source>Running text</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.text.I.1">
+				<source>Columns</source>
+			</trans-unit>
+
 			<!-- tx_theme_list_item -->
 			<trans-unit id="tx_theme_list_item">
 				<source>Theme: List item</source>
