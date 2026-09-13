@@ -868,6 +868,20 @@ A modifier re-points `--theme-display-font-size` rather than restating
 `font-size`, and `--2` exists although it changes nothing, so a template that
 maps an editor's choice onto a class never special-cases the middle one.
 
+Text in columns — the layout "Columns" of the text element — is a modifier
+that stands on its own, like the alignments, on the block holding the rich
+text:
+
+```html
+<div class="theme-content-element__body theme-text--columns">…rich text…</div>
+```
+
+At most two columns, each at least `30ch` (`columns`, so one on a phone), a
+hairline in `--theme-color-border` between them, no heading ending a column
+and no figure, table, quotation, code block or list item split across two.
+The count, the width, the gap and the rule colour are tokens of its own
+(`--theme-text-columns-*`).
+
 The element baseline carries the rest of the typography, without a class,
 because rich text is markup the theme cannot add one to: a `small` inside a
 heading as a secondary line at 0.7 of the heading; `text-wrap: balance` on

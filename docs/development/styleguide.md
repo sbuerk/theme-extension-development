@@ -9,7 +9,7 @@ selected.
 
 The implementation is
 [`Resources/Private/Templates/Page/Styleguide.html`](../../Resources/Private/Templates/Page/Styleguide.html),
-the thirteen partials below
+the partials below
 [`Resources/Private/Partials/Styleguide/`](../../Resources/Private/Partials/Styleguide),
 the page furniture in
 [`Resources/Private/Scss/layout/_styleguide.scss`](../../Resources/Private/Scss/layout/_styleguide.scss)
@@ -69,13 +69,13 @@ is `999` because that is a value nothing renders. Its label is a distinct
 module does not suggest it behaves like the main column of the other layouts.
 
 **The template contains no `f:cObject`.** Not in
-`Templates/Page/Styleguide.html`, not in any of the thirteen partials — not even
+`Templates/Page/Styleguide.html`, not in any of the partials — not even
 for `main`. A single one would quietly make this a content page again, and the
 difference would surface only the first time somebody happened to place an
 element on it. The absence is asserted, not reviewed
 ([below](#what-the-tests-guard)).
 
-## Thirteen sections, thirteen partials
+## One section, one partial
 
 `Templates/Page/Styleguide.html` renders a heading, an intro, a section index
 and then one `f:render partial` per section, in this order:
@@ -95,15 +95,16 @@ and then one `f:render partial` per section, in this order:
 | `Forms.html`       | `forms`        | The whole `forms/` contract, selector by selector, including the validation states, `.theme-input-group` and `.theme-choice-group`.                                                                                                                                                                                                                             |
 | `Navigation.html`  | `navigation`   | `.theme-nav-main`, `.theme-nav-sub`, `.theme-breadcrumb`, `.theme-pagination`, `.theme-content-menu`.                                                                                                                                                                                                                                                           |
 | `Media.html`       | `media`        | `.theme-gallery` in one, two and three columns and floated in text, `.theme-figure` with its caption, credit and floats, and `.theme-content-element` with its outline switch, its bands, header positions and header looks.                                                                                                                                    |
+| `Variants.html`    | `variants`     | The layouts an editor picks for a content element, one specimen per value, drawn from the component each maps onto: `.theme-text--columns`, the text in columns of the text element.                                                                                                                                                                            |
 
 Each partial is a single `<section class="theme-styleguide__section" id="…">`
 and nothing else — no `f:layout`, no `f:section`, no wrapper. The page template
-is what places them, and the index at the top is built from the same thirteen ids.
+is what places them, and the index at the top is built from the same ids.
 
 The split follows the same rule as the rest of the theme: a site package that
 wants its own forms section overrides **one file**,
-`Partials/Styleguide/Forms.html`, and keeps the other twelve. Overriding the page
-template instead would mean re-stating all thirteen renders and the index to
+`Partials/Styleguide/Forms.html`, and keeps the others. Overriding the page
+template instead would mean re-stating every render and the index to
 change one section.
 
 `Icons.html` lists the icons the templates use, not the 2001 that ship: a
@@ -228,7 +229,7 @@ frontend sub-request against `Fixtures/Database/StyleguidePage.csv`:
 | Test                                                        | Guards                                                                                                                    |
 |-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `everyComponentOfTheLibraryIsShownOnTheStyleguide`          | Every component of the library appears on the page. Data provider, one case per component.                                |
-| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the thirteen ids renders **and** is linked from the index — no dead anchor.                                       |
+| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each id of `everySection()` renders **and** is linked from the index — no dead anchor.                                    |
 | `contentPlacedOnTheStyleguidePageIsNotRendered`             | Neither the element in `colPos 999` nor the one in `colPos 0` reaches the frontend.                                       |
 | `theFormsSectionShowsTheInvalidState`                       | `.theme-field--invalid`, `aria-invalid="true"`, `.theme-field__error`, `.theme-form-summary`.                             |
 | `everyColourTokenHasASwatch`                                | Every `--theme-color-*` token declared in `abstracts/_tokens.scss` has a swatch.                                          |

@@ -56,6 +56,7 @@ final class ContentElementContractTest extends UnitTestCase
             'Resources/Private/Templates/ContentElements/ThemeTextIcon.html',
             'Resources/Private/Templates/ContentElements/ThemeFeatures.html',
             'Resources/Private/Templates/ContentElements/ThemeSteps.html',
+            'Resources/Private/Templates/ContentElements/Text.html',
         ] as $template) {
             $source = (string)file_get_contents(self::root() . '/' . $template);
             preg_match_all('#<f:variable name="\w+" value="([^"]*)"\s*/>#', $source, $values);
@@ -78,11 +79,11 @@ final class ContentElementContractTest extends UnitTestCase
         $classes = array_keys(iterator_to_array(self::writtenClasses()));
 
         // Five frames, ten spacings, three positions, five looks, the text
-        // role, three bullet list layouts, the three times three axes of the
-        // text and icon element, three feature layouts and three column
-        // counts, and the icon marker of a step - fewer means a value lost its
+        // One case per modifier the templates above write: the appearance
+        // fields, the lists, the text and icon element, the features, the
+        // steps and the layouts and variants - fewer means a value lost its
         // case, and the test below would pass on an empty list.
-        $this->assertCount(43, $classes, implode(', ', $classes));
+        $this->assertCount(44, $classes, implode(', ', $classes));
     }
 
     #[DataProvider('writtenClasses')]

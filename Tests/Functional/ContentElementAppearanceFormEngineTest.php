@@ -45,6 +45,7 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/PageWithAppearanceFields.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/ThemeHeroOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/BulletsOnAppearancePage.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/HeaderOnAppearancePage.csv');
         $backendUser = $this->setUpBackendUser(1);
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
     }
@@ -145,27 +146,62 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
     }
 
     /**
-     * @return \Generator<string, array{field: string}>
+     * `layout` is asserted on the header element: the text element and the
+     * bullet list render it, and re-enable it for their own type, below.
+     *
+     * @return \Generator<string, array{field: string, uid: int}>
      */
     public static function fieldsWithoutRendering(): \Generator
     {
-        yield 'layout' => ['field' => 'layout'];
-        yield 'sectionIndex' => ['field' => 'sectionIndex'];
-        yield 'linkToTop' => ['field' => 'linkToTop'];
+        yield 'layout' => ['field' => 'layout', 'uid' => 920];
+        yield 'sectionIndex' => ['field' => 'sectionIndex', 'uid' => 10];
+        yield 'linkToTop' => ['field' => 'linkToTop', 'uid' => 10];
     }
 
     #[DataProvider('fieldsWithoutRendering')]
     #[Test]
-    public function aFieldTheThemeDoesNotRenderIsNotInTheForm(string $field): void
+    public function aFieldTheThemeDoesNotRenderIsNotInTheForm(string $field, int $uid): void
     {
-        $this->assertTrue(self::isDisabled($this->compile(10), $field), sprintf('"%s" is still offered.', $field));
+        $this->assertTrue(self::isDisabled($this->compile($uid), $field), sprintf('"%s" is still offered.', $field));
 
         // And the rendered form carries no input for it - next to a field of
         // the same palette that it does carry, so an empty rendering cannot
         // pass for a missing field.
-        $form = $this->renderedForm(10);
-        $this->assertStringContainsString(self::inputName(10, 'frame_class'), $form);
-        $this->assertStringNotContainsString(self::inputName(10, $field), $form, sprintf('"%s" is rendered.', $field));
+        $form = $this->renderedForm($uid);
+        $this->assertStringContainsString(self::inputName($uid, 'frame_class'), $form);
+        $this->assertStringNotContainsString(self::inputName($uid, $field), $form, sprintf('"%s" is rendered.', $field));
+    }
+
+    /**
+     * `layout` is re-enabled for the text element, which renders "1" as
+     * columns (`Templates/ContentElements/Text.html`), and narrowed to the two
+     * values it renders: "2" and "3" would be layouts that look like the
+     * default.
+     */
+    #[Test]
+    public function theTextElementOffersItsTwoLayoutsUnderTheirOwnNames(): void
+    {
+        $result = $this->compile(10);
+
+        $this->assertFalse(self::isDisabled($result, 'layout'), '"layout" is missing from the text element.');
+        $this->assertSame(['0', '1'], self::itemValues($result, 'layout'));
+
+        $labels = array_values(array_map(
+            static fn(array $item): string => (string)$item['label'],
+            $result['processedTca']['columns']['layout']['config']['items'] ?? [],
+        ));
+        $expected = array_map(
+            static fn(int $value): string => $GLOBALS['LANG']->sL(
+                'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.text.I.' . $value,
+            ),
+            [0, 1],
+        );
+        $this->assertNotContains('', $expected, 'A label of the text layouts is not translated.');
+        $this->assertSame($expected, $labels);
+
+        $this->assertStringContainsString(self::inputName(10, 'layout'), $this->renderedForm(10));
+        // The bullet list keeps its four: the narrowing is the text element's.
+        $this->assertSame(['0', '1', '2', '3'], self::itemValues($this->compile(910), 'layout'));
     }
 
     /**
@@ -196,9 +232,9 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $this->assertSame($expected, $labels);
 
         $this->assertStringContainsString(self::inputName(910, 'layout'), $this->renderedForm(910));
-        // Still disabled on the text element beside it: the type specific
+        // Still disabled on the header element beside it: the type specific
         // part applies to its type only.
-        $this->assertTrue(self::isDisabled($this->compile(10), 'layout'));
+        $this->assertTrue(self::isDisabled($this->compile(920), 'layout'));
     }
 
     /**
