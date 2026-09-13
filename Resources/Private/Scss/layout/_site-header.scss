@@ -21,12 +21,19 @@
 // --- One row, at every width --------------------------------------------------
 //
 // Brand, main navigation and the actions slot share one row. Above "bp.$md"
-// the navigation does not shrink, so when the row gets tight it is the brand
-// that wraps onto a second line, never the menu. Below it the row holds the
-// brand, the menu toggle and the settings cog, and the menu - once its toggle
-// is expanded - drops down under the header as a full-width band instead of
-// unfolding inside the narrow slot the toggle occupies, which would squeeze
-// it next to the cog.
+// which of the two gives way when the row gets tight depends on how wide it
+// is. From "bp.$lg" up the title keeps its line - up to half the row, beyond
+// which a very long one wraps as the last resort - and the menu wraps its top
+// level onto a second row inside its frame: that is what lets the header hold
+// seven top level entries at 1280 pixels, where a sixth used to push the title
+// onto a second line. Between the two breakpoints the row is too narrow for
+// that trade: a title held to one line there left a menu of three entries on
+// two rows beside a title on two lines anyway. So there the menu keeps its
+// row, up to 60% of it, and the title wraps, as it always did. Below "bp.$md"
+// the row holds the brand, the menu toggle and the settings cog, and the menu
+// - once its toggle is expanded - drops down under the header as a full-width
+// band instead of unfolding inside the narrow slot the toggle occupies, which
+// would squeeze it next to the cog.
 //
 // That drop-down is gated behind "data-js" like the collapse itself (see
 // "components/_nav-main.scss"): without a script the list stays in the flow,
@@ -128,19 +135,39 @@
     }
 }
 
-// The menu keeps its row above the breakpoint - see "One row" above.
-//
-// @todo From "bp.$md" up the navigation does not shrink, so the site title
-//       takes up whatever the row lacks: with a long title, a sixth top level
-//       entry already wraps the title onto a second line at 1280 pixels (the
-//       showcase keeps its layout fallback fixture out of the menu for that
-//       reason). The header needs a layout that tolerates more top level
-//       entries - letting the list wrap, or moving it below the title - before
-//       the showcase gains its planned Examples section, which is a sixth
-//       entry again.
+// Above "bp.$md" the top level of the menu may wrap onto a second row inside
+// its frame, aligned to the end next to the cog, and an entry never breaks
+// inside itself. Which of title and menu gives way is the business of the two
+// rules after this one - see "One row" above.
 @media (min-width: bp.$md) {
+    .theme-site-header .theme-nav-main > ul {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        row-gap: var(--theme-space-1, 0.3125rem);
+    }
+
+    .theme-site-header .theme-nav-main__link {
+        white-space: nowrap;
+    }
+}
+
+// A narrow row: the menu does not shrink below its one row width as long as
+// that is at most 60% of the row, and wraps inside that width beyond it; the
+// brand shrinks and wraps. 60% leaves the brand the room of its longest word
+// with seven entries at 768 pixels, so nothing spills sideways.
+@media (min-width: bp.$md) and (max-width: bp.$lg-max) {
     .theme-site-header .theme-nav-main {
-        flex-shrink: 0;
+        flex: none;
+        max-inline-size: 60%;
+    }
+}
+
+// A wide row: the brand does not shrink, up to half the row; the navigation
+// shrinks down to its widest entry and wraps.
+@media (min-width: bp.$lg) {
+    .theme-site-header__brand {
+        flex: none;
+        max-inline-size: 50%;
     }
 }
 
