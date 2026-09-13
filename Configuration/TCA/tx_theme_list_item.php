@@ -127,6 +127,24 @@ return [
             'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.link_icon',
             'config' => IconItems::selectConfig(),
         ],
+        // The icon of the item itself, from the same picker - not the icon of
+        // its link, which is "link_icon" above and is shown with the link. A
+        // parent element that renders an icon per item adds this column to the
+        // "showitem" of its "overrideChildTca"; every other relation leaves it
+        // out, so an editor is never offered an icon nothing renders. The
+        // default type below shows it, because that is the form of the record
+        // edited on its own, outside any relation.
+        //
+        // Named for the item and not for one element, so every element with an
+        // icon per item uses this one column. The icons it offers by default
+        // are the curated list of "Configuration/PageTsConfig/IconPicker.tsconfig".
+        // A "selectSingle" of string values, so "DefaultTcaSchema" derives a
+        // "VARCHAR(255) DEFAULT ''" column on v13.4 and v14.3, as for
+        // "link_icon".
+        'icon' => [
+            'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.icon',
+            'config' => IconItems::selectConfig(),
+        ],
     ],
     'palettes' => [
         'theme_link' => [
@@ -143,6 +161,8 @@ return [
                 header,
                 --linebreak--,
                 text,
+                --linebreak--,
+                icon,
                 --linebreak--,
                 image,
                 --linebreak--,
