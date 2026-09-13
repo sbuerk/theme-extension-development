@@ -338,6 +338,7 @@ a state. The stylesheet still draws a few shapes of its own, and they are
 | The arrow of the tooltip bubble   | `components/_tooltip.scss`    | Part of the bubble's outline, pointing at its trigger; it means nothing alone. |
 | The spinner of a busy button      | `components/_button.scss`     | An animated ring over `[aria-busy='true']`; the label says what happens.       |
 | The track and thumb of the switch | `forms/_controls.scss`        | The control itself, drawn on the native checkbox.                              |
+| The ring and rail of a timeline   | `components/_timeline.scss`   | The position of an entry in a sequence; the date says what the ring marks.     |
 | The `/` between breadcrumb items  | `components/_breadcrumb.scss` | A text separator in `content`, not a glyph.                                    |
 | The arrow of a native select      | the browser                   | The user agent's own indicator, left in place on purpose.                      |
 

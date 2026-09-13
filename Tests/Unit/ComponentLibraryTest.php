@@ -48,6 +48,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'breadcrumb' => '.theme-breadcrumb',
             'button' => '.theme-button',
             'card' => '.theme-card',
+            'card scroller' => '.theme-card-scroller',
             'close button' => '.theme-close',
             'code block' => '.theme-code',
             'content element' => '.theme-content-element',
@@ -67,6 +68,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'icon' => '.theme-icon',
             'link decoration' => '.theme-link',
             'list' => '.theme-list',
+            'list group' => '.theme-list-group',
             'media object' => '.theme-media-object',
             'meter' => '.theme-meter',
             'main navigation' => '.theme-nav-main',
@@ -92,6 +94,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'display size three' => '.theme-display--3',
             'eyebrow text role' => '.theme-eyebrow',
             'lead text role' => '.theme-lead',
+            'timeline' => '.theme-timeline',
             'tooltip' => '.theme-tooltip',
             'form field' => '.theme-field',
             'form input' => '.theme-input',
@@ -317,6 +320,29 @@ final class ComponentLibraryTest extends UnitTestCase
         yield 'step title' => ['selector' => '.theme-steps__title'];
         // "Templates/ContentElements/ThemeCta.html" puts it on h1 to h5.
         yield 'call to action title' => ['selector' => '.theme-cta__title'];
+        yield 'card title' => ['selector' => '.theme-card__title'];
+        yield 'timeline title' => ['selector' => '.theme-timeline__title'];
+        yield 'list group title' => ['selector' => '.theme-list-group__title'];
+    }
+
+    /**
+     * A row of the list group is the target of its link, so the link gives up
+     * the ring around its title and the row carries it. It is drawn on the
+     * link's own `::after`, the hit area covering the row, and not through
+     * `:has()` on the row: DESIGN.md sets the browser floor at Firefox 120,
+     * `:has()` arrived in 121, and a rule of the row alone would leave the
+     * keyboard focus invisible there (WCAG 2.4.7).
+     */
+    #[Test]
+    public function aListGroupRowShowsItsFocusRingWithoutHas(): void
+    {
+        $css = $this->stylesheet();
+
+        $this->assertMatchesRegularExpression(
+            '/\.theme-list-group__link:focus-visible::after\{[^}]*outline:var\(--theme-border-width-strong\) solid var\(--theme-color-primary\)[^}]*box-shadow:var\(--theme-focus-ring\)/',
+            $css,
+        );
+        $this->assertStringNotContainsString(':has(.theme-list-group__link:focus-visible)', $css);
     }
 
     /**
