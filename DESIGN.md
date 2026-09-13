@@ -489,6 +489,56 @@ The rule between the rows and the frame of a thumbnail are decorative
 hairlines, like every `--theme-color-border` of the Frame language: the row
 and the image are what they separate, and nothing depends on seeing them.
 
+### Quotation mark
+
+The quotation styles `--pull` and `--centred` of `.theme-quote` draw the
+quotation mark and the rules of a pull quote in `--theme-color-secondary`, the
+accent of the rule every quotation already has. The mark is decoration beside a
+`blockquote`, and the rules are its shape; both are held to the 3:1 of a
+graphic that carries meaning anyway, and clear the 4.5:1 of text. Neutral
+palette, from the token tables above:
+
+| Part        | Token       | Page  | vs background | vs surface | vs surface-raised |
+|-------------|-------------|-------|---------------|------------|-------------------|
+| Mark, rules | `secondary` | light | 5.47          | 5.06       | 5.47              |
+| Mark, rules | `secondary` | dark  | 9.99          | 9.18       | 8.27              |
+
+Every other palette changes `secondary`; its lowest value against the
+background and the surface is ocean on the light surface, 5.60 (see
+[Palettes](#palettes)). Against the raised surface, which is the background in
+light, the light values repeat. The dark raised surface, where a colour loses
+the most, per palette:
+
+| Palette | `secondary` (dark) | vs dark surface-raised `#1d2531` |
+|---------|--------------------|----------------------------------|
+| neutral | `#4fd1c5`          | 8.27                             |
+| ember   | `#e8c16a`          | 9.01                             |
+| ocean   | `#63cfd8`          | 8.41                             |
+| moss    | `#cbd06a`          | 9.38                             |
+| violet  | `#f090c0`          | 6.95                             |
+
+A pull quote inside an accent band sits on the accent tint - 5% of the primary
+accent mixed into the background in Oklab, the tints of
+[Content element bands](#content-element-bands), reproduced to the digit by the
+same computation:
+
+| Palette | Page  | Tint      | `secondary` on tint |
+|---------|-------|-----------|---------------------|
+| neutral | light | `#f3f7fe` | 5.09                |
+| neutral | dark  | `#141922` | 9.45                |
+| ember   | light | `#fbf5f3` | 6.27                |
+| ember   | dark  | `#18191e` | 10.25               |
+| ocean   | light | `#f3f7fa` | 5.62                |
+| ocean   | dark  | `#141a22` | 9.53                |
+| moss    | light | `#f4f7f4` | 6.05                |
+| moss    | dark  | `#141b1e` | 10.59               |
+| violet  | light | `#f7f5fb` | 6.09                |
+| violet  | dark  | `#161922` | 7.90                |
+
+Lowest: 6.95 on the dark raised surface (violet) and 5.09 on the accent tint
+(neutral, light) - above the 4.5:1 of text in both, so the mark and the rules
+clear the 3:1 of a graphic by a wide margin wherever a quotation can sit.
+
 ### Content element bands
 
 An editor picks a band in the `frame_class` field of a content element;

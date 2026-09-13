@@ -176,6 +176,37 @@
             </div>
         </section>
     </div>
+
+    <h3>Quotation styles</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_quote.scss, the two
+            styles of the testimonial: "--pull" and "--centred", each with the
+            quotation mark of the set in "__mark". The default - the rule at
+            the start - is the specimen of "Boxes.html".
+        </f:comment>
+        <figure class="theme-quote theme-quote--pull">
+            <span class="theme-quote__mark" aria-hidden="true"><theme:icon name="quote-left" /></span>
+            <blockquote class="theme-quote__text">
+                <p>A pull quote lifts one sentence out of the text around it and sets it large enough to be found while scrolling past.</p>
+            </blockquote>
+            <figcaption class="theme-quote__attribution">
+                <span class="theme-quote__author">--pull</span>
+                <cite class="theme-quote__source">Between two rules in the accent</cite>
+            </figcaption>
+        </figure>
+
+        <figure class="theme-quote theme-quote--centred">
+            <span class="theme-quote__mark" aria-hidden="true"><theme:icon name="quote-left" /></span>
+            <blockquote class="theme-quote__text">
+                <p>A centred quotation stands on its own between two sections of a page, below its mark and never wider than the reading measure.</p>
+            </blockquote>
+            <figcaption class="theme-quote__attribution">
+                <span class="theme-quote__author">--centred</span>
+                <cite class="theme-quote__source">On one axis, without a rule</cite>
+            </figcaption>
+        </figure>
+    </div>
 </section>
 
 </html>

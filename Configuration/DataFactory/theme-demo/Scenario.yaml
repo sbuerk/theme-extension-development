@@ -2860,6 +2860,63 @@ entities:
                               starts at the start of the line and runs to the reading
                               measure.</p>
 
+                # The three styles of the testimonial. The attributions are
+                # real people and what they are known for; the quotations are
+                # written for this page and attributed to nobody as a quote of
+                # theirs - "header" and "subheader" say who is speaking in the
+                # example, the copy says what the style does.
+                - self:
+                      id: 112
+                      title: 'Quotation styles'
+                      slug: '/elements/theme/quote'
+                      backend_layout: 'content_sidebar'
+                  entities:
+                    content:
+                      - self:
+                            id: 11201
+                            CType: 'header'
+                            header: 'Quotation styles'
+                            header_layout: 1
+                      - self:
+                            id: 11202
+                            CType: 'text'
+                            header: 'Three ways to set a quotation'
+                            header_layout: 2
+                            bodytext: |
+                              <p>The testimonial sets its quotation with a rule at the
+                              start by default. A pull quote lifts a sentence out of the
+                              text around it; a centred quotation stands on its own. Both
+                              open with a quotation mark from the icon set.</p>
+                      - self:
+                            id: 11203
+                            CType: 'theme_testimonial'
+                            tx_theme_quote_style: ''
+                            header: 'The default style'
+                            subheader: 'A rule at the start'
+                            bodytext: |
+                              <p>The quotation as every testimonial rendered it so far: set
+                              apart by a rule at the start of the line and by its weight,
+                              without a quotation mark.</p>
+                      - self:
+                            id: 11204
+                            CType: 'theme_testimonial'
+                            tx_theme_quote_style: 'pull'
+                            header: 'The pull quote'
+                            subheader: 'Larger, between two rules'
+                            bodytext: |
+                              <p>One sentence worth reading twice, lifted out of the text
+                              and set large enough to be found while scrolling past.</p>
+                      - self:
+                            id: 11205
+                            CType: 'theme_testimonial'
+                            tx_theme_quote_style: 'centred'
+                            header: 'The centred quotation'
+                            subheader: 'On one axis, held to the measure'
+                            bodytext: |
+                              <p>A quotation that stands on its own between two sections of
+                              a page, centred below its mark and never wider than the
+                              reading measure.</p>
+
             # The appearance fields of a content element, every value once:
             # the frames, the space before and after, the alignment and the
             # look of the header. Text elements throughout, so nothing but

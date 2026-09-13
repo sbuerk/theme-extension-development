@@ -370,6 +370,39 @@ $additionalColumns['tx_theme_hero_layout'] = [
     ],
 ];
 
+// How a testimonial sets its quotation: a modifier of ".theme-quote"
+// (components/_quote.scss), mapped by
+// "Templates/ContentElements/ThemeTestimonial.html".
+//
+// A select of its own rather than the core "layout": that column holds the
+// numbers 0 to 3 under the labels "Layout 1" to "Layout 3", is disabled for
+// every CType by the theme's page TSconfig, and is an "exclude" field an editor
+// group has to be granted. The theme's own elements carry their choices in
+// columns of their own - the kind of a notice, the layout of a hero - whose
+// values are the names of the modifiers they select.
+$additionalColumns['tx_theme_quote_style'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_quote_style',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => '',
+        'items' => [
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_quote_style.I.default',
+                'value' => '',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_quote_style.I.pull',
+                'value' => 'pull',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_quote_style.I.centred',
+                'value' => 'centred',
+            ],
+        ],
+    ],
+];
+
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
 
 // The icon of the layout "Icons" of the bullet list, next to the list type.
