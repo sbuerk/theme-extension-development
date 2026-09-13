@@ -833,7 +833,10 @@
             <code>meter</code> reports a measurement within a known range rather than
             progress towards completion. The browser picks its own fill colour from the
             value's position between <code>low</code>, <code>high</code> and
-            <code>optimum</code>, which is why only the accent is set here.
+            <code>optimum</code>, and <code>accent-color</code> does not reach it, so
+            no colour is set here. Chromium fills the track only halfway unless the bar
+            is stretched in its inner element, which is the one rule the element
+            carries besides its size.
         </p>
         <meter value="8" min="0" max="10" low="3" high="7" optimum="9"></meter>
 
