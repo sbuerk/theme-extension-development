@@ -518,6 +518,17 @@
 				<source>Centred, with a quotation mark</source>
 			</trans-unit>
 
+			<!-- tt_content: layout items of the two page menus, relabelled by page TSconfig -->
+			<trans-unit id="tt_content.layout.menu.I.0">
+				<source>List</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.menu.I.1">
+				<source>Cards: page media, title and abstract</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.menu.I.2">
+				<source>Thumbnails: page media and title</source>
+			</trans-unit>
+
 			<!-- tt_content: CType theme_card_group -->
 			<trans-unit id="tt_content.CType.theme_card_group.label">
 				<source>Card group</source>

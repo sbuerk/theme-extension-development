@@ -1,0 +1,3 @@
+sys_file_reference,,,,,,,,,
+,uid,pid,uid_local,uid_foreign,tablenames,fieldname,sorting_foreign,alternative,hidden
+,1,2,1,2,pages,media,1,The first page of the typography section,0

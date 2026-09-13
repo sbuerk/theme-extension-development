@@ -15,7 +15,8 @@
     Arguments: "data" (the content element record), "class", "title", and
     optionally "link" with "linkClass": a TYPO3 link reference - the value of
     a TCA type=link field - which turns the title into "f:link.typolink" of
-    that class, inside the heading.
+    that class, inside the heading. Or "href", a URL that is already resolved
+    - the "link" of a menu item - with "current" for "aria-current".
 
     The section "Title" is written on one line on purpose: whatever whitespace
     it holds ends up inside the heading.
@@ -35,6 +36,6 @@
     </f:else>
 </f:if>
 
-<f:section name="Title"><f:if condition="{link}"><f:then><f:link.typolink parameter="{link}" class="{linkClass}">{title}</f:link.typolink></f:then><f:else>{title}</f:else></f:if></f:section>
+<f:section name="Title"><f:if condition="{link}"><f:then><f:link.typolink parameter="{link}" class="{linkClass}">{title}</f:link.typolink></f:then><f:else if="{href} && {current}"><a class="{linkClass}" href="{href}" aria-current="page">{title}</a></f:else><f:else if="{href}"><a class="{linkClass}" href="{href}">{title}</a></f:else><f:else>{title}</f:else></f:if></f:section>
 
 </html>

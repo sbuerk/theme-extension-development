@@ -50,6 +50,7 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/TestimonialOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/CtaOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/CollectionsOnAppearancePage.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/MenusOnAppearancePage.csv');
         $backendUser = $this->setUpBackendUser(1);
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
     }
@@ -151,8 +152,8 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
 
     /**
      * `layout` is asserted on the header element: the text element, the
-     * bullet list and the card group render it, and re-enable it for their
-     * own type, below.
+     * bullet list, the card group and the two page menus render it, and
+     * re-enable it for their own type, below.
      *
      * @return \Generator<string, array{field: string, uid: int}>
      */
@@ -278,6 +279,52 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $timeline = $this->renderedForm(980);
         $this->assertStringContainsString(self::inputName(980, 'tx_theme_sort_direction'), $timeline);
         $this->assertStringNotContainsString(self::inputName(980, 'layout'), $timeline);
+    }
+
+    /**
+     * @return \Generator<string, array{uid: int}>
+     */
+    public static function pageMenus(): \Generator
+    {
+        yield 'menu_pages' => ['uid' => 940];
+        yield 'menu_subpages' => ['uid' => 950];
+    }
+
+    /**
+     * The two page menus offer the list, the cards and the thumbnails, under
+     * names that say so, and not the core value 3, which renders nothing of
+     * its own. Every other menu keeps the field out of the form.
+     */
+    #[DataProvider('pageMenus')]
+    #[Test]
+    public function aPageMenuOffersTheListTheCardsAndTheThumbnails(int $uid): void
+    {
+        $result = $this->compile($uid);
+
+        $this->assertFalse(self::isDisabled($result, 'layout'), '"layout" is missing from the page menu.');
+        $this->assertSame(['0', '1', '2'], self::itemValues($result, 'layout'));
+        $labels = array_values(array_map(
+            static fn(array $item): string => (string)$item['label'],
+            $result['processedTca']['columns']['layout']['config']['items'] ?? [],
+        ));
+        $expected = array_map(
+            static fn(int $value): string => $GLOBALS['LANG']->sL(
+                'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.menu.I.' . $value,
+            ),
+            [0, 1, 2],
+        );
+        $this->assertNotContains('', $expected, 'A label of the menu layouts is not translated.');
+        $this->assertSame($expected, $labels);
+        $this->assertStringContainsString(self::inputName($uid, 'layout'), $this->renderedForm($uid));
+    }
+
+    #[Test]
+    public function aMenuThatRendersNoLayoutOffersNone(): void
+    {
+        $this->assertTrue(self::isDisabled($this->compile(960), 'layout'), '"layout" is offered on the section menu.');
+        $form = $this->renderedForm(960);
+        $this->assertStringContainsString(self::inputName(960, 'frame_class'), $form);
+        $this->assertStringNotContainsString(self::inputName(960, 'layout'), $form);
     }
 
     /**

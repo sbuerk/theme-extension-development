@@ -1,0 +1,5 @@
+tt_content,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,layout,pages
+,940,1,0,0,0,940,menu_pages,Some pages,2,0,1
+,950,1,0,0,0,950,menu_subpages,Some subpages,2,0,1
+,960,1,0,0,0,960,menu_section,A section menu,2,0,1

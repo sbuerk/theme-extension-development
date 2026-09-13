@@ -945,6 +945,31 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * `/elements/menu` shows every layout the form offers the two page menus -
+     * the list, the cards and the thumbnails - and the cards show page media.
+     */
+    #[Test]
+    public function theMenuPageShowsEveryLayoutOfThePageMenus(): void
+    {
+        $page = $this->pageBySlug('/elements/menu');
+        $this->assertNotNull($page, 'The menu page is missing.');
+
+        foreach (['menu_pages', 'menu_subpages'] as $type) {
+            $this->assertSame(['0', '1', '2'], self::offeredValues($page['uid'], $type, 'layout'), sprintf('The form offers other layouts for "%s".', $type));
+            $this->assertSame(
+                [],
+                self::unshownValues($this->elementsOn($page['uid'], $type), $page['uid'], $type, 'layout'),
+                sprintf('No "%s" element on the menu page shows these layouts.', $type),
+            );
+        }
+
+        $body = $this->render('/elements/menu');
+        $this->assertStringContainsString('<li class="theme-card theme-card--linked">', $body);
+        $this->assertStringContainsString('<li class="theme-card theme-card--linked theme-card--compact">', $body);
+        $this->assertMatchesRegularExpression('#<div class="theme-card__media">\s*<img #', $body, 'The seeded menu cards show no page media.');
+    }
+
+    /**
      * @return \Generator<string, array{field: string}>
      */
     public static function appearanceFields(): \Generator

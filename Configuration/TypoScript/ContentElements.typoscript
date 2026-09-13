@@ -613,6 +613,42 @@ tt_content.menu_categorized_content {
     }
 }
 
+# --- The page media of the card and thumbnail layouts ----------------------
+#
+# Read by "tt_content.menu_pages" below, and through it by every menu type
+# that references it; see the section after this one for the menus.
+# "1" for a "menu_pages" or "menu_subpages" element in one of the two layouts
+# that show page media - cards (1) and thumbnails (2) - and nothing for any
+# other element. It decides which of the two "MenuProcessor"s below runs.
+#
+# The page media is fetched only there: a "FilesProcessor" nested in a
+# "MenuProcessor" runs once per menu item, and a seven level sitemap or a list
+# layout has no use for it. Nested inside the menu, the "if" of that processor
+# would see the page of the item, not the element, so the choice is made one
+# level up, on the element, between two "MenuProcessor"s.
+#
+# The CType is part of the condition because every other menu type is a
+# reference to "tt_content.menu_pages" and inherits both processors: a
+# "menu_section" that still carries a layout value from an earlier rendering -
+# fluid_styled_content offered the field on every menu - keeps its own menu.
+# "isInList" tests the single value it holds against the list in "value" -
+# "GeneralUtility::inList($value, $isInList)" in "checkIf()", read on v14.3 -
+# not the other way round, which is why the lists are the "value"s here.
+lib.themeMenuWithPageMedia = TEXT
+lib.themeMenuWithPageMedia {
+    value = 1
+    if {
+        value = 1,2
+        isInList.field = layout
+        isTrue.cObject = TEXT
+        isTrue.cObject {
+            value = 1
+            if.value = menu_pages,menu_subpages
+            if.isInList.field = CType
+        }
+    }
+}
+
 # The remaining nine "menu_*" content types. All are core "MenuProcessor"
 # (unchanged on v13.4 and v14.3, see "Configuration/TypoScript/Navigation.-
 # typoscript") with a different "special" - the "special"/HMENU documentation
@@ -653,6 +689,27 @@ tt_content.menu_pages {
             as = menu
             special = list
             special.value.field = pages
+            if.isFalse.cObject < lib.themeMenuWithPageMedia
+        }
+
+        # The same menu with the first page media of every item, for the card
+        # and thumbnail layouts - see "lib.themeMenuWithPageMedia" above. It
+        # repeats the lines of "10" rather than copying it: a copy made here
+        # would not follow what "menu_subpages" changes on "10".
+        20 = TYPO3\CMS\Frontend\DataProcessing\MenuProcessor
+        20 {
+            as = menu
+            special = list
+            special.value.field = pages
+            if.isTrue.cObject < lib.themeMenuWithPageMedia
+
+            dataProcessing {
+                10 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+                10 {
+                    references.fieldName = media
+                    as = files
+                }
+            }
         }
     }
 }
@@ -701,6 +758,7 @@ tt_content.menu_subpages =< tt_content.menu_pages
 tt_content.menu_subpages {
     templateName = ContentElements/MenuSubpages
     dataProcessing.10.special = directory
+    dataProcessing.20.special = directory
 }
 
 # "menu_subpages" plus one more level - the subpages' own children, standing
