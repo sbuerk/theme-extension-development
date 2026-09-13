@@ -149,7 +149,8 @@ quality ─┬─> visual
 phpstan ─┤         ┌─> acceptance
 lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
          │
-docs ────┘
+docs ────┤
+assets ──┘
 ```
 
 | Job                 | Matrix                                   | Runs                                                                                      |
@@ -162,6 +163,7 @@ docs ────┘
 | `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs | `functional` against each database                                                        |
 | `acceptance`        | lowest PHP × both core versions          | `acceptance`: an instance built from nothing, in a browser; uploads the report on failure |
 | `visual`            | lowest PHP, one core version             | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure    |
+| `assets`            | —                                        | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build        |
 | `documentation`     | —                                        | `renderDocumentation`, uploads the artifact                                               |
 
 Two decisions are worth knowing:
