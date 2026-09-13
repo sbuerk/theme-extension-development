@@ -6,14 +6,34 @@
 //         <div class="theme-card__media"><img …></div>
 //         <div class="theme-card__body">
 //             <h3 class="theme-card__title">…</h3>
+//             <p class="theme-card__subtitle">…</p>
 //             <p class="theme-card__text">…</p>
 //             <a class="theme-card__link" href="…">…</a>
+//             <div class="theme-card__actions"><a class="theme-button" href="…">…</a></div>
 //         </div>
 //     </article>
 //
-// A grid of them:
+// Every part but the body is optional. "__link" is the card's own link at the
+// foot of the body, "__actions" the place for a button instead - a card shows
+// one of the two. Where the title itself is the link, it holds one:
+//
+//     <h3 class="theme-card__title"><a class="theme-card__title-link" href="…">…</a></h3>
+//
+// Modifiers: "--linked" makes the whole card the target of its "__link" or
+// "__title-link", "--compact" tightens the padding and the title for a card
+// that is mostly its image.
+//
+// A grid of them, a "div" of "article"s or a "ul" of "li.theme-card" where the
+// cards are items of a list - a menu, a group of cards:
 //
 //     <div class="theme-card-grid">…</div>
+//     <ul class="theme-card-grid theme-card-grid--columns-3">
+//         <li class="theme-card">…</li>
+//     </ul>
+//
+// Grid modifiers: "--wide" and "--narrow" raise and lower the minimum width of
+// a column, "--columns-2" to "--columns-4" cap the number of columns,
+// "--scroller" turns the grid into one row that scrolls sideways - see below.
 //
 // See "components/_button.scss" for why every component declares its own token
 // layer with a fallback.
@@ -28,6 +48,9 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    // A card may be the "li" of a list, and the element baseline spaces list
+    // items apart; the grid spaces the cards.
+    margin: 0;
 
     background-color: var(--theme-card-background);
     border: var(--theme-border-width) solid var(--theme-card-border-color);
@@ -53,12 +76,24 @@
     padding: var(--theme-card-padding);
 }
 
+// The title follows the heading level of the element it is part of, so it
+// states the case and the colour the element baseline gives "h5" and "h6"
+// otherwise - capitals, and the secondary text colour.
 .theme-card__title {
     margin: 0;
+    color: var(--theme-color-text-primary);
     font-size: var(--theme-font-size-md);
     font-weight: var(--theme-font-weight-bold);
     letter-spacing: var(--theme-letter-spacing-wide);
     line-height: var(--theme-line-height-snug);
+    text-transform: none;
+}
+
+.theme-card__subtitle {
+    margin: 0;
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
 }
 
 .theme-card__text {
@@ -90,33 +125,164 @@
     }
 }
 
+// A button instead of the card link, pushed down the same way. It keeps the
+// look of the button: the card only places it.
+.theme-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--theme-space-2);
+    margin-top: auto;
+}
+
+// The title as the link, for a card whose only name is its title - a page in
+// a menu. It keeps the size and the weight of the title and takes the colour
+// of a link.
+.theme-card__title-link {
+    color: var(--theme-color-primary);
+    text-decoration: none;
+
+    &:hover {
+        color: var(--theme-color-primary-hover);
+        text-decoration: underline;
+    }
+}
+
 // The whole card becomes the target, without nesting interactive elements:
 // the link keeps the accessible name and the pseudo element does the hit area.
 .theme-card--linked {
     position: relative;
 
-    .theme-card__link::after {
+    .theme-card__link::after,
+    .theme-card__title-link::after {
         content: '';
         position: absolute;
         inset: 0;
     }
 
-    &:has(.theme-card__link:hover) {
+    &:has(.theme-card__link:hover, .theme-card__title-link:hover) {
         border-color: var(--theme-color-border-strong);
+    }
+}
+
+.theme-card--compact {
+    --theme-card-padding: var(--theme-space-3, 0.9375rem);
+    --theme-card-gap: var(--theme-space-1, 0.3125rem);
+
+    .theme-card__title {
+        font-size: var(--theme-font-size-sm);
     }
 }
 
 // Auto-fit rather than a fixed column count: the grid answers the space it is
 // given, which is what makes it work in a narrow content column and in a full
 // width band without a modifier for each.
+//
+// The list reset does nothing to a "div" and everything the element baseline
+// gives a "ul" - the indent, the marker, the space below the list.
 .theme-card-grid {
     --theme-card-grid-min: 14rem;
+    --theme-card-grid-gap: var(--theme-space-4, 1.25rem);
+    --theme-card-grid-columns: 3;
 
     display: grid;
-    gap: var(--theme-space-4);
+    gap: var(--theme-card-grid-gap);
     grid-template-columns: repeat(auto-fit, minmax(min(var(--theme-card-grid-min), 100%), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .theme-card-grid--wide {
     --theme-card-grid-min: 20rem;
+}
+
+// Thumbnails: "auto-fill" rather than "auto-fit", the one grid of the file
+// that keeps empty tracks. A thumbnail is small on purpose, and "auto-fit"
+// would stretch three of them across a full content column.
+.theme-card-grid--narrow {
+    --theme-card-grid-min: 9rem;
+
+    grid-template-columns: repeat(auto-fill, minmax(min(var(--theme-card-grid-min), 100%), 1fr));
+}
+
+// At most that many columns, each at least "--theme-card-grid-min" wide: fewer
+// where there is no room for them, one on a phone. A track is the larger of
+// the minimum and the share of the count, so "auto-fill" never fits more
+// columns than the count; "min()" against 100% keeps a minimum wider than the
+// grid from overflowing it. No breakpoint: the count is a maximum, and the
+// minimum decides when it is reached.
+.theme-card-grid--columns-2 {
+    --theme-card-grid-columns: 2;
+}
+
+.theme-card-grid--columns-3 {
+    --theme-card-grid-columns: 3;
+}
+
+// Four columns of 14rem need 60rem, more than a content column has; 11rem
+// lets four sit side by side in the content column of a wide window.
+.theme-card-grid--columns-4 {
+    --theme-card-grid-columns: 4;
+    --theme-card-grid-min: 11rem;
+}
+
+.theme-card-grid--columns-2,
+.theme-card-grid--columns-3,
+.theme-card-grid--columns-4 {
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(
+            min(100%, max(var(--theme-card-grid-min), calc((100% - (var(--theme-card-grid-columns) - 1) * var(--theme-card-grid-gap)) / var(--theme-card-grid-columns)))),
+            1fr
+        )
+    );
+}
+
+// --- The scroller -----------------------------------------------------------
+//
+//     <div class="theme-card-scroller" role="region" tabindex="0" aria-label="…">
+//         <ul class="theme-card-grid theme-card-grid--scroller theme-card-grid--columns-3">
+//             <li class="theme-card">…</li>
+//         </ul>
+//     </div>
+//
+// One row of cards that scrolls sideways and snaps each card to the start
+// edge. No script: scrolling is the browser's, by touch, trackpad, wheel and
+// scroll bar, and the keyboard reaches it the way it reaches the table - the
+// scroller is the one region that scrolls, it carries the tab stop and a name
+// ("tabindex", "role=region", "aria-label"), and the arrow keys scroll it once
+// it has focus. A link inside a card is reached by Tab as well, and the
+// browser scrolls it into view. The name says what the strip holds; the
+// template takes the heading of the element.
+//
+// The wrapper, not the list, is the region: a "role" on the list would take
+// its list semantics away, and the number of cards is what a screen reader
+// announces for a list.
+//
+// A card is the share of "--theme-card-grid-columns" of the width, less a
+// quarter of a card, so the next one always shows at the end edge - a strip
+// whose cards all fit reads as a grid and hides that it scrolls. On a phone
+// the share is too narrow, and a card takes the minimum, at most 85% of the
+// strip. "scroll-snap-type" is "mandatory" on the inline axis only; nothing
+// here animates, so there is no motion for "prefers-reduced-motion" to stop.
+// The padding below the cards keeps an overlay scroll bar off their border.
+.theme-card-scroller {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    padding-block-end: var(--theme-space-2, 0.625rem);
+    border-radius: var(--theme-radius-sm, 5px);
+}
+
+.theme-card-grid--scroller {
+    grid-auto-columns: max(
+        min(85%, var(--theme-card-grid-min)),
+        calc((100% - var(--theme-card-grid-columns) * var(--theme-card-grid-gap)) / (var(--theme-card-grid-columns) + 0.25))
+    );
+    grid-auto-flow: column;
+    grid-template-columns: none;
+
+    > * {
+        scroll-snap-align: start;
+    }
 }

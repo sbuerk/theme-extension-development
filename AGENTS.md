@@ -217,9 +217,12 @@ violation of any of them is a rejected change, not a review comment.
    by its path relative to the compiled stylesheet. Never an SVG drawn into a
    template by hand, never a glyph in CSS `content`, never a `data:` URI, a
    webfont, a sprite or a CDN. CSS may draw only the component geometry listed
-   as not being an icon in `docs/development/icons.md` (tooltip arrow, busy
-   spinner, switch thumb). The ViewHelper stays plain Fluid with no TYPO3 API
-   in it — the visual suite renders the styleguide partials without TYPO3.
+   as not being an icon in the table of `docs/development/icons.md` — the
+   tooltip arrow, the busy spinner, the switch thumb, the timeline ring and
+   rail, and the few others named there — each with the reason it means
+   nothing on its own. A new entry is added to that table in the same change
+   that draws it. The ViewHelper stays plain Fluid with no TYPO3 API in it —
+   the visual suite renders the styleguide partials without TYPO3.
    `Tests/Unit/IconUsageTest` enforces both the templates and the stylesheets.
    → [Icons](docs/development/icons.md)
 

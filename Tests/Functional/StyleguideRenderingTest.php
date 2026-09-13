@@ -110,7 +110,7 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
      */
     public static function everySection(): \Generator
     {
-        foreach (['tokens', 'typography', 'lists', 'tables', 'buttons', 'icons', 'boxes', 'data-display', 'features', 'interactive', 'forms', 'navigation', 'media', 'variants'] as $id) {
+        foreach (['tokens', 'typography', 'lists', 'tables', 'buttons', 'icons', 'boxes', 'data-display', 'features', 'collections', 'interactive', 'forms', 'navigation', 'media', 'variants'] as $id) {
             yield $id => ['id' => $id];
         }
     }
