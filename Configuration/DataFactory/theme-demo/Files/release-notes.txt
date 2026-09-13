@@ -1,0 +1,14 @@
+Theme demo - release notes
+
+This file is part of the showcase page tree of the theme. It is listed by the
+"File Links" elements on /elements/core/uploads, where the display type
+"file name and extension icon" shows it with the icon of a text file.
+
+What changed in this release
+
+- The text element sets its text in columns with the layout "Columns".
+- The file list shows the icon of each file type, or a thumbnail of an image.
+- Every file list can show the size and the description of each file.
+
+The same notes are listed as a PDF next to this file, and the two placeholder
+graphics of the showcase as a zip archive.

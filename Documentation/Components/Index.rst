@@ -32,8 +32,9 @@ What the library contains
         -   Components
     *   -   Content
         -   Accordion, alert, author, badge, card, code block, description
-            list - with a divided variant for key and value - divider, feature and feature grid, figure, hero, list, media
-            object, panel, quote, stats, steps, table, teaser, and the text
+            list - with a divided variant for key and value - divider, feature and
+            feature grid, figure, file list, hero, list, media object, panel,
+            quote, stats, steps, table, teaser, and the text
             roles display, lead and eyebrow
     *   -   Data display
         -   Avatar and avatar group, tag list, progress bar, meter
@@ -262,6 +263,12 @@ not know renders the element without one.
         -   :guilabel:`Running text`; :guilabel:`Columns` - :css:`.theme-text--columns`,
             two columns of at least 30 characters, one on a phone - see
             :ref:`feature-text-columns`
+    *   -   :guilabel:`File Links`
+        -   :guilabel:`Display file/icon/thumbnail`
+        -   The file names alone - :css:`.theme-file-list`; with the icon of
+            the file type - :css:`--icon`; with a thumbnail, or the icon where
+            there is none - :css:`--preview`. See
+            :ref:`feature-file-list-display-types`
 
 Tables
 ======
