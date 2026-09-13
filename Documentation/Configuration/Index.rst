@@ -219,7 +219,9 @@ TYPO3 v14 it is not installed at all. What that covers:
     :guilabel:`Text & Media`, :guilabel:`Bullet List`, :guilabel:`Table`,
     :guilabel:`File Links`, :guilabel:`Insert Records`, :guilabel:`Divider` and
     :guilabel:`Plain HTML` — see :ref:`feature-core-content-elements`.
-*   All eleven menu elements — see :ref:`feature-menu-content-elements`.
+*   All eleven menu elements — see :ref:`feature-menu-content-elements` —
+    and cards and thumbnails for two of them — see
+    :ref:`feature-menu-card-layouts`.
 *   The content elements of the theme's own, in a :guilabel:`Theme` group —
     see :ref:`feature-theme-content-elements`,
     :ref:`feature-notice-tabs-accordion-elements`,

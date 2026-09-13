@@ -666,6 +666,49 @@ markup written out once per level. `children` is only ever populated when
 single-level menu and a whole seven-level sitemap with no level argument
 needed to gate it.
 
+### Cards and thumbnails for two page menus
+
+`menu_pages` and `menu_subpages` render their pages as a list, as cards or as
+thumbnails, by the core column `layout`: 0 the list, 1 a `.theme-card-grid` of
+`.theme-card--linked` cards with the first page media, the title and the
+abstract, 2 the same as `--compact` cards in a `--narrow` grid, image and title
+only. Both templates switch into one partial,
+`Partials/ContentElement/MenuCards.html`; any other value renders the list.
+`layout` is disabled for every CType and re-enabled for these two by
+`ContentElementAppearance.tsconfig`, with its three values relabelled and the
+core value 3 removed. The other nine menu types keep it out of the form: a
+sitemap or a section menu of cards would lose the tree that is its point.
+
+The title is the link of a card, stretched over it by `--linked`: the page
+title is the only name the link can have, and a "read more" link would repeat
+it. `ItemHeading.html` renders it one level below the heading of the element,
+from an `href` and `current` - the resolved `link` of a menu item and its
+`aria-current` - rather than a link reference.
+
+**Page media costs a query per page, so only these two layouts fetch it.** A
+`FilesProcessor` nested in a `MenuProcessor` runs once per menu item, and its
+`if` sees the page of that item, not the element. The choice is therefore made
+on the element, between two `MenuProcessor`s: `10`, the menu as before, and
+`20`, the same menu with the nested `FilesProcessor` on `media`. The `if` of
+each reads `lib.themeMenuWithPageMedia`, which is `1` for a `menu_pages` or
+`menu_subpages` element in layout 1 or 2 and empty otherwise - `isFalse` for
+`10`, `isTrue` for `20`. `menu_subpages` sets `special = directory` on both.
+
+The CType is part of that condition because the other menu types are
+references to `menu_pages` and inherit both processors. A `menu_section` that
+still carries a layout value from an earlier rendering - fluid_styled_content
+offered the field on every menu - would otherwise get the flat list of
+processor `20` in place of its own two levels.
+
+`MenuCardLayoutRenderingTest` renders both layouts of both menus through the
+site set and the static include, against a real indexed file as page media:
+the image and its alternative text, the title as the link, the abstract on
+cards only, a page without media, the list for layout 0 and for the removed
+value 3, and a `menu_section` with a layout value keeping its own menu.
+`ContentElementAppearanceFormEngineTest` holds the three values and their
+labels to the two menus and the field to no other menu, and
+`ShowcaseTreeTest` holds `/elements/menu` to showing every layout.
+
 ### Known gap: no `sectionIndex` embedding
 
 Historical `fluid_styled_content` gave `menu_section` and `menu_section_pages`
@@ -1548,10 +1591,10 @@ a select with string values on both cores. The level stays the level: an `h3`
 in the look of heading 1 is still an `h3` in the outline. `display` reuses the
 text role `.theme-display` instead of repeating its metrics.
 
-**Disabled, not rendered.** `layout` is disabled for every CType and
-re-enabled per type where a template renders it: the bullet list and the text
-element, above. `sectionIndex` and `linkToTop` wait for a table of contents
-and a link back to the top.
+**Disabled, not rendered.** `layout` has a rendering only where a CType gives
+it one, and is re-enabled for that CType alone: the bullet list, the text
+element, the card group and the two page menus. `sectionIndex` and
+`linkToTop` wait for a table of contents and a link back to the top.
 `sectionIndex` keeps its TCA default of `1`, so elements created meanwhile
 are already part of that index. `header_position` and `tx_theme_header_style`
 are disabled per type for the CTypes that render their title outside the

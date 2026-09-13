@@ -1257,6 +1257,38 @@ entities:
                       header_layout: 2
                       selected_categories: 0
                       category_field: categories
+                  -
+                    self:
+                      id: 1713
+                      CType: menu_pages
+                      header: 'menu_pages as cards: page media, title and abstract'
+                      header_layout: 2
+                      layout: 1
+                      pages: '1090,1091,1092'
+                  -
+                    self:
+                      id: 1714
+                      CType: menu_pages
+                      header: 'menu_pages as thumbnails: page media and title'
+                      header_layout: 2
+                      layout: 2
+                      pages: '1090,1091,1092'
+                  -
+                    self:
+                      id: 1715
+                      CType: menu_subpages
+                      header: 'menu_subpages as cards: the pages below one page'
+                      header_layout: 2
+                      layout: 1
+                      pages: '1008'
+                  -
+                    self:
+                      id: 1716
+                      CType: menu_subpages
+                      header: 'menu_subpages as thumbnails'
+                      header_layout: 2
+                      layout: 2
+                      pages: '1008'
             -
               self:
                 id: 1008
