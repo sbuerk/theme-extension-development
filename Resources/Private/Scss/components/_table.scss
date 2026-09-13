@@ -90,6 +90,10 @@
     --theme-table-wrapper-radius: var(--theme-radius-sm, 5px);
     --theme-table-wrapper-sticky-max-block-size: 25rem;
 
+    // The bottom margin every block of the library ends on, as a bare
+    // "table" does in "base/_elements.scss": the wrapper is the block now,
+    // and without it the next component touched its border.
+    margin: 0 0 var(--theme-space-4, 1.25rem);
     overflow-x: auto;
 
     background-color: var(--theme-table-wrapper-background);
