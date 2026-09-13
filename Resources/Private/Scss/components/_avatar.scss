@@ -1,0 +1,122 @@
+// Avatar.
+//
+// Markup contract:
+//
+//     <span class="theme-avatar"><img class="theme-avatar__image" src="…" alt="…" width="40" height="40"></span>
+//     <span class="theme-avatar theme-avatar--square theme-avatar--large"><img class="theme-avatar__image" …></span>
+//     <span class="theme-avatar" role="img" aria-label="Ada Example"><span class="theme-avatar__initials" aria-hidden="true">AE</span></span>
+//
+//     Next to the visible name - decoration, named by nothing:
+//     <span class="theme-avatar"><img class="theme-avatar__image" src="…" alt="" width="40" height="40"></span> Ada Example
+//     <span class="theme-avatar"><span class="theme-avatar__initials" aria-hidden="true">AE</span></span> Ada Example
+//
+//     <ul class="theme-avatar-group" aria-label="…">
+//         <li><span class="theme-avatar">…</span></li>
+//         <li><span class="theme-avatar" role="img" aria-label="3 more"><span class="theme-avatar__initials" aria-hidden="true">+3</span></span></li>
+//     </ul>
+//
+// Modifiers: "--square" (the system radius instead of a circle), "--small"
+// and "--large". Each re-points a token of the layer below.
+//
+// A picture of a person, or the person's initials where there is no picture.
+// The initials are text, not an icon: they say who it is, where a generic
+// "user" glyph would say nothing a screen reader could not say better. The
+// accessible name is the person's name, on the avatar as "role='img'" with
+// "aria-label", and the letters themselves are hidden - "A E" read out letter
+// by letter is not a name. An image carries the name in its "alt".
+//
+// An avatar next to the person's name in text - an author line, a comment -
+// is decoration: the name is already there, and a second one on the avatar is
+// read out twice. The image then takes an empty "alt", and the initials drop
+// "role" and "aria-label"; the letters stay "aria-hidden".
+//
+// The sizes are steps of the spacing scale - 30, 40 and 60 pixels - and the
+// initials are set at 40% of the size, so they scale with it.
+//
+// --- The group --------------------------------------------------------------
+//
+// A list, because it is one: several people, counted by a screen reader. The
+// avatars overlap by "--theme-avatar-group-overlap", and each is ringed in the
+// colour of what the group sits on, so the edge of one reads against the next.
+// That colour cannot be known here: it defaults to the page background, and a
+// group on a card or a band re-points "--theme-avatar-group-ring-color". The
+// last item may be a count of the people left out, drawn as initials.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-avatar {
+    --theme-avatar-size: var(--theme-space-7, 2.5rem);
+    --theme-avatar-radius: var(--theme-radius-full, 9999px);
+    --theme-avatar-border-width: var(--theme-border-width, 1px);
+    --theme-avatar-border-color: var(--theme-color-border, #d6dce6);
+    --theme-avatar-background: var(--theme-color-surface, #f4f6fa);
+    --theme-avatar-foreground: var(--theme-color-text-secondary, #4a5567);
+
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--theme-avatar-size);
+    block-size: var(--theme-avatar-size);
+    overflow: hidden;
+    border: var(--theme-avatar-border-width) solid var(--theme-avatar-border-color);
+    border-radius: var(--theme-avatar-radius);
+    background-color: var(--theme-avatar-background);
+    color: var(--theme-avatar-foreground);
+    vertical-align: middle;
+}
+
+.theme-avatar--square {
+    --theme-avatar-radius: var(--theme-radius-sm, 5px);
+}
+
+.theme-avatar--small {
+    --theme-avatar-size: var(--theme-space-6, 1.875rem);
+}
+
+.theme-avatar--large {
+    --theme-avatar-size: var(--theme-space-8, 3.75rem);
+}
+
+// "cover": a portrait that is not square is cut to the box rather than
+// squeezed into it.
+.theme-avatar__image {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+}
+
+.theme-avatar__initials {
+    font-size: calc(var(--theme-avatar-size) * 0.4);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.theme-avatar-group {
+    --theme-avatar-group-overlap: var(--theme-space-2, 0.625rem);
+    --theme-avatar-group-ring-color: var(--theme-color-background, #ffffff);
+
+    display: flex;
+    align-items: center;
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+    padding: 0;
+    list-style: none;
+
+    > li {
+        display: flex;
+    }
+
+    > li + li {
+        margin-inline-start: calc(-1 * var(--theme-avatar-group-overlap));
+    }
+
+    .theme-avatar {
+        --theme-avatar-border-width: var(--theme-border-width-strong, 2px);
+        --theme-avatar-border-color: var(--theme-avatar-group-ring-color);
+    }
+}

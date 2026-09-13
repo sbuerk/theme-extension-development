@@ -1,0 +1,87 @@
+// Progress.
+//
+// Markup contract:
+//
+//     <div class="theme-field">
+//         <label class="theme-field__label" for="upload-progress">…</label>
+//         <progress class="theme-progress" id="upload-progress" max="100" value="40" aria-describedby="upload-progress-value">40 %</progress>
+//         <p class="theme-field__hint" id="upload-progress-value">40 % of 12 MB</p>
+//     </div>
+//
+// The native "<progress>", which carries the value, the role and the
+// announcement by itself. It is labelled like any control, by a "label" in a
+// ".theme-field", and the value is written out next to it as a hint: a bar is
+// read at a glance, a number is read exactly. The bar references the hint with
+// "aria-describedby", as the meter does, so the words reach a screen reader
+// with the bar. Without "value" the bar is
+// indeterminate and shows an empty track; its label then has to say that
+// something is under way.
+//
+// --- The track is a graphical object -----------------------------------------
+//
+// The track is the only thing that shows how far the bar could go, so its edge
+// is held to 3:1 against what it sits on (WCAG 1.4.11) and drawn in
+// "--theme-color-border-strong", like the edge of a text field - the
+// decorative "--theme-color-border" reaches about 1.4:1. The fill is the
+// primary accent on the surface tint of the track. Contrast of both is in
+// DESIGN.md, "Indicators".
+//
+// --- Engines -----------------------------------------------------------------
+//
+// "appearance: none" hands the element to the stylesheet, and the track is the
+// element's own box. Chromium and WebKit draw the fill as
+// "::-webkit-progress-value" over a "::-webkit-progress-bar" of their own,
+// which is made transparent; Firefox draws it as "::-moz-progress-bar". Each
+// engine's pseudo-element sits in a rule of its own: a selector list holding
+// one an engine does not know is dropped by that engine as a whole. The track
+// clips the fill to its radius.
+//
+// Under forced colours every fill would be repainted to the canvas colour and
+// the bar would show nothing, so it opts out and paints itself in system
+// colours - the track "Canvas" inside a "CanvasText" edge, the fill
+// "Highlight".
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-progress {
+    --theme-progress-track-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-progress-track-background: var(--theme-color-surface, #f4f6fa);
+    --theme-progress-fill: var(--theme-color-primary, #0b57d0);
+    --theme-progress-height: var(--theme-space-2, 0.625rem);
+    --theme-progress-radius: var(--theme-radius-sm, 5px);
+
+    display: block;
+    inline-size: 100%;
+    block-size: var(--theme-progress-height);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    appearance: none;
+    border: var(--theme-border-width, 1px) solid var(--theme-progress-track-border-color);
+    border-radius: var(--theme-progress-radius);
+    background-color: var(--theme-progress-track-background);
+    color: var(--theme-progress-fill);
+}
+
+.theme-progress::-webkit-progress-bar {
+    background-color: transparent;
+}
+
+.theme-progress::-webkit-progress-value {
+    background-color: var(--theme-progress-fill);
+}
+
+.theme-progress::-moz-progress-bar {
+    background-color: var(--theme-progress-fill);
+}
+
+@media (forced-colors: active) {
+    .theme-progress {
+        --theme-progress-track-border-color: CanvasText;
+        --theme-progress-track-background: Canvas;
+        --theme-progress-fill: Highlight;
+
+        forced-color-adjust: none;
+    }
+}

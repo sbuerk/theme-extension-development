@@ -1,0 +1,157 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    Styleguide section "data-display" - ".theme-avatar", ".theme-tag-list",
+    ".theme-progress" and ".theme-meter": the components that show a value
+    or a person rather than a passage of content. Key and value pairs are the
+    description list, in "Lists".
+
+    Contracts: "Resources/Private/Scss/components/_avatar.scss", "_tag.scss",
+    "_progress.scss" and "_meter.scss". Literal markup only, specimen copy in
+    English.
+
+    Portraits are inline SVG data URIs, like the images of "Media": a
+    specimen has no file reference to render, and the theme renders with no
+    network. The tag icon is "<theme:icon>", as every icon of the theme.
+
+    Ids are prefixed "sg-data-", so no id of this section meets one of the
+    page chrome or of another section.
+</f:comment>
+<section class="theme-styleguide__section" id="data-display">
+    <h2 class="theme-styleguide__heading">Data display</h2>
+
+    <h3>Avatar</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A portrait in a circle, in three sizes of the spacing scale - small,
+            the default and large - and square with <code>--square</code>. The
+            name is the <code>alt</code> of the image.
+        </p>
+        <p>
+            <span class="theme-avatar theme-avatar--small"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23c7d0e0'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%238b96ab'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%238b96ab'/%3E%3C/svg%3E" alt="Ada Example" width="30" height="30" /></span>
+            <span class="theme-avatar"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23c7d0e0'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%238b96ab'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%238b96ab'/%3E%3C/svg%3E" alt="Ada Example" width="40" height="40" /></span>
+            <span class="theme-avatar theme-avatar--large"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23c7d0e0'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%238b96ab'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%238b96ab'/%3E%3C/svg%3E" alt="Ada Example" width="60" height="60" /></span>
+            <span class="theme-avatar theme-avatar--square theme-avatar--large"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23b9c6d8'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%237e8ba1'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%237e8ba1'/%3E%3C/svg%3E" alt="Bea Sample" width="60" height="60" /></span>
+        </p>
+        <p>
+            Without a portrait, the initials - text, not an icon, set at 40% of
+            the size. The name is the <code>aria-label</code> of the avatar,
+            and the letters themselves are hidden from a screen reader.
+        </p>
+        <p>
+            <span class="theme-avatar theme-avatar--small" role="img" aria-label="Carl Placeholder"><span class="theme-avatar__initials" aria-hidden="true">CP</span></span>
+            <span class="theme-avatar" role="img" aria-label="Carl Placeholder"><span class="theme-avatar__initials" aria-hidden="true">CP</span></span>
+            <span class="theme-avatar theme-avatar--large" role="img" aria-label="Carl Placeholder"><span class="theme-avatar__initials" aria-hidden="true">CP</span></span>
+            <span class="theme-avatar theme-avatar--square theme-avatar--large" role="img" aria-label="Dora Dummy"><span class="theme-avatar__initials" aria-hidden="true">DD</span></span>
+        </p>
+        <p>
+            Next to the person's name the avatar is decoration: the image takes
+            an empty <code>alt</code>, and the initials neither a
+            <code>role</code> nor an <code>aria-label</code>, so a screen reader
+            reads the name once.
+        </p>
+        <p>
+            <span class="theme-avatar theme-avatar--small"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23c7d0e0'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%238b96ab'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%238b96ab'/%3E%3C/svg%3E" alt="" width="30" height="30" /></span>
+            Ada Example
+        </p>
+        <p>
+            <span class="theme-avatar theme-avatar--small"><span class="theme-avatar__initials" aria-hidden="true">CP</span></span>
+            Carl Placeholder
+        </p>
+    </div>
+
+    <h3>Avatar group</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A list of avatars that overlap, each ringed in the colour of the
+            page so its edge reads against the next. The last item counts the
+            people left out. On a card or a band, re-point
+            <code>--theme-avatar-group-ring-color</code> to the colour the group
+            sits on.
+        </p>
+        <ul class="theme-avatar-group" aria-label="Maintainers, specimen">
+            <li><span class="theme-avatar"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23c7d0e0'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%238b96ab'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%238b96ab'/%3E%3C/svg%3E" alt="Ada Example" width="40" height="40" /></span></li>
+            <li><span class="theme-avatar"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23b9c6d8'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%237e8ba1'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%237e8ba1'/%3E%3C/svg%3E" alt="Bea Sample" width="40" height="40" /></span></li>
+            <li><span class="theme-avatar" role="img" aria-label="Carl Placeholder"><span class="theme-avatar__initials" aria-hidden="true">CP</span></span></li>
+            <li><span class="theme-avatar"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23ccd6e4'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%2390a0b6'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%2390a0b6'/%3E%3C/svg%3E" alt="Dora Dummy" width="40" height="40" /></span></li>
+            <li><span class="theme-avatar" role="img" aria-label="3 more"><span class="theme-avatar__initials" aria-hidden="true">+3</span></span></li>
+        </ul>
+    </div>
+
+    <h3>Tags</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Keywords, as a list that wraps. A plain tag is text on the surface
+            tint; a linked tag is underlined as well as drawn in the accent, so
+            it is not told apart by colour alone, and turns its hairline to the
+            accent on hover. An icon before the label is optional decoration.
+        </p>
+        <ul class="theme-tag-list" aria-label="Topics, specimen">
+            <li><span class="theme-tag">TYPO3 v13</span></li>
+            <li><span class="theme-tag">TYPO3 v14</span></li>
+            <li><span class="theme-tag">Site sets</span></li>
+            <li><span class="theme-tag">Accessibility</span></li>
+        </ul>
+        <ul class="theme-tag-list" aria-label="Linked topics, specimen">
+            <li><a class="theme-tag" href="#">Content elements</a></li>
+            <li><a class="theme-tag" href="#">Design tokens</a></li>
+            <li><a class="theme-tag" href="#"><theme:icon name="tag" /> Dark mode</a></li>
+            <li><a class="theme-tag" href="#"><theme:icon name="tag" /> Forced colours</a></li>
+        </ul>
+    </div>
+
+    <h3>Progress</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The native progress bar, labelled like a control, with its value
+            written out as a hint. The track is edged in the strong border
+            colour: it is the only thing showing how far the bar could go, a
+            graphical object held to 3:1. Without a value the bar is
+            indeterminate and shows the empty track.
+        </p>
+        <div class="theme-form">
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-data-upload">Uploading the site package</label>
+                <progress class="theme-progress" id="sg-data-upload" max="100" value="40" aria-describedby="sg-data-upload-value">40 %</progress>
+                <p class="theme-field__hint" id="sg-data-upload-value">40 % - 4.8 of 12 MB</p>
+            </div>
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-data-reindex">Rebuilding the reference index</label>
+                <progress class="theme-progress" id="sg-data-reindex" aria-describedby="sg-data-reindex-value"></progress>
+                <p class="theme-field__hint" id="sg-data-reindex-value">Under way - the length of the task is not known.</p>
+            </div>
+        </div>
+    </div>
+
+    <h3>Meter</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A measurement within a known range. The browser sorts the value into
+            a region from <code>low</code>, <code>high</code> and
+            <code>optimum</code>, drawn in the success, the warning and the
+            danger colour. The colour is not the message: the hint says in words
+            what the region means, and the meter references it.
+        </p>
+        <div class="theme-form">
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-data-storage-low">Storage, first instance</label>
+                <meter class="theme-meter" id="sg-data-storage-low" min="0" max="100" low="60" high="85" optimum="0" value="30" aria-describedby="sg-data-storage-low-value">30 GB</meter>
+                <p class="theme-field__hint" id="sg-data-storage-low-value">30 of 100 GB used - plenty of room</p>
+            </div>
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-data-storage-high">Storage, second instance</label>
+                <meter class="theme-meter" id="sg-data-storage-high" min="0" max="100" low="60" high="85" optimum="0" value="72" aria-describedby="sg-data-storage-high-value">72 GB</meter>
+                <p class="theme-field__hint" id="sg-data-storage-high-value">72 of 100 GB used - filling up</p>
+            </div>
+            <div class="theme-field">
+                <label class="theme-field__label" for="sg-data-storage-full">Storage, third instance</label>
+                <meter class="theme-meter" id="sg-data-storage-full" min="0" max="100" low="60" high="85" optimum="0" value="92" aria-describedby="sg-data-storage-full-value">92 GB</meter>
+                <p class="theme-field__hint" id="sg-data-storage-full-value">92 of 100 GB used - nearly full</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+</html>
