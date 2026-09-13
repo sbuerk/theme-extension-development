@@ -126,6 +126,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         'theme_hero' => 'hero',
         'theme_hero_small' => 'hero',
         'theme_hero_text_only' => 'hero',
+        'theme_testimonial' => 'quote',
     ];
 
     /**
@@ -138,6 +139,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         'theme_hero' => ['tx_theme_hero_layout'],
         'theme_hero_small' => ['tx_theme_hero_layout'],
         'theme_hero_text_only' => ['tx_theme_hero_layout'],
+        'theme_testimonial' => ['tx_theme_quote_style'],
     ];
 
     protected const LANGUAGE_PRESETS = [

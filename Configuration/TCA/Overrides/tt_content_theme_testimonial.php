@@ -25,7 +25,11 @@ ExtensionManagementUtility::addRecordType(
     // anyway would let an editor attach an image that silently never appears -
     // worse than not offering it, because the page looks finished and the work
     // is gone. Add the slot to the component first if that changes.
+    //
+    // "tx_theme_quote_style" first, as the kind comes first on a notice: it
+    // decides how everything below it is set.
     '
+        tx_theme_quote_style,
         bodytext,
         --palette--;;headers,
     ',

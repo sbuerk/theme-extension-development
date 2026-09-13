@@ -1,22 +1,38 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:layout name="ContentElement" />
 
 <f:section name="Main">
     <f:comment>
         Maps onto ".theme-quote" (Resources/Private/Scss/components/_quote.scss);
-        markup matches that file's header comment exactly. "header" and
-        "subheader" are relabelled in
+        markup matches that file's header comment. "header" and "subheader"
+        are relabelled in
         Configuration/TCA/Overrides/tt_content_theme_testimonial.php to hold
         the attributed person's name and role, not a content-element heading -
         Partials/ContentElement/Header.html is therefore not reused here, and
-        "header_layout" (still exposed through the "headers" palette this
-        CType's showitem reuses, alongside "header_position"/"date"/
-        "header_link") has no effect on this markup: there is no heading to
-        hide or re-level, only the attribution text below. Those fields stay
-        in the form because they are part of the shared "headers" palette
-        (TCA is out of this step's scope), they are simply inert here.
+        "header_layout" (part of the "headers" palette this CType's showitem
+        reuses, alongside "date" and "header_link") has no effect on this
+        markup: there is no heading to hide or re-level, only the attribution
+        below. "header_position" and "tx_theme_header_style" are disabled for
+        this CType in the page TSconfig.
+
+        "tx_theme_quote_style" picks a modifier:
+
+          (empty)   a rule at the start of the quotation   no modifier
+          pull      larger, between two rules              "--pull"
+          centred   centred                                "--centred"
+
+        Any other value renders the default, the rule of the frame modifiers
+        in "Layouts/ContentElement.html"; "ContentElementContractTest" holds
+        both modifiers to a rule of the stylesheet.
+
+        The two styles carry a quotation mark, the "quote-left" icon of the
+        set, in ".theme-quote__mark" before the quotation. It is decoration:
+        "aria-hidden" on the slot, and the "blockquote" is what says that this
+        is a quotation. The default has none, so every testimonial saved
+        before the field existed renders as it did.
 
         There is no media here, and no "image" field on the CType either. The
         element renders through ".theme-quote", which has no media slot in its
@@ -26,7 +42,15 @@
         not offering it, because the page looks finished and the work is gone.
         Give the component a slot before giving the element the field back.
     </f:comment>
-    <figure class="theme-quote">
+    <f:switch expression="{data.tx_theme_quote_style}">
+        <f:case value="pull"><f:variable name="quoteStyle" value=" theme-quote--pull" /></f:case>
+        <f:case value="centred"><f:variable name="quoteStyle" value=" theme-quote--centred" /></f:case>
+        <f:defaultCase><f:variable name="quoteStyle" value="" /></f:defaultCase>
+    </f:switch>
+    <figure class="theme-quote{quoteStyle}">
+        <f:if condition="{quoteStyle}">
+            <span class="theme-quote__mark" aria-hidden="true"><theme:icon name="quote-left" /></span>
+        </f:if>
         <f:if condition="{data.bodytext}">
             <blockquote class="theme-quote__text">
                 <f:format.html>{data.bodytext}</f:format.html>

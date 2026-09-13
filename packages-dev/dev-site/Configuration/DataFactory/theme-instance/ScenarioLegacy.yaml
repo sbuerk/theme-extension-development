@@ -2042,6 +2042,51 @@ entities:
                           header: 'Text at the start of the line'
                           header_layout: 2
                           bodytext: "<p>The hero without media in its default layout: the text\nstarts at the start of the line and runs to the reading\nmeasure.</p>\n"
+                -
+                  self:
+                    id: 1112
+                    title: 'Quotation styles'
+                    slug: /elements/theme/quote
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 12201
+                          CType: header
+                          header: 'Quotation styles'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 12202
+                          CType: text
+                          header: 'Three ways to set a quotation'
+                          header_layout: 2
+                          bodytext: "<p>The testimonial sets its quotation with a rule at the\nstart by default. A pull quote lifts a sentence out of the\ntext around it; a centred quotation stands on its own. Both\nopen with a quotation mark from the icon set.</p>"
+                      -
+                        self:
+                          id: 12203
+                          CType: theme_testimonial
+                          tx_theme_quote_style: ''
+                          header: 'The default style'
+                          subheader: 'A rule at the start'
+                          bodytext: "<p>The quotation as every testimonial rendered it so far: set\napart by a rule at the start of the line and by its weight,\nwithout a quotation mark.</p>"
+                      -
+                        self:
+                          id: 12204
+                          CType: theme_testimonial
+                          tx_theme_quote_style: pull
+                          header: 'The pull quote'
+                          subheader: 'Larger, between two rules'
+                          bodytext: "<p>One sentence worth reading twice, lifted out of the text\nand set large enough to be found while scrolling past.</p>"
+                      -
+                        self:
+                          id: 12205
+                          CType: theme_testimonial
+                          tx_theme_quote_style: centred
+                          header: 'The centred quotation'
+                          subheader: 'On one axis, held to the measure'
+                          bodytext: "<p>A quotation that stands on its own between two sections of\na page, centred below its mark and never wider than the\nreading measure.</p>\n"
             -
               self:
                 id: 1051

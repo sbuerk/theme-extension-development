@@ -727,7 +727,12 @@ visual suite; the Firefox rules were looked at once in the Firefox of the
 pinned Playwright image. The contrast of the fills and the edge is in
 [`DESIGN.md`](../../DESIGN.md#indicators).
 
-Quote:
+Quote. Modifiers `--pull` (larger and bolder, between a rule above and one
+below in the accent, instead of the rule at the start) and `--centred` (on one
+axis, no rule, the text held to the measure). Both open with the quotation
+mark in `__mark`: the `quote-left` icon of the set, rendered by `<theme:icon>`
+in the accent of the rule, `aria-hidden` because the `blockquote` is what makes
+it a quotation. The bare class has no mark:
 
 ```html
 <figure class="theme-quote">
@@ -737,7 +742,16 @@ Quote:
         <cite class="theme-quote__source">…</cite>
     </figcaption>
 </figure>
+
+<figure class="theme-quote theme-quote--pull">
+    <span class="theme-quote__mark" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
+    <blockquote class="theme-quote__text"><p>…</p></blockquote>
+    <figcaption class="theme-quote__attribution">…</figcaption>
+</figure>
 ```
+
+No media slot yet: the portrait of a testimonial waits for the avatar
+component, see [Content elements](../architecture/content-elements.md#a-field-was-removed-theme_testimonial-lost-its-image).
 
 Stat — a figure and what it counts, as a description list: the label is the
 term, the figure its description, a sentence about it a second one. Each pair
