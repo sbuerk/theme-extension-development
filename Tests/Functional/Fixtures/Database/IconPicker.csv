@@ -4,7 +4,8 @@ pages,,,,,,,,,,
 ,2,1,0,0,0,1,0,A narrowed list,/narrowed,"TCEFORM.tt_content.tx_iconpickerfixture_icon.keepItems = ,envelope,arrow-right,circle-info"
 ,3,1,0,0,0,1,0,Without the curated list,/without-curated,"TCEFORM.tt_content.tx_theme_link_icon.keepItems >
 TCEFORM.tx_theme_list_item.link_icon.keepItems >
-TCEFORM.tt_content.tx_theme_icon.keepItems >"
+TCEFORM.tt_content.tx_theme_icon.keepItems >
+TCEFORM.tx_theme_list_item.icon.keepItems >"
 tt_content,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,tx_theme_link,tx_theme_link_label,tx_theme_list_items
 ,10,2,0,0,0,10,header,Narrowed,,,0
