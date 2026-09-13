@@ -4,9 +4,10 @@
 
 <f:comment>
     Styleguide section "Layouts and variants": the layouts an editor picks for
-    a content element, drawn from the component each one maps onto - the text
-    in columns of the text element, and the file list in the three display
-    types of the file links element.
+    a content element, drawn from the component each one maps onto: the text
+    in columns of the text element, the file list in the three display types
+    of the file links element, the layouts of the heroes, the widths and tones
+    of the call to action, and the styles of the testimonial.
 
     A section of its own rather than more specimens in "Typography.html" and
     "Boxes.html": these are the choices of a content element's form, shown
@@ -173,6 +174,57 @@
                 <div class="theme-hero__actions">
                     <a class="theme-button" href="#">The primary action</a>
                 </div>
+            </div>
+        </section>
+    </div>
+
+    <h3>Call to action</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_cta.scss - the two
+            widths, "--boxed" and "--band", and the tones: the surface of the
+            bare class, "--accent", "--inverse" and "--placeholder". Titles
+            are "h4", for the reason "Boxes.html" gives.
+        </f:comment>
+        <section class="theme-cta theme-cta--boxed">
+            <span class="theme-cta__icon" aria-hidden="true"><theme:icon name="lightbulb" /></span>
+            <h4 class="theme-cta__title">A box on the surface</h4>
+            <div class="theme-cta__text"><p>Narrower than the column and centred in it, with a large icon of the set and two links.</p></div>
+            <div class="theme-cta__actions">
+                <a class="theme-button" href="#">The main action</a>
+                <a class="theme-button theme-button--secondary" href="#">The alternative</a>
+            </div>
+        </section>
+    </div>
+    <div class="theme-styleguide__specimen">
+        <section class="theme-cta theme-cta--band theme-cta--accent">
+            <span class="theme-cta__icon" aria-hidden="true"><theme:icon name="file-lines" /></span>
+            <h4 class="theme-cta__title">A band on the accent tint</h4>
+            <div class="theme-cta__text"><p>Across the whole column, the hairline above and below it only, on the tint of the accent band.</p></div>
+            <div class="theme-cta__actions">
+                <a class="theme-button" href="#">The main action</a>
+                <a class="theme-button theme-button--link" href="#">A quieter one</a>
+            </div>
+        </section>
+    </div>
+    <div class="theme-styleguide__specimen">
+        <section class="theme-cta theme-cta--boxed theme-cta--inverse">
+            <span class="theme-cta__icon" aria-hidden="true"><theme:icon name="moon" /></span>
+            <h4 class="theme-cta__title">The other appearance</h4>
+            <div class="theme-cta__text"><p>The colour scheme of everything inside it is turned, the buttons included.</p></div>
+            <div class="theme-cta__actions">
+                <a class="theme-button" href="#">The main action</a>
+                <a class="theme-button theme-button--ghost" href="#">A ghost button</a>
+            </div>
+        </section>
+    </div>
+    <div class="theme-styleguide__specimen">
+        <section class="theme-cta theme-cta--band theme-cta--placeholder">
+            <span class="theme-cta__icon" aria-hidden="true"><theme:icon name="note-sticky" /></span>
+            <h4 class="theme-cta__title">No articles yet</h4>
+            <div class="theme-cta__text"><p>No fill and a dashed frame, standing in for content that is not there yet.</p></div>
+            <div class="theme-cta__actions">
+                <a class="theme-button" href="#">Write the first</a>
             </div>
         </section>
     </div>

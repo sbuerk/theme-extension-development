@@ -460,6 +460,44 @@
 				<source>Cropped: the image at the end, cut off at the end and bottom edges</source>
 			</trans-unit>
 
+			<!-- tt_content: CType theme_cta -->
+			<trans-unit id="tt_content.CType.theme_cta.label">
+				<source>Call to action</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_cta.description">
+				<source>A band or a box with a heading, a short text, an icon and up to two links.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_cta_tone">
+				<source>Tone</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_cta_tone.I.surface">
+				<source>Surface</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_cta_tone.I.accent">
+				<source>Accent tint</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_cta_tone.I.inverse">
+				<source>Inverse: the other appearance</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_cta_tone.I.placeholder">
+				<source>Placeholder: no fill, a dashed frame</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_cta_width">
+				<source>Width</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_cta_width.I.boxed">
+				<source>A box, centred in the column</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_cta_width.I.band">
+				<source>A band across the whole column</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_secondary_link">
+				<source>Second link</source>
+			</trans-unit>
+			<trans-unit id="tt_content.palette.theme_secondary_link">
+				<source>Second link</source>
+			</trans-unit>
+
 			<!-- tt_content: the testimonial -->
 			<trans-unit id="tt_content.tx_theme_quote_style">
 				<source>Style</source>

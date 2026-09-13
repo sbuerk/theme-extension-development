@@ -489,6 +489,36 @@ The rule between the rows and the frame of a thumbnail are decorative
 hairlines, like every `--theme-color-border` of the Frame language: the row
 and the image are what they separate, and nothing depends on seeing them.
 
+### Call to action
+
+`.theme-cta` takes its tones from the content element bands: the surface fill,
+the accent tint mixed exactly as the accent band, and the inverse tone turning
+the colour scheme as the inverse band does. The text, the links and the
+buttons inside therefore have the contrast of the band tables below, in every
+palette. The new colour uses are the icon, in `--theme-color-primary`, and the
+dashed frame of the placeholder tone, in `--theme-color-border-strong` on
+whatever the element sits on:
+
+| Part                       | Token           | Page  | vs background | vs surface | vs surface-raised |
+|----------------------------|-----------------|-------|---------------|------------|-------------------|
+| Icon on the surface tone   | `primary`       | light | —             | 5.90       | —                 |
+| Icon on the surface tone   | `primary`       | dark  | —             | 7.51       | —                 |
+| Icon on the inverse tone   | `primary`       | light | 8.18 (dark)   | —          | —                 |
+| Icon on the inverse tone   | `primary`       | dark  | 6.39 (light)  | —          | —                 |
+| Placeholder frame          | `border-strong` | light | 3.35          | 3.10       | 3.35              |
+| Placeholder frame          | `border-strong` | dark  | 3.74          | 3.44       | 3.10              |
+| Placeholder icon and links | `primary`       | light | 6.39          | 5.90       | 6.39              |
+| Placeholder icon and links | `primary`       | dark  | 8.18          | 7.51       | 6.77              |
+
+On the accent tone the icon is the "Link" column of the accent table below,
+5.94 at the lowest (neutral, light). The inverse tone sits on the background of
+the other appearance, so its icon is the primary accent of that appearance
+against that background. The placeholder has no fill of its own: it sits on the
+page, a surface band or a raised surface, which is why its rows have all three
+columns. The dashed frame is a boundary that shows the element's extent, so it
+is held to the 3:1 of a control boundary, which `border-strong` clears on all
+three.
+
 ### Quotation mark
 
 The quotation styles `--pull` and `--centred` of `.theme-quote` draw the

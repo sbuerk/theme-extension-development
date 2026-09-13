@@ -414,7 +414,7 @@ entities:
                 self:
                   id: 1502
                   CType: text
-                  bodytext: "<p>Three pages, one per family: the classic types\n<em>EXT:frontend</em> registers without supplying a rendering,\nthe eleven menu types, and the thirteen this extension adds itself.\nEvery one of them appears exactly once, so a single branch of the\ntree answers what the theme does with each.</p>\n<p>Below the classic types, each has a page of its own with its\nvariants, and the <a href=\"t3://page?uid=1051\">Frames</a> page shows\nevery value of the Appearance tab, one element each.</p>"
+                  bodytext: "<p>Three pages, one per family: the classic types\n<em>EXT:frontend</em> registers without supplying a rendering,\nthe eleven menu types, and the types this extension adds itself.\nEach of them appears on the page of its family, so a single branch\nof the tree answers what the theme does with it.</p>\n<p>The theme types with layouts of their own - the heroes, the call\nto action and the testimonial - also have a page each below the\ntheme elements, showing every layout.</p>\n<p>Below the classic types, each has a page of its own with its\nvariants, and the <a href=\"t3://page?uid=1051\">Frames</a> page shows\nevery value of the Appearance tab, one element each.</p>"
           children:
             -
               self:
@@ -1263,7 +1263,7 @@ entities:
                 title: 'Theme elements'
                 slug: /elements/theme
                 backend_layout: content
-                abstract: 'The thirteen content elements this extension registers itself, from the hero down to the accordion.'
+                abstract: 'The content elements this extension registers itself, one each; the pages below show the layouts of the heroes, the call to action and the quotation.'
                 keywords: 'content elements, theme'
               entities:
                 content:
@@ -2042,6 +2042,79 @@ entities:
                           header: 'Text at the start of the line'
                           header_layout: 2
                           bodytext: "<p>The hero without media in its default layout: the text\nstarts at the start of the line and runs to the reading\nmeasure.</p>\n"
+                -
+                  self:
+                    id: 1111
+                    title: 'Calls to action'
+                    slug: /elements/theme/cta
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 12101
+                          CType: header
+                          header: 'Calls to action'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 12102
+                          CType: theme_cta
+                          tx_theme_cta_tone: ''
+                          tx_theme_cta_width: boxed
+                          tx_theme_icon: rocket
+                          header: 'Build the next extension against this theme'
+                          header_layout: 2
+                          bodytext: "<p>Every content element, every component and both appearances\nare on these pages. Start with the elements, or read the\ncomponent library first.</p>\n"
+                          tx_theme_link: 't3://page?uid=1005'
+                          tx_theme_link_label: 'See every element'
+                          tx_theme_link_icon: arrow-right
+                          tx_theme_secondary_link: 't3://page?uid=1009'
+                          tx_theme_secondary_link_label: 'Open the styleguide'
+                          tx_theme_secondary_link_variant: secondary
+                      -
+                        self:
+                          id: 12103
+                          CType: theme_cta
+                          tx_theme_cta_tone: accent
+                          tx_theme_cta_width: band
+                          tx_theme_icon: book-open
+                          header: 'The TYPO3 documentation'
+                          header_layout: 2
+                          bodytext: "<p>A band across the column on the tint of the accent, the same\ntint as the accent band of the Appearance tab. It follows the\npalette chosen in the display settings.</p>\n"
+                          tx_theme_link: 'https://docs.typo3.org/'
+                          tx_theme_link_label: 'Read the documentation'
+                          tx_theme_secondary_link: 't3://page?uid=1051'
+                          tx_theme_secondary_link_label: 'Compare with the bands'
+                          tx_theme_secondary_link_variant: link
+                      -
+                        self:
+                          id: 12104
+                          CType: theme_cta
+                          tx_theme_cta_tone: inverse
+                          tx_theme_cta_width: boxed
+                          tx_theme_icon: moon
+                          header: 'The other appearance, in a box'
+                          header_layout: 2
+                          bodytext: "<p>The inverse tone turns the colour scheme of everything inside\nit: dark on a light page, light on a dark one. The buttons turn\nwith it.</p>\n"
+                          tx_theme_link: 't3://page?uid=1002'
+                          tx_theme_link_label: 'Read the typography'
+                          tx_theme_secondary_link: 't3://page?uid=1010'
+                          tx_theme_secondary_link_label: 'Try the forms'
+                          tx_theme_secondary_link_variant: ghost
+                      -
+                        self:
+                          id: 12105
+                          CType: theme_cta
+                          tx_theme_cta_tone: placeholder
+                          tx_theme_cta_width: band
+                          tx_theme_icon: newspaper
+                          header: 'No articles yet'
+                          header_layout: 2
+                          bodytext: "<p>The placeholder tone has no fill and a dashed frame. It\nstands in for content that is not there yet, and says what to\ndo about it.</p>\n"
+                          tx_theme_link: 't3://page?uid=1056'
+                          tx_theme_link_label: 'Read the sample article'
+                          tx_theme_link_icon: pen
                 -
                   self:
                     id: 1112

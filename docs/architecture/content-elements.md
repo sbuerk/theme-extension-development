@@ -826,6 +826,7 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_features`          | A group of features with an icon each                    | `.theme-feature` in `.theme-feature-grid`               |
 | `theme_stats`             | Figures and what they count                              | `.theme-stat` in `.theme-stats`                         |
 | `theme_steps`             | The numbered steps of a process                          | `.theme-steps`                                          |
+| `theme_cta`               | A call to action: heading, text, icon, two links         | `.theme-cta`                                            |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -1271,6 +1272,54 @@ reduced and the text-only hero, the unknown value, the order of the image and
 the eyebrow through both delivery paths; `ContentElementAppearanceFormEngineTest`
 holds the values each hero offers; `ShowcaseTreeTest` holds
 `/elements/theme/hero` to showing all of them.
+
+### The call to action
+
+`theme_cta` is a band or a box with a heading, a short rich text, an optional
+large icon and up to two links, on `.theme-cta`. Two selects pick one modifier
+each in `ThemeCta.html`: `tx_theme_cta_width` — `boxed`, the default, or
+`band` — and `tx_theme_cta_tone` — the surface by default, `accent`,
+`inverse` or `placeholder`. A value nothing offers picks none.
+
+The tones are the bands of `frame_class` applied to the component: the accent
+tone mixes the 5% tint of the accent band, the inverse tone turns the colour
+scheme of its subtree in the same three rules. The contrast tables of the bands
+in `DESIGN.md` therefore hold for everything inside, and
+`ContentElementContractTest` holds the tint and the three rules to the
+stylesheet so they cannot drift apart. `placeholder` is no fill and a dashed
+frame, for an empty state that says what to do about it.
+
+`band` spans the column the element sits in, not the viewport. A full bleed to
+the viewport needs `margin-inline: calc(50% - 50vw)`, which assumes a centred
+column: in the `content_sidebar` layout it would run across the sidebar, and
+`100vw` includes the scrollbar, so the page scrolls sideways by its width. An
+element across the column, with `frame_class` "No frame" dropping the inner
+padding, is the widest band the column model allows.
+
+The icon is `tx_theme_icon`, the element icon column the bullet list uses,
+rendered `optional` in an `aria-hidden` slot. The first link is the
+`theme_link` palette; the second is a palette of its own,
+`theme_secondary_link`, with four columns of the same shape —
+`tx_theme_secondary_link`, `_label`, `_variant` (the items of the first link's
+style, defaulting to `secondary`) and `_icon` (the icon picker, with the curated
+`keepItems` of the first link's icon). Both are rendered by `LinkButton.html`,
+the second handed its columns under the names of the first, so one set of cases
+decides the style of either. Two fixed places, not an inline relation: a list
+of links has no first and second.
+
+The heading is `header` at the level of `header_layout`, h2 by default — a call
+to action is a section, not the page title — and `header_position` and
+`tx_theme_header_style` are disabled for the type, as for the heroes.
+`bodytext` is rich text through `columnsOverrides`. The new content element
+wizard lists the element from its TCA (Feature #102834), so no page TSconfig
+registers it.
+
+`CtaRenderingTest` holds the modifiers through both delivery paths, the icon,
+heading, text and both links, either link alone, and what is not rendered;
+`ContentElementAppearanceFormEngineTest` the form; `IconPickerFormEngineTest`
+both icon fields to the curated list; `ShowcaseTreeTest`
+`/elements/theme/cta` to every tone and width; `AccountsTest` the grant of the
+editor group.
 
 ### The styles of the testimonial
 

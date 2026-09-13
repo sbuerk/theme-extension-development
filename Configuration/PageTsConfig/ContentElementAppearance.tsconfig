@@ -93,6 +93,7 @@ TCEFORM.tt_content {
     # a component of their own, outside the shared header partial, so neither
     # the position nor the look of the header reaches the page.
     header_position.types {
+        theme_cta.disabled = 1
         theme_hero.disabled = 1
         theme_hero_small.disabled = 1
         theme_hero_text_only.disabled = 1
@@ -101,6 +102,7 @@ TCEFORM.tt_content {
     }
 
     tx_theme_header_style.types {
+        theme_cta.disabled = 1
         theme_hero.disabled = 1
         theme_hero_small.disabled = 1
         theme_hero_text_only.disabled = 1
