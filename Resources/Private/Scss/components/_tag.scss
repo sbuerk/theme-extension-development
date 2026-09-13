@@ -1,0 +1,77 @@
+// Tag.
+//
+// Markup contract:
+//
+//     <ul class="theme-tag-list" aria-label="…">
+//         <li><span class="theme-tag">…</span></li>
+//         <li><a class="theme-tag" href="…">…</a></li>
+//         <li><a class="theme-tag" href="…"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg> …</a></li>
+//     </ul>
+//
+// A keyword attached to something - a topic, a category, a version. Not a
+// badge: a badge is a status with a severity, a tag is a label that may lead
+// to everything else carrying it. A tag list is a list, because a screen
+// reader should count the tags, and it wraps.
+//
+// A tag is either text or a link. A linked tag is told apart from a plain one
+// by more than its colour (WCAG 1.4.1): it is underlined, as every link in
+// running text is, and turns its hairline to the accent on hover. It is at
+// least 24 pixels high, the target size WCAG 2.5.8 asks of a control that is
+// not given more room around it. The leading icon is optional decoration,
+// "<theme:icon>" before the label, spaced by the "gap" of the tag - so a
+// decorated link inside a tag gives up its own marker gap, as a button does.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-tag-list {
+    --theme-tag-list-gap: var(--theme-space-2, 0.625rem);
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--theme-tag-list-gap);
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+    padding: 0;
+    list-style: none;
+}
+
+.theme-tag {
+    --theme-tag-background: var(--theme-color-surface, #f4f6fa);
+    --theme-tag-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-tag-border-color: var(--theme-color-border, #d6dce6);
+    --theme-tag-radius: var(--theme-radius-sm, 5px);
+    --theme-tag-min-block-size: 1.5rem;
+    --theme-link-marker-gap: 0;
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--theme-space-1, 0.3125rem);
+    min-block-size: var(--theme-tag-min-block-size);
+    padding-inline: var(--theme-space-2, 0.625rem);
+    border: var(--theme-border-width, 1px) solid var(--theme-tag-border-color);
+    border-radius: var(--theme-tag-radius);
+    background-color: var(--theme-tag-background);
+    color: var(--theme-tag-foreground);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-tight);
+    white-space: nowrap;
+}
+
+// Selected by the attribute, not by a modifier: a tag that links is a link,
+// and a class that says so could disagree with the markup.
+.theme-tag[href] {
+    --theme-tag-foreground: var(--theme-color-primary, #0b57d0);
+
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    transition:
+        color var(--theme-duration-fast) var(--theme-easing-standard),
+        border-color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        --theme-tag-foreground: var(--theme-color-primary-hover, #0a4bb4);
+        --theme-tag-border-color: var(--theme-color-primary, #0b57d0);
+    }
+}

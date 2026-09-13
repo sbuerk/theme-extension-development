@@ -32,8 +32,11 @@ What the library contains
         -   Components
     *   -   Content
         -   Accordion, alert, author, badge, card, code block, description
-            list, divider, figure, hero, list, panel, quote, table, teaser, and
-            the text roles display, lead and eyebrow
+            list - with a divided variant for key and value - divider, figure,
+            hero, list, panel, quote, table, teaser, and the text roles
+            display, lead and eyebrow
+    *   -   Data display
+        -   Avatar and avatar group, tag list, progress bar, meter
     *   -   Actions
         -   Button - with a link and an icon variant, pressed and busy states,
             and an attached button group - and the close button

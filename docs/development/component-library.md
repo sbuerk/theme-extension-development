@@ -27,6 +27,8 @@ against, and the rename was cheap while only one template depended on it.
 | Accordion               | `.theme-accordion`        | `components/_accordion.scss`        |
 | Alert                   | `.theme-alert`            | `components/_alert.scss`            |
 | Author                  | `.theme-author`           | `components/_author.scss`           |
+| Avatar                  | `.theme-avatar`           | `components/_avatar.scss`           |
+| Avatar group            | `.theme-avatar-group`     | `components/_avatar.scss`           |
 | Badge                   | `.theme-badge`            | `components/_badge.scss`            |
 | Breadcrumb              | `.theme-breadcrumb`       | `components/_breadcrumb.scss`       |
 | Button                  | `.theme-button`           | `components/_button.scss`           |
@@ -46,15 +48,18 @@ against, and the rename was cheap while only one template depended on it.
 | Link decoration         | `.theme-link`             | `components/_link.scss`             |
 | List                    | `.theme-list`             | `components/_list.scss`             |
 | Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`         |
+| Meter                   | `.theme-meter`            | `components/_meter.scss`            |
 | Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`          |
 | Pagination              | `.theme-pagination__list` | `components/_pagination.scss`       |
 | Panel                   | `.theme-panel`            | `components/_panel.scss`            |
+| Progress                | `.theme-progress`         | `components/_progress.scss`         |
 | Quote                   | `.theme-quote`            | `components/_quote.scss`            |
 | Segmented control       | `.theme-segmented`        | `components/_settings.scss`         |
 | Palette swatch          | `.theme-swatch`           | `components/_settings.scss`         |
 | Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`        |
 | Table                   | `.theme-table-wrapper`    | `components/_table.scss`            |
 | Tabs                    | `.theme-tabs`             | `components/_tabs.scss`             |
+| Tag list                | `.theme-tag-list`         | `components/_tag.scss`              |
 | Teaser                  | `.theme-teaser`           | `components/_teaser.scss`           |
 | Text: display           | `.theme-display`          | `components/_text.scss`             |
 | Text: eyebrow           | `.theme-eyebrow`          | `components/_text.scss`             |
@@ -127,6 +132,7 @@ fit the square slots below.
 | Icon button          | whatever the button stands for                                                              | `--theme-button-icon-size`, through the token             |
 | Theme links          | the icon an editor picked, before the label of a button, a content menu link or a card link | one em, spaced by the `gap` of the link                   |
 | Link decoration      | `arrow-up-right-from-square`, `download`, `envelope`, `phone`, as a CSS mask after the text | `--theme-link-marker-size`, three quarters of an em       |
+| Tag                  | optional, whatever a template puts before the label                                         | one em, spaced by the `gap` of the tag                    |
 
 ### Link decoration
 
@@ -311,6 +317,34 @@ component's own:
 </div>
 ```
 
+Avatar — a portrait, or the initials where there is none. `--square` takes
+the system radius instead of the circle, `--small` and `--large` are 30 and
+60 pixels against the default 40, all steps of the spacing scale. The
+initials are text, not an icon, set at 40% of the size; the name is the
+`aria-label` of the avatar with `role="img"`, and the letters are
+`aria-hidden`, since "A E" read letter by letter is not a name. Next to the
+person's visible name — an author line, a comment — the avatar is decoration:
+the image takes `alt=""` and the initials drop `role` and `aria-label`, so the
+name is not read twice. A group is a list whose avatars overlap, each ringed in
+`--theme-avatar-group-ring-color` — the page background by default, re-pointed
+by a group that sits on a card or a band — and whose last item may count the
+people left out:
+
+```html
+<span class="theme-avatar"><img class="theme-avatar__image" src="…" alt="…" width="40" height="40"></span>
+<span class="theme-avatar theme-avatar--square theme-avatar--large"><img class="theme-avatar__image" …></span>
+<span class="theme-avatar" role="img" aria-label="Ada Example"><span class="theme-avatar__initials" aria-hidden="true">AE</span></span>
+
+<!-- Next to the visible name: decoration -->
+<span class="theme-avatar"><img class="theme-avatar__image" src="…" alt="" width="40" height="40"></span> Ada Example
+<span class="theme-avatar"><span class="theme-avatar__initials" aria-hidden="true">AE</span></span> Ada Example
+
+<ul class="theme-avatar-group" aria-label="…">
+    <li><span class="theme-avatar">…</span></li>
+    <li><span class="theme-avatar" role="img" aria-label="3 more"><span class="theme-avatar__initials" aria-hidden="true">+3</span></span></li>
+</ul>
+```
+
 Badge. Two independent axes — severity (`--info`, `--success`, `--warning`,
 `--danger`) and fill (soft by default, `--solid` combined with a severity):
 
@@ -454,14 +488,20 @@ without a name is a bare `pre`:
 Description list. `--horizontal` sets terms and descriptions side by side from
 `bp.$md` up; `--truncate`, with it, keeps every term on one line and cuts it
 with an ellipsis. Truncation is opt-in because a cut term is text a sighted
-reader cannot read. `dt`/`dd` are bare direct children, and the bare class
-differs from the element baseline only in not indenting the description:
+reader cannot read. `--divided` draws a hairline in the decorative border
+colour above every term but the first — the key and value look of the details
+of a record; with `--horizontal` the line runs across both columns, and a
+second description of the same term follows without one. Key and value is
+therefore this component with a modifier, not a component of its own.
+`dt`/`dd` are bare direct children, and the bare class differs from the
+element baseline only in not indenting the description:
 
 ```html
 <dl class="theme-dl theme-dl--horizontal">
     <dt>…</dt>
     <dd>…</dd>
 </dl>
+<dl class="theme-dl theme-dl--horizontal theme-dl--divided">…</dl>
 ```
 
 Divider — a separator with a label, and a section break. `<hr>` is void and
@@ -557,6 +597,44 @@ content:
 </ul>
 ```
 
+Progress and meter — the native `<progress>` and `<meter>`, each labelled
+by a `label` in a `.theme-field` and followed by its value in words as a
+`.theme-field__hint`: a bar is read at a glance, a number exactly. A meter is
+a measurement within a known range — storage used — and a progress bar the
+progress of a task. The browser sorts a meter's value into a region from
+`low`, `high` and `optimum`, drawn in the success, warning and danger colour;
+colour alone carries no information (WCAG 1.4.1), so the hint
+says what the region means — "nearly full" — and the meter references it with
+`aria-describedby`. A progress bar without `value` is indeterminate and shows
+the empty track:
+
+```html
+<div class="theme-field">
+    <label class="theme-field__label" for="upload-progress">…</label>
+    <progress class="theme-progress" id="upload-progress" max="100" value="40" aria-describedby="upload-progress-value">40 %</progress>
+    <p class="theme-field__hint" id="upload-progress-value">40 % of 12 MB</p>
+</div>
+<div class="theme-field">
+    <label class="theme-field__label" for="storage-meter">…</label>
+    <meter class="theme-meter" id="storage-meter" min="0" max="100" low="60" high="85" optimum="0" value="92" aria-describedby="storage-meter-value">92 GB</meter>
+    <p class="theme-field__hint" id="storage-meter-value">92 of 100 GB used - nearly full</p>
+</div>
+```
+
+The track is the element's own box after `appearance: none`, and its edge is
+a graphical object held to 3:1 (WCAG 1.4.11): it is drawn in
+`--theme-color-border-strong`, like the edge of a text field, not in the
+decorative border. Chromium and WebKit draw the fill as pseudo-elements of
+their own — `::-webkit-progress-value`, and one per region of a meter — and
+Firefox as `::-moz-progress-bar` and `::-moz-meter-bar`, each in a rule of its
+own, since a selector list naming a pseudo-element an engine does not know is
+dropped by that engine as a whole. Chromium stretches a meter's fill to the
+height of the track only as the one flex item of its inner element; a height
+on the bar or the value does not reach it. Only Chromium is tested, by the
+visual suite; the Firefox rules were looked at once in the Firefox of the
+pinned Playwright image. The contrast of the fills and the edge is in
+[`DESIGN.md`](../../DESIGN.md#indicators).
+
 Quote:
 
 ```html
@@ -608,6 +686,24 @@ the end edge only, no hairline above a group or totals rule), and gives the wrap
 maximum height through `:has()`, so the wrapper stays the one scrolling,
 focusable region. The table content element maps `table_class` onto these one
 to one; see [Content elements](../architecture/content-elements.md#table_class-the-modifier-of-the-same-name).
+
+Tag — a keyword attached to something, in a list that wraps. Not a badge: a
+badge is a status with a severity, a tag a label that may lead to everything
+else carrying it. A tag is text or a link, told apart by the `href` rather
+than by a modifier; a linked tag is underlined as well as drawn in the primary
+accent, so it differs from a plain one by more than colour (WCAG 1.4.1), and
+turns its hairline to the accent on hover. It is at least 24 pixels high, the
+target size WCAG 2.5.8 asks for. An icon before the label is optional
+decoration, spaced by the `gap`, which is why a decorated link inside a tag
+drops its own marker gap, as a button does:
+
+```html
+<ul class="theme-tag-list" aria-label="…">
+    <li><span class="theme-tag">…</span></li>
+    <li><a class="theme-tag" href="…">…</a></li>
+    <li><a class="theme-tag" href="…"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg> …</a></li>
+</ul>
+```
 
 Teaser. Modifier `--reversed` swaps media and body once the row layout kicks
 in, stacking below `bp.$md` the same as `theme-hero--media`:
@@ -1168,6 +1264,8 @@ instead of being repainted in turn — and `CanvasText`, `ButtonText` and
 | Alert       | the tint, so only the leading rule is left                | an edge all round, the leading side strong   |
 | Dialog      | —                                                         | the strong border width                      |
 | Input group | nothing — the lifted edge is position, not colour         | none                                         |
+| Progress    | the fill and the tint of the track                        | opt out: `Canvas`, `CanvasText`, `Highlight` |
+| Meter       | the fill and the tint of the track; the three regions     | as progress, every region `Highlight`        |
 
 The `::backdrop` needs no rule: forced colours keep the alpha of its
 background, so the scrim stays a translucent canvas over the page. The alert
@@ -1213,7 +1311,7 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 | `aTitleOnAnyHeadingLevelKeepsItsOwnCase`             | `.theme-hero__title` and `.theme-teaser__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                                                                             |
 | `noComponentReferencesAnUndeclaredToken`             | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                         |
 | `aListItemHoldingAFloatKeepsItsMarker`               | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                            |
-| `aControlDrawsItsBoundaryInTheStrongBorderColour`    | The text input, the input group addon and the switch track default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                                                           |
+| `aControlDrawsItsBoundaryInTheStrongBorderColour`    | The text input, the input group addon, the switch track and the tracks of progress and meter default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                         |
 | `aHoveredTextInputChangesItsBorder`                  | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                    |
 | `everyTableClassAnEditorCanPickIsStyled`             | Every `table_class` an editor can pick — the core's `striped` and `bordered` and the `addItems` of `Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig` — has a compiled `.theme-table--<value>` rule.                         |
 
