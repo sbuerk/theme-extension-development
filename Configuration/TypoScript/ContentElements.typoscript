@@ -1131,3 +1131,45 @@ tt_content.theme_stats.templateName = ContentElements/ThemeStats
 
 tt_content.theme_steps =< tt_content.theme_linklist
 tt_content.theme_steps.templateName = ContentElements/ThemeSteps
+
+# A card group, a timeline and a teaser list. All three read
+# "tx_theme_list_items" with the image of every row, exactly the way
+# "tt_content.theme_media_teaser_grid" does - the same query and the same
+# nested "FilesProcessor" - so all three are references to it with a template
+# of their own, as the tabs and the accordion are to the link list.
+tt_content.theme_card_group =< tt_content.theme_media_teaser_grid
+tt_content.theme_card_group.templateName = ContentElements/ThemeCardGroup
+
+tt_content.theme_teaser_list =< tt_content.theme_media_teaser_grid
+tt_content.theme_teaser_list.templateName = ContentElements/ThemeTeaserList
+
+# The timeline is the one of the three whose order is not the order of the
+# relation: its entries are sorted by their date, in the direction the
+# element asks for, and "sorting_foreign" only decides between entries of one
+# date. "orderBy" is read through stdWrap ("stdWrapValue()" in
+# "ContentObjectRenderer::getQuery()", read on v13.4 and v14.3), so a "CASE"
+# on the record of the element picks the clause. The reference merges this
+# over the "orderBy = sorting_foreign" of the teaser grid, and "cObject"
+# replaces that value.
+#
+# The two clauses are fixed strings; "tx_theme_sort_direction" only chooses
+# between them and never reaches the query. "date" is required in the form of
+# this relation, but "required" is a check of the form only: an import, or a
+# teaser list switched to a timeline, leaves entries without a date. Such an
+# entry sorts as NULL, which SQLite, MariaDB and MySQL put first in ascending
+# order and PostgreSQL last, and it renders without its "time".
+tt_content.theme_timeline =< tt_content.theme_media_teaser_grid
+tt_content.theme_timeline {
+    templateName = ContentElements/ThemeTimeline
+
+    dataProcessing.10.orderBy.cObject = CASE
+    dataProcessing.10.orderBy.cObject {
+        key.field = tx_theme_sort_direction
+
+        desc = TEXT
+        desc.value = date DESC, sorting_foreign
+
+        default = TEXT
+        default.value = date ASC, sorting_foreign
+    }
+}

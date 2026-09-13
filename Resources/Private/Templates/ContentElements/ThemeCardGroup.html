@@ -1,0 +1,92 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_card_group" - cards in a grid or in one row that scrolls sideways,
+    on ".theme-card-grid" (Resources/Private/Scss/components/_card.scss).
+
+    The cards are "tx_theme_list_items", resolved like those of
+    "ThemeMediaTeaserGrid.html" - see its comment for the "item.data" and
+    "item.files" shape "DatabaseQueryProcessor" hands over. They are items of
+    a list, a "ul" of "li.theme-card", and their titles sit one level below
+    the heading of the element ("Partials/ContentElement/ItemHeading.html").
+
+    "tx_theme_columns" picks the column modifier, "layout" the arrangement:
+    1 is the scroller, anything else the grid - the core values 2 and 3 are
+    removed from the form for this type, and a record still carrying one
+    renders the grid. A value of "tx_theme_columns" outside the three renders
+    three columns, the default of the column. "ContentElementContractTest"
+    holds every modifier written here to a rule of the compiled stylesheet.
+
+    The scroller is the region of the contract, with a tab stop and a name:
+    the heading of the element, and a generic label where there is none, so
+    the region is never nameless. The heading is used although it may be
+    hidden ("header_layout" 100) - it still says what the cards are.
+
+    A card with a link renders it as a button of the style the editor picked,
+    through "Partials/ContentElement/LinkButton.html", the partial the heroes
+    and teasers render their link through. "item.data.text" is the plain text
+    column of the child table, hence "f:format.nl2br".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <f:switch expression="{data.tx_theme_columns}">
+            <f:case value="2"><f:variable name="columns" value="theme-card-grid--columns-2" /></f:case>
+            <f:case value="4"><f:variable name="columns" value="theme-card-grid--columns-4" /></f:case>
+            <f:defaultCase><f:variable name="columns" value="theme-card-grid--columns-3" /></f:defaultCase>
+        </f:switch>
+        <f:if condition="{data.layout} == 1">
+            <f:then>
+                <f:if condition="{data.header}">
+                    <f:then><f:variable name="label">{data.header}</f:variable></f:then>
+                    <f:else><f:variable name="label"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.cardGroupLabel" /></f:variable></f:else>
+                </f:if>
+                <div class="theme-card-scroller" role="region" tabindex="0" aria-label="{label}">
+                    <f:variable name="scroller" value="theme-card-grid--scroller" />
+                    <ul class="theme-card-grid {scroller} {columns}">
+                        <f:render section="Cards" arguments="{_all}" />
+                    </ul>
+                </div>
+            </f:then>
+            <f:else>
+                <ul class="theme-card-grid {columns}">
+                    <f:render section="Cards" arguments="{_all}" />
+                </ul>
+            </f:else>
+        </f:if>
+    </f:if>
+</f:section>
+
+<f:section name="Cards">
+    <f:for each="{listItems}" as="item">
+        <li class="theme-card">
+            <f:if condition="{item.files.0}">
+                <div class="theme-card__media">
+                    <f:image image="{item.files.0}" loading="lazy" />
+                </div>
+            </f:if>
+            <div class="theme-card__body">
+                <f:if condition="{item.data.header}">
+                    <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-card__title', title: item.data.header}" />
+                </f:if>
+                <f:if condition="{item.data.subheader}">
+                    <p class="theme-card__subtitle">{item.data.subheader}</p>
+                </f:if>
+                <f:if condition="{item.data.text}">
+                    <p class="theme-card__text"><f:format.nl2br>{item.data.text}</f:format.nl2br></p>
+                </f:if>
+                <f:if condition="{item.data.link}">
+                    <div class="theme-card__actions">
+                        <f:render partial="ContentElement/LinkButton" arguments="{link: item.data.link, label: item.data.link_label, variant: item.data.link_variant, icon: item.data.link_icon}" />
+                    </div>
+                </f:if>
+            </div>
+        </li>
+    </f:for>
+</f:section>
+
+</html>

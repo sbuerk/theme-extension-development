@@ -505,3 +505,115 @@ references:
     values:
       alternative: 'A placeholder graphic in portrait format'
       description: 'Placed in the text, at the end of the line'
+  -
+    file: placeholder
+    table: pages
+    uid: 1090
+    field: media
+    values:
+      alternative: 'A placeholder graphic standing in for the card group'
+  -
+    file: placeholder
+    table: pages
+    uid: 1091
+    field: media
+    values:
+      alternative: 'A placeholder graphic standing in for the timeline'
+  -
+    file: placeholder
+    table: pages
+    uid: 1092
+    field: media
+    values:
+      alternative: 'A placeholder graphic standing in for the teaser list'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1150
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1151
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1153
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 1154
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1159
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1160
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1161
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1162
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1163
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1166
+    field: image
+    values:
+      alternative: 'A placeholder graphic standing in for a screenshot of the prototype'
+  -
+    file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 1173
+    field: image
+    values:
+      alternative: 'A placeholder portrait'
+  -
+    file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 1174
+    field: image
+    values:
+      alternative: 'A placeholder portrait'
+  -
+    file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 1175
+    field: image
+    values:
+      alternative: 'A placeholder portrait'

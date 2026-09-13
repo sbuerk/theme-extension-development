@@ -290,7 +290,8 @@ $additionalColumns['tx_theme_icon_size'] = [
 // The most columns an element lays its items out in - the modifiers
 // "--columns-2" to "--columns-4" of ".theme-feature-grid". Named for the grid,
 // not for the one element that has it so far, so a later element with a grid
-// of items offers the same column.
+// of items offers the same column: the card group lays out its cards by it,
+// and its scroller reads it as the number of cards in view.
 //
 // Integer values: "DefaultTcaSchema" derives an INT column. v14.3 gives it
 // the TCA default, 3, as its database default; v13.4 gives every integer
@@ -300,13 +301,16 @@ $additionalColumns['tx_theme_icon_size'] = [
 // not know - as three columns, so the difference never reaches the page.
 //
 // @todo Drop the v13.4 half of this note, and the mapping of 0 in
-//       "Templates/ContentElements/ThemeFeatures.html" with it, once v13.4
-//       support is dropped. No core changelog entry documents the change of
-//       the default: #105441 ("TCA select fields with null item values create
-//       nullable columns", 14.2) covers items with a null value only, and
-//       nothing else was found in the 13.4.x and 14.* changelogs.
+//       "Templates/ContentElements/ThemeFeatures.html" and
+//       "Templates/ContentElements/ThemeCardGroup.html" with it, once
+//       v13.4 support is dropped. No core changelog entry documents the
+//       change of the default: #105441 ("TCA select fields with null item
+//       values create nullable columns", 14.2) covers items with a null
+//       value only, and nothing else was found in the 13.4.x and 14.*
+//       changelogs.
 $additionalColumns['tx_theme_columns'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_columns',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_columns.description',
     'config' => [
         'type' => 'select',
         'renderType' => 'selectSingle',
@@ -365,6 +369,29 @@ $additionalColumns['tx_theme_hero_layout'] = [
             [
                 'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_hero_layout.I.bordered',
                 'value' => 'bordered',
+            ],
+        ],
+    ],
+];
+
+// The order of the entries of a "theme_timeline", by their date. The order of
+// the inline list decides only between entries of one date - see
+// "tt_content.theme_timeline" in ContentElements.typoscript.
+$additionalColumns['tx_theme_sort_direction'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_sort_direction',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_sort_direction.description',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => 'asc',
+        'items' => [
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_sort_direction.I.asc',
+                'value' => 'asc',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_sort_direction.I.desc',
+                'value' => 'desc',
             ],
         ],
     ],
@@ -464,7 +491,7 @@ $additionalColumns['tx_theme_cta_width'] = [
 // next to the first is what the component lays out. An inline relation of
 // list items, as the link list has, would be a list where the element has
 // two fixed places. Rendered by the same "Partials/ContentElement/LinkButton.html",
-// handed these four columns under the names of the first link.
+// handed these four columns as the four arguments the first link fills.
 $additionalColumns['tx_theme_secondary_link'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_secondary_link',
     'config' => [

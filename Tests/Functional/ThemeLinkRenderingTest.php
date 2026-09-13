@@ -159,6 +159,20 @@ final class ThemeLinkRenderingTest extends AbstractFunctionalTestCase
         $this->assertSame(['', 'secondary', 'ghost', 'link'], array_column($items, 'value'));
     }
 
+    /**
+     * The link of a card of the card group takes the same styles, through the
+     * same partial: the column of the child carries the configuration of the
+     * element's, so the two lists cannot drift apart.
+     */
+    #[Test]
+    public function aCardLinkOffersTheStylesOfTheLinkOfAnElement(): void
+    {
+        $this->assertSame(
+            $GLOBALS['TCA']['tt_content']['columns']['tx_theme_link_variant']['config'],
+            $GLOBALS['TCA']['tx_theme_list_item']['columns']['link_variant']['config'] ?? null,
+        );
+    }
+
     #[Test]
     public function aLinkIconRendersBeforeTheLabelThroughTheIconViewHelper(): void
     {

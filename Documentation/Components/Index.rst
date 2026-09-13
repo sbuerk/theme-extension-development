@@ -31,11 +31,12 @@ What the library contains
     *   -   Group
         -   Components
     *   -   Content
-        -   Accordion, alert, author, badge, card, code block, description
+        -   Accordion, alert, author, badge, card - in a grid, with a column
+            count or as a row that scrolls sideways -, code block, description
             list - with a divided variant for key and value - call to action,
             divider, feature and feature grid, figure, file list, hero, list,
-            media object, panel, quote, stats, steps, table, teaser, and the
-            text roles display, lead and eyebrow
+            list group, media object, panel, quote, stats, steps, table,
+            teaser, timeline, and the text roles display, lead and eyebrow
     *   -   Data display
         -   Avatar and avatar group, tag list, progress bar, meter
     *   -   Actions
