@@ -3,10 +3,11 @@
 
 <f:comment>
     The "Sitemap" menu - the whole site, seven levels deep, from the site
-    root. "ContentElements.typoscript", "tt_content.menu_sitemap", sets no
-    "special" at all (the same default "MenuProcessor" uses for the site's
-    own main navigation) and "levels = 7"; it has no "pages" field at all
-    (see the core TCA), which is why nothing here reads one.
+    root. "ContentElements.typoscript", "tt_content.menu_sitemap", sets an
+    empty "special", which the core treats exactly like none (the same
+    default "MenuProcessor" uses for the site's own main navigation), and
+    "levels = 7"; the type offers no "pages" field (see the core TCA),
+    which is why nothing here reads one.
 
     This is a whole tree, not a flat list - "Partials/ContentElement/Menu"
     renders it with the same recursive "Item" section
