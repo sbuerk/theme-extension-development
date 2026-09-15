@@ -662,6 +662,39 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * @return \Generator<string, array{path: string, minimum: int}>
+     */
+    public static function plainTextLeads(): \Generator
+    {
+        yield 'the theme elements' => ['path' => '/elements/theme', 'minimum' => 5];
+        yield 'the hero layouts' => ['path' => '/elements/theme/hero', 'minimum' => 10];
+    }
+
+    /**
+     * The lead of a hero and the text of a teaser are plain text rendered
+     * through "f:format.html", which makes every line of the value a
+     * paragraph. So a paragraph is a sentence or more, never a line of the
+     * source the value was written in, and there is no empty one around it -
+     * see "PlainTextSeedTest" for the rule the seeds follow.
+     */
+    #[DataProvider('plainTextLeads')]
+    #[Test]
+    public function aPlainTextLeadRendersWholeParagraphs(string $path, int $minimum): void
+    {
+        $body = $this->render($path);
+        preg_match_all('#<div class="theme-(?:hero__lead|teaser__text)">(.*?)</div>#s', $body, $leads);
+        $this->assertGreaterThanOrEqual($minimum, count($leads[1]), sprintf('"%s" renders fewer leads than it seeds.', $path));
+
+        foreach ($leads[1] as $lead) {
+            preg_match_all('#<p>(.*?)</p>#s', $lead, $paragraphs);
+            $this->assertNotSame([], $paragraphs[1], 'A lead without a paragraph: ' . $lead);
+            foreach ($paragraphs[1] as $paragraph) {
+                $this->assertMatchesRegularExpression('/\S[.!?:"\')]$/', trim($paragraph), 'A lead is split into paragraphs: ' . trim($lead));
+            }
+        }
+    }
+
+    /**
      * The classic CTypes: every type the TypoScript renders that is neither a
      * menu nor one of the theme's own - the set `/elements/core` shows.
      *

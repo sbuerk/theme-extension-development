@@ -8,10 +8,12 @@
     "docs/development/component-library.md#content") rather than a component
     of its own - it was built for exactly this shape.
 
-    "header"/"bodytext" are the optional lead-in above the grid, rendered the
-    same way every other element renders them (the shared
-    "ContentElement/Header" plus a plain "f:format.html" body, see
-    "Text.html"). The grid items themselves are "tx_theme_list_items",
+    "header"/"bodytext" are the optional lead-in above the grid: the shared
+    "ContentElement/Header", and "bodytext" through "f:format.html". The
+    type enables no rich text editor for "bodytext", so it is plain text,
+    and every line of it becomes a paragraph of its own - as in the lead of
+    "Partials/ContentElement/Hero.html". The grid items themselves are
+    "tx_theme_list_items",
     narrowed by "overrideChildTca" in
     "Configuration/TCA/Overrides/tt_content_theme_media_teaser_grid.php" to
     "header"/"text"/"image"/the "theme_link" palette - resolved by
