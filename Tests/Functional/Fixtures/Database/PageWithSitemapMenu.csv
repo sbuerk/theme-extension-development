@@ -1,0 +1,12 @@
+pages,,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,sorting,title,slug
+,1,0,0,0,0,1,1,256,Theme root,/
+,10,1,0,0,0,1,0,256,First section,/first
+,11,1,0,0,0,1,0,512,Second section,/second
+,100,10,0,0,0,1,0,256,A page in the first section,/first/a
+,1000,100,0,0,0,1,0,256,Three levels down,/first/a/deep
+,10000,1000,0,0,0,1,0,256,Four levels down,/first/a/deep/deeper
+,200,11,0,0,0,1,0,256,The page carrying the sitemap,/second/sitemap
+tt_content,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout
+,10,200,0,0,0,10,menu_sitemap,A menu_sitemap element,3

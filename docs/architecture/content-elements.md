@@ -524,7 +524,7 @@ verbatim for seven of the nine:
 | `menu_subpages`         | `directory` | 1      | current page                                      |
 | `menu_section`          | `list`      | 2      | current page (`special.value.override`)           |
 | `menu_section_pages`    | `directory` | 2      | current page                                      |
-| `menu_sitemap`          | *(none)*    | 7      | site root — the CType has no `pages` field at all |
+| `menu_sitemap`          | *(empty)*   | 7      | site root — the CType has no `pages` field at all |
 | `menu_sitemap_pages`    | `directory` | 7      | current page                                      |
 | `menu_abstract`         | `directory` | 1      | current page                                      |
 | `menu_recently_updated` | `updated`   | 1      | current page                                      |
@@ -540,6 +540,21 @@ is about the page(s) the element itself sits among, not an arbitrary
 site-wide list. Every `directory`-based type already defaults to the current
 page through `MenuProcessor`'s own request-attribute fallback, so none of
 them needs the same override.
+
+`menu_sitemap` is built `=< tt_content.menu_subpages` and so inherits
+`special = directory`, which it has to get rid of again. **`special >` does
+not do that.** `=<` is resolved at render time by
+`ContentObjectRenderer::mergeTSRef()`, which overlays the referencing block
+onto the referenced one with `array_replace_recursive()`; a property removed
+with `>` is merely absent from that overlay, and the referenced value
+survives. The sitemap therefore sets `special =` — an empty value is a key in
+the overlay and replaces `directory`, and the core treats an empty `special`
+exactly like none: `prepareMenuItems()` enters its `special` branch only for
+a truthy value, and `start()` reads `special.value` only for `directory`. The
+same holds for any type added here: below an `=<`, override a property, never
+remove it with `>`. `SitemapMenuRenderingTest` renders the sitemap on a leaf
+page away from the root, where the inherited `directory` fallback lists
+nothing.
 
 `menu_section` and `menu_section_pages` are the two whose `levels = 2` is
 this theme's stand-in for what historical `fluid_styled_content` did instead
