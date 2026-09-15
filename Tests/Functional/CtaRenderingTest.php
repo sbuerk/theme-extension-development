@@ -109,6 +109,9 @@ final class CtaRenderingTest extends AbstractFunctionalTestCase
      * Icon, heading, text and both links, in that order: the icon of the set
      * in a slot hidden from assistive technology, the heading at h2 when the
      * editor left the level alone, and the second link in its own style.
+     * Each link carries its own icon before its label: the second link hands
+     * its icon column to the partial like the other three, and an argument
+     * left out of that call renders a button without one.
      */
     #[Test]
     public function aCallToActionRendersItsIconHeadingTextAndBothLinks(): void
@@ -122,8 +125,20 @@ final class CtaRenderingTest extends AbstractFunctionalTestCase
         preg_match('# d="([^"]+)"#', (new IconSet())->markup('rocket'), $icon);
         $this->assertStringContainsString($icon[1] ?? 'no path', $element);
 
-        $this->assertMatchesRegularExpression('#<a [^>]*class="theme-button"[^>]*>\s*Get started\s*</a>#', $element);
-        $this->assertMatchesRegularExpression('#<a [^>]*class="theme-button theme-button--secondary"[^>]*>\s*Read the guide\s*</a>#', $element);
+        $links = [
+            'theme-button' => ['label' => 'Get started', 'icon' => 'arrow-right'],
+            'theme-button theme-button--secondary' => ['label' => 'Read the guide', 'icon' => 'arrow-left'],
+        ];
+        foreach ($links as $class => $link) {
+            $matched = preg_match(sprintf('#<a [^>]*class="%s"[^>]*>(.*?)</a>#s', preg_quote($class, '#')), $element, $button);
+            $this->assertSame(1, $matched, sprintf('No "%s" link was rendered.', $class));
+            $this->assertMatchesRegularExpression(
+                sprintf('#^\s*<svg class="theme-icon" aria-hidden="true"[^>]*>.*?</svg>\s*%s\s*$#s', preg_quote($link['label'], '#')),
+                $button[1],
+            );
+            preg_match('# d="([^"]+)"#', (new IconSet())->markup($link['icon']), $path);
+            $this->assertStringContainsString($path[1] ?? 'no path', $button[1], sprintf('The "%s" link shows another icon.', $link['label']));
+        }
         $this->assertStringNotContainsString('t3://', $element);
     }
 

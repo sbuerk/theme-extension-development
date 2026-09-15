@@ -8,14 +8,13 @@
     "label", "variant" and "icon" - the "theme_link" palette of a content
     element (tx_theme_link, tx_theme_link_label, tx_theme_link_variant,
     tx_theme_link_icon, Configuration/TCA/Overrides/tt_content.php) for the
-    three hero variants, theme_teaser, theme_media_teaser, theme_text_icon
-    and both links of theme_cta, whose second link fills the same four
-    arguments from its own columns, and the
-    "theme_link_style" palette of an inline list item (link, link_label,
-    link_variant, link_icon) for a card of theme_card_group. The fields are
-    passed in rather than read off "data", so one partial and one set of cases
-    serves both. theme_testimonial does not carry a link at all, see its own
-    template.
+    three hero variants, theme_teaser, theme_media_teaser, theme_text_icon and
+    both links of theme_cta, whose second link fills the same four arguments
+    from its own columns, and the "theme_link_style" palette of an inline list
+    item (link, link_label, link_variant, link_icon) for a card of
+    theme_card_group. The fields are passed in rather than read off "data", so
+    one partial and one set of cases serves both. theme_testimonial does not
+    carry a link at all, see its own template.
 
     A link without a label renders with no content at all, and the core
     fills in its fallback text: the title of the page for a page link
@@ -43,16 +42,15 @@
 
     The style - "Link style" in the form, "tx_theme_link_variant" and the
     "link_variant" of the child, which carries the same configuration - only
-    ever holds '',
-    'secondary', 'ghost' or 'link', read from the "items" of the column, not
-    assumed. The switch covers exactly those values, one per modifier
-    "_button.scss" ships; the empty default case renders the plain
+    ever holds '', 'secondary', 'ghost' or 'link', read from the "items" of
+    the column, not assumed. The switch covers exactly those values, one per
+    modifier "_button.scss" ships; the empty default case renders the plain
     ".theme-button". "ThemeLinkRenderingTest" holds the items and the cases to
     each other.
 
-    The icon is an icon of the shipped set an editor picked, and
-    goes before the label: it says what the link leads to, and leaves the end
-    of the link to what says how it opens. It is decoration, hidden from assistive
+    The icon is an icon of the shipped set an editor picked, and goes before
+    the label: it says what the link leads to, and leaves the end of the link
+    to what says how it opens. It is decoration, hidden from assistive
     technology; the label names the link. The button's "gap" spaces it, in
     reading order, so it also comes first in a right-to-left page. "optional":
     a name a later Font Awesome version dropped loses the icon, not the page.
