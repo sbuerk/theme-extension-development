@@ -103,12 +103,13 @@
         <f:if condition="{data.bodytext}">
             <f:comment>
                 A "div", not the "p" the markup contract in "_hero.scss"
-                illustrates: "f:format.html" parses "bodytext" through
-                "lib.parseFunc_RTE", which already wraps multi-line text in
-                its own "p" tags - see Templates/ContentElements/Text.html for
-                the same reasoning. Nesting those inside a literal "p" here
-                would be invalid HTML; ".theme-hero__lead" is selected by
-                class, not by tag, so a "div" is styled identically.
+                illustrates: "bodytext" is plain text on the heroes, and
+                "f:format.html" parses it through "lib.parseFunc_RTE", which
+                wraps every line of it in a "p" of its own - one line of the
+                field is one paragraph, a single line included. Nesting those
+                inside a literal "p" here would be invalid HTML;
+                ".theme-hero__lead" is selected by class, not by tag, so a
+                "div" is styled identically.
             </f:comment>
             <div class="theme-hero__lead">
                 <f:format.html>{data.bodytext}</f:format.html>

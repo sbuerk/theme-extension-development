@@ -159,6 +159,29 @@ on both sides becomes the list `[0, 0]` and reaches the database as the string
 entity it is ignored without a word, which is the most likely way to write a
 scenario that seeds less than it says. Only `page` is a node here.
 
+## Plain text and rich text
+
+Whether a text field is rich text is decided by the TCA of its type:
+`enableRichtext` in the column or in the `columnsOverrides` of the `CType`, and
+for the `text` of a list item in the `overrideChildTca` of the relation. The
+heroes, the teasers, the testimonial, the author and the lead-in of the media
+teaser grid have none of these, and neither do the list items of every relation
+but the accordion and the tabs: their fields are plain textareas.
+
+A plain text field is seeded with plain text. Markup is shown to an editor as
+tags in the textarea, and the templates render these fields through
+`f:format.html`, whose `lib.parseFunc_RTE` makes every line of the value a
+paragraph, or through `f:format.nl2br`, where every line ends in a line break.
+So a value wrapped in the source renders one paragraph per source line, and a
+trailing newline an empty paragraph after the text. A long value is written as
+a folded scalar with strip chomping, `>-`: the source wraps, the value is one
+line. A blank line in it is a single newline in the value, and with it a new
+paragraph.
+
+`PlainTextSeedTest` reads which field is which from the schema of the running
+core and holds every seeded plain text value to that: no markup, no white space
+around it, no empty line, and no line that ends inside a sentence.
+
 ## The demo tree
 
 Not a sample of the format — the frontend this extension is developed against.
