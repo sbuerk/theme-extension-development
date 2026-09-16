@@ -335,6 +335,29 @@ references:
     values:
       alternative: 'A placeholder graphic in portrait format'
   -
+    file: placeholder-clip
+    table: tt_content
+    uid: 4306
+    field: assets
+    values:
+      title: 'A placeholder clip'
+      description: 'A video, with the caption track of the file of the same name.'
+  -
+    file: placeholder-clip-captions
+    table: tt_content
+    uid: 4306
+    field: tx_theme_captions
+    values:
+      title: English
+  -
+    file: placeholder-tone
+    table: tt_content
+    uid: 4307
+    field: assets
+    values:
+      title: 'A placeholder tone'
+      description: 'An audio file: a second of a 440 Hz tone.'
+  -
     file: placeholder
     table: tt_content
     uid: 4406

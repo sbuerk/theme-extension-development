@@ -73,6 +73,11 @@ final class ComponentLibraryTest extends UnitTestCase
             'link decoration' => '.theme-link',
             'list' => '.theme-list',
             'list group' => '.theme-list-group',
+            // The modifier rather than the bare ".theme-media" the docs name:
+            // this is a substring check, and ".theme-media" is also a
+            // substring of ".theme-media-object", which is a different
+            // component and would satisfy the assertion on its own.
+            'media' => '.theme-media--video',
             'media object' => '.theme-media-object',
             'meter' => '.theme-meter',
             'main navigation' => '.theme-nav-main',
