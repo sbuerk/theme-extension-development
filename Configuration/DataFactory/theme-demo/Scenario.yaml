@@ -1378,6 +1378,17 @@ entities:
                             header: 'Four columns'
                             header_layout: 2
                             imagecols: 4
+                      # "image_zoom" - the editor's "Enlarge on click". Every
+                      # image of this element carries the badge and the link to
+                      # the file, and with the theme's script the link opens the
+                      # lightbox instead, which moves between the three.
+                      - self:
+                            id: 3406
+                            CType: 'image'
+                            header: 'Three columns, enlargeable'
+                            header_layout: 2
+                            imagecols: 3
+                            image_zoom: 1
 
                 # "bullets" - every "layout" on an unordered list, two on an
                 # ordered one, and the definition list, which reads

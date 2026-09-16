@@ -68,6 +68,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'gallery' => '.theme-gallery',
             'hero' => '.theme-hero',
             'icon' => '.theme-icon',
+            'lightbox' => '.theme-lightbox',
             'link decoration' => '.theme-link',
             'list' => '.theme-list',
             'list group' => '.theme-list-group',
@@ -284,6 +285,22 @@ final class ComponentLibraryTest extends UnitTestCase
             ':root:not([data-js]) [data-theme-dialog-open]{display:none}',
             $this->stylesheet(),
             'An opener without the script marker is a button that does nothing.',
+        );
+    }
+
+    /**
+     * The lightbox opener is the gallery's zoom link, and it is deliberately
+     * not a `data-theme-dialog-open` opener: that attribute is hidden without
+     * the script marker, and this link still enlarges the image without one.
+     * A rule hiding it would take the fallback away with the enhancement.
+     */
+    #[Test]
+    public function theLightboxOpenerIsNotHiddenWithoutTheScriptMarker(): void
+    {
+        $this->assertStringNotContainsString(
+            ':root:not([data-js]) [data-theme-lightbox]',
+            $this->stylesheet(),
+            'The zoom link is the fallback, not an enhancement - hiding it removes the only way to the image.',
         );
     }
 

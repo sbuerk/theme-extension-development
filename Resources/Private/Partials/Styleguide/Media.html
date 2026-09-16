@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     Styleguide section D1/"media" - ".theme-gallery" and
@@ -65,11 +66,14 @@
              data-theme-gallery-columns="1">
             <div class="theme-gallery__row">
                 <figure class="theme-gallery__item theme-figure">
-                    <a class="theme-gallery__zoom" href="#">
+                    <a class="theme-gallery__zoom" href="#media"
+                           data-theme-lightbox="sg-lightbox"
+                           data-theme-lightbox-item="sg-lightbox-1">
                         <img class="theme-gallery__image"
                              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                              alt="Placeholder landscape standing in for a processed image"
                              width="592" height="370" loading="lazy" />
+                        <span class="theme-gallery__zoom-hint" aria-hidden="true"><theme:icon name="magnifying-glass-plus" /></span>
                     </a>
                     <figcaption class="theme-gallery__caption theme-figure__caption">
                         A caption. It is rendered from the description of the
@@ -133,36 +137,50 @@
     <div class="theme-styleguide__specimen">
         <p>
             The zoom wrapper is what the editor's "Enlarge on click" field
-            produces. It is a plain link to the original file: a lightbox is
-            JavaScript, and this extension ships none.
+            produces. It is a link to the original file first, and stays one:
+            without a script it is the whole of the feature, and the badge in
+            the corner says so either way. With the theme's script it opens the
+            lightbox in the Interactive section instead, which is why the link
+            carries <code>data-theme-lightbox</code> rather than the
+            <code>data-theme-dialog-open</code> of the dialog - that attribute
+            is hidden without a script, and this link must not be.
         </p>
         <div class="theme-gallery theme-gallery--below theme-gallery--right"
              data-theme-gallery-columns="3">
             <div class="theme-gallery__row">
                 <figure class="theme-gallery__item theme-figure">
-                    <a class="theme-gallery__zoom" href="#">
+                    <a class="theme-gallery__zoom" href="#media"
+                           data-theme-lightbox="sg-lightbox"
+                           data-theme-lightbox-item="sg-lightbox-2">
                         <img class="theme-gallery__image"
                              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                              alt="Placeholder landscape standing in for a processed image"
                              width="188" height="118" loading="lazy" />
+                        <span class="theme-gallery__zoom-hint" aria-hidden="true"><theme:icon name="magnifying-glass-plus" /></span>
                     </a>
                     <figcaption class="theme-gallery__caption theme-figure__caption">Enlargeable.</figcaption>
                 </figure>
                 <figure class="theme-gallery__item theme-figure">
-                    <a class="theme-gallery__zoom" href="#">
+                    <a class="theme-gallery__zoom" href="#media"
+                           data-theme-lightbox="sg-lightbox"
+                           data-theme-lightbox-item="sg-lightbox-3">
                         <img class="theme-gallery__image"
                              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23b9c6d8'/%3E%3Cpath%20d='M0%2010%205%205%2010%208%2016%203%2016%2010z'%20fill='%237e8ba1'/%3E%3Ccircle%20cx='3.2'%20cy='2.6'%20r='1.5'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                              alt="Placeholder landscape standing in for a processed image"
                              width="188" height="118" loading="lazy" />
+                        <span class="theme-gallery__zoom-hint" aria-hidden="true"><theme:icon name="magnifying-glass-plus" /></span>
                     </a>
                     <figcaption class="theme-gallery__caption theme-figure__caption">Enlargeable.</figcaption>
                 </figure>
                 <figure class="theme-gallery__item theme-figure">
-                    <a class="theme-gallery__zoom" href="#">
+                    <a class="theme-gallery__zoom" href="#media"
+                           data-theme-lightbox="sg-lightbox"
+                           data-theme-lightbox-item="sg-lightbox-4">
                         <img class="theme-gallery__image"
                              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23ccd6e4'/%3E%3Cpath%20d='M0%2010%204%206%208%207.5%2016%202%2016%2010z'%20fill='%2390a0b6'/%3E%3Ccircle%20cx='9.6'%20cy='2.2'%20r='1.2'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                              alt="Placeholder landscape standing in for a processed image"
                              width="188" height="118" loading="lazy" />
+                        <span class="theme-gallery__zoom-hint" aria-hidden="true"><theme:icon name="magnifying-glass-plus" /></span>
                     </a>
                     <figcaption class="theme-gallery__caption theme-figure__caption">Enlargeable.</figcaption>
                 </figure>

@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     The gallery of a content element, as "GalleryProcessor" computed it: rows,
@@ -34,13 +35,20 @@
                             <f:then>
                                 <f:comment>
                                     "image_zoom" is the core TCA field an editor
-                                    ticks to make an image enlargeable. It is
-                                    answered with a plain link to the original
-                                    file: a lightbox is JavaScript, and this
-                                    extension ships none.
+                                    ticks to make an image enlargeable. The link
+                                    to the original file is what it has always
+                                    been, and it stays: it is what a visitor
+                                    without a script gets, and it is why this is
+                                    not a "data-theme-dialog-open" opener, which
+                                    would be hidden without one. With a script,
+                                    "theme.js" prevents the navigation and opens
+                                    the item named here in the lightbox.
                                 </f:comment>
-                                <a class="theme-gallery__zoom" href="{f:uri.image(image: column.media)}">
+                                <a class="theme-gallery__zoom" href="{f:uri.image(image: column.media)}"
+                                   data-theme-lightbox="c{data.uid}-lightbox"
+                                   data-theme-lightbox-item="c{data.uid}-lightbox-{column.media.uid}">
                                     <f:render section="Media" arguments="{column: column}" />
+                                    <span class="theme-gallery__zoom-hint" aria-hidden="true"><theme:icon name="magnifying-glass-plus" /></span>
                                 </a>
                             </f:then>
                             <f:else>
@@ -55,6 +63,14 @@
             </div>
         </f:for>
     </div>
+
+    <f:comment>
+        The dialog the zoom links open, once per element and after the gallery
+        - a closed dialog renders nothing, so its place in the flow is free.
+    </f:comment>
+    <f:if condition="{data.image_zoom}">
+        <f:render partial="ContentElement/Lightbox" arguments="{data: data, files: files}" />
+    </f:if>
 </f:if>
 
 <f:comment>

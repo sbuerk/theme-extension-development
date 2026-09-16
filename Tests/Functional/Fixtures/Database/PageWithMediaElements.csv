@@ -1,0 +1,12 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,image,image_zoom,imagecols
+,30,1,0,0,0,30,image,Enlargeable images,2,2,1,2
+,40,1,0,0,0,40,image,Plain images,2,1,0,1
+sys_file_reference,,,,,,,,,,
+,uid,pid,uid_local,uid_foreign,tablenames,fieldname,sorting_foreign,title,description,hidden
+,1,1,1,30,tt_content,image,1,,The first image,0
+,2,1,1,30,tt_content,image,2,,The second image,0
+,3,1,1,40,tt_content,image,1,,An image nobody may enlarge,0

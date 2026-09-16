@@ -715,7 +715,136 @@ function bindOneCarousel(carousel) {
     carousel.setAttribute('data-theme-carousel-bound', '');
 }
 
+/**
+ * The lightbox - the enlarged images of one gallery in one dialog.
+ * "components/_lightbox.scss" documents the markup contract.
+ *
+ * The opener is the gallery's zoom link, and it is **not** a
+ * `data-theme-dialog-open` opener: that attribute is hidden without "data-js",
+ * which is right for a button that could do nothing and wrong for a link that
+ * still leads to the image. So the link keeps its "href", carries
+ * `data-theme-lightbox` (the dialog's id) and `data-theme-lightbox-item` (the
+ * id of the figure showing that image), and the navigation is prevented here -
+ * only once everything the dialog needs has actually been found. A page this
+ * file never reached is a page whose zoom links still work.
+ *
+ * Items are addressed by id rather than by position: a "textmedia" gallery may
+ * hold a video between two images, and an index would have to agree with a
+ * list the template does not have.
+ */
+function bindLightboxes() {
+    document.querySelectorAll('dialog.theme-lightbox').forEach(bindOneLightbox);
+    document.querySelectorAll('[data-theme-lightbox]').forEach(bindOneLightboxOpener);
+}
+
+/**
+ * The figures of one lightbox, in document order.
+ */
+function lightboxItems(dialog) {
+    return Array.prototype.slice.call(dialog.querySelectorAll('[data-theme-lightbox-item]'));
+}
+
+/**
+ * Shows one figure and hides the others. The markup hides nothing - see the
+ * contract - so this is also what puts the dialog into a usable state the
+ * first time it is bound.
+ */
+function showLightboxItem(dialog, item) {
+    lightboxItems(dialog).forEach(function (candidate) {
+        candidate.hidden = candidate !== item;
+    });
+}
+
+function bindOneLightbox(dialog) {
+    const items = lightboxItems(dialog);
+    if (items.length === 0) {
+        return;
+    }
+
+    // One image has nowhere to go, and two arrows that do nothing are two more
+    // tab stops. The count is known here and not in the template, which would
+    // have to count the images among the files of the element.
+    const controls = dialog.querySelector('.theme-lightbox__controls');
+    if (controls && items.length < 2) {
+        controls.hidden = true;
+    }
+
+    showLightboxItem(dialog, items[0]);
+
+    function move(step) {
+        let current = 0;
+        items.forEach(function (item, index) {
+            if (!item.hidden) {
+                current = index;
+            }
+        });
+        // Wraps in both directions, like the arrow keys of the tab list above.
+        showLightboxItem(dialog, items[(current + step + items.length) % items.length]);
+    }
+
+    const previous = dialog.querySelector('[data-theme-lightbox-previous]');
+    if (previous) {
+        previous.addEventListener('click', function () {
+            move(-1);
+        });
+    }
+    const next = dialog.querySelector('[data-theme-lightbox-next]');
+    if (next) {
+        next.addEventListener('click', function () {
+            move(1);
+        });
+    }
+
+    // Escape is the browser's. The arrows are listened for on the dialog
+    // rather than on the document: a modal dialog holds focus, so the event
+    // arrives here, and nothing is caught while the lightbox is closed.
+    dialog.addEventListener('keydown', function (event) {
+        if (items.length < 2) {
+            return;
+        }
+
+        // "Next" follows the reading direction, as in the tab list above.
+        const rightToLeft = window.getComputedStyle(dialog).direction === 'rtl';
+        if (event.key === (rightToLeft ? 'ArrowLeft' : 'ArrowRight')) {
+            event.preventDefault();
+            move(1);
+        } else if (event.key === (rightToLeft ? 'ArrowRight' : 'ArrowLeft')) {
+            event.preventDefault();
+            move(-1);
+        }
+    });
+}
+
+function bindOneLightboxOpener(opener) {
+    const dialog = document.getElementById(opener.getAttribute('data-theme-lightbox'));
+    if (!dialog || typeof dialog.showModal !== 'function') {
+        return;
+    }
+    const item = document.getElementById(opener.getAttribute('data-theme-lightbox-item') || '');
+    if (!item) {
+        return;
+    }
+
+    opener.addEventListener('click', function (event) {
+        if (dialog.open) {
+            return;
+        }
+        // Only now: everything needed to show the image in the dialog is
+        // present, so the link may stop leading to the file.
+        event.preventDefault();
+        showLightboxItem(dialog, item);
+        // Registered per opening, and only once: every zoom link of the
+        // gallery opens the same dialog, and focus has to go back to the one
+        // that was pressed.
+        dialog.addEventListener('close', function () {
+            opener.focus();
+        }, { once: true });
+        dialog.showModal();
+    });
+}
+
 bindTabs();
 bindDialogs();
+bindLightboxes();
 bindTooltips();
 bindCarousels();

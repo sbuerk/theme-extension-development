@@ -1,0 +1,109 @@
+// Lightbox - the enlarged image of a gallery, in a dialog.
+//
+// Markup contract:
+//
+//     <dialog class="theme-dialog theme-lightbox" id="c1-lightbox" aria-label="…">
+//         <form method="dialog">
+//             <div class="theme-dialog__header theme-lightbox__header">
+//                 <button class="theme-close" aria-label="Close"><svg class="theme-icon" …>…</svg></button>
+//             </div>
+//             <div class="theme-dialog__body theme-lightbox__body">
+//                 <figure class="theme-lightbox__item" id="c1-lightbox-7" data-theme-lightbox-item>
+//                     <img class="theme-lightbox__image" src="…" alt="…">
+//                     <figcaption class="theme-lightbox__caption">…</figcaption>
+//                 </figure>
+//             </div>
+//             <div class="theme-dialog__footer theme-lightbox__controls">
+//                 <button class="theme-button theme-button--secondary theme-button--icon" type="button" data-theme-lightbox-previous aria-label="Previous image">…</button>
+//                 <button class="theme-button theme-button--secondary theme-button--icon" type="button" data-theme-lightbox-next aria-label="Next image">…</button>
+//             </div>
+//         </form>
+//     </dialog>
+//
+// A ".theme-dialog" first, so the box, the scrim, the header and the footer are
+// the dialog's; this file only widens it and lays the picture out. Everything
+// "components/_dialog.scss" documents applies - Escape and the
+// "<form method='dialog'>" close it, the browser keeps focus inside, and the
+// page behind it is inert.
+//
+// Three departures from the dialog's own contract, each forced by what is in
+// this one:
+//
+//  1. **The header carries no title.** An image has no title of its own - it
+//     has a caption, which is inside the picture and changes with it - and a
+//     heading reading "Image" would be the same word on every gallery of every
+//     page. The dialog is named by "aria-label" instead, and the header holds
+//     nothing but the close button, at the end of its row.
+//  2. **The close button carries no "value".** Nothing here reads
+//     "returnValue", so there is nothing to tell apart.
+//  3. **The two arrows are "type='button'".** They sit inside the
+//     "<form method='dialog'>" that closes the dialog, where a button without
+//     a type is a submit button: left implicit, the first arrow press would
+//     close the lightbox instead of moving it.
+//
+// --- What the script does, and what the markup may not do -------------------
+//
+// "Resources/Public/JavaScript/theme.js" shows one item and hides the rest,
+// moves with the arrow keys, and hides the controls where there is only one
+// item. **The markup hides nothing**, for the reason "components/_tabs.scss"
+// gives for its panels: the script owns "hidden" here.
+//
+// The opener is **not** a "data-theme-dialog-open" opener, and that is
+// deliberate. That attribute is hidden without "data-js"
+// ("components/_dialog.scss"), which is right for a button that would do
+// nothing - and wrong here: the opener is the gallery's zoom link, and without
+// a script it still leads to the file. It carries "data-theme-lightbox"
+// instead, which nothing hides, and the script calls "preventDefault()" on it.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-lightbox {
+    // Wide enough for a picture, and still short of the viewport so the scrim
+    // says the page is behind it - the gutter is the dialog's own.
+    --theme-dialog-width: 60rem;
+
+    --theme-lightbox-caption-color: var(--theme-color-text-secondary, #4a5567);
+
+    // What is left for the picture once the header, the footer and the gutters
+    // have taken theirs. A cap rather than a size: a small image is shown at
+    // its own size, not blown up to fill the dialog.
+    --theme-lightbox-image-max-block-size: 60vh;
+}
+
+// Nothing but the close button, which belongs at the end of the row.
+.theme-lightbox__header {
+    justify-content: flex-end;
+}
+
+.theme-lightbox__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.theme-lightbox__item {
+    inline-size: 100%;
+    margin: 0;
+}
+
+.theme-lightbox__image {
+    display: block;
+    max-inline-size: 100%;
+    max-block-size: var(--theme-lightbox-image-max-block-size);
+    block-size: auto;
+    margin-inline: auto;
+}
+
+.theme-lightbox__caption {
+    margin-block-start: var(--theme-space-2, 0.625rem);
+    color: var(--theme-lightbox-caption-color);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    text-align: start;
+}
+
+// The dialog's footer puts its actions at the end of the row; the two arrows
+// belong at opposite ends of the picture they move through.
+.theme-lightbox__controls {
+    justify-content: space-between;
+}
