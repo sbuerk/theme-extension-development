@@ -1,0 +1,101 @@
+// Media - a video or an audio file, played in place.
+//
+// Markup contract:
+//
+//     <figure class="theme-media theme-media--video">
+//         <video class="theme-media__player" controls preload="metadata" playsinline>
+//             <source src="…" type="video/mp4">
+//             <track kind="captions" src="…" srclang="en" label="…">
+//         </video>
+//         <figcaption class="theme-media__caption">…</figcaption>
+//     </figure>
+//
+//     <figure class="theme-media theme-media--audio">
+//         <audio class="theme-media__player" controls preload="metadata">…</audio>
+//         <figcaption class="theme-media__caption">…</figcaption>
+//     </figure>
+//
+// Modifiers: "--video" and "--audio". They are not decoration - the two
+// elements need opposite sizing rules, and which one is in the figure cannot
+// be selected for otherwise without an element selector that would also catch
+// a video inside something else in the same box.
+//
+// --- Why the theme renders the tag rather than "f:media" -------------------
+//
+// The core has a renderer per kind ("AudioTagRenderer", "VideoTagRenderer" in
+// "Resource/Rendering/"), and "f:media" dispatches to it. Both emit exactly
+// "<video controls><source …></video>" and neither has any notion of a text
+// track: there is no "track" in either file, on v13.4 or on v14.3. A caption
+// track is the one part of a media element that is not decoration - WCAG 1.2.2
+// asks for it - so the tag is written in the template instead, and the
+// renderers are left to whoever wants their defaults.
+//
+// --- Sizing ---------------------------------------------------------------
+//
+// A video is sized by the box, not by the file: "GalleryProcessor" computes a
+// width and a height per file from the file's own dimensions, and a video file
+// has none in FAL - it would be rendered at a height of zero. So the player
+// takes the width of the column and keeps "--theme-media-ratio", which the
+// intrinsic ratio of the first frame then overrides once the metadata has
+// loaded ("object-fit: contain" keeps it letterboxed until then).
+//
+// An audio player is a control, not a picture: it has a height of its own that
+// the user agent decides, and only its width is set here.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-media {
+    --theme-media-background: var(--theme-color-surface, #f4f6fa);
+    --theme-media-border-color: var(--theme-color-border, #d6dce6);
+    --theme-media-radius: var(--theme-radius-sm, 5px);
+    --theme-media-caption-gap: var(--theme-space-2, 0.625rem);
+    --theme-media-caption-color: var(--theme-color-text-secondary, #4a5567);
+
+    // The box a video is letterboxed into until its own ratio is known.
+    --theme-media-ratio: 16 / 9;
+
+    inline-size: 100%;
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+}
+
+.theme-media__player {
+    display: block;
+    inline-size: 100%;
+    border-radius: var(--theme-media-radius);
+    background-color: var(--theme-media-background);
+}
+
+.theme-media--video .theme-media__player {
+    aspect-ratio: var(--theme-media-ratio);
+    block-size: auto;
+
+    // The frame keeps its own ratio inside the box rather than being stretched
+    // to it: a portrait clip in a 16/9 box is letterboxed, not distorted.
+    object-fit: contain;
+}
+
+// An audio player draws no picture, so the surface behind it is all there is
+// to tell it apart from the page. The user agent decides its height.
+.theme-media--audio .theme-media__player {
+    border: var(--theme-border-width) solid var(--theme-media-border-color);
+}
+
+.theme-media__caption {
+    margin-block-start: var(--theme-media-caption-gap);
+    color: var(--theme-media-caption-color);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    text-align: start;
+}
+
+// --- Forced colours -----------------------------------------------------------
+//
+// See "Forced colours" in docs/development/component-library.md. The controls
+// of a media element are the user agent's own and are left alone; the box
+// around an audio player is not, and it is the only thing that says where the
+// player is once the surface colour is gone.
+@media (forced-colors: active) {
+    .theme-media--audio .theme-media__player {
+        border-color: CanvasText;
+    }
+}

@@ -666,6 +666,12 @@
 			<trans-unit id="tt_content.image.types.theme_external_media.description">
 				<source>Shown in place of the video until it is played. Without one the frame stays empty.</source>
 			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_captions">
+				<source>Captions</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_captions.description">
+				<source>WebVTT files. A caption file belongs to the media file of the same name: "launch.vtt" captions "launch.mp4".</source>
+			</trans-unit>
 			<!-- tx_theme_list_item -->
 			<trans-unit id="tx_theme_list_item">
 				<source>Theme: List item</source>

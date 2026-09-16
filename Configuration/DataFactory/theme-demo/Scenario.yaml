@@ -1337,6 +1337,48 @@ entities:
                             imageorient: 8
                             imagecols: 3
                             bodytext: *textmediaBody
+                      # The two media types "assets" takes that "image" does
+                      # not. Both render as ".theme-media" rather than through
+                      # "f:image" - see "Partials/ContentElement/Gallery.html".
+                      # The film carries a caption track, in
+                      # "tx_theme_captions": a field of the theme, because a
+                      # file reference has nowhere to keep one. It is paired
+                      # with the film by its file name.
+                      #
+                      # THE FILM DOES NOT PLAY, AND IS NOT MEANT TO. It is an
+                      # "ftyp" and a "free" box - the header that makes the
+                      # file "video/mp4" and nothing else - so a browser draws
+                      # the player and its controls and then fails to decode
+                      # it. A playable film needs an encoder, and committing
+                      # one would put a megabyte of video in an extension
+                      # whose showcase is about markup. The audio file beside
+                      # it IS playable: a second of a 440 Hz tone. See
+                      # "config.yml" and "docs/development/seeding.md".
+                      - self:
+                            id: 3306
+                            CType: 'textmedia'
+                            header: 'A video, with a caption track'
+                            header_layout: 2
+                            imageorient: 0
+                            imagecols: 1
+                            bodytext: >-
+                              <p>A video file in the <em>assets</em> field renders as a
+                              native player with its controls, and the WebVTT file of
+                              the same name becomes its caption track. The file itself
+                              is a placeholder that carries no picture, so the player
+                              shows its controls and nothing else.</p>
+                      - self:
+                            id: 3307
+                            CType: 'textmedia'
+                            header: 'An audio file'
+                            header_layout: 2
+                            imageorient: 0
+                            imagecols: 1
+                            bodytext: >-
+                              <p>An audio file renders as a native player as well. It
+                              draws no picture, so its height is the browser's and only
+                              its width is the theme's. This one is a second of a
+                              440&nbsp;Hz tone.</p>
 
                 # "image" - one element per column count up to four, each with
                 # as many files as columns. The select offers up to eight; at

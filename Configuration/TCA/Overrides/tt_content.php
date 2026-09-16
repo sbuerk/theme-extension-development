@@ -577,12 +577,51 @@ $additionalColumns['tx_theme_embed_ratio'] = [
     ],
 ];
 
+// The caption files of a "textmedia" element, added to that CType below.
+//
+// A caption track is the one part of a video that is not decoration - WCAG
+// 1.2.2 asks for it - and there is nowhere in the core to put one:
+// "sys_file_reference" carries a title, a description, an alternative text, a
+// link, a crop and "autoplay", and nothing that could hold a WebVTT file
+// (verified in "Configuration/TCA/sys_file_reference.php" of EXT:core on
+// v13.4 and v14.3). So the theme adds a field of its own.
+//
+// "allowed" is "vtt" alone. It is the only text track format browsers agree
+// on, and it is deliberately not added to "common-media-types": that alias
+// resolves to "$GLOBALS['TYPO3_CONF_VARS']['SYS']['mediafile_ext']", which is
+// the list of what may go into "assets" - a caption file is not a medium of
+// the element, it belongs to one.
+//
+// "allowed" here decides what the *field* takes. Whether the file may be
+// placed in a storage at all is a second, unrelated check, and the core allows
+// no "vtt" anywhere: "ext_localconf.php" adds it to "textfile_ext", where the
+// core already keeps "srt". Without that an editor gets "Resource consistency
+// check failed" on upload and this field can never be filled.
+//
+// "Partials/ContentElement/Gallery.html" pairs a caption with its medium **by
+// file name**: "launch.vtt" captions "launch.mp4". See there for why pairing
+// by position in the two lists was rejected.
+$additionalColumns['tx_theme_captions'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_captions',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_captions.description',
+    'config' => [
+        'type' => 'file',
+        'allowed' => 'vtt',
+    ],
+];
+
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
 
 // The icon of the layout "Icons" of the bullet list, next to the list type.
 // "bullets" is registered by EXT:frontend, whose TCA overrides run before
 // this extension's, so its type exists here.
 ExtensionManagementUtility::addToAllTCAtypes('tt_content', 'tx_theme_icon', 'bullets', 'after:bullets_type');
+
+// The caption files, next to the media they caption. "textmedia" is the one
+// CType whose media field takes a video or an audio file at all - "image" and
+// "textpic" read "image", which is restricted to image types - so it is the
+// one CType that can have a caption track.
+ExtensionManagementUtility::addToAllTCAtypes('tt_content', 'tx_theme_captions', 'textmedia', 'after:assets');
 
 // Next to "header_layout" in both header palettes of the core, so every CType
 // offering a heading level also offers its look. The CTypes of this extension
