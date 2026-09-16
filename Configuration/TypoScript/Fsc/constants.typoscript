@@ -1,0 +1,23 @@
+# Constants of the bridge to "fluid_styled_content".
+#
+# The bridge deliberately declares none of its own. It changes which templates
+# render the classic content elements, not what they are configured with: the
+# theme's own constants come from "Configuration/TypoScript/constants.typoscript"
+# by way of the theme's set or its static include, and that extension's
+# "styles.*" constants come from its own.
+#
+# The file exists anyway, and is not an oversight. Both delivery mechanisms
+# append a file name to the registered directory - the site set through
+# "typoscript:" in "config.yaml", the static include through the path passed to
+# "addStaticFile()" - so the constants half of this include resolves to this
+# file rather than to nothing.
+#
+# Its sibling "Configuration/TypoScript/Static/constants.typoscript" is NOT
+# there for the same reason, and the difference is worth stating rather than
+# glossing: that file carries a guarded "@import" of the theme's real
+# constants, behind the
+# "[not ('sbuerk/theme-extension-development' in site('sets'))]" condition that
+# stops a site using the set from parsing them a second time. It earns its
+# keep; this one is a true placeholder. What the two have in common is only
+# that "StaticTypoScriptIncludeTest" holds both directories to shipping both
+# files.

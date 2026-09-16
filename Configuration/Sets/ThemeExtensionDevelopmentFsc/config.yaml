@@ -1,0 +1,29 @@
+# The bridge set: this theme next to "fluid_styled_content".
+#
+# A site enables it instead of "sbuerk/theme-extension-development", never
+# beside it - it depends on that set, so it brings the whole theme with it:
+#
+#   dependencies:
+#     - sbuerk/theme-extension-development-fsc
+#
+# "optionalDependencies", not "dependencies", for the fluid_styled_content set,
+# and the difference matters twice over. A missing entry under "dependencies"
+# makes the whole set invalid - "SetRegistry::computeOrderedSets()" drops it and
+# logs an error - so a hard dependency would make this set an error message in
+# every installation of the theme that does not have that extension. An optional
+# one is skipped when the set is absent and, when it is present, both orders the
+# theme after it and activates it for the site ("hasDependency()" counts
+# optional dependencies). So the site names one set and gets both, in the order
+# the bridge needs.
+#
+# "typoscript" points at "Configuration/TypoScript/Fsc/", which the classic
+# static include of the same name reads as well - the theme's two delivery
+# mechanisms, one file. The trailing slash is required: the core appends
+# "setup.typoscript" to this path directly.
+name: sbuerk/theme-extension-development-fsc
+label: 'Theme Extension Development (fluid_styled_content)'
+dependencies:
+  - sbuerk/theme-extension-development
+optionalDependencies:
+  - typo3/fluid-styled-content
+typoscript: 'EXT:theme_extension_development/Configuration/TypoScript/Fsc/'

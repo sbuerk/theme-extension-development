@@ -44,8 +44,10 @@ in a frontend rather than only in a test assertion:
     :ref:`configuration`. It covers **every classic content element**
     :file:`EXT:frontend` registers, the eleven menu elements, the elements of
     its own, and third-party Extbase plugins, none of which requires
-    :file:`fluid_styled_content` — that extension is not a dependency here, and
-    on TYPO3 v14 it is not installed at all. It ships six backend layouts, a
+    :file:`fluid_styled_content` — that extension is not a dependency here. An
+    installation that has it anyway enables a bridge set, which keeps the
+    rendering the theme's own — see
+    :ref:`feature-fluid-styled-content-bridge`. It ships six backend layouts, a
     main menu, a section menu and a breadcrumb, and a light/dark appearance
     switch. A seeded ``/styleguide`` page renders the whole component library
     on one page, so the theme can be looked at without building content for it
