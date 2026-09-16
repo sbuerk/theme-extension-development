@@ -12,11 +12,17 @@
     the heading of the element ("Partials/ContentElement/ItemHeading.html").
 
     "tx_theme_columns" picks the column modifier, "layout" the arrangement:
-    1 is the scroller, anything else the grid - the core values 2 and 3 are
-    removed from the form for this type, and a record still carrying one
+    1 is the scroller, 2 the wall, anything else the grid - the core value 3
+    is removed from the form for this type, and a record still carrying it
     renders the grid. A value of "tx_theme_columns" outside the three renders
     three columns, the default of the column. "ContentElementContractTest"
     holds every modifier written here to a rule of the compiled stylesheet.
+
+    The wall is the same list of cards laid out in columns the cards stack
+    into, so it needs no wrapper and no region: it does not scroll. It fills
+    **column by column** rather than row by row, which the component's header
+    comment states, justifies and bounds - it is why no element whose items
+    are a sequence offers one.
 
     The scroller is the region of the contract, with a tab stop and a name:
     the heading of the element, and a generic label where there is none, so
@@ -53,9 +59,19 @@
                 </div>
             </f:then>
             <f:else>
-                <ul class="theme-card-grid {columns}">
-                    <f:render section="Cards" arguments="{_all}" />
-                </ul>
+                <f:if condition="{data.layout} == 2">
+                    <f:then>
+                        <f:variable name="wall" value="theme-card-grid--wall" />
+                        <ul class="theme-card-grid {wall} {columns}">
+                            <f:render section="Cards" arguments="{_all}" />
+                        </ul>
+                    </f:then>
+                    <f:else>
+                        <ul class="theme-card-grid {columns}">
+                            <f:render section="Cards" arguments="{_all}" />
+                        </ul>
+                    </f:else>
+                </f:if>
             </f:else>
         </f:if>
     </f:if>

@@ -885,7 +885,7 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_stats`             | Figures and what they count                              | `.theme-stat` in `.theme-stats`                         |
 | `theme_steps`             | The numbered steps of a process                          | `.theme-steps`                                          |
 | `theme_cta`               | A call to action: heading, text, icon, two links         | `.theme-cta`                                            |
-| `theme_card_group`        | Cards in a grid, or in one row that scrolls sideways     | `.theme-card-grid` of `.theme-card` items               |
+| `theme_card_group`        | Cards in a grid, in a sideways row, or in a wall         | `.theme-card-grid` of `.theme-card` items               |
 | `theme_timeline`          | Dated entries on a line, sorted by date                  | `.theme-timeline`                                       |
 | `theme_teaser_list`       | Rows of teasers, each row one link                       | `.theme-list-group`                                     |
 | `theme_carousel`          | Slides in one track that scrolls sideways; no autoplay   | `.theme-carousel`                                       |
@@ -1333,8 +1333,8 @@ which is why the palette is part of the child's TCA and not of the relation.
 **The card group** arranges its cards by the core column `layout` and by
 `tx_theme_columns`. `layout` is disabled for every CType and re-enabled for
 this one by `ContentElementAppearance.tsconfig`, the way the bullet list does
-it, with the two values it renders relabelled - *Grid* and *Scroller* - and the
-other two removed; it is in the palette `theme_grid` with `tx_theme_columns`,
+it, with the three values it renders relabelled - *Grid*, *Scroller* and
+*Wall* - and the remaining one removed; it is in the palette `theme_grid` with `tx_theme_columns`,
 on the tab of the cards, rather than on the *Appearance* tab the theme's
 elements do not show. `tx_theme_columns` is the column of the features, with
 the database default 0 on v13.4 described above, which is why the template
@@ -1343,6 +1343,26 @@ modifiers in one `f:switch` each, and a value the form does not offer renders
 the grid in three columns. The scroller is a `.theme-card-scroller` region
 named after the heading of the element, or *Cards* where there is none, so it
 is never nameless.
+
+The **wall** is the third arrangement, `.theme-card-grid--wall`: multi-column
+layout, so the cards keep their own heights and stack into columns instead of
+being stretched to the tallest card of a row. It needs no wrapper and no
+region, because it does not scroll, and it reuses the column count and the
+minimum column width the grid already carries, which is what lets `--wide` and
+`--narrow` keep working for it.
+
+Its one real consequence is the **order**, and it is stated here because it
+cannot be configured away: multi-column fills the block direction first, so a
+wall fills column by column and what the eye reads across the top is not the
+order of the relation. The DOM order is untouched - a screen reader and the tab
+sequence follow the relation - so WCAG 1.3.2 is not engaged: the cards of a
+card group are an unordered set, and no meaning attaches to which of them the
+eye reaches first. That is exactly why only the card group offers a wall and
+the timeline and the steps do not: their items *are* a sequence, and there the
+visual order would contradict a real one. `masonry` in `grid-template-rows` was
+the obvious alternative and was rejected - no browser ships it unprefixed at
+the floor DESIGN.md sets - and a script was rejected because no layout in this
+library depends on one.
 
 **The timeline** sorts by date in the TypoScript, not in Fluid: `orderBy` goes
 through stdWrap (`ContentObjectRenderer::getQuery()`), so a `CASE` on
@@ -1373,10 +1393,12 @@ the static include: the column modifiers and the scroller region, the defaults
 for values the form does not offer, the date order with a tie in both
 directions, the date as `time`, the icon of an entry, and one link per
 row.
-`ContentElementAppearanceFormEngineTest` holds `layout` to the two
-arrangements of the card group and to no other type, and
+`ContentElementAppearanceFormEngineTest` holds `layout` to the three
+arrangements of the card group, and
 `ContentElementContractTest` every modifier the card group writes to a rule of
-the stylesheet.
+the stylesheet. `CollectionElementRenderingTest` also holds the wall to
+rendering its cards in the order of the relation, which is the property the
+column-by-column fill makes worth asserting.
 
 ### Carousel and split tiles
 
@@ -1385,18 +1407,17 @@ Two more elements on the same child table, and the same reference to
 is not the query but what each one refuses to do.
 
 **The carousel** renders `.theme-carousel`. The child gains one column,
-`caption_position`,
-whose values are the names of the modifiers they select, as every choice column
-of this extension is — with one resolution the template makes rather than the
-stylesheet: **`overlay` is only written where the slide has a picture.** The
-modifier takes the caption out of the flow, and the figure is a flex box that
-clips what overflows it, so with no media branch to give the figure height the
-caption would be clipped away entirely, text and all. Two ordinary editor
-choices — an overlay caption, and a slide with no image — must not lose the
-content between them, so without a picture the caption keeps the bare class and
-sits in the flow, the way every value this theme does not render falls back to
-it. Resolved in the template and not by scoping the CSS selector, because that
-would leave the markup naming a modifier that does not apply, and
+`caption_position`, whose values are the names of the modifiers they select, as
+every choice column of this extension is — with one resolution the template
+makes rather than the stylesheet: **`overlay` is only written where the slide
+has a picture.** The modifier takes the caption out of the flow, and the figure
+is a flex box that clips what overflows it, so with no media branch to give the
+figure height the caption would be clipped away entirely, text and all. Two
+ordinary editor choices — an overlay caption, and a slide with no image — must
+not lose the content between them, so without a picture the caption keeps the
+bare class and sits in the flow, the way every value this theme does not render
+falls back to it. Resolved in the template and not by scoping the CSS selector,
+because that would leave the markup naming a modifier that does not apply, and
 `ContentElementContractTest` would not see the discrepancy.
 
 Three further decisions are load bearing and each is asserted by

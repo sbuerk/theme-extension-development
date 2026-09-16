@@ -100,6 +100,54 @@
         </ul>
     </div>
 
+    <h3>Card wall</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--wall</code> lays the same cards out in columns they stack
+            into, each keeping its own height, so the foot of the group is not
+            the ragged edge a grid of equal rows leaves. It fills
+            <strong>column by column</strong>: the cards below read 1, 2 down
+            the first column and 3, 4 down the second, not 1, 2 across the top.
+            The order in the markup is unchanged, so a screen reader and the
+            tab sequence still follow it &mdash; see the component's header
+            comment for why that is acceptable for a set of cards and why no
+            element whose items are a sequence offers a wall.
+        </p>
+        <ul class="theme-card-grid theme-card-grid--wall theme-card-grid--columns-2">
+            <li class="theme-card">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the first card of the wall.">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">The first card</h4>
+                    <p class="theme-card__text">A card with media and a short text. It is the first in the markup and the first in the left column.</p>
+                </div>
+            </li>
+            <li class="theme-card">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">The second card</h4>
+                    <p class="theme-card__text">A taller card with no media at all, and enough text that it does not end level with its neighbour. The uneven heights are the point of the wall: each card takes the room it needs and the next one starts where it ends, rather than every card in a row being stretched to the tallest of them.</p>
+                </div>
+            </li>
+            <li class="theme-card">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">The third card</h4>
+                    <p class="theme-card__text">Third in the markup, and the head of the second column rather than the end of the first row.</p>
+                    <div class="theme-card__actions"><a class="theme-button theme-button--secondary" href="#">Read the notes</a></div>
+                </div>
+            </li>
+            <li class="theme-card">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the fourth card of the wall.">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">The fourth card</h4>
+                    <p class="theme-card__text">A card is never split across a column break.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+
     <h3>Split tiles</h3>
     <div class="theme-styleguide__specimen">
         <p>

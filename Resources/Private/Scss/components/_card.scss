@@ -238,6 +238,78 @@
     );
 }
 
+// --- The wall ---------------------------------------------------------------
+//
+//     <ul class="theme-card-grid theme-card-grid--wall theme-card-grid--columns-3">
+//         <li class="theme-card">…</li>
+//     </ul>
+//
+// A masonry wall: the cards keep their own heights and stack into columns
+// without the ragged bottom edge a grid of equal rows leaves. Multi-column
+// layout rather than "grid-template-rows: masonry", which no browser ships
+// unprefixed at the floor DESIGN.md sets, and rather than a script, which the
+// library does not depend on for any layout.
+//
+// "display: block" replaces the grid of the base rule, so the
+// "grid-template-columns" the base rule and every "--columns-*" modifier set
+// no longer apply. The column count still comes from
+// "--theme-card-grid-columns" and the minimum width from
+// "--theme-card-grid-min", passed to the "columns" shorthand as the count and
+// the width, so a wall answers the space it is given exactly as the grid does:
+// at most that many columns, each at least that wide, fewer where there is no
+// room and one on a phone. "--wide" and "--narrow" move the same minimum and
+// therefore work here unchanged.
+//
+// "gap" on a block box is the column gap; the space **between** two cards in
+// one column is their own bottom margin, because a multi-column container has
+// no row gap to set. The card's "margin: 0" of the base rule is what makes
+// that margin the only one.
+//
+// --- The order of the cards -------------------------------------------------
+//
+// **A wall fills column by column, not row by row.** Six cards in three
+// columns are laid out 1-2 down the first column, 3-4 down the second, 5-6
+// down the third; read across the top edge they are 1, 3, 5. A grid of the
+// same six reads 1, 2, 3 across the top. That is inherent to multi-column
+// layout - the block direction is filled first - and it is not something the
+// modifier can correct.
+//
+// It is acceptable **here** and stated rather than hidden, for one reason: the
+// DOM order is untouched, so it is only the eye that is affected. A screen
+// reader announces the cards in source order, the tab sequence follows source
+// order, and a reader with the stylesheet off or a browser without multi-column
+// support gets source order too. The cards of a card group are an unordered
+// set - independent items that do not read as a sequence and where no card
+// depends on the one before it - so no meaning is carried by which of them the
+// eye reaches first, and WCAG 1.3.2 (Meaningful Sequence) is not engaged: there
+// is no correct reading sequence for the visual order to contradict.
+//
+// The consequence for an editor is the one thing worth knowing, and the
+// changelog entry says it: ordering the cards in the backend orders them down
+// the columns, not across them. An element whose items *are* a sequence -
+// the steps, the timeline - has no wall for exactly this reason.
+.theme-card-grid--wall {
+    display: block;
+    columns: var(--theme-card-grid-columns) var(--theme-card-grid-min);
+    gap: var(--theme-card-grid-gap);
+
+    // The bottom margin below is what spaces two cards in one column, and the
+    // last card of every column carries it too - a multi-column container has
+    // no row gap to set instead, and nothing can select "the last card of a
+    // column", which is decided during layout. Left alone it is a stray gap
+    // under the whole group, where the grid ends flush with its last row. The
+    // container takes the same distance back, so the wall ends where its cards
+    // end and whatever follows keeps the distance it would keep after a grid.
+    margin-block-end: calc(-1 * var(--theme-card-grid-gap));
+
+    > * {
+        // A card split across a column break would show its image at the foot
+        // of one column and its text at the head of the next.
+        break-inside: avoid;
+        margin-block-end: var(--theme-card-grid-gap);
+    }
+}
+
 // --- The scroller -----------------------------------------------------------
 //
 //     <div class="theme-card-scroller" role="region" tabindex="0" aria-label="…">

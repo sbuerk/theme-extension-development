@@ -81,17 +81,19 @@ TCEFORM.tt_content {
         theme_hero_text_only.removeItems = image-end, screenshot, bordered
     }
 
-    # "theme_card_group" arranges its cards by "layout": the grid (0) or one
-    # row that scrolls sideways (1), ".theme-card-grid--scroller" in
-    # "Templates/ContentElements/ThemeCardGroup.html". The two core values
-    # the element does not render are removed for this type, and a record
-    # still carrying one renders the grid.
+    # "theme_card_group" arranges its cards by "layout": the grid (0), one
+    # row that scrolls sideways (1), ".theme-card-grid--scroller", or a wall
+    # of columns the cards stack into (2), ".theme-card-grid--wall" - all in
+    # "Templates/ContentElements/ThemeCardGroup.html". The one core value the
+    # element does not render is removed for this type, and a record still
+    # carrying it renders the grid.
     layout.types.theme_card_group {
         disabled = 0
-        removeItems = 2,3
+        removeItems = 3
         altLabels {
             0 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_card_group.I.0
             1 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_card_group.I.1
+            2 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_card_group.I.2
         }
     }
 
