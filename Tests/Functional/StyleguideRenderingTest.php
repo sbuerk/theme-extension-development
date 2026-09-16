@@ -321,7 +321,7 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
 
         preg_match_all('#\sid="([^"]+)"#', $body, $ids);
         preg_match_all(
-            '#\s(?:for|aria-controls|aria-labelledby|aria-describedby|data-theme-dialog-open)="([^"]+)"#',
+            '#\s(?:for|aria-controls|aria-labelledby|aria-describedby|data-theme-dialog-open|popovertarget)="([^"]+)"#',
             $body,
             $references,
         );

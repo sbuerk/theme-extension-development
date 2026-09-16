@@ -180,6 +180,46 @@
     </div>
 
     <div class="theme-styleguide__specimen">
+        <h3>Dropdown</h3>
+        <p>
+            A labelled button that discloses a panel below it &mdash; the site header
+            puts the language menu in one. The trigger carries
+            <code>popovertarget</code> and the panel <code>popover</code>, so the
+            browser opens it, puts it in the top layer and closes it again on Escape
+            or a click outside, with no script of the theme's own.
+        </p>
+        <p>
+            It is a disclosure, not an ARIA menu: the panel holds ordinary links that
+            Tab reaches. <code>aria-expanded</code> is mirrored onto the trigger from
+            the panel's <code>toggle</code> event, because the Popover API tells
+            assistive technology nothing about the trigger &mdash; and that is also
+            what the stylesheet paints the open state from and what turns the chevron.
+            The trigger's name is real text, visually hidden, so the header row keeps
+            its width and the name is still translated with the page.
+        </p>
+        <p class="theme-styleguide__label">
+            The button works on this page. In the screenshots of the visual suite it
+            is shown closed: those pages render with no script, and a popover is
+            closed until something opens it.
+        </p>
+        <div class="theme-dropdown">
+            <button class="theme-dropdown__trigger" type="button" popovertarget="theme-styleguide-dropdown-panel" aria-expanded="false">
+                <theme:icon name="globe" />
+                <span class="theme-dropdown__label">Language</span>
+                <theme:icon name="chevron-down" class="theme-dropdown__marker" />
+            </button>
+            <div class="theme-dropdown__panel" id="theme-styleguide-dropdown-panel" popover>
+                <nav class="theme-content-menu" aria-label="Dropdown panel specimen">
+                    <ul class="theme-content-menu__list">
+                        <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#">First entry</a></li>
+                        <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#">Second entry</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="theme-styleguide__specimen">
         <h3>Content menu</h3>
         <p>
             The shared component behind every <code>menu_*</code> content element: a

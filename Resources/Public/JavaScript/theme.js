@@ -899,9 +899,52 @@ function bindOneEmbed(button) {
     embed.setAttribute('data-theme-embed-bound', '');
 }
 
+/**
+ * The dropdown of the site header.
+ *
+ * The opening and closing are the browser's: the trigger carries
+ * `popovertarget`, the panel carries `popover`, and the Popover API gives them
+ * the top layer, Escape and light dismiss with no script at all. See
+ * "components/_dropdown.scss".
+ *
+ * What is left for this file is the one thing the platform does not do: the
+ * Popover API says nothing to assistive technology about the *trigger*, so the
+ * open state is mirrored onto its `aria-expanded` from the panel's own
+ * `toggle` event.
+ *
+ * This only ever *reports* a state the browser already changed. It never opens
+ * or closes anything, which is why the dropdown is not hidden behind
+ * "data-js" the way the display settings and the dialog opener are: a page
+ * whose script never ran still has a working dropdown, with a trigger whose
+ * `aria-expanded` is stale - a far smaller failure than a control that does
+ * nothing at all.
+ *
+ * `toggle` is bound on the panel rather than `click` on the trigger, because
+ * a popover also closes by routes the trigger never sees: Escape, a click
+ * anywhere outside, and another popover opening.
+ */
+function bindDropdowns() {
+    document.querySelectorAll('.theme-dropdown__trigger').forEach(bindOneDropdownTrigger);
+}
+
+function bindOneDropdownTrigger(trigger) {
+    const panel = document.getElementById(trigger.getAttribute('popovertarget') || '');
+    if (!panel) {
+        return;
+    }
+
+    // "ToggleEvent.newState" is "open" or "closed". Older engines that have
+    // the Popover API but not the event simply leave the attribute at its
+    // server-rendered "false", which is the same degradation as no script.
+    panel.addEventListener('toggle', function (event) {
+        trigger.setAttribute('aria-expanded', event.newState === 'open' ? 'true' : 'false');
+    });
+}
+
 bindTabs();
 bindDialogs();
 bindLightboxes();
 bindEmbeds();
 bindTooltips();
 bindCarousels();
+bindDropdowns();

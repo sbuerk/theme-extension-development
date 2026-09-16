@@ -32,9 +32,11 @@
 // above, so the two cannot be told apart by whatever reads it.
 //
 // Opening is the one step that needs a script. Invoker commands
-// ("commandfor" plus "command='show-modal'") would do it declaratively, but
-// they arrived in browsers long after the "light-dark()" floor DESIGN.md
-// writes this stylesheet against, so they are not relied on. The opener
+// ("commandfor" plus "command='show-modal'") would do it declaratively, and
+// they are still above the browser floor of DESIGN.md - which is Firefox 125
+// since the toggletip and the dropdown were built on the Popover API, and
+// invoker commands need a newer Firefox than that. Adopting them is a
+// follow-up of its own, not something the floor move already bought. The opener
 // names the dialog's id in "data-theme-dialog-open" instead, and
 // "Resources/Public/JavaScript/theme.js" calls "showModal()", closes the
 // dialog on a click on the backdrop, and puts focus back on the opener when it

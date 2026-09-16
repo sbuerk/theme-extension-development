@@ -358,6 +358,38 @@
         </figure>
     </div>
 
+    <h3>Toggletip</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_toggletip.scss. The
+            bubble carries "popover" and the trigger "popovertarget", so the
+            browser opens it. "role=status" makes the bubble a polite live
+            region and the reader's focus stays on the button - see the SCSS
+            header for what that does and does not guarantee.
+        </f:comment>
+        <p>
+            Extra information a reader asks for. The trigger is a button that means
+            &ldquo;explain this&rdquo;, and the bubble opens on a click &mdash; never
+            on hover, and never on focus alone. The browser opens and closes it:
+            Escape and a click outside dismiss it, with no script.
+        </p>
+        <p>
+            It is <strong>not</strong> a tooltip, and the two are not variants of each
+            other. A tooltip <em>describes a control that already has a name</em> and
+            is tied to it with <code>aria-describedby</code>; a toggletip
+            <em>is</em> the information, and its button has no name of its own to
+            describe. The bubble is therefore <code>role="status"</code>, a polite live
+            region, rather than <code>role="tooltip"</code>, which would claim to
+            describe the button.
+        </p>
+        <span class="theme-toggletip">
+            <button class="theme-toggletip__trigger" type="button" popovertarget="sg-toggletip-index" aria-label="About the section index">
+                <theme:icon name="circle-question" />
+            </button>
+            <span class="theme-toggletip__bubble" id="sg-toggletip-index" popover role="status">An element is in the table of contents of its page when &ldquo;Show in Section Menus&rdquo; is set and it has a header that is actually shown.</span>
+        </span>
+    </div>
+
     <h3>Tooltip</h3>
     <div class="theme-styleguide__specimen">
         <f:comment>

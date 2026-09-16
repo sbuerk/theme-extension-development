@@ -1,0 +1,148 @@
+// Dropdown - a labelled button that discloses a panel below it.
+//
+// Markup contract:
+//
+//     <div class="theme-dropdown">
+//         <button class="theme-dropdown__trigger" type="button" popovertarget="theme-language-panel" aria-expanded="false">
+//             <svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg>
+//             <span class="theme-dropdown__label">…</span>
+//             <svg class="theme-icon theme-dropdown__marker" aria-hidden="true" focusable="false" …>…</svg>
+//         </button>
+//         <div class="theme-dropdown__panel" id="theme-language-panel" popover>…</div>
+//     </div>
+//
+// The generic disclosure of the site header. ".theme-settings" is the same
+// shape built for one purpose - it owns three form groups and their server
+// defaults, and predates this - and this is the version with nothing in it,
+// for a panel whose content is someone else's component.
+//
+// --- The Popover API does the showing and hiding ----------------------------
+//
+// The panel carries "popover" and the trigger "popovertarget": the browser
+// opens and closes it, puts it in the top layer, and gives it light dismiss -
+// Escape and a click anywhere outside close it, with no script and no
+// listeners of this theme's own. That is why the panel needs no "hidden"
+// attribute and no rule to hide it: "[popover]" is "display: none" until the
+// browser opens it.
+//
+// The Popover API is what moved the browser floor of DESIGN.md to Firefox 125.
+//
+// **Do not give this element a "display" of its own.** An author "display" on
+// ".theme-dropdown__panel" outranks the user agent's "[popover] { display:
+// none }" and the panel never closes - the same trap "components/_settings.scss"
+// documents for "[hidden]". The panel below therefore sets its box with
+// "padding", "border" and sizing only, and the one "display" it needs while
+// open is written under ":popover-open".
+//
+// --- "aria-expanded" is still mirrored --------------------------------------
+//
+// The Popover API tells assistive technology nothing about the trigger, so
+// "Resources/Public/JavaScript/theme.js" mirrors the open state onto
+// "aria-expanded" from the panel's own "toggle" event. The script does not
+// open or close anything - it only reports what the browser already did - so a
+// page whose script failed to load still has a working dropdown, with a
+// trigger whose "aria-expanded" is stale. That is why this component is not
+// hidden behind "data-js" the way the display settings and the dialog opener
+// are: those need their script to work at all, and this one does not.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+@use '../abstracts/mixins' as mixins;
+
+.theme-dropdown {
+    --theme-dropdown-foreground: var(--theme-color-text-secondary, #4a5567);
+    --theme-dropdown-foreground-active: var(--theme-color-primary, #0b57d0);
+    --theme-dropdown-border-color: var(--theme-color-border, #d6dce6);
+    --theme-dropdown-border-color-hover: var(--theme-color-border-strong, #828d9f);
+    --theme-dropdown-background-active: var(--theme-color-surface, #f4f6fa);
+    --theme-dropdown-radius: var(--theme-radius-sm, 5px);
+    --theme-dropdown-panel-width: 12rem;
+    --theme-dropdown-panel-gutter: var(--theme-space-4, 1.25rem);
+    --theme-dropdown-panel-padding: var(--theme-space-2, 0.625rem);
+    --theme-dropdown-panel-background: var(--theme-color-surface-raised, #ffffff);
+    --theme-dropdown-panel-foreground: var(--theme-color-text-primary, #14181f);
+    --theme-dropdown-panel-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-dropdown-panel-radius: var(--theme-radius-md, 10px);
+
+    display: inline-flex;
+    flex: none;
+}
+
+// Icon only in the site header, like the settings cog beside it: the label is
+// there for assistive technology and for a browser's own page translation, and
+// the header row has no width to spend on a second piece of visible text - see
+// "layout/_site-header.scss".
+.theme-dropdown__trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--theme-space-1, 0.3125rem);
+    min-height: var(--theme-tap-target-min);
+    padding-inline: var(--theme-space-2, 0.625rem);
+
+    border: var(--theme-border-width) solid var(--theme-dropdown-border-color);
+    border-radius: var(--theme-dropdown-radius);
+    background-color: transparent;
+    color: var(--theme-dropdown-foreground);
+
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    cursor: pointer;
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        border-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        border-color: var(--theme-dropdown-border-color-hover);
+        color: var(--theme-dropdown-foreground-active);
+    }
+
+    // The open state, read off the attribute a screen reader announces. The
+    // script mirrors it from the panel's "toggle" event.
+    &[aria-expanded='true'] {
+        border-color: var(--theme-dropdown-foreground-active);
+        background-color: var(--theme-dropdown-background-active);
+        color: var(--theme-dropdown-foreground-active);
+    }
+}
+
+// Real text rather than an "aria-label", so it is translated with the rest of
+// the page - by the language file and by a browser's own page translation
+// alike. The same treatment the settings cog gives its name.
+.theme-dropdown__label {
+    @include mixins.visually-hidden;
+}
+
+// The chevron turns when the panel opens, like the accordion marker.
+.theme-dropdown__marker {
+    transition: transform var(--theme-duration-base) var(--theme-easing-standard);
+
+    .theme-dropdown__trigger[aria-expanded='true'] & {
+        transform: rotate(180deg);
+    }
+}
+
+// No "display" here - see the header. The popover is in the top layer, so it
+// is positioned against the viewport rather than against the trigger: without
+// anchor positioning, which is still above the floor, "position: absolute"
+// inside the component would be ignored. It is pinned under the header at the
+// end of the row instead, which is where the trigger is.
+.theme-dropdown__panel {
+    position: fixed;
+    inset: auto var(--theme-dropdown-panel-gutter) auto auto;
+    margin: 0;
+
+    inline-size: min(var(--theme-dropdown-panel-width), calc(100vw - 2 * var(--theme-dropdown-panel-gutter)));
+    padding: var(--theme-dropdown-panel-padding);
+
+    border: var(--theme-border-width) solid var(--theme-dropdown-panel-border-color);
+    border-radius: var(--theme-dropdown-panel-radius);
+    background-color: var(--theme-dropdown-panel-background);
+    color: var(--theme-dropdown-panel-foreground);
+
+    &:popover-open {
+        display: block;
+    }
+}
