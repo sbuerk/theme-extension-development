@@ -157,6 +157,74 @@ that extension is the wrong place for elements only the theme can render — see
 Both delivery paths read the same `ContentElements.typoscript`, so neither needs
 anything of its own for it.
 
+## The `fluid_styled_content` bridge
+
+The theme does not depend on `fluid_styled_content` and renders every classic
+element itself. Installed **beside** it, the two are not merely redundant —
+they are order dependent, and both orders are wrong:
+
+| `fluid_styled_content` loads | What happens                                                                                                                                                                   |
+|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **after** the theme          | Its `lib.contentElement >` clears the object, taking the theme's Fluid paths with it. The theme's branches then look for `ContentElements/…` among that extension's templates. |
+| **before** the theme         | Its per-element `dataProcessing` stays underneath the theme's branches: `=<` and a plain assignment keep every key the theme does not overwrite.                               |
+
+The second is the quiet one, and it is not quiet in practice. Both extensions
+wire `menu_categorized_content` through `DatabaseQueryProcessor` and configure
+it differently — that extension with `join` and `where.wrap`, the theme with a
+portable `where.cObject` subquery (see
+[the two categorized types](content-elements.md#the-two-categorized-types-are-built-differently--deliberately)).
+The surviving keys compose one query out of two, and the page dies on a SQL
+syntax error rather than rendering something slightly wrong. It was found by
+running it, not by reading it.
+
+The bridge makes the combination **defined**: a site set and a static include,
+both reading `Configuration/TypoScript/Fsc/setup.typoscript`.
+
+```yaml
+dependencies:
+  - sbuerk/theme-extension-development-fsc
+```
+
+That file clears the twenty-two classic `tt_content` branches and then imports
+the theme's own `ContentElements.typoscript` again, last. The result is the
+rendering the theme produces on its own — **byte for byte**, whichever
+extension was loaded first.
+
+Three details carry the weight:
+
+- **Clearing, not merging.** Only `>` removes children
+  (`AbstractAstBuilder::handleIdentifierUnsetLine()`), so re-declaring a branch
+  over the other extension's would inherit whatever the theme does not happen
+  to overwrite, key by key — the border settings of `GalleryProcessor`, a
+  `table` fed by `comma-separated-value` against the theme's own
+  `TableProcessor`, a `menu` with a different `special`.
+- **Root path index `5`.** `lib.contentElement` carries that extension's
+  templates at `0` and the integrator's `{$styles.templates.*}` at `10` — the
+  same two indices in its **13.4 and 14.3** releases, read in both rather than
+  assumed from one. Fluid tries root paths from the highest index down — the
+  core sorts them by integer key and the engine walks them reversed — so at `5`
+  the theme's templates beat that extension's while an integrator's documented
+  override still beats both. Standalone this is the same single entry it always
+  was. (v13 ships those templates as `*.html` and v14 as `*.fluid.html`;
+  `resolveFileInPaths()` tries both spellings per path, so the theme's `*.html`
+  overrides win on either.)
+- **`optionalDependencies`, not `dependencies`.** A missing entry under
+  `dependencies` makes the whole set invalid: `SetRegistry::computeOrderedSets()`
+  drops it and logs an error, so a hard dependency would turn this set into an
+  error message in every installation of the theme that does not have that
+  extension. An optional one is skipped when absent and, when present, both
+  orders the theme after it and activates it for the site
+  (`hasDependency()` counts optional dependencies).
+
+`tt_content.list` is deliberately **not** cleared. It is the historical plugin
+CType, and on v13 `configurePlugin()` writes straight into it through
+`defaultContentRendering`, at a point this file cannot see — clearing it could
+drop a third-party plugin's own registration, a worse failure than the leftover
+it would prevent. On v14 the CType does not exist at all.
+
+On the static path the order is the integrator's, and the bridge has to be
+**last**, after both `Fluid Content Elements` and `Theme Extension Development`.
+
 ## Plugins, and the static include as a content rendering template
 
 `ExtensionUtility::configurePlugin()` adds the rendering of every plugin
@@ -227,6 +295,7 @@ had deliberately hidden.
 | `FeloginRenderingTest`                         | The login form renders on the form contract, through the set and the static include.   |
 | `DevelopmentInstance/LegacyDeliveryTest`       | The seeded showcase renders the same markup through both mechanisms.                   |
 | `DevelopmentInstance/DeliveryRegistrationTest` | Every static include of the seeded `sys_template` root resolves and is registered.     |
+| `FluidStyledContentBridgeTest`                 | The bridged page is byte for byte the page the theme renders alone, on both paths.     |
 
 The first two cover the two branches of the guard condition. Both were shown to
 fail: renaming the set breaks the first, inverting the condition breaks the

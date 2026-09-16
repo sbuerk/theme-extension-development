@@ -5,6 +5,9 @@ pages,,,,,,,,,
 ,3,1,0,0,0,1,0,Another listed sub page,/sub-two
 tt_content,,,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,records,selected_categories,category_field
+,1,1,0,0,0,1,header,A header element,3,,,,
+,2,1,0,0,0,2,text,A text element,3,<p>Text element body.</p>,,,
+,3,1,0,0,0,3,image,An image element,3,,,,
 ,10,1,0,0,0,10,bullets,A bullet list,3,"First item
 Second item
 Third item",,,

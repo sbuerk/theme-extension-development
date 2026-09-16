@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
@@ -20,10 +21,25 @@ use PHPUnit\Framework\Attributes\Test;
  */
 final class StaticTypoScriptIncludeTest extends AbstractFunctionalTestCase
 {
-    private const EXPECTED_VALUE = 'EXT:theme_extension_development/Configuration/TypoScript/Static';
+    /**
+     * Both static includes the extension registers: the theme itself, and the
+     * bridge to `fluid_styled_content`.
+     *
+     * @return \Generator<string, array{path: string}>
+     */
+    public static function registeredStaticFiles(): \Generator
+    {
+        yield 'the theme' => [
+            'path' => 'EXT:theme_extension_development/Configuration/TypoScript/Static',
+        ];
+        yield 'the fluid_styled_content bridge' => [
+            'path' => 'EXT:theme_extension_development/Configuration/TypoScript/Fsc',
+        ];
+    }
 
+    #[DataProvider('registeredStaticFiles')]
     #[Test]
-    public function staticFileIsRegisteredForSysTemplateRecords(): void
+    public function staticFileIsRegisteredForSysTemplateRecords(string $path): void
     {
         $items = $GLOBALS['TCA']['sys_template']['columns']['include_static_file']['config']['items'] ?? [];
 
@@ -33,18 +49,28 @@ final class StaticTypoScriptIncludeTest extends AbstractFunctionalTestCase
         );
 
         $this->assertContains(
-            self::EXPECTED_VALUE,
+            $path,
             $values,
-            'The static TypoScript include of the theme is not registered. It is added in '
+            'A static TypoScript include of the theme is not registered. It is added in '
             . '"Configuration/TCA/Overrides/sys_template.php"; moving that call to "ext_localconf.php" '
             . 'makes it a silent no-op.',
         );
     }
 
+    /**
+     * The bridge is selectable in the backend only through this registration.
+     * `FluidStyledContentBridgeTest` writes the literal path into
+     * `include_static_file`, and `SysTemplateTreeBuilder` resolves that without
+     * consulting the TCA items at all - so dropping the `addStaticFile()` call
+     * would leave every other gate green while the bridge became unselectable.
+     *
+     * @param string $path
+     */
+    #[DataProvider('registeredStaticFiles')]
     #[Test]
-    public function staticFileDirectoryProvidesBothTypoScriptFiles(): void
+    public function staticFileDirectoryProvidesBothTypoScriptFiles(string $path): void
     {
-        $directory = dirname(__DIR__, 2) . '/Configuration/TypoScript/Static/';
+        $directory = dirname(__DIR__, 2) . '/' . substr($path, strlen('EXT:theme_extension_development/')) . '/';
 
         // The core appends the file name to the registered path, so a missing
         // file means the include resolves to nothing rather than failing.

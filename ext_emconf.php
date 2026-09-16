@@ -18,6 +18,7 @@ $EM_CONF['theme_extension_development'] = [
         'conflicts' => [],
         'suggests' => [
             'data_factory' => '2.0.0-2.99.99',
+            'fluid_styled_content' => '13.4.0-14.3.99',
             'rte_ckeditor' => '13.4.0-14.3.99',
         ],
     ],
