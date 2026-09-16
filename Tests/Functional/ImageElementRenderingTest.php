@@ -138,6 +138,12 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         $this->assertSame(3, substr_count($body, '<div class="theme-gallery '));
     }
 
+    /**
+     * The link to the file is what `image_zoom` has always rendered, and it
+     * stays: the lightbox is opened by a script on top of it, so a page
+     * without one still enlarges the image. See
+     * `MediaElementRenderingTest` for the dialog itself.
+     */
     #[Test]
     public function imageZoomLinksTheImageToTheOriginalFile(): void
     {
@@ -146,9 +152,12 @@ final class ImageElementRenderingTest extends AbstractFunctionalTestCase
         // Set on the third element only.
         $this->assertSame(1, substr_count($body, '<a class="theme-gallery__zoom"'));
         $this->assertMatchesRegularExpression(
-            '#<a class="theme-gallery__zoom" href="[^"]+/placeholder\.svg">#',
+            '#<a class="theme-gallery__zoom" href="[^"]+/placeholder\.svg"\s+data-theme-lightbox="c\d+-lightbox"#',
             $body,
         );
+        // Not a dialog opener: those are hidden without a script, and this
+        // link is what a page without one is left with.
+        $this->assertStringNotContainsString('data-theme-dialog-open', $body);
     }
 
     #[Test]

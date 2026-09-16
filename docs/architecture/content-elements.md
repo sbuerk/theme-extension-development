@@ -112,6 +112,32 @@ only field, `header`, has its label overridden by `EXT:frontend`'s own
 language file to "Name (not visible in frontend)", which is also why neither
 `div`, `html` nor `shortcut` render the shared header partial.
 
+### `image_zoom`: the link, and the dialog on top of it
+
+`image_zoom` is the core field an editor ticks to make an image enlargeable. It
+was answered with a plain link to the file; it now also renders
+`Partials/ContentElement/Lightbox.html`, one `<dialog>` per element holding one
+figure per image, and `theme.js` opens it on the image the link names.
+
+**The link keeps its `href`.** It is therefore deliberately *not* a
+`data-theme-dialog-open` opener: `components/_dialog.scss` hides those while
+the root carries no `data-js`, which is right for a button that could do
+nothing and wrong for a link that enlarges the image on its own. It carries
+`data-theme-lightbox` (the dialog's id) and `data-theme-lightbox-item` (the id
+of the figure showing that image), and the script calls `preventDefault()` only
+once it has found both — so a page the script never reached, or one where the
+markup and the script disagree, still opens the file.
+
+Items are addressed by the id of their file reference rather than by a
+position, because a `textmedia` gallery may hold a video between two images and
+an index would have to agree with a list the template does not have. Only
+images are in the dialog: a video has no enlarged form and gets no zoom link.
+
+`MediaElementRenderingTest` covers all of it against real files of a real
+storage — the player, the track, the pairing by name, the mixed gallery, the
+dialog and its items, and the element without `image_zoom` rendering no dialog
+at all.
+
 ## `bullets`: core processors, and the list components
 
 `bodytext` for `bullets` is one item per line. No processor of this

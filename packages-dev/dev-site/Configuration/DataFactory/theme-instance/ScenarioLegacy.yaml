@@ -834,6 +834,14 @@ entities:
                           header: 'Four columns'
                           header_layout: 2
                           imagecols: 4
+                      -
+                        self:
+                          id: 4406
+                          CType: image
+                          header: 'Three columns, enlargeable'
+                          header_layout: 2
+                          imagecols: 3
+                          image_zoom: 1
                 -
                   self:
                     id: 1035

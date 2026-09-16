@@ -367,6 +367,25 @@ final class LegacyDeliveryTest extends AbstractInstanceSeedTestCase
         $markup = str_replace(array_keys($this->expectedDifferences), array_values($this->expectedDifferences), $markup);
         // The nonce of a Content Security Policy, drawn per request.
         $markup = (string)preg_replace('#nonce="[^"]*"#', 'nonce="*"', $markup);
+        // The item of a lightbox is named after the file reference it shows -
+        // "c3406-lightbox-48" - and a "sys_file_reference" uid is **not**
+        // mirrored. The generator moves pages, content elements and list items
+        // by the offset; a file reference is written by the import itself,
+        // from "config.yml" for the one tree and "ReferencesLegacy.yaml" for
+        // the other, so the two trees hold two sets of references to the same
+        // files and their uids have no relation at all.
+        //
+        // So the tail is blanked on **both** sides, unlike the offset rule
+        // below: there is nothing to translate it to. What the comparison
+        // keeps is that both trees name the same element ("c3406-") and that
+        // the link and the item it opens agree - a mismatch there would still
+        // differ, because the same number is blanked in both attributes only
+        // if it was the same number.
+        $markup = (string)preg_replace(
+            '#((?:id="|data-theme-lightbox-item=")c\d+-lightbox-)\d+#',
+            '$1*',
+            $markup,
+        );
         // The anchor of a content element, "c<uid>" in its "id" and in every
         // link to it: a mirrored element carries the uid of its original plus
         // the offset. Translated back on the mirror side only, and only this
@@ -375,12 +394,15 @@ final class LegacyDeliveryTest extends AbstractInstanceSeedTestCase
         //
         // The same anchor also starts the identifiers an element derives from
         // it - "c801-tab-1" and its panel "c801-tab-1-panel" of the tabs, in
-        // "id" and "aria-controls", and "c801-accordion", the "name" grouping
-        // an accordion's items - so a "c<uid>" followed by "-" is translated
-        // back as well, in those two attributes too.
+        // "id" and "aria-controls", "c801-accordion", the "name" grouping an
+        // accordion's items, and "c801-lightbox" with its "c801-lightbox-<n>"
+        // items, which the zoom link of a gallery names in
+        // "data-theme-lightbox" and "data-theme-lightbox-item" - so a "c<uid>"
+        // followed by "-" is translated back as well, in each of those
+        // attributes.
         if ($isMirror) {
             $markup = (string)preg_replace_callback(
-                '/(id="|#|aria-controls="|name=")c(\d+)(["-])/',
+                '/(id="|#|aria-controls="|name="|data-theme-lightbox="|data-theme-lightbox-item=")c(\d+)(["-])/',
                 fn(array $match): string => isset($this->mirroredContentUids[(int)$match[2]])
                     ? $match[1] . 'c' . ((int)$match[2] - self::OFFSET) . $match[3]
                     : $match[0],

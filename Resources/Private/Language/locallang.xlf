@@ -189,6 +189,18 @@
 			<trans-unit id="theme.carousel.next">
 				<source>Next slide</source>
 			</trans-unit>
+			<trans-unit id="theme.lightboxLabel">
+				<source>Enlarged images</source>
+			</trans-unit>
+			<trans-unit id="theme.lightboxClose">
+				<source>Close</source>
+			</trans-unit>
+			<trans-unit id="theme.lightboxPrevious">
+				<source>Previous image</source>
+			</trans-unit>
+			<trans-unit id="theme.lightboxNext">
+				<source>Next image</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

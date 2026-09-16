@@ -1,0 +1,100 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    The enlarged images of one gallery, in a dialog - what the editor's
+    "Enlarge on click" field ("image_zoom") produces once there is a script.
+    Rendered once per element by "Partials/ContentElement/Gallery.html", after
+    the gallery itself; the contract is
+    "Resources/Private/Scss/components/_lightbox.scss".
+
+    --- The link is still the fallback -------------------------------------
+
+    The zoom link in the gallery keeps its "href" to the file and is **not** a
+    "data-theme-dialog-open" opener. That attribute is hidden while the root
+    carries no "data-js" ("components/_dialog.scss"), which is right for a
+    button that could do nothing - and wrong for this one: without a script the
+    link still opens the image, exactly as it did before this dialog existed.
+    It carries "data-theme-lightbox" instead, which nothing hides, and
+    "theme.js" calls "preventDefault()" on it.
+
+    A closed dialog renders nothing at all, so a page whose script never runs
+    carries this markup and shows none of it.
+
+    --- One item per image, addressed by its reference ----------------------
+
+    Each item carries the id of the file reference it shows, and the zoom link
+    of that image names the same id. Nothing counts: a gallery of a "textmedia"
+    element may hold a video between two images, and an index would have to
+    agree with a list this template does not have.
+
+    Only images are in here, by the same "file.type" the gallery partial
+    branches on. A video or an audio file has no enlarged form - it is played
+    where it stands - and gets no zoom link either.
+
+    The two arrows are always rendered and the script hides them where there is
+    only one item: how many of the files are images is known there, after the
+    loop below, and counting them again in Fluid would be a second answer to
+    the same question.
+
+    --- The picture is the file, not the thumbnail --------------------------
+
+    "f:image" without a width hands out the original file, which is the point
+    of enlarging it. The thumbnail in the gallery is the processed one, and the
+    two are different files whenever the gallery scaled anything down.
+
+    "alt" and "title" are not passed, for the reason the gallery partial gives:
+    the ViewHelper takes them from the file reference itself.
+</f:comment>
+<f:variable name="lightboxLabel"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.lightboxLabel" /></f:variable>
+<f:variable name="lightboxClose"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.lightboxClose" /></f:variable>
+<f:variable name="lightboxPrevious"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.lightboxPrevious" /></f:variable>
+<f:variable name="lightboxNext"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.lightboxNext" /></f:variable>
+
+<dialog class="theme-dialog theme-lightbox" id="c{data.uid}-lightbox" aria-label="{lightboxLabel}">
+    <form method="dialog">
+        <div class="theme-dialog__header theme-lightbox__header">
+            <f:comment>
+                No "value": the close button of the dialog contract carries
+                "value=cancel" so that whatever reads "returnValue" cannot tell
+                it from the cancel button beside it. Nothing reads it here, and
+                there is no second way of closing to tell it from.
+            </f:comment>
+            <button class="theme-close" aria-label="{lightboxClose}">
+                <theme:icon name="xmark" />
+            </button>
+        </div>
+
+        <div class="theme-dialog__body theme-lightbox__body">
+            <f:for each="{files}" as="file">
+                <f:if condition="{file.type} == 2">
+                    <figure class="theme-lightbox__item" id="c{data.uid}-lightbox-{file.uid}" data-theme-lightbox-item="">
+                        <f:image class="theme-lightbox__image" image="{file}" />
+                        <f:if condition="{file.description}">
+                            <figcaption class="theme-lightbox__caption">{file.description}</figcaption>
+                        </f:if>
+                    </figure>
+                </f:if>
+            </f:for>
+        </div>
+
+        <f:comment>
+            Both are "type=button": inside a "form method=dialog" a button
+            without a type is a submit button, and the first arrow press would
+            close the lightbox instead of moving it.
+        </f:comment>
+        <div class="theme-dialog__footer theme-lightbox__controls">
+            <button class="theme-button theme-button--secondary theme-button--icon" type="button"
+                    data-theme-lightbox-previous="" aria-label="{lightboxPrevious}">
+                <theme:icon name="chevron-left" />
+            </button>
+            <button class="theme-button theme-button--secondary theme-button--icon" type="button"
+                    data-theme-lightbox-next="" aria-label="{lightboxNext}">
+                <theme:icon name="chevron-right" />
+            </button>
+        </div>
+    </form>
+</dialog>
+
+</html>

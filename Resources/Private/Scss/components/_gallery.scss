@@ -5,11 +5,20 @@
 //     <div class="theme-gallery theme-gallery--intext theme-gallery--left theme-gallery--float-start" data-theme-gallery-columns="1">
 //         <div class="theme-gallery__row">
 //             <figure class="theme-gallery__item theme-figure">
-//                 <a class="theme-gallery__zoom" href="…"><img class="theme-gallery__image" …></a>
+//                 <a class="theme-gallery__zoom" href="…" data-theme-lightbox="c1-lightbox" data-theme-lightbox-item="c1-lightbox-7">
+//                     <img class="theme-gallery__image" …>
+//                     <span class="theme-gallery__zoom-hint" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
+//                 </a>
 //                 <figcaption class="theme-gallery__caption theme-figure__caption">…</figcaption>
 //             </figure>
 //         </div>
 //     </div>
+//
+// "__zoom" is the editor's "Enlarge on click", and it is a link to the file
+// first: the lightbox ("components/_lightbox.scss") is what a script makes of
+// it, and the "__zoom-hint" badge is the affordance that says so. The badge is
+// shown whether or not there is a script, because the link enlarges the image
+// either way.
 //
 // "GalleryProcessor" has already decided how many columns a row holds and how
 // wide each image is, so this layer only lays the row out. It deliberately sets
@@ -119,7 +128,41 @@
 }
 
 .theme-gallery__zoom {
+    position: relative;
     display: block;
+}
+
+// The badge that says the image enlarges. It sits in the corner the reading
+// direction ends in, over the image, and is decoration: the link around it is
+// what has the name.
+.theme-gallery__zoom-hint {
+    --theme-gallery-zoom-hint-background: var(--theme-color-overlay, rgb(20 24 31 / 55%));
+    --theme-gallery-zoom-hint-foreground: var(--theme-color-on-primary, #ffffff);
+    --theme-icon-size: var(--theme-font-size-sm, 0.875rem);
+
+    position: absolute;
+    inset-block-end: var(--theme-space-1, 0.3125rem);
+    inset-inline-end: var(--theme-space-1, 0.3125rem);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: var(--theme-space-1, 0.3125rem);
+    border-radius: var(--theme-radius-sm, 5px);
+    background-color: var(--theme-gallery-zoom-hint-background);
+    color: var(--theme-gallery-zoom-hint-foreground);
+}
+
+// --- Forced colours -----------------------------------------------------------
+//
+// See "Forced colours" in docs/development/component-library.md. The badge's
+// scrim is repainted to the canvas colour, which leaves the glyph on the image
+// with nothing behind it: an edge is what keeps it legible.
+@media (forced-colors: active) {
+    .theme-gallery__zoom-hint {
+        border: var(--theme-border-width, 1px) solid CanvasText;
+    }
 }
 
 .theme-gallery__image {
