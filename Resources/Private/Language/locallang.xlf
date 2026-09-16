@@ -171,6 +171,24 @@
 			<trans-unit id="theme.cardGroupLabel">
 				<source>Cards</source>
 			</trans-unit>
+			<trans-unit id="theme.carouselLabel">
+				<source>Slides</source>
+			</trans-unit>
+			<trans-unit id="theme.carousel.slide">
+				<source>%1$s of %2$s</source>
+			</trans-unit>
+			<trans-unit id="theme.carousel.slides">
+				<source>Go to a slide</source>
+			</trans-unit>
+			<trans-unit id="theme.carousel.goToSlide">
+				<source>Slide %1$s</source>
+			</trans-unit>
+			<trans-unit id="theme.carousel.previous">
+				<source>Previous slide</source>
+			</trans-unit>
+			<trans-unit id="theme.carousel.next">
+				<source>Next slide</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

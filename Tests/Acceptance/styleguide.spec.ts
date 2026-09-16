@@ -140,6 +140,46 @@ test.describe('the styleguide with JavaScript', () => {
         await expect(opener).toBeFocused();
     });
 
+    test('the carousel scrolls by its buttons and marks the slide in view', async ({ page }) => {
+        const carousel = page.locator('#interactive .theme-carousel');
+        const track = carousel.locator('.theme-carousel__track');
+
+        // The script has bound it, which is the only thing that shows the
+        // buttons at all.
+        await expect(carousel).toHaveAttribute('data-theme-carousel-bound', '');
+        const next = carousel.getByRole('button', { name: 'Next slide', exact: true });
+        const previous = carousel.getByRole('button', { name: 'Previous slide', exact: true });
+        await expect(next).toBeVisible();
+        await expect(previous).toBeVisible();
+
+        // The first slide is the one in view, and its indicator says so.
+        const indicator = (n: number) => carousel.getByRole('link', { name: `Slide ${n}`, exact: true });
+        await expect(indicator(1)).toHaveAttribute('aria-current', 'true');
+
+        const start = await track.evaluate((element) => element.scrollLeft);
+        await next.click();
+        await expect.poll(async () => track.evaluate((element) => element.scrollLeft)).toBeGreaterThan(start);
+
+        await previous.click();
+        await expect.poll(async () => track.evaluate((element) => element.scrollLeft)).toBe(start);
+        await expect(indicator(1)).toHaveAttribute('aria-current', 'true');
+    });
+
+    test('an indicator is a link that moves the reader to its slide', async ({ page }) => {
+        const carousel = page.locator('#interactive .theme-carousel');
+        const track = carousel.locator('.theme-carousel__track');
+
+        // A link, not a tab: this is the property that keeps every slide
+        // reachable when the script never runs.
+        const third = carousel.getByRole('link', { name: 'Slide 3', exact: true });
+        await expect(third).toHaveAttribute('href', '#sg-carousel-slide-3');
+        await expect(carousel.getByRole('tab')).toHaveCount(0);
+
+        await third.click();
+        await expect.poll(async () => track.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+        await expect(page.locator('#sg-carousel-slide-3')).toBeInViewport();
+    });
+
     test('a tooltip shows on focus, and Escape hides it without moving focus', async ({ page }) => {
         const trigger = page.getByRole('button', { name: 'Element outlines', exact: true });
         const bubble = page.locator('#sg-tooltip-outline');
@@ -377,6 +417,30 @@ async function expectTheUndecoratedTabs(page: import('@playwright/test').Page): 
     }
 }
 
+/**
+ * The carousel with no script: the two buttons are not offered, nothing marks
+ * the carousel as bound, and the indicators still move the reader - they are
+ * links to the ids of the slides, and a fragment link needs no script.
+ *
+ * That last one is the property the whole element is designed around, so it
+ * is exercised in a browser rather than left to reading the source: the
+ * reasoning that a link "must" work is exactly the kind that stays true until
+ * somebody turns the indicators into buttons.
+ */
+async function expectTheUndecoratedCarousel(page: import('@playwright/test').Page): Promise<void> {
+    const carousel = page.locator('#interactive .theme-carousel');
+    await expect(carousel).not.toHaveAttribute('data-theme-carousel-bound', /.*/);
+    await expect(carousel.getByRole('button', { name: 'Previous slide', exact: true })).toBeHidden();
+    await expect(carousel.getByRole('button', { name: 'Next slide', exact: true })).toBeHidden();
+
+    const track = carousel.locator('.theme-carousel__track');
+    await expect.poll(async () => track.evaluate((element) => element.scrollLeft)).toBe(0);
+
+    await carousel.getByRole('link', { name: 'Slide 3', exact: true }).click();
+    await expect.poll(async () => track.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+    await expect(page.locator('#sg-carousel-slide-3')).toBeInViewport();
+}
+
 test.describe('the styleguide without JavaScript', () => {
     test.use({ javaScriptEnabled: false });
 
@@ -389,6 +453,13 @@ test.describe('the styleguide without JavaScript', () => {
         await expect(page.locator('[data-theme-dialog-open]')).toBeHidden();
         await expect(page.locator('#sg-dialog-reseed')).toBeHidden();
     });
+
+    test('the carousel offers no buttons and its indicators still move the reader', async ({ page }) => {
+        await page.goto('/styleguide');
+        await expect(page.locator('html')).not.toHaveAttribute('data-js', /.*/);
+
+        await expectTheUndecoratedCarousel(page);
+    });
 });
 
 test.describe('the styleguide when theme.js does not load', () => {
@@ -400,5 +471,16 @@ test.describe('the styleguide when theme.js does not load', () => {
         await expect(page.locator('html')).toHaveAttribute('data-js', '');
 
         await expectTheUndecoratedTabs(page);
+    });
+
+    test('the carousel is still reachable slide by slide', async ({ page }) => {
+        await page.route(/\/JavaScript\/theme\.js/, (route) => route.abort());
+        await page.goto('/styleguide');
+        // "data-js" is set and the buttons are still not offered: they follow
+        // the carousel's own marker, which only "theme.js" sets, so a page
+        // whose script failed to load shows no control that does nothing.
+        await expect(page.locator('html')).toHaveAttribute('data-js', '');
+
+        await expectTheUndecoratedCarousel(page);
     });
 });

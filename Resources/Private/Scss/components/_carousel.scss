@@ -1,0 +1,333 @@
+// Carousel.
+//
+// Markup contract:
+//
+//     <section class="theme-carousel" aria-roledescription="carousel" aria-label="…">
+//         <ul class="theme-carousel__track" tabindex="0">
+//             <li class="theme-carousel__slide" id="c12-slide-1">
+//                 <figure class="theme-carousel__figure" role="group" aria-roledescription="slide" aria-label="1 of 3">
+//                     <div class="theme-carousel__media"><img …></div>
+//                     <figcaption class="theme-carousel__caption">
+//                         <h3 class="theme-carousel__title">…</h3>
+//                         <p class="theme-carousel__text">…</p>
+//                         <a class="theme-button" href="…">…</a>
+//                     </figcaption>
+//                 </figure>
+//             </li>
+//         </ul>
+//         <div class="theme-carousel__controls">
+//             <button class="theme-carousel__control theme-carousel__control--previous" type="button" aria-label="…">…</button>
+//             <ol class="theme-carousel__indicators" aria-label="…">
+//                 <li><a class="theme-carousel__indicator" href="#c12-slide-1">…</a></li>
+//             </ol>
+//             <button class="theme-carousel__control theme-carousel__control--next" type="button" aria-label="…">…</button>
+//         </div>
+//     </section>
+//
+// Caption modifiers: "--above" puts the caption before the media, "--overlay"
+// lays it over the foot of the media. The bare class puts it below. The
+// modifier is on the caption, not on the slide, because it is the caption that
+// moves and a slide may hold no media at all.
+//
+// --- There is no autoplay -----------------------------------------------------
+//
+// Nothing here moves on its own, and that is a decision rather than an omission:
+// WCAG 2.2.2 (Pause, Stop, Hide) requires any motion that starts automatically
+// and lasts more than five seconds to carry a control that stops it. The
+// cheapest way to satisfy that rule is not to start. Every change of slide in
+// this component is something the reader asked for - a scroll, a key, an
+// indicator, a button - so there is no motion to pause, nothing to stop for
+// "prefers-reduced-motion", and no timer racing the reader who is halfway
+// through a caption.
+//
+// --- Without the script -------------------------------------------------------
+//
+// The track is the whole component. It is a scroll container that snaps each
+// slide to its start edge, so it scrolls by touch, trackpad, wheel and scroll
+// bar with nothing bound to it, exactly as ".theme-card-scroller" does
+// ("components/_card.scss"). It carries the tab stop and, through the section
+// around it, a name, so the arrow keys scroll it once it has focus; axe's
+// "scrollable-region-focusable" is the rule that holds it to that.
+//
+// The indicators are **links to the slides**, and that is the whole of their
+// semantics. A link to a slide's id works with no script at all: the browser
+// scrolls that slide into view and puts the reader on it. The alternative -
+// "role=tablist" with "role=tab" on each indicator - was rejected, because it
+// promises activation this markup cannot keep without a script: a tab claims
+// that pressing it selects a panel and hides the others, which would mean
+// hiding every slide but one in the markup, and a page whose script never ran
+// would then show one slide and strand the rest. The list also says how many
+// slides there are, which a "tablist" would too, but a list of links says it
+// without claiming behaviour nothing implements. Once the script runs it adds
+// "aria-current" to the indicator of the slide in view - a statement about
+// where the reader is, which is true whether or not anything was pressed.
+//
+// The two buttons are the one part that needs the script: a button does nothing
+// without one. They are therefore hidden until the script has bound this
+// carousel and set "data-theme-carousel-bound" on it - the group's own marker,
+// not the root's "data-js", for the reason "components/_tabs.scss" spells out:
+// "data-js" says the inline head script ran, not that "theme.js" did, and a
+// page gated on it would show two buttons that do nothing.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-carousel {
+    --theme-carousel-gap: var(--theme-space-3, 0.9375rem);
+    --theme-carousel-radius: var(--theme-radius-sm, 5px);
+    --theme-carousel-border-color: var(--theme-color-border, #d6dce6);
+    --theme-carousel-slide-width: 100%;
+    --theme-carousel-caption-background: var(--theme-color-surface, #f4f6fa);
+    --theme-carousel-caption-padding: var(--theme-space-4, 1.25rem);
+    --theme-carousel-indicator-size: 0.625rem;
+    --theme-carousel-indicator-color: var(--theme-color-border-strong, #828d9f);
+    --theme-carousel-indicator-color-current: var(--theme-color-primary, #0b57d0);
+
+    display: grid;
+    gap: var(--theme-carousel-gap);
+
+    // A grid item is "auto" wide, which for a scroll container means "as wide
+    // as its content" - the track would grow with the slides instead of
+    // scrolling. Pinning the column to the available width is what makes it
+    // scroll at all.
+    grid-template-columns: minmax(0, 1fr);
+}
+
+// The scroll container and the list of slides in one element: a wrapper around
+// the list would take the list semantics off whatever scrolls, and the number
+// of slides is what a screen reader announces for a list.
+//
+// Which is why the "role='group'" of a slide is on the "figure" inside the
+// "li" and never on the "li": a role on a list item replaces its implicit
+// "listitem" role, leaving the "ul" with a child that is not a list item -
+// invalid, reported by axe as the serious "list" rule, and it costs exactly
+// the item count this element is a list for.
+//
+// Two slides in view from the breakpoint up, one below it: a slide carries a
+// caption, and half a content column is not enough for one on a phone.
+.theme-carousel__track {
+    display: flex;
+    gap: var(--theme-carousel-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+
+    // Keeps an overlay scroll bar off the foot of the slides.
+    padding-block-end: var(--theme-space-2, 0.625rem);
+    border-radius: var(--theme-carousel-radius);
+
+    @media (min-width: bp.$md) {
+        --theme-carousel-slide-width: calc((100% - var(--theme-carousel-gap)) / 2);
+    }
+}
+
+.theme-carousel__slide {
+    flex: 0 0 var(--theme-carousel-slide-width);
+    margin: 0;
+    scroll-snap-align: start;
+}
+
+// The figure is the frame of the slide - the surface fill, the hairline and
+// the single radius of "_card.scss" - and holds the media and the caption in
+// the order the caption modifier asks for. "position: relative" is what the
+// overlay caption is placed against.
+.theme-carousel__figure {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+
+    border: var(--theme-border-width) solid var(--theme-carousel-border-color);
+    border-radius: var(--theme-carousel-radius);
+}
+
+// Bleeds to the edge of the figure: the padding lives on the caption, the same
+// split "_card.scss" uses, so an image sits flush without a negative margin.
+.theme-carousel__media {
+    img,
+    picture,
+    video {
+        display: block;
+        width: 100%;
+        object-fit: cover;
+    }
+}
+
+.theme-carousel__caption {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: start;
+    gap: var(--theme-space-2, 0.625rem);
+    padding: var(--theme-carousel-caption-padding);
+    background-color: var(--theme-carousel-caption-background);
+}
+
+// The level follows "header_layout" - see ".theme-card__title" for why the
+// case is stated.
+.theme-carousel__title {
+    margin: 0;
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+}
+
+.theme-carousel__text {
+    margin: 0;
+    color: var(--theme-color-text-secondary, #4a5567);
+    font-size: var(--theme-font-size-sm);
+}
+
+// --- Caption position ---------------------------------------------------------
+//
+// "order" rather than a second markup order: the caption follows the media in
+// the source whichever side it is painted on, so the reading and the focus
+// order never diverge from each other - the argument "_teaser.scss--reversed"
+// makes at length for its own flip. Here it is the media that is decorative
+// and the caption that carries the text, so a reader who meets the caption
+// first hears the same words in the same order either way.
+.theme-carousel__caption--above {
+    order: -1;
+}
+
+// Over the foot of the media.
+//
+// The fill behind the caption is **solid**, the whole of it, so the contrast
+// of the text against it is the one the tokens were computed for and does not
+// depend on what the picture happens to look like underneath. An earlier
+// version faded the scrim in across the caption itself, which left the title -
+// the first line in the box - sitting in the translucent part, and its
+// contrast was then whatever the photograph gave it. The feather that keeps
+// the box from cutting a hard line across the picture is a band of the same
+// colour *above* the caption instead, where no text sits.
+//
+// Only from the breakpoint up. Below it a slide is the width of the column,
+// the caption is as tall as its text, and laid over the media it would cover
+// most of the picture it is meant to caption.
+.theme-carousel__caption--overlay {
+    @media (min-width: bp.$md) {
+        position: absolute;
+        inset-inline: 0;
+        inset-block-end: 0;
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset-inline: 0;
+            inset-block-end: 100%;
+            block-size: var(--theme-space-7, 2.5rem);
+            background-image: linear-gradient(
+                to top,
+                var(--theme-carousel-caption-background),
+                transparent
+            );
+        }
+    }
+}
+
+// --- Controls -----------------------------------------------------------------
+//
+// One row: the previous button, the indicators, the next button. The row is
+// rendered whatever happens, because the indicators are in it and they work
+// without the script; only the two buttons are gated.
+.theme-carousel__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--theme-carousel-gap);
+}
+
+// See "Without the script" above. First in the block on purpose:
+// "ComponentLibraryTest::carouselControlsAreHiddenUntilTheScriptHasBoundThem()"
+// asserts this gate, and the absence of a "data-js" one, on the compiled file.
+.theme-carousel__control {
+    display: none;
+
+    .theme-carousel[data-theme-carousel-bound] & {
+        display: inline-flex;
+    }
+}
+
+// The indicators are a list of links, one per slide. The label of each is for
+// a screen reader only - the dot is what a sighted reader sees - so it is
+// taken out of the flow rather than hidden, which would take it out of the
+// accessibility tree with it.
+.theme-carousel__indicators {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-carousel__indicator {
+    display: block;
+
+    // The dot is small; the target around it is not. WCAG 2.2 2.5.8 asks for
+    // 24 by 24 CSS pixels, and the padding is what provides it without
+    // changing what is drawn.
+    padding: var(--theme-space-2, 0.625rem);
+    border-radius: var(--theme-radius-full, 9999px);
+
+    &::before {
+        content: '';
+        display: block;
+        inline-size: var(--theme-carousel-indicator-size);
+        block-size: var(--theme-carousel-indicator-size);
+        border-radius: var(--theme-radius-full, 9999px);
+        background-color: var(--theme-carousel-indicator-color);
+    }
+
+    &:hover::before {
+        background-color: var(--theme-carousel-indicator-color-current);
+    }
+
+    // Set by the script on the slide in view. Told apart by more than its
+    // colour (WCAG 1.4.1): the dot of the current slide is drawn as a ring
+    // around a filled centre, which is a shape the others do not have.
+    &[aria-current]::before {
+        background-color: var(--theme-carousel-indicator-color-current);
+        box-shadow: 0 0 0 var(--theme-border-width-strong, 2px) var(--theme-color-background, #ffffff),
+            0 0 0 calc(2 * var(--theme-border-width-strong, 2px)) var(--theme-carousel-indicator-color-current);
+    }
+}
+
+.theme-carousel__indicator-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+// --- Forced colours -----------------------------------------------------------
+//
+// See "Forced colours" in docs/development/component-library.md. The dots are
+// backgrounds, which forced colours repaint to the canvas colour and would
+// leave invisible, so they become borders instead; the current one keeps the
+// system highlight, which is already the colour the reader's scheme asked for.
+@media (forced-colors: active) {
+    .theme-carousel__indicator::before {
+        border: var(--theme-border-width-strong, 2px) solid CanvasText;
+    }
+
+    .theme-carousel__indicator[aria-current]::before {
+        forced-color-adjust: none;
+        border-color: Highlight;
+        background-color: Highlight;
+    }
+}

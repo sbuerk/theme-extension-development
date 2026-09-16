@@ -289,6 +289,11 @@ not know renders the element without one.
         -   A rule at the start - the default; a pull quote -
             :css:`.theme-quote--pull`; centred - :css:`--centred`, both with a
             quotation mark. See :ref:`feature-quotation-styles`
+    *   -   :guilabel:`Carousel`
+        -   :guilabel:`Caption` per slide
+        -   Below the image - the default; above it -
+            :css:`.theme-carousel__caption--above`; over its foot -
+            :css:`--overlay`. See :ref:`feature-carousel-and-split-tiles`
 
 Tables
 ======

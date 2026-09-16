@@ -1217,6 +1217,14 @@ tt_content.theme_card_group.templateName = ContentElements/ThemeCardGroup
 tt_content.theme_teaser_list =< tt_content.theme_media_teaser_grid
 tt_content.theme_teaser_list.templateName = ContentElements/ThemeTeaserList
 
+# A carousel. It reads "tx_theme_list_items" with the image of every row, the
+# same query and the same nested "FilesProcessor" as the three above, so it is
+# a reference to "tt_content.theme_media_teaser_grid" with a template of its
+# own. It does not sort its rows: the order of the relation is the order on the
+# page, which is the "orderBy = sorting_foreign" the reference already carries.
+tt_content.theme_carousel =< tt_content.theme_media_teaser_grid
+tt_content.theme_carousel.templateName = ContentElements/ThemeCarousel
+
 # The timeline is the one of the three whose order is not the order of the
 # relation: its entries are sorted by their date, in the direction the
 # element asks for, and "sorting_foreign" only decides between entries of one

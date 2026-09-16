@@ -3,9 +3,11 @@
       xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
-    Styleguide section "Interactive": the three components of the library
-    that need "Resources/Public/JavaScript/theme.js" - tabs, the dialog and
-    the tooltip - each with what it does when the script never runs.
+    Styleguide section "Interactive": the four components of the library
+    that need "Resources/Public/JavaScript/theme.js" - tabs, the dialog, the
+    carousel and the tooltip - each with what it does when the script never
+    runs. The carousel is the one of the four that needs the script least:
+    only its two buttons do, and everything else about it works without one.
 
     The rules of every other section apply: literal markup copied from the
     markup contract in the component's own SCSS header comment, nothing driven
@@ -37,11 +39,13 @@
     <h2 class="theme-styleguide__heading">Interactive</h2>
 
     <p>
-        The three components in this section are the only ones in the library
+        The four components in this section are the only ones in the library
         that need the theme's script. Each one says what it does without it,
         and this page is the place to check that claim: switch JavaScript off in
         the browser and reload.
     </p>
+
+    <f:variable name="specimenMediaLandscape" value="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20160%2090%27%3E%3Crect%20width=%27160%27%20height=%2790%27%20fill=%27%23d6dce6%27/%3E%3Cpath%20d=%27M0%2090%2058%2038%2092%2066%20118%2044%20160%2090Z%27%20fill=%27%234a5567%27/%3E%3Ccircle%20cx=%2736%27%20cy=%2724%27%20r=%2711%27%20fill=%27%234a5567%27/%3E%3C/svg%3E" />
 
     <h3>Tabs</h3>
     <div class="theme-styleguide__specimen">
@@ -142,6 +146,80 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <h3>Carousel</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_carousel.scss. The ids
+            are prefixed "sg-carousel-" like every other id in this section.
+            The indicators are links to those ids, which is what makes them
+            work with no script; only the two buttons are gated on the
+            script's own "data-theme-carousel-bound".
+        </f:comment>
+        <p>
+            Slides in one track that scrolls sideways and snaps.
+            <strong>Nothing moves on its own</strong> &mdash; there is no
+            autoplay, which is how WCAG 2.2.2 is satisfied: there is no motion
+            to pause. Without the script the track still scrolls by touch,
+            trackpad, wheel and scroll bar, and by the arrow keys once it has
+            focus, and the indicators below are ordinary links to the slides,
+            so every slide stays reachable. The previous and next buttons are
+            the one part that needs the script, so they are not rendered until
+            it has bound this carousel. The caption of a slide sits below the
+            picture, above it, or over its foot.
+        </p>
+        <section class="theme-carousel" aria-roledescription="carousel" aria-label="Specimen: releases">
+            <ul class="theme-carousel__track" tabindex="0">
+                <li class="theme-carousel__slide" id="sg-carousel-slide-1">
+                    <figure class="theme-carousel__figure" role="group" aria-roledescription="slide" aria-label="1 of 3">
+                        <div class="theme-carousel__media">
+                            <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the picture of the first slide.">
+                        </div>
+                        <figcaption class="theme-carousel__caption">
+                            <h4 class="theme-carousel__title">The caption below</h4>
+                            <p class="theme-carousel__text">The default: the words sit under the picture, in the surface fill.</p>
+                            <a class="theme-button" href="#">Read the notes</a>
+                        </figcaption>
+                    </figure>
+                </li>
+                <li class="theme-carousel__slide" id="sg-carousel-slide-2">
+                    <figure class="theme-carousel__figure" role="group" aria-roledescription="slide" aria-label="2 of 3">
+                        <div class="theme-carousel__media">
+                            <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the picture of the second slide.">
+                        </div>
+                        <figcaption class="theme-carousel__caption theme-carousel__caption--above">
+                            <h4 class="theme-carousel__title">The caption above</h4>
+                            <p class="theme-carousel__text">Painted before the picture, while staying after it in the markup, so the reading order does not follow the flip.</p>
+                        </figcaption>
+                    </figure>
+                </li>
+                <li class="theme-carousel__slide" id="sg-carousel-slide-3">
+                    <figure class="theme-carousel__figure" role="group" aria-roledescription="slide" aria-label="3 of 3">
+                        <div class="theme-carousel__media">
+                            <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the picture of the third slide.">
+                        </div>
+                        <figcaption class="theme-carousel__caption theme-carousel__caption--overlay">
+                            <h4 class="theme-carousel__title">The caption over the picture</h4>
+                            <p class="theme-carousel__text">Over the foot of the picture on a wide screen, and below it on a narrow one, where it would cover what it captions.</p>
+                        </figcaption>
+                    </figure>
+                </li>
+            </ul>
+            <div class="theme-carousel__controls">
+                <button class="theme-carousel__control theme-carousel__control--previous" type="button" aria-label="Previous slide">
+                    <theme:icon name="chevron-left" />
+                </button>
+                <ol class="theme-carousel__indicators" aria-label="Go to a slide">
+                    <li><a class="theme-carousel__indicator" href="#sg-carousel-slide-1"><span class="theme-carousel__indicator-label">Slide 1</span></a></li>
+                    <li><a class="theme-carousel__indicator" href="#sg-carousel-slide-2"><span class="theme-carousel__indicator-label">Slide 2</span></a></li>
+                    <li><a class="theme-carousel__indicator" href="#sg-carousel-slide-3"><span class="theme-carousel__indicator-label">Slide 3</span></a></li>
+                </ol>
+                <button class="theme-carousel__control theme-carousel__control--next" type="button" aria-label="Next slide">
+                    <theme:icon name="chevron-right" />
+                </button>
+            </div>
+        </section>
     </div>
 
     <h3>Tooltip</h3>

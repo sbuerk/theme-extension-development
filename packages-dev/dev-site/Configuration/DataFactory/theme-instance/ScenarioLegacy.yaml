@@ -2261,6 +2261,71 @@ entities:
                           meta: Berlin
                 -
                   self:
+                    id: 1150
+                    title: Carousel
+                    slug: /elements/theme/carousel
+                    backend_layout: content_sidebar
+                    abstract: 'Slides in one track that scrolls sideways, with the caption below, above or over the picture.'
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 16001
+                          CType: header
+                          header: Carousel
+                          header_layout: 1
+                      -
+                        self:
+                          id: 16002
+                          CType: theme_carousel
+                          header: 'Every caption position'
+                          header_layout: 2
+                          tx_theme_list_items: '1460,1461,1462,1463'
+                      -
+                        self:
+                          id: 16003
+                          CType: theme_carousel
+                          tx_theme_list_items: '1464,1465'
+                    listItem:
+                      -
+                        self:
+                          id: 1460
+                          header: 'The caption below'
+                          text: 'The default: the words sit under the picture.'
+                          link: 't3://page?uid=1009'
+                          link_label: 'Open the styleguide'
+                      -
+                        self:
+                          id: 1461
+                          header: 'The caption above'
+                          text: 'Painted before the picture, and still after it in the markup.'
+                          caption_position: above
+                      -
+                        self:
+                          id: 1462
+                          header: 'The caption over the picture'
+                          text: 'Over the foot of the picture on a wide screen, below it on a narrow one.'
+                          caption_position: overlay
+                          link: 't3://page?uid=1003'
+                          link_label: 'Look at the images'
+                          link_variant: secondary
+                      -
+                        self:
+                          id: 1463
+                          header: 'The fourth slide'
+                          text: 'Out of view until the track is scrolled, which is what makes it obvious that it scrolls.'
+                      -
+                        self:
+                          id: 1464
+                          header: 'A carousel with no heading'
+                          text: 'The region is named after the element, and takes a generic name where the element has none.'
+                      -
+                        self:
+                          id: 1465
+                          header: 'A slide without a picture'
+                          text: 'The caption is the whole slide.'
+                -
+                  self:
                     id: 1110
                     title: 'Hero layouts'
                     slug: /elements/theme/hero

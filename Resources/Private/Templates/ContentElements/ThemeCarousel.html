@@ -1,0 +1,154 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    "theme_carousel" - slides in one track that scrolls sideways, on
+    ".theme-carousel" (Resources/Private/Scss/components/_carousel.scss).
+
+    The slides are "tx_theme_list_items", resolved like those of
+    "ThemeMediaTeaserGrid.html" - see its comment for the "item.data" and
+    "item.files" shape "DatabaseQueryProcessor" hands over - in the order of
+    the relation. They are the items of a list, a "ul" of "li", and their
+    titles sit one level below the heading of the element
+    ("Partials/ContentElement/ItemHeading.html").
+
+    "item.data.caption_position" picks the modifier of the caption: "above"
+    and "overlay", anything else the caption below the picture, which is the
+    bare class. "ContentElementContractTest" holds every modifier written here
+    to a rule of the compiled stylesheet.
+
+    --- The semantics, which are the whole point of this element -------------
+
+    The section is the carousel: "aria-roledescription='carousel'" tells a
+    screen reader what the pattern is, and it needs a role to describe, which
+    a "section" only has once it carries an accessible name - so the name is
+    never left off. It is the heading of the element, or a generic label where
+    there is none, exactly as the scroller of "ThemeCardGroup.html" does it.
+
+    Each slide is a "role='group'" with "aria-roledescription='slide'" and a
+    position - "3 of 7" - which is what lets a reader who has jumped into the
+    middle of the track know where they are.
+
+    That group role sits on the "figure" **inside** the "li", not on the "li"
+    itself, and that is not a stylistic choice: a "role" on a list item
+    replaces its implicit "listitem" role, which leaves the "ul" with a direct
+    child that is not a list item. It is invalid, axe reports it as the serious
+    "list" rule, and the cost of it is the item count - the very thing the
+    list was kept for. With the role one level in, the track is still a list of
+    three items *and* each slide still announces itself as a slide.
+    "aTrackIsAListOfItemsAndEachSlideIsAGroupInsideIt" is the regression guard,
+    because axe only ever sees the styleguide, never a rendered element.
+
+    **The indicators are links, not tabs.** Each one points at the id of its
+    slide, so with no script at all the browser scrolls that slide into view -
+    which is what keeps every slide reachable with JavaScript off, together
+    with the track being a scroll container with a tab stop. A "role='tablist'"
+    was rejected: a tab promises that pressing it selects a panel and hides the
+    others, which would mean hiding every slide but one in the markup, and a
+    page whose script never ran would then show one slide and strand the rest.
+    Nothing here carries "aria-current" from the server either - which slide is
+    in view is not something the server can know - so the script adds it once
+    it can observe the track.
+
+    The two buttons are the one part that needs the script. They are rendered
+    always and hidden by the stylesheet until "theme.js" has bound this
+    carousel, so a page whose script failed to load shows no control that does
+    nothing - see the component's header comment.
+
+    There is no autoplay, and no field for one: see the same comment for the
+    WCAG 2.2.2 reasoning.
+
+    A slide with a link renders it as a button of the style the editor picked,
+    through "Partials/ContentElement/LinkButton.html", like a card of the card
+    group. "item.data.text" is the plain text column of the child table, hence
+    "f:format.nl2br".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <f:if condition="{data.header}">
+            <f:then><f:variable name="label">{data.header}</f:variable></f:then>
+            <f:else><f:variable name="label"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.carouselLabel" /></f:variable></f:else>
+        </f:if>
+        <section class="theme-carousel" aria-roledescription="carousel" aria-label="{label}">
+            <ul class="theme-carousel__track" tabindex="0">
+                <f:for each="{listItems}" as="item" iteration="slide">
+                    <li class="theme-carousel__slide" id="c{data.uid}-slide-{slide.cycle}">
+                        <figure class="theme-carousel__figure"
+                                role="group"
+                                aria-roledescription="slide"
+                                aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.carousel.slide', arguments: {0: slide.cycle, 1: slide.total})}">
+                            <f:if condition="{item.files.0}">
+                                <div class="theme-carousel__media">
+                                    <f:image image="{item.files.0}" loading="lazy" />
+                                </div>
+                            </f:if>
+                            <f:switch expression="{item.data.caption_position}">
+                                <f:case value="above"><f:variable name="caption" value="theme-carousel__caption theme-carousel__caption--above" /></f:case>
+                                <f:defaultCase><f:variable name="caption" value="theme-carousel__caption" /></f:defaultCase>
+                            </f:switch>
+                            <f:comment>
+                                "overlay" needs a picture to lie over, and only
+                                gets the modifier when the slide has one. The
+                                modifier takes the caption out of the flow, and
+                                the figure is a flex box that clips what
+                                overflows it - so on a slide without a picture
+                                there would be nothing left to give the figure
+                                height and the caption would be clipped away
+                                entirely. Two ordinary editor choices, an
+                                overlay caption and a slide with no image, must
+                                not lose the text between them. Without a
+                                picture the caption keeps the bare class and
+                                sits in the flow, the same way every value this
+                                theme does not render falls back to it.
+                            </f:comment>
+                            <f:if condition="{item.files.0}">
+                                <f:if condition="{item.data.caption_position} == 'overlay'">
+                                    <f:variable name="caption" value="theme-carousel__caption theme-carousel__caption--overlay" />
+                                </f:if>
+                            </f:if>
+                            <figcaption class="{caption}">
+                                <f:if condition="{item.data.header}">
+                                    <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-carousel__title', title: item.data.header}" />
+                                </f:if>
+                                <f:if condition="{item.data.text}">
+                                    <p class="theme-carousel__text"><f:format.nl2br>{item.data.text}</f:format.nl2br></p>
+                                </f:if>
+                                <f:if condition="{item.data.link}">
+                                    <f:render partial="ContentElement/LinkButton" arguments="{link: item.data.link, label: item.data.link_label, variant: item.data.link_variant, icon: item.data.link_icon}" />
+                                </f:if>
+                            </figcaption>
+                        </figure>
+                    </li>
+                </f:for>
+            </ul>
+            <div class="theme-carousel__controls">
+                <button class="theme-carousel__control theme-carousel__control--previous"
+                        type="button"
+                        aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.carousel.previous')}">
+                    <theme:icon name="chevron-left" />
+                </button>
+                <ol class="theme-carousel__indicators" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.carousel.slides')}">
+                    <f:for each="{listItems}" as="item" iteration="slide">
+                        <li>
+                            <a class="theme-carousel__indicator" href="#c{data.uid}-slide-{slide.cycle}">
+                                <span class="theme-carousel__indicator-label"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.carousel.goToSlide" arguments="{0: slide.cycle}" /></span>
+                            </a>
+                        </li>
+                    </f:for>
+                </ol>
+                <button class="theme-carousel__control theme-carousel__control--next"
+                        type="button"
+                        aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.carousel.next')}">
+                    <theme:icon name="chevron-right" />
+                </button>
+            </div>
+        </section>
+    </f:if>
+</f:section>
+
+</html>
