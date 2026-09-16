@@ -518,18 +518,18 @@ every value to a compiled `.theme-table--<value>` rule.
 
 ## `shortcut`: recursion, and a guard that is version-dependent
 
-`records` holds one or more `tt_content_<uid>` references (the TCA `group`
-field allows only `tt_content`). The TypoScript branch resolves them through
-the core's `RECORDS` cObject rather than anything of this extension's own,
-assigned as a TypoScript **variable**, not a `dataProcessing` entry:
+The column `records` holds one or more `tt_content_<uid>` references (the TCA
+`group` field allows only `tt_content`). The TypoScript branch resolves them
+through the core's `RECORDS` cObject rather than anything of this extension's
+own, assigned as a TypoScript **variable**, not a `dataProcessing` entry:
 
 ```typoscript
 tt_content.shortcut {
     templateName = ContentElements/Shortcut
 
     variables {
-        records = RECORDS
-        records {
+        shortcuts = RECORDS
+        shortcuts {
             tables = tt_content
             source.field = records
             conf.tt_content =< tt_content
@@ -537,6 +537,21 @@ tt_content.shortcut {
     }
 }
 ```
+
+The variable is `shortcuts` and the column is `records`, which looks like a
+slip and is not: `shortcuts` is the name `fluid_styled_content` assigns the
+rendered markup to (its `Configuration/TypoScript/ContentElement/Shortcut.typoscript`,
+read at `v14.3.7`). It is not the only place the two disagree: both categorized
+menus do as well — `menu_categorized_pages` because that extension builds it
+with `MenuProcessor`, whose default `as` is `menu`, where this theme assigns
+`variables.items` from `RECORDS`; and `menu_categorized_content` because it
+assigns `content` where this theme assigns `items`. Those two are left
+disagreeing on purpose, because there the shapes behind the names differ too
+(see [the two categorized types](#the-two-categorized-types-are-built-differently--deliberately)),
+and renaming either would advertise a shared contract that does not hold.
+`shortcut` is the one element where only the spelling differed, so the theme
+adopted that name so that a
+template written against either contract reads the same variable.
 
 `conf.tt_content =< tt_content` is what makes a referenced record render
 **exactly as it would on its own**: it copies the whole `tt_content` `CASE`
