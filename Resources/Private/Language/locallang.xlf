@@ -222,6 +222,12 @@
 			<trans-unit id="theme.languageMenuListLabel">
 				<source>Languages</source>
 			</trans-unit>
+			<trans-unit id="theme.tableOfContentsHeading">
+				<source>On this page</source>
+			</trans-unit>
+			<trans-unit id="theme.linkToTop">
+				<source>Back to top</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
