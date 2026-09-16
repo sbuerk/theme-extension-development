@@ -888,6 +888,7 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_card_group`        | Cards in a grid, or in one row that scrolls sideways     | `.theme-card-grid` of `.theme-card` items               |
 | `theme_timeline`          | Dated entries on a line, sorted by date                  | `.theme-timeline`                                       |
 | `theme_teaser_list`       | Rows of teasers, each row one link                       | `.theme-list-group`                                     |
+| `theme_carousel`          | Slides in one track that scrolls sideways; no autoplay   | `.theme-carousel`                                       |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -1375,6 +1376,55 @@ row.
 arrangements of the card group and to no other type, and
 `ContentElementContractTest` every modifier the card group writes to a rule of
 the stylesheet.
+
+### The carousel
+
+Another element on the same child table, and the same reference to
+`theme_media_teaser_grid` for its TypoScript. What is interesting about it is
+not the query but what it refuses to do.
+
+It renders `.theme-carousel`. The child gains one column, `caption_position`,
+whose values are the names of the modifiers they select, as every choice column
+of this extension is — with one resolution the template makes rather than the
+stylesheet: **`overlay` is only written where the slide has a picture.** The
+modifier takes the caption out of the flow, and the figure is a flex box that
+clips what overflows it, so with no media branch to give the figure height the
+caption would be clipped away entirely, text and all. Two ordinary editor
+choices — an overlay caption, and a slide with no image — must not lose the
+content between them, so without a picture the caption keeps the bare class and
+sits in the flow, the way every value this theme does not render falls back to
+it. Resolved in the template and not by scoping the CSS selector, because that
+would leave the markup naming a modifier that does not apply, and
+`ContentElementContractTest` would not see the discrepancy.
+
+Three further decisions are load bearing and each is asserted by
+`CarouselRenderingTest`:
+
+- **There is no autoplay, and no column that could turn one on.** Motion that
+  starts by itself and runs longer than five seconds needs a control that stops
+  it (WCAG 2.2.2); not starting satisfies the rule without one, and nothing
+  then races a reader mid-caption.
+- **The indicators are links to the ids of the slides, not an ARIA tablist.**
+  A link moves the reader with no script at all, which is what keeps every
+  slide reachable with JavaScript off. `role="tab"` would promise an activation
+  the markup cannot honour without a script, and honouring it would mean hiding
+  every slide but one - so a page whose script failed would show one slide and
+  strand the rest. The test asserts the absence of the tab roles as well as the
+  presence of the links, because "improving" this into the tabs pattern is the
+  plausible wrong move.
+- **The two buttons are the only part that needs the script**, so they are
+  gated on the carousel's own `data-theme-carousel-bound`, which `theme.js`
+  sets - not on the root's `data-js`, for the reason `_tabs.scss` gives.
+
+The `role="group"` of a slide sits on the `figure` inside the `li`, never on
+the `li`: a role on a list item replaces its implicit `listitem` role and
+leaves the `ul` with a child that is not a list item - invalid, reported by axe
+as the serious `list` rule, and it costs exactly the item count the track is a
+list for. `aTrackIsAListOfItemsAndEachSlideIsAGroupInsideIt` holds a rendered
+element to that, because axe only ever sees the styleguide.
+
+The track is the scroll container and the list in one, carrying the tab stop,
+so the arrow keys work exactly as they do for the card scroller.
 
 ### Gaps, stated as gaps
 

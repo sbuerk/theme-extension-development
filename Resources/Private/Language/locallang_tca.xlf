@@ -549,6 +549,20 @@
 				<source>Scroller: one row that scrolls sideways</source>
 			</trans-unit>
 
+			<!-- tt_content: CType theme_carousel -->
+			<trans-unit id="tt_content.CType.theme_carousel.label">
+				<source>Carousel</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_carousel.description">
+				<source>Slides with an image, a heading, a text and a link, in one track that scrolls sideways. Nothing moves on its own.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.slides">
+				<source>Slides</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_carousel.label">
+				<source>Slides</source>
+			</trans-unit>
+
 			<!-- tt_content: CType theme_timeline -->
 			<trans-unit id="tt_content.CType.theme_timeline.label">
 				<source>Timeline</source>
@@ -595,6 +609,21 @@
 			</trans-unit>
 			<trans-unit id="tx_theme_list_item.date">
 				<source>Date</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.caption_position">
+				<source>Caption</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.caption_position.description">
+				<source>Where the text of the slide sits against its image. Laid over the image it moves below it on a narrow screen, and on a slide with no image at all.</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.caption_position.I.below">
+				<source>Below the image</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.caption_position.I.above">
+				<source>Above the image</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.caption_position.I.overlay">
+				<source>Over the foot of the image</source>
 			</trans-unit>
 			<trans-unit id="tx_theme_list_item.meta">
 				<source>Meta data</source>

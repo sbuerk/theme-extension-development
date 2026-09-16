@@ -617,3 +617,45 @@ references:
     field: image
     values:
       alternative: 'A placeholder portrait'
+  -
+    file: placeholder
+    table: pages
+    uid: 1150
+    field: media
+    values:
+      alternative: 'A placeholder graphic standing in for the carousel'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1460
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1461
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1462
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1463
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1464
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'

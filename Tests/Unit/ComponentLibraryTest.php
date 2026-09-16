@@ -49,6 +49,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'button' => '.theme-button',
             'card' => '.theme-card',
             'card scroller' => '.theme-card-scroller',
+            'carousel' => '.theme-carousel',
             'close button' => '.theme-close',
             'code block' => '.theme-code',
             'content element' => '.theme-content-element',
@@ -228,6 +229,42 @@ final class ComponentLibraryTest extends UnitTestCase
             '[data-js] .theme-tabs',
             $css,
             'The tabs must not be gated on the root marker: it does not say that "theme.js" ran.',
+        );
+    }
+
+    /**
+     * The carousel's previous and next buttons are not offered while nothing
+     * can operate them.
+     *
+     * The track scrolls and the indicators move the reader with no script at
+     * all - the two buttons are the one part that needs one, and a button
+     * does nothing without it. They are rendered always and hidden until
+     * "theme.js" has bound that carousel and set "data-theme-carousel-bound"
+     * on it.
+     *
+     * Not gated on the root's "data-js", and that is the assertion worth
+     * having: that marker only says the inline head script ran, so a page
+     * whose "theme.js" failed to load would show two buttons that do nothing.
+     * The same mistake the tabs are held to above.
+     */
+    #[Test]
+    public function carouselControlsAreHiddenUntilTheScriptHasBoundThem(): void
+    {
+        $css = $this->stylesheet();
+
+        $this->assertStringContainsString(
+            '.theme-carousel__control{display:none',
+            $css,
+            'The controls must not be offered until the script has bound the carousel.',
+        );
+        $this->assertStringContainsString(
+            '.theme-carousel[data-theme-carousel-bound] .theme-carousel__control{display:inline-flex}',
+            $css,
+        );
+        $this->assertStringNotContainsString(
+            '[data-js] .theme-carousel',
+            $css,
+            'The carousel must not be gated on the root marker: it does not say that "theme.js" ran.',
         );
     }
 

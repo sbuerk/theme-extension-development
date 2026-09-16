@@ -34,6 +34,7 @@ against, and the rename was cheap while only one template depended on it.
 | Button                  | `.theme-button`           | `components/_button.scss`           |
 | Card                    | `.theme-card`             | `components/_card.scss`             |
 | Card scroller           | `.theme-card-scroller`    | `components/_card.scss`             |
+| Carousel                | `.theme-carousel`         | `components/_carousel.scss`         |
 | Close button            | `.theme-close`            | `components/_close.scss`            |
 | Code block              | `.theme-code`             | `components/_code.scss`             |
 | Content element wrapper | `.theme-content-element`  | `components/_content-element.scss`  |
