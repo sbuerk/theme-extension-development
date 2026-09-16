@@ -2031,6 +2031,7 @@ entities:
                           layout: 1
                           tx_theme_columns: 3
                           tx_theme_list_items: '1159,1160,1161,1162,1163'
+                          linkToTop: 1
                       -
                         self:
                           id: 10006

@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     The frame every content element renders through - the core set on
@@ -55,6 +56,29 @@
     <div class="theme-content-element__inner">
         <f:render section="Main" />
     </div>
+    <f:comment>
+        "linkToTop" - the core field that appends a link back to the top of
+        the page. The core renders nothing for it: it was
+        fluid_styled_content's, which this theme does not install, so the
+        markup is the theme's own.
+
+        The target is "#content", the id "Layouts/Default.html" puts on the
+        "main" landmark - not "#top" and not "#", which scroll to the top of
+        the document and leave focus where it was. An id that is a real
+        element moves focus with the link, so the next Tab continues from the
+        top of the content rather than from the bottom of the page.
+
+        It sits outside "__inner" on purpose: the inner box carries the
+        padding and the band of "frame_class", and a link back to the top is
+        not part of the element's content - an inverse band would otherwise
+        paint it too.
+    </f:comment>
+    <f:if condition="{data.linkToTop}">
+        <a class="theme-content-element__to-top" href="#content">
+            <theme:icon name="arrow-up" />
+            <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.linkToTop" />
+        </a>
+    </f:if>
 </div>
 
 </html>

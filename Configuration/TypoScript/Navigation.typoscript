@@ -156,3 +156,78 @@ page.10.dataProcessing {
     }
 }
 
+# The table of contents of a page: its own content elements, by their header.
+#
+# An "HMENU" rather than a fifth "MenuProcessor", because "MenuProcessor"
+# cannot express this at all: "sectionIndex" is not one of its
+# "allowedConfigurationKeys" and passing it throws exception 1478806566 from
+# "MenuProcessor::validateConfiguration()", not from its constructor. The
+# section index is an HMENU option, read off the configuration of
+# the menu level in "AbstractMenuContentObject::prepareMenuItems()", so the
+# menu has to be built as one. It is assigned as a template variable rather
+# than through "dataProcessing" for the same reason - there is no processor to
+# hand the result over.
+#
+# "useColPos = -1" lifts the column restriction. Without it the index is
+# "colPos = 0" only - the default of "sectionIndex()" - and an element of the
+# sidebar or the stage would be missing from the contents of its own page with
+# nothing to show for it.
+#
+# "type = header" is what makes the entries readable: with the default type an
+# element whose header is empty, or whose "header_layout" is 100 (hidden),
+# still becomes an entry, and the anchor gets the empty string as its text. The
+# "header" type drops both. An editor who wants a hidden header in the index
+# switches "includeHiddenHeaders" on in their own TypoScript; the theme does
+# not, because an entry pointing at a heading nobody can see is a promise the
+# page does not keep.
+#
+# The order is "sorting", the order of the column in the backend - the default
+# of "sectionIndex()", stated here because it is the one thing about a table of
+# contents a reader notices immediately if it is wrong.
+#
+# The anchor needs nothing: "sectionIndex()" puts the content uid in
+# "sectionIndex_uid", "link()" copies it into "conf.section", and
+# "PageLinkBuilder::calculateUrlFragment()" prefixes a numeric fragment with
+# "c" - so the href is "#c<uid>", exactly the id "Layouts/ContentElement.html"
+# writes. Changing that id breaks every entry of this menu.
+#
+# The markup is split: the menu emits one "li" per entry with the classes of
+# ".theme-content-menu", and "Partials/Navigation/TableOfContents.html" wraps
+# them in the "nav" and the "ul". The component is the content menu rather
+# than one of its own, the same decision "Templates/Page/Styleguide.html"
+# records for its own index: a flat list of links is exactly what that
+# component is.
+page.10.variables.tableOfContents = HMENU
+page.10.variables.tableOfContents {
+    # The index is of THIS page, which takes saying so. Without an
+    # "entryLevel" the menu starts at "$localRootLine[$this->entryLevel]"
+    # with "entryLevel" defaulting to 0 - the site root - and
+    # "sectionIndex()" then reads the site root's content elements on every
+    # page of the site. "-1" counts from the end of the local rootline, so
+    # it is the current page at any depth.
+    entryLevel = -1
+
+    1 = TMENU
+    1 {
+        sectionIndex = 1
+        sectionIndex {
+            useColPos = -1
+            type = header
+        }
+
+        NO = 1
+        NO {
+            ATagParams = class="theme-content-menu__link"
+            allWrap = <li class="theme-content-menu__item">|</li>
+
+            # The header of a content element reaches this menu unescaped.
+            # "sectionIndex()" assigns "$row['header']" to the item title
+            # verbatim, "getPageTitle()" does not escape it, and nothing in
+            # "ContentObject/Menu/" ever calls "htmlspecialchars()" - the
+            # only hook is the item's own "stdWrap", which is this one. An
+            # editor's header of "<img src=x onerror=...>" is stored XSS
+            # without it, because the partial renders this menu raw.
+            stdWrap.htmlSpecialChars = 1
+        }
+    }
+}

@@ -836,20 +836,25 @@ value 3, and a `menu_section` with a layout value keeping its own menu.
 labels to the two menus and the field to no other menu, and
 `ShowcaseTreeTest` holds `/elements/menu` to showing every layout.
 
-### Known gap: no `sectionIndex` embedding
+### The `menu_*` types still do not embed a section index
 
 Historical `fluid_styled_content` gave `menu_section` and `menu_section_pages`
-one thing this theme does not reproduce: it additionally queried each listed
+one thing these two types do not reproduce: it additionally queried each listed
 page's own `tt_content` rows flagged `sectionIndex` and linked into them by
-anchor, so a section menu could jump straight to a heading inside a page, not
-only to the page itself. **That is not implemented here.** `levels = 2` — a
-second menu level, the listed pages' own children — stands in for it instead,
-the same way `menu_categorized_content` is the only element in this file that
-renders more than a link and `menu_abstract`/`menu_recently_updated` are the
-only two among the nine that render more than a title. A fourth type quietly
-doing the same would contradict that boundary, so this is stated here as a
-gap, not folded in as a feature: a site package that needs anchor-level
-section navigation has to add it itself.
+anchor, so a section menu could jump straight to a heading inside a *listed*
+page. **That is still not implemented for these content elements.** `levels = 2`
+— a second menu level, the listed pages' own children — stands in for it, the
+same way `menu_categorized_content` is the only element in this file that
+renders more than a link.
+
+What the theme does render from `sectionIndex` is the table of contents of the
+**current** page, in the aside of the `content_sidebar` layout — an `HMENU` with
+`sectionIndex = 1`, not a menu content element, documented in
+[Navigation](navigation.md#the-table-of-contents). The two are different
+features: one is a menu an editor places in the content column and points at
+other pages, the other is page chrome built from the page it sits on. A site
+package that needs anchor-level navigation *into other pages* still has to add
+it itself.
 
 ### What the tests guard
 
@@ -1772,16 +1777,16 @@ per element. All of them used to be ignored: the layout rendered the wrapper and
 nothing else. Each field is now either rendered or taken out of the form. None
 is left in the form with no effect.
 
-| Field                   | Rendered as                                                                              | Where                                 |
-|-------------------------|------------------------------------------------------------------------------------------|---------------------------------------|
-| `frame_class`           | `--frame-surface`, `--frame-raised`, `--frame-accent`, `--frame-inverse`, `--frame-none` | `Layouts/ContentElement.html`         |
-| `space_before_class`    | `--space-before-{extra-small … extra-large}`                                             | `Layouts/ContentElement.html`         |
-| `space_after_class`     | `--space-after-{extra-small … extra-large}`                                              | `Layouts/ContentElement.html`         |
-| `header_position`       | `__header--center`, `--end` for `right`, `--start` for `left`                            | `Partials/ContentElement/Header.html` |
-| `tx_theme_header_style` | `.theme-display`, or `__heading--h1` … `--h5`                                            | `Partials/ContentElement/Header.html` |
-| `layout`                | per CType: `bullets` and `text` render it, every other type has it disabled              | page TSconfig, the element template   |
-| `sectionIndex`          | disabled                                                                                 | page TSconfig                         |
-| `linkToTop`             | disabled                                                                                 | page TSconfig                         |
+| Field                   | Rendered as                                                                              | Where                                               |
+|-------------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| `frame_class`           | `--frame-surface`, `--frame-raised`, `--frame-accent`, `--frame-inverse`, `--frame-none` | `Layouts/ContentElement.html`                       |
+| `space_before_class`    | `--space-before-{extra-small … extra-large}`                                             | `Layouts/ContentElement.html`                       |
+| `space_after_class`     | `--space-after-{extra-small … extra-large}`                                              | `Layouts/ContentElement.html`                       |
+| `header_position`       | `__header--center`, `--end` for `right`, `--start` for `left`                            | `Partials/ContentElement/Header.html`               |
+| `tx_theme_header_style` | `.theme-display`, or `__heading--h1` … `--h5`                                            | `Partials/ContentElement/Header.html`               |
+| `layout`                | per CType: `bullets` and `text` render it, every other type has it disabled              | page TSconfig, the element template                 |
+| `sectionIndex`          | an entry of the table of contents of the page                                            | `HMENU`, `Partials/Navigation/TableOfContents.html` |
+| `linkToTop`             | `__to-top`, a link to `#content` with the `arrow-up` icon                                | `Layouts/ContentElement.html`                       |
 
 Every value is matched by an `f:case`, and anything else renders no modifier:
 the default, a value the page TSconfig removed that an older record still
