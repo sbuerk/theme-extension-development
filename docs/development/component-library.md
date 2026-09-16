@@ -55,6 +55,7 @@ against, and the rename was cheap while only one template depended on it.
 | Gallery                 | `.theme-gallery`          | `components/_gallery.scss`          |
 | Hero                    | `.theme-hero`             | `components/_hero.scss`             |
 | Icon                    | `.theme-icon`             | `components/_icon.scss`             |
+| Language menu           | `.theme-language-menu`    | `components/_language-menu.scss`    |
 | Lightbox                | `.theme-lightbox`         | `components/_lightbox.scss`         |
 | Link decoration         | `.theme-link`             | `components/_link.scss`             |
 | List                    | `.theme-list`             | `components/_list.scss`             |

@@ -145,38 +145,113 @@ degraded one. See [Component library § The `data-js`
 marker](../development/component-library.md#the-data-js-marker) for the CSS
 side of that gate and the test that pins it down.
 
-## Language navigation is deliberately absent
+## The language menu, and the honest unavailable state
 
-Nothing in the navigation contract asks for one, and the theme has no
-multi-language story yet — `NavigationRenderingTest` runs a single-language
-site configuration. Adding a language menu ahead of that would be building
-against a contract that does not exist yet rather than the one that does.
+`page.10.dataProcessing.40` is core `LanguageMenuProcessor`, rendered by
+`Partials/Navigation/Language.html` inside the header dropdown. The processor
+takes four keys only — `if`, `languages`, `as` and `addQueryString` — and
+anything else throws (`1522959188`); it sets `special = language` itself.
 
-## What the tests cover
+**A one-language site gets no dropdown, and that takes a count to arrange.**
+The processor defaults `special.value` to `auto` and returns early only when
+the site has no language at all, so one language yields a menu of exactly one
+item — the language already being read. `Partials/Page/Header.html` therefore
+guards on `{languageMenu -> f:count()} > 1` rather than on the menu being
+non-empty: a truthiness test would render a dropdown whose single entry offers
+the reader nothing. The partial itself keeps the ordinary empty guard, so the
+decision sits with the caller that has the header row to spend.
 
-`Tests/Functional/NavigationRenderingTest.php`, against the three-level
-fixture in `NavigationPageTree.csv`:
+**The template reads `active`, never `current`.** `current` comes from the item
+states `CUR`/`CURIFSUB`, and a language menu never emits either — it marks the
+language being viewed `ACT`. `current` is therefore always `0` in a language
+menu, and a template built on it marks nothing at all. The entry carries
+`aria-current="true"`, not `"page"`: it is this page in the language already
+being read, not a different page.
 
-| Test                                                     | Guards                                                                    |
-|----------------------------------------------------------|---------------------------------------------------------------------------|
-| `theMainMenuListsTheTopLevelOfTheSite`                   | The top level renders, from the site root regardless of the current page. |
-| `theMainMenuLeavesOutAPageHiddenFromNavigation`          | `nav_hide` is honoured.                                                   |
-| `theMainMenuCarriesASecondLevel`                         | `expandAll = 1` puts the second level in the markup unconditionally.      |
-| `theSubNavigationShowsTheSectionOnEveryLevelOfIt`        | The `leveluid:1` fix, asserted at all three page depths at once.          |
-| `theCurrentPageIsMarkedForAssistiveTechnology`           | `aria-current="page"` is present on the current page's link.              |
-| `theBreadcrumbShowsTheTrailAndDoesNotLinkTheCurrentPage` | The trail order, and that the last item is not an anchor.                 |
-| `everyNavigationLandmarkIsLabelled`                      | No `<nav>` without an `aria-label`.                                       |
-| `theMenuToggleIsWiredToTheListItControls`                | The button's `aria-controls` names an `id` that actually exists.          |
-| `onlyTheSidebarLayoutCarriesTheSubNavigation`            | The sub navigation appears on `content_sidebar` and nowhere else.         |
+**How that flag is produced is not the same on the two cores**, which is worth
+knowing before reading either implementation as if it were the other:
 
-The accessible state is asserted throughout, not the visual one — asserting a
-modifier class instead of `[aria-current='page']` would let the two drift
-apart without any test noticing, since the stylesheet reads the attribute, not
-a class.
+| Core  | How `active`, `current` and `available` are produced                                                                                                                                        |
+|-------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| v14.3 | Computed in PHP from the item's `ITEM_STATE`: `ACT`/`ACTIFSUB`/`USERDEF2` → active, `CUR`/`CURIFSUB` → current, `USERDEF1`/`USERDEF2` → unavailable.                                        |
+| v13.4 | Never computed in PHP. Each item is a JSON string assembled by TypoScript, with `cObject` slots `91`, `92` and `93` carrying the three flags and a link placeholder substituted afterwards. |
 
-## See also
+On v13 the state configuration sets the values: `ACT` writes `1` into slot
+`91`, `CUR` writes `1` into slot `92`, and `USERDEF1`/`USERDEF2` write `0` into
+slot `93` — with `USERDEF2` derived from `ACT`, so it keeps slot `91`. The
+resulting key names and their meanings are identical on both cores, and neither
+sets `special.normalWhenNoLanguage`. The template therefore depends on the
+contract rather than on the mechanism, which is why one template serves both;
+`LanguageMenuRenderingTest` is green on v13.4 and v14.3 alike.
 
-- [Page rendering](page-rendering.md)
-- [Component library](../development/component-library.md)
-- [`DESIGN.md`](../../DESIGN.md)
-- [Functional tests](../testing/functional-tests.md)
+It also uses only the keys `LanguageMenuProcessor` has documented since TYPO3
+9.3 — `languageId`, `navigationTitle`, `hreflang`, `link`, `active`,
+`available`. TYPO3 v14 additionally puts `data`, `target`, `spacer` and
+`hasSubpages` on every item; those are not part of the contract on v13.4 and
+are deliberately unused.
+
+### An untranslated language is shown, not hidden
+
+A language the current page has no translation for comes back with
+`available = 0`, and the partial renders it as plain text carrying
+`aria-disabled="true"` rather than as a link. Hiding it would tell a reader the
+site has fewer languages than it has; linking it would promise a translation
+that does not exist.
+
+**`fallbackType` cannot argue that flag away.** The state is decided by whether
+`getPageOverlay()` returned a record carrying `_LOCALIZED_UID`, and
+`LanguageMenuProcessor` never sets `special.normalWhenNoLanguage`, so for any
+language other than the default an empty overlay is `USERDEF1` — unavailable.
+`fallbacks: [0]` does not help either: `PageRepository::getPageOverlaysForLanguage()`
+filters the default language out of the overlay chain with `array_filter()`, so
+the chain is empty and there is no overlay to find. Only a **non-zero** fallback
+language that actually has the page translated makes an entry available.
+
+That is exactly the state the demo instances are in. Both sites declare a second
+language, German, in `instance-core-*/config/sites/*/config.yaml`, and the
+showcase is seeded in English only — `sbuerk/data-factory` declares records
+through `self`, `children` and `entities` and cannot express a translation at
+all. So the menu shows German as unavailable on every page of the demo, which is
+the truth about that tree rather than a translation faked for a screenshot.
+Adding the language needs no database record: `sys_language` was removed in
+TYPO3 v12, and a site language is the site configuration alone.
+
+### The landmark and the trigger are named differently, on purpose
+
+The dropdown's button is named "Language" and the `<nav>` inside it
+"Languages" (`theme.languageMenuLabel` and `theme.languageMenuListLabel`).
+Both once used the first key, so a screen reader announced the button as
+"Language" and then the region it opened as "Language" again — the same word
+twice for two different things. The trigger names the control a reader
+operates; the landmark names the list it contains. The rule that every `<nav>`
+carries a translated `aria-label` is unchanged; what changed is that the label
+is no longer a copy of the name of whatever opens it.
+
+The table of contents solves the same problem the other way: it has a visible
+heading, so its landmark takes `aria-labelledby` pointing at that heading
+rather than repeating the words in an `aria-label` — see
+[Content elements](content-elements.md). Where a landmark has visible text of
+its own, that text names it; where it has none, it gets a label that does not
+duplicate its trigger.
+
+### The header dropdown is a popover
+
+`Partials/Page/Dropdown.html` is a trigger carrying `popovertarget` over a panel
+carrying `popover`. The browser opens and closes it, puts it in the top layer
+and gives it light dismiss — Escape and a click outside — with no script of the
+theme's own. That is why the dropdown, unlike the display settings, is rendered
+unconditionally rather than hidden until `data-js`: nothing about opening it
+depends on a script having run.
+
+`aria-expanded` is still mirrored onto the trigger, because the Popover API
+tells assistive technology nothing about it. `theme.js` does that from the
+panel's own `toggle` event — it reports the state and never changes it, so a
+page whose script failed to load still has a working dropdown with a stale
+attribute, rather than a dead button.
+
+The Popover API is what moved the [browser floor](../../DESIGN.md#the-browser-floor)
+to Firefox 125.
+
+The language menu inside it is a plain `<nav>` that renders anywhere; the
+dropdown only decides where it sits in the header row.
+

@@ -50,8 +50,8 @@ What the library contains
         -   Controls, field, input group, choice group, validation
     *   -   Navigation and page
         -   Main and sub navigation, breadcrumb, pagination, content menu,
-            dropdown, skip link, gallery, the content element wrapper, site
-            header and site footer
+            language menu, dropdown, skip link, gallery, the content element
+            wrapper, site header and site footer
 
 ..  _icons:
 

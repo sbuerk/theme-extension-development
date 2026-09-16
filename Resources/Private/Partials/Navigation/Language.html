@@ -1,0 +1,108 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The language menu: one entry per language of the site.
+
+    "{languageMenu}" comes from core "LanguageMenuProcessor"
+    ("Configuration/TypoScript/Navigation.typoscript"). Only the keys that
+    processor has documented since TYPO3 9.3 are read here - "languageId",
+    "navigationTitle", "hreflang", "link", "active" and "available". The keys
+    v14 adds on top of them ("data", "target", "spacer", "hasSubpages") are
+    deliberately not used: they are not part of the contract on v13.4.
+
+    --- "active", never "current" -------------------------------------------
+
+    The processor derives "current" from the item states "CUR"/"CURIFSUB", and
+    "prepareMenuItemsForLanguageMenu()" never emits either - it marks the
+    language being viewed "ACT". So "current" is always 0 in a language menu,
+    and reading it would leave the menu with nothing marked at all. "active"
+    is the one that says "this is the language you are reading".
+
+    "aria-current='true'", not "page": the entry is not another page, it is
+    this page in the language already being read.
+
+    --- The unavailable state is rendered, not hidden ------------------------
+
+    A language the current page has no translation for comes out with
+    "available = 0", and it stays in the menu as plain text rather than a
+    link. Hiding it would tell a reader the site has fewer languages than it
+    has; linking it would promise a translation that does not exist and land
+    them on the fallback without a word.
+
+    That flag is not something "fallbackType" can talk out of. The state is
+    decided by whether "getPageOverlay()" returned a record carrying
+    "_LOCALIZED_UID", and "LanguageMenuProcessor" never sets
+    "special.normalWhenNoLanguage", so for any language other than the default
+    an empty overlay is "USERDEF1" - unavailable. A "fallbacks: [0]" does not
+    change it either: "PageRepository::getPageOverlaysForLanguage()" filters
+    the default language out of the overlay chain with "array_filter()", so
+    the chain is empty and there is no overlay to find. Only a *non-zero*
+    fallback language that really has the page translated makes an entry
+    available.
+
+    The two cores reach that answer by different routes, so this was read on
+    both. v14.3 maps the item's "ITEM_STATE" in PHP. v13.4 never computes these
+    keys in PHP at all: the processor assembles each item as a JSON string
+    built by TypoScript, with "cObject" slots 91, 92 and 93 supplying "active",
+    "current" and "available" and a link placeholder substituted afterwards by
+    "replacePlaceholderInRenderedMenuItem()". The state configuration is what
+    sets them - "USERDEF1" and "USERDEF2" write "0" into slot 93, and
+    "USERDEF2" is derived from "ACT" so it keeps slot 91. Neither core sets
+    "special.normalWhenNoLanguage".
+
+    So the flags mean the same thing on both cores while the machinery differs,
+    and this template depends on the contract rather than on the mechanism -
+    which is why one template serves both.
+
+    The entry is a "span" rather than a link, so there is nothing to click and
+    nothing in the tab sequence - a span is not focusable to begin with, which
+    is why it carries no "hidden" and no "tabindex".
+
+    "aria-disabled" is on it as a statement of state, not as a promise of an
+    announcement: "aria-disabled" is only mapped to a disabled state on
+    elements that can be disabled, and a bare "span" is not one, so a screen
+    reader is not obliged to read anything out for it. What carries the
+    meaning for every reader is that the entry is plain text next to entries
+    that are links. The attribute stays because it is correct and costs
+    nothing, not because it does the work.
+
+    "lang" and "hreflang" carry the language of the entry, so "Deutsch" is
+    announced in German whichever language the page around it is in.
+
+    The guard below is emptiness only. Whether a menu of one language is worth
+    showing is the caller's decision, and "Partials/Page/Header.html" makes it
+    by counting - see the comment there.
+
+    The landmark is "Languages", the dropdown trigger around it "Language":
+    the trigger names the control a reader operates, the landmark names the
+    list it contains. Both read "Language" once, which meant a screen reader
+    announced the button and then the region with the same word twice over.
+</f:comment>
+<f:if condition="{languageMenu}">
+    <nav class="theme-language-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.languageMenuListLabel')}">
+        <ul class="theme-language-menu__list">
+            <f:for each="{languageMenu}" as="item">
+                <li class="theme-language-menu__item">
+                    <f:if condition="{item.available}">
+                        <f:then>
+                            <f:if condition="{item.active}">
+                                <f:then>
+                                    <a class="theme-language-menu__link" href="{item.link}" hreflang="{item.hreflang}" lang="{item.hreflang}" aria-current="true">{item.navigationTitle}</a>
+                                </f:then>
+                                <f:else>
+                                    <a class="theme-language-menu__link" href="{item.link}" hreflang="{item.hreflang}" lang="{item.hreflang}">{item.navigationTitle}</a>
+                                </f:else>
+                            </f:if>
+                        </f:then>
+                        <f:else>
+                            <span class="theme-language-menu__link theme-language-menu__link--unavailable" lang="{item.hreflang}" aria-disabled="true">{item.navigationTitle}</span>
+                        </f:else>
+                    </f:if>
+                </li>
+            </f:for>
+        </ul>
+    </nav>
+</f:if>
+
+</html>

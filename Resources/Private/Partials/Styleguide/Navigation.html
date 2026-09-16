@@ -180,6 +180,34 @@
     </div>
 
     <div class="theme-styleguide__specimen">
+        <h3>Language menu</h3>
+        <p>
+            One entry per language of the site. The language being read carries
+            <code>aria-current="true"</code> &mdash; not <code>"page"</code>, since it is
+            this page rather than another one &mdash; and is set in the medium weight.
+            A language the current page has no translation for is rendered as plain
+            text with <code>aria-disabled="true"</code>: hiding it would say the site
+            has fewer languages than it has, and linking it would promise a
+            translation that does not exist. Each entry carries its own
+            <code>lang</code> and <code>hreflang</code>, so &ldquo;Deutsch&rdquo; is
+            announced in German whatever language the page around it is in.
+        </p>
+        <nav class="theme-language-menu" aria-label="Language menu specimen">
+            <ul class="theme-language-menu__list">
+                <li class="theme-language-menu__item">
+                    <a class="theme-language-menu__link" href="#" hreflang="en-US" lang="en-US" aria-current="true">English</a>
+                </li>
+                <li class="theme-language-menu__item">
+                    <a class="theme-language-menu__link" href="#" hreflang="de-DE" lang="de-DE">Deutsch</a>
+                </li>
+                <li class="theme-language-menu__item">
+                    <span class="theme-language-menu__link theme-language-menu__link--unavailable" lang="fr-FR" aria-disabled="true">Français</span>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="theme-styleguide__specimen">
         <h3>Dropdown</h3>
         <p>
             A labelled button that discloses a panel below it &mdash; the site header
@@ -209,10 +237,14 @@
                 <theme:icon name="chevron-down" class="theme-dropdown__marker" />
             </button>
             <div class="theme-dropdown__panel" id="theme-styleguide-dropdown-panel" popover>
-                <nav class="theme-content-menu" aria-label="Dropdown panel specimen">
-                    <ul class="theme-content-menu__list">
-                        <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#">First entry</a></li>
-                        <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#">Second entry</a></li>
+                <nav class="theme-language-menu" aria-label="Language dropdown specimen">
+                    <ul class="theme-language-menu__list">
+                        <li class="theme-language-menu__item">
+                            <a class="theme-language-menu__link" href="#" hreflang="en-US" lang="en-US" aria-current="true">English</a>
+                        </li>
+                        <li class="theme-language-menu__item">
+                            <span class="theme-language-menu__link theme-language-menu__link--unavailable" lang="de-DE" aria-disabled="true">Deutsch</span>
+                        </li>
                     </ul>
                 </nav>
             </div>
