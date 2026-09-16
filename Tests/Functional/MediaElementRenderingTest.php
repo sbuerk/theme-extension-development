@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use TYPO3\CMS\Core\Resource\File;
@@ -12,11 +13,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
- * What a gallery renders beyond the images themselves.
+ * What a page does with media beyond showing an image.
  *
- * `image_zoom` renders the lightbox dialog beside the gallery, one item per
- * image, and the zoom link keeps its `href` so it still leads to the file
- * without a script.
+ * - `image_zoom` renders the lightbox dialog beside the gallery, and the zoom
+ *   link keeps its `href` so it still works without a script.
+ * - `theme_external_media` renders a poster and a button and **no** iframe,
+ *   and only for a host the processor recognises.
  *
  * The files are real files of a real storage, so the references of the fixture
  * can name them by uid: 1 `placeholder.svg`.
@@ -145,5 +147,73 @@ final class MediaElementRenderingTest extends AbstractFunctionalTestCase
         $this->assertStringNotContainsString('theme-lightbox', $element);
         $this->assertStringNotContainsString('data-theme-lightbox', $element);
         $this->assertStringNotContainsString('theme-gallery__zoom', $element);
+    }
+
+    /**
+     * @return \Generator<string, array{uid: int, needle: string}>
+     */
+    public static function embedMarkup(): \Generator
+    {
+        yield 'the ratio of the record' => ['uid' => 50, 'needle' => 'theme-embed theme-embed--16-9'];
+        yield 'the other ratio' => ['uid' => 60, 'needle' => 'theme-embed theme-embed--4-3'];
+        yield 'the cookieless address of the recognised host' => [
+            'uid' => 50,
+            'needle' => 'data-theme-embed-src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"',
+        ];
+        yield 'the name of the frame' => ['uid' => 50, 'needle' => 'data-theme-embed-title="The launch"'];
+        yield 'the link to the source' => ['uid' => 50, 'needle' => 'class="theme-embed__source"'];
+        yield 'the link to the source of a host that is not embedded' => [
+            'uid' => 60,
+            'needle' => 'href="https://media.example.org/videos/the-launch"',
+        ];
+    }
+
+    #[DataProvider('embedMarkup')]
+    #[Test]
+    public function theExternalMediaElementRendersItsPlaceholder(int $uid, string $needle): void
+    {
+        $this->assertStringContainsString($needle, $this->element($this->render(), $uid));
+    }
+
+    /**
+     * The whole point of the element: opening the page opens no connection to
+     * the video's host. An iframe anywhere in the page - however lazy - is the
+     * defect this asserts against.
+     */
+    #[Test]
+    public function noIframeReachesThePage(): void
+    {
+        $body = $this->render();
+
+        $this->assertStringNotContainsString('<iframe', $body);
+        $this->assertStringNotContainsString('youtube.com/embed', $body, 'Only the cookieless host may be named at all.');
+    }
+
+    /**
+     * A host the processor does not recognise is not embedded: no button, so
+     * nothing can put an iframe of it in the page, and the link is what is
+     * left - the same page a visitor without JavaScript gets.
+     */
+    #[Test]
+    public function aHostThatIsNotRecognisedGetsNoPlayButton(): void
+    {
+        $element = $this->element($this->render(), 60);
+
+        $this->assertStringNotContainsString('data-theme-embed-play', $element);
+        $this->assertStringNotContainsString('theme-embed__button', $element);
+        $this->assertStringContainsString('theme-embed__source', $element);
+    }
+
+    /**
+     * The poster is a file of this installation, and it is decoration: the
+     * button over it carries the name of what pressing it does.
+     */
+    #[Test]
+    public function thePosterIsAFileOfThisInstallationAndIsDecoration(): void
+    {
+        $element = $this->element($this->render(), 50);
+
+        $this->assertMatchesRegularExpression('#<img class="theme-embed__poster" [^>]*src="[^"]*placeholder#', $element);
+        $this->assertMatchesRegularExpression('#<img class="theme-embed__poster" [^>]*alt=""#', $element);
     }
 }

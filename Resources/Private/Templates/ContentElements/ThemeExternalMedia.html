@@ -1,0 +1,115 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    "theme_external_media" - a video of another site, embedded without loading
+    anything from that site until the reader asks for it. The component is
+    ".theme-embed" (Resources/Private/Scss/components/_embed.scss).
+
+    **No iframe is in this markup.** The placeholder is a poster and a button,
+    and "Resources/Public/JavaScript/theme.js" is what puts an iframe in its
+    place once the button is pressed. That is the whole point of the element:
+    opening the page opens no connection to the video's host, so nothing of it
+    - not a cookie, not a fingerprint, not an entry in its logs - happens to a
+    reader who never watches the video.
+
+    "{embed}" is "Classes/DataProcessing/ExternalMediaProcessor.php": the URL
+    the editor pasted, the provider it recognised, and the address of the
+    cookieless embed. An unrecognised host leaves the last two empty, and this
+    template then renders the placeholder with no button and keeps the link -
+    which is the same page a visitor without JavaScript gets. See that class
+    for what is recognised and why anything else is not embedded at all.
+
+    The poster is the "image" of the element, a file of this installation. A
+    thumbnail fetched from the provider would be a request to the host this
+    element exists to avoid.
+
+    The title of the iframe is "tx_theme_embed_title" - an iframe needs an
+    accessible name, and "the video" is not one. It falls back to the heading
+    of the element, and the button's label to a translated sentence, so neither
+    is ever empty.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{embed.url}">
+        <f:if condition="{data.tx_theme_embed_title}">
+            <f:then><f:variable name="title">{data.tx_theme_embed_title}</f:variable></f:then>
+            <f:else><f:variable name="title">{data.header}</f:variable></f:else>
+        </f:if>
+        <f:switch expression="{data.tx_theme_embed_ratio}">
+            <f:case value="4-3"><f:variable name="ratio" value="theme-embed--4-3" /></f:case>
+            <f:defaultCase><f:variable name="ratio" value="theme-embed--16-9" /></f:defaultCase>
+        </f:switch>
+
+        <figure class="theme-embed {ratio}">
+            <div class="theme-embed__frame">
+                <f:if condition="{files.0}">
+                    <f:comment>
+                        The poster is decoration: the button over it carries the
+                        name of what pressing it does, and a poster described
+                        twice is read twice.
+                    </f:comment>
+                    <f:image class="theme-embed__poster" image="{files.0}" alt="" loading="lazy" />
+                </f:if>
+                <f:if condition="{embed.embedUrl}">
+                    <button class="theme-embed__button" type="button"
+                            data-theme-embed-play=""
+                            data-theme-embed-src="{embed.embedUrl}"
+                            data-theme-embed-title="{title}">
+                        <span class="theme-embed__play" aria-hidden="true"><theme:icon name="play" /></span>
+                        <span class="theme-embed__label">
+                            <f:if condition="{title}">
+                                <f:then><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.embedPlayNamed" arguments="{0: title}" /></f:then>
+                                <f:else><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.embedPlay" /></f:else>
+                            </f:if>
+                        </span>
+                    </button>
+                </f:if>
+            </div>
+
+            <figcaption class="theme-embed__note">
+                <f:if condition="{embed.embedUrl}">
+                    <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.embedNote" />
+                </f:if>
+                <f:comment>
+                    The link is rendered whether there is a button or not. It is
+                    the way to the video when nothing else is, and it stays a
+                    way to it when the button is there - a reader who would
+                    rather not load the frame at all is one press from the
+                    source either way.
+
+                    "{embed.url}" is only ever a URL whose scheme is "http" or
+                    "https": "ExternalMediaProcessor" checks the scheme before
+                    it hands anything on, and returns an **empty** "url" for
+                    everything else, which the condition above this figure then
+                    renders as no element at all. That check is the whole of the
+                    guard - the column is a plain input, and neither the TCA nor
+                    Fluid constrains a scheme. Escaping does not stand in for
+                    it: Fluid escapes the quotes of a "javascript:" value and
+                    leaves a working script behind the link.
+
+                    Not "f:link.typolink" or "f:uri.typolink", which every other
+                    link of this extension goes through. Those take a typolink
+                    *parameter string* - the "<url> <target> <class> <title>"
+                    syntax "TypoLinkCodecService" splits on white space, and the
+                    "t3://" forms "LinkService" resolves - and this column holds
+                    neither: it is an "input", not a TCA "link", because what an
+                    iframe needs is the plain address. Fed to typolink, a URL
+                    carrying a space would silently lose its tail to a "target",
+                    and a "t3://page?uid=1" an editor pasted would resolve to a
+                    page rather than being refused.
+                </f:comment>
+                <a class="theme-embed__source" href="{embed.url}" target="_blank" rel="noreferrer noopener">
+                    <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.embedSource" />
+                    <theme:icon name="arrow-up-right-from-square" />
+                </a>
+            </figcaption>
+        </figure>
+    </f:if>
+</f:section>
+
+</html>

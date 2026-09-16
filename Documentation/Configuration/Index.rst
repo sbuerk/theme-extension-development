@@ -226,8 +226,9 @@ TYPO3 v14 it is not installed at all. What that covers:
     see :ref:`feature-theme-content-elements`,
     :ref:`feature-notice-tabs-accordion-elements`,
     :ref:`feature-icon-content-elements`,
-    :ref:`feature-card-group-timeline-teaser-list` and
-    :ref:`feature-carousel-and-split-tiles`.
+    :ref:`feature-card-group-timeline-teaser-list`,
+    :ref:`feature-carousel-and-split-tiles` and
+    :ref:`feature-external-media`.
 *   A wall layout for the card group — see :ref:`feature-card-wall`.
 *   :guilabel:`Enlarge on click`, which opens a lightbox — see
     :ref:`feature-gallery-lightbox`.

@@ -1,0 +1,201 @@
+// Embed - a video of another site, loaded only when the reader asks for it.
+//
+// Markup contract:
+//
+//     <figure class="theme-embed theme-embed--16-9">
+//         <div class="theme-embed__frame">
+//             <img class="theme-embed__poster" src="…" alt="" width="…" height="…">
+//             <button class="theme-embed__button" type="button"
+//                     data-theme-embed-play
+//                     data-theme-embed-src="https://www.youtube-nocookie.com/embed/…"
+//                     data-theme-embed-title="…">
+//                 <span class="theme-embed__play" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
+//                 <span class="theme-embed__label">…</span>
+//             </button>
+//         </div>
+//         <figcaption class="theme-embed__note">
+//             …
+//             <a class="theme-embed__source" href="…">… <svg class="theme-icon" …>…</svg></a>
+//         </figcaption>
+//     </figure>
+//
+// Modifiers: "--16-9" and "--4-3", the two ratios the form offers. They
+// re-point "--theme-embed-ratio", which the frame keeps whether it holds the
+// placeholder or the iframe, so the page does not jump when the one is
+// replaced by the other.
+//
+// "Resources/Public/JavaScript/theme.js" replaces the contents of
+// "__frame" with an "iframe" built from the two data attributes on the button.
+// Nothing here draws the iframe: it is the browser's box, and the frame's
+// ratio is what sizes it.
+//
+// --- Nothing is loaded until it is asked for --------------------------------
+//
+// The whole point of this component is that opening a page does not open a
+// connection to the video's host. So the markup holds no "iframe", no
+// "preconnect" and no image from the other site - the poster is a file of this
+// installation - and the placeholder is a button rather than a link, because a
+// link would have to point somewhere and the only place it could point is the
+// host this is avoiding.
+//
+// --- Without JavaScript ------------------------------------------------------
+//
+// The button is the one control that needs the script, so it is not rendered
+// until the script has actually bound this embed and set
+// "data-theme-embed-bound" on it.
+//
+// The gate is that marker and **not** the root's "data-js", which is what
+// "components/_dialog.scss" gates its opener on. The difference is the reason
+// "components/_tabs.scss" gives for the same choice: "data-js" only says the
+// inline head script ran, and says nothing about whether "theme.js" loaded
+// after it. Gated on "data-js", a page whose "theme.js" failed to load would
+// show a play button that does nothing, over a video nothing else offers a way
+// to. Gated on the marker, that page shows the poster and the link, which is
+// the same page a page with no script at all shows.
+//
+// The link in the caption is never hidden: it is the way to the video when
+// there is no script, and it stays a useful way to it when there is. A reader
+// who chooses not to press the button is exactly as far from the video as one
+// who cannot.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-embed {
+    --theme-embed-ratio: 16 / 9;
+    --theme-embed-background: var(--theme-color-surface, #f4f6fa);
+    --theme-embed-border-color: var(--theme-color-border, #d6dce6);
+    --theme-embed-radius: var(--theme-radius-sm, 5px);
+    --theme-embed-scrim: var(--theme-color-overlay, rgb(20 24 31 / 55%));
+    --theme-embed-foreground: var(--theme-color-on-primary, #ffffff);
+    --theme-embed-play-background: var(--theme-color-primary, #0b57d0);
+    --theme-embed-play-background-hover: var(--theme-color-primary-hover, #0a4bb4);
+    --theme-embed-play-size: var(--theme-space-8, 3.75rem);
+    --theme-embed-note-color: var(--theme-color-text-secondary, #4a5567);
+
+    inline-size: 100%;
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+}
+
+.theme-embed--16-9 {
+    --theme-embed-ratio: 16 / 9;
+}
+
+.theme-embed--4-3 {
+    --theme-embed-ratio: 4 / 3;
+}
+
+// The box both the placeholder and the iframe live in. It keeps the ratio, so
+// replacing the one with the other moves nothing below it.
+.theme-embed__frame {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: var(--theme-embed-ratio);
+    border: var(--theme-border-width) solid var(--theme-embed-border-color);
+    border-radius: var(--theme-embed-radius);
+    background-color: var(--theme-embed-background);
+
+    iframe {
+        display: block;
+        inline-size: 100%;
+        block-size: 100%;
+        border: 0;
+    }
+}
+
+.theme-embed__poster {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+}
+
+// The button covers the whole frame: the target is the picture, which is what
+// a reader expects to press, and it is never smaller than the tap target.
+//
+// "display: none" until the script has bound it - see "Without JavaScript"
+// above. The layout of the button is on the bound rule below, so this one has
+// nothing to undo.
+.theme-embed__button {
+    display: none;
+
+    position: absolute;
+    inset: 0;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--theme-space-2, 0.625rem);
+
+    inline-size: 100%;
+    min-block-size: var(--theme-tap-target-min);
+    padding: var(--theme-space-3, 0.9375rem);
+
+    border: 0;
+    background-color: var(--theme-embed-scrim);
+    color: var(--theme-embed-foreground);
+    font: inherit;
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    text-align: center;
+    cursor: pointer;
+}
+
+// Bound: the script is there, so the button is.
+.theme-embed[data-theme-embed-bound] .theme-embed__button {
+    display: flex;
+}
+
+// The disc the icon sits in. The glyph is a "<theme:icon>" of the shipped set;
+// this rule only paints the round background behind it, the way a button paints
+// its own fill - it stands in for nothing and carries no meaning of its own.
+.theme-embed__play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    inline-size: var(--theme-embed-play-size);
+    block-size: var(--theme-embed-play-size);
+
+    border-radius: var(--theme-radius-full, 999px);
+    background-color: var(--theme-embed-play-background);
+
+    --theme-icon-size: var(--theme-font-size-2xl, 1.5rem);
+}
+
+.theme-embed__button:hover .theme-embed__play {
+    background-color: var(--theme-embed-play-background-hover);
+}
+
+.theme-embed__label {
+    max-inline-size: var(--theme-measure, 66ch);
+    font-weight: var(--theme-font-weight-medium, 500);
+}
+
+.theme-embed__note {
+    margin-block-start: var(--theme-space-2, 0.625rem);
+    color: var(--theme-embed-note-color);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+    text-align: start;
+}
+
+.theme-embed__source {
+    white-space: nowrap;
+}
+
+// --- Forced colours -----------------------------------------------------------
+//
+// See "Forced colours" in docs/development/component-library.md. The scrim and
+// the disc are both repainted to the canvas colour, which would leave the play
+// icon on the poster with nothing behind it and no edge anywhere: the button
+// takes the highlight pair, and the disc an edge of its own.
+@media (forced-colors: active) {
+    .theme-embed__button {
+        background-color: Canvas;
+        color: CanvasText;
+        border: var(--theme-border-width-strong, 2px) solid CanvasText;
+    }
+
+    .theme-embed__play {
+        border: var(--theme-border-width, 1px) solid CanvasText;
+    }
+}

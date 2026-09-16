@@ -201,6 +201,18 @@
 			<trans-unit id="theme.lightboxNext">
 				<source>Next image</source>
 			</trans-unit>
+			<trans-unit id="theme.embedPlay">
+				<source>Play the video</source>
+			</trans-unit>
+			<trans-unit id="theme.embedPlayNamed">
+				<source>Play &quot;%1$s&quot;</source>
+			</trans-unit>
+			<trans-unit id="theme.embedNote">
+				<source>The video is loaded from the other site only once you press play.</source>
+			</trans-unit>
+			<trans-unit id="theme.embedSource">
+				<source>Watch it on the source site</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

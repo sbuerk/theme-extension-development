@@ -7,7 +7,7 @@
 # sequence:
 #
 #   pages               1-10, the first tree, and 30-39, 50-56, 70-79,
-#                       90-92, 110-119 and 150-151,
+#                       90-92, 110-119, 130 and 150-151,
 #                       the pages added below its sections - see below for
 #                       why the new ones skip decades
 #   tt_content          the uid of its page times 100, plus its position on
@@ -3267,6 +3267,67 @@ entities:
                               below one another read as one column of tiles rather than
                               repeating the same arrangement.
                             tone: 'accent'
+                # "theme_external_media" - a video of another site, loaded only
+                # when the reader presses play. Both ratios the form offers are
+                # shown, and both ends of what the processor recognises: a
+                # YouTube watch URL and a Vimeo one are rewritten to the host
+                # that sets no cookie, and a host nobody vetted is not embedded
+                # at all - that element renders the poster and the link, which
+                # is also what every element here renders without JavaScript.
+                #
+                # The addresses are real ones. Nothing requests them: the page
+                # carries no iframe until somebody presses the button.
+                - self:
+                      id: 130
+                      title: 'External media'
+                      slug: '/elements/theme/external-media'
+                      backend_layout: 'content_sidebar'
+                      abstract: 'A video of another site, with nothing loaded from it until the reader presses play.'
+                  entities:
+                    content:
+                      - self:
+                            id: 13001
+                            CType: 'header'
+                            header: 'External media'
+                            header_layout: 1
+                      - self:
+                            id: 13002
+                            CType: 'theme_external_media'
+                            header: 'A YouTube video, widescreen'
+                            header_layout: 2
+                            tx_theme_embed_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+                            tx_theme_embed_title: 'The TYPO3 project in three minutes'
+                            tx_theme_embed_ratio: '16-9'
+                      - self:
+                            id: 13003
+                            CType: 'theme_external_media'
+                            header: 'A Vimeo video, in the classic shape'
+                            header_layout: 2
+                            tx_theme_embed_url: 'https://vimeo.com/76979871'
+                            tx_theme_embed_title: 'An interview about theme development'
+                            tx_theme_embed_ratio: '4-3'
+                      # No poster: the frame keeps its shape and stays empty
+                      # until the video is played.
+                      - self:
+                            id: 13004
+                            CType: 'theme_external_media'
+                            header: 'Without a poster image'
+                            header_layout: 2
+                            tx_theme_embed_url: 'https://youtu.be/dQw4w9WgXcQ'
+                            tx_theme_embed_title: 'The same video, without a poster'
+                            tx_theme_embed_ratio: '16-9'
+                      # A host the processor does not recognise. No iframe is
+                      # built for it at all - see the class for why an
+                      # arbitrary URL is not embedded - so this element is the
+                      # poster and the link, and no button.
+                      - self:
+                            id: 13005
+                            CType: 'theme_external_media'
+                            header: 'A host that is not embedded'
+                            header_layout: 2
+                            tx_theme_embed_url: 'https://media.example.org/videos/the-launch'
+                            tx_theme_embed_title: 'A recording of the launch'
+                            tx_theme_embed_ratio: '16-9'
 
                 # The layouts and the eyebrow of the three heroes. The images
                 # are attached in "config.yml". "header_layout" 2 throughout:

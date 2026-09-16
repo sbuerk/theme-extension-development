@@ -1173,6 +1173,33 @@ tt_content.theme_notice.templateName = ContentElements/ThemeNotice
 tt_content.theme_cta =< lib.themeContentElement
 tt_content.theme_cta.templateName = ContentElements/ThemeCta
 
+# A video of another site, embedded only once the reader presses play.
+#
+# "ExternalMediaProcessor" turns the URL of the record into the address of a
+# cookieless embed, or into nothing where the host is not one of the two it
+# knows - see the class for what that decision is and why it is not made in
+# Fluid. The "FilesProcessor" is the poster image: a file of this installation,
+# because a thumbnail fetched from the provider would be the very request this
+# element exists to avoid.
+tt_content.theme_external_media =< lib.themeContentElement
+tt_content.theme_external_media {
+    templateName = ContentElements/ThemeExternalMedia
+
+    dataProcessing {
+        10 = SBUERK\ThemeExtensionDevelopment\DataProcessing\ExternalMediaProcessor
+        10 {
+            fieldName = tx_theme_embed_url
+            as = embed
+        }
+
+        20 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        20 {
+            references.fieldName = image
+            as = files
+        }
+    }
+}
+
 # Tabs and an accordion. Both read "tx_theme_list_items" exactly the way the
 # link list does - the same "DatabaseQueryProcessor" on the same relation
 # triple, see the section comment above "tt_content.theme_author" - so both
