@@ -228,6 +228,7 @@ TYPO3 v14 it is not installed at all. What that covers:
     :ref:`feature-icon-content-elements`,
     :ref:`feature-card-group-timeline-teaser-list` and
     :ref:`feature-carousel-and-split-tiles`.
+*   A wall layout for the card group — see :ref:`feature-card-wall`.
 *   Third-party Extbase plugins, which render through a generic template
     without any per-plugin configuration — see
     :ref:`feature-extbase-plugin-rendering` — on both delivery paths, the

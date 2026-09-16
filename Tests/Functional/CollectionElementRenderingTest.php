@@ -170,6 +170,41 @@ final class CollectionElementRenderingTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * The wall is the same list of cards with one more modifier: no wrapper
+     * and no region, because it does not scroll, and the column count it is
+     * given is kept.
+     *
+     * The order of the cards in the markup is asserted, and that is the point
+     * of the test rather than a detail of it: a wall fills column by column,
+     * so what the eye reads across the top is not the order of the relation.
+     * The DOM order is what a screen reader and the tab sequence follow, and
+     * it has to stay the order the editor put the cards in - see the component
+     * for why the visual order is acceptable and the source order is not
+     * negotiable.
+     */
+    #[DataProvider('deliveryPaths')]
+    #[Test]
+    public function aCardGroupInTheWallLayoutKeepsTheOrderOfTheRelation(string $path): void
+    {
+        $group = $this->element($this->render($path), 80);
+
+        $this->assertStringContainsString(
+            '<ul class="theme-card-grid theme-card-grid--wall theme-card-grid--columns-2">',
+            $group,
+        );
+        // It does not scroll, so it is not a region and has no tab stop.
+        $this->assertStringNotContainsString('theme-card-scroller', $group);
+        $this->assertStringNotContainsString('role="region"', $group);
+        $this->assertStringNotContainsString('tabindex', $group);
+
+        $this->assertSame(
+            ['The first card of the wall', 'The second card of the wall', 'The third card of the wall'],
+            self::titles($group, 'theme-card__title'),
+            'The wall renders its cards in an order other than the relation.',
+        );
+    }
+
+    /**
      * A layout and a column count the form does not offer - core layouts the
      * page TSconfig removes, a value from an import - render the grid in
      * three columns, the defaults, not a modifier nothing styles.

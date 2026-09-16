@@ -114,10 +114,11 @@ them it decides which uids are free:
 | 50–59     | new pages; the mirror of their content is 6001–6999                                           |
 | 70–79     | new pages; the mirror of their content is 8001–8999                                           |
 | 110–119   | new pages; the mirror of their content is 12001–12999                                         |
+| 150–159   | new pages; the mirror of their content is 16001–16999                                         |
 
 So a new page takes a uid in an odd decade from 30 up — 30–39, 50–59, 70–79,
-90–99, 110–119, 130–139 and so on — and the even decade after it stays free for
-its mirror. The rule is stated at the top of `Scenario.yaml` as well, and
+90–99, 110–119, 130–139, 150–159 and so on — and the even decade after it stays
+free for its mirror. The rule is stated at the top of `Scenario.yaml` as well, and
 `Tests/Unit/GeneratedLegacyScenarioTest::theInstanceSetDeclaresNoUidTwice()`
 walks the composed set — showcase, mirror and accounts — and fails on any uid
 declared twice in one table, which is what a page in the wrong decade
@@ -203,6 +204,7 @@ classic `CType` in its variants, and every appearance value:
 | 8         | Theme elements           | `/elements/theme`        | `content`                       | The `theme_*` elements, one each; parent of 70 and up.                                                                                        |
 | 70–73     | Text and icon … Steps    | `/elements/theme/<name>` | `content_sidebar`, 71 `content` | One page per theme element with icons, every value of the fields that change its look; 71 without a sidebar, which four feature columns need. |
 | 90–92     | Card group … Teaser list | `/elements/theme/<name>` | `content_sidebar`               | One page per collection element, every variant; page media and an abstract for the menus.                                                     |
+| 150–151   | Carousel, Split tiles    | `/elements/theme/<name>` | `content_sidebar`               | The carousel in every caption position, and the split tiles in every tone and both rhythms.                                                   |
 | 110       | Hero layouts             | `/elements/theme/hero`   | `content_sidebar`               | Every layout of the three heroes, with an eyebrow each.                                                                                       |
 | 111       | Calls to action          | `/elements/theme/cta`    | `content_sidebar`               | The call to action in every tone and width.                                                                                                   |
 | 112       | Quotation styles         | `/elements/theme/quote`  | `content_sidebar`               | The styles and the portrait of the testimonial.                                                                                               |

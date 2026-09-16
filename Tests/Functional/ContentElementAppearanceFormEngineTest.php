@@ -244,19 +244,19 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
     }
 
     /**
-     * `layout` is the arrangement of a card group - the grid or the scroller -
-     * and the form offers exactly those two, under names that say so. The
-     * core values 2 and 3 are removed for this type, and the field stays
+     * `layout` is the arrangement of a card group - the grid, the scroller or
+     * the wall - and the form offers exactly those three, under names that say
+     * so. The core value 3 is removed for this type, and the field stays
      * disabled for every type that does not render it, the timeline beside
      * it included.
      */
     #[Test]
-    public function theCardGroupOffersItsTwoArrangementsUnderTheirOwnNames(): void
+    public function theCardGroupOffersItsThreeArrangementsUnderTheirOwnNames(): void
     {
         $result = $this->compile(970);
 
         $this->assertFalse(self::isDisabled($result, 'layout'), '"layout" is missing from the card group.');
-        $this->assertSame(['0', '1'], self::itemValues($result, 'layout'));
+        $this->assertSame(['0', '1', '2'], self::itemValues($result, 'layout'));
         $labels = array_values(array_map(
             static fn(array $item): string => (string)$item['label'],
             $result['processedTca']['columns']['layout']['config']['items'] ?? [],
@@ -265,7 +265,7 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
             static fn(int $value): string => $GLOBALS['LANG']->sL(
                 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_card_group.I.' . $value,
             ),
-            [0, 1],
+            [0, 1, 2],
         );
         $this->assertNotContains('', $expected, 'A label of the card group layouts is not translated.');
         $this->assertSame($expected, $labels);
