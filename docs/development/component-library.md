@@ -45,6 +45,7 @@ against, and the rename was cheap while only one template depended on it.
 | Display settings        | `.theme-settings`         | `components/_settings.scss`         |
 | Dialog                  | `.theme-dialog`           | `components/_dialog.scss`           |
 | Divider                 | `.theme-divider`          | `components/_divider.scss`          |
+| Dropdown                | `.theme-dropdown`         | `components/_dropdown.scss`         |
 | Embed                   | `.theme-embed`            | `components/_embed.scss`            |
 | Feature                 | `.theme-feature`          | `components/_feature.scss`          |
 | Feature grid            | `.theme-feature-grid`     | `components/_feature.scss`          |
@@ -83,6 +84,7 @@ against, and the rename was cheap while only one template depended on it.
 | Text: eyebrow           | `.theme-eyebrow`          | `components/_text.scss`             |
 | Text: lead              | `.theme-lead`             | `components/_text.scss`             |
 | Timeline                | `.theme-timeline`         | `components/_timeline.scss`         |
+| Toggletip               | `.theme-toggletip`        | `components/_toggletip.scss`        |
 | Tooltip                 | `.theme-tooltip`          | `components/_tooltip.scss`          |
 | Form controls           | `.theme-input`            | `forms/_controls.scss`              |
 | Form switch             | `.theme-switch`           | `forms/_controls.scss`              |
@@ -836,10 +838,12 @@ ring moves from the title to the row, because the row is what a press
 activates: the ring of `base/_reset.scss`, drawn on the link's `::after` - the
 hit area that already covers the row - and inset by its own width so the frame
 of the list does not cut it off. It depends on nothing but the link having
-`:focus-visible`, not on `:has()` on the row: the browser floor in
-[`DESIGN.md`](../../DESIGN.md#one-declaration-both-appearances) is Firefox
-120, `:has()` arrived in 121, and with the link's own ring removed focus would
-be invisible there. The hover fill does use `:has()`; without it, hover shows
+`:focus-visible`, not on `:has()` on the row. That began as a browser floor
+decision — the floor was Firefox 120 and `:has()` arrived in 121 — and the
+[floor](../../DESIGN.md#the-browser-floor) has since moved to 125, so the
+original reason no longer holds; the rule is kept because depending on the
+link's own `:focus-visible` is the simpler dependency for an indicator that
+has to be right. The hover fill does use `:has()`; without it, hover shows
 the underline of the title only. A row without a link has a title of plain
 text and is no target. The meta data wraps onto a line of its own, at its end,
 where the row is too narrow for it. The image is an [avatar](#content) in its
@@ -1606,9 +1610,9 @@ the selected tab. Under forced colours the tab keeps the highlight pair of the
 the inert page, Escape and the `::backdrop` are the browser's, and a
 `<form method="dialog">` closes it with the pressed button's `value` as its
 `returnValue`. Only opening needs the script. Invoker commands would do that
-declaratively, but they arrived long after the browser floor
-[`DESIGN.md`](../../DESIGN.md#one-declaration-both-appearances) writes the
-stylesheet against:
+declaratively, and they are still above the
+[browser floor](../../DESIGN.md#the-browser-floor) even after it moved to
+Firefox 125 for the Popover API — adopting them is a change of its own:
 
 ```html
 <button class="theme-button" type="button" aria-haspopup="dialog" data-theme-dialog-open="d-reseed">…</button>
@@ -1653,8 +1657,9 @@ on a 44px trigger, a 15rem bubble stuck out past the edge of a 400px viewport
 (WCAG 1.4.10), and opening one way it stays on screen for any trigger in the
 first two thirds of a phone's line. There is no collision handling beyond
 that — keeping the bubble inside the viewport whatever the trigger is what CSS
-anchor positioning is for, and that is outside the browser floor — so a trigger
-at the inline end of a narrow viewport is a placement to avoid:
+anchor positioning is for, and that is still above the
+[browser floor](../../DESIGN.md#the-browser-floor) — so a trigger at the inline
+end of a narrow viewport is a placement to avoid:
 
 ```html
 <span class="theme-tooltip">

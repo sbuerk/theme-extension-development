@@ -1,0 +1,134 @@
+// Toggletip - a short explanation a reader asks for.
+//
+// Markup contract:
+//
+//     <span class="theme-toggletip">
+//         <button class="theme-toggletip__trigger" type="button" popovertarget="tt-index" aria-label="…">
+//             <svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg>
+//         </button>
+//         <span class="theme-toggletip__bubble" id="tt-index" popover role="status">…</span>
+//     </span>
+//
+// --- Toggletip, not tooltip. Which to use -----------------------------------
+//
+// The library has both, and they are different patterns with different jobs.
+// They are not variants of each other and neither should be built from the
+// other.
+//
+//   ".theme-tooltip"   a *description of a control that already has a name*.
+//                      It appears on hover and on focus, the reader did not
+//                      ask for it, and it is tied to its trigger with
+//                      "aria-describedby" - so a screen reader announces it
+//                      with the control whether the bubble is on screen or
+//                      not. It never holds the only copy of anything.
+//
+//   ".theme-toggletip" *extra information the reader asks for*. The trigger is
+//                      a button that means "explain this", it opens on click
+//                      and only on click, and the text is new information
+//                      rather than a description of the button. The button
+//                      has no name of its own to describe - "More
+//                      information" is the whole of it - so there is nothing
+//                      for "aria-describedby" to attach to.
+//
+// Rule of thumb: if the text describes the control, it is a tooltip; if the
+// text is the point and the control only reveals it, it is a toggletip.
+//
+// --- How the text reaches a screen reader -----------------------------------
+//
+// The bubble is "role=status", a polite live region, and the reader's focus
+// stays on the button - it never enters the bubble, which is the whole point
+// of a toggletip.
+//
+// What is deliberately *not* claimed here is that opening the bubble is
+// announced. A live region announces a *change* to its contents, and this
+// bubble's text is in the DOM from page load - opening the popover changes
+// only whether it is displayed. Whether an assistive technology treats that
+// as a change differs between implementations, and it was not verified
+// against one here. The pattern that does guarantee the announcement injects
+// the text into an empty live region on activation, which needs a script;
+// this component works without one, and that is the trade. The text is
+// reachable either way: it follows the button in the DOM.
+//
+// That is also why the bubble must not be "role=tooltip": a tooltip role
+// describes its trigger, and this text does not.
+//
+// The trigger carries "aria-label" and no "aria-expanded". A toggletip is not
+// a disclosure of content that is part of the page - the bubble is an aside
+// the reader summons - and "aria-expanded" would promise a region that stays.
+//
+// --- The Popover API does the rest ------------------------------------------
+//
+// "popover" plus "popovertarget": the browser opens and closes the bubble,
+// puts it in the top layer, and gives it light dismiss - Escape and a click
+// outside - with no script at all. WCAG 1.4.13 asks a dismissible mechanism of
+// content shown on hover or focus; this one is shown on neither, and Escape
+// closes it regardless.
+//
+// The Popover API is what moved the browser floor of DESIGN.md to Firefox 125.
+//
+// **No "display" on the bubble** - see "components/_dropdown.scss" for the
+// trap that sets. The only "display" is under ":popover-open".
+//
+// Placement is the viewport, not the trigger: the bubble is in the top layer,
+// and pinning it to its trigger is what CSS anchor positioning is for, which is
+// still above the floor. It is centred near the top of the viewport instead,
+// which is correct at any trigger position and at any width - the compromise
+// the tooltip could not make, because a tooltip has to sit beside the control
+// it describes.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-toggletip {
+    --theme-toggletip-background: var(--theme-color-surface-raised, #ffffff);
+    --theme-toggletip-foreground: var(--theme-color-text-primary, #14181f);
+    --theme-toggletip-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-toggletip-radius: var(--theme-radius-md, 10px);
+    --theme-toggletip-padding: var(--theme-space-3, 0.9375rem);
+    --theme-toggletip-max-width: 22rem;
+    --theme-toggletip-gutter: var(--theme-space-4, 1.25rem);
+    --theme-toggletip-trigger-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-toggletip-trigger-color-hover: var(--theme-color-primary, #0b57d0);
+
+    display: inline-flex;
+}
+
+.theme-toggletip__trigger {
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--theme-tap-target-min);
+    block-size: var(--theme-tap-target-min);
+    padding: 0;
+
+    border: 0;
+    background-color: transparent;
+    color: var(--theme-toggletip-trigger-color);
+    cursor: pointer;
+    transition: color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        color: var(--theme-toggletip-trigger-color-hover);
+    }
+}
+
+.theme-toggletip__bubble {
+    position: fixed;
+    inset: var(--theme-space-7, 2.5rem) auto auto 50%;
+    translate: -50% 0;
+    margin: 0;
+
+    inline-size: min(var(--theme-toggletip-max-width), calc(100vw - 2 * var(--theme-toggletip-gutter)));
+    padding: var(--theme-toggletip-padding);
+
+    border: var(--theme-border-width) solid var(--theme-toggletip-border-color);
+    border-radius: var(--theme-toggletip-radius);
+    background-color: var(--theme-toggletip-background);
+    color: var(--theme-toggletip-foreground);
+
+    font-size: var(--theme-font-size-sm);
+    line-height: var(--theme-line-height-base);
+
+    &:popover-open {
+        display: block;
+    }
+}
