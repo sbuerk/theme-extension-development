@@ -1,0 +1,112 @@
+// Language menu.
+//
+// Markup contract:
+//
+//     <nav class="theme-language-menu" aria-label="…">
+//         <ul class="theme-language-menu__list">
+//             <li class="theme-language-menu__item">
+//                 <a class="theme-language-menu__link" href="…" hreflang="de-DE" lang="de-DE" aria-current="true">Deutsch</a>
+//             </li>
+//             <li class="theme-language-menu__item">
+//                 <span class="theme-language-menu__link theme-language-menu__link--unavailable" lang="fr-FR" aria-disabled="true">Français</span>
+//             </li>
+//         </ul>
+//     </nav>
+//
+// One entry per language of the site. An entry is a link where the current
+// page has that translation and a span where it does not - see
+// "Partials/Navigation/Language.html" for why an untranslated language is
+// shown rather than hidden, and why that cannot be argued away with
+// "fallbackType".
+//
+// --- The two states are not told apart by colour alone ----------------------
+//
+// The language being read carries "aria-current='true'" and is set in the
+// medium weight; the unavailable one is in the muted colour *and* carries
+// "aria-disabled", which is what a screen reader announces. Weight and the
+// absence of a link cursor are what a reader sees, so neither state depends on
+// hue (WCAG 1.4.1). The unavailable entry keeps the full text contrast of
+// "--theme-color-text-muted" rather than being dimmed with "opacity", which
+// would take it below 4.5:1.
+//
+// --- It does not decide where it sits ---------------------------------------
+//
+// The menu is a flat row and nothing else: the site header puts it inside a
+// ".theme-dropdown" panel, and a footer or a content column could render it
+// bare. So there is no position, no absolute placement and no z-index here -
+// that belongs to whatever holds it.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-language-menu {
+    --theme-language-menu-gap: var(--theme-space-1, 0.3125rem);
+    --theme-language-menu-link-color: var(--theme-color-primary, #0b57d0);
+    --theme-language-menu-link-color-hover: var(--theme-color-primary-hover, #0a4bb4);
+    --theme-language-menu-current-color: var(--theme-color-text-primary, #14181f);
+    --theme-language-menu-unavailable-color: var(--theme-color-text-muted, #616b80);
+    --theme-language-menu-radius: var(--theme-radius-sm, 5px);
+    --theme-language-menu-background-hover: var(--theme-color-surface, #f4f6fa);
+}
+
+.theme-language-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-language-menu-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-language-menu__item {
+    margin: 0;
+}
+
+.theme-language-menu__link {
+    display: flex;
+    align-items: center;
+    min-height: var(--theme-tap-target-min);
+    padding-inline: var(--theme-space-2, 0.625rem);
+    border-radius: var(--theme-language-menu-radius);
+    color: var(--theme-language-menu-link-color);
+    text-decoration: none;
+    transition:
+        background-color var(--theme-duration-fast) var(--theme-easing-standard),
+        color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    &:hover {
+        background-color: var(--theme-language-menu-background-hover);
+        color: var(--theme-language-menu-link-color-hover);
+    }
+
+    // The language being read: the weight and the text colour, read off the
+    // attribute a screen reader announces rather than a class the template
+    // would have to keep in step.
+    &[aria-current='true'] {
+        color: var(--theme-language-menu-current-color);
+        font-weight: var(--theme-font-weight-medium);
+    }
+}
+
+// Not a link, so nothing about it may look like one: no pointer, no hover
+// colour, no underline on hover.
+.theme-language-menu__link--unavailable {
+    color: var(--theme-language-menu-unavailable-color);
+    cursor: default;
+
+    &:hover {
+        background-color: transparent;
+        color: var(--theme-language-menu-unavailable-color);
+    }
+}
+
+// Under forced colours the muted colour and the accent both become the system
+// text colour, so the unavailable entry would read as available. "GrayText" is
+// the system colour for exactly this state, and the entry opts out so it is
+// painted as written.
+@media (forced-colors: active) {
+    .theme-language-menu__link--unavailable {
+        forced-color-adjust: none;
+        color: GrayText;
+    }
+}
