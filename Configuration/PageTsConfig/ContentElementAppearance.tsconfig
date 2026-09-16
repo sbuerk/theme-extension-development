@@ -95,6 +95,20 @@ TCEFORM.tt_content {
         }
     }
 
+    # "theme_split_tiles" takes "layout" for the foot the alternation starts
+    # on: the default rhythm (0) or "--reversed" (1), which flips it - see
+    # "Templates/ContentElements/ThemeSplitTiles.html". The picture side of an
+    # individual tile is never a field: the stylesheet alternates it with
+    # ":nth-child(even)". The two core values with no rendering are removed.
+    layout.types.theme_split_tiles {
+        disabled = 0
+        removeItems = 2,3
+        altLabels {
+            0 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_split_tiles.I.0
+            1 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_split_tiles.I.1
+        }
+    }
+
     # The two page menus show their pages as a list (0), as cards (1) or as
     # thumbnails (2) - "MenuPages.html", "MenuSubpages.html" and
     # "Partials/ContentElement/MenuCards.html". The core value 3 has no

@@ -33,3 +33,25 @@ $GLOBALS['TCA']['tx_theme_list_item']['palettes']['theme_link_style'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.palette.theme_link',
     'showitem' => 'link, link_label, --linebreak--, link_variant, link_icon',
 ];
+
+// The tone of one tile of "theme_split_tiles": the fill and the frame of
+// ".theme-split-tiles__item" (components/_split-tiles.scss).
+//
+// The configuration is the one of "tt_content.tx_theme_cta_tone", taken from it
+// rather than written out again, exactly as "link_variant" above takes the one
+// of "tt_content.tx_theme_link_variant" and for the same reason: the two
+// components mix the same three tones from the same tokens, one set of cases
+// renders them, and a copy of the items would be a second list to keep in step.
+// "SplitTilesRenderingTest" holds the values of the column to those cases.
+//
+// A column of the child rather than of the parent, because the tone is a
+// property of the individual tile: a column of tiles that all carry one tone is
+// a list, and setting each one apart from the one above it is what the element
+// is for.
+ExtensionManagementUtility::addTCAcolumns('tx_theme_list_item', [
+    'tone' => [
+        'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.tone',
+        'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.tone.description',
+        'config' => $GLOBALS['TCA']['tt_content']['columns']['tx_theme_cta_tone']['config'],
+    ],
+]);

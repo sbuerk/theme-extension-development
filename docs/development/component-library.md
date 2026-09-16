@@ -66,6 +66,7 @@ against, and the rename was cheap while only one template depended on it.
 | Segmented control       | `.theme-segmented`        | `components/_settings.scss`         |
 | Palette swatch          | `.theme-swatch`           | `components/_settings.scss`         |
 | Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`        |
+| Split tiles             | `.theme-split-tiles`      | `components/_split-tiles.scss`      |
 | Stat                    | `.theme-stat`             | `components/_stat.scss`             |
 | Stats                   | `.theme-stats`            | `components/_stat.scss`             |
 | Steps                   | `.theme-steps`            | `components/_steps.scss`            |

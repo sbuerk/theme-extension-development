@@ -563,6 +563,26 @@
 				<source>Slides</source>
 			</trans-unit>
 
+			<!-- tt_content: CType theme_split_tiles -->
+			<trans-unit id="tt_content.CType.theme_split_tiles.label">
+				<source>Split tiles</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_split_tiles.description">
+				<source>A column of tiles, each an image on one side and a heading, a text and a link on the other. The side alternates.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.tiles">
+				<source>Tiles</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_split_tiles.label">
+				<source>Tiles</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_split_tiles.I.0">
+				<source>The first image at the start of the line</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_split_tiles.I.1">
+				<source>The first image at the end of the line</source>
+			</trans-unit>
+
 			<!-- tt_content: CType theme_timeline -->
 			<trans-unit id="tt_content.CType.theme_timeline.label">
 				<source>Timeline</source>
@@ -624,6 +644,12 @@
 			</trans-unit>
 			<trans-unit id="tx_theme_list_item.caption_position.I.overlay">
 				<source>Over the foot of the image</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.tone">
+				<source>Tone</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.tone.description">
+				<source>The fill and the frame of this tile. Every tile carries its own, which is what sets it apart from the one above it.</source>
 			</trans-unit>
 			<trans-unit id="tx_theme_list_item.meta">
 				<source>Meta data</source>
