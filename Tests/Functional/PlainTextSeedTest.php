@@ -93,6 +93,23 @@ final class PlainTextSeedTest extends AbstractFunctionalTestCase
             $parent = $parents[$item['id']] ?? null;
             $richText = $listItemText->isRichText();
             if ($parent !== null) {
+                // A relation whose "text" holds lines rather than paragraphs
+                // says so with "wrap = off", the flag the core sets on the
+                // "bodytext" of "bullets", "table" and "html" for the same
+                // reason - the pricing plans list one feature per line. Such a
+                // value is checked for markup like any other plain text, and
+                // its line breaks are left alone: they are what the template
+                // splits on.
+                $relationConfiguration = $content->getSubSchema($parent)->getField('tx_theme_list_items')->getConfiguration();
+                if (($relationConfiguration['overrideChildTca']['columns']['text']['config']['wrap'] ?? '') === 'off') {
+                    $checked['lines']++;
+                    foreach (self::violations($item['text'], false) as $violation) {
+                        $violations[] = sprintf('tx_theme_list_item %d (of %s) "text": %s', $item['id'], $parent, $violation);
+                    }
+                    continue;
+                }
+            }
+            if ($parent !== null) {
                 // The editor is enabled for the child's "text" through the
                 // "columns" of the relation's "overrideChildTca", the one form
                 // this extension uses (tabs, accordion). A "columnsOverrides"
@@ -130,9 +147,14 @@ final class PlainTextSeedTest extends AbstractFunctionalTestCase
      * break (`f:format.nl2br`), so a line that ends in the middle of a sentence
      * is a wrap of the source that reached the database.
      *
+     * `$linesAreParagraphs` is false for a column whose relation declares
+     * `wrap = off`: there a line break is the structure of the value - one
+     * feature of a pricing plan per line - and a line is not meant to be a
+     * sentence. Markup and stray white space are still wrong there.
+     *
      * @return list<string>
      */
-    private static function violations(string $value): array
+    private static function violations(string $value, bool $linesAreParagraphs = true): array
     {
         $violations = [];
         if (preg_match('#</?[a-z][^>]*>|&[a-z]+;#i', $value, $match) === 1) {
@@ -144,10 +166,12 @@ final class PlainTextSeedTest extends AbstractFunctionalTestCase
         if (str_contains($value, "\n\n")) {
             $violations[] = 'holds an empty line - an empty paragraph';
         }
-        foreach (explode("\n", trim($value)) as $line) {
-            $line = rtrim($line);
-            if ($line !== '' && preg_match('/[.!?:"\')\x{201D}\x{2026}]$/u', $line) !== 1) {
-                $violations[] = sprintf('breaks a line inside a sentence, after "%s"', mb_substr($line, -24));
+        if ($linesAreParagraphs) {
+            foreach (explode("\n", trim($value)) as $line) {
+                $line = rtrim($line);
+                if ($line !== '' && preg_match('/[.!?:"\')\x{201D}\x{2026}]$/u', $line) !== 1) {
+                    $violations[] = sprintf('breaks a line inside a sentence, after "%s"', mb_substr($line, -24));
+                }
             }
         }
 

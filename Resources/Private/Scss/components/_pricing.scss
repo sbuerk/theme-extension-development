@@ -1,0 +1,180 @@
+// Pricing.
+//
+// Markup contract:
+//
+//     <ul class="theme-pricing">
+//         <li class="theme-pricing__plan theme-pricing__plan--highlighted">
+//             <h3 class="theme-pricing__name">…</h3>
+//             <p class="theme-pricing__price">
+//                 49 €
+//                 <span class="theme-pricing__period">per month</span>
+//             </p>
+//             <ul class="theme-list theme-list--check theme-pricing__features">
+//                 <li>…</li>
+//             </ul>
+//             <div class="theme-pricing__actions"><a class="theme-button" href="…">…</a></div>
+//         </li>
+//     </ul>
+//
+// Everything inside a plan but the name is optional. A "ul" of "li": the plans
+// are items of one list, and how many there are is what a screen reader
+// announces for it.
+//
+// --- The plans are compared, so they share a grid ---------------------------
+//
+// "grid-auto-flow: column" with equal tracks rather than the auto-fit of
+// ".theme-card-grid": a pricing table is read across, and two plans of three
+// sitting on one row with the third wrapped below them is the one arrangement
+// that stops a reader comparing them. Below "bp.$md" the plans stack, because
+// three columns of prices on a phone are three columns nobody can read.
+//
+// "align-items: stretch" and the "margin-block-start: auto" on "__actions" put
+// every button on the same line whatever the feature lists above them did,
+// which is the other half of "the columns can be compared".
+//
+// --- The price is figures, so it is set as figures --------------------------
+//
+// "font-variant-numeric: tabular-nums" on "__price": proportional figures give
+// "1" less room than "9", so "19 €" and "99 €" in two plans of the same grid
+// start at the same place and end at different ones. Tabular figures are the
+// typographic answer to a column of numbers, and the date of the timeline is
+// set the same way.
+//
+// --- The highlighted plan ---------------------------------------------------
+//
+// "--highlighted" is the plan a site recommends. It is told apart by more than
+// its colour (WCAG 1.4.1): a border of the strong width in the accent, not a
+// fill alone. The fill is the 5% tint of the accent band - the same mix
+// "components/_content-element.scss" uses for "--frame-accent", in "oklab"
+// against the page background, so the contrast DESIGN.md computed for that
+// band holds inside this plan as well.
+//
+// Under forced colours the tint and the accent border both go, and the plan
+// would look exactly like its neighbours; it keeps the highlight colour as an
+// edge instead, opting out so the colour is painted as written.
+//
+// The plan carries no "aria-*" of its own: which plan a site recommends is
+// editorial emphasis, not a state of a control, and the name of the plan is
+// what the reader acts on. A site that wants it announced puts the word in the
+// plan's own text.
+//
+// --- The features are the check list, not a list of this component ----------
+//
+// "__features" is ".theme-list--check" with a class of this component only for
+// its spacing: the marker is the vendored "check.svg" as a mask, which
+// "components/_list.scss" already draws, and a second check mark drawn here
+// would be a second place to keep the shape and its forced-colours rule in.
+// A feature a plan does not include is left out of the list rather than
+// crossed out - see the changelog entry for why.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-pricing {
+    --theme-pricing-gap: var(--theme-space-4, 1.25rem);
+    --theme-pricing-padding: var(--theme-space-5, 1.5625rem);
+    --theme-pricing-radius: var(--theme-radius-sm, 5px);
+    --theme-pricing-background: var(--theme-color-surface, #f4f6fa);
+    --theme-pricing-border-color: var(--theme-color-border, #d6dce6);
+    --theme-pricing-accent: var(--theme-color-primary, #0b57d0);
+    --theme-pricing-name-color: var(--theme-color-text-primary, #14181f);
+    --theme-pricing-price-color: var(--theme-color-text-primary, #14181f);
+    --theme-pricing-period-color: var(--theme-color-text-secondary, #4a5567);
+
+    display: grid;
+    gap: var(--theme-pricing-gap);
+    align-items: stretch;
+    // The grid spaces the plans; the content element around it spaces the
+    // element, exactly as ".theme-card-grid" leaves it.
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @media (min-width: bp.$md) {
+        grid-auto-columns: 1fr;
+        grid-auto-flow: column;
+    }
+}
+
+.theme-pricing__plan {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-3, 0.9375rem);
+    // A plan is the "li" of a list, and the element baseline spaces list items
+    // apart; the grid spaces the plans.
+    margin: 0;
+    padding: var(--theme-pricing-padding);
+
+    background-color: var(--theme-pricing-background);
+    border: var(--theme-border-width, 1px) solid var(--theme-pricing-border-color);
+    border-radius: var(--theme-pricing-radius);
+}
+
+// The tint and the border of the accent band, applied to one plan.
+.theme-pricing__plan--highlighted {
+    --theme-pricing-background: color-mix(in oklab, var(--theme-color-primary, #0b57d0) 5%, var(--theme-color-background, #ffffff));
+
+    border-color: var(--theme-pricing-accent);
+    border-width: var(--theme-border-width-strong, 2px);
+}
+
+// Follows the heading level of the element, so it states the case the element
+// baseline gives "h5" and "h6" - capitals - and gives it up again.
+.theme-pricing__name {
+    margin: 0;
+    color: var(--theme-pricing-name-color);
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+}
+
+// Tabular figures, so the prices of the plans beside each other line up digit
+// for digit. The period is a line of its own inside the paragraph: it belongs
+// to the price and is read with it.
+.theme-pricing__price {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-1, 0.3125rem);
+    margin: 0;
+    color: var(--theme-pricing-price-color);
+    font-size: var(--theme-font-size-xl, 1.5rem);
+    font-weight: var(--theme-font-weight-bold);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--theme-line-height-snug);
+}
+
+.theme-pricing__period {
+    color: var(--theme-pricing-period-color);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-regular, 400);
+    letter-spacing: var(--theme-letter-spacing-wide);
+}
+
+// The check list of the library, spaced for this component: the list's own
+// bottom margin would sit between the features and the button, which
+// "__actions" already spaces.
+.theme-pricing__features {
+    margin-block-end: 0;
+}
+
+// Every button on the same line, whatever the feature lists above them did.
+.theme-pricing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--theme-space-2, 0.625rem);
+    margin-block-start: auto;
+}
+
+// The tint and the accent border are both colour, and forced colours repaints
+// every background to the canvas and every border to the system text colour -
+// which would leave the highlighted plan looking exactly like its neighbours.
+@media (forced-colors: active) {
+    .theme-pricing__plan--highlighted {
+        forced-color-adjust: none;
+        border-color: Highlight;
+    }
+}

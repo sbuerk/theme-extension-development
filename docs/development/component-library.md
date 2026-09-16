@@ -65,6 +65,7 @@ against, and the rename was cheap while only one template depended on it.
 | Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`          |
 | Pagination              | `.theme-pagination__list` | `components/_pagination.scss`       |
 | Panel                   | `.theme-panel`            | `components/_panel.scss`            |
+| Pricing                 | `.theme-pricing`          | `components/_pricing.scss`          |
 | Progress                | `.theme-progress`         | `components/_progress.scss`         |
 | Quote                   | `.theme-quote`            | `components/_quote.scss`            |
 | Segmented control       | `.theme-segmented`        | `components/_settings.scss`         |

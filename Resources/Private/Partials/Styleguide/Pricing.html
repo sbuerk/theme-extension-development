@@ -1,0 +1,121 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Styleguide section "Pricing": ".theme-pricing", the component
+    "theme_pricing" renders its plans on.
+
+    The rules of every other section apply: literal markup copied from the
+    markup contract in "components/_pricing.scss", nothing driven by a record,
+    a data processor or an "f:cObject", and literal English copy.
+
+    Three plans, because three is where the grid has something to say: they
+    share one row above 48rem and stack below it, and the middle one is the
+    highlighted plan, so the modifier is shown next to the plans it is meant to
+    be compared against rather than on its own.
+
+    The plan names are "h4": the page owns h1, the section h2, and "h3" is
+    already the specimen heading below - the same outline reason "Boxes.html"
+    gives. In a rendered content element they follow the heading level of the
+    element instead ("Partials/ContentElement/ItemHeading.html").
+
+    The prices are deliberately of different widths - 0, 19 and 49 - because
+    the point of "font-variant-numeric: tabular-nums" is that the digits line
+    up across the three columns. The feature lists are deliberately of
+    different lengths, which is what pushes the buttons apart unless
+    "__actions" keeps them on one line.
+
+    The third plan has no button: a plan an editor left without a link ends
+    with its features, and the two beside it keep their own buttons at the
+    bottom of their own box rather than lining up with nothing.
+</f:comment>
+<section class="theme-styleguide__section" id="pricing">
+    <h2 class="theme-styleguide__heading">Pricing</h2>
+
+    <p>
+        Plans side by side, to be read across rather than down. Above 48rem the
+        plans share one row in equal columns, so a reader compares the same line
+        of three plans at a glance; below it they stack. The prices are set in
+        tabular figures, which is what makes the digits line up between the
+        columns, and every button sits on the same line whatever the feature
+        lists above them did.
+    </p>
+
+    <h3>Three plans, the middle one highlighted</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A feature a plan does not include is left out of its list rather
+            than crossed out. The highlighted plan is told apart by a border of
+            the strong width in the accent as well as by its tint, so it
+            survives forced colours and a reader who does not see the fill.
+        </p>
+        <ul class="theme-pricing">
+            <li class="theme-pricing__plan">
+                <h4 class="theme-pricing__name">Starter</h4>
+                <p class="theme-pricing__price">
+                    0 €
+                    <span class="theme-pricing__period">per month</span>
+                </p>
+                <ul class="theme-list theme-list--check theme-pricing__features">
+                    <li>One site</li>
+                    <li>Community support</li>
+                </ul>
+                <div class="theme-pricing__actions">
+                    <a class="theme-button theme-button--secondary" href="#pricing">Start for nothing</a>
+                </div>
+            </li>
+            <li class="theme-pricing__plan theme-pricing__plan--highlighted">
+                <h4 class="theme-pricing__name">Team</h4>
+                <p class="theme-pricing__price">
+                    19 €
+                    <span class="theme-pricing__period">per seat and month</span>
+                </p>
+                <ul class="theme-list theme-list--check theme-pricing__features">
+                    <li>Ten sites</li>
+                    <li>Support within one working day</li>
+                    <li>Staging and deployment</li>
+                    <li>Audit log</li>
+                </ul>
+                <div class="theme-pricing__actions">
+                    <a class="theme-button" href="#pricing">Choose Team</a>
+                </div>
+            </li>
+            <li class="theme-pricing__plan">
+                <h4 class="theme-pricing__name">Agency</h4>
+                <p class="theme-pricing__price">
+                    49 €
+                    <span class="theme-pricing__period">per seat and month</span>
+                </p>
+                <ul class="theme-list theme-list--check theme-pricing__features">
+                    <li>Sites without a limit</li>
+                    <li>Support within four hours</li>
+                    <li>A named contact</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <h3>A single plan</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            One plan takes the whole width of the column rather than a third of
+            it: the grid lays out the plans it is given, and there is no column
+            count to pick. A plan without a price is its name, its features and
+            its button.
+        </p>
+        <ul class="theme-pricing">
+            <li class="theme-pricing__plan">
+                <h4 class="theme-pricing__name">Everything, one price</h4>
+                <ul class="theme-list theme-list--check theme-pricing__features">
+                    <li>Every feature of every plan above</li>
+                    <li>Support within four hours</li>
+                </ul>
+                <div class="theme-pricing__actions">
+                    <a class="theme-button" href="#pricing">Get in touch</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+
+</html>
