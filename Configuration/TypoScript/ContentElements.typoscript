@@ -781,15 +781,29 @@ tt_content.menu_section_pages {
 # ("EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:
 # CType.menu_sitemap.description") - deep enough for any realistic page tree
 # without being unbounded, matching FSC's own "MenuSitemap.typoscript".
-# "special" is unset explicitly ("special >") rather than left to default,
-# because this type is built "=< tt_content.menu_subpages" below, which did
-# set one.
+#
+# This type is built "=< tt_content.menu_subpages", which sets "special =
+# directory", so "special" has to be emptied here - and "special >" cannot do
+# that. "=<" is resolved at render time by "ContentObjectRenderer::
+# mergeTSRef()", which overlays this block onto the referenced one with
+# "array_replace_recursive()": a property removed with ">" is merely absent
+# from the overlay, and the referenced "directory" survives. That is what
+# this block did until now, and it made the sitemap a directory menu of
+# "pages" - a field this type does not offer, so it fell back to the current
+# page and listed nothing on any page without children. An empty value is a
+# key in the overlay and replaces "directory". "AbstractMenuContentObject::
+# prepareMenuItems()" only enters its "special" branch for a truthy
+# "special", and "start()" only reads "special.value" for "directory", so an
+# empty "special" is the default menu, and the inherited "special.value.
+# field = pages" is never read. "dataProcessing.20" keeps "directory"; it
+# never runs for this type, "lib.themeMenuWithPageMedia" limits it to
+# "menu_pages" and "menu_subpages".
 tt_content.menu_sitemap =< tt_content.menu_subpages
 tt_content.menu_sitemap {
     templateName = ContentElements/MenuSitemap
 
     dataProcessing.10 {
-        special >
+        special =
         levels = 7
     }
 }
