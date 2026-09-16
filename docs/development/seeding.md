@@ -78,11 +78,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                                                                                                                       |
-|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pages`              | 1 to 10, then 30 to 39, 50 to 59, 70 to 79, 90 to 99, 110 to 119, 130 to 139 and 150 to 159 — every other decade, see [below](#why-new-pages-skip-decades) |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                            |
-| `tx_theme_list_item` | 1 to 18 on page 8, and 100 to 199 on the pages below it, in declaration order                                                                              |
+| Table                | Uids                                                                                                                                                                                                        |
+|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 151 and 170 — forty-one pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                             |
+| `tx_theme_list_item` | 1 to 18 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -124,9 +124,11 @@ them it decides which uids are free:
 | 30–39     | new pages; the mirror of their content is 4001–4999                                           |
 | 50–59     | new pages; the mirror of their content is 6001–6999                                           |
 | 70–79     | new pages; the mirror of their content is 8001–8999                                           |
+| 90–99     | new pages; the mirror of their content is 10001–10999                                         |
 | 110–119   | new pages; the mirror of their content is 12001–12999                                         |
 | 130–139   | new pages; the mirror of their content is 14001–14999                                         |
 | 150–159   | new pages; the mirror of their content is 16001–16999                                         |
+| 170–179   | new pages; the mirror of their content is 18001–18999                                         |
 
 So a new page takes a uid in an odd decade from 30 up — 30–39, 50–59, 70–79,
 90–99, 110–119, 130–139, 150–159 and so on — and the even decade after it stays
@@ -221,6 +223,7 @@ classic `CType` in its variants, and every appearance value:
 | 111       | Calls to action          | `/elements/theme/cta`            | `content_sidebar`               | The call to action in every tone and width.                                                                                                   |
 | 112       | Quotation styles         | `/elements/theme/quote`          | `content_sidebar`               | The styles and the portrait of the testimonial.                                                                                               |
 | 130       | External media           | `/elements/theme/external-media` | `content_sidebar`               | Both shapes of the embed, an element without a poster, and a host that is not embedded at all.                                                |
+| 170       | Pricing                  | `/elements/theme/pricing`        | `content`                       | Plans side by side, each with a price, a period, a feature list and a link; no sidebar, which the plan columns need.                          |
 | 51        | Frames                   | `/elements/frames`               | `content`                       | Every frame, spacing, header alignment and header look of the Appearance tab.                                                                 |
 | 9         | Styleguide               | `/styleguide`                    | `styleguide`                    | The component library, straight from Fluid.                                                                                                   |
 | 10        | Forms                    | `/forms`                         | `forms`                         | The form showcase, straight from Fluid.                                                                                                       |

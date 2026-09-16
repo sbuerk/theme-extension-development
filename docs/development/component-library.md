@@ -1539,21 +1539,36 @@ one-character change with no visible symptom on a desktop check.
 
 ## Components that need the script
 
-Five components depend on `Resources/Public/JavaScript/theme.js`, and each is
-written so that the page is still usable without it — with JavaScript switched off, and with JavaScript on
-but `theme.js` failing to load, which are two different pages. The dialog
-opener follows the [`data-js` marker](#the-data-js-marker) like the navigation
-toggle does; the tabs follow a marker of their own that only `theme.js` sets,
-because what they hide has to stay reachable until the script that switches
-them has actually run.
+`theme.js` binds nine groups in all. Seven of them are the components in the
+table below, each written so that the page is still usable without the script —
+with JavaScript switched off, and with JavaScript on but `theme.js` failing to
+load, which are two different pages. The other two are just as script-driven and
+have sections of their own rather than a row here: the
+[display settings](#display-settings), and the main navigation toggle behind
+[the `data-js` marker](#the-data-js-marker).
 
-| Component | With the script                                                                                                                          | Without it                                                                                         | Gate in the stylesheet                                      |
-|-----------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
-| Tabs      | WAI-ARIA tabs with automatic activation: arrow keys (mirrored right-to-left), Home, End, a roving tab stop; the panels become tab panels | No tab list; every panel shown, stacked, in its own frame under its heading, with no tab semantics | `.theme-tabs[data-theme-tabs-bound]`, set by `theme.js`     |
-| Dialog    | `data-theme-dialog-open` calls `showModal()`; a click on the backdrop closes it; focus returns to the opener                             | The opener is hidden and the dialog stays closed                                                   | `:root:not([data-js]) [data-theme-dialog-open]`             |
-| Lightbox  | The gallery's zoom link opens the dialog on the image it names; the arrows and the arrow keys move within it, wrapping                   | The zoom link leads to the file, as it always did; the dialog is closed and renders nothing        | none — the link is the fallback, so nothing is hidden       |
-| Embed     | The play button builds the `iframe` from `data-theme-embed-src` and replaces the placeholder with it                                     | No play button; the poster, the note and the link to the source                                    | `.theme-embed[data-theme-embed-bound] .theme-embed__button` |
-| Tooltip   | Escape sets `data-theme-tooltip-dismissed` until pointer and focus have both left                                                        | Hover and focus still show it; Escape does not hide it                                             | none — the CSS behaviour is the fallback                    |
+Three gates decide what a page without the script shows, and the table names the
+one each component uses:
+
+- The dialog opener follows the [`data-js` marker](#the-data-js-marker), like
+  the navigation toggle does. That marker only says the inline head script ran.
+- The tabs, the carousel and the embed follow a marker of their own that only
+  `theme.js` sets, once it has bound that group — `data-js` would show a
+  control that does nothing on a page whose module never loaded.
+- The lightbox, the tooltip and the dropdown are gated by nothing at all.
+  Each degrades to behaviour the platform already provides — a link to the
+  file, a bubble shown on hover and focus, a popover the browser opens — so
+  there is nothing to hide.
+
+| Component | With the script                                                                                                                          | Without it                                                                                         | Gate in the stylesheet                                                |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| Tabs      | WAI-ARIA tabs with automatic activation: arrow keys (mirrored right-to-left), Home, End, a roving tab stop; the panels become tab panels | No tab list; every panel shown, stacked, in its own frame under its heading, with no tab semantics | `.theme-tabs[data-theme-tabs-bound]`, set by `theme.js`               |
+| Dialog    | `data-theme-dialog-open` calls `showModal()`; a click on the backdrop closes it; focus returns to the opener                             | The opener is hidden and the dialog stays closed                                                   | `:root:not([data-js]) [data-theme-dialog-open]`                       |
+| Lightbox  | The gallery's zoom link opens the dialog on the image it names; the arrows and the arrow keys move within it, wrapping                   | The zoom link leads to the file, as it always did; the dialog is closed and renders nothing        | none — the link is the fallback, so nothing is hidden                 |
+| Embed     | The play button builds the `iframe` from `data-theme-embed-src` and replaces the placeholder with it                                     | No play button; the poster, the note and the link to the source                                    | `.theme-embed[data-theme-embed-bound] .theme-embed__button`           |
+| Carousel  | The previous and next buttons scroll the track by one slide, and `aria-current` marks the indicator of the slide in view                 | The track still scrolls and snaps, and the indicators are still links to the slides; no buttons    | `.theme-carousel[data-theme-carousel-bound] .theme-carousel__control` |
+| Tooltip   | Escape sets `data-theme-tooltip-dismissed` until pointer and focus have both left                                                        | Hover and focus still show it; Escape does not hide it                                             | none — the CSS behaviour is the fallback                              |
+| Dropdown  | `aria-expanded` on the trigger is mirrored from the panel's own `toggle` event                                                           | The panel still opens, closes and light-dismisses; `aria-expanded` stays stale                     | none — the Popover API is the behaviour, the script reports it        |
 
 **Tabs.** The markup keeps three rules that the stylesheet and the script both
 depend on: the first tab is the selected one and every other tab carries
