@@ -30,6 +30,7 @@ tt_content,,,,,,,,,,,,,,,
 ,250,1,0,0,0,250,theme_timeline,A timeline,,,,,1,2,
 ,260,1,0,0,0,260,theme_teaser_list,A teaser list,,,,,1,2,
 ,270,1,0,0,0,270,theme_carousel,A carousel,,,,,1,2,
+,280,1,0,0,0,280,theme_split_tiles,Split tiles,,,,,1,2,
 tx_theme_list_item,,,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,text,link,link_label,date
 ,1,1,0,0,1,70,tt_content,tx_theme_list_items,,,t3://page?uid=1,Profile,\NULL
@@ -51,3 +52,4 @@ tx_theme_list_item,,,,,,,,,,,,,
 ,17,1,0,0,1,250,tt_content,tx_theme_list_items,An entry,One entry.,,,2026-01-12
 ,18,1,0,0,1,260,tt_content,tx_theme_list_items,A row,One row.,,,\NULL
 ,19,1,0,0,1,270,tt_content,tx_theme_list_items,A slide,One slide.,,,\NULL
+,20,1,0,0,1,280,tt_content,tx_theme_list_items,A tile,One tile.,,,\NULL

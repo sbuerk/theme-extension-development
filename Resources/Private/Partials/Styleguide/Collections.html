@@ -100,6 +100,59 @@
         </ul>
     </div>
 
+    <h3>Split tiles</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A column of featurettes: a picture on one side and the words on the
+            other, with the side changing from tile to tile. Nothing in the
+            markup of a tile says which side it is on &mdash; the stylesheet
+            alternates with <code>:nth-child(even)</code>, so inserting or
+            reordering a tile keeps the rhythm right, and
+            <code>--reversed</code> on the list starts it on the other foot.
+            Each tile carries its own tone, the same three the call to action
+            offers. The tiles stack below the breakpoint, where there is no
+            room for two halves.
+        </p>
+        <ul class="theme-split-tiles">
+            <li class="theme-split-tiles__item">
+                <div class="theme-split-tiles__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the picture of the first tile.">
+                </div>
+                <div class="theme-split-tiles__body">
+                    <h4 class="theme-split-tiles__title">Write the content first</h4>
+                    <p class="theme-split-tiles__text">The first tile has no tone: the surface fill, and the picture at the start of the line.</p>
+                    <a class="theme-button" href="#">Read the guide</a>
+                </div>
+            </li>
+            <li class="theme-split-tiles__item theme-split-tiles__item--accent">
+                <div class="theme-split-tiles__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the picture of the second tile.">
+                </div>
+                <div class="theme-split-tiles__body">
+                    <h4 class="theme-split-tiles__title">Pick the elements</h4>
+                    <p class="theme-split-tiles__text">The second tile is the accent tint, and the picture has moved to the end of the line without a class of its own.</p>
+                    <a class="theme-button theme-button--secondary" href="#">Open the elements</a>
+                </div>
+            </li>
+            <li class="theme-split-tiles__item theme-split-tiles__item--inverse">
+                <div class="theme-split-tiles__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the picture of the third tile.">
+                </div>
+                <div class="theme-split-tiles__body">
+                    <h4 class="theme-split-tiles__title">Check it in the dark</h4>
+                    <p class="theme-split-tiles__text">The inverse tile turns the colour scheme of everything inside it, the button included, so it is as readable as a page in that appearance.</p>
+                    <a class="theme-button" href="#">Switch the appearance</a>
+                </div>
+            </li>
+            <li class="theme-split-tiles__item theme-split-tiles__item--placeholder">
+                <div class="theme-split-tiles__body">
+                    <h4 class="theme-split-tiles__title">Nothing here yet</h4>
+                    <p class="theme-split-tiles__text">The placeholder tone: no fill and a dashed frame, for a tile standing in for content that does not exist yet. This one has no picture either, so its body takes the whole tile.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+
     <h3>Card scroller</h3>
     <div class="theme-styleguide__specimen">
         <p>

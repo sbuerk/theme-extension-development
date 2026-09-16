@@ -1,0 +1,206 @@
+// Split tiles.
+//
+// Markup contract:
+//
+//     <div class="theme-split-tiles theme-split-tiles--reversed">
+//         <article class="theme-split-tiles__item theme-split-tiles__item--accent">
+//             <div class="theme-split-tiles__media"><img …></div>
+//             <div class="theme-split-tiles__body">
+//                 <h3 class="theme-split-tiles__title">…</h3>
+//                 <p class="theme-split-tiles__text">…</p>
+//                 <a class="theme-button" href="…">…</a>
+//             </div>
+//         </article>
+//         …
+//     </div>
+//
+// A column of featurettes: each one a picture on one side and words on the
+// other, and the side changes from tile to tile down the column.
+//
+// Tone modifiers, on the **item**: "--accent", "--inverse" and "--placeholder",
+// the same three ".theme-cta" carries and mixed exactly the same way, so the
+// contrast DESIGN.md computed for the bands of the content element frame holds
+// here too. Every tile carries its own, which is the point: a column of tiles
+// that all look alike is a list, and what makes a featurette a featurette is
+// that it is set apart from the one above it.
+//
+// List modifier: "--reversed" starts the alternation on the other side, so a
+// second group of tiles further down a page can carry on the rhythm of the
+// first instead of repeating it.
+//
+// --- Why this is not ".theme-teaser" -------------------------------------------
+//
+// A tile is very nearly a teaser: a frame, a media half, a body half, and a
+// "--reversed" that swaps them. Reusing "components/_teaser.scss" was tried and
+// rejected, for two reasons that are both structural rather than cosmetic.
+//
+//  1. **The alternation belongs to the list, not to the tile.** Reusing the
+//     teaser would mean a rule like ".theme-split-tiles > .theme-teaser:nth-child(even)"
+//     - a rule in this file reaching into another component's class. The entry
+//     point "theme.scss" states the property that forbids it: every component
+//     file is self-contained and "reaches into no other component", which is
+//     what lets a site package compile a subset of the library. A file that
+//     styles ".theme-teaser" would break silently in any bundle that includes
+//     this component and not that one.
+//  2. **The teaser has nowhere to put a tone.** The tone modifiers below
+//     re-point a background token and, for "--inverse", turn the colour scheme
+//     of the whole subtree. The teaser declares no such token layer, so giving
+//     it one would change a component several other places already render -
+//     a much larger change than a component of its own, and one with no test
+//     asking for it.
+//
+// What is shared is the reasoning, not the rules: the flip below is the same
+// paint-order-only technique "_teaser.scss" documents at length, for the same
+// WCAG 1.3.2 reason, and it is worth reading there.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-split-tiles {
+    --theme-split-tiles-gap: var(--theme-space-4, 1.25rem);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-split-tiles-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-split-tiles__item {
+    --theme-split-tiles-background: var(--theme-color-surface, #f4f6fa);
+    --theme-split-tiles-border-color: var(--theme-color-border, #d6dce6);
+    --theme-split-tiles-border-style: solid;
+    --theme-split-tiles-radius: var(--theme-radius-sm, 5px);
+    --theme-split-tiles-body-padding: var(--theme-space-6, 1.875rem);
+    --theme-split-tiles-media-basis: 50%;
+
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    overflow: hidden;
+
+    background-color: var(--theme-split-tiles-background);
+    border: var(--theme-border-width) var(--theme-split-tiles-border-style) var(--theme-split-tiles-border-color);
+    border-radius: var(--theme-split-tiles-radius);
+    color: var(--theme-color-text-primary, #14181f);
+
+    // Stacked below the breakpoint, side by side above it - the point at which
+    // half a content column is still wide enough for a paragraph.
+    @media (min-width: bp.$md) {
+        flex-direction: row;
+        align-items: stretch;
+    }
+
+    // The alternation. Every even tile paints its halves the other way round,
+    // so the picture walks down the column from one side to the other with no
+    // class on any individual tile - the markup of every tile is identical,
+    // which is what keeps the rhythm right when an editor reorders, inserts or
+    // deletes one.
+    //
+    // "row-reverse" changes paint order only. The media stays before the body
+    // in the source on every tile, so the reading order and the focus order
+    // are the same on all of them and neither follows the flip (WCAG 1.3.2) -
+    // the argument "_teaser.scss" makes for its own "--reversed", and the
+    // reason that modifier and this selector can use the same technique.
+    @media (min-width: bp.$md) {
+        &:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+    }
+}
+
+// Starts the alternation on the other foot: the odd tiles are the flipped ones.
+// Written as the two selectors rather than by moving the ":nth-child" argument,
+// so the rule above stays the one that states the default.
+.theme-split-tiles--reversed {
+    @media (min-width: bp.$md) {
+        .theme-split-tiles__item:nth-child(even) {
+            flex-direction: row;
+        }
+
+        .theme-split-tiles__item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+    }
+}
+
+// Bleeds to the edge of the tile: the padding is on the body only, the split
+// "_card.scss" and "_teaser.scss" both use.
+.theme-split-tiles__media {
+    flex: 0 0 auto;
+
+    @media (min-width: bp.$md) {
+        flex-basis: var(--theme-split-tiles-media-basis);
+    }
+
+    img,
+    picture,
+    video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.theme-split-tiles__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    gap: var(--theme-space-3, 0.9375rem);
+    padding: var(--theme-split-tiles-body-padding);
+}
+
+// The level follows "header_layout" - see ".theme-card__title" for why the
+// case is stated.
+.theme-split-tiles__title {
+    margin: 0;
+    font-size: var(--theme-font-size-xl, 1.5rem);
+    font-weight: var(--theme-font-weight-bold, 800);
+    letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+    line-height: var(--theme-line-height-snug, 1.3);
+    text-transform: none;
+}
+
+.theme-split-tiles__text {
+    margin: 0;
+    color: var(--theme-color-text-secondary, #4a5567);
+    font-size: var(--theme-font-size-md, 1rem);
+    line-height: var(--theme-line-height-base, 1.6);
+}
+
+// --- Tone ---------------------------------------------------------------------
+//
+// The three tones of ".theme-cta", mixed identically - see that file for what
+// each one is and why the inverse one needs three rules rather than one.
+
+.theme-split-tiles__item--accent {
+    --theme-split-tiles-background: color-mix(in oklab, var(--theme-color-primary, #0b57d0) 5%, var(--theme-color-background, #ffffff));
+}
+
+.theme-split-tiles__item--inverse {
+    --theme-split-tiles-background: var(--theme-color-background, #0f1319);
+
+    color-scheme: dark;
+}
+
+:root[data-theme='dark'] .theme-split-tiles__item--inverse {
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .theme-split-tiles__item--inverse {
+        color-scheme: light;
+    }
+}
+
+.theme-split-tiles__item--placeholder {
+    --theme-split-tiles-background: transparent;
+    --theme-split-tiles-border-style: dashed;
+    --theme-split-tiles-border-color: var(--theme-color-border-strong, #828d9f);
+}

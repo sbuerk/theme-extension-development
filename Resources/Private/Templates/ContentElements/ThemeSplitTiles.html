@@ -1,0 +1,78 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_split_tiles" - alternating featurettes, on ".theme-split-tiles"
+    (Resources/Private/Scss/components/_split-tiles.scss).
+
+    The tiles are "tx_theme_list_items", resolved like those of
+    "ThemeMediaTeaserGrid.html", in the order of the relation. They are the
+    items of a list, a "ul" of "li", and their titles sit one level below the
+    heading of the element ("Partials/ContentElement/ItemHeading.html").
+
+    **The markup of every tile is identical.** Which side the picture of a
+    given tile is on is decided by the stylesheet, with ":nth-child(even)", and
+    by nothing here - so inserting, deleting or reordering a tile in the
+    backend keeps the rhythm right by itself, which a per-tile modifier written
+    by this template would not. "layout" picks the foot the alternation starts
+    on: 1 writes "--reversed" on the list, anything else the plain class. The
+    two core values the element does not render are removed from the form for
+    this type ("ContentElementAppearance.tsconfig"), and a record still
+    carrying one starts on the default foot.
+
+    "item.data.tone" is the tone of the individual tile - the three of
+    ".theme-cta", matched value by value, anything else the surface fill and no
+    modifier. "ContentElementContractTest" holds every modifier written here to
+    a rule of the compiled stylesheet.
+
+    The media is rendered before the body on every tile, whichever side it is
+    painted on, so the reading order and the focus order are the same on all of
+    them - see the component's header comment, and "_teaser.scss" for the same
+    argument at length.
+
+    A tile with a link renders it as a button of the style the editor picked,
+    through "Partials/ContentElement/LinkButton.html". "item.data.text" is the
+    plain text column of the child table, hence "f:format.nl2br".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <f:if condition="{data.layout} == 1">
+            <f:then><f:variable name="rhythm" value=" theme-split-tiles--reversed" /></f:then>
+            <f:else><f:variable name="rhythm" value="" /></f:else>
+        </f:if>
+        <ul class="theme-split-tiles{rhythm}">
+            <f:for each="{listItems}" as="item">
+                <f:switch expression="{item.data.tone}">
+                    <f:case value="accent"><f:variable name="tone" value=" theme-split-tiles__item--accent" /></f:case>
+                    <f:case value="inverse"><f:variable name="tone" value=" theme-split-tiles__item--inverse" /></f:case>
+                    <f:case value="placeholder"><f:variable name="tone" value=" theme-split-tiles__item--placeholder" /></f:case>
+                    <f:defaultCase><f:variable name="tone" value="" /></f:defaultCase>
+                </f:switch>
+                <li class="theme-split-tiles__item{tone}">
+                    <f:if condition="{item.files.0}">
+                        <div class="theme-split-tiles__media">
+                            <f:image image="{item.files.0}" loading="lazy" />
+                        </div>
+                    </f:if>
+                    <div class="theme-split-tiles__body">
+                        <f:if condition="{item.data.header}">
+                            <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-split-tiles__title', title: item.data.header}" />
+                        </f:if>
+                        <f:if condition="{item.data.text}">
+                            <p class="theme-split-tiles__text"><f:format.nl2br>{item.data.text}</f:format.nl2br></p>
+                        </f:if>
+                        <f:if condition="{item.data.link}">
+                            <f:render partial="ContentElement/LinkButton" arguments="{link: item.data.link, label: item.data.link_label, variant: item.data.link_variant, icon: item.data.link_icon}" />
+                        </f:if>
+                    </div>
+                </li>
+            </f:for>
+        </ul>
+    </f:if>
+</f:section>
+
+</html>

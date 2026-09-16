@@ -63,6 +63,7 @@ final class ContentElementContractTest extends UnitTestCase
             'Resources/Private/Templates/ContentElements/ThemeCta.html',
             'Resources/Private/Templates/ContentElements/ThemeCardGroup.html',
             'Resources/Private/Templates/ContentElements/ThemeCarousel.html',
+            'Resources/Private/Templates/ContentElements/ThemeSplitTiles.html',
         ] as $template) {
             $source = (string)file_get_contents(self::root() . '/' . $template);
             preg_match_all('#<f:variable name="\w+" value="([^"]*)"\s*/>#', $source, $values);
@@ -88,10 +89,10 @@ final class ContentElementContractTest extends UnitTestCase
 
         // One case per modifier the templates above write: the appearance
         // fields, the lists, the text and icon element, the features, the
-        // steps, the card group, the carousel's caption positions and the
-        // layouts and variants - fewer means a value lost its case, and the
-        // test below would pass on an empty list.
-        $this->assertCount(64, $classes, implode(', ', $classes));
+        // steps, the card group, the carousel's caption positions, the split
+        // tiles with their tones and the layouts and variants - fewer means a
+        // value lost its case, and the test below would pass on an empty list.
+        $this->assertCount(68, $classes, implode(', ', $classes));
     }
 
     #[DataProvider('writtenClasses')]

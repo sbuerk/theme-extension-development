@@ -289,6 +289,13 @@ not know renders the element without one.
         -   A rule at the start - the default; a pull quote -
             :css:`.theme-quote--pull`; centred - :css:`--centred`, both with a
             quotation mark. See :ref:`feature-quotation-styles`
+    *   -   :guilabel:`Split tiles`
+        -   :guilabel:`Layout`, and :guilabel:`Tone` per tile
+        -   The first image at the start of the line - the default; at the end
+            - :css:`.theme-split-tiles--reversed`. The side alternates from
+            tile to tile by itself. Each tile takes a tone -
+            :css:`.theme-split-tiles__item--accent`, :css:`--inverse`,
+            :css:`--placeholder`. See :ref:`feature-carousel-and-split-tiles`
     *   -   :guilabel:`Carousel`
         -   :guilabel:`Caption` per slide
         -   Below the image - the default; above it -

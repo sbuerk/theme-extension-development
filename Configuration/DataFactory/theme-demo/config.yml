@@ -296,3 +296,11 @@ references:
   - {file: placeholder, table: tx_theme_list_item, uid: 462, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 463, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 464, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+
+  # Page 151: the page media, and the pictures of the tiles - 473 is the
+  # placeholder tone and carries none.
+  - {file: placeholder, table: pages, uid: 151, field: media, values: {alternative: 'A placeholder graphic standing in for the split tiles'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 470, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 471, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 472, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 474, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
