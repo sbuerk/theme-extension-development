@@ -916,6 +916,7 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_teaser_list`       | Rows of teasers, each row one link                       | `.theme-list-group`                                     |
 | `theme_carousel`          | Slides in one track that scrolls sideways; no autoplay   | `.theme-carousel`                                       |
 | `theme_split_tiles`       | Featurettes whose picture side alternates                | `.theme-split-tiles`                                    |
+| `theme_external_media`    | A video of another site, loaded only on request          | `.theme-embed`                                          |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`

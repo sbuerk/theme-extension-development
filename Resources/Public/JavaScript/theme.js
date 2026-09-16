@@ -843,8 +843,65 @@ function bindOneLightboxOpener(opener) {
     });
 }
 
+/**
+ * The privacy friendly embed of "theme_external_media"
+ * ("components/_embed.scss"): the page carries a poster and a button, and the
+ * iframe is built here, on the press, from the two data attributes the button
+ * carries. Nothing of the other site is requested before that - which is the
+ * whole point of the element, and why the iframe is not in the markup with a
+ * "loading=lazy" that would still connect as soon as the box scrolls into
+ * view.
+ *
+ * The button is hidden while the root carries no "data-js", so a page this
+ * file never reached shows the poster and the link to the source instead.
+ */
+function bindEmbeds() {
+    document.querySelectorAll('[data-theme-embed-play]').forEach(bindOneEmbed);
+}
+
+function bindOneEmbed(button) {
+    const frame = button.closest('.theme-embed__frame');
+    const embed = button.closest('.theme-embed');
+    const source = button.getAttribute('data-theme-embed-src');
+    if (!frame || !embed || !source) {
+        return;
+    }
+
+    button.addEventListener('click', function () {
+        const iframe = document.createElement('iframe');
+
+        // The press is the user gesture that lets the player start on its own.
+        // Without it the reader would press play twice: once here, and once
+        // more inside a player that has just appeared.
+        iframe.setAttribute('src', source + (source.indexOf('?') === -1 ? '?' : '&') + 'autoplay=1');
+        // An iframe is a document of its own in the page, and a screen reader
+        // announces it by this name. The template guarantees one.
+        iframe.setAttribute('title', button.getAttribute('data-theme-embed-title') || '');
+        iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media');
+        iframe.setAttribute('allowfullscreen', '');
+        // The provider learns which page the request came from, not which
+        // page of it.
+        iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+
+        while (frame.firstChild) {
+            frame.removeChild(frame.firstChild);
+        }
+        frame.appendChild(iframe);
+        // Focus moves into the player: the control that had it has just been
+        // removed from the document, and focus would otherwise fall back to
+        // the body and lose the reader's place.
+        iframe.focus();
+    });
+
+    // Only now is the button shown - the stylesheet keeps it out of the page
+    // until this marker is set, so a page whose "theme.js" never arrived shows
+    // the poster and the link rather than a button that does nothing.
+    embed.setAttribute('data-theme-embed-bound', '');
+}
+
 bindTabs();
 bindDialogs();
 bindLightboxes();
+bindEmbeds();
 bindTooltips();
 bindCarousels();

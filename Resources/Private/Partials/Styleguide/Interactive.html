@@ -3,12 +3,12 @@
       xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
-    Styleguide section "Interactive": the five components of the library
+    Styleguide section "Interactive": the six components of the library
     that need "Resources/Public/JavaScript/theme.js" - tabs, the dialog, the
-    carousel, the lightbox and the tooltip - each with what it does when the
-    script never runs. The carousel is the one of the five that needs the
-    script least: only its two buttons do, and everything else about it works
-    without one.
+    carousel, the lightbox, the external media embed and the tooltip - each
+    with what it does when the script never runs. The carousel is the one of
+    the six that needs the script least: only its two buttons do, and
+    everything else about it works without one.
 
     The rules of every other section apply: literal markup copied from the
     markup contract in the component's own SCSS header comment, nothing driven
@@ -40,7 +40,7 @@
     <h2 class="theme-styleguide__heading">Interactive</h2>
 
     <p>
-        The five components in this section are the only ones in the library
+        The six components in this section are the only ones in the library
         that need the theme's script. Each one says what it does without it,
         and this page is the place to check that claim: switch JavaScript off in
         the browser and reload.
@@ -281,6 +281,81 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <h3>Privacy friendly embed</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_embed.scss.
+
+            **Neither specimen is wired to a provider.** A specimen carrying a
+            real "data-theme-embed-src" would be bound by "theme.js" on this
+            page, and pressing it would load a video from another site into the
+            styleguide - which contract D2 rules out and which is the one thing
+            this component exists to avoid. The working element is on the
+            seeded showcase page, and "Tests/Acceptance/elements.spec.ts"
+            drives it there.
+
+            So the first specimen is the component as a page without the script
+            shows it, and the second carries "data-theme-embed-bound" by hand -
+            the marker "theme.js" sets - to show what the bound state looks
+            like. Both are "inert": their buttons are part of a picture.
+        </f:comment>
+        <p>
+            A video of another site, which is not loaded until the reader asks
+            for it. The page carries a poster and a button, and only a press on
+            the button puts an iframe in the frame - so opening a page opens no
+            connection to the video's host, and a reader who never watches the
+            video leaves no trace with it.
+        </p>
+        <p>
+            The button follows the marker the script sets on the component,
+            not the one the inline head script sets on the page. The difference
+            matters here: with the script merely announced but never loaded,
+            a button gated on the page marker would be a play button that does
+            nothing, over a video nothing else offers a way to.
+        </p>
+        <p class="theme-styleguide__label">
+            Without the script: the poster, the note and the link to the source
+            - which is the whole of the component, and enough to watch the
+            video.
+        </p>
+        <figure class="theme-embed theme-embed--16-9" inert="inert">
+            <div class="theme-embed__frame">
+                <img class="theme-embed__poster"
+                     src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%209'%3E%3Crect%20width='16'%20height='9'%20fill='%23ccd6e4'/%3E%3Cpath%20d='M0%209%204%205%208%206.5%2016%201%2016%209z'%20fill='%2390a0b6'/%3E%3Ccircle%20cx='12.5'%20cy='2.2'%20r='1.2'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                     alt="" width="640" height="360" />
+                <button class="theme-embed__button" type="button">
+                    <span class="theme-embed__play" aria-hidden="true"><theme:icon name="play" /></span>
+                    <span class="theme-embed__label">Play "A recording of the launch"</span>
+                </button>
+            </div>
+            <figcaption class="theme-embed__note">
+                The video is loaded from the other site only once you press play.
+                <a class="theme-embed__source" href="#interactive">Watch it on the source site <theme:icon name="arrow-up-right-from-square" /></a>
+            </figcaption>
+        </figure>
+        <p class="theme-styleguide__label">
+            With the script: the same component, carrying the marker the script
+            sets once it has bound the button.
+        </p>
+        <figure class="theme-embed theme-embed--4-3" data-theme-embed-bound="" inert="inert">
+            <div class="theme-embed__frame">
+                <img class="theme-embed__poster"
+                     src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%203'%3E%3Crect%20width='4'%20height='3'%20fill='%23c1cddd'/%3E%3Cpath%20d='M0%203%201.6%201.4%202.6%202.2%204%200.9%204%203z'%20fill='%2386929f'/%3E%3C/svg%3E"
+                     alt="" width="480" height="360" />
+                <button class="theme-embed__button" type="button">
+                    <span class="theme-embed__play" aria-hidden="true"><theme:icon name="play" /></span>
+                    <span class="theme-embed__label">Play "An interview, in the classic shape"</span>
+                </button>
+            </div>
+            <figcaption class="theme-embed__note">
+                The second ratio, 4:3. The frame keeps its shape whether it
+                holds the poster or the iframe, so nothing below it moves when
+                the one replaces the other.
+                <a class="theme-embed__source" href="#interactive">Watch it on the source site <theme:icon name="arrow-up-right-from-square" /></a>
+            </figcaption>
+        </figure>
     </div>
 
     <h3>Tooltip</h3>

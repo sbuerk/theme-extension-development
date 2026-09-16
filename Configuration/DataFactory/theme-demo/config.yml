@@ -243,6 +243,12 @@ references:
   - {file: placeholder, table: tt_content, uid: 3406, field: image, values: {alternative: 'A placeholder graphic in landscape format', description: 'The first of three, enlargeable'}}
   - {file: placeholder-portrait, table: tt_content, uid: 3406, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'The second, in portrait format'}}
   - {file: placeholder, table: tt_content, uid: 3406, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  # Page 130, "External media": the poster of the two embedded videos. The
+  # third element deliberately has none, and the fourth is the host that is not
+  # embedded at all.
+  - {file: placeholder, table: tt_content, uid: 13002, field: image, values: {alternative: 'A placeholder graphic standing in for the poster of a video'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 13003, field: image, values: {alternative: 'A placeholder graphic standing in for the poster of a video'}}
+  - {file: placeholder, table: tt_content, uid: 13005, field: image, values: {alternative: 'A placeholder graphic standing in for the poster of a video'}}
 
   # Page 37, "File links": the same two files for every "uploads_type".
   - {file: placeholder, table: tt_content, uid: 3702, field: media, values: {title: 'Placeholder, landscape', description: 'A landscape SVG.'}}

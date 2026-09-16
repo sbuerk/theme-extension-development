@@ -2442,6 +2442,57 @@ entities:
                           tone: accent
                 -
                   self:
+                    id: 1130
+                    title: 'External media'
+                    slug: /elements/theme/external-media
+                    backend_layout: content_sidebar
+                    abstract: 'A video of another site, with nothing loaded from it until the reader presses play.'
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 14001
+                          CType: header
+                          header: 'External media'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 14002
+                          CType: theme_external_media
+                          header: 'A YouTube video, widescreen'
+                          header_layout: 2
+                          tx_theme_embed_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+                          tx_theme_embed_title: 'The TYPO3 project in three minutes'
+                          tx_theme_embed_ratio: 16-9
+                      -
+                        self:
+                          id: 14003
+                          CType: theme_external_media
+                          header: 'A Vimeo video, in the classic shape'
+                          header_layout: 2
+                          tx_theme_embed_url: 'https://vimeo.com/76979871'
+                          tx_theme_embed_title: 'An interview about theme development'
+                          tx_theme_embed_ratio: 4-3
+                      -
+                        self:
+                          id: 14004
+                          CType: theme_external_media
+                          header: 'Without a poster image'
+                          header_layout: 2
+                          tx_theme_embed_url: 'https://youtu.be/dQw4w9WgXcQ'
+                          tx_theme_embed_title: 'The same video, without a poster'
+                          tx_theme_embed_ratio: 16-9
+                      -
+                        self:
+                          id: 14005
+                          CType: theme_external_media
+                          header: 'A host that is not embedded'
+                          header_layout: 2
+                          tx_theme_embed_url: 'https://media.example.org/videos/the-launch'
+                          tx_theme_embed_title: 'A recording of the launch'
+                          tx_theme_embed_ratio: 16-9
+                -
+                  self:
                     id: 1110
                     title: 'Hero layouts'
                     slug: /elements/theme/hero

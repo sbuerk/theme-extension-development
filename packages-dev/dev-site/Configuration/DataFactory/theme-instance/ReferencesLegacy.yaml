@@ -360,6 +360,27 @@ references:
   -
     file: placeholder
     table: tt_content
+    uid: 14002
+    field: image
+    values:
+      alternative: 'A placeholder graphic standing in for the poster of a video'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 14003
+    field: image
+    values:
+      alternative: 'A placeholder graphic standing in for the poster of a video'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 14005
+    field: image
+    values:
+      alternative: 'A placeholder graphic standing in for the poster of a video'
+  -
+    file: placeholder
+    table: tt_content
     uid: 4702
     field: media
     values:
