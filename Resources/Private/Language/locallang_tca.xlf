@@ -672,9 +672,41 @@
 			<trans-unit id="tt_content.tx_theme_captions.description">
 				<source>WebVTT files. A caption file belongs to the media file of the same name: "launch.vtt" captions "launch.mp4".</source>
 			</trans-unit>
+			<!-- tt_content: CType theme_pricing -->
+			<trans-unit id="tt_content.CType.theme_pricing.label">
+				<source>Pricing</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_pricing.description">
+				<source>Pricing plans side by side, each with a price, what it is per, its features and a button. One plan can be highlighted.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.plans">
+				<source>Plans</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_pricing.label">
+				<source>Plans</source>
+			</trans-unit>
+
 			<!-- tx_theme_list_item -->
 			<trans-unit id="tx_theme_list_item">
 				<source>Theme: List item</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.highlighted">
+				<source>Highlighted</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.highlighted.description">
+				<source>Singles this plan out from the others. Meant for one plan of a group.</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.subheader.types.theme_pricing.label">
+				<source>Price</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.meta.types.theme_pricing.label">
+				<source>Per</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.text.types.theme_pricing.label">
+				<source>Features</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.text.types.theme_pricing.description">
+				<source>One feature per line. A feature this plan does not include is left out rather than crossed out.</source>
 			</trans-unit>
 			<trans-unit id="tx_theme_list_item.date">
 				<source>Date</source>
