@@ -48,6 +48,7 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/HeaderOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/HeroesOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/TestimonialOnAppearancePage.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/CtaOnAppearancePage.csv');
         $backendUser = $this->setUpBackendUser(1);
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
     }
@@ -302,6 +303,32 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $form = $this->renderedForm(903);
         $this->assertStringContainsString(self::inputName(903, 'tx_theme_quote_style'), $form);
         $this->assertStringNotContainsString(self::inputName(903, 'layout'), $form);
+    }
+
+    /**
+     * The call to action offers its tones and widths, the icon picker of the
+     * theme and both link palettes, and not the position and the look of the
+     * header: its title is its own, like the hero's.
+     */
+    #[Test]
+    public function theCallToActionOffersItsTonesWidthsIconAndTwoLinks(): void
+    {
+        $result = $this->compile(904);
+
+        $this->assertSame(['', 'accent', 'inverse', 'placeholder'], self::itemValues($result, 'tx_theme_cta_tone'));
+        $this->assertSame(['boxed', 'band'], self::itemValues($result, 'tx_theme_cta_width'));
+        $this->assertFalse(
+            $result['processedTca']['columns']['tx_theme_icon']['config']['fieldWizard']['selectIcons']['disabled'] ?? true,
+            'The icon field of the call to action shows no icon grid.',
+        );
+        $this->assertTrue(self::isDisabled($result, 'header_position'));
+        $this->assertTrue(self::isDisabled($result, 'tx_theme_header_style'));
+
+        $form = $this->renderedForm(904);
+        foreach (['tx_theme_cta_tone', 'tx_theme_cta_width', 'tx_theme_icon', 'tx_theme_link', 'tx_theme_secondary_link', 'tx_theme_secondary_link_variant', 'tx_theme_secondary_link_icon'] as $field) {
+            $this->assertStringContainsString(self::inputName(904, $field), $form, sprintf('"%s" is missing from the form.', $field));
+        }
+        $this->assertStringNotContainsString(self::inputName(904, 'header_position'), $form);
     }
 
     /**

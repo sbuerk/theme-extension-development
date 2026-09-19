@@ -60,6 +60,7 @@ final class ContentElementContractTest extends UnitTestCase
             'Resources/Private/Templates/ContentElements/Uploads.html',
             'Resources/Private/Partials/ContentElement/Hero.html',
             'Resources/Private/Templates/ContentElements/ThemeTestimonial.html',
+            'Resources/Private/Templates/ContentElements/ThemeCta.html',
         ] as $template) {
             $source = (string)file_get_contents(self::root() . '/' . $template);
             preg_match_all('#<f:variable name="\w+" value="([^"]*)"\s*/>#', $source, $values);
@@ -89,7 +90,7 @@ final class ContentElementContractTest extends UnitTestCase
         // fields, the lists, the text and icon element, the features, the
         // steps and the layouts and variants - fewer means a value lost its
         // case, and the test below would pass on an empty list.
-        $this->assertCount(52, $classes, implode(', ', $classes));
+        $this->assertCount(57, $classes, implode(', ', $classes));
     }
 
     #[DataProvider('writtenClasses')]
@@ -117,6 +118,11 @@ final class ContentElementContractTest extends UnitTestCase
         yield 'the chip stays light on the default light page' => ['needle' => '/\.theme-content-element--frame-inverse::before\{color-scheme:light\}/'];
         yield 'the chip stays dark on a page forced to dark' => ['needle' => '/:root\[data-theme=dark\] \.theme-content-element--frame-inverse::before\{color-scheme:dark\}/'];
         yield 'the chip stays dark on a page the system makes dark' => ['needle' => '/@media\(prefers-color-scheme: dark\)\{:root:not\(\[data-theme=light\]\) \.theme-content-element--frame-inverse::before\{color-scheme:dark\}\}/'];
+        // The inverse tone of the call to action turns its scheme the same
+        // three ways, which is what lets it reuse the band's contrast table.
+        yield 'the inverse call to action is dark on the default light page' => ['needle' => '/\.theme-cta--inverse\{[^}]*color-scheme:dark[;}]/'];
+        yield 'the inverse call to action is light on a page forced to dark' => ['needle' => '/:root\[data-theme=dark\] \.theme-cta--inverse\{color-scheme:light\}/'];
+        yield 'the inverse call to action is light on a page the system makes dark' => ['needle' => '/@media\(prefers-color-scheme: dark\)\{:root:not\(\[data-theme=light\]\) \.theme-cta--inverse\{color-scheme:light\}\}/'];
     }
 
     /**
@@ -141,6 +147,20 @@ final class ContentElementContractTest extends UnitTestCase
     {
         $this->assertMatchesRegularExpression(
             '/\.theme-content-element--frame-accent\{[^}]*color-mix\(in oklab, var\(--theme-color-primary, #0b57d0\) 5%, var\(--theme-color-background, #ffffff\)\)/',
+            $this->stylesheet(),
+        );
+    }
+
+    /**
+     * The accent tone of the call to action is the accent band's tint, so the
+     * band's contrast table holds for it. A different mix is a table nobody
+     * computed.
+     */
+    #[Test]
+    public function theAccentCallToActionIsTheTintOfTheAccentBand(): void
+    {
+        $this->assertMatchesRegularExpression(
+            '/\.theme-cta--accent\{--theme-cta-background: ?color-mix\(in oklab, var\(--theme-color-primary, #0b57d0\) 5%, var\(--theme-color-background, #ffffff\)\)/',
             $this->stylesheet(),
         );
     }

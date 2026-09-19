@@ -1038,6 +1038,12 @@ tt_content.theme_testimonial.templateName = ContentElements/ThemeTestimonial
 tt_content.theme_notice =< lib.themeContentElement
 tt_content.theme_notice.templateName = ContentElements/ThemeNotice
 
+# A call to action on ".theme-cta". No data processing: the tone, the width,
+# the icon and both links are fields of the record itself - see
+# "Templates/ContentElements/ThemeCta.html".
+tt_content.theme_cta =< lib.themeContentElement
+tt_content.theme_cta.templateName = ContentElements/ThemeCta
+
 # Tabs and an accordion. Both read "tx_theme_list_items" exactly the way the
 # link list does - the same "DatabaseQueryProcessor" on the same relation
 # triple, see the section comment above "tt_content.theme_author" - so both

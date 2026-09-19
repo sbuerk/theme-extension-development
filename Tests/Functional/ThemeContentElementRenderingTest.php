@@ -14,7 +14,7 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * Renders the content elements the theme registers itself.
  *
  * Everything covered by `CoreContentElementRenderingTest` exists in
- * `EXT:frontend` and only lacked a rendering. These thirteen do not exist at all
+ * `EXT:frontend` and only lacked a rendering. These do not exist at all
  * without this extension: they bring their own TCA, their own columns and an
  * inline child table.
  *
@@ -75,7 +75,7 @@ final class ThemeContentElementRenderingTest extends AbstractFunctionalTestCase
             'theme_teaser', 'theme_media_teaser', 'theme_testimonial',
             'theme_author', 'theme_linklist', 'theme_sociallinks',
             'theme_media_teaser_grid', 'theme_notice', 'theme_tabs',
-            'theme_accordion',
+            'theme_accordion', 'theme_cta',
         ] as $ctype) {
             yield $ctype => ['ctype' => $ctype];
         }

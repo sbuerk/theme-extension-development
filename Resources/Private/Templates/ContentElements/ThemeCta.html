@@ -1,0 +1,80 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    "theme_cta" - a call to action on ".theme-cta"
+    (Resources/Private/Scss/components/_cta.scss).
+
+    Two fields pick the modifiers, each matched value by value, and anything
+    else renders none - the rule of the frame modifiers in
+    "Layouts/ContentElement.html", which "ContentElementContractTest" holds
+    this file to:
+
+      tx_theme_cta_width   boxed         "--boxed", a box centred in the column
+                           band          "--band", across the whole column
+      tx_theme_cta_tone    (empty)       the surface fill, no modifier
+                           accent        "--accent", the tint of the accent band
+                           inverse       "--inverse", the other appearance
+                           placeholder   "--placeholder", no fill, dashed frame
+
+    "tx_theme_icon" is a large icon above the heading, picked by the editor,
+    rendered with "optional": a name a later Font Awesome version dropped
+    costs the icon, not the page. It is decoration - the heading says what
+    the call to action is about - so the slot is "aria-hidden".
+
+    The heading is "header" at the level of "header_layout", h2 by default: a
+    call to action is a section of a page, not its title, unlike the hero.
+    "header_layout" 100 hides it, as everywhere.
+
+    The two links are the "theme_link" palette and the "theme_secondary_link"
+    palette, both rendered by "Partials/ContentElement/LinkButton.html" - the
+    second handed its four columns under the names of the first, so the style
+    and the icon of either link are decided by one set of cases. Either link
+    may be empty; with neither, the element renders no row of actions.
+
+    "bodytext" is rich text (the "columnsOverrides" of the type), so the text
+    is a "div" of paragraphs rather than the "p" a plain text would take.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:switch expression="{data.tx_theme_cta_width}">
+        <f:case value="boxed"><f:variable name="ctaWidth" value=" theme-cta--boxed" /></f:case>
+        <f:case value="band"><f:variable name="ctaWidth" value=" theme-cta--band" /></f:case>
+        <f:defaultCase><f:variable name="ctaWidth" value="" /></f:defaultCase>
+    </f:switch>
+    <f:switch expression="{data.tx_theme_cta_tone}">
+        <f:case value="accent"><f:variable name="ctaTone" value=" theme-cta--accent" /></f:case>
+        <f:case value="inverse"><f:variable name="ctaTone" value=" theme-cta--inverse" /></f:case>
+        <f:case value="placeholder"><f:variable name="ctaTone" value=" theme-cta--placeholder" /></f:case>
+        <f:defaultCase><f:variable name="ctaTone" value="" /></f:defaultCase>
+    </f:switch>
+    <section class="theme-cta{ctaWidth}{ctaTone}">
+        <f:if condition="{data.tx_theme_icon}">
+            <span class="theme-cta__icon" aria-hidden="true"><theme:icon name="{data.tx_theme_icon}" optional="1" /></span>
+        </f:if>
+        <f:if condition="{data.header} && {data.header_layout} != 100">
+            <f:switch expression="{data.header_layout}">
+                <f:case value="1"><h1 class="theme-cta__title">{data.header}</h1></f:case>
+                <f:case value="3"><h3 class="theme-cta__title">{data.header}</h3></f:case>
+                <f:case value="4"><h4 class="theme-cta__title">{data.header}</h4></f:case>
+                <f:case value="5"><h5 class="theme-cta__title">{data.header}</h5></f:case>
+                <f:defaultCase><h2 class="theme-cta__title">{data.header}</h2></f:defaultCase>
+            </f:switch>
+        </f:if>
+        <f:if condition="{data.bodytext}">
+            <div class="theme-cta__text">
+                <f:format.html>{data.bodytext}</f:format.html>
+            </div>
+        </f:if>
+        <f:if condition="{data.tx_theme_link} || {data.tx_theme_secondary_link}">
+            <div class="theme-cta__actions">
+                <f:render partial="ContentElement/LinkButton" arguments="{data: data}" />
+                <f:render partial="ContentElement/LinkButton" arguments="{data: {tx_theme_link: data.tx_theme_secondary_link, tx_theme_link_label: data.tx_theme_secondary_link_label, tx_theme_link_variant: data.tx_theme_secondary_link_variant, tx_theme_link_icon: data.tx_theme_secondary_link_icon}}" />
+            </div>
+        </f:if>
+    </section>
+</f:section>
+
+</html>

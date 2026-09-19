@@ -71,6 +71,14 @@
                     CType = theme_author
                 }
             }
+            theme_cta {
+                iconIdentifier = content-widget-calltoaction
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_cta.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_cta.description
+                tt_content_defValues {
+                    CType = theme_cta
+                }
+            }
             theme_features {
                 iconIdentifier = content-widget-list
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_features.label

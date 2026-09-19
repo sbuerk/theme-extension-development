@@ -10,11 +10,11 @@
 # category|datetime|slug|json|uuid and MM tables - it has no branch for
 # "input", "text", "link", "file", "inline" or a "select" without an MM table,
 # and it only touches tables that an ext_tables.sql defined in the first
-# place. Without this file the tx_theme_list_item table and the fifteen
+# place. Without this file the tx_theme_list_item table and the twenty-one
 # tx_theme_* columns on tt_content are never created on v12, and every theme
 # element using them fails.
 #
-# The definitions below are not written by hand: except for the two "link"
+# The definitions below are not written by hand: except for the three "link"
 # columns, which the next paragraph is about, they reproduce column for column
 # what v13's own schema analyzer derives from this extension's TCA, so the
 # analyzer stays quiet on both versions. Feature #101553 states that an
@@ -29,8 +29,11 @@
 # out for sys_file_reference.
 #
 # ---------------------------------------------------------------------------
-# Why "tt_content.tx_theme_link" and "tx_theme_list_item.link" are nullable
+# Why the "link" columns are nullable
 # ---------------------------------------------------------------------------
+#
+# "tt_content.tx_theme_link", "tt_content.tx_theme_secondary_link" and
+# "tx_theme_list_item.link" are TCA "type=link" fields.
 #
 # v13's DefaultTcaSchema derives a TCA "type=link" field as
 # "TEXT DEFAULT '' NOT NULL" (Classes/Database/Schema/DefaultTcaSchema.php,
@@ -56,7 +59,7 @@
 # There is no v12 spelling of "TEXT NOT NULL DEFAULT ''" that MySQL accepts:
 # the expression default is exactly the thing v13 added and v12 cannot render.
 # The two goals - portable across the four DBMS, and identical to what v13
-# derives - therefore genuinely conflict for these two columns, and portability
+# derives - therefore genuinely conflict for these columns, and portability
 # wins: they are declared nullable, without a default. That is a definition all
 # four platforms render (`TEXT DEFAULT NULL`), and an INSERT omitting the column
 # stores NULL instead of failing.
@@ -80,12 +83,13 @@
 # Why the icon columns are nullable TEXT
 # ---------------------------------------------------------------------------
 #
-# "tt_content.tx_theme_link_icon", "tt_content.tx_theme_icon",
-# "tx_theme_list_item.link_icon" and "tx_theme_list_item.icon" store an icon
-# name, yet they are TEXT, because that is what v13 derives: their select has
-# an "itemsProcFunc", and DefaultTcaSchema then skips the choice of an INT or
-# a VARCHAR column by the item values and ends in its final fallback, a
-# nullable TEXT (13.4.35, "case 'select'").
+# "tt_content.tx_theme_link_icon", "tt_content.tx_theme_secondary_link_icon",
+# "tt_content.tx_theme_icon", "tx_theme_list_item.link_icon" and
+# "tx_theme_list_item.icon" store an icon name, yet they are TEXT, because
+# that is what v13 derives: their select has an "itemsProcFunc", and
+# DefaultTcaSchema then skips the choice of an INT or a VARCHAR column by the
+# item values and ends in its final fallback, a nullable TEXT (13.4.35,
+# "case 'select'").
 #
 
 #
@@ -106,7 +110,13 @@ CREATE TABLE tt_content (
 	tx_theme_columns int(11) unsigned DEFAULT '0' NOT NULL,
 	tx_theme_eyebrow varchar(255) DEFAULT '' NOT NULL,
 	tx_theme_hero_layout varchar(255) DEFAULT '' NOT NULL,
-	tx_theme_quote_style varchar(255) DEFAULT '' NOT NULL
+	tx_theme_quote_style varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_cta_tone varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_cta_width varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_secondary_link text,
+	tx_theme_secondary_link_label varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_secondary_link_variant varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_secondary_link_icon text
 );
 
 #

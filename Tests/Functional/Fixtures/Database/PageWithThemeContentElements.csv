@@ -25,6 +25,7 @@ tt_content,,,,,,,,,,,,,,,
 ,200,1,0,0,0,200,theme_accordion,First accordion,,,,,2,2,
 ,210,1,0,0,0,210,theme_accordion,Second accordion,,,,,2,2,
 ,220,1,0,0,0,220,theme_notice,,,,,,0,0,warning
+,230,1,0,0,0,230,theme_cta,A call to action,<p>Act now.</p>,t3://page?uid=1,Go,,0,0,
 tx_theme_list_item,,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,text,link,link_label
 ,1,1,0,0,1,70,tt_content,tx_theme_list_items,,,t3://page?uid=1,Profile
