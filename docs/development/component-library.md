@@ -485,7 +485,13 @@ controls, `_validation.scss` the error/success repaint of all of it:
 
 `.theme-switch` is the native checkbox drawn as a track and a thumb
 (`appearance: none`, the thumb a radial gradient on the input, since
-`::before` is not rendered on an input in every engine). It is for a setting
+`::before` is not rendered on an input in every engine). The thumb's position
+is the state — the start of the track when off, the end when on — and its
+width is given explicitly as the track's inner height: a gradient has no size
+of its own, so with `background-size: auto` it spans the whole track, left
+and right are the same place, and the thumb sits in the middle in both
+states. The visual suite measures where it is painted, see
+[Visual tests](../testing/visual-tests.md#the-matrix). It is for a setting
 that takes effect the moment it is flipped — the element outlines in the
 [display settings](#display-settings) — and carries `role="switch"` in the
 markup, so a screen reader announces "on"/"off" rather than "checked"; the

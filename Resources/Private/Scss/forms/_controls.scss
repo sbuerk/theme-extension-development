@@ -320,11 +320,17 @@
         border-radius: var(--theme-radius-full, 9999px);
         background-color: var(--theme-switch-track-background);
 
-        // The thumb fills the track's inner height; its position is the state.
+        // The thumb is a square as wide as the track is high inside its
+        // border, and its position is the state. The width has to be given:
+        // a gradient has no size of its own, so "auto" is the whole width of
+        // the track, left and right are then the same place, and the thumb
+        // sat in the middle in both states - with only the colours telling
+        // them apart. "Tests/Acceptance/Visual/styleguide.spec.ts" reads where
+        // it is painted.
         background-image: radial-gradient(circle closest-side, var(--theme-switch-thumb-color) 0 68%, transparent 72%);
         background-position: left center;
         background-repeat: no-repeat;
-        background-size: auto 100%;
+        background-size: calc(var(--theme-switch-track-block-size) - 2 * var(--theme-border-width, 1px)) 100%;
 
         cursor: pointer;
         transition:
