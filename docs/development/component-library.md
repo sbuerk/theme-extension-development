@@ -115,15 +115,16 @@ the slot passes down. Icons wider than tall (576 or 640 units against 512) keep
 the square box and come out lower; Font Awesome's own 1.25em wide box would not
 fit the square slots below.
 
-| Component            | Icon                                                                                       | Size                                                      |
-|----------------------|--------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| Display settings     | `gear`; `desktop`, `sun`, `moon` for the appearance options; `check` on the chosen palette | `.theme-settings__icon`, `.theme-segmented__icon`; one em |
-| Accordion            | `chevron-down`, the marker, turned when an item opens                                      | `--theme-accordion-marker-size`, through the token        |
-| Main navigation      | `bars`, before the label of the toggle                                                     | one em                                                    |
-| Close button         | `xmark`                                                                                    | `--theme-close-glyph-size`, through the token             |
-| Alert, notice, login | one per kind, picked by `Partials/ContentElement/AlertIcon.html`                           | `--theme-alert-icon-size`, through the token              |
-| Field messages       | `circle-exclamation` in an error, `circle-check` in a success                              | one em                                                    |
-| Icon button          | whatever the button stands for                                                             | `--theme-button-icon-size`, through the token             |
+| Component            | Icon                                                                                        | Size                                                      |
+|----------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| Display settings     | `gear`; `desktop`, `sun`, `moon` for the appearance options; `check` on the chosen palette  | `.theme-settings__icon`, `.theme-segmented__icon`; one em |
+| Accordion            | `chevron-down`, the marker, turned when an item opens                                       | `--theme-accordion-marker-size`, through the token        |
+| Main navigation      | `bars`, before the label of the toggle                                                      | one em                                                    |
+| Close button         | `xmark`                                                                                     | `--theme-close-glyph-size`, through the token             |
+| Alert, notice, login | one per kind, picked by `Partials/ContentElement/AlertIcon.html`                            | `--theme-alert-icon-size`, through the token              |
+| Field messages       | `circle-exclamation` in an error, `circle-check` in a success                               | one em                                                    |
+| Icon button          | whatever the button stands for                                                              | `--theme-button-icon-size`, through the token             |
+| Theme links          | the icon an editor picked, before the label of a button, a content menu link or a card link | one em, spaced by the `gap` of the link                   |
 
 ### Navigation
 
@@ -284,10 +285,16 @@ supplies is the only thing visible:
 <button class="theme-button theme-button--secondary" type="button">…</button>
 <button class="theme-button theme-button--danger theme-button--small" type="button">…</button>
 <a class="theme-button theme-button--link" href="…">…</a>
+<a class="theme-button" href="…"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg> …</a>
 <button class="theme-button theme-button--icon" type="button" aria-label="…"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></button>
 <button class="theme-button theme-button--secondary" type="button" aria-pressed="false">…</button>
 <button class="theme-button" type="button" aria-busy="true" aria-disabled="true">…</button>
 ```
+
+An icon before the label is decoration, spaced by the button's `gap` in
+reading order; it is how the link of a theme content element renders the icon
+an editor picked, in each of the four styles the element offers — the plain
+button, `--secondary`, `--ghost` and `--link`.
 
 States are read off attributes, never off a class — `:disabled` and
 `[aria-disabled='true']`, `[aria-pressed='true']`, `[aria-busy='true']` — so the

@@ -763,6 +763,10 @@ entities:
                         # missing value: it is the default variant and renders the
                         # plain ".theme-button" with no modifier.
                         tx_theme_link_variant: ''
+                        # An icon of the shipped set, before the label. The four
+                        # link styles are spread over 801 to 805: primary here,
+                        # secondary 802, ghost 803 and 805, link 804.
+                        tx_theme_link_icon: 'arrow-right'
                   # theme_hero_small - the same field set as theme_hero, rendered
                   # through the same partial with "compact: 1", so the difference
                   # between the two is only visible with both on one page.
@@ -807,7 +811,7 @@ entities:
                           than the hero's h1.</p>
                         tx_theme_link: 't3://page?uid=4'
                         tx_theme_link_label: 'Open the empty page'
-                        tx_theme_link_variant: 'secondary'
+                        tx_theme_link_variant: 'link'
                   # theme_media_teaser - the same teaser with an image beside the
                   # text. The link is an external URL rather than a page, because
                   # "tx_theme_link" is a TCA type=link field and holds whatever
@@ -873,9 +877,10 @@ entities:
                         CType: 'theme_linklist'
                         header: 'Where to read more'
                         tx_theme_list_items: '5,3,6,4'
-                  # theme_sociallinks - the same list, rendered as text labels
-                  # rather than icons: the theme ships no icon assets, so
-                  # "link_label" carries the platform name. The child "link" is
+                  # theme_sociallinks - the same list, rendered as text labels:
+                  # the logos of the platforms are Font Awesome's brands set,
+                  # which the theme does not ship, so "link_label" carries the
+                  # platform name. The child "link" is
                   # restricted to url, email and telephone on this relation, so
                   # each of the three appears once.
                   - self:
@@ -995,6 +1000,9 @@ entities:
                         id: 5
                         link: 't3://page?uid=2'
                         link_label: 'Typography'
+                        # "link_icon" is part of the link palette of every
+                        # relation; one row of the list shows it.
+                        link_icon: 'book-open'
                   - self:
                         id: 6
                         link: 't3://page?uid=4'
@@ -1028,6 +1036,7 @@ entities:
                         text: 'Headings, running text and the inline cases a stylesheet has to answer for.'
                         link: 't3://page?uid=2'
                         link_label: 'Open the typography page'
+                        link_icon: 'arrow-right'
                   - self:
                         id: 11
                         header: 'Media'

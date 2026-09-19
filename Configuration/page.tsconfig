@@ -50,3 +50,7 @@
 
 # The rich text preset of the theme, for the same reason: both delivery paths.
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/Rte.tsconfig'
+
+# The icons an icon field offers by default - loaded the same way, for the same
+# reason: one file applies to the site set and to the static include alike.
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/IconPicker.tsconfig'

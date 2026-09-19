@@ -1,0 +1,41 @@
+# The icons an editor is offered by default.
+#
+# An icon field offers the whole catalogue of the shipped set - every icon
+# once, each with its image in the grid below the select, see
+# "Classes/Tca/IconItems.php". That is a lot to scroll through for a link
+# icon, so the theme narrows its icon fields to the list below with
+# "keepItems". The set itself stays complete: an integrator widens the list, or
+# removes it and gets every icon back.
+#
+#   # Two more icons for the link of a theme content element.
+#   TCEFORM.tt_content.tx_theme_link_icon.keepItems := addToList(anchor, paperclip)
+#
+#   # Every icon of the set, for the link of a list item.
+#   TCEFORM.tx_theme_list_item.link_icon.keepItems >
+#
+# The value starts with a comma on purpose. "keepItems" keeps the items whose
+# value is in the list, and the "No icon" item has the empty value: without the
+# empty entry the comma makes, the form loses the item, preselects the first
+# icon of the list and stores it with the record.
+TCEFORM.tt_content.tx_theme_link_icon.keepItems (
+    ,
+    arrow-right, arrow-left, arrow-up-right-from-square, chevron-right, circle-arrow-right, circle-chevron-right,
+    download, upload, file, file-pdf, file-lines, file-zipper, file-image, link, share-nodes, print,
+    envelope, phone, mobile-screen, comment, comments, bullhorn, bell, rss,
+    location-dot, map, globe, earth-europe, language, house, building,
+    calendar, calendar-days, clock,
+    user, users, user-group, handshake, hand-holding-heart, universal-access, wheelchair,
+    magnifying-glass, circle-info, circle-question, question, circle-check, circle-exclamation, triangle-exclamation, lightbulb,
+    star, heart, bookmark, tag, flag, thumbs-up, trophy, award, quote-left,
+    cart-shopping, credit-card, gift, briefcase, chart-line, chart-pie,
+    book, book-open, newspaper, graduation-cap,
+    gear, wrench, shield-halved, lock, key, code, database, server, cloud, wifi, laptop, desktop,
+    image, images, camera, video, play, music, headphones, microphone,
+    pen, pen-to-square, list, list-check, check, plus, minus, xmark,
+    leaf, seedling, recycle, rocket, bolt, fire, sun, moon,
+    truck, plane, car, bicycle, train, utensils, mug-hot
+)
+
+# The same list for the link of a list item. "<" copies the value as it stands
+# at this point: an integrator changing the list above changes not the copy.
+TCEFORM.tx_theme_list_item.link_icon.keepItems < TCEFORM.tt_content.tx_theme_link_icon.keepItems

@@ -379,6 +379,7 @@ entities:
                       tx_theme_link: 't3://page?uid=1002'
                       tx_theme_link_label: 'Read the typography page'
                       tx_theme_link_variant: ''
+                      tx_theme_link_icon: arrow-right
                   -
                     self:
                       id: 1802
@@ -407,7 +408,7 @@ entities:
                       bodytext: "<p>A teaser is a secondary block: a heading, a couple of\nsentences and one link. Its heading defaults to h2 rather\nthan the hero's h1.</p>\n"
                       tx_theme_link: 't3://page?uid=1004'
                       tx_theme_link_label: 'Open the empty page'
-                      tx_theme_link_variant: secondary
+                      tx_theme_link_variant: link
                   -
                     self:
                       id: 1805
@@ -532,6 +533,7 @@ entities:
                       id: 1005
                       link: 't3://page?uid=1002'
                       link_label: Typography
+                      link_icon: book-open
                   -
                     self:
                       id: 1006
@@ -559,6 +561,7 @@ entities:
                       text: 'Headings, running text and the inline cases a stylesheet has to answer for.'
                       link: 't3://page?uid=1002'
                       link_label: 'Open the typography page'
+                      link_icon: arrow-right
                   -
                     self:
                       id: 1011
