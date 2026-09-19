@@ -1,0 +1,177 @@
+// Timeline.
+//
+// Markup contract:
+//
+//     <ol class="theme-timeline">
+//         <li class="theme-timeline__item">
+//             <span class="theme-timeline__icon" aria-hidden="true"><theme:icon name="…" /></span>
+//             <time class="theme-timeline__date" datetime="2026-03-02">2 March 2026</time>
+//             <h3 class="theme-timeline__title">…</h3>
+//             <div class="theme-timeline__media"><img …></div>
+//             <p class="theme-timeline__text">…</p>
+//         </li>
+//     </ol>
+//
+// Everything inside an item is optional. An ordered list, because the order
+// of the entries is part of what they say, and "time" with "datetime", so the
+// date is machine readable whatever the visible text says.
+//
+// --- The axis ---------------------------------------------------------------
+//
+// Every item has a column at its inline start, "--theme-timeline-axis" wide,
+// with a marker on the first line and a rail down to the marker of the next
+// item. Both are the item's pseudo elements: "::before" the marker, a ring in
+// the primary accent on the background colour, "::after" the rail, a hairline.
+// The last item has no rail below it. Logical properties throughout, so the
+// axis is at the right edge of a right-to-left page.
+//
+// The marker and the rail are component geometry, not icons: they draw the
+// position of an entry in a sequence and mean nothing on their own - the date
+// says what the marker marks. See "docs/development/icons.md#the-rule".
+//
+// An item may carry an icon instead, in "__icon": an icon of the set rendered
+// by "<theme:icon>", centred on the axis over the rail, in the accent colour.
+// The ring then steps aside - "::before" is dropped for an item holding the
+// slot. The slot is decorative, "aria-hidden" like every icon slot of the
+// library; the entry's text is its content.
+//
+// --- Alignment --------------------------------------------------------------
+//
+// The marker is centred on the first line of the item, which is the date: the
+// date sets its line box to "--theme-timeline-first-line", and the marker and
+// the icon are placed against the same length, so the two cannot drift apart
+// when a font size changes. An item without a date has its title on that line
+// instead, which is close enough to the same height.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-timeline {
+    --theme-timeline-axis: 1.25rem;
+    --theme-timeline-gap: var(--theme-space-3, 0.9375rem);
+    --theme-timeline-item-spacing: var(--theme-space-5, 1.5625rem);
+    --theme-timeline-first-line: 1.5rem;
+    --theme-timeline-marker-size: 0.875rem;
+    --theme-timeline-marker-width: var(--theme-border-width-strong, 2px);
+    --theme-timeline-marker-color: var(--theme-color-primary, #0b57d0);
+    --theme-timeline-marker-background: var(--theme-color-background, #ffffff);
+    --theme-timeline-rail-width: var(--theme-border-width, 1px);
+    --theme-timeline-rail-color: var(--theme-color-border, #d6dce6);
+    --theme-timeline-date-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-timeline-text-color: var(--theme-color-text-secondary, #4a5567);
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-timeline__item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-1, 0.3125rem);
+    margin: 0;
+    padding-block-end: var(--theme-timeline-item-spacing);
+    padding-inline-start: calc(var(--theme-timeline-axis) + var(--theme-timeline-gap));
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset-block-start: calc((var(--theme-timeline-first-line) - var(--theme-timeline-marker-size)) / 2);
+        inset-inline-start: calc((var(--theme-timeline-axis) - var(--theme-timeline-marker-size)) / 2);
+        box-sizing: border-box;
+        width: var(--theme-timeline-marker-size);
+        height: var(--theme-timeline-marker-size);
+        background-color: var(--theme-timeline-marker-background);
+        border: var(--theme-timeline-marker-width) solid var(--theme-timeline-marker-color);
+        border-radius: var(--theme-radius-full, 9999px);
+    }
+
+    // From below the marker of this item to the top of the marker of the
+    // next: the next item starts where this one's padding ends, and its
+    // marker sits the same distance below its own start.
+    &::after {
+        content: '';
+        position: absolute;
+        inset-block-start: calc((var(--theme-timeline-first-line) + var(--theme-timeline-marker-size)) / 2);
+        inset-block-end: calc((var(--theme-timeline-marker-size) - var(--theme-timeline-first-line)) / 2);
+        inset-inline-start: calc((var(--theme-timeline-axis) - var(--theme-timeline-rail-width)) / 2);
+        width: var(--theme-timeline-rail-width);
+        background-color: var(--theme-timeline-rail-color);
+    }
+
+    &:last-child {
+        padding-block-end: 0;
+
+        &::after {
+            display: none;
+        }
+    }
+
+    &:has(> .theme-timeline__icon)::before {
+        display: none;
+    }
+}
+
+// On the background colour, so the rail stops at the edge of the icon rather
+// than running through it.
+.theme-timeline__icon {
+    --theme-icon-size: var(--theme-timeline-axis);
+
+    position: absolute;
+    inset-block-start: calc((var(--theme-timeline-first-line) - var(--theme-timeline-axis)) / 2);
+    inset-inline-start: 0;
+    display: flex;
+    width: var(--theme-timeline-axis);
+    height: var(--theme-timeline-axis);
+    color: var(--theme-timeline-marker-color);
+    background-color: var(--theme-timeline-marker-background);
+}
+
+.theme-timeline__date {
+    color: var(--theme-timeline-date-color);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-timeline-first-line);
+}
+
+// Follows the heading level of the element, like the title of a card.
+.theme-timeline__title {
+    margin: 0;
+    color: var(--theme-color-text-primary);
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+}
+
+.theme-timeline__media {
+    margin-block: var(--theme-space-1, 0.3125rem);
+
+    img,
+    picture {
+        display: block;
+        max-width: min(100%, 20rem);
+        height: auto;
+        border: var(--theme-border-width, 1px) solid var(--theme-color-border, #d6dce6);
+        border-radius: var(--theme-radius-sm, 5px);
+    }
+}
+
+.theme-timeline__text {
+    margin: 0;
+    color: var(--theme-timeline-text-color);
+}
+
+// Forced colours drop the background of the marker and repaint its border in
+// the text colour, which keeps a ring; the rail is a background and would
+// disappear, so it is painted in the text colour as well.
+@media (forced-colors: active) {
+    .theme-timeline__item::after {
+        forced-color-adjust: none;
+        background-color: CanvasText;
+    }
+}

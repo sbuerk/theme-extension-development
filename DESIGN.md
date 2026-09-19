@@ -569,6 +569,40 @@ Lowest: 6.95 on the dark raised surface (violet) and 5.09 on the accent tint
 (neutral, light) - above the 4.5:1 of text in both, so the mark and the rules
 clear the 3:1 of a graphic by a wide margin wherever a quotation can sit.
 
+### Collections
+
+The card grid, the timeline and the list group introduce no colour token and
+no mix: every colour they use is a token of the tables above, and so is every
+figure below. What is new is where each one sits. A list group and a timeline
+have no fill of their own, so they sit on whatever the element or the band
+around them paints - the background, the surface or the raised surface - and a
+card sits on its own surface fill.
+
+| Use                                    | Token                          | Appearance | vs background | vs surface | vs surface-raised |
+|----------------------------------------|--------------------------------|------------|---------------|------------|-------------------|
+| Card subtitle, text on the card        | `--theme-color-text-secondary` | light      | 7.54          | 6.97       | 7.54              |
+| Card subtitle, text on the card        | `--theme-color-text-secondary` | dark       | 8.89          | 8.17       | 7.36              |
+| Card title link, list group title link | `--theme-color-primary`        | light      | 6.39          | 5.90       | 6.39              |
+| Card title link, list group title link | `--theme-color-primary`        | dark       | 8.18          | 7.51       | 6.77              |
+| Timeline ring and icon                 | `--theme-color-primary`        | light      | 6.39          | 5.90       | 6.39              |
+| Timeline ring and icon                 | `--theme-color-primary`        | dark       | 8.18          | 7.51       | 6.77              |
+| Timeline date and text                 | `--theme-color-text-secondary` | light      | 7.54          | 6.97       | 7.54              |
+| Timeline date and text                 | `--theme-color-text-secondary` | dark       | 8.89          | 8.17       | 7.36              |
+| List group meta data                   | `--theme-color-text-muted`     | light      | 5.35          | 4.95       | 5.35              |
+| List group meta data                   | `--theme-color-text-muted`     | dark       | 5.70          | 5.24       | 4.72              |
+
+The hovered row of a list group is the surface colour, so its title link and
+its meta data are the "vs surface" column: 5.90 and 4.95 in light, 7.51 and
+5.24 in dark. The meta data is the colour that sits closest to 4.5:1, as
+everywhere the muted text is used, and clears it on all three backgrounds
+(lowest 4.72, on the raised surface in dark). The ring of the timeline is a
+graphic and has to clear 3:1; the primary accent clears it with the margin of a
+text colour. The rail and the frame of the list group are
+`--theme-color-border`, the decorative hairline: neither identifies a control,
+see [Control boundaries](#control-boundaries). A palette changes only the
+primary accent here, and the accent columns of the band table below give its
+lowest value on every band, 5.90.
+
 ### Content element bands
 
 An editor picks a band in the `frame_class` field of a content element;

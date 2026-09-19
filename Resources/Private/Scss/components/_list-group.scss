@@ -1,0 +1,171 @@
+// List group.
+//
+// Markup contract:
+//
+//     <ul class="theme-list-group">
+//         <li class="theme-list-group__item">
+//             <span class="theme-avatar"><img class="theme-avatar__image" src="…" alt="" width="40" height="40"></span>
+//             <div class="theme-list-group__body">
+//                 <h3 class="theme-list-group__title"><a class="theme-list-group__link" href="…">…</a></h3>
+//                 <p class="theme-list-group__text">…</p>
+//             </div>
+//             <p class="theme-list-group__meta">
+//                 <time datetime="2026-03-02">2 March 2026</time>
+//                 <span>…</span>
+//             </p>
+//         </li>
+//     </ul>
+//
+// A framed list of rows, each a small image, a title, a line of text and
+// meta data at the end - a date, a reading time. Every part but the title is
+// optional. A row without a link has a title of plain text and is not a
+// target.
+//
+// --- One link per row -------------------------------------------------------
+//
+// The whole row is the target of its one link, the technique of
+// ".theme-card--linked": the link is the title, and its "::after" is stretched
+// over the row, which is its containing block. No interactive element is
+// nested in another, and the name of the link is the title alone, not the
+// text and the meta data around it.
+//
+// Hovering the row fills it with the surface colour. The focus ring moves
+// from the title to the row: the row is the target, and a ring around the
+// title alone would frame a fraction of what a press activates. It is the ring
+// of "base/_reset.scss" - the same outline and the same shadow token - drawn
+// on the "::after" of the link, the hit area that already covers the row, and
+// inset by the width of the outline so the frame of the list does not cut it
+// off. It depends on nothing but the link having ":focus-visible": the ring
+// must not be drawn through ":has()" on the row, because the browser floor of
+// DESIGN.md is Firefox 120 and ":has()" arrived in 121 - with the link's own
+// ring removed, focus would be invisible there. The hover fill does use
+// ":has()"; without it, the underline of the title is what hover shows.
+//
+// The image of a row is an avatar, ".theme-avatar" of "_avatar.scss", as a
+// direct child of the row. It sits beside the visible title, so it takes the
+// decorative form of the avatar contract - an empty "alt", named by nothing -
+// and keeps its size as a flex item ("flex: none" of the avatar). The list
+// group styles nothing of it.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-list-group {
+    --theme-list-group-border-color: var(--theme-color-border, #d6dce6);
+    --theme-list-group-radius: var(--theme-radius-sm, 5px);
+    --theme-list-group-padding-block: var(--theme-space-3, 0.9375rem);
+    --theme-list-group-padding-inline: var(--theme-space-4, 1.25rem);
+    --theme-list-group-hover-background: var(--theme-color-surface, #f4f6fa);
+    --theme-list-group-text-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-list-group-meta-color: var(--theme-color-text-muted, #616b80);
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: var(--theme-border-width, 1px) solid var(--theme-list-group-border-color);
+    border-radius: var(--theme-list-group-radius);
+}
+
+// "flex-wrap" puts the meta data on a line of its own where the row is too
+// narrow for it, at the end of that line.
+.theme-list-group__item {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--theme-space-1, 0.3125rem) var(--theme-space-3, 0.9375rem);
+    margin: 0;
+    padding: var(--theme-list-group-padding-block) var(--theme-list-group-padding-inline);
+
+    & + & {
+        border-block-start: var(--theme-border-width, 1px) solid var(--theme-list-group-border-color);
+    }
+
+    // The fill is inside the frame, so the first and the last row follow its
+    // corners.
+    &:first-child {
+        border-start-start-radius: var(--theme-list-group-radius);
+        border-start-end-radius: var(--theme-list-group-radius);
+    }
+
+    &:last-child {
+        border-end-start-radius: var(--theme-list-group-radius);
+        border-end-end-radius: var(--theme-list-group-radius);
+    }
+
+    &:has(.theme-list-group__link:hover) {
+        background-color: var(--theme-list-group-hover-background);
+    }
+}
+
+.theme-list-group__body {
+    display: flex;
+    flex: 1 1 14rem;
+    flex-direction: column;
+    gap: var(--theme-space-1, 0.3125rem);
+    min-width: 0;
+}
+
+// Follows the heading level of the element, like the title of a card.
+.theme-list-group__title {
+    margin: 0;
+    color: var(--theme-color-text-primary);
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-wide);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+}
+
+// The ring is the row's, see above: the link draws none around its title,
+// and its "::after", which covers the row, draws it instead.
+.theme-list-group__link {
+    color: var(--theme-color-primary);
+    text-decoration: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+    }
+
+    &:hover {
+        color: var(--theme-color-primary-hover);
+        text-decoration: underline;
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:focus-visible::after {
+        outline: var(--theme-border-width-strong) solid var(--theme-color-primary);
+        outline-offset: calc(-1 * var(--theme-border-width-strong));
+        box-shadow: var(--theme-focus-ring);
+        border-radius: var(--theme-list-group-radius);
+    }
+}
+
+.theme-list-group__text {
+    margin: 0;
+    color: var(--theme-list-group-text-color);
+    font-size: var(--theme-font-size-sm);
+}
+
+.theme-list-group__meta {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0;
+    margin-inline-start: auto;
+    color: var(--theme-list-group-meta-color);
+    font-size: var(--theme-font-size-xs);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+}
+
+// The hover fill is a background and is dropped; the focus ring is an
+// outline and stays. What hover adds under forced colours is the underline of
+// the title, which is text decoration and stays as well.

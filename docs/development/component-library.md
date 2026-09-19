@@ -33,6 +33,7 @@ against, and the rename was cheap while only one template depended on it.
 | Breadcrumb              | `.theme-breadcrumb`       | `components/_breadcrumb.scss`       |
 | Button                  | `.theme-button`           | `components/_button.scss`           |
 | Card                    | `.theme-card`             | `components/_card.scss`             |
+| Card scroller           | `.theme-card-scroller`    | `components/_card.scss`             |
 | Close button            | `.theme-close`            | `components/_close.scss`            |
 | Code block              | `.theme-code`             | `components/_code.scss`             |
 | Content element wrapper | `.theme-content-element`  | `components/_content-element.scss`  |
@@ -52,6 +53,7 @@ against, and the rename was cheap while only one template depended on it.
 | Icon                    | `.theme-icon`             | `components/_icon.scss`             |
 | Link decoration         | `.theme-link`             | `components/_link.scss`             |
 | List                    | `.theme-list`             | `components/_list.scss`             |
+| List group              | `.theme-list-group`       | `components/_list-group.scss`       |
 | Media object            | `.theme-media-object`     | `components/_media-object.scss`     |
 | Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`         |
 | Meter                   | `.theme-meter`            | `components/_meter.scss`            |
@@ -73,6 +75,7 @@ against, and the rename was cheap while only one template depended on it.
 | Text: display           | `.theme-display`          | `components/_text.scss`             |
 | Text: eyebrow           | `.theme-eyebrow`          | `components/_text.scss`             |
 | Text: lead              | `.theme-lead`             | `components/_text.scss`             |
+| Timeline                | `.theme-timeline`         | `components/_timeline.scss`         |
 | Tooltip                 | `.theme-tooltip`          | `components/_tooltip.scss`          |
 | Form controls           | `.theme-input`            | `forms/_controls.scss`              |
 | Form switch             | `.theme-switch`           | `forms/_controls.scss`              |
@@ -451,6 +454,56 @@ more room each:
 <div class="theme-card-grid">…</div>
 ```
 
+Every part of a card but the body is optional. `__subtitle` follows the title;
+`__actions` holds a `.theme-button` instead of the card link and is pushed to
+the foot of the body the same way. Where the title itself is the link - a page
+in a menu - it holds `.theme-card__title-link`, which `--linked` stretches over
+the card like `__link`. `--compact` tightens the padding and the title for a
+card that is mostly its image:
+
+```html
+<li class="theme-card theme-card--linked theme-card--compact">
+    <div class="theme-card__media"><img …></div>
+    <div class="theme-card__body">
+        <h3 class="theme-card__title"><a class="theme-card__title-link" href="…">…</a></h3>
+        <p class="theme-card__subtitle">…</p>
+        <div class="theme-card__actions"><a class="theme-button theme-button--secondary" href="…">…</a></div>
+    </div>
+</li>
+```
+
+A grid of cards is a `div` of `article`s, or a `ul` of `li.theme-card` where the
+cards are items of a list; the grid resets the indent, the markers and the
+margin a list gets from the element baseline, and a card the margin of a list
+item. `--columns-2`, `--columns-3` and `--columns-4` cap the number of columns
+and keep the minimum width of one, so a row still breaks into fewer where there
+is no room - no breakpoint, the minimum decides. Four columns lower the minimum
+to 11rem, since four of 14rem need more than a content column has. `--narrow`
+lowers it to 9rem and, unlike every other grid of the file, keeps empty tracks
+(`auto-fill`), so thumbnails stay small where there are few of them.
+
+`--scroller` turns the grid into one row that scrolls sideways, in a
+`.theme-card-scroller` region:
+
+```html
+<div class="theme-card-scroller" role="region" tabindex="0" aria-label="…">
+    <ul class="theme-card-grid theme-card-grid--scroller theme-card-grid--columns-3">
+        <li class="theme-card">…</li>
+    </ul>
+</div>
+```
+
+No script: the browser scrolls, `scroll-snap-type` snaps each card to the start
+edge, and the keyboard reaches the strip the way it reaches a table - the
+wrapper is the one region that scrolls, and it carries the tab stop and a name,
+so the arrow keys scroll it once it has focus. A link inside a card is reached
+by Tab, and the browser scrolls it into view. The wrapper and not the list is
+the region, because a `role` on the list would take its list semantics away. A
+card is the share of the column count less a quarter of a card, so the next one
+always shows at the end edge; on a phone it takes the minimum width, at most
+85% of the strip. Nothing animates, so `prefers-reduced-motion` has nothing to
+stop.
+
 Content element wrapper — every rendered content element, `--{CType}` and
 `data-ctype` both carry the CType, one for styling hooks and one for the
 diagnostic label. See [the content-element outline](#the-content-element-outline)
@@ -751,6 +804,64 @@ on the bar or the value does not reach it. Only Chromium is tested, by the
 visual suite; the Firefox rules were looked at once in the Firefox of the
 pinned Playwright image. The contrast of the fills and the edge is in
 [`DESIGN.md`](../../DESIGN.md#indicators).
+
+List group — a framed list of rows, each an avatar, a title, a line of text
+and meta data at the end. Every part but the title is optional:
+
+```html
+<ul class="theme-list-group">
+    <li class="theme-list-group__item">
+        <span class="theme-avatar"><img class="theme-avatar__image" src="…" alt="" width="40" height="40"></span>
+        <div class="theme-list-group__body">
+            <h3 class="theme-list-group__title"><a class="theme-list-group__link" href="…">…</a></h3>
+            <p class="theme-list-group__text">…</p>
+        </div>
+        <p class="theme-list-group__meta"><time datetime="…">…</time> <span>…</span></p>
+    </li>
+</ul>
+```
+
+A row has one link, the title, and the whole row is its target - the
+technique of `.theme-card--linked`: the link's `::after` is stretched over the
+row, so no interactive element is nested in another and the name of the link is
+the title alone. Hovering the row fills it with the surface colour. The focus
+ring moves from the title to the row, because the row is what a press
+activates: the ring of `base/_reset.scss`, drawn on the link's `::after` - the
+hit area that already covers the row - and inset by its own width so the frame
+of the list does not cut it off. It depends on nothing but the link having
+`:focus-visible`, not on `:has()` on the row: the browser floor in
+[`DESIGN.md`](../../DESIGN.md#one-declaration-both-appearances) is Firefox
+120, `:has()` arrived in 121, and with the link's own ring removed focus would
+be invisible there. The hover fill does use `:has()`; without it, hover shows
+the underline of the title only. A row without a link has a title of plain
+text and is no target. The meta data wraps onto a line of its own, at its end,
+where the row is too narrow for it. The image is an [avatar](#content) in its
+decorative form, `alt=""`: it sits beside the visible title, which names the
+row, and the list group styles nothing of it.
+
+Timeline — an ordered list on an axis at the inline start: a ring on the first
+line of every entry, and a hairline down to the ring of the next. An entry may
+carry an icon instead of the ring, in `__icon`:
+
+```html
+<ol class="theme-timeline">
+    <li class="theme-timeline__item">
+        <span class="theme-timeline__icon" aria-hidden="true"><theme:icon name="…" /></span>
+        <time class="theme-timeline__date" datetime="…">…</time>
+        <h3 class="theme-timeline__title">…</h3>
+        <div class="theme-timeline__media"><img …></div>
+        <p class="theme-timeline__text">…</p>
+    </li>
+</ol>
+```
+
+The ring and the rail are the item's `::before` and `::after`, component
+geometry rather than icons - see [Icons § The rule](icons.md#the-rule). The
+date sets its line box to `--theme-timeline-first-line`, and the ring and the
+icon are placed against the same length, so they stay centred on the date when
+a font size changes. The icon sits on the background colour, so the rail stops
+at its edge; the ring is dropped for an item holding the slot. Under forced
+colours the rail, a background, is painted `CanvasText`.
 
 Quote. Modifiers `--pull` (larger and bolder, between a rule above and one
 below in the accent, instead of the rule at the start) and `--centred` (on one
@@ -1501,6 +1612,7 @@ instead of being repainted in turn — and `CanvasText`, `ButtonText` and
 | Progress    | the fill and the tint of the track                        | opt out: `Canvas`, `CanvasText`, `Highlight` |
 | Meter       | the fill and the tint of the track; the three regions     | as progress, every region `Highlight`        |
 | Icon tiles  | the fill of the media object and feature tiles            | none: a transparent border is painted solid  |
+| Timeline    | the rail, a background                                    | painted `CanvasText`                         |
 
 The `::backdrop` needs no rule: forced colours keep the alpha of its
 background, so the scrim stays a translucent canvas over the page. The alert
