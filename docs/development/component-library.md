@@ -43,6 +43,7 @@ against, and the rename was cheap while only one template depended on it.
 | Gallery                 | `.theme-gallery`          | `components/_gallery.scss`          |
 | Hero                    | `.theme-hero`             | `components/_hero.scss`             |
 | Icon                    | `.theme-icon`             | `components/_icon.scss`             |
+| Link decoration         | `.theme-link`             | `components/_link.scss`             |
 | List                    | `.theme-list`             | `components/_list.scss`             |
 | Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`         |
 | Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`          |
@@ -125,6 +126,51 @@ fit the square slots below.
 | Field messages       | `circle-exclamation` in an error, `circle-check` in a success                               | one em                                                    |
 | Icon button          | whatever the button stands for                                                              | `--theme-button-icon-size`, through the token             |
 | Theme links          | the icon an editor picked, before the label of a button, a content menu link or a card link | one em, spaced by the `gap` of the link                   |
+| Link decoration      | `arrow-up-right-from-square`, `download`, `envelope`, `phone`, as a CSS mask after the text | `--theme-link-marker-size`, three quarters of an em       |
+
+### Link decoration
+
+A link TYPO3 builds from a link reference — rich text, and the link fields of
+the content elements — marked by what it leads to. Written by
+`Classes/EventListener/LinkDecoration.php`, never by hand:
+
+```html
+<a class="theme-link theme-link--external" href="…" target="_blank">…<span class="theme-link__marker" aria-hidden="true"></span><span class="theme-link__hint">(opens in a new window)</span></a>
+<a class="theme-link theme-link--download" href="…">…<span class="theme-link__marker" aria-hidden="true"></span><span class="theme-link__hint">(download)</span></a>
+<a class="theme-link theme-link--mail" href="mailto:…">…<span class="theme-link__marker" aria-hidden="true"></span></a>
+<a class="theme-link theme-link--tel" href="tel:…">…<span class="theme-link__marker" aria-hidden="true"></span></a>
+```
+
+The kind comes from the type TYPO3 resolved the link to — `url` on a host that
+is no host of the installation, `file`, `email`, `telephone` — and not from an
+attribute selector on the `href`, which cannot tell an absolute link to the
+site itself from one elsewhere, nor a `t3://file` link from a page. The hosts of
+the installation are the host of the request and every base, base variant and
+language base any site configures, compared in their ASCII form
+(`idn_to_ascii()`) and read with `parse_url()`, so userinfo in front of a host
+does not pass for it. A `www.` variant counts only where a site configures it.
+
+The marker is decoration. A link that opens a new window says so in the
+visually hidden `__hint` whatever it leads to — a page of the site too, which
+gets the hint and neither class nor marker — and a link to a file says it is a
+download; a screen reader reads the hint out with the link. The download hint
+is added to every file link and may repeat a label that already says
+"download" — "Download the report (download)". It is left that way rather than
+guessed from the label, which may be in any language; an editor who wants to
+avoid it writes the label without the word. The listener acts only where the
+theme's TypoScript sets `config.tx_theme.linkDecoration`, from the constant
+`theme.linkDecoration`.
+
+The marker is an empty span painted in the text colour and masked with the
+icon file, the way the check list masks `check` — see
+[Icons § The rule](icons.md#the-rule). It is a real element rather than
+`::after` of the link, which `.theme-card--linked` already uses for its hit
+area. Under forced colours it opts out with `forced-color-adjust: none`, so
+the glyph is drawn in the link colour the system forces, not repainted to the
+canvas colour. It keeps a quarter em from the text; a link that spaces its
+content with a `gap` — `.theme-button`, `.theme-content-menu__link`,
+`.theme-card__link` — sets `--theme-link-marker-gap: 0` on itself, read with a
+fallback like `--theme-icon-size`.
 
 ### Navigation
 

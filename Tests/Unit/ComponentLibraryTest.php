@@ -57,6 +57,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'gallery' => '.theme-gallery',
             'hero' => '.theme-hero',
             'icon' => '.theme-icon',
+            'link decoration' => '.theme-link',
             'list' => '.theme-list',
             'main navigation' => '.theme-nav-main',
             'sub navigation' => '.theme-nav-sub',

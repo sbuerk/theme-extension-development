@@ -355,6 +355,18 @@ with `background-color`. That draws nothing: the shape is the file's, the one
 rest of the set. It needs a forced colours rule of its own, because the fill is
 a background — see `components/_list.scss`.
 
+The markers of a decorated link are the second case, for the other reason: no
+template of the theme writes that markup at all.
+`Classes/EventListener/LinkDecoration.php` adds an empty
+`<span class="theme-link__marker">` to a link TYPO3 builds — rich text
+included — and `components/_link.scss` masks it with the file of its kind:
+`arrow-up-right-from-square`, `download`, `envelope`, `phone`. The stylesheet
+decides the glyph, so a site package changes it in CSS. Its forced colours rule
+differs from the check list's on purpose: the marker opts out and keeps
+`currentColor`, which is then the link colour the system forces, where the
+check mark paints `CanvasText` — a marker has to stay the colour of its link.
+See [Component library § Link decoration](component-library.md#link-decoration).
+
 The rule is narrow on purpose: a stylesheet references **only files of
 `Resources/Public/Icons/FontAwesome/Solid/`**, by their relative path from the
 compiled stylesheet. Never a `data:` URI, never an image of its own, never a
@@ -363,13 +375,15 @@ fails on any other `url()`.
 
 `Tests/Unit/IconUsageTest` holds the templates and the stylesheets to it:
 
-| Test                                                          | Guards                                                                                                            |
-|---------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| `everyIconATemplateNamesIsShipped`                            | Every `name` a template passes is a file of the set — an icon a version bump renamed fails here, not on a page.   |
-| `noTemplateDrawsAnSvgOfItsOwn`                                | No template below `Resources/Private/` contains an `<svg>` element.                                               |
-| `noStylesheetDrawsAGlyphAsGeneratedContent`                   | Every quoted `content` in the SCSS sources is empty or the breadcrumb's `/` — no `⚠`, no `✓`.                     |
-| `theStyleguideListsTheIconsTheTemplatesUseAndTheSizeOfTheSet` | The icon table of the styleguide lists exactly the icons the templates use, and the count it states is the set's. |
-| `theShippedSetIsThePinnedVersion`                             | The pin is exact, the lockfile agrees, and `ATTRIBUTION.txt` and every shipped file name that version.            |
+| Test                                                          | Guards                                                                                                                                     |
+|---------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `everyIconATemplateNamesIsShipped`                            | Every `name` a template passes is a file of the set — an icon a version bump renamed fails here, not on a page.                            |
+| `noTemplateDrawsAnSvgOfItsOwn`                                | No template below `Resources/Private/` contains an `<svg>` element.                                                                        |
+| `noStylesheetDrawsAGlyphAsGeneratedContent`                   | Every quoted `content` in the SCSS sources is empty or the breadcrumb's `/` — no `⚠`, no `✓`.                                              |
+| `aNameAnEditorPickedIsRenderedAsOptional`                     | Every `name` that is a variable carries `optional`, so a name a later version dropped costs the icon, not the page.                        |
+| `aStylesheetReferencesOnlyFilesOfTheIconSet`                  | Every `url()` of the SCSS sources is a file of `Solid/` by its path relative to the compiled stylesheet — no `data:` URI, no own image.    |
+| `theStyleguideListsTheIconsTheTemplatesUseAndTheSizeOfTheSet` | The icon table of the styleguide lists exactly the icons the templates use and the stylesheets mask, and the count it states is the set's. |
+| `theShippedSetIsThePinnedVersion`                             | The pin is exact, the lockfile agrees, and `ATTRIBUTION.txt` and every shipped file name that version.                                     |
 
 `checkIconsBuild` proves the files equal the package; these prove that what
 refers to the files is still right.

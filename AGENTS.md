@@ -203,14 +203,16 @@ violation of any of them is a rejected change, not a review comment.
    framework `FunctionalTestCase` directly.
    → [Site based tests](docs/testing/site-based-tests.md#no-test-extends-the-framework-test-case-directly)
 
-7. **Icons come only from the vendored Font Awesome Free solid set, and only
-   through `<theme:icon name="…" />`.** Never an SVG drawn into a template by
-   hand, never a glyph in CSS `content`, never a webfont, a sprite or a CDN.
-   CSS may draw only the component geometry listed as not being an icon in
-   `docs/development/icons.md` (tooltip arrow, busy spinner, switch thumb).
-   The ViewHelper stays plain Fluid with no TYPO3 API in it — the visual suite
-   renders the styleguide partials without TYPO3.
-   `Tests/Unit/IconUsageTest` enforces the templates' side.
+7. **Icons come only from the vendored Font Awesome Free solid set** — through
+   `<theme:icon name="…" />`, or, where a component has no markup per item, as
+   a CSS `mask` referencing a file of `Resources/Public/Icons/FontAwesome/Solid/`
+   by its path relative to the compiled stylesheet. Never an SVG drawn into a
+   template by hand, never a glyph in CSS `content`, never a `data:` URI, a
+   webfont, a sprite or a CDN. CSS may draw only the component geometry listed
+   as not being an icon in `docs/development/icons.md` (tooltip arrow, busy
+   spinner, switch thumb). The ViewHelper stays plain Fluid with no TYPO3 API
+   in it — the visual suite renders the styleguide partials without TYPO3.
+   `Tests/Unit/IconUsageTest` enforces both the templates and the stylesheets.
    → [Icons](docs/development/icons.md)
 
 8. **Commit messages follow the TYPO3 Core conventions** — `[TAG] Short
