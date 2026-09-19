@@ -253,5 +253,15 @@ references:
   - {file: placeholder, table: tt_content, uid: 3706, field: media, values: {title: 'Placeholder, landscape', description: 'An image, so the list shows a thumbnail of it.'}}
   - {file: release-notes-pdf, table: tt_content, uid: 3706, field: media, values: {title: 'Release notes', description: 'A PDF: no thumbnail, so the icon of a PDF stands in its place.'}}
   - {file: placeholder-graphics, table: tt_content, uid: 3706, field: media, values: {title: 'The placeholder graphics', description: 'A zip archive of the two placeholder graphics.'}}
+  # Page 110, "Hero layouts": landscape everywhere, the portrait file for the
+  # screenshot, whose box cuts it off at the bottom edge.
+  - {file: placeholder, table: tt_content, uid: 11002, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 11003, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 11004, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 11005, field: image, values: {alternative: 'A placeholder graphic in portrait format, cut off at the bottom'}}
+  - {file: placeholder, table: tt_content, uid: 11006, field: image, values: {alternative: 'A placeholder graphic in landscape format, cut off at two edges'}}
+  - {file: placeholder, table: tt_content, uid: 11007, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 11008, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 11010, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   # Page 56, "Article": the image the text flows around.
   - {file: placeholder-portrait, table: tt_content, uid: 5604, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'Placed in the text, at the end of the line'}}

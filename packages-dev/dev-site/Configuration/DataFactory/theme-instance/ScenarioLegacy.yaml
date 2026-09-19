@@ -1922,6 +1922,126 @@ entities:
                           id: 1129
                           header: 'Tell people'
                           text: 'A step without an icon keeps its number.'
+                -
+                  self:
+                    id: 1110
+                    title: 'Hero layouts'
+                    slug: /elements/theme/hero
+                    backend_layout: content_sidebar
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 12001
+                          CType: header
+                          header: 'Hero layouts'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 12002
+                          CType: theme_hero
+                          tx_theme_hero_layout: ''
+                          tx_theme_eyebrow: 'The default layout'
+                          header: 'The image beside the text, at the start'
+                          header_layout: 2
+                          bodytext: "<p>The hero as it always rendered: the image takes 45 per\ncent of the row on a wide screen and sits above the text on\na narrow one. The short line above the title is the\neyebrow, a field of its own.</p>\n"
+                          tx_theme_link: 't3://page?uid=1008'
+                          tx_theme_link_label: 'All theme elements'
+                          tx_theme_link_icon: arrow-left
+                      -
+                        self:
+                          id: 12003
+                          CType: theme_hero
+                          tx_theme_hero_layout: image-end
+                          tx_theme_eyebrow: 'Image at the end'
+                          header: 'The image beside the text, at the end'
+                          header_layout: 2
+                          bodytext: "<p>The image moves to the end of the row. In the markup it\nstill comes first, so a screen reader meets the same order\nas in the default layout.</p>\n"
+                          tx_theme_link: 't3://page?uid=1031'
+                          tx_theme_link_label: 'Read about text in columns'
+                          tx_theme_link_variant: secondary
+                      -
+                        self:
+                          id: 12004
+                          CType: theme_hero
+                          tx_theme_hero_layout: centred
+                          tx_theme_eyebrow: Centred
+                          header: 'Everything on one axis'
+                          header_layout: 2
+                          bodytext: "<p>Title, lead, action and image centred, at every width.\nThe image is no wider than the reading measure, so it never\noutgrows the text.</p>\n"
+                          tx_theme_link: 't3://page?uid=1002'
+                          tx_theme_link_label: 'Open the typography'
+                      -
+                        self:
+                          id: 12005
+                          CType: theme_hero
+                          tx_theme_hero_layout: screenshot
+                          tx_theme_eyebrow: Screenshot
+                          header: 'An application that continues below'
+                          header_layout: 2
+                          bodytext: "<p>Centred text and the image below it, resting on the\nbottom edge of the panel, which cuts it off. This is the one\nlayout that puts the image after the text in the markup as\nwell.</p>\n"
+                          tx_theme_link: 't3://page?uid=1009'
+                          tx_theme_link_label: 'Open the styleguide'
+                      -
+                        self:
+                          id: 12006
+                          CType: theme_hero
+                          tx_theme_hero_layout: bordered
+                          tx_theme_eyebrow: Cropped
+                          header: 'The image runs out of the panel'
+                          header_layout: 2
+                          bodytext: "<p>The image sits at the end of the row and is cut off by the\nend and the bottom edges of the panel. A hairline frames the\ntwo edges that stay inside it.</p>\n"
+                          tx_theme_link: 't3://page?uid=1003'
+                          tx_theme_link_label: 'Look at the media page'
+                          tx_theme_link_variant: ghost
+                      -
+                        self:
+                          id: 12007
+                          CType: theme_hero_small
+                          tx_theme_hero_layout: image-end
+                          tx_theme_eyebrow: 'Reduced, image at the end'
+                          header: 'The reduced hero offers three layouts'
+                          header_layout: 2
+                          bodytext: "<p>The default, the image at the end, and centred. It has\ntoo little height for an image cut off at an edge.</p>"
+                      -
+                        self:
+                          id: 12008
+                          CType: theme_hero_small
+                          tx_theme_hero_layout: centred
+                          tx_theme_eyebrow: 'Reduced, centred'
+                          header: 'A sub page header, centred'
+                          header_layout: 2
+                          bodytext: "<p>The same panel with less air above and below, and its\nimage above the text.</p>"
+                      -
+                        self:
+                          id: 12009
+                          CType: theme_hero_text_only
+                          tx_theme_hero_layout: centred
+                          tx_theme_eyebrow: 'Without media, centred'
+                          header: 'No image, and two layouts'
+                          header_layout: 2
+                          bodytext: "<p>The hero without media can be centred or not. There is no\nimage to place, so the other layouts are not offered.</p>\n"
+                          tx_theme_link: 't3://page?uid=1005'
+                          tx_theme_link_label: 'Back to the elements'
+                          tx_theme_link_variant: link
+                      -
+                        self:
+                          id: 12010
+                          CType: theme_hero_small
+                          tx_theme_hero_layout: ''
+                          tx_theme_eyebrow: 'Reduced, the default'
+                          header: 'The reduced hero in its default layout'
+                          header_layout: 2
+                          bodytext: "<p>The image at the start of the row, as on the page of the\ntheme elements, now with an eyebrow above the title.</p>"
+                      -
+                        self:
+                          id: 12011
+                          CType: theme_hero_text_only
+                          tx_theme_hero_layout: ''
+                          tx_theme_eyebrow: 'Without media, the default'
+                          header: 'Text at the start of the line'
+                          header_layout: 2
+                          bodytext: "<p>The hero without media in its default layout: the text\nstarts at the start of the line and runs to the reading\nmeasure.</p>\n"
             -
               self:
                 id: 1051

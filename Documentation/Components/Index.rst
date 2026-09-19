@@ -269,6 +269,14 @@ not know renders the element without one.
             the file type - :css:`--icon`; with a thumbnail, or the icon where
             there is none - :css:`--preview`. See
             :ref:`feature-file-list-display-types`
+    *   -   :guilabel:`Hero`, :guilabel:`Hero, small`,
+            :guilabel:`Hero, text only`
+        -   :guilabel:`Layout`, :guilabel:`Eyebrow`
+        -   The image at the start - the default; at the end -
+            :css:`.theme-hero--image-end`; centred - :css:`--centred`; a
+            screenshot cut off at the bottom - :css:`--screenshot`; cropped at
+            two edges - :css:`--bordered`. The eyebrow is
+            :css:`.theme-hero__eyebrow`. See :ref:`feature-hero-layouts`
 
 Tables
 ======

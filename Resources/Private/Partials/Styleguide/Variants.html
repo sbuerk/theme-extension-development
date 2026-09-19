@@ -107,6 +107,75 @@
             </li>
         </ul>
     </div>
+
+    <h3>Hero layouts</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_hero.scss, the
+            layouts of the hero elements next to "--media": "--image-end",
+            "--centred", "--screenshot" and "--bordered". The default - the
+            image at the start - is the "--media" specimen of "Boxes.html".
+            Titles are "h4", for the reason "Boxes.html" gives. The screenshot
+            is the one layout whose image follows the text in the markup.
+        </f:comment>
+        <f:variable name="specimenHeroImage" value="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20160%2090%27%3E%3Crect%20width=%27160%27%20height=%2790%27%20fill=%27%23d6dce6%27/%3E%3Cpath%20d=%27M0%2090%2058%2038%2092%2066%20118%2044%20160%2090Z%27%20fill=%27%234a5567%27/%3E%3Ccircle%20cx=%2736%27%20cy=%2724%27%20r=%2711%27%20fill=%27%234a5567%27/%3E%3C/svg%3E" />
+        <section class="theme-hero theme-hero--media theme-hero--image-end">
+            <div class="theme-hero__media">
+                <img src="{specimenHeroImage}" width="160" height="90" alt="Placeholder graphic at the end of the row.">
+            </div>
+            <div class="theme-hero__body">
+                <p class="theme-hero__eyebrow">--image-end</p>
+                <h4 class="theme-hero__title">The image beside the text, at the end</h4>
+                <p class="theme-hero__lead">The image comes first in the markup and moves to the end of the row from 48rem upwards.</p>
+                <div class="theme-hero__actions">
+                    <a class="theme-button" href="#">The primary action</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="theme-hero theme-hero--media theme-hero--centred">
+            <div class="theme-hero__media">
+                <img src="{specimenHeroImage}" width="160" height="90" alt="Placeholder graphic above the centred text.">
+            </div>
+            <div class="theme-hero__body">
+                <p class="theme-hero__eyebrow">--centred</p>
+                <h4 class="theme-hero__title">Everything on one axis</h4>
+                <p class="theme-hero__lead">Title, lead, actions and image centred at every width. The image is no wider than the reading measure.</p>
+                <div class="theme-hero__actions">
+                    <a class="theme-button" href="#">The primary action</a>
+                    <a class="theme-button theme-button--secondary" href="#">A second one</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="theme-hero theme-hero--media theme-hero--screenshot">
+            <div class="theme-hero__body">
+                <p class="theme-hero__eyebrow">--screenshot</p>
+                <h4 class="theme-hero__title">An application that continues below</h4>
+                <p class="theme-hero__lead">Centred, the image after the text and cut off by the bottom edge of the panel.</p>
+                <div class="theme-hero__actions">
+                    <a class="theme-button" href="#">The primary action</a>
+                </div>
+            </div>
+            <div class="theme-hero__media">
+                <img src="{specimenHeroImage}" width="160" height="90" alt="Placeholder graphic cut off at the bottom edge.">
+            </div>
+        </section>
+
+        <section class="theme-hero theme-hero--media theme-hero--bordered">
+            <div class="theme-hero__media">
+                <img src="{specimenHeroImage}" width="160" height="90" alt="Placeholder graphic cut off at the end and bottom edges.">
+            </div>
+            <div class="theme-hero__body">
+                <p class="theme-hero__eyebrow">--bordered</p>
+                <h4 class="theme-hero__title">The image runs out of the panel</h4>
+                <p class="theme-hero__lead">The image at the end, cut off by the end and the bottom edges, a hairline on the two edges inside the panel.</p>
+                <div class="theme-hero__actions">
+                    <a class="theme-button" href="#">The primary action</a>
+                </div>
+            </div>
+        </section>
+    </div>
 </section>
 
 </html>
