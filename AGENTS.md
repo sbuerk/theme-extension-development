@@ -280,6 +280,7 @@ Build/Scripts/runTests.sh -t 12 -s checkExceptionCodes
 Build/Scripts/runTests.sh -t 12 -s checkMarkdownTables
 Build/Scripts/runTests.sh -t 12 -s checkTestMethodsPrefix
 Build/Scripts/runTests.sh -t 12 -s checkCssBuild
+Build/Scripts/runTests.sh -t 12 -s checkIconsBuild
 Build/Scripts/runTests.sh -t 12 -s visual
 Build/Scripts/runTests.sh -t 12 -s acceptance
 
@@ -311,6 +312,14 @@ Further:
   `-s checkCssBuild` is the gate that holds it to that, and `-s watchCss` is the
   writing aid that blocks until ctrl-c.
   → [Frontend assets](docs/development/frontend-assets.md)
+- `-s buildIcons` copies the solid SVGs of the Font Awesome Free version pinned
+  exactly in the root `package.json` into
+  `Resources/Public/Icons/FontAwesome/`, byte for byte, with its
+  `LICENSE.txt`; the set is committed for the same reason as the stylesheet.
+  `-s checkIconsBuild` is the gate: an edited, a missing or an extra file
+  fails it. Never edit, add or drop a file there by hand; a version bump also
+  changes `ATTRIBUTION.txt`.
+  → [Icons](docs/development/icons.md)
 - `-s functional -d mariadb -i 10.6` (also `mysql`, `postgres`) when a change
   touches queries, schema or TCA. SQLite alone is not enough there.
 - `-s acceptance` builds a development instance of the `-t` core version from

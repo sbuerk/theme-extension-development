@@ -37,6 +37,9 @@ Build/Scripts/runTests.sh -s checkTestMethodsPrefix
 
 # Ensure the committed CSS matches its SCSS sources.
 Build/Scripts/runTests.sh -s checkCssBuild
+
+# Ensure the committed icons equal the pinned Font Awesome Free package.
+Build/Scripts/runTests.sh -s checkIconsBuild
 ```
 
 | Gate                     | Configuration                                                                                        | Core version dependent |
@@ -50,6 +53,7 @@ Build/Scripts/runTests.sh -s checkCssBuild
 | `checkMarkdownTables`    | [`Build/Scripts/checkMarkdownTables.php`](../../Build/Scripts/checkMarkdownTables.php)               | no                     |
 | `checkTestMethodsPrefix` | [`Build/Scripts/testMethodPrefixChecker.php`](../../Build/Scripts/testMethodPrefixChecker.php)       | no                     |
 | `checkCssBuild`          | [`package.json`](../../package.json), see [Frontend assets](frontend-assets.md)                      | no                     |
+| `checkIconsBuild`        | [`package.json`](../../package.json), see [Icons](icons.md)                                          | no                     |
 
 ## PHPStan
 

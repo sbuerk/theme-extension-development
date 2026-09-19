@@ -36,7 +36,8 @@ measured unless it was counted.
 
 The reference design is set in **Mulish** (weights 400, 500, 800). This extension
 ships **no webfonts** — no CDN, no font files, no external request of any kind —
-so the token resolves to a system stack and Mulish is *not* bundled.
+so the token resolves to a system stack and Mulish is *not* bundled. Icons
+follow the same rule, see [Icons](#icons).
 
 What is taken is the **metrics**: the size scale, the line heights,
 the tracking and the weight steps. They are what carry the design's rhythm, and
@@ -510,6 +511,22 @@ max-width declaration worth lifting.
 1200px is deliberately the same number as the `theme.media.maxGalleryWidth`
 TypoScript constant, which decides how wide images are processed. **If one
 moves, the other has to.**
+
+## Icons
+
+Icons come from **Font Awesome Free, solid style only**: one vendored set,
+shipped whole, rather than a glyph drawn by hand per component. **Decided**,
+not measured from the reference — a set is what an editor will pick icons
+from, and a glyph drawn for one component is not.
+
+The rule is the one [the typeface](#the-typeface-is-not-shipped) follows: no
+webfont, no CDN, no request. The solid SVGs of a pinned package version are
+committed below `Resources/Public/Icons/FontAwesome/` together with their
+licence (CC BY 4.0 for the icons) and an attribution. An icon has no colour of
+its own — every file fills with `currentColor` — so it takes the colour of the
+text around it, and no token is needed for it.
+
+How the set is built, checked and updated: [Icons](docs/development/icons.md).
 
 ## What this file does not decide
 
