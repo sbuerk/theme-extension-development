@@ -37,6 +37,7 @@ against, and the rename was cheap while only one template depended on it.
 | Code block              | `.theme-code`             | `components/_code.scss`             |
 | Content element wrapper | `.theme-content-element`  | `components/_content-element.scss`  |
 | Content menu            | `.theme-content-menu`     | `components/_content-menu.scss`     |
+| Call to action          | `.theme-cta`              | `components/_cta.scss`              |
 | Description list        | `.theme-dl`               | `components/_description-list.scss` |
 | Display settings        | `.theme-settings`         | `components/_settings.scss`         |
 | Dialog                  | `.theme-dialog`           | `components/_dialog.scss`           |
@@ -606,6 +607,30 @@ cascade and win where they meet:
         </figure>
     </div>
 </div>
+```
+
+Call to action — a heading, a short text, an optional large icon and up to two
+links, centred on one axis, the text held to the measure. Width modifiers
+`--boxed` (narrower than the column, centred in it) and `--band` (across the
+column: no radius, no frame at the sides, more air above and below); tone
+modifiers `--accent` (the 5% tint of the accent band), `--inverse` (the colour
+scheme of the subtree turned, in the three rules of the inverse band) and
+`--placeholder` (no fill, a dashed frame in `--theme-color-border-strong`).
+The bare class is a box on the surface filling its column. The tones reuse the
+band tokens rather than defining their own, so the band contrast in
+[`DESIGN.md`](../../DESIGN.md#call-to-action) holds; `ContentElementContractTest`
+holds the tint and the three scheme rules to the stylesheet:
+
+```html
+<section class="theme-cta theme-cta--band theme-cta--accent">
+    <span class="theme-cta__icon" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
+    <h2 class="theme-cta__title">…</h2>
+    <div class="theme-cta__text"><p>…</p></div>
+    <div class="theme-cta__actions">
+        <a class="theme-button" href="…">…</a>
+        <a class="theme-button theme-button--secondary" href="…">…</a>
+    </div>
+</section>
 ```
 
 File list — the three display types of the "File Links" element. Modifiers:

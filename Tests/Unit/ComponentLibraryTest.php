@@ -52,6 +52,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'code block' => '.theme-code',
             'content element' => '.theme-content-element',
             'content menu' => '.theme-content-menu',
+            'call to action' => '.theme-cta',
             'description list' => '.theme-dl',
             'divided description list' => '.theme-dl--divided',
             'dialog' => '.theme-dialog',
@@ -314,6 +315,8 @@ final class ComponentLibraryTest extends UnitTestCase
         // below the element's heading, h2 to h6.
         yield 'feature title' => ['selector' => '.theme-feature__title'];
         yield 'step title' => ['selector' => '.theme-steps__title'];
+        // "Templates/ContentElements/ThemeCta.html" puts it on h1 to h5.
+        yield 'call to action title' => ['selector' => '.theme-cta__title'];
     }
 
     /**

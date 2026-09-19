@@ -43,6 +43,7 @@ final class ThemeContentTypeRegistrationTest extends AbstractFunctionalTestCase
     private const THEME_CONTENT_TYPES = [
         'theme_accordion',
         'theme_author',
+        'theme_cta',
         'theme_features',
         'theme_hero',
         'theme_hero_small',

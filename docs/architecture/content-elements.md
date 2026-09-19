@@ -833,6 +833,7 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_features`          | A group of features with an icon each                    | `.theme-feature` in `.theme-feature-grid`               |
 | `theme_stats`             | Figures and what they count                              | `.theme-stat` in `.theme-stats`                         |
 | `theme_steps`             | The numbered steps of a process                          | `.theme-steps`                                          |
+| `theme_cta`               | A call to action: heading, text, icon, two links         | `.theme-cta`                                            |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -893,7 +894,7 @@ its own prefix, rather than overlooked.
 
 ### `ext_tables.sql`, and why it exists although the schema derives from TCA
 
-On TYPO3 v13 the whole schema for `tx_theme_list_item` and the fifteen
+On TYPO3 v13 the whole schema for `tx_theme_list_item` and the twenty-one
 `tx_theme_*` columns added to `tt_content` comes from
 `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()` reading the TCA at
 compare-schema time (#101553, extended by #104311 in 13.3).
@@ -901,7 +902,7 @@ compare-schema time (#101553, extended by #104311 in 13.3).
 **TYPO3 v12 does none of that.** Its `DefaultTcaSchema` derives the management
 columns from `ctrl`, the `category|datetime|slug|json|uuid` types and MM tables,
 and has no branch for `input`, `text`, `link`, `file`, `inline` or a `select`
-without an MM table — so on v12 the table and the fifteen columns are simply
+without an MM table — so on v12 the table and the twenty-one columns are simply
 never created and every theme element using them fails.
 [`ext_tables.sql`](../../ext_tables.sql) therefore ships the
 definitions v13 would generate, reproduced column for column from what v13's own
@@ -1290,6 +1291,55 @@ the eyebrow through both delivery paths; `ContentElementAppearanceFormEngineTest
 holds the values each hero offers; `ShowcaseTreeTest` holds
 `/elements/theme/hero` to showing all of them.
 
+### The call to action
+
+`theme_cta` is a band or a box with a heading, a short rich text, an optional
+large icon and up to two links, on `.theme-cta`. Two selects pick one modifier
+each in `ThemeCta.html`: `tx_theme_cta_width` — `boxed`, the default, or
+`band` — and `tx_theme_cta_tone` — the surface by default, `accent`,
+`inverse` or `placeholder`. A value nothing offers picks none.
+
+The tones are the bands of `frame_class` applied to the component: the accent
+tone mixes the 5% tint of the accent band, the inverse tone turns the colour
+scheme of its subtree in the same three rules. The contrast tables of the bands
+in `DESIGN.md` therefore hold for everything inside, and
+`ContentElementContractTest` holds the tint and the three rules to the
+stylesheet so they cannot drift apart. `placeholder` is no fill and a dashed
+frame, for an empty state that says what to do about it.
+
+`band` spans the column the element sits in, not the viewport. A full bleed to
+the viewport needs `margin-inline: calc(50% - 50vw)`, which assumes a centred
+column: in the `content_sidebar` layout it would run across the sidebar, and
+`100vw` includes the scrollbar, so the page scrolls sideways by its width. An
+element across the column, with `frame_class` "No frame" dropping the inner
+padding, is the widest band the column model allows.
+
+The icon is `tx_theme_icon`, the element icon column the bullet list uses,
+rendered `optional` in an `aria-hidden` slot. The first link is the
+`theme_link` palette; the second is a palette of its own,
+`theme_secondary_link`, with four columns of the same shape —
+`tx_theme_secondary_link`, `_label`, `_variant` (the items of the first link's
+style, defaulting to `secondary`) and `_icon` (the icon picker, with the curated
+`keepItems` of the first link's icon). Both are rendered by `LinkButton.html`,
+the second handed its columns under the names of the first, so one set of cases
+decides the style of either. Two fixed places, not an inline relation: a list
+of links has no first and second.
+
+The heading is `header` at the level of `header_layout`, h2 by default — a call
+to action is a section, not the page title — and `header_position` and
+`tx_theme_header_style` are disabled for the type, as for the heroes.
+`bodytext` is rich text through `columnsOverrides`. The new content element
+wizard of v13 lists the element from its TCA (Feature #102834); on v12 it is
+listed by its entry in `NewContentElementWizard.tsconfig`, like every theme
+type ([below](#the-wizard-group-and-what-an-unresolved-icon-identifier-does)).
+
+`CtaRenderingTest` holds the modifiers through both delivery paths, the icon,
+heading, text and both links, either link alone, and what is not rendered;
+`ContentElementAppearanceFormEngineTest` the form; `IconPickerFormEngineTest`
+both icon fields to the curated list; `ShowcaseTreeTest`
+`/elements/theme/cta` to every tone and width; `AccountsTest` the grant of the
+editor group.
+
 ### The styles of the testimonial
 
 `tx_theme_quote_style` sets the quotation of `theme_testimonial`, mapped by
@@ -1373,9 +1423,11 @@ invented — every identifier is one the core registers (`content-header`,
 `content-text-teaser`, `content-beside-text-img-left`, `content-card-group`,
 `content-quote`, `content-user`, `content-bullets`, `content-listgroup`, and
 `content-message`, `content-tab`, `content-accordion` for the notice, the
-tabs and the accordion, `content-idea` for the text and icon element, and
+tabs and the accordion, `content-idea` for the text and icon element,
 `content-widget-list`, `content-widget-number` and `content-target` for the
-features, the figures and the steps), verified present in the core's own icon registry
+features, the figures and the steps, and `content-widget-calltoaction` for the
+call to action), verified present in the core's own icon registry of v12.4
+and v13.4
 (`.Build/vendor/typo3/cms-core/Resources/Public/Icons/T3Icons/icons.json`),
 not shipped as image files of this extension's own. An identifier that is
 *not* registered does not fail quietly: `IconRegistry::getIconConfigurationByIdentifier()`

@@ -32,10 +32,10 @@ What the library contains
         -   Components
     *   -   Content
         -   Accordion, alert, author, badge, card, code block, description
-            list - with a divided variant for key and value - divider, feature and
-            feature grid, figure, file list, hero, list, media object, panel,
-            quote, stats, steps, table, teaser, and the text
-            roles display, lead and eyebrow
+            list - with a divided variant for key and value - call to action,
+            divider, feature and feature grid, figure, file list, hero, list,
+            media object, panel, quote, stats, steps, table, teaser, and the
+            text roles display, lead and eyebrow
     *   -   Data display
         -   Avatar and avatar group, tag list, progress bar, meter
     *   -   Actions
@@ -277,6 +277,12 @@ not know renders the element without one.
             screenshot cut off at the bottom - :css:`--screenshot`; cropped at
             two edges - :css:`--bordered`. The eyebrow is
             :css:`.theme-hero__eyebrow`. See :ref:`feature-hero-layouts`
+    *   -   :guilabel:`Call to action`
+        -   :guilabel:`Tone`, :guilabel:`Width`
+        -   Surface, accent tint - :css:`.theme-cta--accent`, the other
+            appearance - :css:`--inverse`, placeholder - :css:`--placeholder`;
+            a box - :css:`--boxed`, or a band - :css:`--band`. See
+            :ref:`feature-call-to-action`
     *   -   :guilabel:`Testimonial`
         -   :guilabel:`Style`
         -   A rule at the start - the default; a pull quote -

@@ -401,6 +401,94 @@ $additionalColumns['tx_theme_quote_style'] = [
     ],
 ];
 
+// The tone of a call to action ("theme_cta"): the fill and the frame of
+// ".theme-cta" (components/_cta.scss), mapped by
+// "Templates/ContentElements/ThemeCta.html". "accent" and "inverse" are the
+// bands of "frame_class" applied to the component - the same 5% tint, and the
+// same turned colour scheme - so the contrast DESIGN.md computed for the bands
+// holds here. "placeholder" is no fill and a dashed frame, for a call to
+// action standing in for content that does not exist yet.
+$additionalColumns['tx_theme_cta_tone'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_cta_tone',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => '',
+        'items' => [
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_cta_tone.I.surface',
+                'value' => '',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_cta_tone.I.accent',
+                'value' => 'accent',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_cta_tone.I.inverse',
+                'value' => 'inverse',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_cta_tone.I.placeholder',
+                'value' => 'placeholder',
+            ],
+        ],
+    ],
+];
+
+// The width of a call to action: a box narrower than the column, centred in
+// it, or a band across the whole column.
+$additionalColumns['tx_theme_cta_width'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_cta_width',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => 'boxed',
+        'items' => [
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_cta_width.I.boxed',
+                'value' => 'boxed',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_cta_width.I.band',
+                'value' => 'band',
+            ],
+        ],
+    ],
+];
+
+// The second link of a call to action: the "theme_link" palette once more,
+// in columns of its own. A call to action offers a main action and an
+// alternative to it - "Start now" and "Read the guide" - and a second button
+// next to the first is what the component lays out. An inline relation of
+// list items, as the link list has, would be a list where the element has
+// two fixed places. Rendered by the same "Partials/ContentElement/LinkButton.html",
+// handed these four columns under the names of the first link.
+$additionalColumns['tx_theme_secondary_link'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_secondary_link',
+    'config' => [
+        'type' => 'link',
+        'size' => 30,
+    ],
+];
+$additionalColumns['tx_theme_secondary_link_label'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_link_label',
+    'config' => [
+        'type' => 'input',
+        'size' => 30,
+        'max' => 255,
+    ],
+];
+// The items of the first link's style, so the partial renders both with the
+// same cases; the second link defaults to the outlined button.
+$additionalColumns['tx_theme_secondary_link_variant'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_link_variant',
+    'config' => array_replace($additionalColumns['tx_theme_link_variant']['config'], ['default' => 'secondary']),
+];
+$additionalColumns['tx_theme_secondary_link_icon'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_link_icon',
+    'config' => IconItems::selectConfig(),
+];
+
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
 
 // The icon of the layout "Icons" of the bullet list, next to the list type.
@@ -435,4 +523,9 @@ $GLOBALS['TCA']['tt_content']['palettes']['theme_icon'] = [
 $GLOBALS['TCA']['tt_content']['palettes']['theme_grid'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_grid',
     'showitem' => 'layout, tx_theme_columns',
+];
+
+$GLOBALS['TCA']['tt_content']['palettes']['theme_secondary_link'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_secondary_link',
+    'showitem' => 'tx_theme_secondary_link, tx_theme_secondary_link_label, --linebreak--, tx_theme_secondary_link_variant, tx_theme_secondary_link_icon',
 ];

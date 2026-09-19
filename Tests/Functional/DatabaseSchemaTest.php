@@ -22,8 +22,9 @@ use PHPUnit\Framework\Attributes\Test;
  * tables — it has no branch for `input`, `text`, `link`, `file`, `inline` or a
  * `select` without an MM table, and it only enriches tables some
  * `ext_tables.sql` defined in the first place.
- * On v12 the whole `tx_theme_list_item` table and the fifteen `tx_theme_*` columns
- * on `tt_content` therefore exist only because `ext_tables.sql` declares them.
+ * On v12 the whole `tx_theme_list_item` table and the twenty-one `tx_theme_*`
+ * columns on `tt_content` therefore exist only because `ext_tables.sql`
+ * declares them.
  *
  * A missing column is not loud: nothing in the extension references it at boot,
  * so the suite stays green until a rendering test happens to select it. This
@@ -46,7 +47,7 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
      * Every column `Configuration/TCA/tx_theme_list_item.php` declares, plus
      * the two columns the `tx_theme_list_items` inline relation on the parent
      * side writes into the child table (`foreign_field` and
-     * `foreign_table_field`), and the fifteen columns
+     * `foreign_table_field`), and the twenty-one columns
      * `Configuration/TCA/Overrides/tt_content.php` adds to `tt_content`.
      *
      * The management columns — `uid`, `pid`, `tstamp`, `crdate`, `deleted`,
@@ -188,6 +189,36 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
             'column' => 'tx_theme_quote_style',
             'type' => StringType::class,
         ];
+        yield 'tt_content.tx_theme_cta_tone is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_cta_tone',
+            'type' => StringType::class,
+        ];
+        yield 'tt_content.tx_theme_cta_width is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_cta_width',
+            'type' => StringType::class,
+        ];
+        yield 'tt_content.tx_theme_secondary_link is a text' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_secondary_link',
+            'type' => TextType::class,
+        ];
+        yield 'tt_content.tx_theme_secondary_link_label is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_secondary_link_label',
+            'type' => StringType::class,
+        ];
+        yield 'tt_content.tx_theme_secondary_link_variant is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_secondary_link_variant',
+            'type' => StringType::class,
+        ];
+        yield 'tt_content.tx_theme_secondary_link_icon is a text' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_secondary_link_icon',
+            'type' => TextType::class,
+        ];
     }
 
     #[Test]
@@ -218,7 +249,7 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
      * TYPO3 v12 cannot render a default for a `TEXT` column on MySQL at all —
      * Doctrine's `AbstractMySQLPlatform::getDefaultValueDeclarationSQL()` drops
      * it, and the platform override that turns it into MySQL's expression
-     * default is TYPO3 v13 (Feature #103578). The two `link` columns are
+     * default is TYPO3 v13 (Feature #103578). The three `link` columns are
      * therefore declared nullable in `ext_tables.sql`, and this test is what
      * says so in a way that fails on the DBMS that cares. MySQL is the only one
      * of the four that ever failed here, so this assertion is only as good as

@@ -9,7 +9,7 @@ Important: Theme content elements have their own frame
 Description
 ===========
 
-The thirteen content elements of the theme's own - the :guilabel:`Theme` group
+The content elements of the theme's own - the :guilabel:`Theme` group
 of the :guilabel:`Create new content element` wizard - are rendered through the
 TypoScript object :typoscript:`lib.themeContentElement` instead of
 :typoscript:`lib.contentElement`. The classic content elements stay on

@@ -43,3 +43,5 @@ TCEFORM.tt_content.tx_theme_link_icon.keepItems (
 TCEFORM.tx_theme_list_item.link_icon.keepItems < TCEFORM.tt_content.tx_theme_link_icon.keepItems
 TCEFORM.tt_content.tx_theme_icon.keepItems < TCEFORM.tt_content.tx_theme_link_icon.keepItems
 TCEFORM.tx_theme_list_item.icon.keepItems < TCEFORM.tt_content.tx_theme_link_icon.keepItems
+# And for the second link of a call to action.
+TCEFORM.tt_content.tx_theme_secondary_link_icon.keepItems < TCEFORM.tt_content.tx_theme_link_icon.keepItems
