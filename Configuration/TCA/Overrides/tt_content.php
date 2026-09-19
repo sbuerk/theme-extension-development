@@ -486,8 +486,9 @@ $additionalColumns['tx_theme_cta_width'] = [
 // alternative to it - "Start now" and "Read the guide" - and a second button
 // next to the first is what the component lays out. An inline relation of
 // list items, as the link list has, would be a list where the element has
-// two fixed places. Rendered by the same "Partials/ContentElement/LinkButton.html",
-// handed these four columns as the four arguments the first link fills.
+// two fixed places. Rendered by the same
+// "Partials/ContentElement/LinkButton.html", handed these four columns as
+// the four arguments the first link fills.
 $additionalColumns['tx_theme_secondary_link'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_secondary_link',
     'config' => [
