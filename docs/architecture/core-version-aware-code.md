@@ -238,7 +238,7 @@ extended by #104311 in 13.3 for the `ctrl` derived columns). v12.4's
 `DefaultTcaSchema` does not — it only derives the management columns, the
 `category|datetime|slug|json|uuid` types and MM tables, with no branch for
 `input`, `text`, `link`, `file`, `inline` or a `select` without an MM table.
-Without an explicit definition the `tx_theme_list_item` table and the twenty-two
+Without an explicit definition the `tx_theme_list_item` table and the twenty-five
 `tx_theme_*` columns on `tt_content` are simply never created on v12, and every
 theme element using them fails.
 

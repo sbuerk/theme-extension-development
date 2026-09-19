@@ -45,6 +45,7 @@ against, and the rename was cheap while only one template depended on it.
 | Display settings        | `.theme-settings`         | `components/_settings.scss`         |
 | Dialog                  | `.theme-dialog`           | `components/_dialog.scss`           |
 | Divider                 | `.theme-divider`          | `components/_divider.scss`          |
+| Embed                   | `.theme-embed`            | `components/_embed.scss`            |
 | Feature                 | `.theme-feature`          | `components/_feature.scss`          |
 | Feature grid            | `.theme-feature-grid`     | `components/_feature.scss`          |
 | Feature introduction    | `.theme-feature-intro`    | `components/_feature.scss`          |
@@ -1094,6 +1095,32 @@ pick that up on level five.
 `Tests/Unit/ComponentLibraryTest::aTitleOnAnyHeadingLevelKeepsItsOwnCase`
 holds both to it.
 
+Embed — a video of another site, which is not requested until the reader asks
+for it. The markup carries no `iframe`, no preconnect and no image of the other
+site; `theme.js` builds the frame on the press and replaces the placeholder
+with it:
+
+```html
+<figure class="theme-embed theme-embed--16-9">
+    <div class="theme-embed__frame">
+        <img class="theme-embed__poster" src="…" alt="" width="…" height="…">
+        <button class="theme-embed__button" type="button" data-theme-embed-play
+                data-theme-embed-src="https://www.youtube-nocookie.com/embed/…"
+                data-theme-embed-title="…">
+            <span class="theme-embed__play" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
+            <span class="theme-embed__label">…</span>
+        </button>
+    </div>
+    <figcaption class="theme-embed__note">… <a class="theme-embed__source" href="…">…</a></figcaption>
+</figure>
+```
+
+`--16-9` and `--4-3` re-point `--theme-embed-ratio`, which the frame keeps
+whether it holds the placeholder or the iframe, so nothing below it moves when
+the one replaces the other. The placeholder is a **button**, not a link: a link
+would have to point somewhere, and the only place it could point is the host
+this is avoiding.
+
 Lightbox — the enlarged image of a gallery, in a dialog. A `.theme-dialog`
 first, widened for a picture; everything the dialog contract documents applies:
 
@@ -1486,7 +1513,7 @@ one-character change with no visible symptom on a desktop check.
 
 ## Components that need the script
 
-Four components depend on `Resources/Public/JavaScript/theme.js`, and each is
+Five components depend on `Resources/Public/JavaScript/theme.js`, and each is
 written so that the page is still usable without it — with JavaScript switched off, and with JavaScript on
 but `theme.js` failing to load, which are two different pages. The dialog
 opener follows the [`data-js` marker](#the-data-js-marker) like the navigation
@@ -1494,12 +1521,13 @@ toggle does; the tabs follow a marker of their own that only `theme.js` sets,
 because what they hide has to stay reachable until the script that switches
 them has actually run.
 
-| Component | With the script                                                                                                                          | Without it                                                                                         | Gate in the stylesheet                                  |
-|-----------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|---------------------------------------------------------|
-| Tabs      | WAI-ARIA tabs with automatic activation: arrow keys (mirrored right-to-left), Home, End, a roving tab stop; the panels become tab panels | No tab list; every panel shown, stacked, in its own frame under its heading, with no tab semantics | `.theme-tabs[data-theme-tabs-bound]`, set by `theme.js` |
-| Dialog    | `data-theme-dialog-open` calls `showModal()`; a click on the backdrop closes it; focus returns to the opener                             | The opener is hidden and the dialog stays closed                                                   | `:root:not([data-js]) [data-theme-dialog-open]`         |
-| Lightbox  | The gallery's zoom link opens the dialog on the image it names; the arrows and the arrow keys move within it, wrapping                   | The zoom link leads to the file, as it always did; the dialog is closed and renders nothing        | none — the link is the fallback, so nothing is hidden   |
-| Tooltip   | Escape sets `data-theme-tooltip-dismissed` until pointer and focus have both left                                                        | Hover and focus still show it; Escape does not hide it                                             | none — the CSS behaviour is the fallback                |
+| Component | With the script                                                                                                                          | Without it                                                                                         | Gate in the stylesheet                                      |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| Tabs      | WAI-ARIA tabs with automatic activation: arrow keys (mirrored right-to-left), Home, End, a roving tab stop; the panels become tab panels | No tab list; every panel shown, stacked, in its own frame under its heading, with no tab semantics | `.theme-tabs[data-theme-tabs-bound]`, set by `theme.js`     |
+| Dialog    | `data-theme-dialog-open` calls `showModal()`; a click on the backdrop closes it; focus returns to the opener                             | The opener is hidden and the dialog stays closed                                                   | `:root:not([data-js]) [data-theme-dialog-open]`             |
+| Lightbox  | The gallery's zoom link opens the dialog on the image it names; the arrows and the arrow keys move within it, wrapping                   | The zoom link leads to the file, as it always did; the dialog is closed and renders nothing        | none — the link is the fallback, so nothing is hidden       |
+| Embed     | The play button builds the `iframe` from `data-theme-embed-src` and replaces the placeholder with it                                     | No play button; the poster, the note and the link to the source                                    | `.theme-embed[data-theme-embed-bound] .theme-embed__button` |
+| Tooltip   | Escape sets `data-theme-tooltip-dismissed` until pointer and focus have both left                                                        | Hover and focus still show it; Escape does not hide it                                             | none — the CSS behaviour is the fallback                    |
 
 **Tabs.** The markup keeps three rules that the stylesheet and the script both
 depend on: the first tab is the selected one and every other tab carries

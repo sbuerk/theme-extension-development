@@ -924,6 +924,7 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_teaser_list`       | Rows of teasers, each row one link                       | `.theme-list-group`                                     |
 | `theme_carousel`          | Slides in one track that scrolls sideways; no autoplay   | `.theme-carousel`                                       |
 | `theme_split_tiles`       | Featurettes whose picture side alternates                | `.theme-split-tiles`                                    |
+| `theme_external_media`    | A video of another site, loaded only on request          | `.theme-embed`                                          |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -984,7 +985,7 @@ its own prefix, rather than overlooked.
 
 ### `ext_tables.sql`, and why it exists although the schema derives from TCA
 
-On TYPO3 v13 the whole schema for `tx_theme_list_item` and the twenty-two
+On TYPO3 v13 the whole schema for `tx_theme_list_item` and the twenty-five
 `tx_theme_*` columns added to `tt_content` comes from
 `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()` reading the TCA at
 compare-schema time (#101553, extended by #104311 in 13.3).
@@ -992,7 +993,7 @@ compare-schema time (#101553, extended by #104311 in 13.3).
 **TYPO3 v12 does none of that.** Its `DefaultTcaSchema` derives the management
 columns from `ctrl`, the `category|datetime|slug|json|uuid` types and MM tables,
 and has no branch for `input`, `text`, `link`, `file`, `inline` or a `select`
-without an MM table — so on v12 the table and the twenty-two columns are simply
+without an MM table — so on v12 the table and the twenty-five columns are simply
 never created and every theme element using them fails.
 [`ext_tables.sql`](../../ext_tables.sql) therefore ships the
 definitions v13 would generate, reproduced column for column from what v13's own

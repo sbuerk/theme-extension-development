@@ -134,6 +134,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         'theme_teaser_list' => 'teaser-list',
         'theme_carousel' => 'carousel',
         'theme_split_tiles' => 'split-tiles',
+        'theme_external_media' => 'external-media',
     ];
 
     /**
@@ -151,6 +152,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         'theme_card_group' => ['layout', 'tx_theme_columns'],
         'theme_timeline' => ['tx_theme_sort_direction'],
         'theme_split_tiles' => ['layout'],
+        'theme_external_media' => ['tx_theme_embed_ratio'],
     ];
 
     protected const LANGUAGE_PRESETS = [
