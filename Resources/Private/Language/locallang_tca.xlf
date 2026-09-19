@@ -363,6 +363,9 @@
 			<trans-unit id="tt_content.tx_theme_columns">
 				<source>Columns, at most</source>
 			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_columns.description">
+				<source>At most this many side by side. A narrower screen shows fewer, a phone one.</source>
+			</trans-unit>
 			<trans-unit id="tt_content.tx_theme_columns.I.2">
 				<source>Two</source>
 			</trans-unit>
@@ -515,9 +518,78 @@
 				<source>Centred, with a quotation mark</source>
 			</trans-unit>
 
+			<!-- tt_content: CType theme_card_group -->
+			<trans-unit id="tt_content.CType.theme_card_group.label">
+				<source>Card group</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_card_group.description">
+				<source>Cards with an image, a title, a text and a button, in a grid or in one row that scrolls sideways.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.cards">
+				<source>Cards</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_card_group.label">
+				<source>Cards</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_card_group.I.0">
+				<source>Grid</source>
+			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_card_group.I.1">
+				<source>Scroller: one row that scrolls sideways</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_timeline -->
+			<trans-unit id="tt_content.CType.theme_timeline.label">
+				<source>Timeline</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_timeline.description">
+				<source>Dated entries on a line, oldest or newest first.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.entries">
+				<source>Entries</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_timeline.label">
+				<source>Entries</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_sort_direction">
+				<source>Order</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_sort_direction.description">
+				<source>The entries are sorted by their date. The order of the list below decides only between entries of the same date.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_sort_direction.I.asc">
+				<source>Oldest first</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_sort_direction.I.desc">
+				<source>Newest first</source>
+			</trans-unit>
+
+			<!-- tt_content: CType theme_teaser_list -->
+			<trans-unit id="tt_content.CType.theme_teaser_list.label">
+				<source>Teaser list</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_teaser_list.description">
+				<source>Rows with a small image, a title, a text, a date and meta data. Each row is one link.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.rows">
+				<source>Rows</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_list_items.types.theme_teaser_list.label">
+				<source>Rows</source>
+			</trans-unit>
+
 			<!-- tx_theme_list_item -->
 			<trans-unit id="tx_theme_list_item">
 				<source>Theme: List item</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.date">
+				<source>Date</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.meta">
+				<source>Meta data</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.link_variant">
+				<source>Link style</source>
 			</trans-unit>
 			<trans-unit id="tx_theme_list_item.header">
 				<source>Title</source>

@@ -168,6 +168,9 @@
 			<trans-unit id="theme.authorLinksLabel">
 				<source>Links</source>
 			</trans-unit>
+			<trans-unit id="theme.cardGroupLabel">
+				<source>Cards</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

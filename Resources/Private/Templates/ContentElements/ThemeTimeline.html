@@ -1,0 +1,64 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    "theme_timeline" - dated entries on a line, on ".theme-timeline"
+    (Resources/Private/Scss/components/_timeline.scss).
+
+    The entries are "tx_theme_list_items", resolved like those of
+    "ThemeMediaTeaserGrid.html" and sorted by their date in the TypoScript
+    ("tt_content.theme_timeline"), so this template renders them in the order
+    it gets them. An "ol": the order is part of what a timeline says.
+
+    The date is a "time" element: "datetime" carries the ISO date, the
+    visible text the ICU pattern "d MMMM y" in the locale of the site
+    language - "12 January 2026" for English. "pattern" is part of
+    "f:format.date" since TYPO3 12.3 (Feature #100187, "ICU-based date and
+    time formatting"), on both core versions this template serves. The date
+    column is a native "DATE" and is required on this relation; an entry
+    without one still renders, without its "time".
+
+    The section "Marker" is where the axis of an entry is decided. An entry
+    with a usable "icon" - the item's icon the features, the figures and the
+    steps show - shows it in ".theme-timeline__icon", and the stylesheet
+    drops the ring for that item. The icon is rendered with "optional" into
+    a variable first, as in "ThemeSteps.html": a name the set no longer has
+    leaves the ring, not an empty slot on the line.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <ol class="theme-timeline">
+            <f:for each="{listItems}" as="item">
+                <li class="theme-timeline__item">
+                    <f:render section="Marker" arguments="{item: item}" />
+                    <f:if condition="{item.data.date}">
+                        <time class="theme-timeline__date" datetime="{f:format.date(date: item.data.date, format: 'Y-m-d')}"><f:format.date date="{item.data.date}" pattern="d MMMM y" /></time>
+                    </f:if>
+                    <f:if condition="{item.data.header}">
+                        <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-timeline__title', title: item.data.header}" />
+                    </f:if>
+                    <f:if condition="{item.files.0}">
+                        <div class="theme-timeline__media">
+                            <f:image image="{item.files.0}" loading="lazy" />
+                        </div>
+                    </f:if>
+                    <f:if condition="{item.data.text}">
+                        <p class="theme-timeline__text"><f:format.nl2br>{item.data.text}</f:format.nl2br></p>
+                    </f:if>
+                </li>
+            </f:for>
+        </ol>
+    </f:if>
+</f:section>
+
+<f:section name="Marker">
+    <f:variable name="icon"><f:if condition="{item.data.icon}"><theme:icon name="{item.data.icon}" optional="1" /></f:if></f:variable>
+    <f:if condition="{icon}"><span class="theme-timeline__icon" aria-hidden="true">{icon -> f:format.raw()}</span></f:if>
+</f:section>
+
+</html>

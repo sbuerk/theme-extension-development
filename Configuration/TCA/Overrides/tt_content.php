@@ -292,7 +292,8 @@ $additionalColumns['tx_theme_icon_size'] = [
 // The most columns an element lays its items out in - the modifiers
 // "--columns-2" to "--columns-4" of ".theme-feature-grid". Named for the grid,
 // not for the one element that has it so far, so a later element with a grid
-// of items offers the same column.
+// of items offers the same column: the card group lays out its cards by it,
+// and its scroller reads it as the number of cards in view.
 //
 // Integer values. v12.4 derives no column from a "select" without an MM
 // table, so it is declared in "ext_tables.sql" as the unsigned INT v13.4
@@ -300,11 +301,12 @@ $additionalColumns['tx_theme_icon_size'] = [
 // gives every integer select 0
 // ("DefaultTcaSchema::enrichSingleTableFieldsFromTcaColumns()", read on
 // v13.4.35). A record written through the form carries the TCA default, and
-// the template renders 0 - and every other value it does not know - as three
-// columns, so a row written without the column renders as three columns as
-// well.
+// the templates of the features and of the card group render 0 - and every
+// other value they do not know - as three columns, so a row written without
+// the column renders as three columns as well.
 $additionalColumns['tx_theme_columns'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_columns',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_columns.description',
     'config' => [
         'type' => 'select',
         'renderType' => 'selectSingle',
@@ -363,6 +365,29 @@ $additionalColumns['tx_theme_hero_layout'] = [
             [
                 'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_hero_layout.I.bordered',
                 'value' => 'bordered',
+            ],
+        ],
+    ],
+];
+
+// The order of the entries of a "theme_timeline", by their date. The order of
+// the inline list decides only between entries of one date - see
+// "tt_content.theme_timeline" in ContentElements.typoscript.
+$additionalColumns['tx_theme_sort_direction'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_sort_direction',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_sort_direction.description',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => 'asc',
+        'items' => [
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_sort_direction.I.asc',
+                'value' => 'asc',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_sort_direction.I.desc',
+                'value' => 'desc',
             ],
         ],
     ],
@@ -462,7 +487,7 @@ $additionalColumns['tx_theme_cta_width'] = [
 // next to the first is what the component lays out. An inline relation of
 // list items, as the link list has, would be a list where the element has
 // two fixed places. Rendered by the same "Partials/ContentElement/LinkButton.html",
-// handed these four columns under the names of the first link.
+// handed these four columns as the four arguments the first link fills.
 $additionalColumns['tx_theme_secondary_link'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_secondary_link',
     'config' => [

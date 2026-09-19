@@ -29,7 +29,7 @@
 
     The two links are the "theme_link" palette and the "theme_secondary_link"
     palette, both rendered by "Partials/ContentElement/LinkButton.html" - the
-    second handed its four columns under the names of the first, so the style
+    second handed its four columns as the arguments the first fills, so the style
     and the icon of either link are decided by one set of cases. Either link
     may be empty; with neither, the element renders no row of actions.
 
@@ -70,8 +70,8 @@
         </f:if>
         <f:if condition="{data.tx_theme_link} || {data.tx_theme_secondary_link}">
             <div class="theme-cta__actions">
-                <f:render partial="ContentElement/LinkButton" arguments="{data: data}" />
-                <f:render partial="ContentElement/LinkButton" arguments="{data: {tx_theme_link: data.tx_theme_secondary_link, tx_theme_link_label: data.tx_theme_secondary_link_label, tx_theme_link_variant: data.tx_theme_secondary_link_variant, tx_theme_link_icon: data.tx_theme_secondary_link_icon}}" />
+                <f:render partial="ContentElement/LinkButton" arguments="{link: data.tx_theme_link, label: data.tx_theme_link_label, variant: data.tx_theme_link_variant, icon: data.tx_theme_link_icon}" />
+                <f:render partial="ContentElement/LinkButton" arguments="{link: data.tx_theme_secondary_link, label: data.tx_theme_secondary_link_label, variant: data.tx_theme_secondary_link_variant, icon: data.tx_theme_secondary_link_icon}" />
             </div>
         </f:if>
     </section>

@@ -116,7 +116,7 @@
         </f:if>
         <f:if condition="{data.tx_theme_link}">
             <div class="theme-hero__actions">
-                <f:render partial="ContentElement/LinkButton" arguments="{data: data}" />
+                <f:render partial="ContentElement/LinkButton" arguments="{link: data.tx_theme_link, label: data.tx_theme_link_label, variant: data.tx_theme_link_variant, icon: data.tx_theme_link_icon}" />
             </div>
         </f:if>
     </div>

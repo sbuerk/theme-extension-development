@@ -252,8 +252,9 @@ development and test instances do not install it. What that covers:
 *   All eleven menu elements — see :ref:`feature-menu-content-elements`.
 *   The content elements of the theme's own, in a :guilabel:`Theme` group —
     see :ref:`feature-theme-content-elements`,
-    :ref:`feature-notice-tabs-accordion-elements` and
-    :ref:`feature-icon-content-elements`.
+    :ref:`feature-notice-tabs-accordion-elements`,
+    :ref:`feature-icon-content-elements` and
+    :ref:`feature-card-group-timeline-teaser-list`.
 *   Third-party Extbase plugins, which render through a generic template
     without any per-plugin configuration — see
     :ref:`feature-extbase-plugin-rendering` — on both delivery paths, the

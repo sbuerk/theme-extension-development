@@ -245,7 +245,12 @@ final class IconContentElementFormEngineTest extends AbstractFunctionalTestCase
         yield 'features' => ['uid' => self::FEATURES, 'icon' => true, 'subheader' => false];
         yield 'figures' => ['uid' => self::STATS, 'icon' => true, 'subheader' => true];
         yield 'steps' => ['uid' => self::STEPS, 'icon' => true, 'subheader' => false];
-        // Relations of the other theme elements, which render no item icon.
+        // The timeline shows the icon of an entry on its line.
+        yield 'timeline' => ['uid' => 250, 'icon' => true, 'subheader' => false];
+        // Relations of the other theme elements, which render no item icon;
+        // the card group shows the subheader below the title of a card.
+        yield 'card group' => ['uid' => 240, 'icon' => false, 'subheader' => true];
+        yield 'teaser list' => ['uid' => 260, 'icon' => false, 'subheader' => false];
         yield 'link list' => ['uid' => 80, 'icon' => false, 'subheader' => false];
         yield 'teaser grid' => ['uid' => 100, 'icon' => false, 'subheader' => false];
     }

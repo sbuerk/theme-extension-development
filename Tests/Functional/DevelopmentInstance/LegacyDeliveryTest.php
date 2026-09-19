@@ -293,18 +293,30 @@ final class LegacyDeliveryTest extends AbstractInstanceSeedTestCase
     }
 
     /**
+     * A content element is mirrored when it sits on a page of the mirror - page
+     * uids move by the offset as well - and its original exists. The page is
+     * part of the test: the uid alone is ambiguous once the showcase uses two
+     * decades ten pages apart. The mirror of the content of page 70 is 8001 and
+     * up, the content of page 90 is 9001 and up, and 9001 less the offset then
+     * exists although 9001 is an original - and a specimen of the styleguide
+     * that writes "c9001" into its markup was translated on the mirror side.
+     *
      * @return array<int, true>
      */
     private function mirroredContentUids(): array
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tt_content');
         $queryBuilder->getRestrictions()->removeAll();
-        $uids = $queryBuilder->select('uid')->from('tt_content')->executeQuery()->fetchFirstColumn();
-        $existing = array_fill_keys(array_map('intval', $uids), true);
+        /** @var list<array{uid: int|string, pid: int|string}> $rows */
+        $rows = $queryBuilder->select('uid', 'pid')->from('tt_content')->executeQuery()->fetchAllAssociative();
+        $pages = [];
+        foreach ($rows as $row) {
+            $pages[(int)$row['uid']] = (int)$row['pid'];
+        }
 
         $mirrored = [];
-        foreach (array_keys($existing) as $uid) {
-            if ($uid > self::OFFSET && isset($existing[$uid - self::OFFSET])) {
+        foreach ($pages as $uid => $pid) {
+            if ($uid > self::OFFSET && $pid > self::OFFSET && isset($pages[$uid - self::OFFSET])) {
                 $mirrored[$uid] = true;
             }
         }

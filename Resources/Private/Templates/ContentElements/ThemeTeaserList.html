@@ -1,0 +1,65 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_teaser_list" - rows of teasers, on ".theme-list-group"
+    (Resources/Private/Scss/components/_list-group.scss).
+
+    The rows are "tx_theme_list_items", resolved like those of
+    "ThemeMediaTeaserGrid.html", in the order of the relation.
+
+    A row has one link, and the title is it: "ItemHeading" renders the title
+    as "f:link.typolink" inside the heading, and the stylesheet stretches the
+    link over the row, so the whole row is its target and nothing interactive
+    is nested in anything else. A row without a link has a title of plain text
+    and is no target. "link" is TCA type=link, so "f:link.typolink", never a
+    plain "href" - see "Partials/ContentElement/LinkList.html".
+
+    The image is an avatar, ".theme-avatar" (components/_avatar.scss), in its
+    decorative form: it sits beside the visible title of the row, which names
+    it, so it takes an empty "alt" rather than the alternative text of its
+    file reference, which would be read out next to the title. It is written
+    as an "img" of its own with "f:uri.image", so its attributes are exactly
+    those of the avatar contract; the file is processed to 80 pixels square,
+    twice the 40 of the avatar. The date is a "time"
+    element, formatted like the date of "ThemeTimeline.html"; the meta data is
+    plain text beside it. Neither is rendered when empty, and the whole
+    "__meta" block is left out when both are.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <ul class="theme-list-group">
+            <f:for each="{listItems}" as="item">
+                <li class="theme-list-group__item">
+                    <f:if condition="{item.files.0}">
+                        <span class="theme-avatar"><img class="theme-avatar__image" src="{f:uri.image(image: item.files.0, width: '80c', height: '80c')}" alt="" width="40" height="40" loading="lazy"></span>
+                    </f:if>
+                    <div class="theme-list-group__body">
+                        <f:if condition="{item.data.header}">
+                            <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-list-group__title', title: item.data.header, link: item.data.link, linkClass: 'theme-list-group__link'}" />
+                        </f:if>
+                        <f:if condition="{item.data.text}">
+                            <p class="theme-list-group__text"><f:format.nl2br>{item.data.text}</f:format.nl2br></p>
+                        </f:if>
+                    </div>
+                    <f:if condition="{item.data.date} || {item.data.meta}">
+                        <p class="theme-list-group__meta">
+                            <f:if condition="{item.data.date}">
+                                <time datetime="{f:format.date(date: item.data.date, format: 'Y-m-d')}"><f:format.date date="{item.data.date}" pattern="d MMMM y" /></time>
+                            </f:if>
+                            <f:if condition="{item.data.meta}">
+                                <span>{item.data.meta}</span>
+                            </f:if>
+                        </p>
+                    </f:if>
+                </li>
+            </f:for>
+        </ul>
+    </f:if>
+</f:section>
+
+</html>
