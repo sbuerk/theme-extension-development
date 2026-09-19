@@ -73,11 +73,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                             |
-|----------------------|------------------------------------------------------------------|
-| `pages`              | 1 to 10                                                          |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603 |
-| `tx_theme_list_item` | 1 to 18 on page 8, in declaration order                          |
+| Table                | Uids                                                                                                |
+|----------------------|-----------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39 and 50 and up — every other decade, see [below](#why-new-pages-skip-decades) |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502     |
+| `tx_theme_list_item` | 1 to 18 on page 8, in declaration order                                                             |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -101,6 +101,33 @@ follow — data-factory resolves each to the uid the run actually wrote — but
 nothing else does: a link, a menu page list, `tt_content_601` and an inline list
 are literal uids in a field, and would then name whatever record of the
 installation carries them.
+
+### Why new pages skip decades
+
+The development instances import the showcase together with a generated
+mirror of it that moves **every uid by 1000**, in every table — see
+[The instance set](#the-instance-set-the-showcase-delivered-twice). A content
+element's uid is its page times 100 plus its position, so 1000 is ten pages:
+the mirror of the content of page *p* takes the uids of the content of page
+*p* + 10. With pages 1 to 10 alone that never mattered. For a page added after
+them it decides which uids are free:
+
+| Page uids | Taken by                                                                                      |
+|-----------|-----------------------------------------------------------------------------------------------|
+| 11–19     | nothing as pages, but their content uids 1101–1999 are the mirror of the content of pages 1–9 |
+| 20–29     | the account pages of the instance set, `Accounts.yaml` — 20, 21, 22, content 2101 and 2201    |
+| 30–39     | new pages; the mirror of their content is 4001–4999                                           |
+| 50–59     | new pages; the mirror of their content is 6001–6999                                           |
+
+So a new page takes a uid in an odd decade from 30 up — 30–39, 50–59, then
+70–79 and 90–99 — and the even decade after it stays free for its mirror. The
+rule is stated at the top of `Scenario.yaml` as well, and
+`Tests/Unit/GeneratedLegacyScenarioTest::theInstanceSetDeclaresNoUidTwice()`
+walks the composed set of the v12 instance, `theme-instance-core12` —
+showcase, mirror, accounts and the root template, a superset of
+`theme-instance` — and fails on any uid declared twice in one table, which is
+what a page in the wrong decade produces. A page uid itself is safe up to 999:
+the mirror's pages are 1001 and up.
 
 ## Relations
 
@@ -140,21 +167,24 @@ scenario that seeds less than it says. Only `page` is a node here.
 ## The demo tree
 
 Not a sample of the format — the frontend this extension is developed against.
-Ten pages, and between them every backend layout the extension registers and
-every `CType` it renders:
+The first ten pages carry between them every backend layout the extension
+registers and every `CType` it renders; the pages below them show every
+classic `CType` in its variants, and every appearance value:
 
-| uid | Title          | Slug              | `backend_layout`  | What it is for                                                                             |
-|-----|----------------|-------------------|-------------------|--------------------------------------------------------------------------------------------|
-| 1   | Theme demo     | `/`               | `start`           | The site root, and the footer columns.                                                     |
-| 2   | Typography     | `/typography`     | `content`         | Running text, and the four content element bands with header positions, looks and spacing. |
-| 3   | Media          | `/media`          | `content`         | One image, and a two column gallery.                                                       |
-| 4   | Empty page     | `/empty`          | *(none)*          | The `default` layout fallback.                                                             |
-| 5   | Elements       | `/elements`       | `content`         | The showcase branch, parent of 6 to 8.                                                     |
-| 6   | Core elements  | `/elements/core`  | `content_sidebar` | Every classic `CType` the theme renders.                                                   |
-| 7   | Menu elements  | `/elements/menu`  | `content_sidebar` | The eleven `menu_*` elements.                                                              |
-| 8   | Theme elements | `/elements/theme` | `content`         | The thirteen `theme_*` elements.                                                           |
-| 9   | Styleguide     | `/styleguide`     | `styleguide`      | The component library, straight from Fluid.                                                |
-| 10  | Forms          | `/forms`          | `forms`           | The form showcase, straight from Fluid.                                                    |
+| uid       | Title                   | Slug                     | `backend_layout`  | What it is for                                                                             |
+|-----------|-------------------------|--------------------------|-------------------|--------------------------------------------------------------------------------------------|
+| 1         | Theme demo              | `/`                      | `start`           | The site root, and the footer columns.                                                     |
+| 2         | Typography              | `/typography`            | `content`         | Running text, and the four content element bands with header positions, looks and spacing. |
+| 3         | Media                   | `/media`                 | `content`         | One image, and a two column gallery.                                                       |
+| 4         | Empty page              | `/empty`                 | *(none)*          | The `default` layout fallback.                                                             |
+| 5         | Elements                | `/elements`              | `content`         | The showcase branch, parent of 6 to 8.                                                     |
+| 6         | Core elements           | `/elements/core`         | `content_sidebar` | Every classic `CType` the theme renders.                                                   |
+| 7         | Menu elements           | `/elements/menu`         | `content_sidebar` | The eleven `menu_*` elements.                                                              |
+| 8         | Theme elements          | `/elements/theme`        | `content`         | The thirteen `theme_*` elements.                                                           |
+| 30–39, 50 | Header … Insert records | `/elements/core/<CType>` | `content_sidebar` | One page per classic `CType` below page 6, with its variants — see below.                  |
+| 51        | Frames                  | `/elements/frames`       | `content`         | Every frame, spacing, header alignment and header look of the Appearance tab.              |
+| 9         | Styleguide              | `/styleguide`            | `styleguide`      | The component library, straight from Fluid.                                                |
+| 10        | Forms                   | `/forms`                 | `forms`           | The form showcase, straight from Fluid.                                                    |
 
 Four properties of that tree are deliberate, and are asserted by
 `Tests/Functional/ShowcaseTreeTest.php` rather than left to a reader to
