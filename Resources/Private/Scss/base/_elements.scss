@@ -94,15 +94,53 @@ h6 {
     font-size: var(--theme-font-size-xs);
 }
 
+// A secondary line inside a heading - a qualifier, a version, a subtitle that
+// belongs to the same outline entry: "<h2>Release notes <small>for 2.0</small></h2>".
+// The caption rule for "small" further down would set it at a fixed 12px,
+// which is a footnote next to a 34px title, so inside a heading it is sized
+// relative to the heading instead. 0.7em puts it on the scale where it
+// matters most - 24px under a first level, 14px under a third - and the floor
+// keeps it from dropping below the caption size under the small levels.
+//
+// @todo "0.7em" is type-relative like the "sub"/"sup" offsets below and has no
+//       token for the same reason: the scale is rem-based and could not track
+//       whichever heading level the element sits in.
+:is(h1, h2, h3, h4, h5, h6) small {
+    color: var(--theme-color-text-secondary);
+    font-size: max(0.7em, var(--theme-font-size-xs));
+    font-weight: var(--theme-font-weight-regular);
+    letter-spacing: inherit;
+}
+
 // --- Prose blocks --------------------------------------------------------
 
 // Body is the one role in DESIGN.md with zero tracking. Stated as a token
 // rather than left to the initial value, so a paragraph nested inside a
 // tracked ancestor - "letter-spacing" is inherited - cannot pick the tracking
 // up by accident.
+//
+// "text-wrap: pretty" is the paragraph counterpart of the headings' "balance":
+// it only looks at the last lines of a paragraph and avoids leaving a single
+// word on the last one. Where a browser does not know the value it is ignored
+// and the paragraph wraps greedily, as before.
 p {
     margin: 0 0 var(--theme-space-4);
     letter-spacing: var(--theme-letter-spacing-none);
+    text-wrap: pretty;
+}
+
+// Hyphenation needs the language: "hyphens: auto" hyphenates by the
+// dictionary of the element's "lang", and does nothing without one. It is
+// switched on for German only, where compounds routinely outgrow a narrow
+// column - a sidebar, a table cell, a phone - and a ragged gap or an
+// overflowing word is the alternative. English prose is left unhyphenated:
+// its words are short enough that "text-wrap: pretty" is all the ragged edge
+// needs, and hyphenating it would change every paragraph of an English site
+// for little gain. A site package that wants it for another language adds the
+// same rule with its own ":lang()". The result still depends on the browser
+// shipping a dictionary for the language; one that does not simply wraps.
+:where(p, li, dd, blockquote, figcaption):lang(de) {
+    hyphens: auto;
 }
 
 hr {
@@ -196,6 +234,19 @@ a {
     }
 }
 
+// A URL written out as the link text is one word as far as line breaking is
+// concerned. The body's "overflow-wrap: break-word" already breaks it rather
+// than widening the page, but it does not lower the minimum width the link
+// asks for, so in a list item or a definition beside other content the
+// container still grows to the full URL. "anywhere" does both. It is scoped to
+// links in prose blocks: it only ever breaks inside a word that does not fit
+// its line, so ordinary link text wraps exactly as before, and the controls
+// that happen to be links - buttons, navigation - are not in these blocks.
+// Where the break points matter, the author adds "<wbr>" after a slash.
+:where(p, li, dd, blockquote, figcaption, address) a {
+    overflow-wrap: anywhere;
+}
+
 // A link that wraps only an image carries no text to underline or recolour,
 // so the hover state has to say "clickable" a different way: the image dims
 // instead. Reusing the disabled opacity rather than inventing a second one -
@@ -227,13 +278,15 @@ caption {
 
     // The UA default centres a caption above the table; every other block in
     // this baseline starts at the inline edge, and a caption is no different.
-    text-align: left;
+    // "start", not "left": in a right-to-left document the inline edge is the
+    // right one, and every other declaration in this file is logical.
+    text-align: start;
 }
 
 th,
 td {
     padding: var(--theme-space-2) var(--theme-space-3);
-    text-align: left;
+    text-align: start;
 
     // The UA default is "middle", which reads oddly the moment a cell wraps
     // to a second line - "top" keeps every row's first line level.
@@ -335,9 +388,23 @@ cite {
     font-style: italic;
 }
 
+// The defining instance of a term - the one place a text says what the word
+// means. Italic like the UA has it, and medium weight on top, so it does not
+// read as the plain emphasis "em" and "var" are also set in.
+dfn {
+    font-style: italic;
+    font-weight: var(--theme-font-weight-medium);
+}
+
 // "quotes" is set explicitly because the UA default set differs by browser
 // and by the document's declared language - two nested "q" elements should
 // not render one style of mark in one engine and another in the next.
+//
+// The language still decides, but through the pairs below rather than
+// through whatever an engine ships: German opens low, French sets guillemets
+// with a narrow no-break space inside them. ":lang()" matches the inherited
+// language, so a "q" in a German page and a "q lang=de" in an English one are
+// the same case. Every other language gets the English pairs.
 q {
     quotes: '“' '”' '‘' '’';
 
@@ -348,6 +415,14 @@ q {
     &::after {
         content: close-quote;
     }
+}
+
+q:lang(de) {
+    quotes: '„' '“' '‚' '‘';
+}
+
+q:lang(fr) {
+    quotes: '«\202F' '\202F»' '‹\202F' '\202F›';
 }
 
 // Tabular figures keep a column of dated items lining up; proportional
@@ -369,6 +444,16 @@ kbd {
     font-family: var(--theme-font-family-mono);
     font-size: var(--theme-font-size-mono);
     line-height: var(--theme-line-height-mono);
+}
+
+// A key combination is a "kbd" of "kbd"s - "<kbd><kbd>Ctrl</kbd>+<kbd>K</kbd></kbd>",
+// the nesting HTML defines for it. Every key keeps its frame; the combination
+// around them drops its own, or the keys and the plus signs would sit inside
+// a second box.
+kbd:has(kbd) {
+    padding-inline: 0;
+    border: 0;
+    background-color: transparent;
 }
 
 samp {

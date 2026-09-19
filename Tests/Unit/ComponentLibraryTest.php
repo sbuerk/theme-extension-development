@@ -66,6 +66,8 @@ final class ComponentLibraryTest extends UnitTestCase
             'tabs' => '.theme-tabs',
             'teaser' => '.theme-teaser',
             'display text role' => '.theme-display',
+            'display size one' => '.theme-display--1',
+            'display size three' => '.theme-display--3',
             'eyebrow text role' => '.theme-eyebrow',
             'lead text role' => '.theme-lead',
             'tooltip' => '.theme-tooltip',
@@ -191,6 +193,25 @@ final class ComponentLibraryTest extends UnitTestCase
             $this->stylesheet(),
             'An opener without the script marker is a button that does nothing.',
         );
+    }
+
+    /**
+     * Text is aligned to the start and the end of a line, never to its left
+     * and right.
+     *
+     * In a right-to-left page the start of a line is its right edge. Every
+     * spacing and border of the library is written in logical properties, and a
+     * physical `text-align` is the one that still slips in - the element
+     * baseline carried two, on the caption and on the table cells, which
+     * aligned the text of a right-to-left table against the wrong edge while
+     * every left-to-right check looked right.
+     */
+    #[Test]
+    public function textIsAlignedToTheStartOrTheEndOfTheLine(): void
+    {
+        preg_match_all('/text-align:(left|right)\b/', $this->stylesheet(), $physical);
+
+        $this->assertSame([], $physical[0], 'Use "start" or "end" - a physical alignment does not follow the direction of the text.');
     }
 
     /**
