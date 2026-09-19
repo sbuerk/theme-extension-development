@@ -84,6 +84,8 @@ final class ComponentLibraryTest extends UnitTestCase
             'sub navigation' => '.theme-nav-sub',
             'pagination' => '.theme-pagination',
             'panel' => '.theme-panel',
+            'pricing' => '.theme-pricing',
+            'pricing plan' => '.theme-pricing__plan',
             'progress' => '.theme-progress',
             'quote' => '.theme-quote',
             'display settings' => '.theme-settings',
@@ -425,6 +427,7 @@ final class ComponentLibraryTest extends UnitTestCase
         yield 'card title' => ['selector' => '.theme-card__title'];
         yield 'timeline title' => ['selector' => '.theme-timeline__title'];
         yield 'list group title' => ['selector' => '.theme-list-group__title'];
+        yield 'pricing plan name' => ['selector' => '.theme-pricing__name'];
     }
 
     /**

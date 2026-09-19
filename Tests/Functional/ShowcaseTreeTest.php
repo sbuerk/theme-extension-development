@@ -135,6 +135,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         'theme_carousel' => 'carousel',
         'theme_split_tiles' => 'split-tiles',
         'theme_external_media' => 'external-media',
+        'theme_pricing' => 'pricing',
     ];
 
     /**

@@ -3373,6 +3373,95 @@ entities:
                             tx_theme_embed_url: 'https://media.example.org/videos/the-launch'
                             tx_theme_embed_title: 'A recording of the launch'
                             tx_theme_embed_ratio: '16-9'
+                # The pricing plans. "content" rather than "content_sidebar",
+                # unlike most of its siblings: three plans share one row above
+                # 48rem, and beside the sub navigation the column is too narrow
+                # for three columns of prices to be compared at a glance.
+                #
+                # The features are one per line - a literal block, not a folded
+                # one, because a line break is the structure of that column
+                # here rather than a wrap of the source. The relation says so
+                # with "wrap = off", the way the core marks the "bodytext" of
+                # the bullet list.
+                - self:
+                      id: 170
+                      title: 'Pricing'
+                      slug: '/elements/theme/pricing'
+                      backend_layout: 'content'
+                      abstract: 'Plans side by side, each with a price, what it is per, its features and a button.'
+                  entities:
+                    content:
+                      - self:
+                            id: 17001
+                            CType: 'header'
+                            header: 'Pricing'
+                            header_layout: 1
+                      # Three plans, the middle one highlighted: the modifier is
+                      # shown beside the plans it is meant to be compared
+                      # against. The prices are of different widths on purpose,
+                      # which is what the tabular figures line up.
+                      - self:
+                            id: 17002
+                            CType: 'theme_pricing'
+                            header: 'Three plans'
+                            header_layout: 2
+                            tx_theme_list_items: '500,501,502'
+                      # One plan takes the whole column: the element lays out
+                      # the plans it is given and has no column count to pick.
+                      - self:
+                            id: 17003
+                            CType: 'theme_pricing'
+                            header: 'A single plan'
+                            header_layout: 2
+                            tx_theme_list_items: '503'
+                    listItem:
+                      - self:
+                            id: 500
+                            header: 'Starter'
+                            subheader: '0 €'
+                            meta: 'per month'
+                            text: |-
+                              One site
+                              Community support
+                            link: 't3://page?uid=10'
+                            link_label: 'Start for nothing'
+                            link_variant: 'secondary'
+                      # The recommended plan, and the only one of the three with
+                      # "highlighted" set.
+                      - self:
+                            id: 501
+                            header: 'Team'
+                            subheader: '19 €'
+                            meta: 'per seat and month'
+                            highlighted: 1
+                            text: |-
+                              Ten sites
+                              Support within one working day
+                              Staging and deployment
+                              Audit log
+                            link: 't3://page?uid=10'
+                            link_label: 'Choose Team'
+                      # No link: a plan an editor left without one ends with its
+                      # features.
+                      - self:
+                            id: 502
+                            header: 'Agency'
+                            subheader: '49 €'
+                            meta: 'per seat and month'
+                            text: |-
+                              Sites without a limit
+                              Support within four hours
+                              A named contact
+                      - self:
+                            id: 503
+                            header: 'Everything, one price'
+                            subheader: '99 €'
+                            meta: 'per month'
+                            text: |-
+                              Every feature of every plan above
+                              Support within four hours
+                            link: 't3://page?uid=10'
+                            link_label: 'Get in touch'
 
                 # The layouts and the eyebrow of the three heroes. The images
                 # are attached in "config.yml". "header_layout" 2 throughout:

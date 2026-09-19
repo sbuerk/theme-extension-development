@@ -257,8 +257,9 @@ development and test instances do not install it. What that covers:
     :ref:`feature-notice-tabs-accordion-elements`,
     :ref:`feature-icon-content-elements`,
     :ref:`feature-card-group-timeline-teaser-list`,
-    :ref:`feature-carousel-and-split-tiles` and
-    :ref:`feature-external-media`.
+    :ref:`feature-carousel-and-split-tiles`,
+    :ref:`feature-external-media` and
+    :ref:`feature-pricing-element`.
 *   A wall layout for the card group — see :ref:`feature-card-wall`.
 *   :guilabel:`Enlarge on click`, which opens a lightbox — see
     :ref:`feature-gallery-lightbox`.
