@@ -69,7 +69,13 @@
 
 // Pushed to the bottom so a row of cards with unequal text still lines its
 // links up.
+// A flex item of the body, and so a block box already; "flex" rather than
+// "inline-flex" keeps it one, the width of the card. "gap" spaces an icon an
+// editor gave the link from its label, and does nothing for a label alone.
 .theme-card__link {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-space-2);
     margin-top: auto;
     color: var(--theme-color-primary);
     font-size: var(--theme-font-size-sm);

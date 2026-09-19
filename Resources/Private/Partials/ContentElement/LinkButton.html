@@ -1,13 +1,14 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     The "theme_link" palette (tx_theme_link + tx_theme_link_label +
-    tx_theme_link_variant, Configuration/TCA/Overrides/tt_content.php),
-    rendered as a ".theme-button" (Resources/Private/Scss/components/_button.scss).
-    Shared by the three hero variants, theme_teaser and theme_media_teaser -
-    theme_testimonial does not carry this palette at all, see its own
-    template.
+    tx_theme_link_variant + tx_theme_link_icon,
+    Configuration/TCA/Overrides/tt_content.php), rendered as a ".theme-button"
+    (Resources/Private/Scss/components/_button.scss). Shared by the three hero
+    variants, theme_teaser and theme_media_teaser - theme_testimonial does not
+    carry this palette at all, see its own template.
 
     "tx_theme_link" is a TCA type=link field. Its stored value is already a
     stdWrap.typolink parameter string (the page/file/url/email/record syntax
@@ -20,20 +21,29 @@
     handed to TypoScript and nothing about the link syntax is re-implemented
     here.
 
-    "tx_theme_link_variant" only ever holds '', 'secondary' or 'ghost' - read
-    from the "items" of "tx_theme_link_variant" in
-    Configuration/TCA/Overrides/tt_content.php, not assumed. The switch below
-    covers exactly those values and no more, matching the two modifiers
-    "_button.scss" actually ships ("--secondary", "--ghost"); the empty
-    default case renders the plain ".theme-button".
+    "tx_theme_link_variant" - "Link style" in the form - only ever holds '',
+    'secondary', 'ghost' or 'link', read from the "items" of the column, not
+    assumed. The switch covers exactly those values, one per modifier
+    "_button.scss" ships; the empty default case renders the plain
+    ".theme-button". "ThemeLinkRenderingTest" holds the items and the cases to
+    each other.
+
+    "tx_theme_link_icon" is an icon of the shipped set an editor picked, and
+    goes before the label: it says what the link leads to, and leaves the end
+    of the link to what says how it opens. It is decoration, hidden from assistive
+    technology; the label names the link. The button's "gap" spaces it, in
+    reading order, so it also comes first in a right-to-left page. "optional":
+    a name a later Font Awesome version dropped loses the icon, not the page.
 </f:comment>
 <f:if condition="{data.tx_theme_link}">
     <f:switch expression="{data.tx_theme_link_variant}">
         <f:case value="secondary"><f:variable name="themeButtonClass" value="theme-button theme-button--secondary" /></f:case>
         <f:case value="ghost"><f:variable name="themeButtonClass" value="theme-button theme-button--ghost" /></f:case>
+        <f:case value="link"><f:variable name="themeButtonClass" value="theme-button theme-button--link" /></f:case>
         <f:defaultCase><f:variable name="themeButtonClass" value="theme-button" /></f:defaultCase>
     </f:switch>
     <f:link.typolink parameter="{data.tx_theme_link}" class="{themeButtonClass}">
+        <f:if condition="{data.tx_theme_link_icon}"><theme:icon name="{data.tx_theme_link_icon}" optional="1" /></f:if>
         <f:if condition="{data.tx_theme_link_label}">
             <f:then>{data.tx_theme_link_label}</f:then>
             <f:else>{data.tx_theme_link}</f:else>

@@ -107,4 +107,41 @@ final class IconViewHelperTest extends UnitTestCase
 
         $this->render('<theme:icon name="../LICENSE" />');
     }
+
+    /**
+     * A name an editor picked that a later version of the set no longer has
+     * costs the icon, not the page.
+     */
+    #[Test]
+    public function anOptionalIconThatIsNotInTheSetRendersNothing(): void
+    {
+        $this->assertSame('', $this->render('<theme:icon name="no-such-icon" optional="1" />'));
+    }
+
+    #[Test]
+    public function anOptionalIconWithoutANameRendersNothing(): void
+    {
+        $this->assertSame('', $this->render('<theme:icon name="{name}" optional="1" />'));
+    }
+
+    #[Test]
+    public function anOptionalIconThatIsInTheSetRendersAsAnyOther(): void
+    {
+        $this->assertSame(
+            $this->render('<theme:icon name="gear" />'),
+            $this->render('<theme:icon name="gear" optional="1" />'),
+        );
+    }
+
+    /**
+     * A record can hold anything a database column can - an import, a script,
+     * a value from before the field was a picker. Under "optional" a malformed
+     * name costs the icon like an unknown one; it is refused before it becomes
+     * part of a path either way.
+     */
+    #[Test]
+    public function anOptionalIconWithAMalformedNameRendersNothing(): void
+    {
+        $this->assertSame('', $this->render('<theme:icon name="../LICENSE" optional="1" />'));
+    }
 }

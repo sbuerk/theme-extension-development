@@ -737,7 +737,7 @@ its own prefix, rather than overlooked.
 
 ### `ext_tables.sql`, and why it exists although the schema derives from TCA
 
-On TYPO3 v13 the whole schema for `tx_theme_list_item` and the six
+On TYPO3 v13 the whole schema for `tx_theme_list_item` and the seven
 `tx_theme_*` columns added to `tt_content` comes from
 `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()` reading the TCA at
 compare-schema time (#101553, extended by #104311 in 13.3).
@@ -745,7 +745,7 @@ compare-schema time (#101553, extended by #104311 in 13.3).
 **TYPO3 v12 does none of that.** Its `DefaultTcaSchema` derives the management
 columns from `ctrl`, the `category|datetime|slug|json|uuid` types and MM tables,
 and has no branch for `input`, `text`, `link`, `file`, `inline` or a `select`
-without an MM table — so on v12 the table and the six columns are simply never
+without an MM table — so on v12 the table and the seven columns are simply never
 created and every theme element using them fails.
 [`ext_tables.sql`](../../ext_tables.sql) therefore ships the
 definitions v13 would generate, reproduced column for column from what v13's own
@@ -791,6 +791,40 @@ never a bare URL — so every template that reads one renders it through
 exists specifically because getting this wrong still renders a page that looks
 correct: the anchor carries `t3://page?uid=1` verbatim and nothing about the
 markup looks broken until the link is followed.
+
+### The link of a theme element: a style and an icon
+
+The `theme_link` palette carries two choices besides the link and its label,
+and so does the link of an inline list item, as far as it applies there:
+
+| Column                             | On                            | Renders as                                                        |
+|------------------------------------|-------------------------------|-------------------------------------------------------------------|
+| `tt_content.tx_theme_link_variant` | hero and teaser elements      | `''` `.theme-button`, `secondary`, `ghost`, `link` its modifier   |
+| `tt_content.tx_theme_link_icon`    | hero and teaser elements      | `<theme:icon>` before the label, in `LinkButton.html`             |
+| `tx_theme_list_item.link_icon`     | every relation showing a link | `<theme:icon>` before the label, in `LinkList.html` and the cards |
+
+The style is `tx_theme_link_variant`, labelled "Link style" in the form, and
+keeps its column name: installations already store the style in this column,
+with the first three values before `link`, so renaming it would lose it.
+`--danger` is not offered — a call to action is not a destructive action.
+`ThemeLinkRenderingTest` holds the items of the column and the cases of
+`LinkButton.html` to each other, in both directions.
+
+A list item has no style. Its link is a row of `.theme-content-menu` in three
+of the four relations, where a button would break the list, and the card link
+of the fourth is the card's own affordance.
+
+The icon goes **before** the label, in every place: it says what the link leads
+to, and leaves the end of the link to what says how it opens. It is
+decoration; the label names the link. Each link spaces it with a `gap` — the
+button already had one, `.theme-content-menu__link` and `.theme-card__link`
+got one — so the icon is a flex item in reading order, first in a
+right-to-left page as well, and no margin names a physical side. Rendered with
+`optional`, because the stored name may be one a later Font Awesome version no
+longer has — see [Icons](../development/icons.md#rendering-an-icon).
+
+The picker and the icons it offers by default are documented in
+[Icons § Picking an icon in the backend](../development/icons.md#picking-an-icon-in-the-backend).
 
 ### Inline children: `DatabaseQueryProcessor`, and its `item.data.*` trap
 
@@ -941,12 +975,13 @@ which exist.
 
 ### Gaps, stated as gaps
 
-- **No icons at all.** This theme ships no icon assets and no icon component
-  — unlike camino, which ships both an icon set and a `link_icon` field.
-  `theme_sociallinks` therefore renders the same text-label list as
-  `theme_linklist`; `link_label` stands in for what would otherwise be a
-  platform icon ("Mastodon", "LinkedIn", …), not a Unicode glyph or any other
-  approximation of one.
+- **No platform logos.** The theme ships the solid set of Font Awesome Free,
+  and a link can carry an icon of it — see
+  [above](#the-link-of-a-theme-element-a-style-and-an-icon). The logos of
+  platforms are Font Awesome's *brands* set, which is not shipped: they are
+  trademarks with rules of their own, not symbols. `theme_sociallinks`
+  therefore renders the same text-label list as `theme_linklist`, and
+  `link_label` carries the platform name ("Mastodon", "LinkedIn", …).
 - **`.theme-hero__eyebrow` has CSS but no TCA field behind it.** The class is
   part of `_hero.scss`'s own markup contract (and the reference markup in
   [Component library](../development/component-library.md#content)), but none

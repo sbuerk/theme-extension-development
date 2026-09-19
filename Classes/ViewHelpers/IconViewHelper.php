@@ -31,6 +31,20 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  * nothing: an icon that silently disappears is found by a reader, not by a
  * test.
  *
+ * Except with "optional", for a name an editor picked:
+ *
+ *     <theme:icon name="{data.tx_theme_link_icon}" optional="1" />
+ *
+ * Then an empty name and a name the set does not have render nothing. The
+ * field offered only names of the set when the record was saved, but a later
+ * Font Awesome version may have renamed or dropped one, and that has to cost
+ * the icon, not the page. So does a malformed name: a record holds whatever
+ * was written into its column, by an import as well as by the picker, and
+ * the name is refused before it becomes part of a path either way.
+ * "Tests/Unit/IconUsageTest" requires "optional" on every name that is, or
+ * contains, a variable, and a name written into a template is checked
+ * against the set there instead.
+ *
  * --- Plain Fluid, for the standalone renderer ------------------------------
  *
  * This is a "typo3fluid/fluid" ViewHelper with no TYPO3 API in it, and it has
@@ -69,11 +83,24 @@ final class IconViewHelper extends AbstractViewHelper
         $this->registerArgument('name', 'string', 'The icon: a file name below "Resources/Public/Icons/FontAwesome/Solid/", without ".svg".', true);
         $this->registerArgument('label', 'string', 'An accessible name. Without one the icon is decoration and hidden from assistive technology.', false, '');
         $this->registerArgument('class', 'string', 'Classes added to "theme-icon".', false, '');
+        $this->registerArgument('optional', 'bool', 'Render nothing for an empty name or a name the set does not have, instead of throwing. For a name read from a record.', false, false);
     }
 
     public function render(): string
     {
-        $markup = $this->iconSet->markup((string)$this->arguments['name']);
+        $name = (string)$this->arguments['name'];
+        $optional = (bool)$this->arguments['optional'];
+        if ($optional && $name === '') {
+            return '';
+        }
+        try {
+            $markup = $this->iconSet->markup($name);
+        } catch (\InvalidArgumentException $exception) {
+            if ($optional && in_array($exception->getCode(), [1789218001, 1789218002], true)) {
+                return '';
+            }
+            throw $exception;
+        }
 
         $class = trim('theme-icon ' . trim((string)$this->arguments['class']));
         $label = trim((string)$this->arguments['label']);
