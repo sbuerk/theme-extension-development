@@ -1,0 +1,41 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    Styleguide section "Layouts and variants": the layouts an editor picks for
+    a content element, drawn from the component each one maps onto - the text
+    in columns of the text element.
+
+    A section of its own rather than more specimens in "Typography.html" and
+    "Boxes.html": these are the choices of a content element's form, shown
+    together, one specimen per value an editor can pick. The components they
+    are made of keep their own specimens in their own sections.
+
+    Literal markup and English copy, like every section: nothing here is
+    driven by a record, a data processor or a TypoScript object.
+</f:comment>
+<section class="theme-styleguide__section" id="variants">
+    <h2 class="theme-styleguide__heading">Layouts and variants</h2>
+
+    <h3>Text in columns</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_text.scss,
+            ".theme-text--columns" - the layout "Columns" of the text
+            element. Long enough to break into two columns at the width of
+            the specimen, with a heading that has to stay with its paragraph
+            and a quotation that moves to the next column whole.
+        </f:comment>
+        <div class="theme-text--columns">
+            <p>The text is set in two columns wherever each can be at least thirty characters wide, and in one where it cannot. The markup inside is ordinary rich text; only the block around it carries the modifier.</p>
+            <p>A hairline in the decorative border colour separates the two columns. A paragraph keeps at least two of its lines on either side of a break.</p>
+            <h4>A heading stays with its text</h4>
+            <p>The heading above never ends a column on its own: it moves to the next one together with the start of this paragraph.</p>
+            <blockquote><p>A quotation, a table, a code block and every item of a list move to the next column whole rather than being cut in two.</p></blockquote>
+            <p>The first element starts at the top of the first column, level with the second, because its top margin is dropped.</p>
+        </div>
+    </div>
+</section>
+
+</html>

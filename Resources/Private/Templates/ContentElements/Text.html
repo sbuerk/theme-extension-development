@@ -10,8 +10,25 @@
         "f:format.html" parses through "lib.parseFunc_RTE", which EXT:frontend
         provides since v13.2 (#103485) - it does NOT come from
         "fluid_styled_content", so rich text keeps working without it.
+
+        "layout" (core TCA, re-enabled for this CType and narrowed to two
+        values in "Configuration/PageTsConfig/ContentElementAppearance.tsconfig")
+        picks how the text is set:
+
+          0  running text   no modifier
+          1  columns        ".theme-text--columns" (components/_text.scss)
+
+        Any other value - "2" and "3", which the page TSconfig removes from
+        the select and an older record may still carry, or one nothing ever
+        offered - renders no modifier, the rule of the frame modifiers in
+        "Layouts/ContentElement.html". "ContentElementContractTest" holds the
+        modifier written here to a rule of the stylesheet.
     </f:comment>
-    <div class="theme-content-element__body">
+    <f:switch expression="{data.layout}">
+        <f:case value="1"><f:variable name="textModifier" value=" theme-text--columns" /></f:case>
+        <f:defaultCase><f:variable name="textModifier" value="" /></f:defaultCase>
+    </f:switch>
+    <div class="theme-content-element__body{textModifier}">
         <f:format.html>{data.bodytext}</f:format.html>
     </div>
 </f:section>

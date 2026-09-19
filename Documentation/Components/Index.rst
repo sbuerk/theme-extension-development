@@ -244,6 +244,25 @@ Rich text needs no class for the rest of the typography:
 *   Text set right to left with :html:`dir="rtl"` mirrors its indents, list
     markers and quotation rule.
 
+Layouts of content elements
+===========================
+
+Several content elements offer a choice of how they look. Each value maps onto
+a modifier of the component the element renders, and a value the theme does
+not know renders the element without one.
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Content element
+        -   Field
+        -   Values
+    *   -   :guilabel:`Text`
+        -   :guilabel:`Layout`
+        -   :guilabel:`Running text`; :guilabel:`Columns` - :css:`.theme-text--columns`,
+            two columns of at least 30 characters, one on a phone - see
+            :ref:`feature-text-columns`
+
 Tables
 ======
 
