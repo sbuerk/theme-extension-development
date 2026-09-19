@@ -89,10 +89,11 @@ final class ContentElementContractTest extends UnitTestCase
 
         // One case per modifier the templates above write: the appearance
         // fields, the lists, the text and icon element, the features, the
-        // steps, the card group, the carousel's caption positions, the split
-        // tiles with their tones and the layouts and variants - fewer means a
-        // value lost its case, and the test below would pass on an empty list.
-        $this->assertCount(68, $classes, implode(', ', $classes));
+        // steps, the card group with its wall, the carousel's caption
+        // positions, the split tiles with their tones and the layouts and
+        // variants - fewer means a value lost its case, and the test below
+        // would pass on an empty list.
+        $this->assertCount(69, $classes, implode(', ', $classes));
     }
 
     #[DataProvider('writtenClasses')]

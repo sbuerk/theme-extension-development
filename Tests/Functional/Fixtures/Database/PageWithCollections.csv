@@ -10,6 +10,7 @@ tt_content,,,,,,,,,,,,,
 ,50,1,0,0,0,50,theme_timeline,Newest first,2,0,3,desc,3
 ,60,1,0,0,0,60,theme_teaser_list,Reading,2,0,3,asc,2
 ,70,1,0,0,0,70,theme_card_group,,0,1,3,asc,1
+,80,1,0,0,0,80,theme_card_group,What people ask,2,2,2,asc,3
 tx_theme_list_item,,,,,,,,,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,subheader,text,link,link_label,link_variant,link_icon,date,meta,image,icon
 ,1,1,0,0,1,10,tt_content,tx_theme_list_items,Workshops,Every second Thursday,Two hours on one topic.,t3://page?uid=1,Book a seat,,,\NULL,,0,
@@ -26,3 +27,6 @@ tx_theme_list_item,,,,,,,,,,,,,,,,,,,
 ,15,1,0,0,3,50,tt_content,tx_theme_list_items,Beta feedback,,Collected on the same day.,,,,,2021-03-10,,0,
 ,16,1,0,0,1,60,tt_content,tx_theme_list_items,Moving to site sets,,What changes for the TypoScript.,t3://page?uid=1,,,,2026-03-02,8 min read,1,
 ,17,1,0,0,2,60,tt_content,tx_theme_list_items,Announced,,A row without a link.,,,,,\NULL,,0,
+,20,1,0,0,1,80,tt_content,tx_theme_list_items,The first card of the wall,,Short.,,,,,\NULL,,0,
+,21,1,0,0,2,80,tt_content,tx_theme_list_items,The second card of the wall,,"A card with a good deal more text than the one before it, so the two do not end level and the wall has something to show.",,,,,\NULL,,0,
+,22,1,0,0,3,80,tt_content,tx_theme_list_items,The third card of the wall,,Third in the markup.,,,,,\NULL,,0,

@@ -2005,6 +2005,15 @@ entities:
                           layout: 1
                           tx_theme_columns: 3
                           tx_theme_list_items: '1159,1160,1161,1162,1163'
+                      -
+                        self:
+                          id: 10006
+                          CType: theme_card_group
+                          header: 'What people ask'
+                          header_layout: 2
+                          layout: 2
+                          tx_theme_columns: 2
+                          tx_theme_list_items: '1450,1451,1452,1453,1454'
                     listItem:
                       -
                         self:
@@ -2110,6 +2119,37 @@ entities:
                           link: 't3://page?uid=1051'
                           link_label: 'Open the frames'
                           link_variant: link
+                      -
+                        self:
+                          id: 1450
+                          header: 'Does the theme need JavaScript?'
+                          text: 'No. Every component renders and reads without a script, and the four that offer more with one say what they do without it.'
+                          link: 't3://page?uid=1009'
+                          link_label: 'Open the styleguide'
+                          link_variant: link
+                      -
+                        self:
+                          id: 1451
+                          header: 'Can I use it with a site package?'
+                          text: Yes.
+                      -
+                        self:
+                          id: 1452
+                          header: 'Which TYPO3 versions are supported?'
+                          text: 'The branch you are looking at supports v12.4 and v13.4 on PHP 8.1 and up. Each version has its own directory for the code that differs - Core12 and Core13 - and the shared code never asks which one it is running on. A card of a wall is never split across a column break, however long its text gets.'
+                      -
+                        self:
+                          id: 1453
+                          header: 'Where do the icons come from?'
+                          text: 'The solid set of Font Awesome Free, vendored into the extension and committed.'
+                      -
+                        self:
+                          id: 1454
+                          header: 'How do I report a problem?'
+                          text: 'Open an issue with the page it happens on and the core version you are running.'
+                          link: 'mailto:issues@example.org'
+                          link_label: 'Write an issue'
+                          link_variant: secondary
                 -
                   self:
                     id: 1091

@@ -289,6 +289,14 @@ not know renders the element without one.
         -   A rule at the start - the default; a pull quote -
             :css:`.theme-quote--pull`; centred - :css:`--centred`, both with a
             quotation mark. See :ref:`feature-quotation-styles`
+    *   -   :guilabel:`Card group`
+        -   :guilabel:`Layout`, :guilabel:`Columns`
+        -   A grid - the default; one row that scrolls sideways -
+            :css:`.theme-card-grid--scroller`; a wall of columns the cards
+            stack into - :css:`--wall`, which fills column by column. Two,
+            three or four columns - :css:`--columns-2` to :css:`--columns-4`.
+            See :ref:`feature-card-group-timeline-teaser-list` and
+            :ref:`feature-card-wall`
     *   -   :guilabel:`Split tiles`
         -   :guilabel:`Layout`, and :guilabel:`Tone` per tile
         -   The first image at the start of the line - the default; at the end

@@ -49,6 +49,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'button' => '.theme-button',
             'card' => '.theme-card',
             'card scroller' => '.theme-card-scroller',
+            'card wall' => '.theme-card-grid--wall',
             'carousel' => '.theme-carousel',
             'close button' => '.theme-close',
             'code block' => '.theme-code',

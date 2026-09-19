@@ -548,6 +548,9 @@
 			<trans-unit id="tt_content.layout.theme_card_group.I.1">
 				<source>Scroller: one row that scrolls sideways</source>
 			</trans-unit>
+			<trans-unit id="tt_content.layout.theme_card_group.I.2">
+				<source>Wall: columns the cards stack into, filled top to bottom</source>
+			</trans-unit>
 
 			<!-- tt_content: CType theme_carousel -->
 			<trans-unit id="tt_content.CType.theme_carousel.label">

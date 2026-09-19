@@ -288,18 +288,16 @@ references:
   - {file: placeholder-portrait, table: tx_theme_list_item, uid: 174, field: image, values: {alternative: 'A placeholder portrait'}}
   - {file: placeholder-portrait, table: tx_theme_list_item, uid: 175, field: image, values: {alternative: 'A placeholder portrait'}}
 
-  # Page 150: the page media the menus on page 7 show, and the pictures of the
-  # slides of the carousel - 465 has none on purpose.
+  # Pages 150 and 151: the page media the menus on page 7 show, the pictures
+  # of the slides of the carousel - 465 has none on purpose - and of the
+  # tiles, where 473 is the placeholder tone and carries none either.
   - {file: placeholder, table: pages, uid: 150, field: media, values: {alternative: 'A placeholder graphic standing in for the carousel'}}
+  - {file: placeholder, table: pages, uid: 151, field: media, values: {alternative: 'A placeholder graphic standing in for the split tiles'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 460, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 461, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 462, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 463, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 464, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
-
-  # Page 151: the page media, and the pictures of the tiles - 473 is the
-  # placeholder tone and carries none.
-  - {file: placeholder, table: pages, uid: 151, field: media, values: {alternative: 'A placeholder graphic standing in for the split tiles'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 470, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 471, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 472, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
