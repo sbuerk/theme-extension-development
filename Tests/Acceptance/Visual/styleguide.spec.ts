@@ -174,6 +174,66 @@ test.describe('palette', () => {
     }
 });
 
+test.describe('switch', () => {
+    // Where a switch paints its thumb is the whole of its state, and neither
+    // other check here can see it. A screenshot proves the switch looks as it
+    // did, not that it looks right: the baselines were once captured with the
+    // thumb in the middle of the track in both states, and passed because of
+    // it. The computed "background-position" flipped from "0% 50%" to
+    // "100% 50%" all along, over an image as wide as the track that had
+    // nowhere to go. So the switch is screenshotted, the picture decoded on a
+    // canvas in the page, and the thumb found as the pixels of the middle row
+    // that differ from the track - reported as the horizontal centre of those
+    // pixels, a fraction of the width.
+    for (const fixture of manifest.pages.filter((page) => page.section === 'forms')) {
+        test(`${name(fixture)} draws the thumb at the end its state names`, async ({ page }) => {
+            await open(page, fixture);
+
+            const thumb = async (id: string): Promise<number> => {
+                const picture = await page.locator(`#${id}`).screenshot();
+                return page.evaluate(async (base64) => {
+                    const image = new Image();
+                    image.src = `data:image/png;base64,${base64}`;
+                    await image.decode();
+                    const canvas = document.createElement('canvas');
+                    canvas.width = image.naturalWidth;
+                    canvas.height = image.naturalHeight;
+                    const context = canvas.getContext('2d');
+                    if (context === null) {
+                        throw new Error('The page has no 2D canvas context.');
+                    }
+                    context.drawImage(image, 0, 0);
+                    const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const pixel = (x: number, y: number) => data.subarray((y * width + x) * 4, (y * width + x) * 4 + 3);
+
+                    // Two rows in: inside the one pixel border, and above the
+                    // thumb, which the transparent end of its gradient keeps
+                    // clear of the track's edge.
+                    const track = pixel(Math.floor(width / 2), 2);
+                    const row = Math.floor(height / 2);
+                    let sum = 0;
+                    let count = 0;
+                    // Two columns in from either end: the border is not the thumb.
+                    for (let x = 2; x < width - 2; x++) {
+                        const [red, green, blue] = pixel(x, row);
+                        if (Math.abs(red - track[0]) + Math.abs(green - track[1]) + Math.abs(blue - track[2]) > 96) {
+                            sum += x;
+                            count++;
+                        }
+                    }
+                    if (count === 0) {
+                        throw new Error('There is no thumb on the middle row of the switch.');
+                    }
+                    return (sum / count + 0.5) / width;
+                }, picture.toString('base64'));
+            };
+
+            expect(await thumb('sg-form-switch-beta'), 'The thumb of a switch that is off is not at its start.').toBeLessThan(0.4);
+            expect(await thumb('sg-form-switch-digest'), 'The thumb of a switch that is on is not at its end.').toBeGreaterThan(0.6);
+        });
+    }
+});
+
 test.describe('screenshot', () => {
     for (const fixture of manifest.pages) {
         for (const target of targets(fixture)) {
