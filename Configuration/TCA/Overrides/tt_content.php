@@ -289,6 +289,34 @@ $additionalColumns['tx_theme_icon_size'] = [
     ],
 ];
 
+// The most columns an element lays its items out in - the modifiers
+// "--columns-2" to "--columns-4" of ".theme-feature-grid". Named for the grid,
+// not for the one element that has it so far, so a later element with a grid
+// of items offers the same column.
+//
+// Integer values. v12.4 derives no column from a "select" without an MM
+// table, so it is declared in "ext_tables.sql" as the unsigned INT v13.4
+// derives, whose database default is 0 rather than the TCA default 3 - v13.4
+// gives every integer select 0
+// ("DefaultTcaSchema::enrichSingleTableFieldsFromTcaColumns()", read on
+// v13.4.35). A record written through the form carries the TCA default, and
+// the template renders 0 - and every other value it does not know - as three
+// columns, so a row written without the column renders as three columns as
+// well.
+$additionalColumns['tx_theme_columns'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_columns',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => 3,
+        'items' => [
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_columns.I.2', 'value' => 2],
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_columns.I.3', 'value' => 3],
+            ['label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_columns.I.4', 'value' => 4],
+        ],
+    ],
+];
+
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
 
 // The icon of the layout "Icons" of the bullet list, next to the list type.
@@ -316,4 +344,11 @@ $GLOBALS['TCA']['tt_content']['palettes']['theme_link'] = [
 $GLOBALS['TCA']['tt_content']['palettes']['theme_icon'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_icon',
     'showitem' => 'tx_theme_icon, --linebreak--, tx_theme_icon_position, tx_theme_icon_shape, tx_theme_icon_size',
+];
+
+// The layout of a grid of items: the core "layout", which the page TSconfig
+// re-enables and relabels per CType, and how many columns the grid takes.
+$GLOBALS['TCA']['tt_content']['palettes']['theme_grid'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_grid',
+    'showitem' => 'layout, tx_theme_columns',
 ];

@@ -10,7 +10,7 @@
 # category|datetime|slug|json|uuid and MM tables - it has no branch for
 # "input", "text", "link", "file", "inline" or a "select" without an MM table,
 # and it only touches tables that an ext_tables.sql defined in the first
-# place. Without this file the tx_theme_list_item table and the eleven
+# place. Without this file the tx_theme_list_item table and the twelve
 # tx_theme_* columns on tt_content are never created on v12, and every theme
 # element using them fails.
 #
@@ -102,7 +102,8 @@ CREATE TABLE tt_content (
 	tx_theme_icon text,
 	tx_theme_icon_position varchar(255) DEFAULT '' NOT NULL,
 	tx_theme_icon_shape varchar(255) DEFAULT '' NOT NULL,
-	tx_theme_icon_size varchar(255) DEFAULT '' NOT NULL
+	tx_theme_icon_size varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_columns int(11) unsigned DEFAULT '0' NOT NULL
 );
 
 #
@@ -120,6 +121,7 @@ CREATE TABLE tx_theme_list_item (
 	image int(11) unsigned DEFAULT '0' NOT NULL,
 	link text,
 	link_label varchar(255) DEFAULT '' NOT NULL,
+	subheader varchar(255) DEFAULT '' NOT NULL,
 	link_icon text,
 	icon text
 );

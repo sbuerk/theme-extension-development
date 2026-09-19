@@ -1,0 +1,50 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    "theme_stats" - one figure per row of "tx_theme_list_items", on
+    ".theme-stat" in a ".theme-stats" description list
+    (Resources/Private/Scss/components/_stat.scss).
+
+    The child's "subheader" is what the figure counts, the term of the list;
+    its "header" is the figure, the first description; its plain "text" a
+    second description, only when there is one. Both "header" and "subheader"
+    are required on this relation ("tt_content_theme_stats.php"), and a row
+    without one of them - a record still mid-edit, or written outside the
+    form - renders nothing rather than an empty "dt" or "dd", as the
+    definition list of the bullet list skips a row without its term. The
+    comparison is with the empty string, not a truth test, so a figure "0"
+    is a figure. The stylesheet shows the figure above the term; the source
+    keeps the order a description list reads in.
+
+    The icon is the child's "icon", decoration before the figure, rendered with
+    "optional" into a variable first - see "ThemeTextIcon.html".
+
+    "item.data.*": "DatabaseQueryProcessor" wraps every row, see
+    "ThemeMediaTeaserGrid.html".
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <dl class="theme-stats">
+            <f:for each="{listItems}" as="item">
+                <f:if condition="{item.data.header} != '' && {item.data.subheader} != ''">
+                    <f:variable name="icon"><f:if condition="{item.data.icon}"><theme:icon name="{item.data.icon}" optional="1" /></f:if></f:variable>
+                    <div class="theme-stat">
+                        <dt class="theme-stat__label">{item.data.subheader}</dt>
+                        <dd class="theme-stat__value"><f:if condition="{icon}"><span class="theme-stat__icon" aria-hidden="true">{icon -> f:format.raw()}</span></f:if>{item.data.header}</dd>
+                        <f:if condition="{item.data.text}">
+                            <dd class="theme-stat__text"><f:format.nl2br>{item.data.text}</f:format.nl2br></dd>
+                        </f:if>
+                    </div>
+                </f:if>
+            </f:for>
+        </dl>
+    </f:if>
+</f:section>
+
+</html>

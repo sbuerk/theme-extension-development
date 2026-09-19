@@ -71,6 +71,14 @@
                     CType = theme_author
                 }
             }
+            theme_features {
+                iconIdentifier = content-widget-list
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_features.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_features.description
+                tt_content_defValues {
+                    CType = theme_features
+                }
+            }
             theme_hero {
                 iconIdentifier = content-header
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_hero.label
@@ -133,6 +141,22 @@
                 description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_sociallinks.description
                 tt_content_defValues {
                     CType = theme_sociallinks
+                }
+            }
+            theme_stats {
+                iconIdentifier = content-widget-number
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_stats.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_stats.description
+                tt_content_defValues {
+                    CType = theme_stats
+                }
+            }
+            theme_steps {
+                iconIdentifier = content-target
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_steps.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_steps.description
+                tt_content_defValues {
+                    CType = theme_steps
                 }
             }
             theme_tabs {

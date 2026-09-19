@@ -31,6 +31,12 @@ final class IconContentElementFormEngineTest extends AbstractFunctionalTestCase
 {
     private const TEXT_ICON = 1010;
 
+    private const FEATURES = 1110;
+
+    private const STATS = 1210;
+
+    private const STEPS = 1310;
+
     /**
      * A notice of the fixture of the other theme elements: a theme element
      * that shows no icon.
@@ -49,9 +55,12 @@ final class IconContentElementFormEngineTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * @param array<string, list<int>> $expandCollapseState The inline children
+     *        shown open, by table - the state an editor's clicks store in the
+     *        user settings, and what `TcaInlineExpandCollapseState` reads.
      * @return array<string, mixed>
      */
-    private function compile(int $uid): array
+    private function compile(int $uid, array $expandCollapseState = []): array
     {
         // The route of the record editor: rendering the form, the containers
         // resolve their Fluid templates through "BackendViewFactory", which
@@ -67,6 +76,7 @@ final class IconContentElementFormEngineTest extends AbstractFunctionalTestCase
                 'tableName' => 'tt_content',
                 'vanillaUid' => $uid,
                 'command' => 'edit',
+                'inlineExpandCollapseStateArray' => $expandCollapseState,
             ],
             GeneralUtility::makeInstance(TcaDatabaseRecord::class),
         );
@@ -163,5 +173,120 @@ final class IconContentElementFormEngineTest extends AbstractFunctionalTestCase
             $own,
             $this->compile(self::TEXT_ICON)['processedTca']['columns']['tx_theme_icon']['description'] ?? null,
         );
+    }
+
+    /**
+     * `layout` is disabled for every CType and re-enabled for the features,
+     * whose template maps it onto the item layout. The four core values keep
+     * their numbers and carry labels that describe a layout of features; the
+     * columns offer the three modifiers of the grid.
+     */
+    #[Test]
+    public function theFeaturesOfferTheirLayoutsAndColumnsUnderTheirOwnNames(): void
+    {
+        $result = $this->compile(self::FEATURES);
+
+        $this->assertFalse((bool)($result['pageTsConfig']['TCEFORM.']['tt_content.']['layout.']['disabled'] ?? false), '"layout" is missing from the features.');
+        $this->assertSame(['0', '1', '2', '3'], self::itemValues($result, 'layout'));
+        $labels = array_values(array_map(
+            static fn(array $item): string => (string)$item['label'],
+            $result['processedTca']['columns']['layout']['config']['items'] ?? [],
+        ));
+        $expected = array_map(
+            static fn(int $value): string => $GLOBALS['LANG']->sL(
+                'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_features.I.' . $value,
+            ),
+            [0, 1, 2, 3],
+        );
+        $this->assertNotContains('', $expected, 'A label of the feature layouts is not translated.');
+        $this->assertSame($expected, $labels);
+        $this->assertSame(['2', '3', '4'], self::itemValues($result, 'tx_theme_columns'));
+
+        $form = $this->renderedForm(self::FEATURES);
+        $this->assertStringContainsString(self::inputName(self::FEATURES, 'layout'), $form);
+        $this->assertStringContainsString(self::inputName(self::FEATURES, 'tx_theme_columns'), $form);
+
+        // Still disabled on the text and icon element: the type specific part
+        // applies to its type only.
+        $this->assertTrue((bool)($this->compile(self::TEXT_ICON)['pageTsConfig']['TCEFORM.']['tt_content.']['layout.']['disabled'] ?? false));
+        $this->assertStringNotContainsString(self::inputName(self::TEXT_ICON, 'layout'), $this->renderedForm(self::TEXT_ICON));
+    }
+
+    /**
+     * The compiled form of the first inline child of a content element, the
+     * way `TcaInline` compiles it with the configuration of its parent.
+     *
+     * The child is compiled open. A collapsed child is compiled with the
+     * columns of its title only (`TcaColumnsProcessShowitem`, "isInlineChild"
+     * without "isInlineChildExpanded", read on v12.4 and v13.4), which says
+     * nothing about the form an editor fills in; the state lists every uid of
+     * the fixtures, as an editor who opened them all would store it.
+     *
+     * @return array<string, mixed>
+     */
+    private function firstInlineChild(int $contentElementUid): array
+    {
+        $children = $this->compile($contentElementUid, ['tx_theme_list_item' => range(1, 200)])['processedTca']['columns']['tx_theme_list_items']['children'] ?? [];
+        $this->assertNotEmpty($children, sprintf('Content element %d compiled no inline child.', $contentElementUid));
+        $this->assertSame('tx_theme_list_item', $children[0]['tableName']);
+        $this->assertTrue(
+            (bool)($children[0]['isInlineChildExpanded'] ?? false),
+            sprintf('The child of c%d was compiled collapsed, with the columns of its title only.', $contentElementUid),
+        );
+
+        return $children[0];
+    }
+
+    /**
+     * @return \Generator<string, array{uid: int, icon: bool, subheader: bool}>
+     */
+    public static function listItemRelations(): \Generator
+    {
+        yield 'features' => ['uid' => self::FEATURES, 'icon' => true, 'subheader' => false];
+        yield 'figures' => ['uid' => self::STATS, 'icon' => true, 'subheader' => true];
+        yield 'steps' => ['uid' => self::STEPS, 'icon' => true, 'subheader' => false];
+        // Relations of the other theme elements, which render no item icon.
+        yield 'link list' => ['uid' => 80, 'icon' => false, 'subheader' => false];
+        yield 'teaser grid' => ['uid' => 100, 'icon' => false, 'subheader' => false];
+    }
+
+    /**
+     * The icon of an item is offered where the parent renders one per item,
+     * and nowhere else; so is the subheader, which only the figures render.
+     */
+    #[DataProvider('listItemRelations')]
+    #[Test]
+    public function theListItemOffersAnIconWhereItsParentRendersOne(int $uid, bool $icon, bool $subheader): void
+    {
+        $columns = $this->firstInlineChild($uid)['processedTca']['columns'] ?? [];
+
+        $this->assertSame($icon, array_key_exists('icon', $columns), sprintf('The child of c%d %s the icon.', $uid, $icon ? 'does not offer' : 'offers'));
+        $this->assertSame($subheader, array_key_exists('subheader', $columns), sprintf('The child of c%d %s the subheader.', $uid, $subheader ? 'does not offer' : 'offers'));
+        if ($icon) {
+            $this->assertFalse($columns['icon']['config']['fieldWizard']['selectIcons']['disabled'] ?? true, 'The icon of the item shows no icon grid.');
+        }
+    }
+
+    /**
+     * The title of a feature and of a step, and the figure and what it counts,
+     * are required; the figures call the two fields by what they hold.
+     */
+    #[Test]
+    public function theItemsRequireTheirTitleAndTheFiguresNameTheirFields(): void
+    {
+        foreach ([self::FEATURES, self::STATS, self::STEPS] as $uid) {
+            $this->assertTrue(
+                (bool)($this->firstInlineChild($uid)['processedTca']['columns']['header']['config']['required'] ?? false),
+                sprintf('The title of an item of c%d is not required.', $uid),
+            );
+        }
+
+        $columns = $this->firstInlineChild(self::STATS)['processedTca']['columns'];
+        $this->assertTrue((bool)($columns['subheader']['config']['required'] ?? false));
+        foreach (['header' => 'tx_theme_list_item.header.types.theme_stats.label', 'subheader' => 'tx_theme_list_item.subheader.types.theme_stats.label'] as $field => $key) {
+            $label = $GLOBALS['LANG']->sL('LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:' . $key);
+            $this->assertNotSame('', $label);
+            $this->assertSame($label, $columns[$field]['label'] ?? null, sprintf('The "%s" of a figure keeps the label of the table.', $field));
+        }
     }
 }
