@@ -126,6 +126,29 @@ on the 5px grid.
 Weights: `400` regular, `500` medium, `800` bold. There is no 600 or 700 in the
 reference. A system font may synthesise 800 or clamp it to its boldest weight.
 
+### Display sizes
+
+The reference has **one** display size, and it is measured: 54px, reached
+fluidly from 34px — `--theme-font-size-display`, `clamp(2.125rem, 1.5rem + 3vw,
+3.375rem)`, which grows between a 333px and a 1000px viewport. A landing page
+asks for more than one, so two are **derived** from it, not measured:
+
+| Token                         | Class                   | Value                                             | px    | Origin   |
+|-------------------------------|-------------------------|---------------------------------------------------|-------|----------|
+| `--theme-font-size-display-1` | `.theme-display--1`     | `clamp(2.125rem, 1.0625rem + 5.1vw, 4.25rem)`     | 34→68 | derived  |
+| `--theme-font-size-display`   | `.theme-display`, `--2` | `clamp(2.125rem, 1.5rem + 3vw, 3.375rem)`         | 34→54 | measured |
+| `--theme-font-size-display-3` | `.theme-display--3`     | `clamp(2.125rem, 1.84375rem + 1.35vw, 2.6875rem)` | 34→43 | derived  |
+
+The derivation uses nothing but the measured size. The measured display step
+is 34 to 54, a ratio of 1.588; half of it, √1.588 = 1.260, taken once above and
+once below 54 gives 68.05 and 42.85, rounded to 68 and 43. The minimum and the
+viewport range are the measured one's, so all three are 34px — the size of a
+first level heading — on a phone and differ only in how far they grow: a
+display heading is never smaller than a page title, and never larger than one
+where there is no room for it. Line height and tracking are the display role's
+(1.5, +0.05em) for all three; at 68px that is airy, and it is kept rather than
+tightened because nothing was measured to tighten it to.
+
 Line heights: `tight` 1.1, `snug` 1.3, `heading` 1.5, `base` 1.6, `mono` 1.5.
 Tracking: `wide` 0.05em, `caps` 0.08em (authored), `none` 0. Measure: 68ch
 (authored).

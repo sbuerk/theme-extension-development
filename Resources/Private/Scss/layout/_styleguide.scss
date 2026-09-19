@@ -144,6 +144,33 @@
     background-color: var(--theme-styleguide-stage-background);
 }
 
+// A line length on show. The measure specimen sets the same paragraph at three
+// widths, and a paragraph narrower than its frame does not show where it
+// stops, so the inline end of each is drawn as a dashed hairline. The default
+// is the theme's own measure, the token the lead and the running text of a
+// site package are meant to be held to; the two modifiers are the comparison
+// either side of it and exist only here.
+.theme-styleguide__measure {
+    --theme-styleguide-measure: var(--theme-measure, 68ch);
+
+    max-inline-size: var(--theme-styleguide-measure);
+    margin-block-end: var(--theme-space-4, 1.25rem);
+    padding-inline-end: var(--theme-space-2, 0.625rem);
+    border-inline-end: var(--theme-border-width, 1px) dashed var(--theme-color-border-strong, #828d9f);
+
+    > :last-child {
+        margin-block-end: 0;
+    }
+}
+
+.theme-styleguide__measure--narrow {
+    --theme-styleguide-measure: 45ch;
+}
+
+.theme-styleguide__measure--wide {
+    --theme-styleguide-measure: 90ch;
+}
+
 // Token names are long, unspaced and set in mono so they can be copied by eye
 // into a site package. "anywhere" rather than a wider cell: the grid should
 // stay dense, and a name is still readable broken across two lines.

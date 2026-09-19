@@ -52,6 +52,11 @@
     --theme-font-size-xl: 1.5rem;       // 24px
     --theme-font-size-2xl: 2.125rem;    // 34px
     --theme-font-size-display: clamp(2.125rem, 1.5rem + 3vw, 3.375rem); // 34-54px
+    // The two derived display sizes, see DESIGN.md "Display sizes": half the
+    // measured display step (54/34, square root 1.26) above and below 54px,
+    // grown from the same 34px over the same viewport range, 333 to 1000px.
+    --theme-font-size-display-1: clamp(2.125rem, 1.0625rem + 5.1vw, 4.25rem); // 34-68px
+    --theme-font-size-display-3: clamp(2.125rem, 1.84375rem + 1.35vw, 2.6875rem); // 34-43px
     --theme-font-size-mono: 0.9375rem;  // 15px
 
     --theme-font-weight-regular: 400;

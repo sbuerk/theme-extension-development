@@ -183,7 +183,8 @@
             Eight steps, and no single modular ratio behind them: the steps run 1.17, 1.14, 1.5,
             1.42, 1.59, because the scale was measured rather than generated. The display size is a
             <code>clamp()</code>, so it is the one line below that changes as the window is
-            resized.
+            resized. Its two siblings are derived from it rather than measured: half its step
+            above and below 54 pixels, grown from the same 34 pixels.
         </p>
         <p style="font-size: var(--theme-font-size-xs)">Grumpy wizards make toxic brew for the evil queen.</p>
         <span class="theme-styleguide__label">--theme-font-size-xs — 12px</span>
@@ -205,6 +206,12 @@
 
         <p style="font-size: var(--theme-font-size-display)">Grumpy wizards</p>
         <span class="theme-styleguide__label">--theme-font-size-display — clamp, 34px to 54px</span>
+
+        <p style="font-size: var(--theme-font-size-display-1)">Grumpy wizards</p>
+        <span class="theme-styleguide__label">--theme-font-size-display-1 — clamp, 34px to 68px, derived</span>
+
+        <p style="font-size: var(--theme-font-size-display-3)">Grumpy wizards</p>
+        <span class="theme-styleguide__label">--theme-font-size-display-3 — clamp, 34px to 43px, derived</span>
 
         <p style="font-family: var(--theme-font-family-mono); font-size: var(--theme-font-size-mono)">theme.color.primary = #0b57d0;</p>
         <span class="theme-styleguide__label">--theme-font-size-mono — 15px</span>
