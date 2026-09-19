@@ -2,10 +2,10 @@ pages,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
 ,1,0,0,0,0,1,1,Theme root,/
 tt_content,,,,,,,,,,,,,,,,,
-,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,tx_theme_cta_width,tx_theme_cta_tone,tx_theme_icon,tx_theme_link,tx_theme_link_label,tx_theme_link_variant,tx_theme_secondary_link,tx_theme_secondary_link_label,tx_theme_secondary_link_variant
-,10,1,0,0,0,10,theme_cta,Start a site,0,<p>With the theme.</p>,boxed,,rocket,t3://page?uid=1,Get started,,t3://page?uid=1,Read the guide,secondary
-,20,1,0,0,0,20,theme_cta,A band on the tint,2,<p>Across the column.</p>,band,accent,,t3://page?uid=1,Only the first,,,,
-,30,1,0,0,0,30,theme_cta,The other appearance,2,<p>Turned.</p>,boxed,inverse,moon,,,,t3://page?uid=1,Only the second,link
-,40,1,0,0,0,40,theme_cta,Nothing here yet,2,<p>Write the first.</p>,band,placeholder,,,,,,,
-,50,1,0,0,0,50,theme_cta,Values nothing offers,2,<p>Unknown.</p>,wide,neon,,,,,,,
-,60,1,0,0,0,60,theme_cta,A hidden heading,100,<p>An icon the set does not have.</p>,boxed,,no-such-icon,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,tx_theme_cta_width,tx_theme_cta_tone,tx_theme_icon,tx_theme_link,tx_theme_link_label,tx_theme_link_variant,tx_theme_secondary_link,tx_theme_secondary_link_label,tx_theme_secondary_link_variant,tx_theme_link_icon,tx_theme_secondary_link_icon
+,10,1,0,0,0,10,theme_cta,Start a site,0,<p>With the theme.</p>,boxed,,rocket,t3://page?uid=1,Get started,,t3://page?uid=1,Read the guide,secondary,arrow-right,arrow-left
+,20,1,0,0,0,20,theme_cta,A band on the tint,2,<p>Across the column.</p>,band,accent,,t3://page?uid=1,Only the first,,,,,,
+,30,1,0,0,0,30,theme_cta,The other appearance,2,<p>Turned.</p>,boxed,inverse,moon,,,,t3://page?uid=1,Only the second,link,,
+,40,1,0,0,0,40,theme_cta,Nothing here yet,2,<p>Write the first.</p>,band,placeholder,,,,,,,,,
+,50,1,0,0,0,50,theme_cta,Values nothing offers,2,<p>Unknown.</p>,wide,neon,,,,,,,,,
+,60,1,0,0,0,60,theme_cta,A hidden heading,100,<p>An icon the set does not have.</p>,boxed,,no-such-icon,,,,,,,,
