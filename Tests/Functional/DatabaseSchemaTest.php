@@ -137,6 +137,11 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
             'column' => 'caption_position',
             'type' => StringType::class,
         ];
+        yield 'tx_theme_list_item.tone is a string' => [
+            'table' => 'tx_theme_list_item',
+            'column' => 'tone',
+            'type' => StringType::class,
+        ];
         yield 'tt_content.tx_theme_link is a text' => [
             'table' => 'tt_content',
             'column' => 'tx_theme_link',

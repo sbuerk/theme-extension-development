@@ -55,6 +55,7 @@ final class ThemeContentTypeRegistrationTest extends AbstractFunctionalTestCase
         'theme_media_teaser_grid',
         'theme_notice',
         'theme_sociallinks',
+        'theme_split_tiles',
         'theme_stats',
         'theme_steps',
         'theme_tabs',

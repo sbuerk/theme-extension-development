@@ -2326,6 +2326,74 @@ entities:
                           text: 'The caption is the whole slide.'
                 -
                   self:
+                    id: 1151
+                    title: 'Split tiles'
+                    slug: /elements/theme/split-tiles
+                    backend_layout: content_sidebar
+                    abstract: 'Featurettes in a column, the picture changing sides from tile to tile, each tile with its own tone.'
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 16101
+                          CType: header
+                          header: 'Split tiles'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 16102
+                          CType: theme_split_tiles
+                          header: 'The first picture at the start'
+                          header_layout: 2
+                          layout: 0
+                          tx_theme_list_items: '1470,1471,1472'
+                      -
+                        self:
+                          id: 16103
+                          CType: theme_split_tiles
+                          header: 'The first picture at the end'
+                          header_layout: 2
+                          layout: 1
+                          tx_theme_list_items: '1473,1474'
+                    listItem:
+                      -
+                        self:
+                          id: 1470
+                          header: 'Write the content first'
+                          text: 'A tile without a tone takes the surface fill, and its picture sits at the start of the line.'
+                          link: 't3://page?uid=1002'
+                          link_label: 'Read the text'
+                      -
+                        self:
+                          id: 1471
+                          header: 'Pick the elements'
+                          text: 'The second tile is the accent tint, and its picture has moved to the end of the line with no class of its own.'
+                          tone: accent
+                          link: 't3://page?uid=1008'
+                          link_label: 'Open the elements'
+                          link_variant: secondary
+                      -
+                        self:
+                          id: 1472
+                          header: 'Check it in the dark'
+                          text: 'The inverse tile turns the colour scheme of everything inside it, the button included.'
+                          tone: inverse
+                          link: 't3://page?uid=1009'
+                          link_label: 'Open the styleguide'
+                      -
+                        self:
+                          id: 1473
+                          header: 'Nothing here yet'
+                          text: 'The placeholder tone: no fill and a dashed frame, for a tile standing in for content that does not exist. This one has no picture either.'
+                          tone: placeholder
+                      -
+                        self:
+                          id: 1474
+                          header: 'The rhythm carries on'
+                          text: 'This element starts on the other foot, so the two groups below one another read as one column of tiles rather than repeating the same arrangement.'
+                          tone: accent
+                -
+                  self:
                     id: 1110
                     title: 'Hero layouts'
                     slug: /elements/theme/hero

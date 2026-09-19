@@ -659,3 +659,38 @@ references:
     field: image
     values:
       alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: pages
+    uid: 1151
+    field: media
+    values:
+      alternative: 'A placeholder graphic standing in for the split tiles'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1470
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1471
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1472
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1474
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'

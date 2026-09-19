@@ -897,6 +897,7 @@ empty wrapper — indistinguishable from "the editor added no entries" — and a
 | `theme_timeline`          | Dated entries on a line, sorted by date                  | `.theme-timeline`                                       |
 | `theme_teaser_list`       | Rows of teasers, each row one link                       | `.theme-list-group`                                     |
 | `theme_carousel`          | Slides in one track that scrolls sideways; no autoplay   | `.theme-carousel`                                       |
+| `theme_split_tiles`       | Featurettes whose picture side alternates                | `.theme-split-tiles`                                    |
 
 `theme_hero`, `theme_hero_small` and `theme_hero_text_only` share one Fluid
 partial and differ only in a `compact` argument and in whether an `image`
@@ -1399,13 +1400,14 @@ arrangements of the card group and to no other type, and
 `ContentElementContractTest` every modifier the card group writes to a rule of
 the stylesheet.
 
-### The carousel
+### Carousel and split tiles
 
-Another element on the same child table, and the same reference to
-`theme_media_teaser_grid` for its TypoScript. What is interesting about it is
-not the query but what it refuses to do.
+Two more elements on the same child table, and the same reference to
+`theme_media_teaser_grid` for their TypoScript. What is interesting about them
+is not the query but what each one refuses to do.
 
-It renders `.theme-carousel`. The child gains one column, `caption_position`,
+**The carousel** renders `.theme-carousel`. The child gains one column,
+`caption_position`,
 whose values are the names of the modifiers they select, as every choice column
 of this extension is — with one resolution the template makes rather than the
 stylesheet: **`overlay` is only written where the slide has a picture.** The
@@ -1447,6 +1449,27 @@ element to that, because axe only ever sees the styleguide.
 
 The track is the scroll container and the list in one, carrying the tab stop,
 so the arrow keys work exactly as they do for the card scroller.
+
+**The split tiles** render `.theme-split-tiles`, and the point of the element
+is that *the markup of every tile is identical*: which side a picture is on is
+decided by `:nth-child(even)` in the stylesheet, so inserting, deleting or
+reordering a tile keeps the rhythm correct with no template change and no
+per-item class. `layout` picks the foot the alternation starts on. The flip is
+paint order only - the media precedes the body in the source on every tile - so
+the reading and the focus order never follow it, the argument `_teaser.scss`
+makes for its own `--reversed`.
+
+Reusing `.theme-teaser` for a tile was tried and rejected, for two structural
+reasons rather than cosmetic ones: the alternation belongs to the list, so
+reuse would mean a rule in `_split-tiles.scss` selecting `.theme-teaser` -
+which breaks the self-containment `theme.scss` relies on for subset bundles -
+and the teaser declares no token layer a tone could re-point. The tone is a
+column of the *child*, `tone`, taking its configuration from
+`tt_content.tx_theme_cta_tone` exactly as `link_variant` takes that of
+`tx_theme_link_variant`, so the two lists cannot drift.
+
+`SplitTilesRenderingTest` asserts the negative that matters - that no tile
+carries a modifier for its picture side - as well as the tones and the rhythm.
 
 ### Gaps, stated as gaps
 

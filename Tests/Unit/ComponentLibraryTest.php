@@ -82,6 +82,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'segmented control' => '.theme-segmented',
             'palette swatch' => '.theme-swatch',
             'skip link' => '.theme-skip-link',
+            'split tiles' => '.theme-split-tiles',
             'stat' => '.theme-stat',
             'stats' => '.theme-stats',
             'steps' => '.theme-steps',
