@@ -175,7 +175,8 @@ quality ─┬─> visual
 phpstan ─┤         ┌─> acceptance
 lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
          │
-docs ────┘
+docs ────┤
+assets ──┘
 ```
 
 | Job                 | Matrix                                             | Runs                                                                                      |
@@ -188,6 +189,7 @@ docs ────┘
 | `functional-dbms`   | the four edge pairs × 4 DBMS — 16 jobs             | `functional` against each database                                                        |
 | `acceptance`        | PHP 8.2 × v12, v13 — 2 jobs                        | `acceptance`: an instance built from nothing, in a browser; uploads the report on failure |
 | `visual`            | PHP 8.2 × v12 — one job                            | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure    |
+| `assets`            | —                                                  | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build        |
 | `documentation`     | —                                                  | `renderDocumentation`, uploads the artifact                                               |
 
 The "edge pairs" are `{v12, 8.1}`, `{v12, 8.4}`, `{v13, 8.2}`, `{v13, 8.4}` —

@@ -16,7 +16,7 @@ name: "CI"
 #   lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
 #            │
 #   docs ────┤  (independent, for fast feedback on documentation changes)
-#   css  ────┘  (independent, neither PHP nor core version dependent)
+#   assets ──┘  (independent, neither PHP nor core version dependent)
 #
 # The DBMS matrix is the expensive part — 16 jobs, each starting a database
 # container — so it only runs once the same tests have passed on SQLite for every
@@ -456,13 +456,15 @@ jobs:
           if-no-files-found: "ignore"
           retention-days: 5
 
-  # Independent of PHP and of the core version: the stylesheet is compiled from
-  # SCSS and depends on neither, so this is a single job rather than a matrix
-  # dimension. It also needs no "composerUpdate", which is what makes it the
-  # cheapest job in the workflow. The vendored icons are checked here as well:
-  # the same node image, the same "npm ci" of the same lockfile.
-  css:
-    name: "css"
+  # The committed build output: the stylesheet compiled from its SCSS and the
+  # vendored Font Awesome icons, each compared with what the build writes. It
+  # was called "css" while it checked the stylesheet alone. Independent of PHP
+  # and of the core version, so a single job rather than a matrix dimension; it
+  # also needs no "composerUpdate", which is what makes it the cheapest job in
+  # the workflow. Both gates share the node image and the "npm ci" of one
+  # lockfile.
+  assets:
+    name: "assets"
     runs-on: ubuntu-latest
     steps:
 
@@ -473,8 +475,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ".cache/npm"
-          key: "npm-css-${{ hashFiles('package-lock.json') }}"
-          restore-keys: "npm-css-"
+          key: "npm-assets-${{ hashFiles('package-lock.json') }}"
+          restore-keys: "npm-assets-"
 
       - name: "Ensure the committed CSS matches its SCSS sources"
         run: "Build/Scripts/runTests.sh -b docker -s checkCssBuild"
