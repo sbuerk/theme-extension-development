@@ -415,6 +415,13 @@
             buttons in it are the ones of the other appearance - each as
             readable as it is on a page in that appearance.
         </p>
+        <p>
+            The accent and the inverse band each carry a check list, a
+            striped and bordered table, a figure and a code block as well:
+            the components that paint surfaces and rules of their own, whose
+            readability on a band is otherwise only argued from the
+            stylesheet.
+        </p>
         <div class="theme-content-element theme-content-element--text theme-content-element--frame-surface" id="c9009" data-ctype="text">
             <div class="theme-content-element__inner">
                 <header class="theme-content-element__header">
@@ -441,6 +448,41 @@
                     <a class="theme-button" href="#media">Primary</a>
                     <a class="theme-button theme-button--secondary" href="#media">Secondary</a>
                 </div>
+                <ul class="theme-list theme-list--check">
+                    <li>A check mark in the success accent, on the tint.</li>
+                    <li>The text of the item in the text colour of the band.</li>
+                </ul>
+                <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="The bands, in the accent band">
+                    <table class="theme-table theme-table--striped theme-table--bordered">
+                        <caption class="theme-table__caption">The bands, in the accent band</caption>
+                        <thead>
+                            <tr><th scope="col">Band</th><th scope="col">Fill</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><th scope="row">Surface</th><td>The surface colour</td></tr>
+                            <tr><th scope="row">Accent</th><td>A tint of the primary accent</td></tr>
+                            <tr><th scope="row">Inverse</th><td>The other appearance</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <figure class="theme-figure">
+                    <img class="theme-figure__media"
+                         src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23b9c6d8'/%3E%3Cpath%20d='M0%2010%205%205%2010%208%2016%203%2016%2010z'%20fill='%237e8ba1'/%3E%3Ccircle%20cx='3.2'%20cy='2.6'%20r='1.5'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                         alt="Placeholder landscape standing in for a photograph"
+                         width="240" height="150" loading="lazy" />
+                    <figcaption class="theme-figure__caption">
+                        A caption on the accent tint.
+                        <small class="theme-figure__credit">Photo: Example Photographer</small>
+                    </figcaption>
+                </figure>
+                <figure class="theme-code">
+                    <figcaption class="theme-code__caption">
+                        <span class="theme-code__filename">config/sites/demo/config.yaml</span>
+                        <span class="theme-code__language">YAML</span>
+                    </figcaption>
+                    <pre class="theme-code__block" role="region" tabindex="0" aria-label="config/sites/demo/config.yaml, in the accent band"><code>dependencies:
+  - sbuerk/theme-extension-development</code></pre>
+                </figure>
             </div>
         </div>
         <div class="theme-content-element theme-content-element--text theme-content-element--frame-inverse" id="c9012" data-ctype="text">
@@ -453,6 +495,41 @@
                     <a class="theme-button" href="#media">Primary</a>
                     <a class="theme-button theme-button--secondary" href="#media">Secondary</a>
                 </div>
+                <ul class="theme-list theme-list--check">
+                    <li>A check mark in the success accent of the other appearance.</li>
+                    <li>The text of the item in the text colour of that appearance.</li>
+                </ul>
+                <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="The bands, in the inverse band">
+                    <table class="theme-table theme-table--striped theme-table--bordered">
+                        <caption class="theme-table__caption">The bands, in the inverse band</caption>
+                        <thead>
+                            <tr><th scope="col">Band</th><th scope="col">Fill</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><th scope="row">Surface</th><td>The surface colour</td></tr>
+                            <tr><th scope="row">Accent</th><td>A tint of the primary accent</td></tr>
+                            <tr><th scope="row">Inverse</th><td>The other appearance</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <figure class="theme-figure">
+                    <img class="theme-figure__media"
+                         src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23ccd6e4'/%3E%3Cpath%20d='M0%2010%204%206%208%207.5%2016%202%2016%2010z'%20fill='%2390a0b6'/%3E%3Ccircle%20cx='9.6'%20cy='2.2'%20r='1.2'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                         alt="Placeholder landscape standing in for a photograph"
+                         width="240" height="150" loading="lazy" />
+                    <figcaption class="theme-figure__caption">
+                        A caption in the other appearance.
+                        <small class="theme-figure__credit">Photo: Example Photographer</small>
+                    </figcaption>
+                </figure>
+                <figure class="theme-code">
+                    <figcaption class="theme-code__caption">
+                        <span class="theme-code__filename">config/sites/demo/config.yaml</span>
+                        <span class="theme-code__language">YAML</span>
+                    </figcaption>
+                    <pre class="theme-code__block" role="region" tabindex="0" aria-label="config/sites/demo/config.yaml, in the inverse band"><code>dependencies:
+  - sbuerk/theme-extension-development</code></pre>
+                </figure>
             </div>
         </div>
         <div class="theme-content-element theme-content-element--text theme-content-element--frame-none" id="c9013" data-ctype="text">
