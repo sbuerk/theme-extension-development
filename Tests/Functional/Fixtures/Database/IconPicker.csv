@@ -3,7 +3,8 @@ pages,,,,,,,,,,
 ,1,0,0,0,0,1,1,Every icon,/,
 ,2,1,0,0,0,1,0,A narrowed list,/narrowed,"TCEFORM.tt_content.tx_iconpickerfixture_icon.keepItems = ,envelope,arrow-right,circle-info"
 ,3,1,0,0,0,1,0,Without the curated list,/without-curated,"TCEFORM.tt_content.tx_theme_link_icon.keepItems >
-TCEFORM.tx_theme_list_item.link_icon.keepItems >"
+TCEFORM.tx_theme_list_item.link_icon.keepItems >
+TCEFORM.tt_content.tx_theme_icon.keepItems >"
 tt_content,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,tx_theme_link,tx_theme_link_label,tx_theme_list_items
 ,10,2,0,0,0,10,header,Narrowed,,,0
@@ -12,6 +13,8 @@ tt_content,,,,,,,,,,,
 ,40,3,0,0,0,20,theme_teaser,Uncurated teaser,t3://page?uid=1,Start,0
 ,50,1,0,0,0,30,theme_linklist,Curated links,,,1
 ,60,3,0,0,0,30,theme_linklist,Uncurated links,,,1
+,70,1,0,0,0,40,bullets,Curated bullet list,,,0
+,80,3,0,0,0,40,bullets,Uncurated bullet list,,,0
 tx_theme_list_item,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,link,link_label
 ,1,1,0,0,1,50,tt_content,tx_theme_list_items,Curated,t3://page?uid=1,Start

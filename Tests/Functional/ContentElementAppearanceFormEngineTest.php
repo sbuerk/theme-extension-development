@@ -44,6 +44,7 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/AdminBackendUser.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/PageWithAppearanceFields.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/ThemeHeroOnAppearancePage.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/BulletsOnAppearancePage.csv');
         $backendUser = $this->setUpBackendUser(1);
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
     }
@@ -165,6 +166,59 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $form = $this->renderedForm(10);
         $this->assertStringContainsString(self::inputName(10, 'frame_class'), $form);
         $this->assertStringNotContainsString(self::inputName(10, $field), $form, sprintf('"%s" is rendered.', $field));
+    }
+
+    /**
+     * `layout` is disabled for every CType and re-enabled for the bullet list,
+     * which renders it (`Templates/ContentElements/Bullets.html`). The four
+     * core values keep their numbers and carry labels that describe a list,
+     * not the core's "Layout 1" to "Layout 3".
+     */
+    #[Test]
+    public function theBulletListOffersItsLayoutsUnderTheirOwnNames(): void
+    {
+        $result = $this->compile(910);
+
+        $this->assertFalse(self::isDisabled($result, 'layout'), '"layout" is missing from the bullet list.');
+        $this->assertSame(['0', '1', '2', '3'], self::itemValues($result, 'layout'));
+
+        $labels = array_values(array_map(
+            static fn(array $item): string => (string)$item['label'],
+            $result['processedTca']['columns']['layout']['config']['items'] ?? [],
+        ));
+        $expected = array_map(
+            static fn(int $value): string => $GLOBALS['LANG']->sL(
+                'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.bullets.I.' . $value,
+            ),
+            [0, 1, 2, 3],
+        );
+        $this->assertNotContains('', $expected, 'A label of the bullet list layouts is not translated.');
+        $this->assertSame($expected, $labels);
+
+        $this->assertStringContainsString(self::inputName(910, 'layout'), $this->renderedForm(910));
+        // Still disabled on the text element beside it: the type specific
+        // part applies to its type only.
+        $this->assertTrue(self::isDisabled($this->compile(10), 'layout'));
+    }
+
+    /**
+     * The icon of the layout "Icons" is picked in the bullet list's own form
+     * and in no other: the column is added to that CType alone, and it is the
+     * picker of the theme, the icon grid switched on.
+     */
+    #[Test]
+    public function theIconOfTheListIsPickedInTheBulletListOnly(): void
+    {
+        $bullets = $this->renderedForm(910);
+        $this->assertStringContainsString(self::inputName(910, 'tx_theme_icon'), $bullets);
+        $this->assertFalse(
+            $this->compile(910)['processedTca']['columns']['tx_theme_icon']['config']['fieldWizard']['selectIcons']['disabled'] ?? true,
+            'The icon field of the bullet list shows no icon grid.',
+        );
+
+        $text = $this->renderedForm(10);
+        $this->assertStringContainsString(self::inputName(10, 'frame_class'), $text);
+        $this->assertStringNotContainsString(self::inputName(10, 'tx_theme_icon'), $text);
     }
 
     /**

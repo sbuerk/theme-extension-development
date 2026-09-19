@@ -63,7 +63,8 @@ does not draw — the rulers and indents of the core list — are removed from
 :guilabel:`Frame`, and three fields are taken out of the form until the theme
 renders them:
 
-*   :guilabel:`Layout`
+*   :guilabel:`Layout`, except on the :guilabel:`Bullet List`, see
+    :ref:`feature-bullet-list-layouts`
 *   :guilabel:`Include in section index`
 *   :guilabel:`Append with link to top of page`
 
