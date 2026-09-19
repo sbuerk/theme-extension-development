@@ -398,7 +398,9 @@ global, in `base/_reset.scss`, so every focusable thing on the page carries the
 same one and a new component cannot forget it.
 
 `.theme-button-group` lays out a row of them with the standard gap and wraps
-rather than overflowing. `--attached` makes the row one control in several
+rather than overflowing. It is a block like a list or a figure, and ends on
+the same bottom margin, `var(--theme-space-4)`, so the component after it does
+not touch the buttons. `--attached` makes the row one control in several
 parts — edges joined, only the outer corners round, no wrapping — and lifts the
 button whose border means something right now (hovered, focused, pressed) over
 the shared edge with `position: relative` alone, not with a `z-index` outside
@@ -655,7 +657,8 @@ Quote:
 
 Table. `tabindex="0"` plus `role="region"` plus `aria-label` on the wrapper is
 the W3C APG scrollable-region-focusable pattern — a container that scrolls but
-carries no tab stop is unreachable by keyboard:
+carries no tab stop is unreachable by keyboard. The wrapper is the block, and
+ends on the bottom margin a bare `table` of the element baseline ends on:
 
 ```html
 <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="…">
@@ -1344,6 +1347,7 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 | `aControlDrawsItsBoundaryInTheStrongBorderColour`    | The text input, the input group addon, the switch track and the tracks of progress and meter default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                         |
 | `aHoveredTextInputChangesItsBorder`                  | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                    |
 | `everyTableClassAnEditorCanPickIsStyled`             | Every `table_class` an editor can pick — the core's `striped` and `bordered` and the `addItems` of `Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig` — has a compiled `.theme-table--<value>` rule.                         |
+| `aBlockKeepsItsDistanceToWhatFollows`                | The list, the description list, the code block, the figure, the button group and the table wrapper each end on `margin: 0 0 var(--theme-space-4)` in their base rule, so the next component never touches them.                    |
 
 The last one strips comments before scanning, which matters here specifically:
 the comment documenting why a breakpoint cannot be a custom property spells
