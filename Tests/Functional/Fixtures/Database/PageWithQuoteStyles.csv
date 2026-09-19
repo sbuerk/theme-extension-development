@@ -1,0 +1,9 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,subheader,bodytext,tx_theme_quote_style
+,10,1,0,0,0,10,theme_testimonial,Ada Lovelace,Mathematician,<p>The default.</p>,
+,20,1,0,0,0,20,theme_testimonial,Grace Hopper,Computer scientist,<p>A pull quote.</p>,pull
+,30,1,0,0,0,30,theme_testimonial,Margaret Hamilton,Software engineer,<p>Centred.</p>,centred
+,40,1,0,0,0,40,theme_testimonial,Radia Perlman,Network engineer,<p>A style nothing offers.</p>,sideways

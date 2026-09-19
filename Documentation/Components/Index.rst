@@ -277,6 +277,11 @@ not know renders the element without one.
             screenshot cut off at the bottom - :css:`--screenshot`; cropped at
             two edges - :css:`--bordered`. The eyebrow is
             :css:`.theme-hero__eyebrow`. See :ref:`feature-hero-layouts`
+    *   -   :guilabel:`Testimonial`
+        -   :guilabel:`Style`
+        -   A rule at the start - the default; a pull quote -
+            :css:`.theme-quote--pull`; centred - :css:`--centred`, both with a
+            quotation mark. See :ref:`feature-quotation-styles`
 
 Tables
 ======

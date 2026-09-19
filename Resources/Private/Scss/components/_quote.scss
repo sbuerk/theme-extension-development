@@ -10,6 +10,25 @@
 //         </figcaption>
 //     </figure>
 //
+//     <figure class="theme-quote theme-quote--pull">
+//         <span class="theme-quote__mark" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
+//         <blockquote class="theme-quote__text"><p>…</p></blockquote>
+//         <figcaption class="theme-quote__attribution">…</figcaption>
+//     </figure>
+//
+// Modifiers: "--pull" (a pull quote: larger and bolder, between a rule above
+// and one below instead of the rule at the start), "--centred" (on one axis,
+// no rule, held to the reading measure). Both are set off by shape rather
+// than by the rule at the start, and take the quotation mark in "__mark" -
+// the "quote-left" icon of the set, rendered by "<theme:icon>", in the
+// accent of the rule. The mark is decoration: the slot is "aria-hidden", and
+// the "blockquote" is what makes it a quotation. The default takes no mark.
+//
+// The mark is one icon, not a character: a "“" is drawn by whichever font
+// covers it, in that font's shape and weight, and the icon rule of the theme
+// holds every symbol to the shipped set. It is not mirrored in a
+// right-to-left text; only its position follows the direction.
+//
 // See "components/_button.scss" for why every component declares its own
 // token layer with a fallback.
 
@@ -17,6 +36,7 @@
     --theme-quote-accent: var(--theme-color-secondary, #0f766e);
     --theme-quote-gap: var(--theme-space-3, 0.9375rem);
     --theme-quote-padding-inline-start: var(--theme-space-5, 1.5625rem);
+    --theme-quote-mark-size: 2rem;
 
     display: flex;
     flex-direction: column;
@@ -66,4 +86,57 @@
     // emphasis is not what a publication name next to a name is. Overridden
     // rather than left standing.
     font-style: normal;
+}
+
+.theme-quote__mark {
+    --theme-icon-size: var(--theme-quote-mark-size);
+
+    display: flex;
+    color: var(--theme-quote-accent);
+}
+
+// Both styles give up the rule at the start and its indent: they are set off
+// by their shape instead. The "blockquote" inside keeps the rule and the
+// indent of the element baseline ("base/_elements.scss") otherwise, a second
+// rule where the style has none.
+.theme-quote--pull,
+.theme-quote--centred {
+    --theme-quote-padding-inline-start: 0;
+
+    border-inline-start: 0;
+
+    .theme-quote__text {
+        padding-inline-start: 0;
+        border-inline-start: 0;
+    }
+}
+
+// A pull quote lifts a sentence out of the text around it: larger, bolder,
+// between a rule above and a rule below in the accent.
+.theme-quote--pull {
+    padding-block: var(--theme-space-5, 1.5625rem);
+    border-block: var(--theme-border-width-strong, 2px) solid var(--theme-quote-accent);
+
+    .theme-quote__text {
+        font-size: var(--theme-font-size-xl, 1.5rem);
+        font-weight: var(--theme-font-weight-bold, 800);
+        letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+        text-wrap: balance;
+    }
+}
+
+// Centred on one axis, the mark above, and held to the reading measure: a
+// centred line longer than that is hard to find the start of.
+.theme-quote--centred {
+    align-items: center;
+    text-align: center;
+
+    .theme-quote__text {
+        max-inline-size: var(--theme-measure, 68ch);
+        text-wrap: balance;
+    }
+
+    .theme-quote__attribution {
+        justify-content: center;
+    }
 }

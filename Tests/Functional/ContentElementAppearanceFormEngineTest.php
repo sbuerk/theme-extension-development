@@ -47,6 +47,7 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/BulletsOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/HeaderOnAppearancePage.csv');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/HeroesOnAppearancePage.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/TestimonialOnAppearancePage.csv');
         $backendUser = $this->setUpBackendUser(1);
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
     }
@@ -284,6 +285,23 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
         $form = $this->renderedForm($uid);
         $this->assertStringContainsString(self::inputName($uid, 'tx_theme_hero_layout'), $form);
         $this->assertStringContainsString(self::inputName($uid, 'tx_theme_eyebrow'), $form);
+    }
+
+    /**
+     * The testimonial offers its three styles in a select of its own, and not
+     * the core "layout", which stays disabled for it.
+     */
+    #[Test]
+    public function theTestimonialOffersItsStyles(): void
+    {
+        $result = $this->compile(903);
+
+        $this->assertSame(['', 'pull', 'centred'], self::itemValues($result, 'tx_theme_quote_style'));
+        $this->assertTrue(self::isDisabled($result, 'layout'));
+
+        $form = $this->renderedForm(903);
+        $this->assertStringContainsString(self::inputName(903, 'tx_theme_quote_style'), $form);
+        $this->assertStringNotContainsString(self::inputName(903, 'layout'), $form);
     }
 
     /**
