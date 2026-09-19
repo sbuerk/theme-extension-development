@@ -18,6 +18,7 @@ $EM_CONF['theme_extension_development'] = [
         'conflicts' => [],
         'suggests' => [
             'data_factory' => '1.0.0-1.99.99',
+            'rte_ckeditor' => '12.4.0-13.4.99',
         ],
     ],
 ];

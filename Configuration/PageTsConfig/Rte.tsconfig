@@ -1,0 +1,9 @@
+# Every rich text field uses the preset of the theme, "Configuration/RTE/Theme.yaml",
+# registered as "theme" in "ext_localconf.php". A preset named for one field or
+# one type ("RTE.config.<table>.<field>.preset") still wins over this one, and so
+# does a "richtextConfiguration" in the TCA of a field.
+#
+# Without rte_ckeditor the preset is not registered, and the core resolves this
+# name to no configuration - the same as its own "default" without that
+# extension.
+RTE.default.preset = theme
