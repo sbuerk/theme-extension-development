@@ -14,10 +14,17 @@
 //
 // This file emits nothing. Using it pulls no rules into a bundle.
 //
-// Only one breakpoint exists, deliberately. It is the width at which the main
+// "$md" is the breakpoint of the library. It is the width at which the main
 // navigation's two levels stop fitting a single row, and every other component
 // that stacks was checked to see whether it wanted a different one - none did.
-// A second breakpoint should be added when a component actually needs it, not
+//
+// "$lg" is used by one component, the site header, and by nothing else. Above
+// "$md" the header holds the title and the menu in one row, and which of the
+// two gives way when the row gets tight depends on how wide the row is: on a
+// wide one the title keeps its line and the menu wraps, on a narrow one the
+// menu keeps its row and the title wraps. Flex layout cannot make that choice
+// by itself, so the header switches at "$lg" - see "layout/_site-header.scss".
+// A further breakpoint should be added when a component actually needs it, not
 // in anticipation of one.
 
 // 768px at the default root size. Expressed in rem so the layout responds to
@@ -28,3 +35,7 @@ $md: 48rem;
 // rather than above it. 0.0625rem is one pixel at the default root size, which
 // is the smallest step that cannot overlap "$md".
 $md-max: 47.9375rem;
+
+// 1024px at the default root size, and its complement.
+$lg: 64rem;
+$lg-max: 63.9375rem;

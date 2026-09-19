@@ -197,6 +197,12 @@ other:
 </nav>
 ```
 
+In the row layout, from `bp.$md` up, the top level items drop the bottom
+margin every `li` takes from the element baseline — all but the last one. An
+entry is centred in its row by its margin box, so the last entry used to sit
+half a margin lower than the others; stacked, the margin still adds to the
+gap.
+
 Sub navigation — the current section, not the whole site. No `--active`
 modifier: the nav is scoped to one section, so `[aria-current="page"]` alone
 is enough wherever it sits:
@@ -892,9 +898,24 @@ height on every scroll position:
 ```
 
 `__actions` holds the [display settings](#display-settings). Brand,
-navigation and actions share one row at every width: above `bp.$md` the
-navigation does not shrink, so the brand wraps first; below it the expanded
-navigation drops down under the header as a full-width band, behind
+navigation and actions share one row at every width. Above `bp.$md` the top
+level of the menu may wrap onto a second row inside its frame, aligned to the
+end, and an entry never breaks inside itself; which of title and menu gives
+way when the row gets tight depends on its width:
+
+- From `bp.$lg` up the title does not give way: the brand keeps its line up to
+  half the row, and the navigation shrinks down to its widest entry and wraps.
+  That holds seven top level entries beside the title of the showcase at 1280
+  pixels, where a sixth used to push the title onto a second line.
+- Between `bp.$md` and `bp.$lg` the menu keeps its row, up to 60% of the row,
+  and the brand wraps beside it — held to one line there, the title left a
+  menu of three entries on two rows next to a title on two lines anyway. A
+  menu wider than 60% wraps inside that width, so nothing spills sideways.
+
+`Tests/Acceptance/frontend.spec.ts` asserts both, in both trees: seven entries
+beside a one line title at 1280 pixels, three in one row at 768 pixels, and
+seven without spilling sideways at 768 and 900 pixels. Below `bp.$md` the
+expanded navigation drops down under the header as a full-width band, behind
 `data-js` like the collapse itself.
 
 ### Display settings
@@ -1284,11 +1305,14 @@ alert and dialog edges.
 
 ## Breakpoints
 
-There is exactly one: `bp.$md`, `48rem` (768px), declared in
-`abstracts/_breakpoints.scss`. It is the point at which the main navigation's
-two levels stop fitting a single row — every other component that stacks
-(`theme-hero--media`, `theme-teaser`, `theme-page__body`) was checked against
-it and none wanted a different one.
+There are two, declared in `abstracts/_breakpoints.scss`. `bp.$md`, `48rem`
+(768px), is the breakpoint of the library: the point at which the main
+navigation's two levels stop fitting a single row — every other component that
+stacks (`theme-hero--media`, `theme-teaser`, `theme-page__body`) was checked
+against it and none wanted a different one. `bp.$lg`, `64rem` (1024px), is used
+by the [site header](#layout) alone, where it decides whether the title or the
+menu gives way when the row gets tight; flex layout cannot make that choice by
+itself.
 
 It is a **Sass variable, not a custom property**, and that is forced rather
 than preferred: a media query condition is evaluated before the cascade runs,

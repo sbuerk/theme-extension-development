@@ -101,6 +101,97 @@ for (const tree of trees) {
                 await expect(navigation.getByRole('link', { name: hidden, exact: true })).toHaveCount(0);
             }
         });
+
+        // The showcase has five top level entries; a site has fewer or more.
+        // From the breakpoint up the header holds them in one row with the
+        // title of this tree and never spills sideways. On a wide row the
+        // title keeps its line and the menu wraps; on a narrow one the menu
+        // keeps its row as long as it can and the title wraps. Entries are
+        // added as copies of the last one, with the markup the menu renders,
+        // or removed from the end.
+        const headerScenarios = [
+            { name: 'holds seven top level entries beside a one line title at 1280 pixels', width: 1280, entries: 7, titleOneLine: true, menuOneRow: false },
+            { name: 'keeps three top level entries in one row at 768 pixels', width: 768, entries: 3, titleOneLine: false, menuOneRow: true },
+            { name: 'holds seven top level entries without spilling sideways at 768 pixels', width: 768, entries: 7, titleOneLine: false, menuOneRow: false },
+            { name: 'holds seven top level entries without spilling sideways at 900 pixels', width: 900, entries: 7, titleOneLine: false, menuOneRow: false },
+        ];
+        for (const scenario of headerScenarios) {
+            test(`${tree.prefix}/ ${scenario.name}`, async ({ page }) => {
+                await page.setViewportSize({ width: scenario.width, height: 800 });
+                await page.goto(`${tree.prefix}/typography`);
+                const count = await page.evaluate((entries) => {
+                    const list = document.querySelector('nav.theme-nav-main > .theme-nav-main__list');
+                    if (list === null) {
+                        return 0;
+                    }
+                    while (list.children.length > entries && list.lastElementChild !== null) {
+                        list.lastElementChild.remove();
+                    }
+                    const labels = ['Examples', 'Documentation', 'Downloads'];
+                    const template = list.lastElementChild;
+                    while (template !== null && list.children.length < entries) {
+                        const item = template.cloneNode(true) as HTMLElement;
+                        item.classList.remove('theme-nav-main__item--active');
+                        item.querySelectorAll('.theme-nav-main__list--sub').forEach((sub) => sub.remove());
+                        const link = item.querySelector('a');
+                        if (link !== null) {
+                            link.removeAttribute('aria-current');
+                            link.textContent = labels.shift() ?? 'More';
+                        }
+                        list.append(item);
+                    }
+                    return list.children.length;
+                }, scenario.entries);
+                expect(count).toBe(scenario.entries);
+
+                const brandLocator = page.locator('.theme-site-header__brand');
+                const brand = await brandLocator.boundingBox();
+                const nav = await page.locator('nav.theme-nav-main').boundingBox();
+                const cog = await page.getByRole('button', { name: 'Display settings' }).boundingBox();
+                if (brand === null || nav === null || cog === null) {
+                    throw new Error('The brand, the main navigation or the settings button is not rendered.');
+                }
+
+                if (scenario.titleOneLine) {
+                    const lineHeight = await brandLocator.evaluate((element) => parseFloat(getComputedStyle(element).lineHeight));
+                    expect(brand.height).toBeLessThan(lineHeight * 1.5);
+                }
+
+                // Brand, navigation and cog side by side, nothing overlapping and
+                // nothing outside the screen.
+                expect(brand.x + brand.width).toBeLessThanOrEqual(nav.x);
+                expect(nav.x + nav.width).toBeLessThanOrEqual(cog.x);
+                expect(cog.x + cog.width).toBeLessThanOrEqual(scenario.width);
+                expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(scenario.width);
+
+                // Every entry inside the navigation, and no two on top of each other.
+                const items = await page.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link').evaluateAll(
+                    (links) => links.map((link) => {
+                        const box = link.getBoundingClientRect();
+                        return { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+                    }),
+                );
+                expect(items).toHaveLength(scenario.entries);
+                for (const [index, item] of items.entries()) {
+                    expect(item.left).toBeGreaterThanOrEqual(nav.x);
+                    expect(item.right).toBeLessThanOrEqual(nav.x + nav.width);
+                    for (const other of items.slice(index + 1)) {
+                        const apart = item.right <= other.left || other.right <= item.left || item.bottom <= other.top || other.bottom <= item.top;
+                        expect(apart).toBe(true);
+                        // Entries of one row share their top. The last entry of
+                        // the list used to sit half a list item margin lower.
+                        const sameRow = item.top < other.bottom && other.top < item.bottom;
+                        if (sameRow) {
+                            expect(Math.abs(item.top - other.top)).toBeLessThan(0.5);
+                        }
+                    }
+                }
+                if (scenario.menuOneRow) {
+                    const tops = items.map((item) => item.top);
+                    expect(Math.max(...tops) - Math.min(...tops)).toBeLessThan(0.5);
+                }
+            });
+        }
     });
 }
 
