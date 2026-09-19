@@ -250,10 +250,12 @@ is work an editor does for nothing.
 
 The icon fields of the theme:
 
-| Column                          | Shown in                                                       | Rendered by                                  |
-|---------------------------------|----------------------------------------------------------------|----------------------------------------------|
-| `tx_theme_list_item.link_icon`  | The `theme_link` palette of the child, so every link relation. | `LinkList.html`, `ThemeMediaTeaserGrid.html` |
-| `tt_content.tx_theme_link_icon` | The `theme_link` palette of the hero and teaser elements.      | `LinkButton.html`                            |
+| Column                          | Shown in                                                                                                              | Rendered by                                  |
+|---------------------------------|-----------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
+| `tx_theme_list_item.link_icon`  | The `theme_link` palette of the child, so every link relation.                                                        | `LinkList.html`, `ThemeMediaTeaserGrid.html` |
+| `tt_content.tx_theme_link_icon` | The `theme_link` palette of the hero and teaser elements.                                                             | `LinkButton.html`                            |
+| `tt_content.tx_theme_icon`      | The icon of an element as a whole: the bullet list in its layout "Icons".                                             | `Bullets.html`                               |
+| `tx_theme_list_item.icon`       | The icon of an item, in the relations of the elements that render one per item; and in the default type of the child. | the template of the parent element           |
 
 The stored value is the name, and a template renders it with
 `<theme:icon name="{…}" optional="1" />` — see
