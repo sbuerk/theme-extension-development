@@ -117,6 +117,94 @@ only field, `header`, has its label overridden by `EXT:frontend`'s own
 language file to "Name (not visible in frontend)", which is also why neither
 `div`, `html` nor `shortcut` render the shared header partial.
 
+### Not every file of a gallery is an image
+
+`image` and `textpic` read the `image` field, which takes image types only.
+`textmedia` reads `assets`, which takes anything in
+`$GLOBALS['TYPO3_CONF_VARS']['SYS']['mediafile_ext']` — a video and an audio
+file included. The theme rendered every file of a gallery through `f:image`,
+which for a video produces an `img` whose source a browser cannot decode, and
+nothing on the page says so.
+
+`Partials/ContentElement/Gallery.html` branches per file instead, on
+`file.type`, read through `getType()`, which returns the same `int` on 12.4.45
+and 13.4.35 (verified in `AbstractFile::getType()`). The integers are the
+`FILETYPE_*` constants of `AbstractFile` on v12.4 and the cases of the
+`FileType` enum that superseded them on v13.4 (#102032, 13.0, which deprecated
+the constants and not the method) — the same values either way, so no version
+split is needed:
+
+| `file.type` | Is    | Renders as                                      |
+|-------------|-------|-------------------------------------------------|
+| `4`         | video | `<video controls>` in `.theme-media--video`     |
+| `3`         | audio | `<audio controls>` in `.theme-media--audio`     |
+| anything    | image | `f:image` in `.theme-gallery__image`, as before |
+
+The gallery item is a `.theme-media` **as well as** a `.theme-figure`, so the
+caption stays the gallery's own rather than a second one inside a nested
+figure. No `width`/`height` attribute is written for a player: `GalleryProcessor`
+computes both from the file's own dimensions, and FAL records none for a video,
+so what it computes is the width of the column and a height of zero — the
+component sizes the player instead.
+
+**The tag is written in the template rather than handed to `f:media`.** That is
+not a preference: `AudioTagRenderer` and `VideoTagRenderer`, which `f:media`
+dispatches to, both emit `<video controls><source …></video>` and neither has
+any notion of a text track — there is no `track` in either class, on 12.4.45
+or 13.4.35. A caption track is what WCAG 1.2.2 asks for, and it cannot come
+from a renderer that cannot produce one.
+
+#### The seeded film does not play, and is not meant to
+
+`/elements/core/textmedia` of the showcase carries a video and an audio
+element. **The video is a header-only stub** — an `ftyp` and a `free` box,
+which is enough to be detected as `video/mp4` and nothing more — so a browser
+draws the player, its controls and its caption menu, and then fails to decode
+the film. That is deliberate: a playable film needs an encoder, and committing
+a real one would put a megabyte of video into an extension whose showcase is
+about markup. What the page demonstrates is the markup, the controls and the
+caption track, and all three are there.
+
+**The audio file beside it is real** — a second of a 440 Hz tone — so the page
+does demonstrate playback, once, on the element that costs four kilobytes to
+ship. The same split is stated in `Configuration/DataFactory/theme-demo/config.yml`,
+next to the seed record in `Scenario.yaml`, and in
+[Seeding](../development/seeding.md).
+
+#### Where a caption file comes from
+
+Nowhere in the core: `sys_file_reference` carries a title, a link, a
+description, an alternative text, a crop and `autoplay`, and nothing that could
+hold a WebVTT file. So the theme adds `tx_theme_captions`, a `type=file` column
+restricted to `vtt`, on `textmedia` alone — the only CType whose media field
+can hold a video at all. It is resolved by a third `FilesProcessor` on that
+branch, deliberately not through `GalleryProcessor`, which would lay the
+caption files out as media of their own.
+
+**A caption belongs to the medium of the same name**: `launch.vtt` captions
+`launch.mp4`. Pairing by position in the two lists was the alternative and was
+rejected — an image added in the middle of `assets` would silently re-point
+every caption after it, and nothing about the page would look wrong. The track
+carries no `srclang` (required for `kind=subtitles`, optional for
+`kind=captions`) and no `default` (valid on one track per kind, and two files
+of the same name in different folders would put it on two).
+
+**A `.vtt` file cannot be uploaded at all without one more registration**, and
+that is not a TCA concern. `allowed` decides what the *field* takes; whether a
+file may be placed in a storage is
+`ResourceConsistencyService::getAllowedFileExtensions()`, which reads
+`textfile_ext`, `mediafile_ext` and `miscfile_ext` whenever the security
+feature `security.system.enforceAllowedFileExtensions` is on. The core ships
+`srt` — the other subtitle format — in `textfile_ext`, and `vtt` in none of the
+three. So `ext_localconf.php` appends it to `textfile_ext`, where the sibling
+format already is, and not to `mediafile_ext`, which is what `assets` accepts.
+
+This was found by the seeding: the showcase places a caption file through the
+storage API, and the import failed with `Resource consistency check failed` —
+a message that names neither the file nor the extension. An editor uploading
+one in the backend gets the same message, so the registration is a
+prerequisite of the feature rather than a convenience for the demo tree.
+
 ### `image_zoom`: the link, and the dialog on top of it
 
 `image_zoom` is the core field an editor ticks to make an image enlargeable. It
@@ -985,7 +1073,7 @@ its own prefix, rather than overlooked.
 
 ### `ext_tables.sql`, and why it exists although the schema derives from TCA
 
-On TYPO3 v13 the whole schema for `tx_theme_list_item` and the twenty-five
+On TYPO3 v13 the whole schema for `tx_theme_list_item` and the twenty-six
 `tx_theme_*` columns added to `tt_content` comes from
 `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()` reading the TCA at
 compare-schema time (#101553, extended by #104311 in 13.3).
@@ -993,7 +1081,7 @@ compare-schema time (#101553, extended by #104311 in 13.3).
 **TYPO3 v12 does none of that.** Its `DefaultTcaSchema` derives the management
 columns from `ctrl`, the `category|datetime|slug|json|uuid` types and MM tables,
 and has no branch for `input`, `text`, `link`, `file`, `inline` or a `select`
-without an MM table — so on v12 the table and the twenty-five columns are simply
+without an MM table — so on v12 the table and the twenty-six columns are simply
 never created and every theme element using them fails.
 [`ext_tables.sql`](../../ext_tables.sql) therefore ships the
 definitions v13 would generate, reproduced column for column from what v13's own

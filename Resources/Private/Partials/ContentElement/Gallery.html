@@ -23,6 +23,27 @@
 
     Every item is a ".theme-figure" as well, and its caption a
     ".theme-figure__caption" - the figure component the gallery builds on.
+
+    --- Not every file in a gallery is an image ----------------------------
+
+    "textmedia" reads "assets", which takes any media type, so a column may
+    hold a video or an audio file. "file.type" says which - 2 an image, 3
+    audio, 4 video - and it is read through "getType()", which returns the
+    same "int" on 12.4.45 and 13.4.35 (verified in "AbstractFile::getType()").
+    The integers are the "FILETYPE_*" constants of "AbstractFile" on v12.4,
+    and the cases of the "FileType" enum that superseded them on v13.4
+    (Feature #102032, 13.0, which deprecated the constants and not the
+    method); the values are the same on both.
+
+    A video or an audio file is played where it stands, as ".theme-media" -
+    see "components/_media.scss" for why the tag is written here rather than
+    left to "f:media". The gallery item is the figure of that component as
+    well as of the figure component, which is what lets the caption stay the
+    gallery's.
+
+    Anything else - a PDF that reached "assets" before an integrator narrowed
+    the field - falls through to the image branch, where "f:image" is what the
+    element has always done with it.
 </f:comment>
 <f:if condition="{gallery.count.files}">
     <div class="theme-gallery theme-gallery--{gallery.position.vertical} theme-gallery--{gallery.position.horizontal}{f:render(section: 'FloatModifiers', arguments: {position: gallery.position})}"
@@ -30,35 +51,11 @@
         <f:for each="{gallery.rows}" as="row">
             <div class="theme-gallery__row">
                 <f:for each="{row.columns}" as="column">
-                    <figure class="theme-gallery__item theme-figure">
-                        <f:if condition="{data.image_zoom}">
-                            <f:then>
-                                <f:comment>
-                                    "image_zoom" is the core TCA field an editor
-                                    ticks to make an image enlargeable. The link
-                                    to the original file is what it has always
-                                    been, and it stays: it is what a visitor
-                                    without a script gets, and it is why this is
-                                    not a "data-theme-dialog-open" opener, which
-                                    would be hidden without one. With a script,
-                                    "theme.js" prevents the navigation and opens
-                                    the item named here in the lightbox.
-                                </f:comment>
-                                <a class="theme-gallery__zoom" href="{f:uri.image(image: column.media)}"
-                                   data-theme-lightbox="c{data.uid}-lightbox"
-                                   data-theme-lightbox-item="c{data.uid}-lightbox-{column.media.uid}">
-                                    <f:render section="Media" arguments="{column: column}" />
-                                    <span class="theme-gallery__zoom-hint" aria-hidden="true"><theme:icon name="magnifying-glass-plus" /></span>
-                                </a>
-                            </f:then>
-                            <f:else>
-                                <f:render section="Media" arguments="{column: column}" />
-                            </f:else>
-                        </f:if>
-                        <f:if condition="{column.media.description}">
-                            <figcaption class="theme-gallery__caption theme-figure__caption">{column.media.description}</figcaption>
-                        </f:if>
-                    </figure>
+                    <f:switch expression="{column.media.type}">
+                        <f:case value="4"><f:render section="Player" arguments="{_all}" /></f:case>
+                        <f:case value="3"><f:render section="Player" arguments="{_all}" /></f:case>
+                        <f:defaultCase><f:render section="Picture" arguments="{_all}" /></f:defaultCase>
+                    </f:switch>
                 </f:for>
             </div>
         </f:for>
@@ -67,6 +64,7 @@
     <f:comment>
         The dialog the zoom links open, once per element and after the gallery
         - a closed dialog renders nothing, so its place in the flow is free.
+        Only the images of the gallery are in it; see the partial.
     </f:comment>
     <f:if condition="{data.image_zoom}">
         <f:render partial="ContentElement/Lightbox" arguments="{data: data, files: files}" />
@@ -79,7 +77,35 @@
 </f:comment>
 <f:section name="FloatModifiers"><f:if condition="{position.vertical} == 'intext'"><f:if condition="{position.horizontal} == 'left'"><f:then> theme-gallery--float-start</f:then><f:else> theme-gallery--float-end</f:else></f:if><f:if condition="{position.noWrap}"> theme-gallery--nowrap</f:if></f:if></f:section>
 
-<f:section name="Media">
+<f:section name="Picture">
+    <figure class="theme-gallery__item theme-figure">
+        <f:if condition="{data.image_zoom}">
+            <f:then>
+                <f:comment>
+                    "image_zoom" is the core TCA field an editor ticks to make
+                    an image enlargeable. The link to the original file is what
+                    it has always been, and it stays: it is what a visitor
+                    without a script gets, and it is why this is not a
+                    "data-theme-dialog-open" opener, which would be hidden
+                    without one. With a script, "theme.js" prevents the
+                    navigation and opens the item named here in the lightbox.
+                </f:comment>
+                <a class="theme-gallery__zoom" href="{f:uri.image(image: column.media)}"
+                   data-theme-lightbox="c{data.uid}-lightbox"
+                   data-theme-lightbox-item="c{data.uid}-lightbox-{column.media.uid}">
+                    <f:render section="Image" arguments="{column: column}" />
+                    <span class="theme-gallery__zoom-hint" aria-hidden="true"><theme:icon name="magnifying-glass-plus" /></span>
+                </a>
+            </f:then>
+            <f:else>
+                <f:render section="Image" arguments="{column: column}" />
+            </f:else>
+        </f:if>
+        <f:render section="Caption" arguments="{column: column}" />
+    </figure>
+</f:section>
+
+<f:section name="Image">
     <f:comment>
         "alt" and "title" are not passed: the view helper takes them from the
         "alternative" and "title" properties of the file reference by itself,
@@ -91,6 +117,85 @@
              width="{column.dimensions.width}"
              height="{column.dimensions.height}"
              loading="lazy" />
+</f:section>
+
+<f:section name="Player">
+    <f:comment>
+        The item is a ".theme-media" as well as a ".theme-figure", so the
+        caption below is the one caption of the item rather than a second one
+        inside a nested figure.
+
+        No width or height attribute: "GalleryProcessor" computes both from the
+        file's own dimensions, and a video or an audio file has none in FAL, so
+        what it computes is a width of the column and a height of zero. The
+        component sizes the player instead.
+
+        "preload=metadata" rather than "auto": a gallery may hold several
+        players, and none of them is what the reader came for. "playsinline"
+        keeps a video in its box on iOS instead of taking over the screen the
+        moment it starts.
+    </f:comment>
+    <f:if condition="{column.media.type} == 4">
+        <f:then>
+            <figure class="theme-gallery__item theme-figure theme-media theme-media--video">
+                <video class="theme-media__player" controls="controls" preload="metadata" playsinline="playsinline">
+                    <source src="{column.media.publicUrl}" type="{column.media.mimeType}" />
+                    <f:render section="Captions" arguments="{_all}" />
+                </video>
+                <f:render section="Caption" arguments="{column: column}" />
+            </figure>
+        </f:then>
+        <f:else>
+            <figure class="theme-gallery__item theme-figure theme-media theme-media--audio">
+                <audio class="theme-media__player" controls="controls" preload="metadata">
+                    <source src="{column.media.publicUrl}" type="{column.media.mimeType}" />
+                    <f:render section="Captions" arguments="{_all}" />
+                </audio>
+                <f:render section="Caption" arguments="{column: column}" />
+            </figure>
+        </f:else>
+    </f:if>
+</f:section>
+
+<f:section name="Captions">
+    <f:comment>
+        The caption track of a media file, from the "tx_theme_captions" field
+        of the element - a field of this extension, because a file reference
+        has none: "sys_file_reference" carries a title, a description, an
+        alternative text, a link, a crop and "autoplay", and nothing that could
+        hold a WebVTT file.
+
+        A caption file belongs to the media file **of the same name**:
+        "launch.vtt" captions "launch.mp4". Pairing by position in the two
+        lists was the alternative and was rejected - an image added in the
+        middle of "assets" would silently re-point every caption after it,
+        and nothing about the page would look wrong.
+
+        No "default" attribute. It would switch the captions on, which is the
+        friendlier default, but it is valid on one track per kind only, and two
+        files of the same name in different folders would put it on two.
+
+        No "srclang" either: it is required for "kind=subtitles" - a
+        translation, which has to say which language it is - and optional for
+        "kind=captions", which is the transcript of what is spoken in the
+        language that is spoken. The label names the track in the browser's
+        menu, and falls back to a translated word rather than to nothing.
+    </f:comment>
+    <f:for each="{captions}" as="caption">
+        <f:if condition="{caption.nameWithoutExtension} == {column.media.nameWithoutExtension}">
+            <f:if condition="{caption.title}">
+                <f:then><f:variable name="captionLabel">{caption.title}</f:variable></f:then>
+                <f:else><f:variable name="captionLabel"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.mediaCaptions" /></f:variable></f:else>
+            </f:if>
+            <track kind="captions" src="{caption.publicUrl}" label="{captionLabel}" />
+        </f:if>
+    </f:for>
+</f:section>
+
+<f:section name="Caption">
+    <f:if condition="{column.media.description}">
+        <figcaption class="theme-gallery__caption theme-figure__caption">{column.media.description}</figcaption>
+    </f:if>
 </f:section>
 
 </html>

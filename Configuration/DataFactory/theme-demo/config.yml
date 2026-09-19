@@ -64,6 +64,30 @@ files:
   - identifier: placeholder-graphics
     source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder-graphics.zip'
     folder: 'theme-demo'
+  # A video, an audio file and a caption track, for the two media types the
+  # "assets" field of "Text & Media" takes that "image" does not.
+  #
+  # The WAV is a real, playable file: a second of a 440 Hz tone, faded in and
+  # out so it does not click. The MP4 is **not** a playable film - it is an
+  # "ftyp" and a "free" box, the header that makes the file detectable as
+  # "video/mp4" and nothing else. A playable film needs an encoder, and
+  # committing a real one would put a megabyte of video in an extension whose
+  # showcase is about markup: the player, its controls and its caption track
+  # are what the page demonstrates, and all three are there. A browser will
+  # show the player and fail to decode the film.
+  #
+  # The caption file is paired with the video by its name, "placeholder-clip"
+  # for both - see "tx_theme_captions" in
+  # "Configuration/TCA/Overrides/tt_content.php".
+  - identifier: placeholder-clip
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder-clip.mp4'
+    folder: 'theme-demo'
+  - identifier: placeholder-clip-captions
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder-clip.vtt'
+    folder: 'theme-demo'
+  - identifier: placeholder-tone
+    source: 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Files/placeholder-tone.wav'
+    folder: 'theme-demo'
 
 # Every file relation of the tree. "uid" is the uid the scenario declares as
 # the "id" of the record the reference hangs on - see the uid scheme at the top
@@ -239,6 +263,12 @@ references:
   - {file: placeholder-portrait, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
   - {file: placeholder, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder-portrait, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  # Page 33, "Text & Media": the video with its caption track, and the audio
+  # file. The caption is a reference of its own field, not of "assets" - it is
+  # not a medium of the element, it belongs to one.
+  - {file: placeholder-clip, table: tt_content, uid: 3306, field: assets, values: {title: 'A placeholder clip', description: 'A video, with the caption track of the file of the same name.'}}
+  - {file: placeholder-clip-captions, table: tt_content, uid: 3306, field: tx_theme_captions, values: {title: 'English'}}
+  - {file: placeholder-tone, table: tt_content, uid: 3307, field: assets, values: {title: 'A placeholder tone', description: 'An audio file: a second of a 440 Hz tone.'}}
   # Page 34, "Images": the enlargeable element, three images in three columns.
   - {file: placeholder, table: tt_content, uid: 3406, field: image, values: {alternative: 'A placeholder graphic in landscape format', description: 'The first of three, enlargeable'}}
   - {file: placeholder-portrait, table: tt_content, uid: 3406, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'The second, in portrait format'}}

@@ -180,3 +180,37 @@ if ((new Typo3Version())->getMajorVersion() < 13) {
 if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('rte_ckeditor')) {
     $GLOBALS['TYPO3_CONF_VARS']['RTE']['Presets']['theme'] ??= 'EXT:theme_extension_development/Configuration/RTE/Theme.yaml';
 }
+
+// WebVTT, so a caption file can be uploaded at all.
+//
+// "tx_theme_captions" of "Text & Media" holds the caption track of a video or
+// an audio file (see "Configuration/TCA/Overrides/tt_content.php"). A file
+// reaches a storage only if its extension is in one of the three lists
+// "ResourceConsistencyService::getAllowedFileExtensions()" reads -
+// "textfile_ext", "mediafile_ext" and "miscfile_ext" - whenever the security
+// feature "security.system.enforceAllowedFileExtensions" is on. The core
+// ships "srt", the other subtitle format, in "textfile_ext", and "vtt" in
+// none of the three (verified in "Configuration/DefaultConfiguration.php" of
+// EXT:core on 12.4.45 and 13.4.35). Without this an editor cannot upload the
+// file the field asks for, and the check fails with "Resource consistency
+// check failed" rather than with anything naming the extension.
+//
+// "textfile_ext" rather than "mediafile_ext" on purpose: a WebVTT file is
+// text - the transcript of a medium, not a medium of its own - and it is the
+// list the core keeps "srt" in. It also stays out of "common-media-types",
+// which resolves to "mediafile_ext" and is what the "assets" field accepts: a
+// caption file is not something to put in the media field.
+//
+// Appended rather than replaced, and only when absent: the list belongs to the
+// installation, and another extension or "additional.php" may have added to it
+// first.
+$themeTextFileExtensions = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+    ',',
+    (string)($GLOBALS['TYPO3_CONF_VARS']['SYS']['textfile_ext'] ?? ''),
+    true,
+);
+if (!in_array('vtt', array_map('strtolower', $themeTextFileExtensions), true)) {
+    $themeTextFileExtensions[] = 'vtt';
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['textfile_ext'] = implode(',', $themeTextFileExtensions);
+}
+unset($themeTextFileExtensions);
