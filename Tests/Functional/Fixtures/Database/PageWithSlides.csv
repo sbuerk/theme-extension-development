@@ -1,0 +1,21 @@
+# "tx_theme_list_items" is the *number* of children, not a list of their uids:
+# the column of an inline relation with "foreign_field" is an integer, and the
+# relation itself is carried by "uid_foreign", "tablename" and "fieldname" on
+# each child below. A list of uids here is coerced to an integer by SQLite and
+# MariaDB and rejected by PostgreSQL. (A comma separated list of declared ids
+# *is* right in "Configuration/DataFactory/theme-demo/Scenario.yaml", where
+# DataHandler resolves it like a form submit - this is the other case.)
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,layout,tx_theme_list_items
+,10,1,0,0,0,10,theme_carousel,Every caption position,2,0,3
+,20,1,0,0,0,20,theme_carousel,,0,0,2
+tx_theme_list_item,,,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,text,link,link_label,link_variant,caption_position,image
+,460,1,0,0,1,10,tt_content,tx_theme_list_items,The caption below,The words sit under the picture.,t3://page?uid=1,Read on,,,1
+,461,1,0,0,2,10,tt_content,tx_theme_list_items,The caption above,Painted before the picture.,,,,above,0
+,462,1,0,0,3,10,tt_content,tx_theme_list_items,The caption over the picture,Over the foot of the picture.,,,,overlay,1
+,464,1,0,0,1,20,tt_content,tx_theme_list_items,A carousel with no heading,The region takes a generic name.,,,,,0
+,466,1,0,0,2,20,tt_content,tx_theme_list_items,An overlay caption with no picture,There is nothing to lie over.,,,,overlay,0

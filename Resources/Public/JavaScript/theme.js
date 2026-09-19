@@ -603,6 +603,119 @@ function bindOneTooltip(tooltip) {
     });
 }
 
+/**
+ * The carousel - the previous and next buttons, and which indicator is marked
+ * as the one the reader is on.
+ *
+ * "components/_carousel.scss" documents the contract, and the short version is
+ * that this file adds nothing the component needs in order to work: the track
+ * is a scroll container that snaps, so it scrolls by touch, trackpad, wheel,
+ * scroll bar and - because it carries a tab stop - by the arrow keys, with
+ * nothing bound to it; and the indicators are links to the ids of the slides,
+ * so they move the reader with no script either. What is added here is the two
+ * buttons, which the stylesheet keeps hidden until this function has marked the
+ * carousel "data-theme-carousel-bound", and "aria-current" on the indicator of
+ * the slide in view, which is a fact only the running page knows.
+ *
+ * **Nothing here starts on its own.** There is no timer, no autoplay and no
+ * "play/pause" control to go with one, which is the WCAG 2.2.2 decision the
+ * component's header comment makes; every scroll below is the answer to
+ * something the reader did.
+ *
+ * Every carousel on the page is bound, each scoped to its own element, for the
+ * reason the main menu toggle above gives.
+ */
+function bindCarousels() {
+    document.querySelectorAll('.theme-carousel').forEach(bindOneCarousel);
+}
+
+function bindOneCarousel(carousel) {
+    const track = carousel.querySelector('.theme-carousel__track');
+    if (!track) {
+        return;
+    }
+
+    const slides = Array.prototype.filter.call(track.children, function (element) {
+        return element.classList.contains('theme-carousel__slide');
+    });
+    if (slides.length === 0) {
+        return;
+    }
+
+    const indicators = carousel.querySelectorAll('.theme-carousel__indicator');
+
+    // Scrolling by the width of one slide plus the gap, read off the two
+    // slides rather than from a token: the gap is a custom property the page
+    // may have re-pointed, and the measured distance is right whatever it
+    // holds. With one slide there is nothing to measure and nothing to scroll.
+    function step() {
+        if (slides.length < 2) {
+            return track.clientWidth;
+        }
+
+        return Math.abs(slides[1].offsetLeft - slides[0].offsetLeft);
+    }
+
+    function scrollBy(direction) {
+        // "scrollBy" with "behavior: smooth" is animation the reader asked
+        // for, and the browser already suppresses it for
+        // "prefers-reduced-motion: reduce" - it is the one place where
+        // honouring that preference needs no rule of ours.
+        track.scrollBy({ left: direction * step(), behavior: 'smooth' });
+    }
+
+    const previous = carousel.querySelector('.theme-carousel__control--previous');
+    if (previous) {
+        previous.addEventListener('click', function () {
+            // The start edge is to the right in a right-to-left page, and
+            // "scrollLeft" is negative there; multiplying by the direction of
+            // the track is what makes "previous" mean previous in both.
+            scrollBy(window.getComputedStyle(track).direction === 'rtl' ? 1 : -1);
+        });
+    }
+
+    const next = carousel.querySelector('.theme-carousel__control--next');
+    if (next) {
+        next.addEventListener('click', function () {
+            scrollBy(window.getComputedStyle(track).direction === 'rtl' ? -1 : 1);
+        });
+    }
+
+    // Which slide the reader is on, marked on its indicator. An
+    // IntersectionObserver against the track rather than a scroll listener:
+    // it reports only when a slide crosses the threshold, and it is right
+    // after a jump by a fragment link, after a resize and after a scroll the
+    // reader made by hand, none of which a click handler would see.
+    //
+    // "aria-current" and nothing else: the indicator is a link to a slide, and
+    // the statement being made is "this is the one you are on", which is what
+    // that attribute says. It is not "selected" - nothing here is a tab.
+    if (indicators.length === slides.length && typeof window.IntersectionObserver === 'function') {
+        const observer = new window.IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                const index = slides.indexOf(entry.target);
+                if (index === -1) {
+                    return;
+                }
+                if (entry.isIntersecting) {
+                    indicators[index].setAttribute('aria-current', 'true');
+                } else {
+                    indicators[index].removeAttribute('aria-current');
+                }
+            });
+        }, { root: track, threshold: 0.6 });
+
+        slides.forEach(function (slide) {
+            observer.observe(slide);
+        });
+    }
+
+    // Last, as for the tabs: the marker says the controls above are wired, so
+    // it must not be set before they are.
+    carousel.setAttribute('data-theme-carousel-bound', '');
+}
+
 bindTabs();
 bindDialogs();
 bindTooltips();
+bindCarousels();

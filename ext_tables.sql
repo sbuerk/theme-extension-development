@@ -141,5 +141,6 @@ CREATE TABLE tx_theme_list_item (
 	link_icon text,
 	icon text,
 	meta varchar(255) DEFAULT '' NOT NULL,
-	link_variant varchar(255) DEFAULT '' NOT NULL
+	link_variant varchar(255) DEFAULT '' NOT NULL,
+	caption_position varchar(255) DEFAULT '' NOT NULL
 );
