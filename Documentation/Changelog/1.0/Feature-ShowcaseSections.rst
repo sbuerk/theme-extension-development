@@ -31,11 +31,25 @@ grows from one page per family of content elements to one page per element:
         -   Every frame, every space before and after, and every header
             alignment and look of the :guilabel:`Appearance` tab, one
             element each.
+    *   -   :guilabel:`Typography` (``/typography``) and its pages
+            :guilabel:`Text`, :guilabel:`Lists`, :guilabel:`Tables`,
+            :guilabel:`Quotes and code` and :guilabel:`Article`
+        -   The typography of the theme as an editor produces it, from rich
+            text and content elements: headings inside a text, the inline
+            semantics, the alignments and styles of the rich text preset,
+            lists and tables of the rich text next to the elements, quotations,
+            code blocks, and a long article that uses all of them.
+
+The rich text of the typography pages is written into the database the way a
+backend save writes it, so the processing of the installation's rich text
+preset applies to it. With the preset of the theme everything on the pages
+survives; it was not typed into the editor, and several parts need its source
+view.
 
 Impact
 ======
 
-The set declares more uids: pages 30 to 39, 50 and 51, and their content
+The set declares more uids: pages 30 to 39 and 50 to 56, and their content
 elements at the page uid times 100 plus the position, for example ``3502``.
 An installation importing ``theme-demo`` needs those uids free as well.
 
