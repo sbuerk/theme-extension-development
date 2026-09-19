@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:layout name="ContentElement" />
 
@@ -7,64 +8,111 @@
     <f:render partial="ContentElement/Header" arguments="{_all}" />
 
     <f:comment>
-        "bodytext" is one item per line. "TYPO3\CMS\Frontend\DataProcessing\
-        SplitProcessor" already does exactly the split this needs - one field,
-        one delimiter (its default is LF, which is what "bodytext" already
-        uses), no nesting - so no processor of this extension's own was
-        written for "bullets"; see "ContentElements.typoscript" for the
-        TypoScript-only wiring.
-
         "bullets_type" (core TCA, EXT:frontend
         "Configuration/TCA/Overrides/235-tt_content-content_type-bullets.php")
-        selects the list type: 0 = unordered ("<ul>"), 1 = ordered ("<ol>"),
-        2 = definition list ("<dl>").
+        selects the list: 0 = "<ul>", 1 = "<ol>", 2 = "<dl>".
+        "ContentElements.typoscript" splits "bodytext" the way
+        fluid_styled_content does, so the same record renders the same list
+        with either installed: one item per line for the first two, and one
+        "term|description" pair per line for the definition list.
 
-        The component library ("docs/development/component-library.md") has
-        no dedicated list/bullets component - no ".theme-list" or similar is
-        documented, so none is invented here. This renders plain semantic
-        "<ul>"/"<ol>"/"<dl>" inside the same ".theme-content-element__body"
-        wrapper "Text.html" uses, styled only by whatever base typography the
-        theme already applies to those elements.
+        --- The lists: ".theme-list", modifier from "layout" -----------------
 
-        A definition list has no second field to supply the "<dd>" half of a
-        term/description pair - "bodytext" for "bullets" is documented as one
-        item per line with no delimiter convention for splitting a term from
-        its description, and no reference rendering ships with this core
-        version to defer to (this distribution carries no
-        "fluid_styled_content"). Each line therefore becomes a "<dt>" on its
-        own; inventing an ad-hoc in-line delimiter the editor was never told
-        about would be worse than leaving "<dd>" out.
+        "layout" (core TCA, 0-3, relabelled for this CType in
+        "Configuration/PageTsConfig/ContentElementAppearance.tsconfig") picks
+        the modifier of "components/_list.scss":
 
-        Escaping: each bullet item comes straight from an editor and is output
+          0  bullets or numbers   ".theme-list"
+          1  check marks          ".theme-list--check"
+          2  icons                ".theme-list--icon", the icon picked in
+                                  "tx_theme_icon" in front of every item
+          3  inline               ".theme-list--inline"
+
+        An "<ol>" takes them as well: the component works on both, and the
+        list stays ordered for assistive technology when the numbers give
+        way to a marker. Any other value renders the bare ".theme-list", the
+        rule of the frame modifiers in "Layouts/ContentElement.html";
+        "ContentElementContractTest" holds every modifier written here to a
+        rule of the stylesheet.
+
+        --- The icon list ----------------------------------------------------
+
+        One icon for the whole list, picked by the editor in "tx_theme_icon"
+        ("Classes/Tca/IconItems.php", the picker every icon field of the
+        theme uses). The name comes from a record, so it is rendered with
+        "optional": an icon a later version of the set no longer has costs
+        the icon, not the page. With no icon picked the layout has nothing to
+        show, and the list renders as layout 0 rather than as a column of
+        empty marker slots.
+
+        --- The definition list ---------------------------------------------
+
+        Always ".theme-dl--horizontal": terms and descriptions side by side
+        from "bp.$md" up, stacked below it. "layout" does not apply to it.
+        Each line is a row of "CommaSeparatedValueProcessor", split at "|"
+        with the enclosure '"', as fluid_styled_content splits it: the first
+        cell is the term, every further non-empty cell a description of it.
+        A line without "|" is a term without a description. Unlike
+        fluid_styled_content's "Bullets/Type-2" partial, a row with an empty
+        term - an empty line, or "|description" - is skipped whole, and an
+        empty cell renders no empty "<dd>": a description without its term
+        is not a definition.
+
+        Escaping: every item comes straight from an editor and is output
         through plain Fluid variable interpolation, which HTML-escapes by
         default - nothing here uses "f:format.raw" or "f:format.html".
     </f:comment>
+    <f:switch expression="{data.layout}">
+        <f:case value="1"><f:variable name="listModifier" value=" theme-list--check" /></f:case>
+        <f:case value="2">
+            <f:if condition="{data.tx_theme_icon}">
+                <f:then><f:variable name="listModifier" value=" theme-list--icon" /></f:then>
+                <f:else><f:variable name="listModifier" value="" /></f:else>
+            </f:if>
+        </f:case>
+        <f:case value="3"><f:variable name="listModifier" value=" theme-list--inline" /></f:case>
+        <f:defaultCase><f:variable name="listModifier" value="" /></f:defaultCase>
+    </f:switch>
     <f:if condition="{bullets}">
         <div class="theme-content-element__body">
             <f:switch expression="{data.bullets_type}">
                 <f:case value="1">
-                    <ol>
+                    <ol class="theme-list{listModifier}">
                         <f:for each="{bullets}" as="bullet">
-                            <li>{bullet}</li>
+                            <f:render section="Item" arguments="{bullet: bullet, layout: data.layout, icon: data.tx_theme_icon}" />
                         </f:for>
                     </ol>
                 </f:case>
                 <f:case value="2">
-                    <dl>
-                        <f:for each="{bullets}" as="bullet">
-                            <dt>{bullet}</dt>
+                    <dl class="theme-dl theme-dl--horizontal">
+                        <f:for each="{bullets}" as="row">
+                            <f:if condition="{row.0}">
+                                <f:for each="{row}" as="cell" iteration="position">
+                                    <f:if condition="{position.isFirst}">
+                                        <f:then><dt>{cell}</dt></f:then>
+                                        <f:else if="{cell}"><dd>{cell}</dd></f:else>
+                                    </f:if>
+                                </f:for>
+                            </f:if>
                         </f:for>
                     </dl>
                 </f:case>
                 <f:defaultCase>
-                    <ul>
+                    <ul class="theme-list{listModifier}">
                         <f:for each="{bullets}" as="bullet">
-                            <li>{bullet}</li>
+                            <f:render section="Item" arguments="{bullet: bullet, layout: data.layout, icon: data.tx_theme_icon}" />
                         </f:for>
                     </ul>
                 </f:defaultCase>
             </f:switch>
         </div>
+    </f:if>
+</f:section>
+
+<f:section name="Item">
+    <f:if condition="{layout} == 2 && {icon}">
+        <f:then><li><span class="theme-list__icon" aria-hidden="true"><theme:icon name="{icon}" optional="1" /></span>{bullet}</li></f:then>
+        <f:else><li>{bullet}</li></f:else>
     </f:if>
 </f:section>
 

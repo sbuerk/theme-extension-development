@@ -118,39 +118,90 @@ only field, `header`, has its label overridden by `EXT:frontend`'s own
 language file to "Name (not visible in frontend)", which is also why neither
 `div`, `html` nor `shortcut` render the shared header partial.
 
-## `bullets`: the core's own `SplitProcessor`, no PHP of this extension's
+## `bullets`: core processors, and the list components
 
-`bodytext` for `bullets` is one item per line — exactly what
-`TYPO3\CMS\Frontend\DataProcessing\SplitProcessor` is for: one field, one
-delimiter, no nesting. Its default delimiter is `LF`, which is already how
-`bodytext` is stored, so the TypoScript branch configures nothing beyond
-`fieldName` and `as`. No processor of this extension's own was needed.
+`bodytext` for `bullets` is one item per line. No processor of this
+extension's own was needed: the TypoScript branch wires the two core
+processors the way `fluid_styled_content` wires them for this CType
+(`Configuration/TypoScript/ContentElement/Bullets.typoscript` there), condition
+for condition, so both split a record into the same items — which matters for
+the optional bridge to `fluid_styled_content` that points its paths at these
+templates. What the templates then render of a definition list differs in one
+point, below.
 
-`bullets_type` (core TCA,
-`Configuration/TCA/Overrides/235-tt_content-content_type-bullets.php`)
-selects the list shape:
+| `bullets_type` | Processor                      | Split                        | Element                                      |
+|----------------|--------------------------------|------------------------------|----------------------------------------------|
+| `0`            | `SplitProcessor`               | one item per line            | `<ul class="theme-list …">`                  |
+| `1`            | `SplitProcessor`               | one item per line            | `<ol class="theme-list …">`                  |
+| `2`            | `CommaSeparatedValueProcessor` | `term\|description` per line | `<dl class="theme-dl theme-dl--horizontal">` |
 
-| `bullets_type` | Element |
-|----------------|---------|
-| `0`            | `<ul>`  |
-| `1`            | `<ol>`  |
-| `2`            | `<dl>`  |
+`SplitProcessor` runs with `removeEmptyEntries`, so an empty line — the
+trailing line break of a textarea included — is no item. The CSV processor has
+no such option: an empty line is a row with an empty first cell, and the
+template skips it. The first cell of a row is the `<dt>`, every further
+non-empty cell a `<dd>` of it, and a line without `|` is a term with no
+description — the reading of `fluid_styled_content`'s `Bullets/Type-2`
+partial, with one deliberate difference: that partial renders an empty `<dt>`
+for a line such as `|description` and an empty `<dd>` for an empty cell, and
+this template skips both, the description of an empty term with it. A
+description without its term is not a definition. `BulletListRenderingTest`
+pins that.
 
-For the definition list, **every line becomes a standalone `<dt>`**, never a
-`<dt>`/`<dd>` pair. `bodytext` for `bullets` carries no second field and no
-documented delimiter convention for splitting a term from its description,
-and no `fluid_styled_content` reference rendering is installed here to defer
-to. Inventing an ad-hoc in-line delimiter the
-editor was never told about would be worse than leaving `<dd>` out entirely,
-so the template does exactly that.
+The enclosure stays the processor's default `"`, as there, so a line is read as
+CSV (`CsvUtility::csvToArray()`, `fgetcsv()`): a line starting with `"` loses
+the quote, and a `"` that is never closed swallows the lines after it into one
+cell. That is the same in both, and it is why the changelog does not promise
+that every line without `|` renders as before.
 
-`Bullets.html` renders plain semantic `<ul>`/`<ol>`/`<dl>` inside the same
-`.theme-content-element__body` wrapper `Text.html` uses, styled by the element
-baseline. The library now has list components — `.theme-list` with its marker
-and layout modifiers and `.theme-dl --horizontal`, see
-[Component library](../development/component-library.md) — but `bullets` does
-not map its `layout` or `bullets_type` onto them yet; that mapping is a change
-of its own, not part of adding the components.
+Until this change every line of a definition list was a `<dt>` of its own:
+there was no reference rendering installed to take the convention from, and
+inventing a delimiter nobody told the editor about was worse than leaving
+`<dd>` out. `fluid_styled_content` is that reference, and a line of the old
+shape — no `|` — still renders as a term.
+
+### `layout` picks the modifier of `.theme-list`
+
+`layout` is disabled for every CType in
+`Configuration/PageTsConfig/ContentElementAppearance.tsconfig` and re-enabled
+for `bullets` alone through `layout.types.bullets.disabled = 0`:
+`PageTsConfigMerged` merges `types.<CType>` over the field configuration for
+the record type of the form, so the `0` wins for this type and no other. The
+four core values keep their numbers and get labels that describe a list:
+
+| `layout` | Label              | Modifier                                                |
+|----------|--------------------|---------------------------------------------------------|
+| `0`      | Bullets or numbers | none — `.theme-list` alone, the markers of the baseline |
+| `1`      | Check marks        | `.theme-list--check`                                    |
+| `2`      | Icons              | `.theme-list--icon`, one icon of the set for every item |
+| `3`      | Inline             | `.theme-list--inline`                                   |
+
+An `<ol>` takes the same modifiers — the component is written for both, and an
+ordered list stays ordered for assistive technology when a check mark replaces
+the number. A value outside the four renders the bare `.theme-list`, the rule
+of the frame modifiers; `ContentElementContractTest` reads the modifiers out
+of `Bullets.html` and holds each to a rule of the compiled stylesheet. The
+definition list ignores `layout`: it is always `--horizontal`, stacked below
+`bp.$md` by the component itself.
+
+**Layout 2 shows the icon the editor picked**, one for the whole list, in
+`tt_content.tx_theme_icon`. The column is the theme's icon picker —
+`IconItems::selectConfig()`, the icon grid below the select, the curated
+`keepItems` of `Configuration/PageTsConfig/IconPicker.tsconfig` copied from the
+link icon — see [Icons](../development/icons.md#picking-an-icon-in-the-backend).
+It is a column of its own rather than `tx_theme_link_icon`, which belongs to a
+link and is shown with it, and it is added to `bullets` alone, after the list
+type; a later core layout that shows one icon for the whole element adds the
+same column to its CType. The template renders the name with `optional`: an
+icon a later version of the set no longer has costs the icon, not the page.
+With no icon picked the layout has nothing to put in the slot, so the list
+renders as layout 0 rather than as a column of empty slots.
+
+`BulletListRenderingTest` holds the four layouts, the picked icon, the layout
+without one, the unknown value, the ordered list and the definition list
+against fixture records; `ContentElementAppearanceFormEngineTest` holds the
+form to offering `layout` and the icon on this CType, under these labels, and
+on no other, and `IconPickerFormEngineTest` holds the icon field to the
+curated list and to the whole set without it.
 
 ## `table`: why a real `DataProcessor` was necessary
 
@@ -737,7 +788,7 @@ its own prefix, rather than overlooked.
 
 ### `ext_tables.sql`, and why it exists although the schema derives from TCA
 
-On TYPO3 v13 the whole schema for `tx_theme_list_item` and the seven
+On TYPO3 v13 the whole schema for `tx_theme_list_item` and the eight
 `tx_theme_*` columns added to `tt_content` comes from
 `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()` reading the TCA at
 compare-schema time (#101553, extended by #104311 in 13.3).
@@ -745,7 +796,7 @@ compare-schema time (#101553, extended by #104311 in 13.3).
 **TYPO3 v12 does none of that.** Its `DefaultTcaSchema` derives the management
 columns from `ctrl`, the `category|datetime|slug|json|uuid` types and MM tables,
 and has no branch for `input`, `text`, `link`, `file`, `inline` or a `select`
-without an MM table — so on v12 the table and the seven columns are simply never
+without an MM table — so on v12 the table and the eight columns are simply never
 created and every theme element using them fails.
 [`ext_tables.sql`](../../ext_tables.sql) therefore ships the
 definitions v13 would generate, reproduced column for column from what v13's own
