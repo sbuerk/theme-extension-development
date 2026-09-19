@@ -158,6 +158,34 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * The CType chip straddles the top edge of an element. "--frame-none"
+     * drops the inner padding, and without a clearance the lower half of the
+     * chip lay over the first line of the content. Where there is no chip - the
+     * global switch, "--plain" - there is nothing to clear, and the element is
+     * flush with its box again.
+     */
+    #[Test]
+    public function anElementWithoutPaddingKeepsItsContentClearOfTheChip(): void
+    {
+        $css = (string)preg_replace('/\s+/', '', $this->stylesheet());
+
+        $this->assertStringContainsString(
+            '.theme-content-element--frame-none>.theme-content-element__inner{padding-block-start:var(--theme-content-element-chip-clearance)}',
+            $css,
+            'An element without inner padding has to start its content below the chip.',
+        );
+        foreach (['[data-theme-content-outline=off].theme-content-element{', '.theme-content-element--plain{'] as $rule) {
+            preg_match('/' . preg_quote($rule, '/') . '([^}]*)\}/', $css, $declarations);
+            $this->assertArrayHasKey(1, $declarations, sprintf('The compiled stylesheet has no rule "%s".', $rule));
+            $this->assertStringContainsString(
+                '--theme-content-element-chip-clearance:0',
+                $declarations[1],
+                sprintf('"%s" removes the chip, so it has to remove the clearance as well.', $rule),
+            );
+        }
+    }
+
+    /**
      * Tabs must leave every panel readable until the script has bound them.
      *
      * A tab is a button, and a button does nothing without a script, so tabs
