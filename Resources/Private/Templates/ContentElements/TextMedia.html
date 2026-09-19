@@ -20,10 +20,10 @@
         computed by "GalleryProcessor" and read by the gallery partial into the
         "theme-gallery--{vertical}"/"--{horizontal}" classes. "below" is the only
         vertical value that changes the DOM order here: "above" and "intext" both
-        put the gallery first, which is also where a stylesheet has to find it to
-        float it beside the following text for "intext" - see
-        "components/_gallery.scss" for why the position modifiers are structural
-        only for now.
+        put the gallery first, which is also where the float has to be for the
+        text after it to flow around it. The gallery partial adds
+        "--float-start"/"--float-end" (and "--nowrap") for "intext", see
+        "components/_gallery.scss".
     </f:comment>
     <f:if condition="{gallery.position.vertical} == 'below'">
         <f:then>

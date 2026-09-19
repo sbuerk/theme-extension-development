@@ -253,6 +253,22 @@ of a linked card and the hover bridge of the tooltip are invisible, and the
 `CType` label of the content-element outline and the quotation marks are text.
 A new shape drawn in CSS is either one of the kinds above or an icon.
 
+An icon of the set may still reach the page through the stylesheet where a
+component shows the same one on every item and has no markup per item to put
+`<theme:icon>` into — the marker of `.theme-list--check`. The stylesheet then
+references the vendored file as a CSS `mask`, relative to the compiled
+`theme.css` (`url('../Icons/FontAwesome/Solid/check.svg')`), and paints it
+with `background-color`. That draws nothing: the shape is the file's, the one
+`<theme:icon name="check" />` renders, and `checkIconsBuild` covers it with the
+rest of the set. It needs a forced colours rule of its own, because the fill is
+a background — see `components/_list.scss`.
+
+The rule is narrow on purpose: a stylesheet references **only files of
+`Resources/Public/Icons/FontAwesome/Solid/`**, by their relative path from the
+compiled stylesheet. Never a `data:` URI, never an image of its own, never a
+file the set does not ship. `IconUsageTest::aStylesheetReferencesOnlyFilesOfTheIconSet`
+fails on any other `url()`.
+
 `Tests/Unit/IconUsageTest` holds the templates and the stylesheets to it:
 
 | Test                                                          | Guards                                                                                                            |

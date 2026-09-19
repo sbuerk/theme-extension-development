@@ -411,6 +411,31 @@
 &lt;/div&gt;</code></pre>
     </div>
 
+    <h3>Code block with a file name</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_code.scss. The "pre"
+            is the scrolling region, so it carries the tab stop and the name.
+        </f:comment>
+        <p>
+            <code>.theme-code</code> puts a file name - and optionally the
+            language - above the same <code>pre</code>, in one frame. The block
+            is the part that scrolls, so it is a named region with a tab stop
+            of its own: focus it and the arrow keys scroll the long line
+            below.
+        </p>
+        <figure class="theme-code">
+            <figcaption class="theme-code__caption">
+                <span class="theme-code__filename">Configuration/Sets/ThemeExtensionDevelopment/config.yaml</span>
+                <span class="theme-code__language">YAML</span>
+            </figcaption>
+            <pre class="theme-code__block" role="region" tabindex="0" aria-label="Configuration/Sets/ThemeExtensionDevelopment/config.yaml"><code>name: sbuerk/theme-extension-development
+label: 'Theme Extension Development'
+# A line long enough to scroll: the site set points at the shared TypoScript directory, so the set and the static include read the very same files.
+typoscript: 'EXT:theme_extension_development/Configuration/TypoScript/'</code></pre>
+        </figure>
+    </div>
+
     <h3>Horizontal rule</h3>
     <div class="theme-styleguide__specimen">
         <p>
@@ -423,6 +448,38 @@
         <p>
             The text after the rule sits at the same distance from it as the
             text before, which is the point of setting one value for both.
+        </p>
+    </div>
+
+    <h3>Divider with a label, and a section break</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_divider.scss. A
+            separator's children are presentational, so its name is the
+            "aria-label", which repeats the visible label.
+        </f:comment>
+        <p>
+            An <code>hr</code> cannot hold a label, so a labelled separator is a
+            <code>div</code> with the separator role, named by
+            <code>aria-label</code>. The label sits in the middle, or at the
+            start with <code>--start</code>.
+        </p>
+        <div class="theme-divider" role="separator" aria-label="Part two">
+            <span class="theme-divider__label">Part two</span>
+        </div>
+        <div class="theme-divider theme-divider--start" role="separator" aria-label="Appendix">
+            <span class="theme-divider__label">Appendix</span>
+        </div>
+        <p>
+            <code>--break</code> is the break between two passages of the same
+            section: an asterism instead of a rule, and no label.
+        </p>
+        <div class="theme-divider theme-divider--break" role="separator">
+            <span class="theme-divider__glyph" aria-hidden="true">⁂</span>
+        </div>
+        <p>
+            The passage after the break continues the section rather than
+            starting a new one.
         </p>
     </div>
 

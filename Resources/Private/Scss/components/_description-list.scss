@@ -1,0 +1,84 @@
+// Description list.
+//
+// Markup contract:
+//
+//     <dl class="theme-dl theme-dl--horizontal">
+//         <dt>…</dt>
+//         <dd>…</dd>
+//     </dl>
+//
+// Modifiers: "--horizontal" sets terms and descriptions side by side from
+// "bp.$md" up, stacked below it; "--truncate", with "--horizontal", keeps
+// every term on one line and cuts it with an ellipsis.
+//
+// "<dt>"/"<dd>" are bare and selected as direct children, like the items of
+// ".theme-list": a nested "<dl>" inside a description keeps the element
+// baseline unless it carries the class itself. A term may have several
+// descriptions and a description several terms; both land in their own column.
+//
+// The bare class differs from the element baseline in one thing: a
+// description is not indented. The baseline indents it like a list item so a
+// "dl" in rich text reads as a list; a component that lays terms and
+// descriptions out on purpose does not need the indent to tell them apart.
+//
+// --- Truncation is opt-in ---------------------------------------------------
+//
+// A cut term is text a sighted reader cannot read, so it is never the default:
+// a term column narrower than a term would otherwise hide the end of it
+// without anyone having asked. "--truncate" is for terms that are known to be
+// identifiers or paths, where the start is what identifies them. A screen
+// reader still reads the whole term; a "title" with the full text helps a
+// pointer user and nobody else, so it is a courtesy rather than the fix.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-dl {
+    --theme-dl-term-width: 14rem;
+    --theme-dl-column-gap: var(--theme-space-4, 1.25rem);
+    --theme-dl-row-gap: var(--theme-space-2, 0.625rem);
+
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+
+    > dd {
+        margin-inline-start: 0;
+
+        // A description of several paragraphs, or one holding a nested list,
+        // ends on its own last block; that block's bottom margin would add a
+        // gap before the next term that a one-line description does not get.
+        > :last-child {
+            margin-block-end: 0;
+        }
+    }
+}
+
+@media (min-width: bp.$md) {
+    .theme-dl--horizontal {
+        display: grid;
+        grid-template-columns: minmax(0, var(--theme-dl-term-width)) minmax(0, 1fr);
+        gap: var(--theme-dl-row-gap) var(--theme-dl-column-gap);
+
+        // The grid gap is the rhythm now, so the margins the element baseline
+        // gives a term and a description are dropped rather than added to it.
+        > dt,
+        > dd {
+            margin: 0;
+        }
+
+        > dt {
+            grid-column: 1;
+        }
+
+        > dd {
+            grid-column: 2;
+        }
+    }
+
+    .theme-dl--horizontal.theme-dl--truncate > dt {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
