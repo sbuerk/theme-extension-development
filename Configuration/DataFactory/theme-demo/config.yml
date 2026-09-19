@@ -232,3 +232,5 @@ references:
   - {file: placeholder-portrait, table: tt_content, uid: 3703, field: media, values: {title: 'Placeholder, portrait', description: 'A portrait SVG.'}}
   - {file: placeholder, table: tt_content, uid: 3704, field: media, values: {title: 'Placeholder, landscape', description: 'A landscape SVG, with its thumbnail.'}}
   - {file: placeholder-portrait, table: tt_content, uid: 3704, field: media, values: {title: 'Placeholder, portrait', description: 'A portrait SVG, with its thumbnail.'}}
+  # Page 56, "Article": the image the text flows around.
+  - {file: placeholder-portrait, table: tt_content, uid: 5604, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'Placed in the text, at the end of the line'}}
