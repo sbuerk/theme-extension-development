@@ -1059,6 +1059,24 @@ entities:
                           uploads_type: 2
                           filelink_size: 1
                           uploads_description: 1
+                      -
+                        self:
+                          id: 4705
+                          CType: uploads
+                          header: 'The icon of each file type, with the size (1)'
+                          header_layout: 2
+                          uploads_type: 1
+                          filelink_size: 1
+                          filelink_sorting: name
+                          filelink_sorting_direction: asc
+                      -
+                        self:
+                          id: 4706
+                          CType: uploads
+                          header: 'A thumbnail for the image, the icon for the rest (2)'
+                          header_layout: 2
+                          uploads_type: 2
+                          uploads_description: 1
                 -
                   self:
                     id: 1038

@@ -110,10 +110,9 @@ is for the horizontal alignment of the gallery row. Every gallery item is a
 `textpic` and `textmedia` against seeded records with real file references.
 `uploads` is a file list, not a gallery: `FilesProcessor` merges `media` and
 `file_collections` and applies `filelink_sorting`/`filelink_sorting_direction`
-natively, so the template only formats what it is handed —
-`f:format.bytes` for the optional size, `f:image` for a thumbnail, and only
-when FAL classifies the file as an image (`file.type == 2`), since `f:image`
-cannot process a PDF or a text file. `div` renders nothing but an `<hr>`; its
+natively, so the template only formats what it is handed, as a
+`.theme-file-list` — see [below](#uploads-the-display-type-picks-the-file-list).
+`div` renders nothing but an `<hr>`; its
 only field, `header`, has its label overridden by `EXT:frontend`'s own
 language file to "Name (not visible in frontend)", which is also why neither
 `div`, `html` nor `shortcut` render the shared header partial.
@@ -236,6 +235,74 @@ decorative border colour, like every hairline of the Frame language.
 include, `ContentElementAppearanceFormEngineTest` the form to offering `0` and
 `1` under these labels on this CType, and `ContentElementContractTest` the
 modifier to a rule of the stylesheet.
+
+## `uploads`: the display type picks the file list
+
+The core gives the file links element a display type of its own,
+`uploads_type`, in the palette `uploadslayout` next to `filelink_size` and
+`uploads_description` — the same three values on v12.4 and v13.4
+(`Configuration/TCA/tt_content.php` of EXT:frontend on v12.4,
+`Overrides/245-tt_content-content_type-uploads.php` on v13.4). They are
+the three layouts of a file list, so `Uploads.html` maps them onto
+`.theme-file-list` rather than the theme adding a second field for the same
+choice:
+
+| `uploads_type` | Core label                            | Renders                                                                              |
+|----------------|---------------------------------------|--------------------------------------------------------------------------------------|
+| `0`            | Only file name                        | `.theme-file-list`                                                                   |
+| `1`            | File name and file extension icon     | `.theme-file-list--icon`, the icon of the file type before each name                 |
+| `2`            | File name and thumbnail (if possible) | `.theme-file-list--preview`, a thumbnail, or the icon of the file type in its square |
+
+**`layout` stays disabled for `uploads`.** It is the other field a display
+choice could live in, and it would be the same choice twice: an editor would
+find a "Layout" next to a "Display file/icon/thumbnail" that both change the
+list, and a site switching to fluid_styled_content would lose the one the
+theme had picked. `uploads_type` keeps its core meaning, which is also what
+fluid_styled_content renders from it.
+
+`filelink_size` adds the size in every display type, `f:format.bytes`, and
+`uploads_description` the description of the file reference; neither is tied
+to a display type.
+
+The icon of a file type comes from
+`Partials/ContentElement/FileIcon.html`: one `f:case` per lower case
+extension — FAL lower-cases it — with the icon written out, the `file-*`
+icons of the set (`file-pdf`, `file-image`, `file-zipper`, `file-lines`,
+`file-csv`, `file-word`, `file-excel`, `file-powerpoint`, `file-audio`,
+`file-video`) and `file` for any other. By extension rather than by MIME type,
+because the extension is what the name in the link shows. Written out rather
+than computed, so `IconUsageTest` holds every name to the shipped set and the
+icon table of the styleguide to the partial.
+
+A thumbnail is made only for a file FAL classifies as an image
+(`file.type == 2`): `f:image` cannot process a PDF or a text file. A file of
+another type gets its icon in the square the thumbnail would take, so every row
+starts at the same place. Icon and thumbnail are decoration beside the link,
+not inside it: the link names the file, the icon slot is `aria-hidden`, and the
+thumbnail carries `alt=""` — explicitly, because `f:image` otherwise writes the
+alternative text of the reference (`ImageViewHelper`, read on v12.4 and v13.4). A value
+of `uploads_type` outside the three renders the bare list.
+
+**The size stays outside the link.** The link text is the file name, which
+carries its extension and is usually unique within a list, so the entries of a
+screen reader's list of links name their files. WCAG 2.4.4 (Link Purpose, In Context)
+asks that the purpose of a link can be determined from its text together with
+its context, and the size is context: the sibling `.theme-file-list__size` in
+the same list item. Inside the link, every entry of that list would end in its
+size - "release-notes.pdf 1 KB" - and the names that tell the entries apart
+would be followed by a number that tells none of them apart.
+
+The classes `theme-content-element__file-*` the template used to write are
+gone: they had no rule, and `.theme-file-list` replaces them.
+
+`UploadsRenderingTest` renders real files of a storage — a PDF, a zip archive,
+a text file, an extension without an icon and an SVG — and holds the three
+display types and the unknown value through both delivery paths, the icon of
+each type, the thumbnail and its fallback, the size and the description;
+`ContentElementContractTest` holds both modifiers to the stylesheet. The
+showcase page `/elements/core/uploads` shows the icons of four types and the
+thumbnail next to its fallback with files of its own, see
+[Seeding](../development/seeding.md).
 
 ## `table`: why a real `DataProcessor` was necessary
 

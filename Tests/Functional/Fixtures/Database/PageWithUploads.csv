@@ -1,0 +1,25 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,uploads_type,filelink_size,uploads_description
+,10,1,0,0,0,10,uploads,Only the file name,2,0,0,0
+,20,1,0,0,0,20,uploads,File name and icon,2,1,0,0
+,30,1,0,0,0,30,uploads,File name and thumbnail,2,2,0,0
+,40,1,0,0,0,40,uploads,A display type nothing offers,2,7,0,0
+,50,1,0,0,0,50,uploads,With size and description,2,0,1,1
+,60,1,0,0,0,60,uploads,Neither size nor description,2,0,0,0
+sys_file_reference,,,,,,,,,
+,uid,pid,uid_local,uid_foreign,tablenames,fieldname,sorting_foreign,description,title
+,1,1,1,10,tt_content,media,1,,
+,2,1,3,10,tt_content,media,2,,
+,3,1,1,20,tt_content,media,1,,
+,4,1,2,20,tt_content,media,2,,
+,5,1,3,20,tt_content,media,3,,
+,6,1,4,20,tt_content,media,4,,
+,7,1,5,20,tt_content,media,5,,
+,8,1,5,30,tt_content,media,1,,
+,9,1,1,30,tt_content,media,2,,
+,10,1,1,40,tt_content,media,1,,
+,11,1,3,50,tt_content,media,1,The notes of the release.,
+,12,1,3,60,tt_content,media,1,A description nobody asked for.,

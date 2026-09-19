@@ -7,56 +7,81 @@
     <f:render partial="ContentElement/Header" arguments="{_all}" />
 
     <f:comment>
-        "uploads" is a file list, not a gallery: file name, an optional size, an
-        optional thumbnail and an optional description, driven by the core TCA
-        under
-        ".Build/vendor/typo3/cms-frontend/Configuration/TCA/Overrides/245-tt_content-content_type-uploads.php":
+        "uploads" is a file list, not a gallery, rendered as ".theme-file-list"
+        (components/_file-list.scss). The fields are the core TCA of
+        ".Build/vendor/typo3/cms-frontend/Configuration/TCA/Overrides/245-tt_content-content_type-uploads.php"
+        on v13.4, and of the base TCA of EXT:frontend,
+        "Configuration/TCA/tt_content.php", on v12.4 - the same fields and
+        values on both:
 
         - "media" (type "file", no "allowed" restriction) and "file_collections"
-          are both valid sources, wired into "FilesProcessor" the same way
+          are both sources, wired into "FilesProcessor" the same way
           "collections" complements "references" for the image element -
           skipping "file_collections" here would make that field's tab do
           nothing.
         - "filelink_sorting"/"filelink_sorting_direction" order the merged list;
           "FilesProcessor" sorts natively via its "sorting"/"sorting.direction"
           options, so this stays a processor concern rather than a Fluid one.
-        - "filelink_size" (checkbox) toggles the byte count, formatted with
-          "f:format.bytes" - see
-          ".Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/Format/BytesViewHelper.php".
-        - "uploads_description" (checkbox) toggles the reference's own
-          description, when one was entered.
-        - "uploads_type" chooses between "only file name" (0), "file name and
-          extension icon" (1) and "file name and thumbnail" (2). The component
-          library has no file-type icon component (see
-          "docs/development/component-library.md"), so value 1 renders the same
-          as 0 rather than inventing one; value 2 renders a thumbnail, and only
-          for files FAL actually classifies as an image ("file.type == 2",
-          "TYPO3\CMS\Core\Resource\FileType::IMAGE") - "f:image" cannot process
-          a PDF or a text file, and "uploads_type"'s own label already says
-          "if possible".
+        - "uploads_type" is the display type, and picks the modifier:
+
+            0  only the file name             ".theme-file-list"
+            1  file name and extension icon   ".theme-file-list--icon"
+            2  file name and thumbnail        ".theme-file-list--preview"
+
+          The icon is the one of the file type from the shipped set,
+          "Partials/ContentElement/FileIcon.html". The thumbnail is made only
+          for a file FAL classifies as an image ("file.type == 2",
+          "TYPO3\CMS\Core\Resource\FileType::IMAGE" on v13.4,
+          "AbstractFile::FILETYPE_IMAGE" on v12.4) - "f:image" cannot
+          process a PDF or a text file, and the core's own label says "if
+          possible" - and where it is not possible the icon of the file type
+          stands in its square, so every row starts at the same place.
+          Any other value renders the bare list, the rule of the frame
+          modifiers of "Layouts/ContentElement.html".
+        - "filelink_size" (checkbox) adds the size, formatted with
+          "f:format.bytes", in every display type.
+        - "uploads_description" (checkbox) adds the description of the file
+          reference, when one was entered, in every display type.
         - "target" is passed straight through to the link.
 
-        None of the classes below have a stylesheet rule yet, the same way
-        "theme-content-element__body" in "Text.html" does not - they are the
-        structural hook, styling is a separate decision left to whoever owns
-        "Resources/Private/Scss/".
+        The icon and the thumbnail are decoration next to the link, not part
+        of it: the file name is the text of the link and names the file with
+        its extension, so the icon is hidden from assistive technology and
+        the thumbnail has an empty "alt" - set explicitly, because "f:image"
+        otherwise writes the alternative text of the reference.
+
+        Escaping: the name, the size and the description are plain Fluid
+        interpolation, escaped by default.
     </f:comment>
+    <f:switch expression="{data.uploads_type}">
+        <f:case value="1"><f:variable name="fileListModifier" value=" theme-file-list--icon" /></f:case>
+        <f:case value="2"><f:variable name="fileListModifier" value=" theme-file-list--preview" /></f:case>
+        <f:defaultCase><f:variable name="fileListModifier" value="" /></f:defaultCase>
+    </f:switch>
     <f:if condition="{files}">
-        <ul class="theme-content-element__file-list">
+        <ul class="theme-file-list{fileListModifier}">
             <f:for each="{files}" as="file">
-                <li class="theme-content-element__file-item">
-                    <a class="theme-content-element__file-link" href="{file.publicUrl}" target="{data.target}">
-                        <f:if condition="{data.uploads_type} == 2 && {file.type} == 2">
-                            <f:image class="theme-content-element__file-thumbnail" image="{file}" width="60" loading="lazy" />
+                <li class="theme-file-list__item">
+                    <f:switch expression="{data.uploads_type}">
+                        <f:case value="1">
+                            <span class="theme-file-list__icon" aria-hidden="true"><f:render partial="ContentElement/FileIcon" arguments="{extension: file.extension}" /></span>
+                        </f:case>
+                        <f:case value="2">
+                            <f:if condition="{file.type} == 2">
+                                <f:then><f:image class="theme-file-list__preview" image="{file}" width="128" alt="" loading="lazy" /></f:then>
+                                <f:else><span class="theme-file-list__icon" aria-hidden="true"><f:render partial="ContentElement/FileIcon" arguments="{extension: file.extension}" /></span></f:else>
+                            </f:if>
+                        </f:case>
+                    </f:switch>
+                    <div class="theme-file-list__body">
+                        <a class="theme-file-list__link" href="{file.publicUrl}" target="{data.target}">{file.name}</a>
+                        <f:if condition="{data.filelink_size}">
+                            <span class="theme-file-list__size"><f:format.bytes>{file.size}</f:format.bytes></span>
                         </f:if>
-                        <span class="theme-content-element__file-name">{file.name}</span>
-                    </a>
-                    <f:if condition="{data.filelink_size}">
-                        <span class="theme-content-element__file-size">(<f:format.bytes>{file.size}</f:format.bytes>)</span>
-                    </f:if>
-                    <f:if condition="{data.uploads_description} && {file.description}">
-                        <p class="theme-content-element__file-description">{file.description}</p>
-                    </f:if>
+                        <f:if condition="{data.uploads_description} && {file.description}">
+                            <p class="theme-file-list__description">{file.description}</p>
+                        </f:if>
+                    </div>
                 </li>
             </f:for>
         </ul>
