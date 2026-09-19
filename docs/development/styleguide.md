@@ -9,7 +9,7 @@ selected.
 
 The implementation is
 [`Resources/Private/Templates/Page/Styleguide.html`](../../Resources/Private/Templates/Page/Styleguide.html),
-the eight partials below
+the nine partials below
 [`Resources/Private/Partials/Styleguide/`](../../Resources/Private/Partials/Styleguide),
 the page furniture in
 [`Resources/Private/Scss/layout/_styleguide.scss`](../../Resources/Private/Scss/layout/_styleguide.scss)
@@ -66,13 +66,13 @@ is `999` because that is a value nothing renders. Its label is a distinct
 module does not suggest it behaves like the main column of the other layouts.
 
 **The template contains no `f:cObject`.** Not in
-`Templates/Page/Styleguide.html`, not in any of the eight partials — not even
+`Templates/Page/Styleguide.html`, not in any of the nine partials — not even
 for `main`. A single one would quietly make this a content page again, and the
 difference would surface only the first time somebody happened to place an
 element on it. The absence is asserted, not reviewed
 ([below](#what-the-tests-guard)).
 
-## Eight sections, eight partials
+## Nine sections, nine partials
 
 `Templates/Page/Styleguide.html` renders a heading, an intro, a section index
 and then one `f:render partial` per section, in this order:
@@ -82,6 +82,7 @@ and then one `f:render partial` per section, in this order:
 | `Tokens.html`      | `tokens`      | All 27 colour tokens as swatches, the type scale, weight and family, spacing, radius, shadow, focus ring.                                                                                   |
 | `Typography.html`  | `typography`  | The element baseline of `base/_elements.scss` — headings, running text, inline elements, lists, quotes, `pre`/`code`, `hr` — the text roles of `components/_text.scss`, and `.theme-table`. |
 | `Buttons.html`     | `buttons`     | `.theme-button` with every modifier and state its SCSS defines, `.theme-close`, `.theme-button-group` and its `--attached` variant, `.theme-badge` on both axes.                            |
+| `Icons.html`       | `icons`       | Every icon the theme uses, by name, where it is used, the sizes an icon takes, and a labelled icon next to the decorative ones.                                                             |
 | `Boxes.html`       | `boxes`       | `.theme-card`, `.theme-panel`, `.theme-teaser`, `.theme-hero`, `.theme-quote`, `.theme-alert` in all six kinds, `.theme-accordion`, `.theme-author`.                                        |
 | `Interactive.html` | `interactive` | The three components that need the theme's script — `.theme-tabs`, `.theme-dialog`, `.theme-tooltip` — and what each does without it.                                                       |
 | `Forms.html`       | `forms`       | The whole `forms/` contract, selector by selector, including the validation states, `.theme-input-group` and `.theme-choice-group`.                                                         |
@@ -90,13 +91,20 @@ and then one `f:render partial` per section, in this order:
 
 Each partial is a single `<section class="theme-styleguide__section" id="…">`
 and nothing else — no `f:layout`, no `f:section`, no wrapper. The page template
-is what places them, and the index at the top is built from the same eight ids.
+is what places them, and the index at the top is built from the same nine ids.
 
 The split follows the same rule as the rest of the theme: a site package that
 wants its own forms section overrides **one file**,
-`Partials/Styleguide/Forms.html`, and keeps the other seven. Overriding the page
-template instead would mean re-stating all eight renders and the index to
+`Partials/Styleguide/Forms.html`, and keeps the other eight. Overriding the page
+template instead would mean re-stating all nine renders and the index to
 change one section.
+
+`Icons.html` lists the icons the templates use, not the 2001 that ship: a
+gallery of the whole set to pick from belongs with the editor's icon picker,
+see [Icons](icons.md#picking-an-icon-in-the-backend).
+`Tests/Unit/IconUsageTest` holds its table to the icons the templates actually
+render and the number it states to the number of files shipped — both are
+literals, because the partial also renders without TYPO3.
 
 `Interactive.html` is a section of its own rather than three more specimens in
 `Boxes.html` because what it demonstrates is not a shape but a behaviour, and
@@ -124,6 +132,11 @@ data URIs because a specimen has no FAL record to reference and the theme has
 to render with no network. `Interactive.html` adds the two that follow from a
 dialog being read on its own — its title is an `h2`, and the still picture of it
 carries its title on a `p` — and states them in its own header comment.
+
+Literal markup has one exception: an icon is written `<theme:icon name="…" />`,
+in the partials as everywhere else, because an icon is never drawn by hand. The
+ViewHelper is plain Fluid and declared by its URL namespace, so the partials
+still render without TYPO3 — see [Icons](icons.md#plain-fluid-for-the-standalone-renderer).
 
 ### The page furniture is not a card
 
@@ -193,7 +206,7 @@ frontend sub-request against `Fixtures/Database/StyleguidePage.csv`:
 | Test                                                        | Guards                                                                                                                    |
 |-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `everyComponentOfTheLibraryIsShownOnTheStyleguide`          | Every component of the library appears on the page. Data provider, one case per component.                                |
-| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the eight ids renders **and** is linked from the index — no dead anchor.                                          |
+| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the nine ids renders **and** is linked from the index — no dead anchor.                                           |
 | `contentPlacedOnTheStyleguidePageIsNotRendered`             | Neither the element in `colPos 999` nor the one in `colPos 0` reaches the frontend.                                       |
 | `theFormsSectionShowsTheInvalidState`                       | `.theme-field--invalid`, `aria-invalid="true"`, `.theme-field__error`, `.theme-form-summary`.                             |
 | `everyColourTokenHasASwatch`                                | Every `--theme-color-*` token declared in `abstracts/_tokens.scss` has a swatch.                                          |

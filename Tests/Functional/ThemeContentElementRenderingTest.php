@@ -6,6 +6,7 @@ namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use SBUERK\ThemeExtensionDevelopment\Icon\IconSet;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
@@ -282,7 +283,16 @@ final class ThemeContentElementRenderingTest extends AbstractFunctionalTestCase
         $notice = $this->contentElementByUid($this->render(), 110);
 
         $this->assertMatchesRegularExpression('#<p class="theme-alert__title">\s*A note\s*</p>#', $notice);
-        $this->assertMatchesRegularExpression('#<span class="theme-alert__icon" aria-hidden="true">\s*<svg\b#', $notice);
+        // The note's icon of the shipped set, not a glyph drawn in the template:
+        // the markup of the file as shipped, attribution comment included, with
+        // the attributes of the ViewHelper. The stand-in it replaced drew with
+        // strokes.
+        $this->assertMatchesRegularExpression('#<span class="theme-alert__icon" aria-hidden="true">\s*<svg class="theme-icon" aria-hidden="true" focusable="false" #', $notice);
+        $this->assertStringContainsString(
+            '<svg class="theme-icon" aria-hidden="true" focusable="false"' . substr((new IconSet())->markup('note-sticky'), 4),
+            $notice,
+        );
+        $this->assertStringNotContainsString('stroke=', $notice);
         // Rich text reaches the page as markup, not escaped.
         $this->assertStringContainsString('<strong>rich</strong>', $notice);
         // The title is inside the component, not a content heading as well.
@@ -369,7 +379,12 @@ final class ThemeContentElementRenderingTest extends AbstractFunctionalTestCase
                 $this->assertSame(sprintf(' name="c%d-accordion"', $uid), $attributes);
             }
         }
-        $this->assertMatchesRegularExpression('#<summary class="theme-accordion__summary">First question</summary>#', $body);
+        // The title, then the chevron icon of the set as the marker.
+        $this->assertStringContainsString(
+            '<summary class="theme-accordion__summary">First question<svg class="theme-icon theme-accordion__marker" aria-hidden="true" focusable="false"'
+            . substr((new IconSet())->markup('chevron-down'), 4) . '</summary>',
+            $body,
+        );
         $this->assertStringContainsString('<em>rich</em>', $this->contentElementByUid($body, 200));
     }
 

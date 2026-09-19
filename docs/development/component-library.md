@@ -38,6 +38,7 @@ against, and the rename was cheap while only one template depended on it.
 | Dialog                  | `.theme-dialog`           | `components/_dialog.scss`          |
 | Gallery                 | `.theme-gallery`          | `components/_gallery.scss`         |
 | Hero                    | `.theme-hero`             | `components/_hero.scss`            |
+| Icon                    | `.theme-icon`             | `components/_icon.scss`            |
 | Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`        |
 | Sub navigation          | `.theme-nav-sub`          | `components/_nav-sub.scss`         |
 | Pagination              | `.theme-pagination__list` | `components/_pagination.scss`      |
@@ -68,7 +69,7 @@ against, and the rename was cheap while only one template depended on it.
 `__ellipsis` are styled, current-page state comes from `[aria-current="page"]`
 rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
-asserts every one of the thirty-nine selectors above is actually compiled into
+asserts every one of the forty selectors above is actually compiled into
 `Resources/Public/Css/theme.css`. The palette swatch is covered twice over,
 because it duplicates colour that lives in `abstracts/_palettes.scss` and
 `abstracts/_tokens.scss` — see
@@ -85,6 +86,39 @@ that implements it. Where a component reads a token another file declares
 [Frontend assets § Component tokens](frontend-assets.md#component-tokens), not
 repeated here.
 
+### Icon
+
+One icon of the vendored Font Awesome Free solid set, inline. It is never
+written by hand: `<theme:icon name="…" />` renders it — see
+[Icons](icons.md) for the ViewHelper, the set and the rule:
+
+```html
+<svg class="theme-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free … --><path fill="currentColor" d="…"/></svg>
+<svg class="theme-icon" role="img" aria-label="…" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">…</svg>
+```
+
+The attribution comment of the file stays in every rendered icon, see
+[Icons § Licence and attribution](icons.md#licence-and-attribution).
+
+A square one em wide, filled with `currentColor`, `overflow: visible` and set
+`-0.125em` below the baseline in a line of text — the two values Font Awesome's
+own stylesheet uses. `--theme-icon-size` is **read with a fallback and never
+declared on the icon**: a component that gives icons a slot sets it on the slot,
+and every icon inside follows. Declared on `.theme-icon`, it would beat the value
+the slot passes down. Icons wider than tall (576 or 640 units against 512) keep
+the square box and come out lower; Font Awesome's own 1.25em wide box would not
+fit the square slots below.
+
+| Component            | Icon                                                                                       | Size                                                      |
+|----------------------|--------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| Display settings     | `gear`; `desktop`, `sun`, `moon` for the appearance options; `check` on the chosen palette | `.theme-settings__icon`, `.theme-segmented__icon`; one em |
+| Accordion            | `chevron-down`, the marker, turned when an item opens                                      | `--theme-accordion-marker-size`, through the token        |
+| Main navigation      | `bars`, before the label of the toggle                                                     | one em                                                    |
+| Close button         | `xmark`                                                                                    | `--theme-close-glyph-size`, through the token             |
+| Alert, notice, login | one per kind, picked by `Partials/ContentElement/AlertIcon.html`                           | `--theme-alert-icon-size`, through the token              |
+| Field messages       | `circle-exclamation` in an error, `circle-check` in a success                              | one em                                                    |
+| Icon button          | whatever the button stands for                                                             | `--theme-button-icon-size`, through the token             |
+
 ### Navigation
 
 Main navigation, two levels deep from `MenuProcessor`. `--active` marks the
@@ -94,7 +128,7 @@ other:
 
 ```html
 <nav class="theme-nav-main" aria-label="Main">
-    <button class="theme-nav-main__toggle" aria-expanded="false" aria-controls="nav-main">…</button>
+    <button class="theme-nav-main__toggle" aria-expanded="false" aria-controls="nav-main"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg> …</button>
     <ul class="theme-nav-main__list" id="nav-main">
         <li class="theme-nav-main__item theme-nav-main__item--active">
             <a class="theme-nav-main__link" href="…" aria-current="page">…</a>
@@ -154,12 +188,15 @@ Skip link, the first focusable element on the page:
 ### Content
 
 Accordion, built on native `<details>`/`<summary>` — a shared `name` on every
-`<details>` in the group is what makes them mutually exclusive:
+`<details>` in the group is what makes them mutually exclusive. The marker is
+the `chevron-down` icon at the end of the summary, which the stylesheet turns
+half a turn on `[open]`; it replaced a chevron drawn from two borders on
+`::after`, so a summary written to the old contract shows no marker:
 
 ```html
 <div class="theme-accordion">
     <details class="theme-accordion__item" name="faq">
-        <summary class="theme-accordion__summary">…</summary>
+        <summary class="theme-accordion__summary">… <svg class="theme-icon theme-accordion__marker" aria-hidden="true" focusable="false" …>…</svg></summary>
         <div class="theme-accordion__panel">…</div>
     </details>
 </div>
@@ -183,7 +220,7 @@ nothing a live region could announce:
 
 ```html
 <div class="theme-alert theme-alert--warning" role="alert">
-    <span class="theme-alert__icon" aria-hidden="true">…</span>
+    <span class="theme-alert__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>
     <div class="theme-alert__body">
         <p class="theme-alert__title">…</p>
         <p class="theme-alert__text">…</p>
@@ -241,7 +278,7 @@ supplies is the only thing visible:
 <button class="theme-button theme-button--secondary" type="button">…</button>
 <button class="theme-button theme-button--danger theme-button--small" type="button">…</button>
 <a class="theme-button theme-button--link" href="…">…</a>
-<button class="theme-button theme-button--icon" type="button" aria-label="…"><svg aria-hidden="true" focusable="false" …>…</svg></button>
+<button class="theme-button theme-button--icon" type="button" aria-label="…"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></button>
 <button class="theme-button theme-button--secondary" type="button" aria-pressed="false">…</button>
 <button class="theme-button" type="button" aria-busy="true" aria-disabled="true">…</button>
 ```
@@ -275,13 +312,14 @@ the named stacking layers:
 
 Close button — a component of its own rather than a button modifier: no fill,
 no border, no label, and a negative margin that lines up the glyph, not the
-44px target around it, with the content edge. The cross is two borders, which
-forced colours mode keeps where it would drop a background. Its name is
-`aria-label`, and inside a `<form method="dialog">` it carries
-`value="cancel"` instead of `type="button"`:
+44px target around it, with the content edge. The cross is the `xmark` icon in
+the markup — `<theme:icon name="xmark" />` — which replaced two borders drawn
+on pseudo elements; a close button written to the old contract, empty, now
+shows nothing. Its name is `aria-label`, and inside a `<form method="dialog">`
+it carries `value="cancel"` instead of `type="button"`:
 
 ```html
-<button class="theme-close" type="button" aria-label="Close"></button>
+<button class="theme-close" type="button" aria-label="Close"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></button>
 ```
 
 Card. Modifier `--linked` for a card whose whole surface is the link target;
@@ -471,7 +509,7 @@ controls, `_validation.scss` the error/success repaint of all of it:
     <div class="theme-field theme-field--invalid">
         <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required" aria-hidden="true">*</span></label>
         <input class="theme-input" id="f-mail" type="email" aria-invalid="true" aria-describedby="f-mail-error f-mail-hint">
-        <p class="theme-field__error" id="f-mail-error">…</p>
+        <p class="theme-field__error" id="f-mail-error"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg> …</p>
         <p class="theme-field__hint" id="f-mail-hint">…</p>
     </div>
 
@@ -509,6 +547,11 @@ different UA widget and get an explicit `[type='…']` override in
 `_controls.scss`. `.theme-field--invalid`/`--valid` are the explicit
 counterparts of `:user-invalid` — deliberately not `:invalid`, which would
 paint every empty required field red before the reader has typed anything.
+An error or success message starts with its icon in the markup,
+`circle-exclamation` or `circle-check`. It used to be a `⚠` or `✓` in the
+`content` of a `::before`, which is drawn by whichever installed font covers the
+character — possibly a colour emoji font that ignores `color` — and an icon
+cannot be generated content.
 
 **A control boundary uses `--theme-color-border-strong`; `--theme-color-border`
 is decorative only.** The edge of an empty text field is the only thing that
@@ -576,7 +619,7 @@ server defaults the `data-theme-default-*` attributes carry:
 ```html
 <div class="theme-settings" data-theme-default-appearance="auto" data-theme-default-palette="neutral" data-theme-default-content-outline="on">
     <button class="theme-settings__trigger" type="button" aria-expanded="false" aria-controls="theme-settings-panel">
-        <svg class="theme-settings__icon" aria-hidden="true">…</svg>
+        <svg class="theme-icon theme-settings__icon" aria-hidden="true" focusable="false" …>…</svg>
         <span class="theme-settings__label">…</span>
     </button>
     <div class="theme-settings__panel" id="theme-settings-panel" hidden>
@@ -585,7 +628,7 @@ server defaults the `data-theme-default-*` attributes carry:
             <div class="theme-segmented">
                 <label class="theme-segmented__option">
                     <input type="radio" name="theme-settings-appearance" value="auto" data-theme-setting="appearance" checked>
-                    <span class="theme-segmented__label"><svg class="theme-segmented__icon" aria-hidden="true">…</svg>…</span>
+                    <span class="theme-segmented__label"><svg class="theme-icon theme-segmented__icon" aria-hidden="true" focusable="false" …>…</svg>…</span>
                 </label>
             </div>
         </fieldset>
@@ -594,7 +637,7 @@ server defaults the `data-theme-default-*` attributes carry:
             <div class="theme-swatch-list">
                 <label class="theme-swatch-option">
                     <input type="radio" name="theme-settings-palette" value="neutral" data-theme-setting="palette" checked>
-                    <span class="theme-swatch theme-swatch--neutral" aria-hidden="true"></span>…
+                    <span class="theme-swatch theme-swatch--neutral" aria-hidden="true"></span>… <svg class="theme-icon theme-swatch-option__check" aria-hidden="true" focusable="false" …>…</svg>
                 </label>
             </div>
         </fieldset>
@@ -797,7 +840,7 @@ stylesheet against:
     <form method="dialog">
         <div class="theme-dialog__header">
             <h2 class="theme-dialog__title" id="d-reseed-title">…</h2>
-            <button class="theme-close" value="cancel" aria-label="Close"></button>
+            <button class="theme-close" value="cancel" aria-label="Close"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></button>
         </div>
         <div class="theme-dialog__body">…</div>
         <div class="theme-dialog__footer">

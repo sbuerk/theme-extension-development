@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     The form showcase, rendered from the backend layout "forms"
@@ -303,6 +304,7 @@
                        value="Ada Lovelace"
                        aria-describedby="form-returned-name-success">
                 <p class="theme-field__success" id="form-returned-name-success">
+                    <theme:icon name="circle-check" />
                     Looks good
                 </p>
             </div>
@@ -321,6 +323,7 @@
                        aria-invalid="true"
                        aria-describedby="form-returned-email-error form-returned-email-hint">
                 <p class="theme-field__error" id="form-returned-email-error">
+                    <theme:icon name="circle-exclamation" />
                     Enter an email address in the format name@example.org
                 </p>
                 <p class="theme-field__hint" id="form-returned-email-hint">
@@ -348,6 +351,7 @@
                            aria-describedby="form-returned-base-error form-returned-base-scheme">
                 </div>
                 <p class="theme-field__error" id="form-returned-base-error">
+                    <theme:icon name="circle-exclamation" />
                     Enter a host name without spaces
                 </p>
             </div>
@@ -365,6 +369,7 @@
                       aria-invalid="true"
                       aria-describedby="form-returned-message-error">A theme.</textarea>
             <p class="theme-field__error" id="form-returned-message-error">
+                <theme:icon name="circle-exclamation" />
                 Enter at least 20 characters
             </p>
         </div>
@@ -376,6 +381,7 @@
                 I understand that the instance is deleted after 30 days
             </label>
             <p class="theme-field__error" id="form-returned-terms-error">
+                <theme:icon name="circle-exclamation" />
                 Confirm that the instance is deleted after 30 days
             </p>
         </fieldset>

@@ -186,7 +186,10 @@ function renderPartial(string $partial): string
     // already: a ViewHelper of a TYPO3 namespace - "f:translate",
     // "f:uri.resource", "f:image" - resolves to a class that throws without
     // TYPO3 around it, and an unknown ViewHelper or an undeclared namespace is a
-    // parse error. A namespace declared with a URL that is not a PHP namespace
+    // parse error. The one ViewHelper of this extension the partials use,
+    // "<theme:icon>", is plain Fluid and declared by its URL namespace, so it
+    // renders here without being registered ("docs/development/icons.md").
+    // A namespace declared with a URL that is not a PHP namespace
     // is ignored instead, and its tags reach the output verbatim; that is
     // caught here.
     //

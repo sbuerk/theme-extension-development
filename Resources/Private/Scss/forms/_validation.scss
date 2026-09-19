@@ -12,7 +12,7 @@
 //         <div class="theme-field theme-field--invalid">
 //             <label class="theme-field__label" for="f-mail">Email <span class="theme-field__required" aria-hidden="true">*</span></label>
 //             <input class="theme-input" id="f-mail" type="email" aria-invalid="true" aria-describedby="f-mail-error f-mail-hint">
-//             <p class="theme-field__error" id="f-mail-error">…</p>
+//             <p class="theme-field__error" id="f-mail-error"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg> …</p>
 //             <p class="theme-field__hint" id="f-mail-hint">…</p>
 //         </div>
 //
@@ -28,8 +28,22 @@
 // deficiency, and to anyone reading the page in greyscale. Every rule below
 // therefore pairs the colour change with a second, colour-independent signal:
 // the invalid border also gets thicker ("--theme-border-width-strong" instead
-// of "--theme-border-width"), and the error message is prefixed with a glyph
-// that is real content, not a decorative background image.
+// of "--theme-border-width"), and the message starts with an icon -
+// "<theme:icon name="circle-exclamation" />" for an error,
+// "<theme:icon name="circle-check" />" for a success.
+//
+// --- The icon is markup, not generated content -------------------------------
+//
+// It was a character in "content" on "::before" - "⚠" and "✓" - until the
+// theme had an icon set. A character is drawn by whichever installed font
+// covers it, and that may be a colour emoji font, which ignores "color": the
+// one property the glyph is there to carry. The icon of the set is drawn the
+// same everywhere,
+// in the text colour, and matches the icons of the alert. An icon cannot be
+// generated content, so it moved into the markup contract above. It is
+// decoration there: the message is the text, and "aria-invalid" plus
+// "aria-describedby" is what tells a screen reader - the old character was
+// read out in front of every message as well.
 //
 // --- Why ":user-invalid" and not ":invalid" ---------------------------------
 //
@@ -72,10 +86,14 @@
     --theme-input-border-width: var(--theme-border-width-strong, 2px);
 }
 
+// A flex row, so a message that wraps hangs its second line under the text
+// rather than under the icon. "baseline" rather than "start": the icon has no
+// baseline of its own, so its bottom edge takes the baseline of the first line
+// and the icon stands on the text, whatever the line height.
 .theme-field__error,
 .theme-field__success {
     display: flex;
-    align-items: start;
+    align-items: baseline;
     gap: var(--theme-space-1, 0.3125rem);
     margin: 0;
     font-size: var(--theme-font-size-xs, 0.75rem);
@@ -84,23 +102,10 @@
 
 .theme-field__error {
     color: var(--theme-color-danger, #b3261e);
-
-    // Content, not decoration: the glyph carries the same meaning the colour
-    // does, so it survives greyscale printing and a colour vision deficiency
-    // that the border-and-text colour alone would not.
-    &::before {
-        content: '⚠';
-        flex: none;
-    }
 }
 
 .theme-field__success {
     color: var(--theme-color-success, #146c43);
-
-    &::before {
-        content: '✓';
-        flex: none;
-    }
 }
 
 .theme-field--inline .theme-field__error {

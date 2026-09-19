@@ -5,7 +5,7 @@
 //
 //     <div class="theme-settings" data-theme-default-appearance="auto" data-theme-default-palette="neutral" data-theme-default-content-outline="on">
 //         <button class="theme-settings__trigger" type="button" aria-expanded="false" aria-controls="theme-settings-panel">
-//             <svg class="theme-settings__icon" aria-hidden="true">…</svg>
+//             <svg class="theme-icon theme-settings__icon" aria-hidden="true" focusable="false" …>…</svg>
 //             <span class="theme-settings__label">…</span>
 //         </button>
 //         <div class="theme-settings__panel" id="theme-settings-panel" hidden>
@@ -14,7 +14,7 @@
 //                 <div class="theme-segmented">
 //                     <label class="theme-segmented__option">
 //                         <input type="radio" name="theme-settings-appearance" value="auto" data-theme-setting="appearance" checked>
-//                         <span class="theme-segmented__label"><svg class="theme-segmented__icon" aria-hidden="true">…</svg>…</span>
+//                         <span class="theme-segmented__label"><svg class="theme-icon theme-segmented__icon" aria-hidden="true" focusable="false" …>…</svg>…</span>
 //                     </label>
 //                 </div>
 //             </fieldset>
@@ -23,7 +23,7 @@
 //                 <div class="theme-swatch-list">
 //                     <label class="theme-swatch-option">
 //                         <input type="radio" name="theme-settings-palette" value="neutral" data-theme-setting="palette" checked>
-//                         <span class="theme-swatch theme-swatch--neutral" aria-hidden="true"></span>…
+//                         <span class="theme-swatch theme-swatch--neutral" aria-hidden="true"></span>… <svg class="theme-icon theme-swatch-option__check" aria-hidden="true" focusable="false" …>…</svg>
 //                     </label>
 //                 </div>
 //             </fieldset>
@@ -352,20 +352,6 @@
     &:has(input:checked) {
         background-color: var(--theme-swatch-option-background-checked);
         font-weight: var(--theme-font-weight-medium, 500);
-
-        // The check mark: two borders of a narrow box, turned. Physical
-        // "right" and "bottom" on purpose - a check mark is not mirrored in a
-        // right-to-left script, and the logical properties would mirror it.
-        &::after {
-            content: '';
-            flex: none;
-            inline-size: var(--theme-space-1, 0.3125rem);
-            block-size: var(--theme-space-2, 0.625rem);
-            margin-inline: auto var(--theme-space-2, 0.625rem);
-            border-right: var(--theme-border-width-strong) solid var(--theme-swatch-option-check-color);
-            border-bottom: var(--theme-border-width-strong) solid var(--theme-swatch-option-check-color);
-            transform: translateY(-15%) rotate(45deg);
-        }
     }
 
     // Drawn inside the row, since the row is as wide as the panel.
@@ -373,6 +359,22 @@
         outline: var(--theme-border-width-strong) solid var(--theme-color-primary);
         outline-offset: calc(-1 * var(--theme-border-width-strong));
         box-shadow: var(--theme-focus-ring);
+    }
+}
+
+// The check mark of the chosen palette: "<theme:icon name="check" class="theme-swatch-option__check" />"
+// at the end of every option, shown on the checked one. It used to be two
+// borders of a narrow box on "::after". "visibility" rather than "display",
+// so the others keep their place in the row and nothing moves when the
+// choice changes. An icon is not mirrored in a right-to-left script, which
+// is right for a check mark.
+.theme-swatch-option__check {
+    margin-inline: auto var(--theme-space-2, 0.625rem);
+    color: var(--theme-swatch-option-check-color);
+    visibility: hidden;
+
+    .theme-swatch-option:has(input:checked) > & {
+        visibility: visible;
     }
 }
 
