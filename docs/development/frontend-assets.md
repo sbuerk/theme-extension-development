@@ -23,13 +23,13 @@ Build/Scripts/runTests.sh -s watchCss
 Build/Scripts/runTests.sh -s npm -- outdated
 ```
 
-| File                             | Is                                                                    |
-|----------------------------------|-----------------------------------------------------------------------|
-| `Resources/Private/Scss/`        | The sources. `theme.scss` is the entry point, partials are `_*.scss`. |
-| `Resources/Public/Css/theme.css` | The compiled stylesheet. **Committed** — see below.                   |
-| `package.json`                   | The single dependency `sass`, and the four build scripts.             |
-| `package-lock.json`              | Committed, so `npm ci` and the gate are reproducible.                 |
-| [`DESIGN.md`](../../DESIGN.md)   | The design token specification `abstracts/_tokens.scss` implements.   |
+| File                             | Is                                                                      |
+|----------------------------------|-------------------------------------------------------------------------|
+| `Resources/Private/Scss/`        | The sources. `theme.scss` is the entry point, partials are `_*.scss`.   |
+| `Resources/Public/Css/theme.css` | The compiled stylesheet. **Committed** — see below.                     |
+| `package.json`                   | `sass` and its four build scripts; the icon pin, see [Icons](icons.md). |
+| `package-lock.json`              | Committed, so `npm ci` and the gate are reproducible.                   |
+| [`DESIGN.md`](../../DESIGN.md)   | The design token specification `abstracts/_tokens.scss` implements.     |
 
 ## The source tree
 
