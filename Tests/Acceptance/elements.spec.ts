@@ -74,6 +74,78 @@ test.describe('the accordion content element', () => {
     });
 });
 
+/**
+ * The lightbox of an enlargeable gallery, on the seeded page of the image
+ * element. The functional tests hold the markup - the dialog, one item per
+ * image, the zoom link that keeps its "href". What only a browser shows is
+ * that the link stops navigating once the script has bound it, that the dialog
+ * is a real modal, and that the arrows move within the gallery.
+ */
+test.describe('the gallery lightbox', () => {
+    test('opens the image that was pressed, moves between them and gives focus back', async ({ page }) => {
+        await page.goto('/elements/core/image');
+        const zoom = page.locator('#c3406 .theme-gallery__zoom');
+        const dialog = page.locator('#c3406-lightbox');
+
+        await expect(zoom).toHaveCount(3);
+        await expect(dialog).toBeHidden();
+        // The fallback is intact: the link still points at the file.
+        await expect(zoom.first()).toHaveAttribute('href', /fileadmin/);
+
+        await zoom.first().click();
+        await expect(dialog).toBeVisible();
+        expect(await dialog.evaluate((element) => element.matches(':modal'))).toBe(true);
+        // The link was not followed - the page is still the gallery's.
+        await expect(page).toHaveURL(/\/elements\/core\/image$/);
+
+        // The item that was pressed, and only that one.
+        const shown = dialog.locator('.theme-lightbox__item:visible');
+        await expect(shown).toHaveCount(1);
+
+        const first = await shown.getAttribute('id');
+        await dialog.getByRole('button', { name: 'Next image' }).click();
+        await expect(dialog.locator('.theme-lightbox__item:visible')).toHaveCount(1);
+        expect(await dialog.locator('.theme-lightbox__item:visible').getAttribute('id')).not.toBe(first);
+
+        // The arrow keys do the same, and wrap: back twice from the second
+        // item is the last one.
+        await page.keyboard.press('ArrowLeft');
+        expect(await dialog.locator('.theme-lightbox__item:visible').getAttribute('id')).toBe(first);
+        await page.keyboard.press('ArrowLeft');
+        expect(await dialog.locator('.theme-lightbox__item:visible').getAttribute('id')).not.toBe(first);
+
+        await page.keyboard.press('Escape');
+        await expect(dialog).toBeHidden();
+        await expect(zoom.first()).toBeFocused();
+
+        // A second thumbnail opens the same dialog on **its own** image, and
+        // focus goes back to the one that was pressed. The id the link names
+        // is what the dialog has to show - asserting only that some item is
+        // visible would pass whichever one it was.
+        const second = await zoom.nth(1).getAttribute('data-theme-lightbox-item');
+        expect(second).not.toBeNull();
+        await zoom.nth(1).click();
+        await expect(dialog).toBeVisible();
+        await expect(dialog.locator('.theme-lightbox__item:visible')).toHaveCount(1);
+        expect(await dialog.locator('.theme-lightbox__item:visible').getAttribute('id')).toBe(second);
+        await dialog.getByRole('button', { name: 'Close' }).click();
+        await expect(zoom.nth(1)).toBeFocused();
+    });
+
+    test('the zoom link leads to the file without JavaScript', async ({ browser }) => {
+        const context = await browser.newContext({ javaScriptEnabled: false });
+        const page = await context.newPage();
+        await page.goto('/elements/core/image');
+
+        const zoom = page.locator('#c3406 .theme-gallery__zoom');
+        await expect(zoom.first()).toBeVisible();
+        await expect(zoom.first()).toHaveAttribute('href', /fileadmin/);
+        // A closed dialog renders nothing, so the enhancement is simply absent.
+        await expect(page.locator('#c3406-lightbox')).toBeHidden();
+        await context.close();
+    });
+});
+
 test.describe('the notice content element', () => {
     test('draws all six kinds, each with its own glyph', async ({ page }) => {
         await page.goto('/elements/theme');

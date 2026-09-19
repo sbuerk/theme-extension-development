@@ -259,6 +259,8 @@ development and test instances do not install it. What that covers:
     :ref:`feature-card-group-timeline-teaser-list` and
     :ref:`feature-carousel-and-split-tiles`.
 *   A wall layout for the card group — see :ref:`feature-card-wall`.
+*   :guilabel:`Enlarge on click`, which opens a lightbox — see
+    :ref:`feature-gallery-lightbox`.
 *   Third-party Extbase plugins, which render through a generic template
     without any per-plugin configuration — see
     :ref:`feature-extbase-plugin-rendering` — on both delivery paths, the

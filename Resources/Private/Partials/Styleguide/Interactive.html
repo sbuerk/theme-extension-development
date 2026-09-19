@@ -3,11 +3,12 @@
       xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
-    Styleguide section "Interactive": the four components of the library
+    Styleguide section "Interactive": the five components of the library
     that need "Resources/Public/JavaScript/theme.js" - tabs, the dialog, the
-    carousel and the tooltip - each with what it does when the script never
-    runs. The carousel is the one of the four that needs the script least:
-    only its two buttons do, and everything else about it works without one.
+    carousel, the lightbox and the tooltip - each with what it does when the
+    script never runs. The carousel is the one of the five that needs the
+    script least: only its two buttons do, and everything else about it works
+    without one.
 
     The rules of every other section apply: literal markup copied from the
     markup contract in the component's own SCSS header comment, nothing driven
@@ -39,7 +40,7 @@
     <h2 class="theme-styleguide__heading">Interactive</h2>
 
     <p>
-        The four components in this section are the only ones in the library
+        The five components in this section are the only ones in the library
         that need the theme's script. Each one says what it does without it,
         and this page is the place to check that claim: switch JavaScript off in
         the browser and reload.
@@ -220,6 +221,66 @@
                 </button>
             </div>
         </section>
+    </div>
+
+    <h3>Lightbox</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_lightbox.scss. A still
+            picture, for the reason the dialog above has one: a closed dialog
+            renders nothing and an open one covers the page. The stage is
+            "inert", so the buttons in it are part of the picture.
+
+            The markup here shows one item, because that is what the lightbox
+            looks like on screen. In the page the dialog carries one figure per
+            image of its gallery and the script hides all but the one that was
+            opened - the markup hides nothing, per the contract.
+        </f:comment>
+        <p>
+            The enlarged image of a gallery, in a dialog. It is the same
+            component as above - the box, the scrim, the header and the footer
+            are the dialog's - widened for a picture, and its header carries no
+            title: an image has a caption, which is inside the picture and
+            changes with it.
+        </p>
+        <p>
+            The opener is the zoom link of the gallery, which keeps its
+            <code>href</code> to the file. That is why it is not a
+            <code>data-theme-dialog-open</code> opener: the stylesheet hides
+            those without a script, and a link that enlarges the image on its
+            own must not be hidden. The arrows move within the gallery and wrap
+            at both ends, the arrow keys do the same, Escape closes, and focus
+            returns to the thumbnail that was pressed.
+        </p>
+        <p class="theme-styleguide__label">
+            The working lightbox is on the seeded showcase page of the image
+            element, where there are real files to enlarge. Here it is a
+            picture: the scrim below is the stage, not a modal.
+        </p>
+        <div class="theme-styleguide__stage" inert="inert">
+            <div class="theme-dialog theme-lightbox">
+                <div class="theme-dialog__header theme-lightbox__header">
+                    <button class="theme-close" type="button" aria-label="Close"><theme:icon name="xmark" /></button>
+                </div>
+                <div class="theme-dialog__body theme-lightbox__body">
+                    <figure class="theme-lightbox__item">
+                        <img class="theme-lightbox__image"
+                             src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23b9c6d8'/%3E%3Cpath%20d='M0%2010%205%205%2010%208%2016%203%2016%2010z'%20fill='%237e8ba1'/%3E%3Ccircle%20cx='3.2'%20cy='2.6'%20r='1.5'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                             alt="Placeholder landscape standing in for an enlarged image"
+                             width="480" height="300" />
+                        <figcaption class="theme-lightbox__caption">
+                            The caption is the description of the file
+                            reference, the same text the gallery shows under
+                            the thumbnail.
+                        </figcaption>
+                    </figure>
+                </div>
+                <div class="theme-dialog__footer theme-lightbox__controls">
+                    <button class="theme-button theme-button--secondary theme-button--icon" type="button" aria-label="Previous image"><theme:icon name="chevron-left" /></button>
+                    <button class="theme-button theme-button--secondary theme-button--icon" type="button" aria-label="Next image"><theme:icon name="chevron-right" /></button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <h3>Tooltip</h3>

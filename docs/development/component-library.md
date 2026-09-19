@@ -53,6 +53,7 @@ against, and the rename was cheap while only one template depended on it.
 | Gallery                 | `.theme-gallery`          | `components/_gallery.scss`          |
 | Hero                    | `.theme-hero`             | `components/_hero.scss`             |
 | Icon                    | `.theme-icon`             | `components/_icon.scss`             |
+| Lightbox                | `.theme-lightbox`         | `components/_lightbox.scss`         |
 | Link decoration         | `.theme-link`             | `components/_link.scss`             |
 | List                    | `.theme-list`             | `components/_list.scss`             |
 | List group              | `.theme-list-group`       | `components/_list-group.scss`       |
@@ -1093,6 +1094,42 @@ pick that up on level five.
 `Tests/Unit/ComponentLibraryTest::aTitleOnAnyHeadingLevelKeepsItsOwnCase`
 holds both to it.
 
+Lightbox — the enlarged image of a gallery, in a dialog. A `.theme-dialog`
+first, widened for a picture; everything the dialog contract documents applies:
+
+```html
+<dialog class="theme-dialog theme-lightbox" id="c1-lightbox" aria-label="…">
+    <form method="dialog">
+        <div class="theme-dialog__header theme-lightbox__header">
+            <button class="theme-close" aria-label="Close">…</button>
+        </div>
+        <div class="theme-dialog__body theme-lightbox__body">
+            <figure class="theme-lightbox__item" id="c1-lightbox-7" data-theme-lightbox-item>
+                <img class="theme-lightbox__image" src="…" alt="…">
+                <figcaption class="theme-lightbox__caption">…</figcaption>
+            </figure>
+        </div>
+        <div class="theme-dialog__footer theme-lightbox__controls">
+            <button class="theme-button theme-button--secondary theme-button--icon" type="button" data-theme-lightbox-previous aria-label="Previous image">…</button>
+            <button class="theme-button theme-button--secondary theme-button--icon" type="button" data-theme-lightbox-next aria-label="Next image">…</button>
+        </div>
+    </form>
+</dialog>
+```
+
+Three departures from the dialog's own contract, each forced by what is in this
+one: the header carries **no title** (an image has a caption, which is inside
+the picture and changes with it, and a heading reading "Image" would be the
+same word on every gallery of every page); the close button carries **no
+`value`**, because nothing here reads `returnValue`; and the two arrows are
+**`type="button"`**, because inside a `<form method="dialog">` a button without
+a type is a submit button and the first arrow press would close the lightbox
+instead of moving it.
+
+Items are addressed **by the id of their file reference**, never by a position.
+A `textmedia` gallery may hold a video between two images, and an index would
+have to agree with a list the template does not have.
+
 ### Forms
 
 The `forms/` partials style one contract between them — `_controls.scss` the
@@ -1449,9 +1486,8 @@ one-character change with no visible symptom on a desktop check.
 
 ## Components that need the script
 
-Three components are the only ones in the library that depend on
-`Resources/Public/JavaScript/theme.js`, and each is written so that the page is
-still usable without it — with JavaScript switched off, and with JavaScript on
+Four components depend on `Resources/Public/JavaScript/theme.js`, and each is
+written so that the page is still usable without it — with JavaScript switched off, and with JavaScript on
 but `theme.js` failing to load, which are two different pages. The dialog
 opener follows the [`data-js` marker](#the-data-js-marker) like the navigation
 toggle does; the tabs follow a marker of their own that only `theme.js` sets,
@@ -1462,6 +1498,7 @@ them has actually run.
 |-----------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|---------------------------------------------------------|
 | Tabs      | WAI-ARIA tabs with automatic activation: arrow keys (mirrored right-to-left), Home, End, a roving tab stop; the panels become tab panels | No tab list; every panel shown, stacked, in its own frame under its heading, with no tab semantics | `.theme-tabs[data-theme-tabs-bound]`, set by `theme.js` |
 | Dialog    | `data-theme-dialog-open` calls `showModal()`; a click on the backdrop closes it; focus returns to the opener                             | The opener is hidden and the dialog stays closed                                                   | `:root:not([data-js]) [data-theme-dialog-open]`         |
+| Lightbox  | The gallery's zoom link opens the dialog on the image it names; the arrows and the arrow keys move within it, wrapping                   | The zoom link leads to the file, as it always did; the dialog is closed and renders nothing        | none — the link is the fallback, so nothing is hidden   |
 | Tooltip   | Escape sets `data-theme-tooltip-dismissed` until pointer and focus have both left                                                        | Hover and focus still show it; Escape does not hide it                                             | none — the CSS behaviour is the fallback                |
 
 **Tabs.** The markup keeps three rules that the stylesheet and the script both
