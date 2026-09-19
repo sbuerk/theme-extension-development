@@ -303,6 +303,14 @@
 			<trans-unit id="tx_theme_list_item.palette.theme_link">
 				<source>Link</source>
 			</trans-unit>
+
+			<!-- The icon picker, shared by every icon column -->
+			<trans-unit id="icon.I.none">
+				<source>No icon</source>
+			</trans-unit>
+			<trans-unit id="icon.group.uncategorised">
+				<source>Without a category</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

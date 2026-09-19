@@ -1,0 +1,8 @@
+pages,,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug,TSconfig
+,1,0,0,0,0,1,1,Every icon,/,
+,2,1,0,0,0,1,0,A narrowed list,/narrowed,"TCEFORM.tt_content.tx_iconpickerfixture_icon.keepItems = ,envelope,arrow-right,circle-info"
+tt_content,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header
+,10,2,0,0,0,10,header,Narrowed
+,20,1,0,0,0,10,header,Every icon

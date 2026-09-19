@@ -5,16 +5,22 @@ A *fixture extension* is a minimal TYPO3 extension that exists only inside
 and is loaded by functional tests to provide test doubles, additional TCA,
 service overrides or a plugin to render.
 
-| Fixture                | Package                      | Loaded by                                                |
-|------------------------|------------------------------|----------------------------------------------------------|
-| `example-fixture`      | `tests/example-fixture`      | proves the mechanism, and is the template for a new one  |
-| `plugin-fixture`       | `tests/plugin-fixture`       | `ExtbasePluginRenderingTest`, a plugin with no rendering |
-| `data-factory-fixture` | `tests/data-factory-fixture` | `ImageElementRenderingTest`, which imports its seed set  |
+| Fixture                | Package                      | Loaded by                                                 |
+|------------------------|------------------------------|-----------------------------------------------------------|
+| `example-fixture`      | `tests/example-fixture`      | proves the mechanism, and is the template for a new one   |
+| `plugin-fixture`       | `tests/plugin-fixture`       | `ExtbasePluginRenderingTest`, a plugin with no rendering  |
+| `data-factory-fixture` | `tests/data-factory-fixture` | `ImageElementRenderingTest`, which imports its seed set   |
+| `icon-picker-fixture`  | `tests/icon-picker-fixture`  | `IconPickerFormEngineTest`, a column with the icon picker |
 
 `data-factory-fixture` holds no code, only
 `Configuration/DataFactory/image-element/`. A seed set is found by discovery in
 an **active** package, so a set only one test imports needs a package that only
 that test loads — see [Seeding](../development/seeding.md#how-the-tests-import-it).
+
+`icon-picker-fixture` declares its column in an `ext_tables.sql` as well as in
+TCA: TYPO3 v12.4 derives no database column from a `select` without an MM
+table. The definition is the nullable `TEXT` v13.4 derives for a select with an
+`itemsProcFunc`, so the file is redundant, not different, on v13.
 
 ## Why load them by composer package name
 
