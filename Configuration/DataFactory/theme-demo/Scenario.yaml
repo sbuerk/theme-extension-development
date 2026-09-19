@@ -1827,7 +1827,7 @@ entities:
                   # No source field at all: the TCA of this type has no "pages"
                   # (EXT:frontend,
                   # "Overrides/280-tt_content-content_type-menu_sitemap.php"),
-                  # and the TypoScript sets no "special" either - it always
+                  # and the TypoScript empties "special" - it always
                   # starts at the site root and walks seven levels down.
                   - self:
                         id: 706

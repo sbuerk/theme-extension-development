@@ -725,7 +725,7 @@ tt_content.menu_section_pages {
     dataProcessing.10.levels = 2
 }
 
-# No "special" at all - "MenuProcessor"'s own default, the same one
+# An empty "special" - "MenuProcessor"'s own default behaviour, the same one
 # "Navigation.typoscript" uses for "mainMenu": "entryLevel" resolves to index
 # 0 of the *local rootline*, the site root, regardless of which page this
 # element sits on ("AbstractMenuContentObject::start()", line ~223 ff., and
@@ -736,15 +736,33 @@ tt_content.menu_section_pages {
 # ("EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:
 # CType.menu_sitemap.description") - deep enough for any realistic page tree
 # without being unbounded, matching FSC's own "MenuSitemap.typoscript".
-# "special" is unset explicitly ("special >") rather than left to default,
-# because this type is built "=< tt_content.menu_subpages" below, which did
-# set one.
+#
+# This type is built "=< tt_content.menu_subpages", which sets "special =
+# directory", so "special" has to be emptied here - and "special >" cannot do
+# that. "=<" is resolved at render time by "ContentObjectRenderer::
+# mergeTSRef()", which overlays this block onto the referenced one with
+# "array_replace_recursive()": a property removed with ">" is merely absent
+# from the overlay, and the referenced "directory" survives. That is what
+# this block did until now, and it made the sitemap a directory menu of
+# "pages" - a field this type does not offer, so it fell back to the current
+# page and listed nothing on any page without children. An empty value is a
+# key in the overlay and replaces "directory". "AbstractMenuContentObject::
+# prepareMenuItems()" only enters its "special" branch for a truthy
+# "special", and "start()" only reads "special.value" for "directory", so an
+# empty "special" is the default menu. The inherited "special.value.field =
+# pages" is still resolved by "MenuProcessor", which compares "special" with
+# nothing but "language", and then used by nothing. "dataProcessing.20"
+# keeps "directory" and cannot produce a menu for this type:
+# "lib.themeMenuWithPageMedia" limits it to "menu_pages" and
+# "menu_subpages", and the HMENU inside "MenuProcessor" checks that "if."
+# and renders nothing, so "menu" stays untouched. All of it read on v12.4.45
+# and v13.4.35.
 tt_content.menu_sitemap =< tt_content.menu_subpages
 tt_content.menu_sitemap {
     templateName = ContentElements/MenuSitemap
 
     dataProcessing.10 {
-        special >
+        special =
         levels = 7
     }
 }
