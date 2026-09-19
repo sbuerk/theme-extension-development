@@ -223,9 +223,10 @@ TYPO3 v13.0 derives a database column from every TCA `columns` entry (#101553,
 extended by #104311 in 13.3 for the `ctrl` derived columns). v12.4's
 `DefaultTcaSchema` does not — it only derives the management columns, the
 `category|datetime|slug|json|uuid` types and MM tables, with no branch for
-`input`, `text`, `link`, `file` or `inline`. Without an explicit definition the
-`tx_theme_list_item` table and the five `tx_theme_*` columns on `tt_content` are
-simply never created on v12, and every theme element using them fails.
+`input`, `text`, `link`, `file`, `inline` or a `select` without an MM table.
+Without an explicit definition the `tx_theme_list_item` table and the six
+`tx_theme_*` columns on `tt_content` are simply never created on v12, and every
+theme element using them fails.
 
 #101553 states that an explicit `ext_tables.sql` definition takes precedence
 over the derived one, so **one file serves both versions** and nothing in it is

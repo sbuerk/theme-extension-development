@@ -158,7 +158,67 @@ $additionalColumns = [
     ],
 ];
 
+// How loud the heading of a content element is, independent of its level:
+// "header_layout" says where the heading sits in the outline, this how it
+// looks. Rendered by "Partials/ContentElement/Header.html" - "display" as the
+// text role ".theme-display", "h1" to "h5" as modifiers of
+// ".theme-content-element__heading" (components/_content-element.scss). No
+// value is offered that the stylesheet does not implement, the same rule as
+// "tx_theme_link_variant" above.
+//
+// Not "exclude": like every column of this extension it is a presentation
+// choice of the element, and an editor who may edit the header may choose
+// how it looks.
+$additionalColumns['tx_theme_header_style'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style.description',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => '',
+        'items' => [
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style.I.default',
+                'value' => '',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style.I.display',
+                'value' => 'display',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style.I.h1',
+                'value' => 'h1',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style.I.h2',
+                'value' => 'h2',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style.I.h3',
+                'value' => 'h3',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style.I.h4',
+                'value' => 'h4',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_header_style.I.h5',
+                'value' => 'h5',
+            ],
+        ],
+    ],
+];
+
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
+
+// Next to "header_layout" in both header palettes of the core, so every CType
+// offering a heading level also offers its look. The CTypes of this extension
+// that render their title outside the shared header partial - the heroes, the
+// media teaser, the testimonial - hide it again per type, in
+// "Configuration/PageTsConfig/ContentElementAppearance.tsconfig", rather than
+// offering a field that does nothing there.
+ExtensionManagementUtility::addFieldsToPalette('tt_content', 'headers', 'tx_theme_header_style', 'after:header_layout');
+ExtensionManagementUtility::addFieldsToPalette('tt_content', 'header', 'tx_theme_header_style', 'after:header_layout');
 
 $GLOBALS['TCA']['tt_content']['palettes']['theme_link'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_link',

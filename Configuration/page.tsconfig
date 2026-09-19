@@ -41,3 +41,9 @@
 # for the same reason as the layouts: it applies through the site set and the
 # static include alike.
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig'
+
+# The appearance fields of a content element: the bands the theme adds to
+# "frame_class", and the fields it does not render taken out of the form. From
+# this file for the same reason as the backend layouts - it reaches both
+# delivery paths, where the page TSconfig of a site set would reach only one.
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/ContentElementAppearance.tsconfig'

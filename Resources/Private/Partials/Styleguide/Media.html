@@ -398,6 +398,72 @@
             </div>
         </div>
     </div>
+
+    <h3>Content element bands</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The frame of a content element, chosen in its "Appearance" tab:
+            <code>--frame-surface</code>, <code>--frame-raised</code>,
+            <code>--frame-accent</code> and <code>--frame-inverse</code> fill
+            the element and draw the hairline around it. The development
+            outline sits on top of that hairline and goes with the global
+            switch as before; the band stays.
+        </p>
+        <p>
+            The inverse band re-points no colour of its own. It turns the
+            colour scheme of everything inside it, so the link and the
+            buttons in it are the ones of the other appearance - each as
+            readable as it is on a page in that appearance.
+        </p>
+        <div class="theme-content-element theme-content-element--text theme-content-element--frame-surface" id="c9009" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <header class="theme-content-element__header">
+                    <h4 class="theme-content-element__heading">Surface band</h4>
+                </header>
+                <p>Running text on the surface fill, with <a href="#media">a link</a> and <small>small print</small>.</p>
+            </div>
+        </div>
+        <div class="theme-content-element theme-content-element--text theme-content-element--frame-raised" id="c9010" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <header class="theme-content-element__header theme-content-element__header--center">
+                    <h4 class="theme-content-element__heading">Raised band, header centred</h4>
+                </header>
+                <p>The raised surface. In the light appearance it is the colour of the page, and the hairline draws it.</p>
+            </div>
+        </div>
+        <div class="theme-content-element theme-content-element--text theme-content-element--frame-accent" id="c9011" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <header class="theme-content-element__header theme-content-element__header--end">
+                    <h4 class="theme-content-element__heading theme-content-element__heading--h2">Accent band, header at the end, in the look of heading 2</h4>
+                </header>
+                <p>A tint of the primary accent, with <a href="#media">a link</a> in it and the two buttons after it.</p>
+                <div class="theme-button-group">
+                    <a class="theme-button" href="#media">Primary</a>
+                    <a class="theme-button theme-button--secondary" href="#media">Secondary</a>
+                </div>
+            </div>
+        </div>
+        <div class="theme-content-element theme-content-element--text theme-content-element--frame-inverse" id="c9012" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <header class="theme-content-element__header">
+                    <h4 class="theme-content-element__heading theme-content-element__heading--h5">Inverse band, in the look of heading 5</h4>
+                </header>
+                <p>The page in the other appearance, with <a href="#media">a link</a>, <small>small print</small> and the two buttons.</p>
+                <div class="theme-button-group">
+                    <a class="theme-button" href="#media">Primary</a>
+                    <a class="theme-button theme-button--secondary" href="#media">Secondary</a>
+                </div>
+            </div>
+        </div>
+        <div class="theme-content-element theme-content-element--text theme-content-element--frame-none" id="c9013" data-ctype="text">
+            <div class="theme-content-element__inner">
+                <p>
+                    <code>--frame-none</code>: no band and no inner padding, for an
+                    element that brings a box of its own. The outline stays.
+                </p>
+            </div>
+        </div>
+    </div>
 </section>
 
 </html>
