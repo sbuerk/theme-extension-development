@@ -77,6 +77,8 @@
     --theme-tabs-foreground: var(--theme-color-text-secondary, #4a5567);
     --theme-tabs-foreground-hover: var(--theme-color-text-primary, #14181f);
     --theme-tabs-foreground-selected: var(--theme-color-primary, #0b57d0);
+    --theme-tabs-indicator-color: var(--theme-color-primary, #0b57d0);
+    --theme-tabs-indicator-width: var(--theme-border-width-strong, 2px);
     --theme-tabs-padding: var(--theme-space-4, 1.25rem);
     --theme-tabs-stack-gap: var(--theme-space-3, 0.9375rem);
 
@@ -114,7 +116,10 @@
     margin: 0;
     padding-inline: var(--theme-tabs-padding);
 
+    // Every tab carries the top edge of the indicator, transparent until it is
+    // selected, so selecting a tab paints it and moves nothing.
     border: var(--theme-tabs-border-width) solid transparent;
+    border-block-start-width: var(--theme-tabs-indicator-width);
     border-block-end: 0;
     border-start-start-radius: var(--theme-tabs-radius);
     border-start-end-radius: var(--theme-tabs-radius);
@@ -142,8 +147,13 @@
         outline-offset: calc(-2 * var(--theme-border-width-strong));
     }
 
+    // The selected tab is told apart by more than its colour (WCAG 1.4.1): it
+    // takes the frame of the panel, which the decorative border draws at
+    // about 1.4:1 and so hardly shows, and a bar along its top edge in the
+    // accent, two pixels thick - a shape the others do not have.
     &[aria-selected='true'] {
         border-color: var(--theme-tabs-border-color);
+        border-block-start-color: var(--theme-tabs-indicator-color);
         background-color: var(--theme-tabs-background);
         color: var(--theme-tabs-foreground-selected);
     }
