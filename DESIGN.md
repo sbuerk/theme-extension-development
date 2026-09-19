@@ -547,6 +547,63 @@ exactly 3.00, with no margin. At 8% it is 2.95 and fails, and the muted text
 falls to 4.71. `ContentElementContractTest` holds the stylesheet to 5%. A
 different mix is a different table, and it has to be computed again.
 
+### Icon tiles
+
+Four components put an icon of the set on a tile: the square and the circle
+media object (`components/_media-object.scss`), the column feature
+(`components/_feature.scss`) - filled - and the hanging feature and the tile
+feature, framed. None adds a colour token.
+
+| Tile                        | Fill                    | Icon                       | Edge                         |
+|-----------------------------|-------------------------|----------------------------|------------------------------|
+| media object square, circle | `--theme-color-primary` | `--theme-color-on-primary` | transparent                  |
+| feature `--column`          | `--theme-color-primary` | `--theme-color-on-primary` | transparent                  |
+| feature `--hanging`         | `--theme-color-surface` | `--theme-color-primary`    | `--theme-color-border`       |
+| feature `--tile` (the box)  | `--theme-color-surface` | `--theme-color-primary`    | `--theme-color-border`       |
+| step marker                 | none                    | `--theme-color-primary`    | `--theme-color-primary`, 2px |
+
+**The filled tile is the pair of the primary button**: `on-primary` on
+`primary`, which follows the palette and the appearance. It sits on the page,
+on a band or in a specimen frame, so the fill is computed against all three
+backgrounds of its appearance. Computed like every other figure here:
+
+| Palette | Appearance | Fill      | Icon on fill | vs background | vs surface | vs surface-raised |
+|---------|------------|-----------|--------------|---------------|------------|-------------------|
+| neutral | light      | `#0b57d0` | 6.39         | 6.39          | 5.90       | 6.39              |
+| neutral | dark       | `#82abff` | 8.18         | 8.18          | 7.51       | 6.77              |
+| ember   | light      | `#9a4212` | 6.64         | 6.64          | 6.14       | 6.64              |
+| ember   | dark       | `#f0a882` | 9.43         | 9.43          | 8.66       | 7.81              |
+| ocean   | light      | `#00629a` | 6.53         | 6.53          | 6.04       | 6.53              |
+| ocean   | dark       | `#7cc4ee` | 9.75         | 9.75          | 8.96       | 8.07              |
+| moss    | light      | `#2f6a26` | 6.54         | 6.54          | 6.05       | 6.54              |
+| moss    | dark       | `#8fd782` | 10.83        | 10.83         | 9.95       | 8.97              |
+| violet  | light      | `#6a3ba8` | 7.49         | 7.49          | 6.92       | 7.49              |
+| violet  | dark       | `#c2a4f2` | 8.77         | 8.77          | 8.06       | 7.26              |
+
+The icon is decoration - its slot is `aria-hidden` and the text beside it
+says what it shows - so no criterion holds it to a ratio; it clears 4.5:1 on
+its fill all the same (lowest: neutral light, 6.39), and the tile clears 3:1
+against every background it can sit on (lowest: neutral light surface, 5.90).
+`on-primary` is the background of the appearance, `#ffffff` light and
+`#0f1319` dark, so "icon on fill" equals "vs background".
+
+**The framed tile and the box** use only pairs of the neutral tables: the
+primary icon on the surface, 5.90 light and 7.51 dark, and title and text in
+`--theme-color-text-primary` and `-secondary` on it, 16.45 and 6.97 light,
+14.58 and 8.17 dark. The hairline is the decorative `--theme-color-border`:
+the box groups, it is not a control (see
+[Control boundaries](#control-boundaries)). The stat box is the same Frame,
+with the same figures.
+
+**The step marker** is a ring in the primary accent with its number in it, on
+whatever the list sits on - the figures of `--theme-color-primary` in the
+tables above, lowest 5.90 on the light surface. The rail between two markers
+is `--theme-color-border-strong`, decoration.
+
+Under forced colours the fills are dropped and every transparent edge is
+painted in the system text colour, so each tile keeps its shape without a rule
+of its own.
+
 ### Palettes
 
 The neutral palette above is the **default**. Four alternates ship, and each

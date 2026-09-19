@@ -1,0 +1,163 @@
+// Steps.
+//
+// Markup contract:
+//
+//     <ol class="theme-steps">
+//         <li class="theme-steps__step">
+//             <span class="theme-steps__marker" aria-hidden="true"></span>
+//             <div class="theme-steps__body">
+//                 <h3 class="theme-steps__title">…</h3>
+//                 <p class="theme-steps__text">…</p>
+//             </div>
+//         </li>
+//         <li class="theme-steps__step">
+//             <span class="theme-steps__marker theme-steps__marker--icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>
+//             …
+//         </li>
+//     </ol>
+//
+// A process: what to do first, what next. An ordered list, because the order
+// is the content - a step moved is a different process.
+//
+// --- The number is the stylesheet's -----------------------------------------
+//
+// The marker of a step is empty in the markup and numbered by a CSS counter,
+// one per list, so a step inserted in the middle renumbers the rest and the
+// source carries no number that could disagree with the list's own order. The
+// number is text, not a glyph, and the marker is hidden from assistive
+// technology: the list already says which item of how many a step is.
+//
+// "--icon" puts an icon of the set into the marker instead of the number. A
+// list may mix both; each marker decides for itself.
+//
+// --- Down, then across - up to five steps -------------------------------------
+//
+// Below "bp.$md" the steps run down the page, the marker at the start of the
+// line and the text beside it. From "bp.$md" up they run across, one column
+// each, the marker above the text - a list of up to five steps. A list of six
+// or more stays down: across, each step would get a sixth of the column or
+// less, which in the main column beside a sub navigation is narrower than a
+// title. The count is what decides, through ":has()", not the width of the
+// column, so a list keeps one layout wherever it is placed.
+//
+// A hairline rail joins each marker to the next: down the side in the first
+// layout, along the markers in the second. It is a border of an empty pseudo
+// element, decoration in the strong border colour, and sits between two
+// markers rather than behind them, so a marker needs no fill to hide it - on a
+// band as on the page.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-steps {
+    --theme-steps-marker-size: 2.5rem;
+    --theme-steps-gap: var(--theme-space-5, 1.5625rem);
+    --theme-steps-column-gap: var(--theme-space-4, 1.25rem);
+    --theme-steps-rail-gap: var(--theme-space-1, 0.3125rem);
+    --theme-steps-color: var(--theme-color-primary, #0b57d0);
+    --theme-steps-rail-color: var(--theme-color-border-strong, #828d9f);
+
+    counter-reset: theme-step;
+    display: grid;
+    gap: var(--theme-steps-gap);
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+    padding-inline-start: 0;
+    list-style: none;
+}
+
+.theme-steps__step {
+    counter-increment: theme-step;
+    position: relative;
+    display: flex;
+    gap: var(--theme-steps-column-gap);
+    margin: 0;
+}
+
+// The rail from this marker to the next, down: from below the marker to the
+// top of the next one, across the gap between the two steps.
+.theme-steps__step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    inset-block: calc(var(--theme-steps-marker-size) + var(--theme-steps-rail-gap)) calc(var(--theme-steps-rail-gap) - var(--theme-steps-gap));
+    inset-inline-start: calc(var(--theme-steps-marker-size) / 2);
+    border-inline-start: var(--theme-border-width, 1px) solid var(--theme-steps-rail-color);
+}
+
+.theme-steps__marker {
+    --theme-icon-size: 1.25rem;
+
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--theme-steps-marker-size);
+    block-size: var(--theme-steps-marker-size);
+
+    color: var(--theme-steps-color);
+    border: var(--theme-border-width-strong, 2px) solid var(--theme-steps-color);
+    border-radius: var(--theme-radius-full, 9999px);
+    font-weight: var(--theme-font-weight-bold);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.theme-steps__marker:not(.theme-steps__marker--icon)::before {
+    content: counter(theme-step);
+}
+
+.theme-steps__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--theme-space-1, 0.3125rem);
+    min-inline-size: 0;
+
+    // Beside the marker, the first line of the title sits at the height of the
+    // number in it.
+    padding-block-start: calc((var(--theme-steps-marker-size) - 1lh) / 2);
+}
+
+// Selected by class on whatever heading level the element's outline gives it,
+// so the capitals the element baseline sets on "h5" and "h6" are undone here.
+.theme-steps__title {
+    margin: 0;
+    font-size: var(--theme-font-size-md);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-none);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+}
+
+.theme-steps__text {
+    margin: 0;
+    color: var(--theme-color-text-secondary);
+    font-size: var(--theme-font-size-sm);
+}
+
+// Across, from "bp.$md" up, for a list without a sixth step. The rail runs
+// from the end of one marker to the start of the next, across the column gap.
+@media (min-width: bp.$md) {
+    .theme-steps:not(:has(> .theme-steps__step:nth-child(6))) {
+        grid-auto-columns: minmax(0, 1fr);
+        grid-auto-flow: column;
+        column-gap: var(--theme-steps-column-gap);
+
+        > .theme-steps__step {
+            flex-direction: column;
+            gap: var(--theme-space-3, 0.9375rem);
+        }
+
+        > .theme-steps__step:not(:last-child)::after {
+            inset-block: calc(var(--theme-steps-marker-size) / 2) auto;
+            inset-inline: calc(var(--theme-steps-marker-size) + var(--theme-steps-rail-gap)) calc(var(--theme-steps-rail-gap) - var(--theme-steps-column-gap));
+            border-block-start: var(--theme-border-width, 1px) solid var(--theme-steps-rail-color);
+            border-inline-start: 0;
+        }
+
+        .theme-steps__body {
+            padding-block-start: 0;
+        }
+    }
+}

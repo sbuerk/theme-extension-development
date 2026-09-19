@@ -32,9 +32,9 @@ What the library contains
         -   Components
     *   -   Content
         -   Accordion, alert, author, badge, card, code block, description
-            list - with a divided variant for key and value - divider, figure,
-            hero, list, panel, quote, table, teaser, and the text roles
-            display, lead and eyebrow
+            list - with a divided variant for key and value - divider, feature and feature grid, figure, hero, list, media
+            object, panel, quote, stats, steps, table, teaser, and the text
+            roles display, lead and eyebrow
     *   -   Data display
         -   Avatar and avatar group, tag list, progress bar, meter
     *   -   Actions
