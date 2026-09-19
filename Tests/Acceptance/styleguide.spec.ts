@@ -69,6 +69,32 @@ test.describe('the styleguide with JavaScript', () => {
         await expect(panel('sg-tabs-set-panel')).toBeHidden();
     });
 
+    test('the selected tab carries a bar the others do not have', async ({ page }) => {
+        const group = page.locator('#interactive .theme-tabs');
+        const tab = (name: string) => group.getByRole('tab', { name, exact: true });
+        const edge = (name: string) => tab(name).evaluate((element) => {
+            const style = getComputedStyle(element);
+            return { width: parseFloat(style.borderTopWidth), colour: style.borderTopColor, style: style.borderTopStyle };
+        });
+        await expect(group).toHaveAttribute('data-theme-tabs-bound', '');
+
+        // WCAG 1.4.1: not the colour of the label alone. The selected tab has a
+        // solid top edge of at least two pixels, an unselected one the same
+        // edge, transparent - so the bar moves with the selection and nothing
+        // else does.
+        for (const [selected, other] of [['Site set', 'Static include'], ['Static include', 'Site set']]) {
+            await tab(selected).click();
+            await expect(tab(selected)).toHaveAttribute('aria-selected', 'true');
+            const bar = await edge(selected);
+            const none = await edge(other);
+            expect(bar.style).toBe('solid');
+            expect(bar.width).toBeGreaterThanOrEqual(2);
+            expect(bar.colour).not.toBe('rgba(0, 0, 0, 0)');
+            expect(none.width).toBe(bar.width);
+            expect(none.colour).toBe('rgba(0, 0, 0, 0)');
+        }
+    });
+
     test('a dialog opens as a modal and gives focus back however it closes', async ({ page }) => {
         const opener = page.locator('[data-theme-dialog-open="sg-dialog-reseed"]');
         const dialog = page.locator('#sg-dialog-reseed');
