@@ -445,7 +445,7 @@ entities:
                         CType: 'theme_testimonial'
                         header: 'Harold Abelson and Gerald Jay Sussman'
                         subheader: 'Preface to the first edition, 1985'
-                        bodytext: '<p>Programs must be written for people to read, and only incidentally for machines to execute.</p>'
+                        bodytext: 'Programs must be written for people to read, and only incidentally for machines to execute.'
                   - self:
                         id: 5504
                         CType: 'text'
@@ -1986,10 +1986,10 @@ entities:
                         CType: 'theme_hero'
                         header: 'The full hero'
                         header_layout: 2
-                        bodytext: |
-                          <p>The hero carries a heading, a lead paragraph, one media
+                        bodytext: >-
+                          The hero carries a heading, a lead paragraph, one media
                           slot and a single call to action. It is the widest element
-                          the theme ships and is meant to open a page.</p>
+                          the theme ships and is meant to open a page.
                         tx_theme_link: 't3://page?uid=2'
                         tx_theme_link_label: 'Read the typography page'
                         # The empty string is a real item of the select, not a
@@ -2008,10 +2008,10 @@ entities:
                         CType: 'theme_hero_small'
                         header: 'The reduced hero'
                         header_layout: 2
-                        bodytext: |
-                          <p>The same fields as the full hero, rendered compactly. The
+                        bodytext: >-
+                          The same fields as the full hero, rendered compactly. The
                           element above and this one differ in nothing an editor
-                          fills in - only in the variant that was chosen.</p>
+                          fills in - only in the variant that was chosen.
                         tx_theme_link: 't3://page?uid=3'
                         tx_theme_link_label: 'Look at the media page'
                         tx_theme_link_variant: 'secondary'
@@ -2023,10 +2023,10 @@ entities:
                         CType: 'theme_hero_text_only'
                         header: 'The hero without media'
                         header_layout: 2
-                        bodytext: |
-                          <p>This variant has no image field in the backend form, so
+                        bodytext: >-
+                          This variant has no image field in the backend form, so
                           there is nothing to leave empty. What it demonstrates is the
-                          hero body on its own, full width.</p>
+                          hero body on its own, full width.
                         tx_theme_link: 't3://page?uid=1'
                         tx_theme_link_label: 'Back to the start page'
                         tx_theme_link_variant: 'ghost'
@@ -2038,10 +2038,10 @@ entities:
                         id: 804
                         CType: 'theme_teaser'
                         header: 'A teaser without media'
-                        bodytext: |
-                          <p>A teaser is a secondary block: a heading, a couple of
+                        bodytext: >-
+                          A teaser is a secondary block: a heading, a couple of
                           sentences and one link. Its heading defaults to h2 rather
-                          than the hero's h1.</p>
+                          than the hero's h1.
                         tx_theme_link: 't3://page?uid=4'
                         tx_theme_link_label: 'Open the empty page'
                         tx_theme_link_variant: 'link'
@@ -2054,10 +2054,10 @@ entities:
                         id: 805
                         CType: 'theme_media_teaser'
                         header: 'A teaser beside an image'
-                        bodytext: |
-                          <p>Text and a single image side by side. The image is one
+                        bodytext: >-
+                          Text and a single image side by side. The image is one
                           file reference; the theme deliberately wires no gallery
-                          processing here, because there is no grid to arrange.</p>
+                          processing here, because there is no grid to arrange.
                         tx_theme_link: 'https://docs.typo3.org/'
                         tx_theme_link_label: 'Read the TYPO3 documentation'
                         tx_theme_link_variant: 'ghost'
@@ -2074,9 +2074,9 @@ entities:
                         CType: 'theme_testimonial'
                         header: 'Ada Lovelace'
                         subheader: 'Mathematician, 1843'
-                        bodytext: |
-                          <p>The Analytical Engine weaves algebraic patterns just as
-                          the Jacquard loom weaves flowers and leaves.</p>
+                        bodytext: >-
+                          The Analytical Engine weaves algebraic patterns just as
+                          the Jacquard loom weaves flowers and leaves.
                   # theme_author - a person: portrait, name, role, a short bio and
                   # the person's own links. The name is the content element's
                   # heading and goes through the shared header partial; the role
@@ -2089,10 +2089,10 @@ entities:
                         CType: 'theme_author'
                         header: 'Grace Hopper'
                         subheader: 'Compiler pioneer'
-                        bodytext: |
-                          <p>Wrote the first compiler and spent the rest of her career
+                        bodytext: >-
+                          Wrote the first compiler and spent the rest of her career
                           arguing that a programming language should read like
-                          English.</p>
+                          English.
                         tx_theme_list_items: '1,2'
                   # theme_linklist - a flat list of links. "header" is the list
                   # title here, not a content heading, which is why the CType
@@ -2130,9 +2130,9 @@ entities:
                         id: 810
                         CType: 'theme_media_teaser_grid'
                         header: 'Three cards in a grid'
-                        bodytext: |
-                          <p>Every card is one row of the shared child table. The
-                          lead-in above is the element's own heading and body.</p>
+                        bodytext: >-
+                          Every card is one row of the shared child table. The
+                          lead-in above is the element's own heading and body.
                         tx_theme_list_items: '10,11,12'
                   # theme_notice - the six kinds of ".theme-alert", one element
                   # each. The kind decides the modifier and the "role" together
@@ -2283,7 +2283,7 @@ entities:
                   - self:
                         id: 12
                         header: 'A card without a link'
-                        text: |
+                        text: |-
                           The link is optional on this relation only.
                           A card without one is a plain block of text.
 
@@ -3076,11 +3076,11 @@ entities:
                             tx_theme_eyebrow: 'The default layout'
                             header: 'The image beside the text, at the start'
                             header_layout: 2
-                            bodytext: |
-                              <p>The hero as it always rendered: the image takes 45 per
+                            bodytext: >-
+                              The hero as it always rendered: the image takes 45 per
                               cent of the row on a wide screen and sits above the text on
                               a narrow one. The short line above the title is the
-                              eyebrow, a field of its own.</p>
+                              eyebrow, a field of its own.
                             tx_theme_link: 't3://page?uid=8'
                             tx_theme_link_label: 'All theme elements'
                             tx_theme_link_icon: 'arrow-left'
@@ -3091,10 +3091,10 @@ entities:
                             tx_theme_eyebrow: 'Image at the end'
                             header: 'The image beside the text, at the end'
                             header_layout: 2
-                            bodytext: |
-                              <p>The image moves to the end of the row. In the markup it
+                            bodytext: >-
+                              The image moves to the end of the row. In the markup it
                               still comes first, so a screen reader meets the same order
-                              as in the default layout.</p>
+                              as in the default layout.
                             tx_theme_link: 't3://page?uid=31'
                             tx_theme_link_label: 'Read about text in columns'
                             tx_theme_link_variant: 'secondary'
@@ -3105,10 +3105,10 @@ entities:
                             tx_theme_eyebrow: 'Centred'
                             header: 'Everything on one axis'
                             header_layout: 2
-                            bodytext: |
-                              <p>Title, lead, action and image centred, at every width.
+                            bodytext: >-
+                              Title, lead, action and image centred, at every width.
                               The image is no wider than the reading measure, so it never
-                              outgrows the text.</p>
+                              outgrows the text.
                             tx_theme_link: 't3://page?uid=2'
                             tx_theme_link_label: 'Open the typography'
                       - self:
@@ -3118,11 +3118,11 @@ entities:
                             tx_theme_eyebrow: 'Screenshot'
                             header: 'An application that continues below'
                             header_layout: 2
-                            bodytext: |
-                              <p>Centred text and the image below it, resting on the
+                            bodytext: >-
+                              Centred text and the image below it, resting on the
                               bottom edge of the panel, which cuts it off. This is the one
                               layout that puts the image after the text in the markup as
-                              well.</p>
+                              well.
                             tx_theme_link: 't3://page?uid=9'
                             tx_theme_link_label: 'Open the styleguide'
                       - self:
@@ -3132,10 +3132,10 @@ entities:
                             tx_theme_eyebrow: 'Cropped'
                             header: 'The image runs out of the panel'
                             header_layout: 2
-                            bodytext: |
-                              <p>The image sits at the end of the row and is cut off by the
+                            bodytext: >-
+                              The image sits at the end of the row and is cut off by the
                               end and the bottom edges of the panel. A hairline frames the
-                              two edges that stay inside it.</p>
+                              two edges that stay inside it.
                             tx_theme_link: 't3://page?uid=3'
                             tx_theme_link_label: 'Look at the media page'
                             tx_theme_link_variant: 'ghost'
@@ -3146,9 +3146,9 @@ entities:
                             tx_theme_eyebrow: 'Reduced, image at the end'
                             header: 'The reduced hero offers three layouts'
                             header_layout: 2
-                            bodytext: |
-                              <p>The default, the image at the end, and centred. It has
-                              too little height for an image cut off at an edge.</p>
+                            bodytext: >-
+                              The default, the image at the end, and centred. It has
+                              too little height for an image cut off at an edge.
                       - self:
                             id: 11008
                             CType: 'theme_hero_small'
@@ -3156,9 +3156,9 @@ entities:
                             tx_theme_eyebrow: 'Reduced, centred'
                             header: 'A sub page header, centred'
                             header_layout: 2
-                            bodytext: |
-                              <p>The same panel with less air above and below, and its
-                              image above the text.</p>
+                            bodytext: >-
+                              The same panel with less air above and below, and its
+                              image above the text.
                       - self:
                             id: 11009
                             CType: 'theme_hero_text_only'
@@ -3166,9 +3166,9 @@ entities:
                             tx_theme_eyebrow: 'Without media, centred'
                             header: 'No image, and two layouts'
                             header_layout: 2
-                            bodytext: |
-                              <p>The hero without media can be centred or not. There is no
-                              image to place, so the other layouts are not offered.</p>
+                            bodytext: >-
+                              The hero without media can be centred or not. There is no
+                              image to place, so the other layouts are not offered.
                             tx_theme_link: 't3://page?uid=5'
                             tx_theme_link_label: 'Back to the elements'
                             tx_theme_link_variant: 'link'
@@ -3181,9 +3181,9 @@ entities:
                             tx_theme_eyebrow: 'Reduced, the default'
                             header: 'The reduced hero in its default layout'
                             header_layout: 2
-                            bodytext: |
-                              <p>The image at the start of the row, as on the page of the
-                              theme elements, now with an eyebrow above the title.</p>
+                            bodytext: >-
+                              The image at the start of the row, as on the page of the
+                              theme elements, now with an eyebrow above the title.
                       - self:
                             id: 11011
                             CType: 'theme_hero_text_only'
@@ -3191,10 +3191,10 @@ entities:
                             tx_theme_eyebrow: 'Without media, the default'
                             header: 'Text at the start of the line'
                             header_layout: 2
-                            bodytext: |
-                              <p>The hero without media in its default layout: the text
+                            bodytext: >-
+                              The hero without media in its default layout: the text
                               starts at the start of the line and runs to the reading
-                              measure.</p>
+                              measure.
 
                 # The call to action in every tone and width: a box on the
                 # surface with an icon and both links, a band on the accent
@@ -3313,29 +3313,29 @@ entities:
                             tx_theme_quote_style: ''
                             header: 'The default style'
                             subheader: 'A rule at the start'
-                            bodytext: |
-                              <p>The quotation as every testimonial rendered it so far: set
+                            bodytext: >-
+                              The quotation as every testimonial rendered it so far: set
                               apart by a rule at the start of the line and by its weight,
-                              without a quotation mark.</p>
+                              without a quotation mark.
                       - self:
                             id: 11204
                             CType: 'theme_testimonial'
                             tx_theme_quote_style: 'pull'
                             header: 'The pull quote'
                             subheader: 'Larger, between two rules'
-                            bodytext: |
-                              <p>One sentence worth reading twice, lifted out of the text
-                              and set large enough to be found while scrolling past.</p>
+                            bodytext: >-
+                              One sentence worth reading twice, lifted out of the text
+                              and set large enough to be found while scrolling past.
                       - self:
                             id: 11205
                             CType: 'theme_testimonial'
                             tx_theme_quote_style: 'centred'
                             header: 'The centred quotation'
                             subheader: 'On one axis, held to the measure'
-                            bodytext: |
-                              <p>A quotation that stands on its own between two sections of
+                            bodytext: >-
+                              A quotation that stands on its own between two sections of
                               a page, centred below its mark and never wider than the
-                              reading measure.</p>
+                              reading measure.
                       # A portrait of the attributed person, next to the name.
                       # The image is attached in "config.yml"; the template
                       # renders it as a decorative avatar, because the name
@@ -3346,10 +3346,10 @@ entities:
                             tx_theme_quote_style: ''
                             header: 'With a portrait'
                             subheader: 'An avatar before the name'
-                            bodytext: |
-                              <p>A picture of the person quoted, as a round avatar at the
+                            bodytext: >-
+                              A picture of the person quoted, as a round avatar at the
                               start of the attribution. It stands beside the name, so it
-                              carries no text of its own.</p>
+                              carries no text of its own.
 
             # The appearance fields of a content element, every value once:
             # the frames, the space before and after, the alignment and the
