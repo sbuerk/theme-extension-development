@@ -80,12 +80,12 @@
 # Why the icon columns are nullable TEXT
 # ---------------------------------------------------------------------------
 #
-# "tt_content.tx_theme_link_icon", "tt_content.tx_theme_icon" and
-# "tx_theme_list_item.link_icon" store an icon name, yet they are TEXT,
-# because that is what v13 derives: their select has an "itemsProcFunc", and
-# DefaultTcaSchema then skips the choice of an INT or a VARCHAR column by the
-# item values and ends in its final fallback, a nullable TEXT (13.4.35,
-# "case 'select'").
+# "tt_content.tx_theme_link_icon", "tt_content.tx_theme_icon",
+# "tx_theme_list_item.link_icon" and "tx_theme_list_item.icon" store an icon
+# name, yet they are TEXT, because that is what v13 derives: their select has
+# an "itemsProcFunc", and DefaultTcaSchema then skips the choice of an INT or
+# a VARCHAR column by the item values and ends in its final fallback, a
+# nullable TEXT (13.4.35, "case 'select'").
 #
 
 #
@@ -117,5 +117,6 @@ CREATE TABLE tx_theme_list_item (
 	image int(11) unsigned DEFAULT '0' NOT NULL,
 	link text,
 	link_label varchar(255) DEFAULT '' NOT NULL,
-	link_icon text
+	link_icon text,
+	icon text
 );

@@ -332,6 +332,9 @@
 			<trans-unit id="tx_theme_list_item.link_icon">
 				<source>Link icon</source>
 			</trans-unit>
+			<trans-unit id="tx_theme_list_item.icon">
+				<source>Icon</source>
+			</trans-unit>
 
 			<!-- The icon picker, shared by every icon column -->
 			<trans-unit id="icon.I.none">
