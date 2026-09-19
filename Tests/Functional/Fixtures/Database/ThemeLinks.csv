@@ -1,6 +1,7 @@
 pages,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
 ,1,0,0,0,0,1,1,Theme links,/
+,2,0,0,0,0,1,1,Another site,/
 tt_content,,,,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,bodytext,tx_theme_link,tx_theme_link_label,tx_theme_link_variant,tx_theme_link_icon,tx_theme_list_items
 ,10,1,0,0,0,10,theme_teaser,Primary,,t3://page?uid=1,Primary link,,,0
@@ -11,6 +12,10 @@ tt_content,,,,,,,,,,,,,,
 ,60,1,0,0,0,60,theme_teaser,An icon that is gone,,t3://page?uid=1,Still a link,,no-such-icon,0
 ,70,1,0,0,0,70,theme_linklist,Links with icons,,,,,,2
 ,80,1,0,0,0,80,theme_media_teaser_grid,Cards with icons,,,,,,1
+,90,1,0,0,0,90,text,Links in rich text,"<p><a href=""https://example.org/"">External site</a> <a href=""https://example.org/new"" target=""_blank"">New window</a> <a href=""mailto:hello@example.org"">Write to us</a> <a href=""tel:+4930123456"">Call us</a> <a href=""t3://page?uid=1"">Start page</a> <a href=""https://theme.example.com/about"">Own host</a></p>",,,,,0
+,100,1,0,0,0,100,theme_teaser,A file,,t3://file?identifier=1:/theme-link.pdf,The report,,,0
+,110,1,0,0,0,110,theme_teaser,Elsewhere,,https://example.org/ _blank,Read elsewhere,secondary,,0
+,120,1,0,0,0,120,text,More links,"<p><a href=""t3://page?uid=1"" target=""_blank"">Start in a new window</a> <a href=""https://other.example.com/page"">Other site</a></p>",,,,,0
 tx_theme_list_item,,,,,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,text,link,link_label,link_icon
 ,1,1,0,0,1,70,tt_content,tx_theme_list_items,,,t3://page?uid=1,Documentation,book-open

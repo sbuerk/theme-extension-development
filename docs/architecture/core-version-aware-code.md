@@ -92,7 +92,7 @@ with this extension.
 
 ### The worked example: `ThemeDelivery`
 
-The `Example` pair above demonstrates the mechanism. The real splits of this
+The `Example` pair above demonstrates the mechanism. Most real splits of this
 branch live on the test side: `Tests/Functional/Core12/ThemeDelivery.php` and
 `Tests/Functional/Core13/ThemeDelivery.php` describe how a functional test
 enables the theme — a `sys_template` record on v12, the site set on v13 — behind
@@ -104,6 +104,20 @@ The seeder carried the one split of production code, the conflict mode of
 extracted into [`sbuerk/data-factory`](https://github.com/sbuerk/data-factory),
 whose 1.x line carries that split in its own `Core12/` and `Core13/`
 (`Seeding/DataHandling/FileImporter.php`).
+
+### The production split: `FrontendConfig`
+
+`Classes/EventListener/LinkDecoration.php` marks links only where the merged
+TypoScript `config.` of the page switches it on. TYPO3 v13 hands that array out
+as `FrontendTypoScript::getConfigArray()` of the `frontend.typoscript` request
+attribute; v12.4 has no such method — its `FrontendTypoScript` carries the
+whole setup array, without the merge of the `config.` of the PAGE object — and
+keeps the merged array in `config['config']` of the `frontend.controller`
+attribute. `Classes/TypoScript/FrontendConfigInterface.php` is the contract,
+`Core12/TypoScript/FrontendConfig.php` and `Core13/TypoScript/FrontendConfig.php`
+are the two implementations, each tested below `Tests/Unit/Core12/TypoScript/`
+and `Tests/Unit/Core13/TypoScript/`. The split exists on this branch only:
+`main` supports v13 and v14, which both have `getConfigArray()`.
 
 ## Configuration is the exception
 

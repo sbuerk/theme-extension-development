@@ -8,6 +8,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\ThemeExtensionDevelopment\Icon\IconSet;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
+use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
@@ -33,7 +35,31 @@ final class ThemeLinkRenderingTest extends AbstractFunctionalTestCase
         parent::setUp();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/ThemeLinks.csv');
+
+        // The file a "t3://file" link of the fixture names. A test instance has
+        // a "fileadmin/" folder and no storage record.
+        $this->get(StorageRepository::class)
+            ->createLocalStorage('fileadmin', 'fileadmin/', 'relative', 'Default storage of the test instance', true);
+        GeneralUtility::mkdir_deep($this->instancePath . '/fileadmin');
+        GeneralUtility::writeFile($this->instancePath . '/fileadmin/theme-link.pdf', '%PDF-1.4');
         $this->setUpThemeSite();
+
+        // A second site of the same installation. A link to it is not a link
+        // "elsewhere", although its host is not the host of the request.
+        $this->writeSiteConfiguration(
+            'other',
+            $this->buildSiteConfiguration(
+                rootPageId: 2,
+                base: 'https://other.example.com/',
+                websiteTitle: 'Other',
+            ),
+            [
+                $this->buildDefaultLanguageConfiguration(
+                    identifier: 'EN',
+                    base: 'https://other.example.com/',
+                ),
+            ],
+        );
     }
 
     private function render(): string
@@ -56,12 +82,13 @@ final class ThemeLinkRenderingTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * The anchor whose text ends with the given label, with its markup.
+     * The anchor whose text ends with the given label - followed only by the
+     * spans a decorated link carries - with its markup.
      */
     private function anchor(string $fragment, string $label): string
     {
         $matched = preg_match(
-            sprintf('#<a [^>]*>(?:(?!</a>).)*?%s\s*</a>#s', preg_quote($label, '#')),
+            sprintf('#<a [^>]*>(?:(?!</a>).)*?%s\s*(?:<span [^>]*>[^<]*</span>)*</a>#s', preg_quote($label, '#')),
             $fragment,
             $matches,
         );
@@ -149,6 +176,103 @@ final class ThemeLinkRenderingTest extends AbstractFunctionalTestCase
         $this->assertStringContainsString($this->pathOf('book-open'), $withIcon);
 
         $this->assertStringNotContainsString('<svg', $this->anchor($list, 'Plain'));
+    }
+
+    private const MARKER = '<span class="theme-link__marker" aria-hidden="true"></span>';
+
+    /**
+     * @return \Generator<string, array{label: string, kind: string}>
+     */
+    public static function richTextLinksByKind(): \Generator
+    {
+        yield 'another site' => ['label' => 'External site', 'kind' => 'external'];
+        yield 'an email address' => ['label' => 'Write to us', 'kind' => 'mail'];
+        yield 'a phone number' => ['label' => 'Call us', 'kind' => 'tel'];
+    }
+
+    /**
+     * A link in rich text reaches "typolink" through "lib.parseFunc_RTE" and
+     * is marked by the type TYPO3 resolved it to, with the marker last and no
+     * hint: neither opens a window nor starts a download.
+     */
+    #[DataProvider('richTextLinksByKind')]
+    #[Test]
+    public function aLinkInRichTextIsMarkedByItsKind(string $label, string $kind): void
+    {
+        $anchor = $this->anchor($this->contentElement($this->render(), 90), $label);
+
+        $this->assertMatchesRegularExpression(sprintf('#\bclass="theme-link theme-link--%s"#', $kind), $anchor);
+        $this->assertStringEndsWith($label . self::MARKER . '</a>', $anchor);
+        $this->assertStringNotContainsString('theme-link__hint', $anchor);
+    }
+
+    /**
+     * A page of the site is not marked, and neither is an absolute URL on the
+     * host of the site: "external" is the host, not the shape of the "href".
+     */
+    #[Test]
+    public function aLinkToThisSiteIsNotMarked(): void
+    {
+        $element = $this->contentElement($this->render(), 90);
+
+        $this->assertStringNotContainsString('theme-link', $this->anchor($element, 'Start page'));
+        $this->assertStringNotContainsString('theme-link', $this->anchor($element, 'Own host'));
+    }
+
+    /**
+     * A link that opens a window says so before it is followed, in words a
+     * screen reader reads - the marker alone is decoration.
+     */
+    #[Test]
+    public function aLinkOpeningANewWindowSaysSo(): void
+    {
+        $body = $this->render();
+        $hint = '<span class="theme-link__hint"> (opens in a new window)</span>';
+
+        $inText = $this->anchor($this->contentElement($body, 90), 'New window');
+        $this->assertMatchesRegularExpression('#\bclass="theme-link theme-link--external"#', $inText);
+        $this->assertStringEndsWith('New window' . self::MARKER . $hint . '</a>', $inText);
+
+        $button = $this->anchor($this->contentElement($body, 110), 'Read elsewhere');
+        $this->assertMatchesRegularExpression('#\bclass="theme-button theme-button--secondary theme-link theme-link--external"#', $button);
+        $this->assertMatchesRegularExpression('#\btarget="_blank"#', $button);
+        $this->assertStringEndsWith(self::MARKER . $hint . '</a>', $button);
+    }
+
+    #[Test]
+    public function aLinkToAFileIsADownloadAndSaysSo(): void
+    {
+        $anchor = $this->anchor($this->contentElement($this->render(), 100), 'The report');
+
+        $this->assertMatchesRegularExpression('#\bhref="[^"]*fileadmin/theme-link\.pdf"#', $anchor);
+        $this->assertMatchesRegularExpression('#\bclass="theme-button theme-link theme-link--download"#', $anchor);
+        $this->assertStringEndsWith(self::MARKER . '<span class="theme-link__hint"> (download)</span></a>', $anchor);
+    }
+
+    /**
+     * A page of the site is no kind a marker names, and a page that opens a
+     * new window still says so before it is followed.
+     */
+    #[Test]
+    public function aPageLinkOpeningANewWindowSaysSoWithoutAMarker(): void
+    {
+        $anchor = $this->anchor($this->contentElement($this->render(), 120), 'Start in a new window');
+
+        $this->assertStringNotContainsString('theme-link--', $anchor);
+        $this->assertStringEndsWith('Start in a new window<span class="theme-link__hint"> (opens in a new window)</span></a>', $anchor);
+    }
+
+    /**
+     * Another site of the same installation is not "elsewhere": its host is
+     * the base of a site, though not the host of the request.
+     */
+    #[Test]
+    public function aLinkToAnotherSiteOfTheInstallationIsNotMarked(): void
+    {
+        $anchor = $this->anchor($this->contentElement($this->render(), 120), 'Other site');
+
+        $this->assertStringContainsString('other.example.com', $anchor);
+        $this->assertStringNotContainsString('theme-link', $anchor);
     }
 
     #[Test]

@@ -80,6 +80,23 @@ is selecting the core version aware directory to register — see
 | `#[Exclude]`                              | Keep a class out of the container, see [Data objects](class-design.md#data-objects-are-not-services).                          |
 | `#[Required]`                             | Method injection in abstract classes, see [Class design](class-design.md#abstract-classes-must-not-use-constructor-injection). |
 
+An event listener is registered with `#[Autoconfigure]` as well, by the
+`event.listener` tag, because `#[AsEventListener]` is TYPO3 v13 and this branch
+supports v12.4:
+
+```php
+#[Autoconfigure(tags: [['name' => 'event.listener', 'identifier' => 'theme-extension-development/link-decoration']])]
+final class LinkDecoration
+{
+    public function __invoke(AfterLinkIsGeneratedEvent $event): void {}
+}
+```
+
+The `ListenerProviderPass` of both cores reads the `identifier` of the tag and,
+without an `event`, takes the event from the type of the first parameter of
+`__invoke()`. `Classes/EventListener/LinkDecoration.php` is the example, and
+`Tests/Functional/ThemeLinkRenderingTest` proves on both cores that it fires.
+
 ## See also
 
 - [Class design](class-design.md)

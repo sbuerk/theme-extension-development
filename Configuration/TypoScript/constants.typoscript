@@ -15,6 +15,12 @@ theme {
     # "docs/development/frontend-assets.md".
     stylesheet = EXT:theme_extension_development/Resources/Public/Css/theme.css
 
+    # Whether a link to another site, a file, an email address or a phone
+    # number is marked with a glyph after its text, and a link opening a new
+    # window or a download says so to a screen reader. One of "1", "0" - see
+    # "Configuration/TypoScript/LinkDecoration.typoscript".
+    linkDecoration = 1
+
     media {
         # The width in pixels the image gallery is computed for. No image is
         # processed wider than this, so it should match the width the layout

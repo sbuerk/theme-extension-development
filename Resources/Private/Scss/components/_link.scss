@@ -1,0 +1,79 @@
+@use '../abstracts/mixins';
+
+// Link decoration.
+//
+// Markup contract - written by "Classes/EventListener/LinkDecoration.php"
+// into a link TYPO3 builds from a link reference, never by hand:
+//
+//     <a class="theme-link theme-link--external" href="…" target="_blank">…<span class="theme-link__marker" aria-hidden="true"></span><span class="theme-link__hint">(opens in a new window)</span></a>
+//     <a class="theme-link theme-link--download" href="…">…<span class="theme-link__marker" aria-hidden="true"></span><span class="theme-link__hint">(download)</span></a>
+//     <a class="theme-link theme-link--mail" href="mailto:…">…<span class="theme-link__marker" aria-hidden="true"></span></a>
+//     <a class="theme-link theme-link--tel" href="tel:…">…<span class="theme-link__marker" aria-hidden="true"></span></a>
+//
+// Modifiers: --external, --download, --mail, --tel - the kind of the link,
+// decided from its type, not from its "href" by an attribute selector. The
+// marker after the label says how the link opens; the hint says it in words
+// for a screen reader where it matters, and is hidden from sight.
+//
+// --- The glyph is a mask of the vendored file --------------------------------
+//
+// The marker is an empty span, painted in the text colour and masked with an
+// icon of the shipped Font Awesome set. The listener that writes it builds no
+// template, so "<theme:icon>" is out of reach, and the stylesheet decides the
+// glyph per kind: a site package changes or drops it without touching PHP.
+// It is a real element rather than "::after" of the link, because a linked
+// card already uses that pseudo element for its hit area, and it has no
+// "content": an icon is never generated content ("docs/development/icons.md").
+//
+// A mask is an image: forced colours would repaint the background the glyph is
+// drawn in to the canvas colour and make it vanish. The marker opts out, and
+// "currentColor" is then the link colour the system forces on the link.
+//
+// --- Spacing ------------------------------------------------------------------
+//
+// In running text the marker keeps a quarter em from the label. A link that
+// lays its content out with a "gap" - the button, a content menu row, a card
+// link - sets "--theme-link-marker-gap: 0" on itself, and the gap spaces the
+// marker like the icon before the label. Read with a fallback and not
+// declared here, for the reason "_icon.scss" gives for "--theme-icon-size".
+
+.theme-link {
+    --theme-link-marker-size: 0.75em;
+}
+
+.theme-link__marker {
+    display: inline-block;
+    flex: none;
+    inline-size: var(--theme-link-marker-size);
+    block-size: var(--theme-link-marker-size);
+    margin-inline-start: var(--theme-link-marker-gap, 0.25em);
+    vertical-align: -0.05em;
+    background-color: currentColor;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+
+    @media (forced-colors: active) {
+        forced-color-adjust: none;
+    }
+}
+
+.theme-link--external .theme-link__marker {
+    mask-image: url('../Icons/FontAwesome/Solid/arrow-up-right-from-square.svg');
+}
+
+.theme-link--download .theme-link__marker {
+    mask-image: url('../Icons/FontAwesome/Solid/download.svg');
+}
+
+.theme-link--mail .theme-link__marker {
+    mask-image: url('../Icons/FontAwesome/Solid/envelope.svg');
+}
+
+.theme-link--tel .theme-link__marker {
+    mask-image: url('../Icons/FontAwesome/Solid/phone.svg');
+}
+
+.theme-link__hint {
+    @include mixins.visually-hidden;
+}

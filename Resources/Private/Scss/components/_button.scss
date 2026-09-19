@@ -45,6 +45,9 @@
     --theme-button-radius: var(--theme-radius-sm, 5px);
     --theme-button-font-size: var(--theme-font-size-sm, 0.875rem);
 
+    // The "gap" below spaces the marker of a decorated link ("_link.scss").
+    --theme-link-marker-gap: 0;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;

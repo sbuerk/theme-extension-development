@@ -71,8 +71,11 @@
 // links up.
 // A flex item of the body, and so a block box already; "flex" rather than
 // "inline-flex" keeps it one, the width of the card. "gap" spaces an icon an
-// editor gave the link from its label, and does nothing for a label alone.
+// editor gave the link from its label, and does nothing for a label alone. It
+// spaces the marker of a decorated link ("_link.scss") as well.
 .theme-card__link {
+    --theme-link-marker-gap: 0;
+
     display: flex;
     align-items: center;
     gap: var(--theme-space-2);

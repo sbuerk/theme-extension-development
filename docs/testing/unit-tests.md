@@ -76,6 +76,19 @@ The two `Example` test classes are mirror images of each other for that reason:
 each runs on exactly the version whose implementation it instantiates.
 See [Dual core setup](../development/dual-core-setup.md#test-grouping).
 
+The two directories also hold **helpers** a version independent test needs in
+a per core shape. They carry no group and no test: they are picked by the test
+that uses them, by the major version of the running core, the way
+`Tests/Functional/ThemeSiteTrait::themeDelivery()` picks the theme delivery of
+the functional tests. `Tests/Unit/Core12/Site/SiteFinderFactory` and its
+`Core13/` counterpart build a real `SiteFinder` for
+`Tests/Unit/EventListener/LinkDecorationTest`: v13.4 declares `SiteFinder` a
+`readonly` class, which PHPUnit 10.5 cannot double, and its constructor takes
+the runtime cache on v13.4 only. The test resolves the class name with
+`Typo3Version::getMajorVersion()` and fails with `$this->fail()` naming the
+missing class when there is none for the running core — a broken harness is a
+named failure, not an error somewhere inside the test.
+
 [`Tests/Unit/VersionCompatTest`](../../Tests/Unit/VersionCompatTest.php) is the
 guard underneath all of it: it asserts that a run with `-t 12` really is v12 and
 a run with `-t 13` really is v13, so a stale `.Build/` cannot produce a green

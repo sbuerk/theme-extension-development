@@ -9,3 +9,4 @@
 @import 'EXT:theme_extension_development/Configuration/TypoScript/Page.typoscript'
 @import 'EXT:theme_extension_development/Configuration/TypoScript/Navigation.typoscript'
 @import 'EXT:theme_extension_development/Configuration/TypoScript/Felogin.typoscript'
+@import 'EXT:theme_extension_development/Configuration/TypoScript/LinkDecoration.typoscript'
