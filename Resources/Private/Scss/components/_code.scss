@@ -1,0 +1,90 @@
+// Code block.
+//
+// Markup contract:
+//
+//     <figure class="theme-code">
+//         <figcaption class="theme-code__caption">
+//             <span class="theme-code__filename">Configuration/Services.php</span>
+//             <span class="theme-code__language">PHP</span>
+//         </figcaption>
+//         <pre class="theme-code__block" role="region" tabindex="0" aria-label="Configuration/Services.php"><code>…</code></pre>
+//     </figure>
+//
+// A "pre" of the element baseline with a file name above it. "__language" is
+// optional; the caption is not - a code block without a name is a bare "pre",
+// which the element baseline already styles.
+//
+// --- Why "role=region" + "tabindex=0" + "aria-label" on the "pre" ---------
+//
+// A code block scrolls its own overflow rather than wrapping, because
+// rewrapping code changes what it says (see "base/_elements.scss"). A box that
+// scrolls without a tab stop of its own cannot be reached by keyboard at all,
+// so the "pre" carries one, and the region's name says which block the focus
+// landed in - the same W3C APG scrollable-region-focusable pattern the table
+// wrapper uses. The name repeats the file name: the caption labels the figure,
+// not the region inside it. It is the "pre" and not a wrapper around it, since
+// the "pre" is the box that scrolls.
+//
+// Frame variant: one hairline box, the caption on the raised surface above a
+// rule, the code on the surface tint below it. The figure is not clipped with
+// "overflow: hidden" to round the corners - that would clip the focus ring of
+// the "pre" as well - so the caption and the block round their own.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-code {
+    --theme-code-border-color: var(--theme-color-border, #d6dce6);
+    --theme-code-radius: var(--theme-radius-sm, 5px);
+    --theme-code-caption-background: var(--theme-color-surface-raised, #ffffff);
+    --theme-code-caption-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-code-language-color: var(--theme-color-text-muted, #616b80);
+    --theme-code-caption-padding-block: var(--theme-space-2, 0.625rem);
+    --theme-code-caption-padding-inline: var(--theme-space-3, 0.9375rem);
+    --theme-code-block-background: var(--theme-color-surface, #f4f6fa);
+
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+    border: var(--theme-border-width, 1px) solid var(--theme-code-border-color);
+    border-radius: var(--theme-code-radius);
+}
+
+.theme-code__caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--theme-space-1, 0.3125rem) var(--theme-space-3, 0.9375rem);
+    margin: 0;
+    padding: var(--theme-code-caption-padding-block) var(--theme-code-caption-padding-inline);
+    border-block-end: var(--theme-border-width, 1px) solid var(--theme-code-border-color);
+    border-start-start-radius: var(--theme-code-radius);
+    border-start-end-radius: var(--theme-code-radius);
+    background-color: var(--theme-code-caption-background);
+    color: var(--theme-code-caption-color);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+}
+
+// A path is one long word; it breaks anywhere rather than widening the box.
+.theme-code__filename {
+    min-inline-size: 0;
+    font-family: var(--theme-font-family-mono);
+    overflow-wrap: anywhere;
+}
+
+.theme-code__language {
+    color: var(--theme-code-language-color);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-caps);
+    text-transform: uppercase;
+}
+
+// The frame belongs to the figure, so the "pre" gives up its own border and
+// its top corners, and keeps the background, the padding and the scrolling of
+// the element baseline.
+.theme-code__block {
+    margin: 0;
+    border: 0;
+    border-radius: 0 0 var(--theme-code-radius) var(--theme-code-radius);
+    background-color: var(--theme-code-block-background);
+}

@@ -1,0 +1,62 @@
+# One page carrying a text and image element per position that matters for
+# the float - "In text, left" (18), "In text, right" (17), "In text, right, no
+# wrap" (25) and "Above, center" (0) - and one text and media element "In
+# text, left", which renders through the same gallery partial from the
+# "assets" field. The images are attached in "config.yml".
+entitySettings:
+  '*':
+    nodeColumnName: 'pid'
+    columnNames: {id: 'uid'}
+    defaultValues: {pid: 0, hidden: 0}
+  page:
+    isNode: true
+    tableName: 'pages'
+    parentColumnName: 'pid'
+    defaultValues: {doktype: 1}
+  content:
+    tableName: 'tt_content'
+
+entities:
+  page:
+    - self:
+          id: 1
+          title: 'Text and image elements'
+          slug: '/'
+          is_siteroot: 1
+      entities:
+        content:
+          - self:
+                id: 21
+                CType: 'textpic'
+                header: 'In text, left'
+                header_layout: 2
+                imageorient: 18
+                bodytext: '<p>Text flowing around an image on its left.</p>'
+          - self:
+                id: 22
+                CType: 'textpic'
+                header: 'In text, right'
+                header_layout: 2
+                imageorient: 17
+                bodytext: '<p>Text flowing around an image on its right.</p>'
+          - self:
+                id: 23
+                CType: 'textpic'
+                header: 'In text, right, no wrap'
+                header_layout: 2
+                imageorient: 25
+                bodytext: '<p>Text beside an image, never under it.</p>'
+          - self:
+                id: 24
+                CType: 'textpic'
+                header: 'Above, center'
+                header_layout: 2
+                imageorient: 0
+                bodytext: '<p>Text below an image.</p>'
+          - self:
+                id: 25
+                CType: 'textmedia'
+                header: 'Media in text, left'
+                header_layout: 2
+                imageorient: 18
+                bodytext: '<p>Text flowing around media on its left.</p>'

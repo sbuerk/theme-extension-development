@@ -96,8 +96,18 @@ pointed at a different source field — `image` for `textpic`, the
 media-type-unrestricted `assets` for `textmedia` — and add a `bodytext` block
 the gallery partial itself does not carry. `imageorient`'s vertical component
 decides the DOM order: `below` puts the text first, `above` and `intext` both
-put the gallery first, the latter relying on a stylesheet to float it beside
-the following text.
+put the gallery first, the latter so the text after it can flow around it.
+`Partials/ContentElement/Gallery.html` translates `intext` into a float of the
+whole gallery — `theme-gallery--float-start` for "In text, left",
+`--float-end` for "In text, right", and `--nowrap` on top for the two "no
+wrap" variants, which keeps the text beside the gallery instead of letting it
+flow back under it. Left and right become start and end on purpose: in a
+right-to-left page an editor's "left" is the start of the line, as it already
+is for the horizontal alignment of the gallery row. Every gallery item is a
+`.theme-figure` as well — see the gallery and figure contracts in
+[Component library](../development/component-library.md).
+`Tests/Functional/TextPicElementRenderingTest.php` holds the translation for
+`textpic` and `textmedia` against seeded records with real file references.
 `uploads` is a file list, not a gallery: `FilesProcessor` merges `media` and
 `file_collections` and applies `filelink_sorting`/`filelink_sorting_direction`
 natively, so the template only formats what it is handed —
@@ -134,11 +144,13 @@ to. Inventing an ad-hoc in-line delimiter the
 editor was never told about would be worse than leaving `<dd>` out entirely,
 so the template does exactly that.
 
-The component library has no dedicated list component —
-[Component library](../development/component-library.md) documents no `.theme-list` or
-similar — so `Bullets.html` renders plain semantic `<ul>`/`<ol>`/`<dl>` inside
-the same `.theme-content-element__body` wrapper `Text.html` uses, styled only
-by whatever base typography already applies to those elements.
+`Bullets.html` renders plain semantic `<ul>`/`<ol>`/`<dl>` inside the same
+`.theme-content-element__body` wrapper `Text.html` uses, styled by the element
+baseline. The library now has list components — `.theme-list` with its marker
+and layout modifiers and `.theme-dl --horizontal`, see
+[Component library](../development/component-library.md) — but `bullets` does
+not map its `layout` or `bullets_type` onto them yet; that mapping is a change
+of its own, not part of adding the components.
 
 ## `table`: why a real `DataProcessor` was necessary
 

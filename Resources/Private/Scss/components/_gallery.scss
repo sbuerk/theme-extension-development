@@ -1,14 +1,50 @@
 // The gallery of the image content element.
 //
+// Markup contract:
+//
+//     <div class="theme-gallery theme-gallery--intext theme-gallery--left theme-gallery--float-start" data-theme-gallery-columns="1">
+//         <div class="theme-gallery__row">
+//             <figure class="theme-gallery__item theme-figure">
+//                 <a class="theme-gallery__zoom" href="…"><img class="theme-gallery__image" …></a>
+//                 <figcaption class="theme-gallery__caption theme-figure__caption">…</figcaption>
+//             </figure>
+//         </div>
+//     </div>
+//
 // "GalleryProcessor" has already decided how many columns a row holds and how
 // wide each image is, so this layer only lays the row out. It deliberately sets
 // no column count of its own: that is the editor's "Number of columns" field,
 // and a stylesheet overruling it would turn the field into a decoration.
 //
-// @todo The position modifiers and the border the "imageborder" field asks for
-//       are structural only. They get their real values with the design work.
+// Every item is a ".theme-figure" as well (see "components/_figure.scss"), so a
+// gallery caption is a figure caption. The gallery's own rules come later in
+// the cascade and win where the two meet - the tighter caption gap below.
+//
+// --- Position ---------------------------------------------------------------
+//
+// The processor's two positions are carried as they are, "--{above|intext|below}"
+// and "--{left|center|right}". The horizontal three align the row. "above" and
+// "below" need nothing here, the template orders the DOM for them.
+//
+// "intext" is text flowing around the gallery, and the partial translates it
+// into "--float-start" (in text, left) or "--float-end" (in text, right):
+// modifiers named for what they do, and logical like the rest of the library,
+// so the editor's "left" is the start of the line in a right-to-left page. The
+// whole gallery floats, not an item of it - a two-column gallery in text is
+// still one block beside the text. Its width is capped at half the column,
+// and it floats from "bp.$md" up only, for the same reason as a floated
+// figure. "In text, no wrap" adds "--nowrap": the text next to the gallery
+// becomes a block formatting context, which is what stops it from flowing
+// back under the gallery once it is past it.
+//
+// @todo The border the "imageborder" field asks for is not drawn yet.
+
+@use '../abstracts/breakpoints' as bp;
 
 .theme-gallery {
+    --theme-gallery-float-width: 50%;
+    --theme-gallery-float-gap: var(--theme-space-5, 1.5625rem);
+
     margin: 0 0 var(--theme-space-6);
 }
 
@@ -35,12 +71,51 @@
     justify-content: flex-start;
 }
 
+@media (min-width: bp.$md) {
+    .theme-gallery--float-start,
+    .theme-gallery--float-end {
+        max-inline-size: var(--theme-gallery-float-width);
+        margin-block-end: var(--theme-space-3, 0.9375rem);
+    }
+
+    .theme-gallery--float-start {
+        float: inline-start;
+        margin-inline-end: var(--theme-gallery-float-gap);
+    }
+
+    .theme-gallery--float-end {
+        float: inline-end;
+        margin-inline-start: var(--theme-gallery-float-gap);
+    }
+
+    .theme-gallery--nowrap + * {
+        display: flow-root;
+    }
+}
+
+// Whatever holds a floated gallery contains it, see "components/_figure.scss"
+// for why this is keyed on the child.
+:where(:has(> .theme-gallery--float-start, > .theme-gallery--float-end)) {
+    display: flow-root;
+}
+
+// And a list item holding one keeps its marker, as in "components/_figure.scss".
+:where(li:has(> .theme-gallery--float-start, > .theme-gallery--float-end)) {
+    display: flow-root list-item;
+}
+
 .theme-gallery__item {
     // "min-width: 0" keeps a flex item from refusing to shrink below the
     // intrinsic width of its image, which is what makes a wide image break the
     // row instead of scaling down with it.
     min-width: 0;
     margin: 0;
+
+    // The size of an item is the flex row's business, sized from the width
+    // the processor computed; the figure's own "fit-content" is for a figure
+    // standing on its own.
+    inline-size: auto;
+    max-inline-size: none;
 }
 
 .theme-gallery__zoom {

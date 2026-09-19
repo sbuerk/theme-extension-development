@@ -47,12 +47,17 @@ final class ComponentLibraryTest extends UnitTestCase
             'button' => '.theme-button',
             'card' => '.theme-card',
             'close button' => '.theme-close',
+            'code block' => '.theme-code',
             'content element' => '.theme-content-element',
             'content menu' => '.theme-content-menu',
+            'description list' => '.theme-dl',
             'dialog' => '.theme-dialog',
+            'divider' => '.theme-divider',
+            'figure' => '.theme-figure',
             'gallery' => '.theme-gallery',
             'hero' => '.theme-hero',
             'icon' => '.theme-icon',
+            'list' => '.theme-list',
             'main navigation' => '.theme-nav-main',
             'sub navigation' => '.theme-nav-sub',
             'pagination' => '.theme-pagination',
@@ -431,6 +436,33 @@ final class ComponentLibraryTest extends UnitTestCase
         );
 
         return strtolower((string)preg_replace('/\s+/', '', $values[1][0]));
+    }
+
+    /**
+     * @return \Generator<string, array{component: string}>
+     */
+    public static function floatingComponents(): \Generator
+    {
+        yield 'figure' => ['component' => 'theme-figure'];
+        yield 'gallery' => ['component' => 'theme-gallery'];
+    }
+
+    /**
+     * Whatever holds a floated figure or gallery becomes a block formatting
+     * context, so the float cannot hang out of it. For a list item that rule
+     * alone would replace `display: list-item` and silently drop the marker -
+     * the item still renders, one bullet short. The list item therefore gets
+     * `flow-root list-item`, which keeps both.
+     */
+    #[DataProvider('floatingComponents')]
+    #[Test]
+    public function aListItemHoldingAFloatKeepsItsMarker(string $component): void
+    {
+        $this->assertStringContainsString(
+            sprintf(':where(li:has(>.%1$s--float-start,>.%1$s--float-end)){display:flow-root list-item}', $component),
+            $this->stylesheet(),
+            'A list item containing a float must stay a list item.',
+        );
     }
 
     /**

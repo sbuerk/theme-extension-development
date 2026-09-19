@@ -57,19 +57,21 @@
         <p>
             Both position modifiers are on the wrapper. The vertical one comes
             from the same field as the horizontal one - "above", "intext" or
-            "below" - and is carried but not yet styled.
+            "below". "above" and "below" are the order of the markup; "intext"
+            becomes a float, shown further down. Every item is a
+            <code>.theme-figure</code> as well.
         </p>
         <div class="theme-gallery theme-gallery--above theme-gallery--center"
              data-theme-gallery-columns="1">
             <div class="theme-gallery__row">
-                <figure class="theme-gallery__item">
+                <figure class="theme-gallery__item theme-figure">
                     <a class="theme-gallery__zoom" href="#">
                         <img class="theme-gallery__image"
                              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                              alt="Placeholder landscape standing in for a processed image"
                              width="592" height="370" loading="lazy" />
                     </a>
-                    <figcaption class="theme-gallery__caption">
+                    <figcaption class="theme-gallery__caption theme-figure__caption">
                         A caption. It is rendered from the description of the
                         file reference and is omitted entirely when that field
                         is empty, rather than rendered as an empty element.
@@ -89,36 +91,36 @@
         <div class="theme-gallery theme-gallery--above theme-gallery--left"
              data-theme-gallery-columns="2">
             <div class="theme-gallery__row">
-                <figure class="theme-gallery__item">
+                <figure class="theme-gallery__item theme-figure">
                     <img class="theme-gallery__image"
                          src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                          alt="Placeholder landscape standing in for a processed image"
                          width="288" height="180" loading="lazy" />
-                    <figcaption class="theme-gallery__caption">First file.</figcaption>
+                    <figcaption class="theme-gallery__caption theme-figure__caption">First file.</figcaption>
                 </figure>
-                <figure class="theme-gallery__item">
+                <figure class="theme-gallery__item theme-figure">
                     <img class="theme-gallery__image"
                          src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23b9c6d8'/%3E%3Cpath%20d='M0%2010%205%205%2010%208%2016%203%2016%2010z'%20fill='%237e8ba1'/%3E%3Ccircle%20cx='3.2'%20cy='2.6'%20r='1.5'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                          alt="Placeholder landscape standing in for a processed image"
                          width="288" height="180" loading="lazy" />
-                    <figcaption class="theme-gallery__caption">
+                    <figcaption class="theme-gallery__caption theme-figure__caption">
                         A caption is per file, not per row.
                     </figcaption>
                 </figure>
             </div>
             <div class="theme-gallery__row">
-                <figure class="theme-gallery__item">
+                <figure class="theme-gallery__item theme-figure">
                     <img class="theme-gallery__image"
                          src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23ccd6e4'/%3E%3Cpath%20d='M0%2010%204%206%208%207.5%2016%202%2016%2010z'%20fill='%2390a0b6'/%3E%3Ccircle%20cx='9.6'%20cy='2.2'%20r='1.2'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                          alt="Placeholder landscape standing in for a processed image"
                          width="288" height="180" loading="lazy" />
                 </figure>
-                <figure class="theme-gallery__item">
+                <figure class="theme-gallery__item theme-figure">
                     <img class="theme-gallery__image"
                          src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c1cddd'/%3E%3Cpath%20d='M0%2010%207%203%2011%206%2016%204%2016%2010z'%20fill='%2386929f'/%3E%3C/svg%3E"
                          alt="Placeholder landscape standing in for a processed image"
                          width="288" height="180" loading="lazy" />
-                    <figcaption class="theme-gallery__caption">
+                    <figcaption class="theme-gallery__caption theme-figure__caption">
                         The third file carries no caption, this one does - the
                         row stays aligned to the top of its items.
                     </figcaption>
@@ -137,35 +139,139 @@
         <div class="theme-gallery theme-gallery--below theme-gallery--right"
              data-theme-gallery-columns="3">
             <div class="theme-gallery__row">
-                <figure class="theme-gallery__item">
+                <figure class="theme-gallery__item theme-figure">
                     <a class="theme-gallery__zoom" href="#">
                         <img class="theme-gallery__image"
                              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                              alt="Placeholder landscape standing in for a processed image"
                              width="188" height="118" loading="lazy" />
                     </a>
-                    <figcaption class="theme-gallery__caption">Enlargeable.</figcaption>
+                    <figcaption class="theme-gallery__caption theme-figure__caption">Enlargeable.</figcaption>
                 </figure>
-                <figure class="theme-gallery__item">
+                <figure class="theme-gallery__item theme-figure">
                     <a class="theme-gallery__zoom" href="#">
                         <img class="theme-gallery__image"
                              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23b9c6d8'/%3E%3Cpath%20d='M0%2010%205%205%2010%208%2016%203%2016%2010z'%20fill='%237e8ba1'/%3E%3Ccircle%20cx='3.2'%20cy='2.6'%20r='1.5'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                              alt="Placeholder landscape standing in for a processed image"
                              width="188" height="118" loading="lazy" />
                     </a>
-                    <figcaption class="theme-gallery__caption">Enlargeable.</figcaption>
+                    <figcaption class="theme-gallery__caption theme-figure__caption">Enlargeable.</figcaption>
                 </figure>
-                <figure class="theme-gallery__item">
+                <figure class="theme-gallery__item theme-figure">
                     <a class="theme-gallery__zoom" href="#">
                         <img class="theme-gallery__image"
                              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23ccd6e4'/%3E%3Cpath%20d='M0%2010%204%206%208%207.5%2016%202%2016%2010z'%20fill='%2390a0b6'/%3E%3Ccircle%20cx='9.6'%20cy='2.2'%20r='1.2'%20fill='%23eef1f7'/%3E%3C/svg%3E"
                              alt="Placeholder landscape standing in for a processed image"
                              width="188" height="118" loading="lazy" />
                     </a>
-                    <figcaption class="theme-gallery__caption">Enlargeable.</figcaption>
+                    <figcaption class="theme-gallery__caption theme-figure__caption">Enlargeable.</figcaption>
                 </figure>
             </div>
         </div>
+    </div>
+
+    <h3>Gallery in text</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            What "Partials/ContentElement/Gallery.html" renders for "In text,
+            left": the processor's two positions, and the float they translate
+            to. The paragraph after it stands in for the element's bodytext.
+        </f:comment>
+        <div class="theme-gallery theme-gallery--intext theme-gallery--left theme-gallery--float-start"
+             data-theme-gallery-columns="1">
+            <div class="theme-gallery__row">
+                <figure class="theme-gallery__item theme-figure">
+                    <img class="theme-gallery__image"
+                         src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                         alt="Placeholder landscape standing in for a processed image"
+                         width="288" height="180" loading="lazy" />
+                    <figcaption class="theme-gallery__caption theme-figure__caption">In text, left.</figcaption>
+                </figure>
+            </div>
+        </div>
+        <p>
+            "In text, left" of a text-with-image element. The partial adds
+            <code>--float-start</code> to the two positions the processor
+            reports, and the whole gallery floats to the start of the line -
+            the right side of it in a right-to-left page - capped at half the
+            column. Below the medium breakpoint it does not float at all, and
+            the text follows it.
+        </p>
+        <p>
+            Whatever holds a floated gallery becomes a block formatting context
+            and contains it, so a text shorter than the image does not leave the
+            image hanging into the next element. "In text, no wrap" adds
+            <code>--nowrap</code>, and the text beside the gallery then stays
+            beside it instead of flowing back under it.
+        </p>
+    </div>
+
+    <h3>Figure</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_figure.scss.
+        </f:comment>
+        <p>
+            <code>.theme-figure</code> is a figure outside a gallery - in rich
+            text or a template. The caption starts at the inline edge, or ends
+            there with <code>--caption-end</code>, and an optional credit line
+            closes it, one step quieter.
+        </p>
+        <figure class="theme-figure">
+            <img class="theme-figure__media"
+                 src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23b9c6d8'/%3E%3Cpath%20d='M0%2010%205%205%2010%208%2016%203%2016%2010z'%20fill='%237e8ba1'/%3E%3Ccircle%20cx='3.2'%20cy='2.6'%20r='1.5'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                 alt="Placeholder landscape standing in for a photograph"
+                 width="480" height="300" loading="lazy" />
+            <figcaption class="theme-figure__caption">
+                A caption says what the image shows.
+                <small class="theme-figure__credit">Photo: Example Photographer, CC BY 4.0</small>
+            </figcaption>
+        </figure>
+        <figure class="theme-figure theme-figure--caption-end">
+            <img class="theme-figure__media"
+                 src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23ccd6e4'/%3E%3Cpath%20d='M0%2010%204%206%208%207.5%2016%202%2016%2010z'%20fill='%2390a0b6'/%3E%3Ccircle%20cx='9.6'%20cy='2.2'%20r='1.2'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                 alt="Placeholder landscape standing in for a photograph"
+                 width="480" height="300" loading="lazy" />
+            <figcaption class="theme-figure__caption">A caption aligned to the end.</figcaption>
+        </figure>
+    </div>
+
+    <h3>Figure floated in running text</h3>
+    <div class="theme-styleguide__specimen">
+        <figure class="theme-figure theme-figure--float-start">
+            <img class="theme-figure__media"
+                 src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c1cddd'/%3E%3Cpath%20d='M0%2010%207%203%2011%206%2016%204%2016%2010z'%20fill='%2386929f'/%3E%3C/svg%3E"
+                 alt="Placeholder landscape standing in for a photograph"
+                 width="240" height="150" loading="lazy" />
+            <figcaption class="theme-figure__caption">Floated to the start.</figcaption>
+        </figure>
+        <p>
+            <code>--float-start</code> and <code>--float-end</code> float a
+            figure to that side of the text around it from the medium
+            breakpoint up, capped at half the column; below it the figure
+            takes the full width, because text beside a half-width image on a
+            phone is a column of three words. The float is logical: the start
+            is the right side of a right-to-left line.
+        </p>
+        <p>
+            The text wraps around the figure and continues under it once it is
+            past. This paragraph is long enough to do that at the width of the
+            styleguide, so the two lines of it that end below the image run
+            the full width of the frame again.
+        </p>
+        <figure class="theme-figure theme-figure--float-end">
+            <img class="theme-figure__media"
+                 src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2010'%3E%3Crect%20width='16'%20height='10'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%2010%206%204%209%206.5%2016%201.5%2016%2010z'%20fill='%238b96ab'/%3E%3Ccircle%20cx='12.5'%20cy='2.4'%20r='1.4'%20fill='%23eef1f7'/%3E%3C/svg%3E"
+                 alt="Placeholder landscape standing in for a photograph"
+                 width="240" height="150" loading="lazy" />
+            <figcaption class="theme-figure__caption">Floated to the end.</figcaption>
+        </figure>
+        <p>
+            A figure floated to the end sits on the other side. The frame this
+            specimen is drawn in contains both floats by itself - a block that
+            holds a floated figure as a direct child becomes a block formatting
+            context - so the image never hangs out of the bottom of it.
+        </p>
     </div>
 
     <h3>Content element wrapper</h3>

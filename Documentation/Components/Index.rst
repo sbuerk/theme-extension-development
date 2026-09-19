@@ -31,8 +31,9 @@ What the library contains
     *   -   Group
         -   Components
     *   -   Content
-        -   Accordion, alert, author, badge, card, hero, panel, quote, table,
-            teaser, and the text roles display, lead and eyebrow
+        -   Accordion, alert, author, badge, card, code block, description
+            list, divider, figure, hero, list, panel, quote, table, teaser, and
+            the text roles display, lead and eyebrow
     *   -   Actions
         -   Button - with a link and an icon variant, pressed and busy states,
             and an attached button group - and the close button
