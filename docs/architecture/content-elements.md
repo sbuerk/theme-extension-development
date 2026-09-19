@@ -893,7 +893,7 @@ its own prefix, rather than overlooked.
 
 ### `ext_tables.sql`, and why it exists although the schema derives from TCA
 
-On TYPO3 v13 the whole schema for `tx_theme_list_item` and the fourteen
+On TYPO3 v13 the whole schema for `tx_theme_list_item` and the fifteen
 `tx_theme_*` columns added to `tt_content` comes from
 `TYPO3\CMS\Core\Database\Schema\DefaultTcaSchema::enrich()` reading the TCA at
 compare-schema time (#101553, extended by #104311 in 13.3).
@@ -901,7 +901,7 @@ compare-schema time (#101553, extended by #104311 in 13.3).
 **TYPO3 v12 does none of that.** Its `DefaultTcaSchema` derives the management
 columns from `ctrl`, the `category|datetime|slug|json|uuid` types and MM tables,
 and has no branch for `input`, `text`, `link`, `file`, `inline` or a `select`
-without an MM table — so on v12 the table and the fourteen columns are simply
+without an MM table — so on v12 the table and the fifteen columns are simply
 never created and every theme element using them fails.
 [`ext_tables.sql`](../../ext_tables.sql) therefore ships the
 definitions v13 would generate, reproduced column for column from what v13's own
@@ -1289,6 +1289,32 @@ reduced and the text-only hero, the unknown value, the order of the image and
 the eyebrow through both delivery paths; `ContentElementAppearanceFormEngineTest`
 holds the values each hero offers; `ShowcaseTreeTest` holds
 `/elements/theme/hero` to showing all of them.
+
+### The styles of the testimonial
+
+`tx_theme_quote_style` sets the quotation of `theme_testimonial`, mapped by
+`ThemeTestimonial.html`: the default, a rule at the start as before; `pull`,
+`.theme-quote--pull`, larger and between two rules; `centred`,
+`.theme-quote--centred`. Both styles open with the quotation mark of the set,
+`quote-left`, in an `aria-hidden` `.theme-quote__mark`; the default has none,
+so every testimonial saved before the field existed renders unchanged. A value
+nothing offers renders the default.
+
+A select of its own, not the core `layout`. `layout` holds 0 to 3 under the
+labels "Layout 1" to "Layout 3", is disabled for every CType by the theme's page
+TSconfig and is an `exclude` field an editor group has to be granted; the
+theme's own elements carry their choices in columns whose values are the names
+of the modifiers they select, like the kind of a notice and the layout of a
+hero. `QuoteStyleRenderingTest` holds the three styles and the unknown value
+through both delivery paths and the mark,
+`ContentElementAppearanceFormEngineTest` the values the form offers and that
+`layout` stays out of it, and `ShowcaseTreeTest` `/elements/theme/quote` to
+showing all three.
+
+The portrait the catalogue planned for this element is not added: it needs a
+media slot in `.theme-quote`, and that slot is to be built on the avatar
+component, which did not exist when the styles were added. The field stays off
+the form until then, for the reason below.
 
 ### A field was removed: `theme_testimonial` lost its `image`
 

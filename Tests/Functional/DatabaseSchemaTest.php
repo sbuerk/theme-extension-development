@@ -22,7 +22,7 @@ use PHPUnit\Framework\Attributes\Test;
  * tables — it has no branch for `input`, `text`, `link`, `file`, `inline` or a
  * `select` without an MM table, and it only enriches tables some
  * `ext_tables.sql` defined in the first place.
- * On v12 the whole `tx_theme_list_item` table and the fourteen `tx_theme_*` columns
+ * On v12 the whole `tx_theme_list_item` table and the fifteen `tx_theme_*` columns
  * on `tt_content` therefore exist only because `ext_tables.sql` declares them.
  *
  * A missing column is not loud: nothing in the extension references it at boot,
@@ -46,7 +46,7 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
      * Every column `Configuration/TCA/tx_theme_list_item.php` declares, plus
      * the two columns the `tx_theme_list_items` inline relation on the parent
      * side writes into the child table (`foreign_field` and
-     * `foreign_table_field`), and the fourteen columns
+     * `foreign_table_field`), and the fifteen columns
      * `Configuration/TCA/Overrides/tt_content.php` adds to `tt_content`.
      *
      * The management columns — `uid`, `pid`, `tstamp`, `crdate`, `deleted`,
@@ -181,6 +181,11 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
         yield 'tt_content.tx_theme_hero_layout is a string' => [
             'table' => 'tt_content',
             'column' => 'tx_theme_hero_layout',
+            'type' => StringType::class,
+        ];
+        yield 'tt_content.tx_theme_quote_style is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_quote_style',
             'type' => StringType::class,
         ];
     }

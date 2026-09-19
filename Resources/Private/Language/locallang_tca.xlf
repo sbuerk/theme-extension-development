@@ -460,6 +460,20 @@
 				<source>Cropped: the image at the end, cut off at the end and bottom edges</source>
 			</trans-unit>
 
+			<!-- tt_content: the testimonial -->
+			<trans-unit id="tt_content.tx_theme_quote_style">
+				<source>Style</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_quote_style.I.default">
+				<source>A rule at the start of the quotation</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_quote_style.I.pull">
+				<source>Pull quote: larger, between two rules, with a quotation mark</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_quote_style.I.centred">
+				<source>Centred, with a quotation mark</source>
+			</trans-unit>
+
 			<!-- tx_theme_list_item -->
 			<trans-unit id="tx_theme_list_item">
 				<source>Theme: List item</source>
