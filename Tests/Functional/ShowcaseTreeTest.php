@@ -363,12 +363,9 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * `nav_hide`, not `hidden`: the page has to be reachable by URL and absent
-     * from the menu. A `hidden` page returns 404 and needs a backend preview
-     * link carrying a valid hash, which defeats seeding it in the first place.
-     *
-     * The two halves are asserted separately because each passes on its own for
-     * the wrong reason - a 404 page is also absent from the menu.
+     * The styleguide renders through its own layout, not the 404 page - a
+     * page that is `hidden` rather than merely out of a menu would answer
+     * 404, which is why the two are asserted apart from the navigation.
      */
     #[Test]
     public function theStyleguidePageIsReachableInTheFrontend(): void
@@ -379,17 +376,54 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         $this->assertStringNotContainsString('Page Not Found', $body);
     }
 
+    /**
+     * @return \Generator<string, array{path: string}>
+     */
+    public static function showcaseSections(): \Generator
+    {
+        // The three sections the maintainer chose to have in the navigation:
+        // the content elements, the typography, and the component library
+        // with the form showcase.
+        foreach (['/elements', '/typography', '/styleguide', '/forms'] as $path) {
+            yield $path => ['path' => $path];
+        }
+    }
+
+    /**
+     * Every showcase section is a link of the main navigation, looked up in
+     * the navigation landmark rather than anywhere on the page - the start
+     * page links to several of them from its text as well.
+     */
+    #[DataProvider('showcaseSections')]
     #[Test]
-    public function theStyleguidePageIsNotInTheMainNavigation(): void
+    public function aShowcaseSectionIsInTheMainNavigation(string $path): void
+    {
+        $this->assertMatchesRegularExpression(
+            sprintf('#<a class="theme-nav-main__link" href="%s"#', preg_quote($path, '#')),
+            $this->navigation($this->render('/'), 'theme-nav-main'),
+            sprintf('"%s" is not a link of the main navigation.', $path),
+        );
+    }
+
+    /**
+     * The main navigation is two levels deep: the pages of a section are
+     * reached from it as well, the pages of a CType one level further through
+     * the sub navigation of the section.
+     */
+    #[Test]
+    public function thePagesOfTheSectionsAreInTheNavigation(): void
     {
         $menu = $this->navigation($this->render('/'), 'theme-nav-main');
+        foreach (['/typography/text', '/typography/article', '/elements/core', '/elements/frames'] as $path) {
+            $this->assertStringContainsString(sprintf('href="%s"', $path), $menu, sprintf('"%s" is not in the main navigation.', $path));
+        }
+        // The layout fallback fixture is reached by URL, not from the menu:
+        // a sixth top level link does not fit the header row.
+        $this->assertStringNotContainsString('href="/empty"', $menu);
 
-        $this->assertStringNotContainsString('/styleguide', $menu);
-        // The form showcase is kept out of the menu the same way.
-        $this->assertStringNotContainsString('/forms', $menu);
-        // The other new pages are in it, so this is not passing because the
-        // menu came back empty.
-        $this->assertStringContainsString('/elements', $menu);
+        $sub = $this->navigation($this->render('/elements/core/bullets'), 'theme-nav-sub');
+        $this->assertStringContainsString('href="/elements/core/textpic"', $sub);
+        $this->assertMatchesRegularExpression('#href="/elements/core/bullets"[^>]*aria-current="page"#', $sub);
     }
 
     /**

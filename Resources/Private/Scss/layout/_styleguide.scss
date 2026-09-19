@@ -37,6 +37,8 @@
 // See "components/_button.scss" for why every component declares its own token
 // layer with a fallback.
 
+@use '../abstracts/breakpoints' as bp;
+
 .theme-styleguide {
     --theme-styleguide-section-gap: var(--theme-space-8, 3.75rem);
     --theme-styleguide-section-scroll-margin: var(--theme-space-6, 1.875rem);
@@ -59,6 +61,51 @@
     --theme-styleguide-label-font-size: var(--theme-font-size-xs, 0.75rem);
     --theme-styleguide-stage-background: var(--theme-color-overlay, rgb(20 24 31 / 55%));
     --theme-styleguide-stage-padding: var(--theme-space-6, 1.875rem);
+}
+
+// The section index beside the sections.
+//
+//     <div class="theme-styleguide__layout">
+//         <nav class="theme-content-menu theme-styleguide__toc" aria-label="…">…</nav>
+//         <div class="theme-styleguide__sections">…the sections…</div>
+//     </div>
+//
+// Below "bp.$md" nothing changes: the index is the list of links above the
+// sections it always was, and scrolls away with the page - sticky on a phone,
+// it would cover the section it just jumped to. From "bp.$md" up the two sit
+// side by side and the index sticks to the top of the viewport while the
+// sections scroll past, so every section is one link away wherever the reader
+// is. The theme's one breakpoint rather than a second one for this page: the
+// index column is narrow, and the specimens that need width scroll inside
+// their own regions already.
+//
+// "align-self: start" is what lets the index stick at all - a grid item
+// stretched to the height of the row has nowhere to move within it. The index
+// is capped at the height of the viewport and scrolls itself should it ever
+// be taller than that; its links are its focusable content, so it needs no tab
+// stop of its own. The offset is the one the sections scroll to, so the index
+// and a section heading line up after a jump. Like that one, it cannot
+// account for ".theme-site-header--sticky", whose height is not a token.
+.theme-styleguide__layout {
+    --theme-styleguide-toc-width: 11rem;
+    --theme-styleguide-toc-gap: var(--theme-space-6, 1.875rem);
+    --theme-styleguide-toc-offset: var(--theme-styleguide-section-scroll-margin);
+}
+
+@media (min-width: bp.$md) {
+    .theme-styleguide__layout {
+        display: grid;
+        grid-template-columns: var(--theme-styleguide-toc-width) minmax(0, 1fr);
+        gap: var(--theme-styleguide-toc-gap);
+        align-items: start;
+    }
+
+    .theme-styleguide__toc {
+        position: sticky;
+        inset-block-start: var(--theme-styleguide-toc-offset);
+        max-block-size: calc(100vh - 2 * var(--theme-styleguide-toc-offset));
+        overflow-y: auto;
+    }
 }
 
 .theme-styleguide__section {

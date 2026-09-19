@@ -56,7 +56,7 @@ entities:
               CType: text
               header: 'What this is'
               header_layout: 2
-              bodytext: "<p>This page tree is seeded from a definition in the repository, so a\ndevelopment instance can be rebuilt from nothing without clicking a\npage tree together by hand.</p>\n<p>Two of its pages are not in the navigation: the\n<a href=\"t3://page?uid=1009\">styleguide</a>, which renders every\ncomponent of the library, and the\n<a href=\"t3://page?uid=1010\">form showcase</a>, a request form put\ntogether from the form components alone.</p>"
+              bodytext: "<p>This page tree is seeded from a definition in the repository, so a\ndevelopment instance can be rebuilt from nothing without clicking a\npage tree together by hand.</p>\n<p>Three sections are in the navigation: the\n<a href=\"t3://page?uid=1005\">content elements</a>, one page per\nelement with its variants; the\n<a href=\"t3://page?uid=1002\">typography</a>, from rich text and\nelements; and the <a href=\"t3://page?uid=1009\">styleguide</a>, which\nrenders every component of the library, with the\n<a href=\"t3://page?uid=1010\">form showcase</a>, a request form put\ntogether from the form components alone.</p>"
       children:
         -
           self:
@@ -395,6 +395,7 @@ entities:
             id: 1004
             title: 'Empty page'
             slug: /empty
+            nav_hide: 1
         -
           self:
             id: 1005
@@ -1158,7 +1159,7 @@ entities:
                       CType: menu_pages
                       header: 'menu_pages: a hand-picked list of pages'
                       header_layout: 2
-                      pages: '1002,1003,1004'
+                      pages: '1002,1003,1009'
                   -
                     self:
                       id: 1703
@@ -1674,11 +1675,9 @@ entities:
             title: Styleguide
             slug: /styleguide
             backend_layout: styleguide
-            nav_hide: 1
         -
           self:
             id: 1010
             title: Forms
             slug: /forms
             backend_layout: forms
-            nav_hide: 1

@@ -101,9 +101,12 @@ entities:
                   <p>This page tree is seeded from a definition in the repository, so a
                   development instance can be rebuilt from nothing without clicking a
                   page tree together by hand.</p>
-                  <p>Two of its pages are not in the navigation: the
-                  <a href="t3://page?uid=9">styleguide</a>, which renders every
-                  component of the library, and the
+                  <p>Three sections are in the navigation: the
+                  <a href="t3://page?uid=5">content elements</a>, one page per
+                  element with its variants; the
+                  <a href="t3://page?uid=2">typography</a>, from rich text and
+                  elements; and the <a href="t3://page?uid=9">styleguide</a>, which
+                  renders every component of the library, with the
                   <a href="t3://page?uid=10">form showcase</a>, a request form put
                   together from the form components alone.</p>
       children:
@@ -642,6 +645,15 @@ entities:
               id: 4
               title: 'Empty page'
               slug: '/empty'
+              # Out of the menus: it is a fixture of the layout fallback, not
+              # a page a reviewer navigates to. With the three showcase
+              # sections in the main navigation it would be the sixth top
+              # level link - the menu renders none for the start page - and
+              # six push the site title of the header onto a second line at
+              # 1280 pixels (the acceptance test of the header row; see the
+              # @todo in "layout/_site-header.scss"). Reached by URL and by
+              # the links of the theme elements on page 8.
+              nav_hide: 1
 
         # The showcase branch. Its three children each demonstrate one family of
         # content elements, and between them they carry every CType this theme
@@ -1707,12 +1719,15 @@ entities:
                   # order they are listed; nothing is looked up by rootline
                   # position. Three top level pages, so the list is visibly a
                   # hand-picked selection rather than a branch of the tree.
+                  # Not page 4: it is "nav_hide", and every menu leaves such a
+                  # page out unless "includeNotInMenu" is set, a "special =
+                  # list" included.
                   - self:
                         id: 702
                         CType: 'menu_pages'
                         header: 'menu_pages: a hand-picked list of pages'
                         header_layout: 2
-                        pages: '2,3,4'
+                        pages: '2,3,9'
 
                   # "special = directory" - the *children* of the selected pages,
                   # not the pages themselves. Page 5 is the parent of this page,
@@ -2402,26 +2417,23 @@ entities:
         # "Templates/Page/Styleguide.html" renders the component library
         # straight from Fluid, ignoring anything placed on the page.
         #
-        # "nav_hide", never "hidden". A hidden page returns 404 in the frontend
-        # and is only reachable through a backend preview link carrying a valid
-        # hash, which defeats the point of seeding it - the page exists to be
-        # opened. "nav_hide" keeps it reachable by URL and out of every menu,
-        # which is what "not published" meant here.
+        # In the main navigation, like the form showcase below: the showcase
+        # sections - elements, typography, and the styleguide with the forms -
+        # are what a reviewer of the theme navigates. Both pages used to be
+        # "nav_hide"; neither was ever "hidden", which answers 404 in the
+        # frontend and defeats seeding a page that exists to be opened.
         - self:
               id: 9
               title: 'Styleguide'
               slug: '/styleguide'
               backend_layout: 'styleguide'
-              nav_hide: 1
 
         # The form showcase. A request form built from the form contract of the
         # component library, rendered by "Templates/Page/Forms.html" from the
         # "forms" backend layout - which, like "styleguide", declares no usable
-        # content column: the form is the page. "nav_hide" for the reason given
-        # above; the start page links to both.
+        # content column: the form is the page.
         - self:
               id: 10
               title: 'Forms'
               slug: '/forms'
               backend_layout: 'forms'
-              nav_hide: 1
