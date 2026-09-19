@@ -77,6 +77,7 @@ final class ThemeContentElementRenderingTest extends AbstractFunctionalTestCase
             'theme_media_teaser_grid', 'theme_notice', 'theme_tabs',
             'theme_accordion', 'theme_cta', 'theme_card_group',
             'theme_timeline', 'theme_teaser_list', 'theme_carousel',
+            'theme_split_tiles',
         ] as $ctype) {
             yield $ctype => ['ctype' => $ctype];
         }

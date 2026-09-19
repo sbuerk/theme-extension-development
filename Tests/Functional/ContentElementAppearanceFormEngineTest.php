@@ -282,6 +282,38 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
     }
 
     /**
+     * `layout` is the foot the alternation of the split tiles starts on, and
+     * the form offers exactly those two, under names that say so. The two core
+     * values the element does not render are removed for this type.
+     *
+     * Which side an individual tile's picture is on is never a field - the
+     * stylesheet alternates it - so the two values here are about the group,
+     * not about a tile.
+     */
+    #[Test]
+    public function theSplitTilesOfferTheTwoFeetOfTheirAlternation(): void
+    {
+        $result = $this->compile(990);
+
+        $this->assertFalse(self::isDisabled($result, 'layout'), '"layout" is missing from the split tiles.');
+        $this->assertSame(['0', '1'], self::itemValues($result, 'layout'));
+        $labels = array_values(array_map(
+            static fn(array $item): string => (string)$item['label'],
+            $result['processedTca']['columns']['layout']['config']['items'] ?? [],
+        ));
+        $expected = array_map(
+            static fn(int $value): string => $GLOBALS['LANG']->sL(
+                'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_split_tiles.I.' . $value,
+            ),
+            [0, 1],
+        );
+        $this->assertNotContains('', $expected, 'A label of the split tiles layouts is not translated.');
+        $this->assertSame($expected, $labels);
+
+        $this->assertStringContainsString(self::inputName(990, 'layout'), $this->renderedForm(990));
+    }
+
+    /**
      * @return \Generator<string, array{uid: int}>
      */
     public static function pageMenus(): \Generator

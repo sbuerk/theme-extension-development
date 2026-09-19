@@ -1,5 +1,6 @@
 sys_file_reference,,,,,,,,,
 ,uid,pid,uid_local,uid_foreign,tablenames,fieldname,sorting_foreign,alternative,hidden
 ,1,1,1,460,tx_theme_list_item,image,1,A placeholder graphic for the first slide,0
+,2,1,1,470,tx_theme_list_item,image,1,A placeholder graphic for the first tile,0
 ,3,1,1,461,tx_theme_list_item,image,1,A placeholder graphic for the second slide,0
 ,4,1,1,462,tx_theme_list_item,image,1,A placeholder graphic for the third slide,0

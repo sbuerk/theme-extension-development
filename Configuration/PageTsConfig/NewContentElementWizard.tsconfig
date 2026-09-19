@@ -167,6 +167,14 @@
                     CType = theme_sociallinks
                 }
             }
+            theme_split_tiles {
+                iconIdentifier = content-beside-text-img-left
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_split_tiles.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_split_tiles.description
+                tt_content_defValues {
+                    CType = theme_split_tiles
+                }
+            }
             theme_stats {
                 iconIdentifier = content-widget-number
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_stats.label
