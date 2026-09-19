@@ -34,13 +34,19 @@
         is a quotation. The default has none, so every testimonial saved
         before the field existed renders as it did.
 
-        There is no media here, and no "image" field on the CType either. The
-        element renders through ".theme-quote", which has no media slot in its
-        markup contract and no rule for one in "_quote.scss". The field was
-        offered at first and then removed from the showitem: an editor could
-        attach a portrait that never appeared anywhere, which is worse than
-        not offering it, because the page looks finished and the work is gone.
-        Give the component a slot before giving the element the field back.
+        The portrait is the one file of "image", as a ".theme-avatar" in the
+        media slot ".theme-quote__portrait", first in the attribution. It is
+        rendered only next to a name: there it is decoration - the name beside
+        it says who it is, and the avatar contract of "_avatar.scss" gives a
+        picture next to the visible name an empty "alt", set explicitly
+        because "f:image" otherwise writes the alternative text of the
+        reference, and a screen reader would read the name twice. Without a
+        name the picture would be the only thing saying who is quoted, and
+        would need an alternative text an editor may not have written, so it
+        is left out rather than rendered unnamed. Cropped square on the server
+        to 120 pixels, twice the 60 of "--large", so the browser gets no more
+        than the slot shows; "cover" in the avatar still crops whatever was
+        not processed.
     </f:comment>
     <f:switch expression="{data.tx_theme_quote_style}">
         <f:case value="pull"><f:variable name="quoteStyle" value=" theme-quote--pull" /></f:case>
@@ -58,6 +64,9 @@
         </f:if>
         <f:if condition="{data.header} || {data.subheader}">
             <figcaption class="theme-quote__attribution">
+                <f:if condition="{files.0} && {data.header}">
+                    <span class="theme-avatar theme-avatar--large theme-quote__portrait"><f:image class="theme-avatar__image" image="{files.0}" width="120c" height="120c" alt="" loading="lazy" /></span>
+                </f:if>
                 <f:if condition="{data.header}">
                     <span class="theme-quote__author">{data.header}</span>
                 </f:if>

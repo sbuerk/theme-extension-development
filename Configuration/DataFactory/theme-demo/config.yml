@@ -263,5 +263,7 @@ references:
   - {file: placeholder, table: tt_content, uid: 11007, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tt_content, uid: 11008, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tt_content, uid: 11010, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  # Page 112, "Quotation styles": the portrait next to the attributed name.
+  - {file: placeholder-portrait, table: tt_content, uid: 11206, field: image, values: {alternative: 'A placeholder portrait'}}
   # Page 56, "Article": the image the text flows around.
   - {file: placeholder-portrait, table: tt_content, uid: 5604, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'Placed in the text, at the end of the line'}}

@@ -775,8 +775,18 @@ it a quotation. The bare class has no mark:
 </figure>
 ```
 
-No media slot yet: the portrait of a testimonial waits for the avatar
-component, see [Content elements](../architecture/content-elements.md#a-field-was-removed-theme_testimonial-lost-its-image).
+The media slot `__portrait` holds a `.theme-avatar` in its large size, first
+in the attribution. It only centres the avatar on the line of the name; next
+to that visible name the picture is decoration, with an empty `alt` - see
+[Content elements](../architecture/content-elements.md#the-portrait-of-the-testimonial):
+
+```html
+<figcaption class="theme-quote__attribution">
+    <span class="theme-avatar theme-avatar--large theme-quote__portrait"><img class="theme-avatar__image" src="…" alt=""></span>
+    <span class="theme-quote__author">…</span>
+    <cite class="theme-quote__source">…</cite>
+</figcaption>
+```
 
 Stat — a figure and what it counts, as a description list: the label is the
 term, the figure its description, a sentence about it a second one. Each pair

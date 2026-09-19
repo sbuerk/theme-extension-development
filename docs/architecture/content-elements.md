@@ -1361,27 +1361,37 @@ through both delivery paths and the mark,
 `layout` stays out of it, and `ShowcaseTreeTest` `/elements/theme/quote` to
 showing all three.
 
-The portrait the catalogue planned for this element is not added: it needs a
-media slot in `.theme-quote`, and that slot is to be built on the avatar
-component, which did not exist when the styles were added. The field stays off
-the form until then, for the reason below.
+The portrait of the attributed person is the media slot of `.theme-quote`,
+below.
 
-### A field was removed: `theme_testimonial` lost its `image`
+### The portrait of the testimonial
 
-`theme_testimonial`'s TCA
-([`tt_content_theme_testimonial.php`](../../Configuration/TCA/Overrides/tt_content_theme_testimonial.php))
-originally exposed the core `image` field on its own "Images" tab, the same
-way `theme_hero` and `theme_author` do. `.theme-quote` has no media slot in
-its markup contract, though, so a filled-in `image` would never have appeared
-— an editor attaches a portrait, the page looks finished, and the work is
-silently gone. The field was dropped from the showitem rather than left
-inert: the current showitem is `bodytext, --palette--;;headers` only, with no
-`image` and no "Images" `--div--`, and `ContentElements.typoscript` wires no
-`FilesProcessor` for `theme_testimonial` either. (The header comments in
-`ThemeTestimonial.html` and above `tt_content.theme_testimonial` in the
-TypoScript still describe the field as present-but-unrendered — that prose
-predates the removal and is stale; the TCA itself is the current state and no
-longer offers the field to an editor at all.)
+`theme_testimonial` offers the core `image` field again, labelled "Portrait"
+and limited to one file through `columnsOverrides`, on an "Images" tab of its
+own. `ContentElements.typoscript` resolves it with `FilesProcessor` alone, like
+the other single-image elements.
+
+The field was on the form once and taken off: `.theme-quote` had no media slot,
+so an attached portrait never appeared - the page looked finished and the work
+was silently gone. It is back because the slot is: `.theme-quote__portrait`, a
+`.theme-avatar` in its large size, first in the attribution.
+
+`ThemeTestimonial.html` renders the portrait only next to a name
+(`header`). There it is decoration, by the avatar contract of `_avatar.scss`:
+the name beside it says who is quoted, so the image takes `alt=""` - set
+explicitly, since `f:image` otherwise writes the alternative text of the
+reference, and a screen reader would read the name twice. Without a name the
+picture would be the only thing naming the person, and would need an
+alternative text an editor may not have written; it is left out rather than
+rendered unnamed. The image is cropped square on the server, `120c`, twice the
+60 pixels of the large avatar; its `object-fit: cover` crops whatever was not
+processed.
+
+`TestimonialPortraitRenderingTest` holds the slot, its place before the name
+and the empty `alt` through both delivery paths, the missing portrait without
+a name or an image, and the portrait in a quotation style;
+`ContentElementAppearanceFormEngineTest` the field on the form, one file at
+most. The quotation page of the showcase has a testimonial with a portrait.
 
 ### The wizard group, and what an unresolved icon identifier does
 

@@ -7,7 +7,7 @@
     a content element, drawn from the component each one maps onto: the text
     in columns of the text element, the file list in the three display types
     of the file links element, the layouts of the heroes, the widths and tones
-    of the call to action, and the styles of the testimonial.
+    of the call to action, and the styles and the portrait of the testimonial.
 
     A section of its own rather than more specimens in "Typography.html" and
     "Boxes.html": these are the choices of a content element's form, shown
@@ -256,6 +256,27 @@
             <figcaption class="theme-quote__attribution">
                 <span class="theme-quote__author">--centred</span>
                 <cite class="theme-quote__source">On one axis, without a rule</cite>
+            </figcaption>
+        </figure>
+    </div>
+
+    <h3>Quotation with a portrait</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_quote.scss, the media
+            slot "__portrait" - a ".theme-avatar" in the large size, first in
+            the attribution, next to the visible name and therefore with an
+            empty "alt". The picture is an inline SVG data URI in an "img", for
+            the reason "Boxes.html" gives.
+        </f:comment>
+        <figure class="theme-quote">
+            <blockquote class="theme-quote__text">
+                <p>The portrait of the person quoted sits at the start of the attribution, centred on the line of the name.</p>
+            </blockquote>
+            <figcaption class="theme-quote__attribution">
+                <span class="theme-avatar theme-avatar--large theme-quote__portrait"><img class="theme-avatar__image" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2010%2010'%3E%3Crect%20width='10'%20height='10'%20fill='%23c7d0e0'/%3E%3Ccircle%20cx='5'%20cy='4'%20r='2'%20fill='%238b96ab'/%3E%3Cpath%20d='M1%2010c0-2.5%201.8-4%204-4s4%201.5%204%204z'%20fill='%238b96ab'/%3E%3C/svg%3E" alt="" width="60" height="60" /></span>
+                <span class="theme-quote__author">The attributed speaker</span>
+                <cite class="theme-quote__source">With a portrait beside the name</cite>
             </figcaption>
         </figure>
     </div>

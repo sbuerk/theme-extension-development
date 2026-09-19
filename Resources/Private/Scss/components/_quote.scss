@@ -10,6 +10,11 @@
 //         </figcaption>
 //     </figure>
 //
+//     <figcaption class="theme-quote__attribution">
+//         <span class="theme-avatar theme-avatar--large theme-quote__portrait"><img class="theme-avatar__image" src="…" alt=""></span>
+//         <span class="theme-quote__author">…</span>
+//     </figcaption>
+//
 //     <figure class="theme-quote theme-quote--pull">
 //         <span class="theme-quote__mark" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
 //         <blockquote class="theme-quote__text"><p>…</p></blockquote>
@@ -74,6 +79,15 @@
 
     color: var(--theme-color-text-muted);
     font-size: var(--theme-font-size-sm);
+}
+
+// The media slot: the portrait of the attributed person, a ".theme-avatar"
+// (components/_avatar.scss) first in the attribution. The avatar draws itself;
+// the slot only centres it on the line of text beside it, where the baseline
+// alignment of the attribution would sit its bottom edge on the baseline.
+// Next to the visible name it is decoration, with an empty "alt".
+.theme-quote__portrait {
+    align-self: center;
 }
 
 .theme-quote__author {
