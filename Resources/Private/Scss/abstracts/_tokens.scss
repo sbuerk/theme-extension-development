@@ -98,9 +98,11 @@
     --theme-color-text-muted: light-dark(#616b80, #848fa1);
 
     // "border" is decorative separation; "border-strong" is the one that
-    // reaches 3:1 and belongs on anything delimiting a control.
+    // reaches 3:1 and belongs on anything delimiting a control. It is held to
+    // 3:1 against all three backgrounds - in dark the raised surface, where
+    // controls sit, is the lightest of them - see "DESIGN.md".
     --theme-color-border: light-dark(#d6dce6, #29313d);
-    --theme-color-border-strong: light-dark(#828d9f, #5f6c7d);
+    --theme-color-border-strong: light-dark(#828d9f, #637183);
 
     // --- Colour: accents ------------------------------------------------
     //

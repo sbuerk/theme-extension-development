@@ -141,9 +141,16 @@ design of the extension being built against it, so it does not wear another
 product's brand. The palette is neutral, and the tokens are named by role so a
 site package can drop its own values in.
 
-Contrast was **computed**, not estimated, for every value, against both the
-background and the surface of its own mode. Body text clears 4.5:1 (WCAG AA);
-borders that delimit a control clear 3:1 (WCAG 1.4.11).
+Contrast was **computed**, not estimated, for every value, against the
+background, the surface and the raised surface of its own mode. Body text clears
+4.5:1 (WCAG AA); borders that delimit a control clear 3:1 (WCAG 1.4.11).
+
+The figures use the definitions of WCAG 2.2: relative luminance
+`0.2126 R + 0.7152 G + 0.0722 B` over the linearised sRGB channels (`c / 12.92`
+up to 0.04045, `((c + 0.055) / 1.055) ^ 2.4` above), and the ratio
+`(L1 + 0.05) / (L2 + 0.05)` with the lighter colour first, rounded to two
+decimals. They were computed with a PHP implementation of exactly that — the
+same one `Tests/Unit/StylesheetTest` runs on `--theme-color-border-strong`.
 
 ### One declaration, both appearances
 
@@ -178,25 +185,28 @@ May 2024.
 
 ### Light
 
-| Token                           | Hex       | vs background     | vs surface |
-|---------------------------------|-----------|-------------------|------------|
-| `--theme-color-background`      | `#ffffff` | —                 | —          |
-| `--theme-color-surface`         | `#f4f6fa` | —                 | —          |
-| `--theme-color-surface-raised`  | `#ffffff` | —                 | —          |
-| `--theme-color-primary`         | `#0b57d0` | 6.39              | 5.90       |
-| `--theme-color-primary-hover`   | `#0a4bb4` | 7.84              | 7.25       |
-| `--theme-color-on-primary`      | `#ffffff` | 6.39 on primary   | —          |
-| `--theme-color-secondary`       | `#0f766e` | 5.47              | 5.06       |
-| `--theme-color-secondary-hover` | `#0c5f59` | 7.51              | 6.94       |
-| `--theme-color-on-secondary`    | `#ffffff` | 5.47 on secondary | —          |
-| `--theme-color-text-primary`    | `#14181f` | 17.79             | 16.45      |
-| `--theme-color-text-secondary`  | `#4a5567` | 7.54              | 6.97       |
-| `--theme-color-text-muted`      | `#616b80` | 5.35              | 4.95       |
-| `--theme-color-border`          | `#d6dce6` | 1.38              | 1.27       |
-| `--theme-color-border-strong`   | `#828d9f` | 3.35              | 3.10       |
-| `--theme-color-success`         | `#146c43` | 6.45              | 5.96       |
-| `--theme-color-warning`         | `#8a5a00` | 5.93              | 5.48       |
-| `--theme-color-danger`          | `#b3261e` | 6.54              | 6.04       |
+| Token                           | Hex       | vs background     | vs surface | vs surface-raised |
+|---------------------------------|-----------|-------------------|------------|-------------------|
+| `--theme-color-background`      | `#ffffff` | —                 | —          | —                 |
+| `--theme-color-surface`         | `#f4f6fa` | —                 | —          | —                 |
+| `--theme-color-surface-raised`  | `#ffffff` | —                 | —          | —                 |
+| `--theme-color-primary`         | `#0b57d0` | 6.39              | 5.90       | 6.39              |
+| `--theme-color-primary-hover`   | `#0a4bb4` | 7.84              | 7.25       | 7.84              |
+| `--theme-color-on-primary`      | `#ffffff` | 6.39 on primary   | —          | —                 |
+| `--theme-color-secondary`       | `#0f766e` | 5.47              | 5.06       | 5.47              |
+| `--theme-color-secondary-hover` | `#0c5f59` | 7.51              | 6.94       | 7.51              |
+| `--theme-color-on-secondary`    | `#ffffff` | 5.47 on secondary | —          | —                 |
+| `--theme-color-text-primary`    | `#14181f` | 17.79             | 16.45      | 17.79             |
+| `--theme-color-text-secondary`  | `#4a5567` | 7.54              | 6.97       | 7.54              |
+| `--theme-color-text-muted`      | `#616b80` | 5.35              | 4.95       | 5.35              |
+| `--theme-color-border`          | `#d6dce6` | 1.38              | 1.27       | 1.38              |
+| `--theme-color-border-strong`   | `#828d9f` | 3.35              | 3.10       | 3.35              |
+| `--theme-color-success`         | `#146c43` | 6.45              | 5.96       | 6.45              |
+| `--theme-color-warning`         | `#8a5a00` | 5.93              | 5.48       | 5.93              |
+| `--theme-color-danger`          | `#b3261e` | 6.54              | 6.04       | 6.54              |
+
+In light the raised surface is the background colour, so its column repeats
+the first one.
 
 ### Dark
 
@@ -205,49 +215,82 @@ surfaces step **up** in lightness; and the accents invert, because a saturated
 blue that carries on white is unreadable on near-black. `--theme-color-primary`
 becomes a light tint and `--theme-color-on-primary` becomes the background.
 
-| Token                           | Hex       | vs background     | vs surface |
-|---------------------------------|-----------|-------------------|------------|
-| `--theme-color-background`      | `#0f1319` | —                 | —          |
-| `--theme-color-surface`         | `#161c25` | —                 | —          |
-| `--theme-color-surface-raised`  | `#1d2531` | —                 | —          |
-| `--theme-color-primary`         | `#82abff` | 8.18              | 7.51       |
-| `--theme-color-primary-hover`   | `#9dbeff` | 9.97              | 9.16       |
-| `--theme-color-on-primary`      | `#0f1319` | 8.18 on primary   | —          |
-| `--theme-color-secondary`       | `#4fd1c5` | 9.99              | 9.18       |
-| `--theme-color-secondary-hover` | `#6ee0d6` | 11.79             | 10.84      |
-| `--theme-color-on-secondary`    | `#0f1319` | 9.99 on secondary | —          |
-| `--theme-color-text-primary`    | `#e9edf4` | 15.86             | 14.58      |
-| `--theme-color-text-secondary`  | `#a9b4c5` | 8.89              | 8.17       |
-| `--theme-color-text-muted`      | `#848fa1` | 5.70              | 5.24       |
-| `--theme-color-border`          | `#29313d` | 1.42              | 1.30       |
-| `--theme-color-border-strong`   | `#5f6c7d` | 3.48              | 3.20       |
-| `--theme-color-success`         | `#4ade80` | 10.69             | 9.82       |
-| `--theme-color-warning`         | `#fbbf24` | 11.16             | 10.25      |
-| `--theme-color-danger`          | `#ff8a80` | 8.16              | 7.50       |
+| Token                           | Hex       | vs background     | vs surface | vs surface-raised |
+|---------------------------------|-----------|-------------------|------------|-------------------|
+| `--theme-color-background`      | `#0f1319` | —                 | —          | —                 |
+| `--theme-color-surface`         | `#161c25` | —                 | —          | —                 |
+| `--theme-color-surface-raised`  | `#1d2531` | —                 | —          | —                 |
+| `--theme-color-primary`         | `#82abff` | 8.18              | 7.51       | 6.77              |
+| `--theme-color-primary-hover`   | `#9dbeff` | 9.97              | 9.16       | 8.26              |
+| `--theme-color-on-primary`      | `#0f1319` | 8.18 on primary   | —          | —                 |
+| `--theme-color-secondary`       | `#4fd1c5` | 9.99              | 9.18       | 8.27              |
+| `--theme-color-secondary-hover` | `#6ee0d6` | 11.79             | 10.84      | 9.77              |
+| `--theme-color-on-secondary`    | `#0f1319` | 9.99 on secondary | —          | —                 |
+| `--theme-color-text-primary`    | `#e9edf4` | 15.86             | 14.58      | 13.14             |
+| `--theme-color-text-secondary`  | `#a9b4c5` | 8.89              | 8.17       | 7.36              |
+| `--theme-color-text-muted`      | `#848fa1` | 5.70              | 5.24       | 4.72              |
+| `--theme-color-border`          | `#29313d` | 1.42              | 1.30       | 1.18              |
+| `--theme-color-border-strong`   | `#637183` | 3.74              | 3.44       | 3.10              |
+| `--theme-color-success`         | `#4ade80` | 10.69             | 9.82       | 8.85              |
+| `--theme-color-warning`         | `#fbbf24` | 11.16             | 10.25      | 9.24              |
+| `--theme-color-danger`          | `#ff8a80` | 8.16              | 7.50       | 6.76              |
 
 In dark, `--theme-color-surface-raised` is the **lightest** of the three
-backgrounds, not the darkest, so it is where a text colour loses the most
-contrast — and the one the table above does not list. For every text colour but
-one the margin makes that academic. `--theme-color-text-muted` is the exception:
-it sits closest to 4.5:1 by design, and form hints, dates and the current
-breadcrumb item regularly sit on a raised surface. It is therefore held to 4.5:1
-on `--theme-color-surface-raised` as well: `#848fa1` reaches 4.72 there. The
-previous `#808b9d` reached 5.41 and 4.97 against the two listed backgrounds and
-4.48:1 on the raised one (axe reports 4.47), which failed AA without either
-table showing it.
+backgrounds, not the darkest, so it is where a colour loses the most contrast.
+For every text colour but one the margin makes that academic.
+`--theme-color-text-muted` is the exception: it sits closest to 4.5:1 by
+design, and form hints, dates and the current breadcrumb item regularly sit on
+a raised surface. It is therefore held to 4.5:1 on
+`--theme-color-surface-raised` as well: `#848fa1` reaches 4.72 there. The
+previous `#808b9d` reached 5.41 and 4.97 against background and surface and
+4.48:1 on the raised one (axe reports 4.47), which failed AA while the tables
+listed only the first two backgrounds.
 
-`--theme-color-border` is not required to reach 3:1: it is decorative
-separation, not the boundary of a control. `--theme-color-border-strong` is the
-one to use where a border carries meaning.
+### Control boundaries
 
-**Known gap, not fixed yet:** the same raised surface costs
-`--theme-color-border-strong` its 3:1 in dark. `#5f6c7d` reaches 3.48 and 3.20
-against the two listed backgrounds but only 2.89:1 on
-`--theme-color-surface-raised` — and that is exactly where it is used as the
-hover border of an input (`forms/_controls.scss`), whose background is the
-raised surface. axe does not check non-text contrast, so no test reports it.
-It is to be fixed in a change of its own; light (3.35, 3.10, 3.35) is not
-affected.
+**A control boundary uses `--theme-color-border-strong`; `--theme-color-border`
+is decorative only.** An empty text field is a box and nothing else, so its
+edge is the visual information that identifies it, and WCAG 1.4.11 holds that
+edge to 3:1 against the colours next to it: the control's own fill, which is
+the raised surface, and whatever it sits on. `--theme-color-border` reaches
+1.18 to 1.42 and separates content — cards, panels, the fieldset, the rule
+under the tabs — where nothing has to be recognised as operable.
+
+`--theme-color-border-strong` is held to 3:1 against all three backgrounds in
+both appearances. In dark it used to fail exactly where controls sit: `#5f6c7d`
+reached 3.48 and 3.20 against background and surface, but only 2.89:1 on the
+raised surface. `#637183` keeps the hue (HSL 214°, 14 % saturation) and raises
+the lightness from 43.1 % to 45.1 %, the smallest step that clears the raised
+surface with the margin the light value has against the surface (3.10). Light
+(3.35 / 3.10 / 3.35) was not affected and is unchanged.
+
+The controls that draw their resting edge in it are the text input, textarea
+and select (`--theme-input-border-color`), the addon of an input group, which
+shares an edge with its control, and the track of the switch. Hover moves the
+input's border to `--theme-color-text-secondary` (7.54 light, 7.36 dark on the
+raised surface), a step further from every background in both appearances.
+The validation states re-point the same tokens and win over both: invalid is
+the danger colour at the strong border width, valid the success colour.
+
+What is not a control boundary, and why it keeps the decorative border:
+
+- **Text or glyph labelled controls** — the tabs, the pagination links, the
+  navigation toggle, the segmented options of the display settings, the
+  settings trigger. The label identifies the control, and the state is carried
+  by a fill or a colour that clears 3:1 on its own (the selected segment and
+  the current page are filled with the primary accent). Their borders frame.
+- **Grouping** — the fieldset, the segmented track, the `details` frame.
+- **Native checkboxes, radios and the range track** — themed with
+  `accent-color` only. The unchecked widget is drawn by the browser, and the
+  checked one in the primary accent.
+- **Buttons** — the outlined `--secondary` variant draws its border in the
+  primary accent, which clears 4.5:1.
+
+axe checks text contrast only and reports none of this.
+`Tests/Unit/StylesheetTest` computes `--theme-color-border-strong` against the
+three backgrounds of both appearances from `_tokens.scss`, and
+`Tests/Unit/ComponentLibraryTest` asserts that the controls above default to
+it.
 
 ### Semantic colour
 

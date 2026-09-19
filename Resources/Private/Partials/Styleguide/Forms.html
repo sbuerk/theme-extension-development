@@ -24,39 +24,39 @@
     a form happens to need:
 
       Resources/Private/Scss/forms/_controls.scss
-        49   .theme-input/.theme-textarea/.theme-select   the shared box
-        78   &:hover
-        85   &:disabled
-        96   .theme-input:read-only, .theme-textarea:read-only
-        102  ::placeholder
-        109  :placeholder-shown                            ellipsis, not a clip
-        114  .theme-textarea                               vertical resize only
-        124  .theme-select
-        125    &[multiple]
-        133    optgroup
-        139    option
-        144  .theme-input[type='color']
-        155    ::-webkit-color-swatch-wrapper
-        159    ::-webkit-color-swatch
-        164    ::-moz-color-swatch
-        170  .theme-input[type='range']
-        185    &:disabled
-        191  .theme-input[type='file']
-        202    ::file-selector-button
-        225    &:hover::file-selector-button
-        229    &:disabled
-        243  .theme-check
-        252    input[type='checkbox'], input[type='radio']
-        265    &:indeterminate                             not demonstrable, see below
-        269    &:disabled
-        274    &:has(input:disabled)
-        295  .theme-switch
-        312    input[type='checkbox']
-        335    &:checked
-        348    &:has(input:disabled)
-        354  .theme-fieldset
-        363  .theme-fieldset__legend
-        374  output                                        no class, like "hr"
+        60   .theme-input/.theme-textarea/.theme-select   the shared box
+        89   &:hover
+        96   &:disabled
+        107  .theme-input:read-only, .theme-textarea:read-only
+        113  ::placeholder
+        120  :placeholder-shown                            ellipsis, not a clip
+        125  .theme-textarea                               vertical resize only
+        135  .theme-select
+        136    &[multiple]
+        144    optgroup
+        150    option
+        155  .theme-input[type='color']
+        166    ::-webkit-color-swatch-wrapper
+        170    ::-webkit-color-swatch
+        175    ::-moz-color-swatch
+        181  .theme-input[type='range']
+        196    &:disabled
+        202  .theme-input[type='file']
+        213    ::file-selector-button
+        236    &:hover::file-selector-button
+        240    &:disabled
+        254  .theme-check
+        263    input[type='checkbox'], input[type='radio']
+        276    &:indeterminate                             not demonstrable, see below
+        280    &:disabled
+        285    &:has(input:disabled)
+        306  .theme-switch
+        323    input[type='checkbox']
+        346    &:checked
+        359    &:has(input:disabled)
+        389  .theme-fieldset
+        398  .theme-fieldset__legend
+        409  output                                        no class, like "hr"
 
       Resources/Private/Scss/forms/_field.scss
         30   .theme-form
@@ -85,11 +85,11 @@
         159  .theme-form-summary--success
 
       Resources/Private/Scss/forms/_input-group.scss
-        43   .theme-input-group
-        58     > .theme-input, > .theme-select              take the room left over
-        65     > :not(:first-child), > :not(:last-child)    the joined edges
-        77     > :is(:hover, :focus-visible, …)             the lifted edge, shown invalid
-        82   .theme-input-group__addon
+        47   .theme-input-group
+        62     > .theme-input, > .theme-select              take the room left over
+        69     > :not(:first-child), > :not(:last-child)    the joined edges
+        81     > :is(:hover, :focus-visible, …)             the lifted edge, shown invalid
+        86   .theme-input-group__addon
 
       Resources/Private/Scss/forms/_choice-group.scss
         31   .theme-choice-group
@@ -98,7 +98,7 @@
     Two things in that list are not shown on the page, and both are stated
     here rather than left to be noticed:
 
-      - "_controls.scss:263" ":indeterminate" cannot be reached from markup.
+      - "_controls.scss:276" ":indeterminate" cannot be reached from markup.
         It is an IDL property on HTMLInputElement with no content attribute
         behind it, so only a script can set it, and this page carries none.
       - ".theme-form-summary--error" appears in all three markup contracts

@@ -45,14 +45,25 @@
 // indicator already tracks the palette on its own: "abstracts/_tokens.scss"
 // sets "color-scheme: light dark" on ":root", and that is what the native
 // picker icon reads, so nothing here has to touch it.
+//
+// --- The border is the control ----------------------------------------------
+//
+// An empty text field is a box and nothing else: its edge is the only thing
+// that says there is a field to type into, so WCAG 1.4.11 holds it to 3:1
+// against the colours on both sides of it. The default border is therefore
+// "--theme-color-border-strong", never the decorative "--theme-color-border",
+// which reaches about 1.4:1. Hover moves to the secondary text colour, which
+// is further from every background than the resting border in both
+// appearances; the invalid state of "_validation.scss" does not rely on
+// colour, it widens the border as well.
 
 .theme-input,
 .theme-textarea,
 .theme-select {
     --theme-input-background: var(--theme-color-surface-raised, #ffffff);
     --theme-input-foreground: var(--theme-color-text-primary, #14181f);
-    --theme-input-border-color: var(--theme-color-border, #d6dce6);
-    --theme-input-border-color-hover: var(--theme-color-border-strong, #828d9f);
+    --theme-input-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-input-border-color-hover: var(--theme-color-text-secondary, #4a5567);
     --theme-input-border-width: var(--theme-border-width, 1px);
     --theme-input-radius: var(--theme-radius-sm, 5px);
     --theme-input-padding-block: var(--theme-space-2, 0.625rem);
