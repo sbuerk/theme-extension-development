@@ -45,6 +45,7 @@ against, and the rename was cheap while only one template depended on it.
 | Feature grid            | `.theme-feature-grid`     | `components/_feature.scss`          |
 | Feature introduction    | `.theme-feature-intro`    | `components/_feature.scss`          |
 | Figure                  | `.theme-figure`           | `components/_figure.scss`           |
+| File list               | `.theme-file-list`        | `components/_file-list.scss`        |
 | Gallery                 | `.theme-gallery`          | `components/_gallery.scss`          |
 | Hero                    | `.theme-hero`             | `components/_hero.scss`             |
 | Icon                    | `.theme-icon`             | `components/_icon.scss`             |
@@ -605,6 +606,28 @@ cascade and win where they meet:
         </figure>
     </div>
 </div>
+```
+
+File list — the three display types of the "File Links" element. Modifiers:
+the bare class (the names alone), `--icon` (the icon of the file type before
+each name) and `--preview` (a square thumbnail, or the icon of the file type
+in a square of the same size where no thumbnail can be made). Icon and
+thumbnail sit beside the link, never inside it: the link is the file name,
+the icon slot is `aria-hidden` and the thumbnail has `alt=""`. The size and
+the description are optional parts of the body. Rows are separated by the
+hairline, like `.theme-list--divided`:
+
+```html
+<ul class="theme-file-list theme-file-list--icon">
+    <li class="theme-file-list__item">
+        <span class="theme-file-list__icon" aria-hidden="true"><svg class="theme-icon" …>…</svg></span>
+        <div class="theme-file-list__body">
+            <a class="theme-file-list__link" href="…">report.pdf</a>
+            <span class="theme-file-list__size">12 KB</span>
+            <p class="theme-file-list__description">…</p>
+        </div>
+    </li>
+</ul>
 ```
 
 Hero. Modifiers: default (text only), `--media` (adds `theme-hero__media`),

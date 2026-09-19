@@ -5,7 +5,8 @@
 <f:comment>
     Styleguide section "Layouts and variants": the layouts an editor picks for
     a content element, drawn from the component each one maps onto - the text
-    in columns of the text element.
+    in columns of the text element, and the file list in the three display
+    types of the file links element.
 
     A section of its own rather than more specimens in "Typography.html" and
     "Boxes.html": these are the choices of a content element's form, shown
@@ -35,6 +36,76 @@
             <blockquote><p>A quotation, a table, a code block and every item of a list move to the next column whole rather than being cut in two.</p></blockquote>
             <p>The first element starts at the top of the first column, level with the second, because its top margin is dropped.</p>
         </div>
+    </div>
+
+    <h3>File list</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_file-list.scss - the
+            three display types of the "File Links" element: the file names
+            alone, with the icon of the file type, and with a thumbnail, where
+            a file with no thumbnail gets its icon in the thumbnail's square.
+            The links point at "#": a specimen links to no file.
+
+            The thumbnail is an inline SVG data URI in an "img", for the
+            reason "Boxes.html" gives: no image can be referenced from a Fluid
+            partial without a FAL record.
+        </f:comment>
+        <f:variable name="specimenThumbnail" value="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2080%2080%27%3E%3Crect%20width=%2780%27%20height=%2780%27%20fill=%27%23d6dce6%27/%3E%3Cpath%20d=%27M0%2080%2030%2040%2050%2062%2064%2048%2080%2066V80Z%27%20fill=%27%234a5567%27/%3E%3Ccircle%20cx=%2722%27%20cy=%2722%27%20r=%278%27%20fill=%27%234a5567%27/%3E%3C/svg%3E" />
+        <ul class="theme-file-list">
+            <li class="theme-file-list__item">
+                <div class="theme-file-list__body">
+                    <a class="theme-file-list__link" href="#">release-notes.pdf</a>
+                </div>
+            </li>
+            <li class="theme-file-list__item">
+                <div class="theme-file-list__body">
+                    <a class="theme-file-list__link" href="#">placeholder-graphics.zip</a>
+                </div>
+            </li>
+        </ul>
+
+        <ul class="theme-file-list theme-file-list--icon">
+            <li class="theme-file-list__item">
+                <span class="theme-file-list__icon" aria-hidden="true"><theme:icon name="file-pdf" /></span>
+                <div class="theme-file-list__body">
+                    <a class="theme-file-list__link" href="#">release-notes.pdf</a>
+                    <span class="theme-file-list__size">1 KB</span>
+                </div>
+            </li>
+            <li class="theme-file-list__item">
+                <span class="theme-file-list__icon" aria-hidden="true"><theme:icon name="file-zipper" /></span>
+                <div class="theme-file-list__body">
+                    <a class="theme-file-list__link" href="#">placeholder-graphics.zip</a>
+                    <span class="theme-file-list__size">993 B</span>
+                </div>
+            </li>
+            <li class="theme-file-list__item">
+                <span class="theme-file-list__icon" aria-hidden="true"><theme:icon name="file-lines" /></span>
+                <div class="theme-file-list__body">
+                    <a class="theme-file-list__link" href="#">release-notes.txt</a>
+                    <span class="theme-file-list__size">620 B</span>
+                    <p class="theme-file-list__description">The same notes as plain text, with the size and the description of the reference switched on.</p>
+                </div>
+            </li>
+        </ul>
+
+        <ul class="theme-file-list theme-file-list--preview">
+            <li class="theme-file-list__item">
+                <img class="theme-file-list__preview" src="{specimenThumbnail}" width="80" height="80" alt="">
+                <div class="theme-file-list__body">
+                    <a class="theme-file-list__link" href="#">placeholder.svg</a>
+                    <p class="theme-file-list__description">An image gets a square thumbnail.</p>
+                </div>
+            </li>
+            <li class="theme-file-list__item">
+                <span class="theme-file-list__icon" aria-hidden="true"><theme:icon name="file-pdf" /></span>
+                <div class="theme-file-list__body">
+                    <a class="theme-file-list__link" href="#">release-notes.pdf</a>
+                    <p class="theme-file-list__description">A file with no thumbnail gets the icon of its type in the same square.</p>
+                </div>
+            </li>
+        </ul>
     </div>
 </section>
 

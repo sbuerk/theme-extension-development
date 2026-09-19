@@ -383,6 +383,58 @@ references:
       title: 'Placeholder, portrait'
       description: 'A portrait SVG, with its thumbnail.'
   -
+    file: release-notes-pdf
+    table: tt_content
+    uid: 4705
+    field: media
+    values:
+      title: 'Release notes'
+  -
+    file: release-notes-txt
+    table: tt_content
+    uid: 4705
+    field: media
+    values:
+      title: 'Release notes, plain text'
+  -
+    file: placeholder-graphics
+    table: tt_content
+    uid: 4705
+    field: media
+    values:
+      title: 'The placeholder graphics'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4705
+    field: media
+    values:
+      title: 'Placeholder, landscape'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4706
+    field: media
+    values:
+      title: 'Placeholder, landscape'
+      description: 'An image, so the list shows a thumbnail of it.'
+  -
+    file: release-notes-pdf
+    table: tt_content
+    uid: 4706
+    field: media
+    values:
+      title: 'Release notes'
+      description: 'A PDF: no thumbnail, so the icon of a PDF stands in its place.'
+  -
+    file: placeholder-graphics
+    table: tt_content
+    uid: 4706
+    field: media
+    values:
+      title: 'The placeholder graphics'
+      description: 'A zip archive of the two placeholder graphics.'
+  -
     file: placeholder-portrait
     table: tt_content
     uid: 6604

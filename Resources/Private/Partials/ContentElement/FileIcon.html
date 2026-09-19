@@ -1,0 +1,86 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    The icon of a file type, by the extension of the file: the "file-*" icons
+    of the shipped Font Awesome solid set, and "file" for every extension
+    without one of its own. Rendered by "Templates/ContentElements/Uploads.html"
+    in front of every file of the display types "file name and icon" and,
+    where FAL has no thumbnail to offer, "file name and thumbnail".
+
+    Called with "extension", the lower case extension FAL reports for the
+    file ("AbstractFile::getExtension()" lower-cases it on v12.4 and v13.4), so
+    "REPORT.PDF" is a PDF as well.
+
+    By extension rather than by MIME type: the extension is what the name in
+    the link shows, and an icon that disagreed with it - a ".csv" FAL detected
+    as "text/plain" drawn as a text file - would contradict the text next to
+    it. One case per extension, each with its icon written out, so
+    "IconUsageTest" holds every one of them to the shipped set and the icon
+    table of the styleguide to this file.
+
+    Decoration only: the caller wraps it in an "aria-hidden" slot, and the
+    file name in the link is what names the file.
+</f:comment>
+<f:switch expression="{extension}">
+    <f:case value="pdf"><theme:icon name="file-pdf" /></f:case>
+
+    <f:case value="avif"><theme:icon name="file-image" /></f:case>
+    <f:case value="bmp"><theme:icon name="file-image" /></f:case>
+    <f:case value="gif"><theme:icon name="file-image" /></f:case>
+    <f:case value="heic"><theme:icon name="file-image" /></f:case>
+    <f:case value="jpeg"><theme:icon name="file-image" /></f:case>
+    <f:case value="jpg"><theme:icon name="file-image" /></f:case>
+    <f:case value="png"><theme:icon name="file-image" /></f:case>
+    <f:case value="svg"><theme:icon name="file-image" /></f:case>
+    <f:case value="tif"><theme:icon name="file-image" /></f:case>
+    <f:case value="tiff"><theme:icon name="file-image" /></f:case>
+    <f:case value="webp"><theme:icon name="file-image" /></f:case>
+
+    <f:case value="7z"><theme:icon name="file-zipper" /></f:case>
+    <f:case value="bz2"><theme:icon name="file-zipper" /></f:case>
+    <f:case value="gz"><theme:icon name="file-zipper" /></f:case>
+    <f:case value="rar"><theme:icon name="file-zipper" /></f:case>
+    <f:case value="tar"><theme:icon name="file-zipper" /></f:case>
+    <f:case value="tgz"><theme:icon name="file-zipper" /></f:case>
+    <f:case value="xz"><theme:icon name="file-zipper" /></f:case>
+    <f:case value="zip"><theme:icon name="file-zipper" /></f:case>
+
+    <f:case value="log"><theme:icon name="file-lines" /></f:case>
+    <f:case value="md"><theme:icon name="file-lines" /></f:case>
+    <f:case value="rtf"><theme:icon name="file-lines" /></f:case>
+    <f:case value="txt"><theme:icon name="file-lines" /></f:case>
+
+    <f:case value="csv"><theme:icon name="file-csv" /></f:case>
+
+    <f:case value="doc"><theme:icon name="file-word" /></f:case>
+    <f:case value="docx"><theme:icon name="file-word" /></f:case>
+    <f:case value="odt"><theme:icon name="file-word" /></f:case>
+
+    <f:case value="ods"><theme:icon name="file-excel" /></f:case>
+    <f:case value="xls"><theme:icon name="file-excel" /></f:case>
+    <f:case value="xlsx"><theme:icon name="file-excel" /></f:case>
+
+    <f:case value="odp"><theme:icon name="file-powerpoint" /></f:case>
+    <f:case value="ppt"><theme:icon name="file-powerpoint" /></f:case>
+    <f:case value="pptx"><theme:icon name="file-powerpoint" /></f:case>
+
+    <f:case value="flac"><theme:icon name="file-audio" /></f:case>
+    <f:case value="m4a"><theme:icon name="file-audio" /></f:case>
+    <f:case value="mp3"><theme:icon name="file-audio" /></f:case>
+    <f:case value="oga"><theme:icon name="file-audio" /></f:case>
+    <f:case value="ogg"><theme:icon name="file-audio" /></f:case>
+    <f:case value="wav"><theme:icon name="file-audio" /></f:case>
+
+    <f:case value="m4v"><theme:icon name="file-video" /></f:case>
+    <f:case value="mkv"><theme:icon name="file-video" /></f:case>
+    <f:case value="mov"><theme:icon name="file-video" /></f:case>
+    <f:case value="mp4"><theme:icon name="file-video" /></f:case>
+    <f:case value="ogv"><theme:icon name="file-video" /></f:case>
+    <f:case value="webm"><theme:icon name="file-video" /></f:case>
+
+    <f:defaultCase><theme:icon name="file" /></f:defaultCase>
+</f:switch>
+
+</html>
