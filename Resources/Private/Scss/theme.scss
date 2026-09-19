@@ -59,6 +59,7 @@
 @use 'components/accordion';
 @use 'components/alert';
 @use 'components/author';
+@use 'components/avatar';
 @use 'components/badge';
 @use 'components/breadcrumb';
 @use 'components/button';
@@ -76,15 +77,18 @@
 @use 'components/icon';
 @use 'components/link';
 @use 'components/list';
+@use 'components/meter';
 @use 'components/nav-main';
 @use 'components/nav-sub';
 @use 'components/pagination';
 @use 'components/panel';
+@use 'components/progress';
 @use 'components/quote';
 @use 'components/settings';
 @use 'components/skip-link';
 @use 'components/table';
 @use 'components/tabs';
+@use 'components/tag';
 @use 'components/teaser';
 @use 'components/text';
 @use 'components/tooltip';

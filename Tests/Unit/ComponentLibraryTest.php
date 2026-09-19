@@ -42,6 +42,8 @@ final class ComponentLibraryTest extends UnitTestCase
             'accordion' => '.theme-accordion',
             'alert' => '.theme-alert',
             'author' => '.theme-author',
+            'avatar' => '.theme-avatar',
+            'avatar group' => '.theme-avatar-group',
             'badge' => '.theme-badge',
             'breadcrumb' => '.theme-breadcrumb',
             'button' => '.theme-button',
@@ -51,6 +53,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'content element' => '.theme-content-element',
             'content menu' => '.theme-content-menu',
             'description list' => '.theme-dl',
+            'divided description list' => '.theme-dl--divided',
             'dialog' => '.theme-dialog',
             'divider' => '.theme-divider',
             'figure' => '.theme-figure',
@@ -59,10 +62,12 @@ final class ComponentLibraryTest extends UnitTestCase
             'icon' => '.theme-icon',
             'link decoration' => '.theme-link',
             'list' => '.theme-list',
+            'meter' => '.theme-meter',
             'main navigation' => '.theme-nav-main',
             'sub navigation' => '.theme-nav-sub',
             'pagination' => '.theme-pagination',
             'panel' => '.theme-panel',
+            'progress' => '.theme-progress',
             'quote' => '.theme-quote',
             'display settings' => '.theme-settings',
             'segmented control' => '.theme-segmented',
@@ -70,6 +75,8 @@ final class ComponentLibraryTest extends UnitTestCase
             'skip link' => '.theme-skip-link',
             'table' => '.theme-table',
             'tabs' => '.theme-tabs',
+            'tag' => '.theme-tag',
+            'tag list' => '.theme-tag-list',
             'teaser' => '.theme-teaser',
             'display text role' => '.theme-display',
             'display size one' => '.theme-display--1',
@@ -360,6 +367,10 @@ final class ComponentLibraryTest extends UnitTestCase
         yield 'text input, textarea and select' => ['file' => 'forms/_controls.scss', 'token' => '--theme-input-border-color'];
         yield 'input group addon' => ['file' => 'forms/_input-group.scss', 'token' => '--theme-input-group-addon-border-color'];
         yield 'switch track' => ['file' => 'forms/_controls.scss', 'token' => '--theme-switch-track-border-color'];
+        // Not controls, but graphical objects under the same criterion: the
+        // edge of the track is the only thing that shows the whole range.
+        yield 'progress track' => ['file' => 'components/_progress.scss', 'token' => '--theme-progress-track-border-color'];
+        yield 'meter track' => ['file' => 'components/_meter.scss', 'token' => '--theme-meter-track-border-color'];
     }
 
     /**

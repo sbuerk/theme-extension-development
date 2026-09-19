@@ -1,0 +1,118 @@
+// Meter.
+//
+// Markup contract:
+//
+//     <div class="theme-field">
+//         <label class="theme-field__label" for="storage-meter">…</label>
+//         <meter class="theme-meter" id="storage-meter" min="0" max="100" low="60" high="85" optimum="0" value="92" aria-describedby="storage-meter-value">92 GB</meter>
+//         <p class="theme-field__hint" id="storage-meter-value">92 of 100 GB used - nearly full</p>
+//     </div>
+//
+// The native "<meter>": a measurement within a known range - storage used, a
+// rating - not the progress of a task, which is ".theme-progress". It is
+// labelled and accompanied by its value in words exactly like the progress
+// bar, and the words matter more here. The browser sorts the value into one
+// of three regions from "low", "high" and "optimum", and the stylesheet draws
+// them in three colours:
+//
+//     optimum          the success colour
+//     suboptimum       the warning colour
+//     even less good   the danger colour
+//
+// That is colour, and colour alone does not carry information (WCAG 1.4.1):
+// the hint says what the region means - "nearly full" - and a hint that only
+// repeats the number is not enough where the region matters. Referencing it
+// from "aria-describedby" gives a screen reader the same words; the meter
+// itself announces only its value. A meter without "low", "high" and
+// "optimum" is in its optimum region wherever its value is, as in every
+// browser.
+//
+// The track, its 3:1 edge and the forced colours rule are those of
+// "components/_progress.scss", for the same reasons. Under forced colours all
+// three regions are "Highlight" - which is why the words are the contract.
+// Contrast of the three fills against the track is in DESIGN.md,
+// "Indicators".
+//
+// --- Engines -----------------------------------------------------------------
+//
+// Chromium and WebKit draw the value as one of three pseudo-elements, one per
+// region, over a "::-webkit-meter-bar" that is made transparent; Firefox draws
+// "::-moz-meter-bar" and marks the region with a pseudo-class on the element.
+// One rule per pseudo-element, as for the progress bar.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-meter {
+    --theme-meter-track-border-color: var(--theme-color-border-strong, #828d9f);
+    --theme-meter-track-background: var(--theme-color-surface, #f4f6fa);
+    --theme-meter-optimum: var(--theme-color-success, #146c43);
+    --theme-meter-suboptimum: var(--theme-color-warning, #8a5a00);
+    --theme-meter-even-less-good: var(--theme-color-danger, #b3261e);
+    --theme-meter-height: var(--theme-space-2, 0.625rem);
+    --theme-meter-radius: var(--theme-radius-sm, 5px);
+
+    display: block;
+    inline-size: 100%;
+    block-size: var(--theme-meter-height);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    appearance: none;
+    border: var(--theme-border-width, 1px) solid var(--theme-meter-track-border-color);
+    border-radius: var(--theme-meter-radius);
+    background: var(--theme-meter-track-background);
+}
+
+// Chromium lays the bar out in a flex row of the inner element, and a
+// "block-size" on the bar or on the value does not reach the fill: left to
+// it, the fill covers the upper half of the track. Stretched as the one flex
+// item of the row, the bar - and the value in it - takes the full height.
+// Tried in the pinned Playwright image; Firefox fills the track either way.
+.theme-meter::-webkit-meter-inner-element {
+    display: flex;
+    block-size: 100%;
+}
+
+.theme-meter::-webkit-meter-bar {
+    flex: 1;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.theme-meter::-webkit-meter-optimum-value {
+    background: var(--theme-meter-optimum);
+}
+
+.theme-meter::-webkit-meter-suboptimum-value {
+    background: var(--theme-meter-suboptimum);
+}
+
+.theme-meter::-webkit-meter-even-less-good-value {
+    background: var(--theme-meter-even-less-good);
+}
+
+.theme-meter::-moz-meter-bar {
+    background: var(--theme-meter-optimum);
+}
+
+.theme-meter:-moz-meter-sub-optimum::-moz-meter-bar {
+    background: var(--theme-meter-suboptimum);
+}
+
+.theme-meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    background: var(--theme-meter-even-less-good);
+}
+
+@media (forced-colors: active) {
+    .theme-meter {
+        --theme-meter-track-border-color: CanvasText;
+        --theme-meter-track-background: Canvas;
+        --theme-meter-optimum: Highlight;
+        --theme-meter-suboptimum: Highlight;
+        --theme-meter-even-less-good: Highlight;
+
+        forced-color-adjust: none;
+    }
+}

@@ -429,6 +429,37 @@ baseline closes `thead` and `tfoot`.
 `--theme-color-overlay` is the scrim behind a modal or an off-canvas panel:
 `rgb(20 24 31 / 55%)` light, `rgb(0 0 0 / 65%)` dark.
 
+### Indicators
+
+The avatar, the tag, the progress bar and the meter add no colour token.
+Each colour they use, against the three backgrounds of its appearance.
+Where a colour follows the palette, the figure is the lowest of the five
+palettes, which is the neutral one in every column:
+
+| Use                              | Token                          | Light: background | surface | surface-raised | Dark: background | surface | surface-raised |
+|----------------------------------|--------------------------------|-------------------|---------|----------------|------------------|---------|----------------|
+| Initials, text of a plain tag    | `--theme-color-text-secondary` | 7.54              | 6.97    | 7.54           | 8.89             | 8.17    | 7.36           |
+| Text of a linked tag, progress   | `--theme-color-primary`        | 6.39              | 5.90    | 6.39           | 8.18             | 7.51    | 6.77           |
+| Text of a hovered linked tag     | `--theme-color-primary-hover`  | 7.84              | 7.25    | 7.84           | 9.97             | 9.16    | 8.26           |
+| Meter, optimum                   | `--theme-color-success`        | 6.45              | 5.96    | 6.45           | 10.69            | 9.82    | 8.85           |
+| Meter, suboptimum                | `--theme-color-warning`        | 5.93              | 5.48    | 5.93           | 11.16            | 10.25   | 9.24           |
+| Meter, even less good            | `--theme-color-danger`         | 6.54              | 6.04    | 6.54           | 8.16             | 7.50    | 6.76           |
+| Edge of the progress/meter track | `--theme-color-border-strong`  | 3.35              | 3.10    | 3.35           | 3.74             | 3.44    | 3.10           |
+
+The column that decides is not the same for every row. Text sits on the fill
+of its own component, the surface tint of the tag and the avatar, and clears
+4.5:1 there (lowest 5.90). A fill sits on its track, which is the surface tint
+as well; it is a graphical object and clears 3:1 with room (lowest 5.48). The
+edge of the track sits on whatever the component is placed on, so all three
+backgrounds count, and it clears 3:1 on each (lowest 3.10) - the reason it is
+the strong border and not the decorative one, which reaches 1.18 to 1.42. The
+hairline of a tag and the edge of an avatar are decorative: the label and the
+picture identify them.
+
+The meter's three colours are not its message. Under forced colours all three
+are `Highlight`, and in every mode the value is written out in words next to
+it - see [Component library](docs/development/component-library.md#content).
+
 ### Content element bands
 
 An editor picks a band in the `frame_class` field of a content element;
