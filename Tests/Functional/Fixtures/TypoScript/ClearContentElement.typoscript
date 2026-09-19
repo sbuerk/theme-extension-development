@@ -1,0 +1,7 @@
+# What "fluid_styled_content" does to "lib.contentElement" when it is loaded
+# after the theme: its "Helper/ContentElement.typoscript" starts with exactly
+# this line, on v12.4 and v13.4, and builds the object again from nothing.
+#
+# Loaded after the theme by "ThemeContentElementObjectTest", which renders the
+# theme's own content elements with it in place.
+lib.contentElement >

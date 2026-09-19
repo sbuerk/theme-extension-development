@@ -1,0 +1,6 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,2,1,0,0,0,1,0,Core,/core
+tt_content,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout
+,900,2,0,0,0,10,header,A core header,0
