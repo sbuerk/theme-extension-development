@@ -1,0 +1,129 @@
+// Media object.
+//
+// Markup contract:
+//
+//     <div class="theme-media-object theme-media-object--start theme-media-object--square theme-media-object--lg">
+//         <span class="theme-media-object__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>
+//         <div class="theme-media-object__body">…</div>
+//     </div>
+//
+// An icon of the set beside a block of content - the "text and icon" content
+// element renders its heading, its rich text and its link in "__body". The
+// icon is decoration next to text that says the same thing, so the slot is
+// "aria-hidden"; "<theme:icon>" renders the icon itself.
+//
+// Three independent axes, one modifier of each. A block without a modifier of
+// an axis takes its first value:
+//
+//   position  --start, --end, --top
+//   shape     --plain, --square, --circle
+//   size      --md, --lg, --xl
+//
+// --- Position ----------------------------------------------------------------
+//
+// "--start" and "--end" are the edges of the line, not left and right: the
+// icon of "--start" is first in a right-to-left page as well. "--end" reverses
+// the row rather than the source order, so the icon stays first in the markup
+// and a screen reader, which skips it anyway, and the tab order, which it has
+// no part in, are the same for all three. No breakpoint: the largest tile is
+// 6rem, which leaves a phone column enough room for the text beside it.
+//
+// --- Shape and size ----------------------------------------------------------
+//
+// "--plain" is the icon in the primary accent and nothing else; its box is the
+// icon. "--square" and "--circle" put it on a tile twice its size, filled with
+// the primary accent, the icon in "on-primary" - the pair of the primary
+// button, so it follows the palette and the appearance and needs no colour of
+// its own. Its contrast is in DESIGN.md, "Icon tiles".
+//
+// The size sets the icon; the tile follows it. "--theme-media-object-tile-size"
+// is computed from "--theme-media-object-icon-size" on the same element, so a
+// size modifier and a shape modifier combine in any order.
+//
+// The tile carries a transparent border. Forced colours drop the fill and
+// paint a transparent border solid, so the tile keeps its shape there without
+// a rule of its own.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+.theme-media-object {
+    --theme-media-object-gap: var(--theme-space-4, 1.25rem);
+    --theme-media-object-icon-size: 1.5rem;
+    --theme-media-object-tile-size: var(--theme-media-object-icon-size);
+    --theme-media-object-color: var(--theme-color-primary, #0b57d0);
+    --theme-media-object-tile-background: transparent;
+    --theme-media-object-tile-radius: 0;
+
+    display: flex;
+    align-items: flex-start;
+    gap: var(--theme-media-object-gap);
+    margin-block-end: var(--theme-space-4, 1.25rem);
+}
+
+.theme-media-object--end {
+    flex-direction: row-reverse;
+}
+
+.theme-media-object--top {
+    flex-direction: column;
+}
+
+.theme-media-object__icon {
+    --theme-icon-size: var(--theme-media-object-icon-size);
+
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--theme-media-object-tile-size);
+    block-size: var(--theme-media-object-tile-size);
+
+    color: var(--theme-media-object-color);
+    background-color: var(--theme-media-object-tile-background);
+    border: var(--theme-border-width, 1px) solid transparent;
+    border-radius: var(--theme-media-object-tile-radius);
+}
+
+// "min-inline-size: 0" lets a long word or a wide table in the text shrink the
+// body instead of pushing the row wider than its column.
+.theme-media-object__body {
+    flex: 1;
+    min-inline-size: 0;
+
+    > :last-child {
+        margin-block-end: 0;
+    }
+}
+
+// Beside the icon the body is as wide as what is left; above it, the full width.
+.theme-media-object--top .theme-media-object__body {
+    inline-size: 100%;
+}
+
+.theme-media-object--md {
+    --theme-media-object-icon-size: 1.5rem;
+}
+
+.theme-media-object--lg {
+    --theme-media-object-icon-size: 2.25rem;
+}
+
+.theme-media-object--xl {
+    --theme-media-object-icon-size: 3rem;
+}
+
+.theme-media-object--square,
+.theme-media-object--circle {
+    --theme-media-object-tile-size: calc(var(--theme-media-object-icon-size) * 2);
+    --theme-media-object-color: var(--theme-color-on-primary, #ffffff);
+    --theme-media-object-tile-background: var(--theme-color-primary, #0b57d0);
+}
+
+.theme-media-object--square {
+    --theme-media-object-tile-radius: var(--theme-radius-sm, 5px);
+}
+
+.theme-media-object--circle {
+    --theme-media-object-tile-radius: var(--theme-radius-full, 9999px);
+}

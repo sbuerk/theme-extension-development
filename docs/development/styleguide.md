@@ -9,7 +9,7 @@ selected.
 
 The implementation is
 [`Resources/Private/Templates/Page/Styleguide.html`](../../Resources/Private/Templates/Page/Styleguide.html),
-the twelve partials below
+the thirteen partials below
 [`Resources/Private/Partials/Styleguide/`](../../Resources/Private/Partials/Styleguide),
 the page furniture in
 [`Resources/Private/Scss/layout/_styleguide.scss`](../../Resources/Private/Scss/layout/_styleguide.scss)
@@ -69,13 +69,13 @@ is `999` because that is a value nothing renders. Its label is a distinct
 module does not suggest it behaves like the main column of the other layouts.
 
 **The template contains no `f:cObject`.** Not in
-`Templates/Page/Styleguide.html`, not in any of the twelve partials — not even
+`Templates/Page/Styleguide.html`, not in any of the thirteen partials — not even
 for `main`. A single one would quietly make this a content page again, and the
 difference would surface only the first time somebody happened to place an
 element on it. The absence is asserted, not reviewed
 ([below](#what-the-tests-guard)).
 
-## Twelve sections, twelve partials
+## Thirteen sections, thirteen partials
 
 `Templates/Page/Styleguide.html` renders a heading, an intro, a section index
 and then one `f:render partial` per section, in this order:
@@ -90,6 +90,7 @@ and then one `f:render partial` per section, in this order:
 | `Icons.html`       | `icons`        | Every icon the theme uses, by name, where it is used, the sizes an icon takes, and a labelled icon next to the decorative ones.                                                                                                                                                                                                                                 |
 | `Boxes.html`       | `boxes`        | `.theme-card`, `.theme-panel`, `.theme-teaser`, `.theme-hero`, `.theme-quote`, `.theme-alert` in all six kinds, `.theme-accordion`, `.theme-author`.                                                                                                                                                                                                            |
 | `DataDisplay.html` | `data-display` | `.theme-avatar` in every size and shape, with initials, and `.theme-avatar-group`; `.theme-tag-list`, plain and linked; `.theme-progress`, determinate and not; `.theme-meter` in its three regions.                                                                                                                                                            |
+| `Features.html`    | `features`     | `.theme-media-object` in every position, shape and size, `.theme-feature` in its three layouts in `.theme-feature-grid` and `.theme-feature-intro`, `.theme-stat` in `.theme-stats`, and `.theme-steps` numbered and with icons.                                                                                                                                |
 | `Interactive.html` | `interactive`  | The three components that need the theme's script — `.theme-tabs`, `.theme-dialog`, `.theme-tooltip` — and what each does without it.                                                                                                                                                                                                                           |
 | `Forms.html`       | `forms`        | The whole `forms/` contract, selector by selector, including the validation states, `.theme-input-group` and `.theme-choice-group`.                                                                                                                                                                                                                             |
 | `Navigation.html`  | `navigation`   | `.theme-nav-main`, `.theme-nav-sub`, `.theme-breadcrumb`, `.theme-pagination`, `.theme-content-menu`.                                                                                                                                                                                                                                                           |
@@ -97,12 +98,12 @@ and then one `f:render partial` per section, in this order:
 
 Each partial is a single `<section class="theme-styleguide__section" id="…">`
 and nothing else — no `f:layout`, no `f:section`, no wrapper. The page template
-is what places them, and the index at the top is built from the same twelve ids.
+is what places them, and the index at the top is built from the same thirteen ids.
 
 The split follows the same rule as the rest of the theme: a site package that
 wants its own forms section overrides **one file**,
-`Partials/Styleguide/Forms.html`, and keeps the other eleven. Overriding the page
-template instead would mean re-stating all twelve renders and the index to
+`Partials/Styleguide/Forms.html`, and keeps the other twelve. Overriding the page
+template instead would mean re-stating all thirteen renders and the index to
 change one section.
 
 `Icons.html` lists the icons the templates use, not the 2001 that ship: a
@@ -227,7 +228,7 @@ frontend sub-request against `Fixtures/Database/StyleguidePage.csv`:
 | Test                                                        | Guards                                                                                                                    |
 |-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `everyComponentOfTheLibraryIsShownOnTheStyleguide`          | Every component of the library appears on the page. Data provider, one case per component.                                |
-| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the twelve ids renders **and** is linked from the index — no dead anchor.                                         |
+| `everySectionOfTheStyleguideRendersAndIsLinkedFromTheIndex` | Each of the thirteen ids renders **and** is linked from the index — no dead anchor.                                       |
 | `contentPlacedOnTheStyleguidePageIsNotRendered`             | Neither the element in `colPos 999` nor the one in `colPos 0` reaches the frontend.                                       |
 | `theFormsSectionShowsTheInvalidState`                       | `.theme-field--invalid`, `aria-invalid="true"`, `.theme-field__error`, `.theme-form-summary`.                             |
 | `everyColourTokenHasASwatch`                                | Every `--theme-color-*` token declared in `abstracts/_tokens.scss` has a swatch.                                          |

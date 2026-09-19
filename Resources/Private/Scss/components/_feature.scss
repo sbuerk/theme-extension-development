@@ -1,0 +1,216 @@
+// Feature.
+//
+// Markup contract:
+//
+//     <div class="theme-feature-grid theme-feature-grid--columns-3">
+//         <div class="theme-feature theme-feature--column">
+//             <span class="theme-feature__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>
+//             <div class="theme-feature__body">
+//                 <h3 class="theme-feature__title">…</h3>
+//                 <p class="theme-feature__text">…</p>
+//                 <a class="theme-feature__link" href="…">…</a>
+//             </div>
+//         </div>
+//     </div>
+//
+// With an introduction beside the grid:
+//
+//     <div class="theme-feature-intro">
+//         <div class="theme-feature-intro__text">…</div>
+//         <div class="theme-feature-grid theme-feature-grid--columns-2">…</div>
+//     </div>
+//
+// A group of features: an icon, a title, a sentence or two and an optional
+// link each - the "features" examples of Bootstrap, the "icon group" of
+// bootstrap_package. Every part but the title is optional; a feature without
+// an icon leaves the slot out.
+//
+// --- Three item layouts -----------------------------------------------------
+//
+//   --column   the icon on a tile above the title, the default
+//   --hanging  the icon on a smaller, framed tile at the start of the line, the
+//              text hanging beside it
+//   --tile     the whole feature is a framed box, the icon above the title
+//
+// The tile of "--column" is the primary accent with the icon in "on-primary",
+// the pair of the primary button and of the square media object. The framed
+// tile of "--hanging" and the box of "--tile" are the surface with a hairline,
+// the icon in the primary accent - the Frame of every other box of the theme.
+// Contrast: DESIGN.md, "Icon tiles". Both tiles carry a border, transparent on
+// the filled one, so forced colours keep their shape.
+//
+// --- The grid: a maximum of columns, a minimum of width ---------------------
+//
+// "--columns-2", "--columns-3" and "--columns-4" set the most columns the grid
+// takes. Each column is at least "--theme-feature-grid-min" wide, so a narrow
+// content column or a phone gets fewer, down to one, without a breakpoint -
+// the way "--columns-*" of ".theme-list" treats its count. The track is the
+// larger of the minimum and the share of the width the count leaves, and
+// "auto-fill" places as many of those as fit.
+//
+// --- The introduction -------------------------------------------------------
+//
+// ".theme-feature-intro" sets a block of text beside the grid from "bp.$md" up,
+// a third to two thirds, and stacks the two below it. The text is the heading
+// and the rich text of the content element; the grid is the same grid.
+//
+// See "components/_button.scss" for why every component declares its own token
+// layer with a fallback.
+
+@use '../abstracts/breakpoints' as bp;
+
+.theme-feature {
+    --theme-feature-gap: var(--theme-space-3, 0.9375rem);
+    --theme-feature-icon-size: 1.5rem;
+    --theme-feature-tile-size: 3rem;
+    --theme-feature-icon-color: var(--theme-color-on-primary, #ffffff);
+    --theme-feature-tile-background: var(--theme-color-primary, #0b57d0);
+    --theme-feature-tile-border-color: transparent;
+    --theme-feature-box-background: var(--theme-color-surface, #f4f6fa);
+    --theme-feature-box-border-color: var(--theme-color-border, #d6dce6);
+    --theme-feature-box-padding: var(--theme-space-4, 1.25rem);
+    --theme-feature-radius: var(--theme-radius-sm, 5px);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-feature-gap);
+}
+
+.theme-feature__icon {
+    --theme-icon-size: var(--theme-feature-icon-size);
+
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--theme-feature-tile-size);
+    block-size: var(--theme-feature-tile-size);
+
+    color: var(--theme-feature-icon-color);
+    background-color: var(--theme-feature-tile-background);
+    border: var(--theme-border-width, 1px) solid var(--theme-feature-tile-border-color);
+    border-radius: var(--theme-feature-radius);
+}
+
+.theme-feature__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--theme-space-2, 0.625rem);
+    min-inline-size: 0;
+}
+
+// Selected by class on whatever heading level the element's outline gives it,
+// so the capitals the element baseline sets on "h5" and "h6" are undone here.
+.theme-feature__title {
+    margin: 0;
+    font-size: var(--theme-font-size-lg);
+    font-weight: var(--theme-font-weight-bold);
+    letter-spacing: var(--theme-letter-spacing-none);
+    line-height: var(--theme-line-height-snug);
+    text-transform: none;
+}
+
+.theme-feature__text {
+    margin: 0;
+    color: var(--theme-color-text-secondary);
+}
+
+// Pushed to the end of the body, so the links of a row of features line up
+// whatever the length of their text - the card link does the same. "gap"
+// spaces an icon the editor gave the link from its label.
+.theme-feature__link {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-space-2, 0.625rem);
+    margin-block-start: auto;
+    color: var(--theme-color-primary);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    letter-spacing: var(--theme-letter-spacing-wide);
+
+    &:hover {
+        color: var(--theme-color-primary-hover);
+    }
+}
+
+// The default; stated so a template can name it.
+.theme-feature--column {
+    flex-direction: column;
+}
+
+.theme-feature--hanging {
+    --theme-feature-icon-size: 1.25rem;
+    --theme-feature-tile-size: 2.5rem;
+    --theme-feature-icon-color: var(--theme-color-primary, #0b57d0);
+    --theme-feature-tile-background: var(--theme-feature-box-background);
+    --theme-feature-tile-border-color: var(--theme-feature-box-border-color);
+
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--theme-space-4, 1.25rem);
+}
+
+.theme-feature--tile {
+    --theme-feature-tile-size: var(--theme-feature-icon-size);
+    --theme-feature-icon-color: var(--theme-color-primary, #0b57d0);
+    --theme-feature-tile-background: transparent;
+
+    padding: var(--theme-feature-box-padding);
+    background-color: var(--theme-feature-box-background);
+    border: var(--theme-border-width, 1px) solid var(--theme-feature-box-border-color);
+    border-radius: var(--theme-feature-radius);
+}
+
+.theme-feature-grid {
+    --theme-feature-grid-columns: 3;
+    --theme-feature-grid-min: 12rem;
+    --theme-feature-grid-gap: var(--theme-space-6, 1.875rem);
+
+    display: grid;
+    gap: var(--theme-feature-grid-gap);
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(
+            max(
+                min(var(--theme-feature-grid-min), 100%),
+                calc((100% - (var(--theme-feature-grid-columns) - 1) * var(--theme-feature-grid-gap)) / var(--theme-feature-grid-columns))
+            ),
+            1fr
+        )
+    );
+    margin-block-end: var(--theme-space-4, 1.25rem);
+}
+
+.theme-feature-grid--columns-2 {
+    --theme-feature-grid-columns: 2;
+}
+
+.theme-feature-grid--columns-3 {
+    --theme-feature-grid-columns: 3;
+}
+
+.theme-feature-grid--columns-4 {
+    --theme-feature-grid-columns: 4;
+}
+
+.theme-feature-intro {
+    display: grid;
+    gap: var(--theme-space-7, 2.5rem);
+    margin-block-end: var(--theme-space-4, 1.25rem);
+
+    > .theme-feature-grid {
+        margin-block-end: 0;
+    }
+
+    @media (min-width: bp.$md) {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        align-items: start;
+    }
+}
+
+.theme-feature-intro__text {
+    > :last-child {
+        margin-block-end: 0;
+    }
+}
