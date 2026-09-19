@@ -1,0 +1,7 @@
+tt_content,,,,,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,tx_theme_icon,tx_theme_icon_position,tx_theme_icon_shape,tx_theme_icon_size,tx_theme_link,tx_theme_link_label,tx_theme_link_variant
+,1010,1,0,0,0,1010,theme_text_icon,Beside an icon,2,<p>Text with <strong>rich</strong> markup.</p>,lightbulb,start,square,md,t3://page?uid=1,Read on,secondary
+,1020,1,0,0,0,1020,theme_text_icon,At the end,2,<p>An icon at the end of the line.</p>,gear,end,circle,xl,,,
+,1030,1,0,0,0,1030,theme_text_icon,On top,2,<p>An icon above the text.</p>,rocket,top,plain,lg,,,
+,1040,1,0,0,0,1040,theme_text_icon,Unknown values,2,<p>No icon and values nothing offers.</p>,,bogus,bogus,bogus,,,
+,1050,1,0,0,0,1050,theme_text_icon,An icon the set does not have,2,<p>The name is gone from the set.</p>,no-such-icon,start,square,md,,,

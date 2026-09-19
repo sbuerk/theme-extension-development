@@ -6,7 +6,7 @@
 # items and their "itemGroups" -
 # "NewContentElementController::loadAvailableWizards()" turns every item of the
 # type field into a wizard entry, keyed "<group>_<value>", with the item's
-# label, description and icon. The thirteen calls in
+# label, description and icon. The calls in
 # "Configuration/TCA/Overrides/tt_content_theme_*.php" therefore already produce
 # the wizard entries there.
 #
@@ -17,7 +17,7 @@
 # (".Build/vendor/typo3/cms-backend/Configuration/page.tsconfig" and
 # ".Build/vendor/typo3/cms-frontend/Configuration/page.tsconfig" with a v12
 # dependency set installed; no such file exists in either sysext on v13).
-# Without this file the thirteen types are selectable in the CType dropdown of
+# Without this file the theme types are selectable in the CType dropdown of
 # an existing element but cannot be created, which is the only way an editor
 # ever reaches them.
 #
@@ -157,6 +157,14 @@
                 description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_testimonial.description
                 tt_content_defValues {
                     CType = theme_testimonial
+                }
+            }
+            theme_text_icon {
+                iconIdentifier = content-idea
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_text_icon.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_text_icon.description
+                tt_content_defValues {
+                    CType = theme_text_icon
                 }
             }
         }
