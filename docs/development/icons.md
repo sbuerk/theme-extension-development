@@ -18,6 +18,7 @@ Build/Scripts/runTests.sh -s checkIconsBuild
 |------------------------------------------------------|-----------------------------------------------------------------------|
 | `Resources/Public/Icons/FontAwesome/Solid/`          | The 2001 files of `svgs/solid/` of 7.3.1, 1 648 470 bytes, unchanged. |
 | `Resources/Public/Icons/FontAwesome/LICENSE.txt`     | The licence of the package, copied from the same version.             |
+| `Resources/Public/Icons/FontAwesome/categories.yml`  | `metadata/categories.yml` of the same version: the backend groups.    |
 | `Resources/Public/Icons/FontAwesome/ATTRIBUTION.txt` | The attribution, written by hand: set, version, author, licence.      |
 | `package.json`, `package-lock.json`                  | The exact pin — `"7.3.1"`, no range — and its integrity hash.         |
 
@@ -76,10 +77,10 @@ Two things meet that requirement, and both ship:
 The build is two npm scripts in the root `package.json`, next to the CSS build,
 run in the same node image through `runTests.sh`:
 
-| Script               | Suite             | Does                                                                                                             |
-|----------------------|-------------------|------------------------------------------------------------------------------------------------------------------|
-| `build:icons`        | `buildIcons`      | Empties `Solid/`, copies `svgs/solid/*.svg` and `LICENSE.txt` of the installed package into place, nothing else. |
-| `build:icons:verify` | `checkIconsBuild` | `diff -r` of the installed `svgs/solid/` against `Solid/`, and `diff -u` of the two licence files.               |
+| Script               | Suite             | Does                                                                                                                                        |
+|----------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `build:icons`        | `buildIcons`      | Empties `Solid/`, copies `svgs/solid/*.svg`, `LICENSE.txt` and `metadata/categories.yml` of the installed package into place, nothing else. |
+| `build:icons:verify` | `checkIconsBuild` | `diff -r` of the installed `svgs/solid/` against `Solid/`, and `diff -u` of the two licence files and of the two category files.            |
 
 Both start with `npm ci`, which installs exactly the version of
 `package-lock.json` and refuses a tarball whose integrity hash does not match.
@@ -203,30 +204,96 @@ the functional tests render it through TYPO3.
 
 ## Picking an icon in the backend
 
-Letting an editor pick an icon is a later step. What it needs from the set is
-already here:
-[`Classes/Tca/IconItems.php`](../../Classes/Tca/IconItems.php), an
-`itemsProcFunc` that appends every shipped icon, sorted, to the items of a
-select field. A content element that offers a choice of icon declares:
+An editor picks an icon from a select field with the core's `selectIcons`
+field wizard: the list, grouped by Font Awesome's categories, and under it a
+grid of the icons to click on. A column that stores an icon name — of the theme
+or of another extension — takes its `config` from
+[`Classes/Tca/IconItems.php`](../../Classes/Tca/IconItems.php):
 
 ```php
-'tx_theme_icon' => [
+use SBUERK\ThemeExtensionDevelopment\Tca\IconItems;
+
+'tx_myextension_icon' => [
     'label' => '…',
-    'config' => [
-        'type' => 'select',
-        'renderType' => 'selectSingle',
-        'items' => [
-            ['label' => '…', 'value' => ''],
-        ],
-        'itemsProcFunc' => \SBUERK\ThemeExtensionDevelopment\Tca\IconItems::class . '->addItems',
-    ],
+    'config' => IconItems::selectConfig(),
 ],
 ```
 
-and renders the stored name with `<theme:icon name="{data.tx_theme_icon}" />`
-inside an `f:if` on the field. `IconItems` is public in the container, because
-TYPO3 fetches an `itemsProcFunc` by its class name. Label and value are both
-the icon name; a searchable gallery to pick from comes with that step.
+and a template renders the stored name with
+`<theme:icon name="{…}" optional="1" />`. The theme adds such a column where an
+element renders the icon, and not before: a field whose value nothing renders
+is work an editor does for nothing.
+
+| Key             | Is                                                                                                                |
+|-----------------|-------------------------------------------------------------------------------------------------------------------|
+| `renderType`    | `selectSingle`, `default` `''`.                                                                                   |
+| `items`         | "No icon" with the value `''` — the only item in the TCA.                                                         |
+| `itemsProcFunc` | `IconItems->addItems`: every icon of the catalogue, label and value the name, sorted.                             |
+| `items.icon`    | `EXT:theme_extension_development/Resources/Public/Icons/FontAwesome/Solid/<name>.svg`.                            |
+| `items.group`   | The first category of `categories.yml` that lists the name.                                                       |
+| `itemGroups`    | Every category, in the order of the file, with Font Awesome's English label; empty ones are left out by the core. |
+| `fieldWizard`   | `selectIcons` switched on.                                                                                        |
+
+Five decisions, each read in the core rather than assumed:
+
+- **The icon of an item is the file.** `FormEngineUtility::getIconHtml()`
+  renders an item's `icon` as an `<img>` when it resolves to a file and asks
+  the icon registry only otherwise — through `getFileAbsFileName()` on v12.4
+  and on v13.4. So the set needs no registration in `Configuration/Icons.php`:
+  2001 backend icons would be the wrong tool, since the registry is for the
+  backend's own interface.
+  The image draws the icon in black, whatever the backend scheme: an `<img>`
+  inherits no `currentColor`.
+- **The icons are not in the TCA.** Written into it as static items they cost
+  several hundred kilobytes of cached TCA per column, and every request of an
+  installation loads the TCA. The TCA carries the field, "No icon", the groups
+  and the wizard; `IconItems::addItems()`, the `itemsProcFunc`, adds the icons
+  when a form is built. Page TSconfig still narrows them:
+  `TcaSelectItems::addData()` resolves the `itemsProcFunc` before `keepItems`,
+  `addItems` and `removeItems` — lines 59 against 72 to 74 on v12.4.45, 65
+  against 78 to 80 on v13.4.35.
+- **The list is built once and cached.** `IconCatalogue` reads every file of
+  the set to find the aliases below, which is not something to do per form and
+  per inline child. `IconItems` keeps the result in the `core` cache as a PHP
+  file, under a fingerprint of the names of the set and of `categories.yml`, so
+  a different set is a different entry. It keeps nothing in the object: the
+  service is stateless, the cache is the state, and it is flushed with every
+  other cache. After changing the set by hand, flush the caches.
+- **One group per icon, the first category that lists it.** Font Awesome files
+  many icons under several categories, and a select item has one group. Any
+  rule is a choice; this one needs nothing but the file. `circle-info` comes
+  out under *Accessibility*, `envelope` under *Business*.
+- **The aliases of renamed icons are left out.** 579 names of 7.3.1 are in no
+  category, and every one of them is an alias Font Awesome keeps for a renamed
+  icon — `arrow-circle-right` for `circle-arrow-right` — whose file is byte for
+  byte the file of the icon it stands for. A name no category lists is dropped
+  when its glyph is the glyph of one that is listed, which needs no metadata
+  beyond what ships; the alias list of `metadata/icons.yml` is 912 kB. A name no
+  category lists that draws a glyph of its own would be kept, last, under
+  "Without a category" — 7.3.1 has none.
+
+`categories.yml` is copied by `buildIcons` and compared by `checkIconsBuild`,
+like the icons: it is data of the pinned version and changes with it.
+
+Page TSconfig narrows a field to the icons it names:
+
+```typoscript
+TCEFORM.tx_myextension_domain_model_thing.tx_myextension_icon.keepItems = ,envelope,phone,globe
+```
+
+The value starts with a comma. `keepItems` keeps the items whose value it
+lists, and "No icon" has the empty value: without the empty entry the leading
+comma makes, the form drops the item, preselects the first icon and stores it
+with every record saved.
+
+`Tests/Unit/Icon/IconCatalogueTest` holds the groups and the aliases,
+`Tests/Unit/Tca/IconItemsTest` the configuration and the cache.
+`Tests/Functional/IconPickerFormEngineTest` compiles the form the way the
+backend does, on each core, for the column of the fixture extension
+`tests/icon-picker-fixture`, and holds what reaches the editor: a list page
+TSconfig narrowed, with "No icon" still first; the whole catalogue otherwise,
+without the aliases; the category headings; and an `<img>` of the right file for
+every item.
 
 ## The rule
 

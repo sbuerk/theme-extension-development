@@ -86,6 +86,11 @@ licence of the package and an attribution ship next to them, in
 keeps the attribution comment it comes with, and so does every icon on a
 rendered page. The extension itself stays GPL-2.0-or-later.
 
+In the backend, an editor picks an icon from a select list grouped by the
+categories of Font Awesome, with a grid of the icons under it; page TSconfig
+:typoscript:`keepItems` narrows the list per field - see
+:ref:`feature-icon-picker`.
+
 Components that need JavaScript
 ===============================
 
