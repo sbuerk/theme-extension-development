@@ -28,9 +28,10 @@
 identifier: theme-demo
 title: 'Theme showcase page tree'
 description: >-
-  Ten pages carrying every backend layout the theme registers, every content
-  element it renders, the styleguide and the form showcase - the frontend the
-  theme is developed against.
+  Every backend layout the theme registers, every content element it renders
+  with a page of variants for each classic one, every appearance value, the
+  styleguide and the form showcase - the frontend the theme is developed
+  against.
 
 scenarios:
   - 'EXT:theme_extension_development/Configuration/DataFactory/theme-demo/Scenario.yaml'
@@ -189,3 +190,45 @@ references:
     field: image
     values:
       alternative: 'A placeholder graphic in landscape format'
+
+  # The pages below "Core elements", one per CType, written one reference per
+  # line because they differ only in the record and the field.
+  #
+  # Page 32, "Text & Images": landscape above and below the text, portrait in
+  # the text.
+  - {file: placeholder, table: tt_content, uid: 3202, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 3203, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 3204, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 3205, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 3206, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 3207, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3208, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3209, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3210, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3211, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  # Page 33, "Text & Media": as many files as columns.
+  - {file: placeholder, table: tt_content, uid: 3302, field: assets, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3302, field: assets, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3303, field: assets, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3304, field: assets, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder, table: tt_content, uid: 3305, field: assets, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 3305, field: assets, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 3305, field: assets, values: {alternative: 'A placeholder graphic in landscape format'}}
+  # Page 34, "Images": as many files as columns, the caption on the first.
+  - {file: placeholder, table: tt_content, uid: 3402, field: image, values: {alternative: 'A placeholder graphic in landscape format', description: 'One column'}}
+  - {file: placeholder, table: tt_content, uid: 3403, field: image, values: {alternative: 'A placeholder graphic in landscape format', description: 'Two columns'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3403, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder, table: tt_content, uid: 3404, field: image, values: {alternative: 'A placeholder graphic in landscape format', description: 'Three columns'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3404, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder, table: tt_content, uid: 3404, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in landscape format', description: 'Four columns'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  # Page 37, "File links": the same two files for every "uploads_type".
+  - {file: placeholder, table: tt_content, uid: 3702, field: media, values: {title: 'Placeholder, landscape', description: 'A landscape SVG.'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3702, field: media, values: {title: 'Placeholder, portrait', description: 'A portrait SVG.'}}
+  - {file: placeholder, table: tt_content, uid: 3703, field: media, values: {title: 'Placeholder, landscape', description: 'A landscape SVG.'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3703, field: media, values: {title: 'Placeholder, portrait', description: 'A portrait SVG.'}}
+  - {file: placeholder, table: tt_content, uid: 3704, field: media, values: {title: 'Placeholder, landscape', description: 'A landscape SVG, with its thumbnail.'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3704, field: media, values: {title: 'Placeholder, portrait', description: 'A portrait SVG, with its thumbnail.'}}

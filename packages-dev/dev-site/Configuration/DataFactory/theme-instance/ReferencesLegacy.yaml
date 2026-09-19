@@ -141,3 +141,244 @@ references:
     field: image
     values:
       alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4202
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4203
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4204
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4205
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4206
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4207
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4208
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4209
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4210
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4211
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4302
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4302
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4303
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4304
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4305
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4305
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4305
+    field: assets
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4402
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'One column'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4403
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'Two columns'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4403
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4404
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'Three columns'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4404
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4404
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4405
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'Four columns'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4405
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4405
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4405
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4702
+    field: media
+    values:
+      title: 'Placeholder, landscape'
+      description: 'A landscape SVG.'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4702
+    field: media
+    values:
+      title: 'Placeholder, portrait'
+      description: 'A portrait SVG.'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4703
+    field: media
+    values:
+      title: 'Placeholder, landscape'
+      description: 'A landscape SVG.'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4703
+    field: media
+    values:
+      title: 'Placeholder, portrait'
+      description: 'A portrait SVG.'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4704
+    field: media
+    values:
+      title: 'Placeholder, landscape'
+      description: 'A landscape SVG, with its thumbnail.'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4704
+    field: media
+    values:
+      title: 'Placeholder, portrait'
+      description: 'A portrait SVG, with its thumbnail.'
