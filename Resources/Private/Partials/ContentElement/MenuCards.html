@@ -1,0 +1,65 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The card and thumbnail layouts of the two page menus, "menu_pages" and
+    "menu_subpages": one ".theme-card" per page, in a ".theme-card-grid"
+    (Resources/Private/Scss/components/_card.scss).
+
+    Arguments: "data" (the content element record), "items" (the menu of
+    "MenuProcessor"), "label" (the name of the navigation) and "thumbnails"
+    (1 for the thumbnails, anything else for the cards).
+
+    The items come from the second "MenuProcessor" of the element, the one
+    with a nested "FilesProcessor" on the page media - "item.files.0" is the
+    first file of the page's "media" field, with the alternative text of its
+    reference. A page without media gets a card without "__media". The rest of
+    an item is the shape every menu template reads: "item.title" (the
+    navigation title where there is one), "item.link", "item.current" and the
+    page row at "item.data", "abstract" included.
+
+    The title is the link of the card, and "--linked" stretches it over the
+    card: the page title is the only name the link can have, and a separate
+    "read more" link would repeat it. It sits one level below the heading of
+    the element ("ItemHeading.html"), and carries "aria-current" for the
+    current page, as every menu does. A card shows the abstract, a thumbnail
+    only the image and the title, as a "--compact" card in a "--narrow" grid.
+</f:comment>
+<nav aria-label="{label}">
+    <f:if condition="{thumbnails} == 1">
+        <f:then>
+            <ul class="theme-card-grid theme-card-grid--narrow">
+                <f:for each="{items}" as="item">
+                    <li class="theme-card theme-card--linked theme-card--compact">
+                        <f:render section="Card" arguments="{data: data, item: item, thumbnails: 1}" />
+                    </li>
+                </f:for>
+            </ul>
+        </f:then>
+        <f:else>
+            <ul class="theme-card-grid">
+                <f:for each="{items}" as="item">
+                    <li class="theme-card theme-card--linked">
+                        <f:render section="Card" arguments="{data: data, item: item, thumbnails: 0}" />
+                    </li>
+                </f:for>
+            </ul>
+        </f:else>
+    </f:if>
+</nav>
+
+<f:section name="Card">
+    <f:if condition="{item.files.0}">
+        <div class="theme-card__media">
+            <f:image image="{item.files.0}" loading="lazy" />
+        </div>
+    </f:if>
+    <div class="theme-card__body">
+        <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-card__title', title: item.title, href: item.link, current: item.current, linkClass: 'theme-card__title-link'}" />
+        <f:if condition="{thumbnails} != 1 && {item.data.abstract}">
+            <p class="theme-card__text">{item.data.abstract}</p>
+        </f:if>
+    </div>
+</f:section>
+
+</html>

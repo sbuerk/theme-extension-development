@@ -12,6 +12,13 @@
     element differs from "menu_subpages" only in the TypoScript "special", not
     in anything Fluid needs to know, so neither "showAbstract" nor "showDate"
     is passed.
+
+    "layout" picks the rendering: 1 cards, 2 thumbnails - both
+    "Partials/ContentElement/MenuCards.html", fed by the second
+    "MenuProcessor" of the element, which adds the page media (see
+    "lib.themeMenuWithPageMedia" in "ContentElements.typoscript") - and
+    anything else the list. The page TSconfig offers the field on this CType
+    and on "menu_subpages", where the same three values apply.
 </f:comment>
 <f:layout name="ContentElement" />
 
@@ -19,9 +26,16 @@
     <f:render partial="ContentElement/Header" arguments="{_all}" />
 
     <f:if condition="{menu}">
-        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuPagesLabel')}">
-            <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
-        </nav>
+        <f:variable name="label"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.menuPagesLabel" /></f:variable>
+        <f:switch expression="{data.layout}">
+            <f:case value="1"><f:render partial="ContentElement/MenuCards" arguments="{data: data, items: menu, label: label, thumbnails: 0}" /></f:case>
+            <f:case value="2"><f:render partial="ContentElement/MenuCards" arguments="{data: data, items: menu, label: label, thumbnails: 1}" /></f:case>
+            <f:defaultCase>
+                <nav class="theme-content-menu" aria-label="{label}">
+                    <f:render partial="ContentElement/Menu" arguments="{items: menu}" />
+                </nav>
+            </f:defaultCase>
+        </f:switch>
     </f:if>
 </f:section>
 

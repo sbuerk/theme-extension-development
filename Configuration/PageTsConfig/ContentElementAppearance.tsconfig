@@ -95,6 +95,31 @@ TCEFORM.tt_content {
         }
     }
 
+    # The two page menus show their pages as a list (0), as cards (1) or as
+    # thumbnails (2) - "MenuPages.html", "MenuSubpages.html" and
+    # "Partials/ContentElement/MenuCards.html". The core value 3 has no
+    # rendering and is removed. Every other menu type keeps the field out of
+    # the form: a sitemap of cards is not a sitemap.
+    layout.types.menu_pages {
+        disabled = 0
+        removeItems = 3
+        altLabels {
+            0 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.menu.I.0
+            1 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.menu.I.1
+            2 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.menu.I.2
+        }
+    }
+
+    layout.types.menu_subpages {
+        disabled = 0
+        removeItems = 3
+        altLabels {
+            0 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.menu.I.0
+            1 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.menu.I.1
+            2 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.menu.I.2
+        }
+    }
+
     # The section index and the link to the top of the page are a later
     # addition: a table of contents built from "sectionIndex" and a "back to
     # top" link behind "linkToTop". Until then both would be switches that
