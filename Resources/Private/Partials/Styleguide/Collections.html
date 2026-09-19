@@ -1,0 +1,284 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    Styleguide section "collections" - components that arrange several items
+    of one kind: the card grid in its column counts and as a scroller, cards
+    whose title is the link, the timeline and the list group.
+
+    Contracts: "Resources/Private/Scss/components/_card.scss",
+    "components/_timeline.scss" and "components/_list-group.scss". The bare
+    card and the auto-fit grid stay in Boxes, where they were; this section is
+    what the collections add on top of them. Literal markup only, specimen
+    copy in English, headings one level below the section heading like every
+    other section - see the comment at the top of "Boxes.html" for the heading
+    levels and for why the media are data URIs, which the two variables below
+    repeat: a partial is rendered on its own by the visual suite and carries
+    its own.
+
+    The scroller is a region with a tab stop and a name, as the contract
+    requires - "scrollable-region-focusable" is one of the rules axe runs on
+    this page.
+
+    The icon of the timeline is an icon of the set, rendered by "theme:icon";
+    the ring of every other entry is geometry of the stylesheet - see
+    "docs/development/icons.md#the-rule".
+</f:comment>
+<section class="theme-styleguide__section" id="collections">
+    <h2 class="theme-styleguide__heading">Collections</h2>
+
+    <f:variable name="specimenMediaLandscape" value="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20160%2090%27%3E%3Crect%20width=%27160%27%20height=%2790%27%20fill=%27%23d6dce6%27/%3E%3Cpath%20d=%27M0%2090%2058%2038%2092%2066%20118%2044%20160%2090Z%27%20fill=%27%234a5567%27/%3E%3Ccircle%20cx=%2736%27%20cy=%2724%27%20r=%2711%27%20fill=%27%234a5567%27/%3E%3C/svg%3E" />
+    <f:variable name="specimenMediaSquare" value="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2080%2080%27%3E%3Crect%20width=%2780%27%20height=%2780%27%20fill=%27%23d6dce6%27/%3E%3Ccircle%20cx=%2740%27%20cy=%2731%27%20r=%2714%27%20fill=%27%234a5567%27/%3E%3Cpath%20d=%27M12%2080a28%2028%200%200%201%2056%200Z%27%20fill=%27%234a5567%27/%3E%3C/svg%3E" />
+
+    <h3>Card grid, three columns</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            <code>--columns-3</code> caps the grid at three columns and keeps
+            the minimum width of a column, so the row still breaks into fewer
+            on a narrow screen. The cards are items of a list, a subtitle
+            follows the title, and each card ends in a button of its own
+            style, pushed to the foot of the card.
+        </p>
+        <ul class="theme-card-grid theme-card-grid--columns-3">
+            <li class="theme-card">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the first card.">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Workshops</h4>
+                    <p class="theme-card__subtitle">Every second Thursday</p>
+                    <p class="theme-card__text">Two hours on one topic of the theme, with the recording shared afterwards.</p>
+                    <div class="theme-card__actions"><a class="theme-button" href="#">Book a seat</a></div>
+                </div>
+            </li>
+            <li class="theme-card">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the second card.">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Office hours</h4>
+                    <p class="theme-card__subtitle">Mondays, 14:00 to 16:00</p>
+                    <p class="theme-card__text">Bring a question about a site package, and leave with an answer or an issue that describes it.</p>
+                    <div class="theme-card__actions"><a class="theme-button theme-button--secondary" href="#">See the calendar</a></div>
+                </div>
+            </li>
+            <li class="theme-card">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Mailing list</h4>
+                    <p class="theme-card__text">A card without media is the same card: the body is the only part that is not optional.</p>
+                    <div class="theme-card__actions"><a class="theme-button theme-button--link" href="#">Subscribe</a></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <h3>Card grid, two and four columns</h3>
+    <div class="theme-styleguide__specimen">
+        <ul class="theme-card-grid theme-card-grid--columns-2">
+            <li class="theme-card">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">Two columns</h4>
+                    <p class="theme-card__text"><code>--columns-2</code>: at most two cards in a row.</p>
+                </div>
+            </li>
+            <li class="theme-card">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title">The second of two</h4>
+                    <p class="theme-card__text">A ghost button instead of the card link.</p>
+                    <div class="theme-card__actions"><a class="theme-button theme-button--ghost" href="#">Read the notes</a></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="theme-styleguide__specimen">
+        <ul class="theme-card-grid theme-card-grid--columns-4">
+            <li class="theme-card"><div class="theme-card__body"><h4 class="theme-card__title">Plan</h4><p class="theme-card__text">The first of four.</p></div></li>
+            <li class="theme-card"><div class="theme-card__body"><h4 class="theme-card__title">Build</h4><p class="theme-card__text">The second of four.</p></div></li>
+            <li class="theme-card"><div class="theme-card__body"><h4 class="theme-card__title">Review</h4><p class="theme-card__text">The third of four.</p></div></li>
+            <li class="theme-card"><div class="theme-card__body"><h4 class="theme-card__title">Release</h4><p class="theme-card__text">The last of four, at a minimum of 11rem.</p></div></li>
+        </ul>
+    </div>
+
+    <h3>Card scroller</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            One row that scrolls sideways and snaps each card to the start. A
+            card is a third of the strip less a quarter, so the next one shows
+            at the end. The strip is a region with a name and a tab stop: focus
+            it and the arrow keys scroll it, with no script involved.
+        </p>
+        <div class="theme-card-scroller" role="region" tabindex="0" aria-label="Upcoming releases">
+            <ul class="theme-card-grid theme-card-grid--scroller theme-card-grid--columns-3">
+                <li class="theme-card">
+                    <div class="theme-card__media">
+                        <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the first scroller card.">
+                    </div>
+                    <div class="theme-card__body">
+                        <h4 class="theme-card__title">Release 2.1</h4>
+                        <p class="theme-card__text">The first card of the strip.</p>
+                        <a class="theme-card__link" href="#">Read the plan</a>
+                    </div>
+                </li>
+                <li class="theme-card">
+                    <div class="theme-card__media">
+                        <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the second scroller card.">
+                    </div>
+                    <div class="theme-card__body">
+                        <h4 class="theme-card__title">Release 2.2</h4>
+                        <p class="theme-card__text">The second card.</p>
+                        <a class="theme-card__link" href="#">Read the plan</a>
+                    </div>
+                </li>
+                <li class="theme-card">
+                    <div class="theme-card__media">
+                        <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the third scroller card.">
+                    </div>
+                    <div class="theme-card__body">
+                        <h4 class="theme-card__title">Release 2.3</h4>
+                        <p class="theme-card__text">The third card.</p>
+                        <a class="theme-card__link" href="#">Read the plan</a>
+                    </div>
+                </li>
+                <li class="theme-card">
+                    <div class="theme-card__media">
+                        <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for the media slot of the fourth scroller card.">
+                    </div>
+                    <div class="theme-card__body">
+                        <h4 class="theme-card__title">Release 3.0</h4>
+                        <p class="theme-card__text">Out of view until the strip is scrolled.</p>
+                        <a class="theme-card__link" href="#">Read the plan</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Cards whose title is the link</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A menu of pages as cards: the title is the link, and
+            <code>--linked</code> stretches it over the card. Below it the
+            same pages as thumbnails - <code>--compact</code> cards in a
+            <code>--narrow</code> grid, the image and the title only.
+        </p>
+        <ul class="theme-card-grid">
+            <li class="theme-card theme-card--linked">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title"><a class="theme-card__title-link" href="#">Typography</a></h4>
+                    <p class="theme-card__text">Headings, running text and the inline cases a stylesheet has to answer for.</p>
+                </div>
+            </li>
+            <li class="theme-card theme-card--linked">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title"><a class="theme-card__title-link" href="#">Media</a></h4>
+                    <p class="theme-card__text">A single image and a gallery, both driven by the fields of the element.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="theme-styleguide__specimen">
+        <ul class="theme-card-grid theme-card-grid--narrow">
+            <li class="theme-card theme-card--linked theme-card--compact">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title"><a class="theme-card__title-link" href="#">Typography</a></h4>
+                </div>
+            </li>
+            <li class="theme-card theme-card--linked theme-card--compact">
+                <div class="theme-card__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="">
+                </div>
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title"><a class="theme-card__title-link" href="#">Media</a></h4>
+                </div>
+            </li>
+            <li class="theme-card theme-card--linked theme-card--compact">
+                <div class="theme-card__body">
+                    <h4 class="theme-card__title"><a class="theme-card__title-link" href="#">A page without media</a></h4>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <h3>Timeline</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            An ordered list on an axis at the start of the line: a ring on the
+            first line of every entry and a hairline down to the next, and an
+            icon of the set in place of the ring where an entry has one. The
+            date is a <code>time</code> element with a machine readable value.
+        </p>
+        <ol class="theme-timeline">
+            <li class="theme-timeline__item">
+                <time class="theme-timeline__date" datetime="2026-01-12">12 January 2026</time>
+                <h4 class="theme-timeline__title">Kick-off</h4>
+                <p class="theme-timeline__text">The editors, the developers and the owner of the site agree on what the relaunch has to achieve.</p>
+            </li>
+            <li class="theme-timeline__item">
+                <span class="theme-timeline__icon" aria-hidden="true"><theme:icon name="flask" /></span>
+                <time class="theme-timeline__date" datetime="2026-02-23">23 February 2026</time>
+                <h4 class="theme-timeline__title">Prototype</h4>
+                <div class="theme-timeline__media">
+                    <img src="{specimenMediaLandscape}" width="160" height="90" alt="Placeholder graphic standing in for a screenshot of the prototype.">
+                </div>
+                <p class="theme-timeline__text">An entry with an icon in place of the ring, and an image below its title.</p>
+            </li>
+            <li class="theme-timeline__item">
+                <time class="theme-timeline__date" datetime="2026-04-06">6 April 2026</time>
+                <h4 class="theme-timeline__title">Launch</h4>
+                <p class="theme-timeline__text">The last entry has no rail below its ring.</p>
+            </li>
+        </ol>
+    </div>
+
+    <h3>List group</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            A framed list of rows. The title is the one link of a row, and the
+            whole row is its target; hovering it fills it, and the focus ring
+            frames the row rather than the title. The meta data sits at the
+            end of the row, and moves to a line of its own where the row is too
+            narrow. The last row has no link and is no target.
+        </p>
+        <ul class="theme-list-group">
+            <li class="theme-list-group__item">
+                <span class="theme-avatar"><img class="theme-avatar__image" src="{specimenMediaSquare}" alt="" width="40" height="40"></span>
+                <div class="theme-list-group__body">
+                    <h4 class="theme-list-group__title"><a class="theme-list-group__link" href="#">Moving a site to site sets</a></h4>
+                    <p class="theme-list-group__text">What changes for the TypoScript, the constants and the page TSconfig.</p>
+                </div>
+                <p class="theme-list-group__meta">
+                    <time datetime="2026-03-02">2 March 2026</time>
+                    <span>8 min read</span>
+                </p>
+            </li>
+            <li class="theme-list-group__item">
+                <span class="theme-avatar"><img class="theme-avatar__image" src="{specimenMediaSquare}" alt="" width="40" height="40"></span>
+                <div class="theme-list-group__body">
+                    <h4 class="theme-list-group__title"><a class="theme-list-group__link" href="#">Icons from a set, not from a font</a></h4>
+                    <p class="theme-list-group__text">Why every icon of the theme is inline SVG, and what that costs.</p>
+                </div>
+                <p class="theme-list-group__meta">
+                    <time datetime="2026-02-16">16 February 2026</time>
+                </p>
+            </li>
+            <li class="theme-list-group__item">
+                <div class="theme-list-group__body">
+                    <h4 class="theme-list-group__title">Announced: the next workshop</h4>
+                    <p class="theme-list-group__text">A row without a link, without media and without meta data.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+
+</html>
