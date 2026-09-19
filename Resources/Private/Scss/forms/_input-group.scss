@@ -39,12 +39,16 @@
 // It is also why the group needs no rule for forced colours (see "Forced
 // colours" in docs/development/component-library.md): which border is on top
 // is decided by position, not by colour, and the borders themselves are kept.
+//
+// The addon's border is "--theme-color-border-strong", the same as the
+// control's: the two share an edge and read as one field, whose outline is
+// what identifies it (see "The border is the control" in "_controls.scss").
 
 .theme-input-group {
     --theme-input-group-border-width: var(--theme-border-width, 1px);
     --theme-input-group-addon-background: var(--theme-color-surface, #f4f6fa);
     --theme-input-group-addon-foreground: var(--theme-color-text-secondary, #4a5567);
-    --theme-input-group-addon-border-color: var(--theme-color-border, #d6dce6);
+    --theme-input-group-addon-border-color: var(--theme-color-border-strong, #828d9f);
     --theme-input-group-addon-radius: var(--theme-radius-sm, 5px);
     --theme-input-group-addon-padding-inline: var(--theme-space-3, 0.9375rem);
 
