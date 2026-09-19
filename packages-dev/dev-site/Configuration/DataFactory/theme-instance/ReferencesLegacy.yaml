@@ -337,6 +337,29 @@ references:
   -
     file: placeholder
     table: tt_content
+    uid: 4406
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'The first of three, enlargeable'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 4406
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: 'The second, in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 4406
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
     uid: 4702
     field: media
     values:

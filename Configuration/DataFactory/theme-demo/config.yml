@@ -239,6 +239,11 @@ references:
   - {file: placeholder-portrait, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
   - {file: placeholder, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder-portrait, table: tt_content, uid: 3405, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  # Page 34, "Images": the enlargeable element, three images in three columns.
+  - {file: placeholder, table: tt_content, uid: 3406, field: image, values: {alternative: 'A placeholder graphic in landscape format', description: 'The first of three, enlargeable'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 3406, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'The second, in portrait format'}}
+  - {file: placeholder, table: tt_content, uid: 3406, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+
   # Page 37, "File links": the same two files for every "uploads_type".
   - {file: placeholder, table: tt_content, uid: 3702, field: media, values: {title: 'Placeholder, landscape', description: 'A landscape SVG.'}}
   - {file: placeholder-portrait, table: tt_content, uid: 3702, field: media, values: {title: 'Placeholder, portrait', description: 'A portrait SVG.'}}
