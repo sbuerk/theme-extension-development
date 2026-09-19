@@ -10,7 +10,7 @@ use TYPO3\CMS\Backend\Controller\ContentElement\NewContentElementController;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 
 /**
- * The theme's thirteen content types are registered, and creatable.
+ * The theme's own content types are registered, and creatable.
  *
  * Registration is spread over two mechanisms that differ per core version, and
  * a failure of either is silent: the element simply is not offered, and nothing
@@ -54,6 +54,7 @@ final class ThemeContentTypeRegistrationTest extends AbstractFunctionalTestCase
         'theme_tabs',
         'theme_teaser',
         'theme_testimonial',
+        'theme_text_icon',
     ];
 
     /**
@@ -117,7 +118,7 @@ final class ThemeContentTypeRegistrationTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * The thirteen types are creatable, not merely selectable.
+     * The theme types are creatable, not merely selectable.
      *
      * This is the assertion that covers the v12 half of the wizard problem
      * (contract item C3-D): on v13 the wizard entries are derived from the CType

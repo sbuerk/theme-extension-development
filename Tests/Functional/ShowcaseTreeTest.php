@@ -109,6 +109,28 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      */
     private const NOT_SEEDED = ['list', 'menu_categorized_pages', 'menu_categorized_content'];
 
+    /**
+     * The page the theme elements with a page of their own sit below, as
+     * `/elements/theme/<name>`.
+     */
+    private const THEME_ELEMENTS_PAGE = 8;
+
+    /**
+     * The theme elements that have a page of their own below "Theme
+     * elements", by the last segment of its slug.
+     */
+    private const THEME_ELEMENT_PAGES = [
+        'theme_text_icon' => 'text-icon',
+    ];
+
+    /**
+     * The fields whose values change how one of those elements looks. The
+     * values are read from the form, as for the classic CTypes.
+     */
+    private const THEME_VARIANT_FIELDS = [
+        'theme_text_icon' => ['tx_theme_icon_position', 'tx_theme_icon_shape', 'tx_theme_icon_size'],
+    ];
+
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8'],
     ];
@@ -794,6 +816,61 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             '#<li><span class="theme-list__icon" aria-hidden="true"><svg\b[^>]*\bclass="theme-icon"#',
             $body,
             'The seeded icon list renders no icon in its slot.',
+        );
+    }
+
+    /**
+     * A theme element with a page of its own has it below "Theme elements",
+     * and the page renders every element of that CType seeded on it.
+     */
+    #[Test]
+    public function everyThemeElementWithAPageHasItBelowTheThemeElements(): void
+    {
+        foreach (self::THEME_ELEMENT_PAGES as $type => $name) {
+            $slug = '/elements/theme/' . $name;
+            $page = $this->pageBySlug($slug);
+            $this->assertNotNull($page, sprintf('"%s" has no page "%s".', $type, $slug));
+            $this->assertSame(self::THEME_ELEMENTS_PAGE, $page['pid'], sprintf('"%s" is not below "Theme elements".', $slug));
+
+            $elements = $this->elementsOn($page['uid'], $type);
+            $this->assertNotSame([], $elements, sprintf('"%s" shows no "%s" element.', $slug, $type));
+            $this->assertSame(
+                count($elements),
+                substr_count($this->render($slug), sprintf('data-ctype="%s"', $type)),
+                sprintf('"%s" does not render every "%s" element seeded on it.', $slug, $type),
+            );
+        }
+    }
+
+    /**
+     * @return \Generator<string, array{type: string, field: string}>
+     */
+    public static function themeVariantFields(): \Generator
+    {
+        foreach (self::THEME_VARIANT_FIELDS as $type => $fields) {
+            foreach ($fields as $field) {
+                yield $type . ', ' . $field => ['type' => $type, 'field' => $field];
+            }
+        }
+    }
+
+    /**
+     * The page of a theme element shows every value of the fields that change
+     * how it looks - the text and icon element in every position, shape and
+     * size of its icon.
+     */
+    #[DataProvider('themeVariantFields')]
+    #[Test]
+    public function thePageOfAThemeElementShowsEveryVariant(string $type, string $field): void
+    {
+        $page = $this->pageBySlug('/elements/theme/' . self::THEME_ELEMENT_PAGES[$type]);
+        $this->assertNotNull($page, sprintf('"%s" has no page.', $type));
+        $this->assertNotSame([], self::offeredValues($page['uid'], $type, $field), sprintf('The form offers no value for "%s" - the field is wrong.', $field));
+
+        $this->assertSame(
+            [],
+            self::unshownValues($this->elementsOn($page['uid'], $type), $page['uid'], $type, $field),
+            sprintf('No "%s" element on its page shows these values of "%s".', $type, $field),
         );
     }
 

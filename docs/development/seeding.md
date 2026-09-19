@@ -73,11 +73,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                                                                |
-|----------------------|-----------------------------------------------------------------------------------------------------|
-| `pages`              | 1 to 10, then 30 to 39 and 50 and up — every other decade, see [below](#why-new-pages-skip-decades) |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502     |
-| `tx_theme_list_item` | 1 to 18 on page 8, in declaration order                                                             |
+| Table                | Uids                                                                                                         |
+|----------------------|--------------------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39, 50 to 59 and 70 to 79 — every other decade, see [below](#why-new-pages-skip-decades) |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502              |
+| `tx_theme_list_item` | 1 to 18 on page 8, in declaration order                                                                      |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -118,6 +118,7 @@ them it decides which uids are free:
 | 20–29     | the account pages of the instance set, `Accounts.yaml` — 20, 21, 22, content 2101 and 2201    |
 | 30–39     | new pages; the mirror of their content is 4001–4999                                           |
 | 50–59     | new pages; the mirror of their content is 6001–6999                                           |
+| 70–79     | new pages; the mirror of their content is 8001–8999                                           |
 
 So a new page takes a uid in an odd decade from 30 up — 30–39, 50–59, then
 70–79 and 90–99 — and the even decade after it stays free for its mirror. The
@@ -182,7 +183,8 @@ classic `CType` in its variants, and every appearance value:
 | 6         | Core elements           | `/elements/core`         | `content_sidebar` | Every classic `CType` the theme renders, once each; parent of 30 to 39 and 50.             |
 | 30–39, 50 | Header … Insert records | `/elements/core/<CType>` | `content_sidebar` | One page per classic `CType`, every value of the fields that change how it looks.          |
 | 7         | Menu elements           | `/elements/menu`         | `content_sidebar` | The eleven `menu_*` elements.                                                              |
-| 8         | Theme elements          | `/elements/theme`        | `content`         | The thirteen `theme_*` elements.                                                           |
+| 8         | Theme elements          | `/elements/theme`        | `content`         | The first thirteen `theme_*` elements; parent of 70 and up.                                |
+| 70        | Text and icon           | `/elements/theme/<name>` | `content_sidebar` | One page per theme element with icons, every value of the fields that change its look.     |
 | 51        | Frames                  | `/elements/frames`       | `content`         | Every frame, spacing, header alignment and header look of the Appearance tab.              |
 | 9         | Styleguide              | `/styleguide`            | `styleguide`      | The component library, straight from Fluid.                                                |
 | 10        | Forms                   | `/forms`                 | `forms`           | The form showcase, straight from Fluid.                                                    |

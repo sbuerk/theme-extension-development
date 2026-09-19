@@ -22,7 +22,7 @@ use PHPUnit\Framework\Attributes\Test;
  * tables — it has no branch for `input`, `text`, `link`, `file`, `inline` or a
  * `select` without an MM table, and it only enriches tables some
  * `ext_tables.sql` defined in the first place.
- * On v12 the whole `tx_theme_list_item` table and the eight `tx_theme_*` columns
+ * On v12 the whole `tx_theme_list_item` table and the eleven `tx_theme_*` columns
  * on `tt_content` therefore exist only because `ext_tables.sql` declares them.
  *
  * A missing column is not loud: nothing in the extension references it at boot,
@@ -46,7 +46,7 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
      * Every column `Configuration/TCA/tx_theme_list_item.php` declares, plus
      * the two columns the `tx_theme_list_items` inline relation on the parent
      * side writes into the child table (`foreign_field` and
-     * `foreign_table_field`), and the eight columns
+     * `foreign_table_field`), and the eleven columns
      * `Configuration/TCA/Overrides/tt_content.php` adds to `tt_content`.
      *
      * The management columns — `uid`, `pid`, `tstamp`, `crdate`, `deleted`,
@@ -147,6 +147,21 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
             'table' => 'tt_content',
             'column' => 'tx_theme_icon',
             'type' => TextType::class,
+        ];
+        yield 'tt_content.tx_theme_icon_position is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_icon_position',
+            'type' => StringType::class,
+        ];
+        yield 'tt_content.tx_theme_icon_shape is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_icon_shape',
+            'type' => StringType::class,
+        ];
+        yield 'tt_content.tx_theme_icon_size is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_icon_size',
+            'type' => StringType::class,
         ];
     }
 

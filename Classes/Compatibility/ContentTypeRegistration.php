@@ -21,7 +21,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * changelog entry ships for it at all.
  *
  * This class is the single place where that difference is resolved, so the
- * thirteen `Configuration/TCA/Overrides/tt_content_theme_*.php` files keep
+ * `Configuration/TCA/Overrides/tt_content_theme_*.php` files keep
  * exactly one registration call each.
  *
  * ## Why this is in `Classes/` and not split into `Core12/` / `Core13/`
@@ -68,7 +68,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * is the gate that holds it to that on both versions.
  *
  * @todo Delete this class and call
- *       `ExtensionManagementUtility::addRecordType()` directly in the thirteen
+ *       `ExtensionManagementUtility::addRecordType()` directly in the
  *       `Configuration/TCA/Overrides/tt_content_theme_*.php` files as soon as
  *       support for TYPO3 v12 is dropped.
  */

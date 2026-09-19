@@ -113,7 +113,7 @@ The new content element wizard on TYPO3 v12
 ===========================================
 
 TYPO3 v13.0 generates the :guilabel:`new content element` wizard from the TCA
-(:issue:`102834`). TYPO3 v12 builds it from page TSconfig only, so the thirteen
+(:issue:`102834`). TYPO3 v12 builds it from page TSconfig only, so the
 content elements of the theme would be selectable in the :guilabel:`Type`
 dropdown of an existing element and impossible to create.
 
