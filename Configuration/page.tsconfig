@@ -36,3 +36,8 @@
 # @todo Remove this import together with the imported file as soon as support
 #       for TYPO3 v12 is dropped.
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/NewContentElementWizard.tsconfig'
+
+# The table modifiers an editor can pick beyond the two the core offers. Here
+# for the same reason as the layouts: it applies through the site set and the
+# static include alike.
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig'

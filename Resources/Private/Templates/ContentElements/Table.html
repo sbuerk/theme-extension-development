@@ -25,11 +25,18 @@
         caption. "<thead>"/"<tbody>"/"<th>"/"<td>" are styled through plain
         element selectors under ".theme-table", not a class each.
 
-        "table_tfoot" is honoured with a real "<tfoot>" - correct semantic
-        HTML needs no class of its own - but note for anyone extending the
-        stylesheet: "components/_table.scss" only documents and styles
-        "<thead>"/"<tbody>", so a footer row currently renders with no
-        component styling beyond what it inherits from ".theme-table" itself.
+        "table_tfoot" is honoured with a real "<tfoot>", which the component
+        styles as a totals row.
+
+        "table_class" becomes the modifier of the same name,
+        ".theme-table--{data.table_class}", one to one. The core offers
+        "striped" and "bordered"; the page TSconfig
+        "Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig" adds the other
+        modifiers "components/_table.scss" styles. The value is not checked
+        against a list here on purpose: a site package that adds an item of
+        its own gets the class for it and styles it, which is what the core's
+        own rendering of the field always did ("ce-table-{table_class}"). It is
+        escaped like every other attribute value.
 
         Escaping: "table.caption" and every cell come straight from an editor.
         Both are output through plain Fluid variable interpolation, which
@@ -39,7 +46,7 @@
     </f:comment>
     <f:if condition="{table.headerRow} || {table.bodyRows} || {table.footerRow}">
         <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="{f:if(condition: table.caption, then: table.caption, else: data.header)}">
-            <table class="theme-table">
+            <table class="theme-table{f:if(condition: data.table_class, then: ' theme-table--{data.table_class}')}">
                 <f:if condition="{table.caption}">
                     <caption class="theme-table__caption">{table.caption}</caption>
                 </f:if>

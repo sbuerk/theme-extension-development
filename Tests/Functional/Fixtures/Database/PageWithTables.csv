@@ -1,0 +1,21 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,table_class
+,10,1,0,0,0,10,table,Default,3,"Name|Role
+Ada|Analyst",
+,11,1,0,0,0,11,table,Striped,3,"Name|Role
+Ada|Analyst",striped
+,12,1,0,0,0,12,table,Bordered,3,"Name|Role
+Ada|Analyst",bordered
+,13,1,0,0,0,13,table,Striped columns,3,"Name|Role
+Ada|Analyst",striped-columns
+,14,1,0,0,0,14,table,Hover,3,"Name|Role
+Ada|Analyst",hover
+,15,1,0,0,0,15,table,Borderless,3,"Name|Role
+Ada|Analyst",borderless
+,16,1,0,0,0,16,table,Compact,3,"Name|Role
+Ada|Analyst",compact
+,17,1,0,0,0,17,table,Sticky header,3,"Name|Role
+Ada|Analyst",sticky-header

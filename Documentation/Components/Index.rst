@@ -236,6 +236,40 @@ Rich text needs no class for the rest of the typography:
 *   Text set right to left with :html:`dir="rtl"` mirrors its indents, list
     markers and quotation rule.
 
+Tables
+======
+
+The :guilabel:`Table class` of the table content element chooses the look of
+the table. The core offers :guilabel:`Striped` and :guilabel:`Bordered`; the
+theme adds the rest of what its table component draws:
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Table class
+        -   Look
+    *   -   Default
+        -   Rows separated by a hairline, the header row on a tint
+    *   -   :css:`striped`
+        -   Every other row on the tint
+    *   -   :css:`bordered`
+        -   A hairline between the columns as well
+    *   -   :css:`striped-columns`
+        -   Every other column on the tint
+    *   -   :css:`hover`
+        -   The row under the pointer is highlighted
+    *   -   :css:`borderless`
+        -   No rules at all
+    *   -   :css:`compact`
+        -   Half the cell padding
+    *   -   :css:`sticky-header`
+        -   The header row stays in view while a tall table scrolls
+
+Each value becomes the modifier :css:`.theme-table--<value>`. A site package
+adds its own value with page TSconfig -
+:typoscript:`TCEFORM.tt_content.table_class.addItems` - and styles the class
+it produces; :typoscript:`removeItems` hides one of the theme's.
+
 Alerts
 ======
 
