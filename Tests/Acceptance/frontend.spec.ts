@@ -19,6 +19,23 @@ const showcase = [
     '/elements/theme',
     '/styleguide',
     '/forms',
+    '/typography/text',
+    '/typography/lists',
+    '/typography/tables',
+    '/typography/quotes-and-code',
+    '/typography/article',
+    '/elements/core/header',
+    '/elements/core/text',
+    '/elements/core/textpic',
+    '/elements/core/textmedia',
+    '/elements/core/image',
+    '/elements/core/bullets',
+    '/elements/core/table',
+    '/elements/core/uploads',
+    '/elements/core/div',
+    '/elements/core/html',
+    '/elements/core/shortcut',
+    '/elements/frames',
 ];
 
 const trees = [
@@ -73,11 +90,14 @@ for (const tree of trees) {
             }
         });
 
-        test(`${tree.prefix}/ keeps the hidden pages out of the main navigation`, async ({ page }) => {
+        test(`${tree.prefix}/ shows the showcase sections in the main navigation and nothing else`, async ({ page }) => {
             await page.goto(`${tree.prefix}/`);
             const navigation = page.locator('nav.theme-nav-main');
-            await expect(navigation.getByRole('link', { name: 'Elements', exact: true })).toHaveCount(1);
-            for (const hidden of ['Styleguide', 'Forms', 'Login', 'Members', 'Frontend users']) {
+            for (const section of ['Elements', 'Typography', 'Styleguide', 'Forms']) {
+                await expect(navigation.getByRole('link', { name: section, exact: true })).toHaveCount(1);
+            }
+            // The layout fallback fixture and the account pages stay out.
+            for (const hidden of ['Empty page', 'Login', 'Members', 'Frontend users']) {
                 await expect(navigation.getByRole('link', { name: hidden, exact: true })).toHaveCount(0);
             }
         });
