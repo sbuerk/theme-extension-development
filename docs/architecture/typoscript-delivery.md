@@ -221,6 +221,14 @@ both.
 Every classic CType `EXT:frontend` registers is now covered — see
 [Content elements](content-elements.md) for the full table.
 
+The theme's own `theme_*` elements are not built on `lib.contentElement`, but on
+`lib.themeContentElement`, an object with the same root paths. `fluid_styled_content`
+clears `lib.contentElement` before defining it, so a name the theme shares with
+that extension is the wrong place for elements only the theme can render — see
+[Content elements](content-elements.md#libthemecontentelement-their-own-frame-not-libcontentelement).
+Both delivery paths read the same `ContentElements.typoscript`, so neither needs
+anything of its own for it.
+
 ## Plugins, and the static include as a content rendering template
 
 `ExtensionUtility::configurePlugin()` adds the rendering of every plugin
@@ -358,6 +366,7 @@ site package makes it.
 | `StaticIncludeGuardTest`                          | With a set **and** a `sys_template` record, the theme is applied exactly once.                        | v13 only |
 | `StaticTypoScriptIncludeTest`                     | The static include is registered in the TCA at all.                                                   | both     |
 | `ContentElementRenderingTest`                     | `header` and `text` render, and the core error notice does not appear.                                | both     |
+| `ThemeContentElementObjectTest`                   | Every `theme_*` element renders the same with `lib.contentElement` cleared, both ways.                | both     |
 | `ImageElementRenderingTest`                       | The `image` element renders, and its backend fields reach the output.                                 | both     |
 | `ExtbasePluginStaticIncludeRenderingTest`         | An Extbase plugin renders through the `include_static_file` field, not only through the set.          | both     |
 | `FeloginRenderingTest`                            | The login form renders on the form contract, through the theme delivery and the static include.       | both     |

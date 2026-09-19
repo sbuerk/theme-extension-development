@@ -106,6 +106,12 @@ can render their own templates without editing the theme:
         stylesheet = EXT:my_site_package/Resources/Public/Css/my-theme.css
     }
 
+The three paths are those of both content element objects:
+:typoscript:`lib.contentElement`, which renders the classic content elements,
+and :typoscript:`lib.themeContentElement`, which renders the theme's own - see
+:ref:`important-theme-content-element-object`. A root path added to one of the
+two objects directly reaches only the elements of that object.
+
 The stylesheet is compiled from SCSS sources that ship with the extension, so
 it can also be rebuilt with different design tokens instead of being replaced —
 see :ref:`feature-design-tokens`.
