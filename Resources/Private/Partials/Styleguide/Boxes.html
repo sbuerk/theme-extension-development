@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     Styleguide section D1 "Boxes": the box shaped content components of the
@@ -327,20 +328,15 @@
             copies, not a behaviour.
 
             The stylesheet is explicit that colour is not the only signal: the
-            icon slot carries a distinct glyph per severity, and that glyph is
-            what communicates it to a reader who cannot tell the four tints
-            apart. Four different inline SVGs, therefore, not one repeated.
-            They inherit "currentColor" from the slot, which the stylesheet
-            paints with the severity accent.
+            icon slot carries a distinct icon per kind, and that icon is what
+            communicates it to a reader who cannot tell the tints apart. The
+            six are the ones "Partials/ContentElement/AlertIcon.html" maps the
+            kinds to, which is what a notice and a login message render. They
+            fill with "currentColor" from the slot, which the stylesheet paints
+            with the accent of the kind.
         </f:comment>
         <div class="theme-alert theme-alert--info" role="status">
-            <span class="theme-alert__icon" aria-hidden="true">
-                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                    <circle cx="8" cy="8" r="6.5"/>
-                    <path d="M8 7.25v4"/>
-                    <path d="M8 4.5v.5"/>
-                </svg>
-            </span>
+            <span class="theme-alert__icon" aria-hidden="true"><theme:icon name="circle-info" /></span>
             <div class="theme-alert__body">
                 <p class="theme-alert__title">Info, and the bare class</p>
                 <p class="theme-alert__text">The neutral severity, and what ".theme-alert" looks like with no modifier at all. The modifier is listed in the stylesheet anyway, so a template can name it rather than rely on the default.</p>
@@ -348,12 +344,7 @@
         </div>
 
         <div class="theme-alert theme-alert--success" role="status">
-            <span class="theme-alert__icon" aria-hidden="true">
-                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="8" cy="8" r="6.5"/>
-                    <path d="m5 8.25 2.25 2.25L11 6"/>
-                </svg>
-            </span>
+            <span class="theme-alert__icon" aria-hidden="true"><theme:icon name="circle-check" /></span>
             <div class="theme-alert__body">
                 <p class="theme-alert__title">Success</p>
                 <p class="theme-alert__text">Confirms that something finished. Polite like the info variant: it is worth reading, and worth nobody's attention being taken away from what they were doing.</p>
@@ -361,13 +352,7 @@
         </div>
 
         <div class="theme-alert theme-alert--warning" role="alert">
-            <span class="theme-alert__icon" aria-hidden="true">
-                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8 2.25 14.5 13.5h-13Z"/>
-                    <path d="M8 6.5v3.25"/>
-                    <path d="M8 11.5v.5"/>
-                </svg>
-            </span>
+            <span class="theme-alert__icon" aria-hidden="true"><theme:icon name="triangle-exclamation" /></span>
             <div class="theme-alert__body">
                 <p class="theme-alert__title">Warning</p>
                 <p class="theme-alert__text">Something needs attention before it becomes a problem. Note that the body text keeps the same colour in all four variants: it was contrast checked once against every tint, and re-deriving it per severity would reopen a check already settled.</p>
@@ -375,12 +360,7 @@
         </div>
 
         <div class="theme-alert theme-alert--danger" role="alert">
-            <span class="theme-alert__icon" aria-hidden="true">
-                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                    <circle cx="8" cy="8" r="6.5"/>
-                    <path d="m5.75 5.75 4.5 4.5m0-4.5-4.5 4.5"/>
-                </svg>
-            </span>
+            <span class="theme-alert__icon" aria-hidden="true"><theme:icon name="circle-xmark" /></span>
             <div class="theme-alert__body">
                 <p class="theme-alert__title">Danger</p>
                 <p class="theme-alert__text">Something failed or is about to. The four variants differ in nothing but the tint, the leading border and the icon accent - which is why each of them carries its own glyph rather than one shared symbol.</p>
@@ -396,12 +376,7 @@
             stays as it is.
         </f:comment>
         <div class="theme-alert theme-alert--note" role="note">
-            <span class="theme-alert__icon" aria-hidden="true">
-                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3.5" y="2" width="9" height="12" rx="1.5"/>
-                    <path d="M6 5.5h4M6 8h4M6 10.5h2.25"/>
-                </svg>
-            </span>
+            <span class="theme-alert__icon" aria-hidden="true"><theme:icon name="note-sticky" /></span>
             <div class="theme-alert__body">
                 <p class="theme-alert__title">Note</p>
                 <p class="theme-alert__text">An aside to the text around it rather than a message about the page, on the surface panels already sit on, with the secondary ink as its accent. It takes the note role and not a live region, because nothing about it ever changes.</p>
@@ -409,12 +384,7 @@
         </div>
 
         <div class="theme-alert theme-alert--tip" role="note">
-            <span class="theme-alert__icon" aria-hidden="true">
-                <svg viewBox="0 0 16 16" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8 2a4 4 0 0 0-2.25 7.3V11h4.5V9.3A4 4 0 0 0 8 2Z"/>
-                    <path d="M6.25 13.5h3.5"/>
-                </svg>
-            </span>
+            <span class="theme-alert__icon" aria-hidden="true"><theme:icon name="lightbulb" /></span>
             <div class="theme-alert__body">
                 <p class="theme-alert__title">Tip</p>
                 <p class="theme-alert__text">A recommendation, and the one kind that follows the palette: its accent is the palette's secondary, and its tint is mixed from that accent in the stylesheet. Switch the palette in the header and this is the only alert that changes colour.</p>
@@ -440,16 +410,16 @@
         </f:comment>
         <div class="theme-accordion">
             <details class="theme-accordion__item" name="theme-styleguide-boxes-accordion" open>
-                <summary class="theme-accordion__summary">What makes these three mutually exclusive?</summary>
+                <summary class="theme-accordion__summary">What makes these three mutually exclusive?<theme:icon name="chevron-down" class="theme-accordion__marker" /></summary>
                 <div class="theme-accordion__panel">The shared "name" attribute on every "details" element in the group. Open either of the two below and this one closes on its own, with no script involved.</div>
             </details>
             <details class="theme-accordion__item" name="theme-styleguide-boxes-accordion">
-                <summary class="theme-accordion__summary">Where does the chevron come from?</summary>
-                <div class="theme-accordion__panel">From two borders of a square rotated 45 degrees - no icon asset for a shape this simple. Opening an item turns it a further 180 degrees, so there is no second glyph to keep in sync with the open state.</div>
+                <summary class="theme-accordion__summary">Where does the chevron come from?<theme:icon name="chevron-down" class="theme-accordion__marker" /></summary>
+                <div class="theme-accordion__panel">From the icon set of the theme: it is the chevron-down icon, the last thing in the summary. Opening an item turns it half a turn, so there is no second icon to keep in sync with the open state.</div>
             </details>
             <details class="theme-accordion__item" name="theme-styleguide-boxes-accordion">
-                <summary class="theme-accordion__summary">What does the stylesheet actually do here?</summary>
-                <div class="theme-accordion__panel">It draws the marker and gives the summary a tap target floor, and that is all. Toggle state, keyboard handling and the expanded/collapsed semantics an assistive technology reads all come from the element itself.</div>
+                <summary class="theme-accordion__summary">What does the stylesheet actually do here?<theme:icon name="chevron-down" class="theme-accordion__marker" /></summary>
+                <div class="theme-accordion__panel">It places and turns the marker and gives the summary a tap target floor, and that is all. Toggle state, keyboard handling and the expanded/collapsed semantics an assistive technology reads all come from the element itself.</div>
             </details>
         </div>
     </div>

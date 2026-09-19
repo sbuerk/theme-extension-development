@@ -4,17 +4,21 @@
 //
 //     <div class="theme-accordion">
 //         <details class="theme-accordion__item" name="faq">
-//             <summary class="theme-accordion__summary">…</summary>
+//             <summary class="theme-accordion__summary">… <svg class="theme-icon theme-accordion__marker" aria-hidden="true" focusable="false" …>…</svg></summary>
 //             <div class="theme-accordion__panel">…</div>
 //         </details>
 //     </div>
+//
+// The marker is "<theme:icon name="chevron-down" class="theme-accordion__marker" />",
+// the last thing in the summary.
 //
 // Built on native "details"/"summary" and nothing else. A shared "name" on
 // every "details" in the group is what makes them mutually exclusive - the
 // browser closes the others when one opens - which is the one behaviour a
 // hand-rolled accordion usually reaches for JavaScript to get. Toggle state,
 // keyboard handling and the accessible expanded/collapsed semantics all come
-// from the element for free. This file only draws the marker.
+// from the element for free. This file only places and turns the marker. The
+// marker is decoration: the summary's text is its name.
 //
 // See "components/_button.scss" for why every component declares its own
 // token layer with a fallback.
@@ -30,7 +34,7 @@
 .theme-accordion {
     --theme-accordion-border-color: var(--theme-color-border, #d6dce6);
     --theme-accordion-marker-color: var(--theme-color-text-secondary, #4a5567);
-    --theme-accordion-marker-size: var(--theme-space-2, 0.625rem);
+    --theme-accordion-marker-size: var(--theme-space-3, 0.9375rem);
     --theme-accordion-summary-padding-block: var(--theme-space-3, 0.9375rem);
     --theme-accordion-summary-padding-inline: var(--theme-space-2, 0.625rem);
     --theme-accordion-panel-padding-inline: var(--theme-space-2, 0.625rem);
@@ -49,6 +53,9 @@
 }
 
 .theme-accordion__summary {
+    // The marker icon takes its size from here, see "components/_icon.scss".
+    --theme-icon-size: var(--theme-accordion-marker-size);
+
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -76,28 +83,20 @@
     &::-webkit-details-marker {
         display: none;
     }
-
-    &::after {
-        content: '';
-        flex-shrink: 0;
-
-        width: var(--theme-accordion-marker-size);
-        height: var(--theme-accordion-marker-size);
-
-        // Two visible sides of a square, rotated 45deg, read as a chevron -
-        // no icon asset needed for a shape this simple.
-        border-inline-end: var(--theme-border-width-strong, 2px) solid var(--theme-accordion-marker-color);
-        border-block-end: var(--theme-border-width-strong, 2px) solid var(--theme-accordion-marker-color);
-        transform: rotate(45deg);
-        transition: transform var(--theme-duration-base, 200ms) var(--theme-easing-standard, cubic-bezier(0.2, 0, 0, 1));
-    }
 }
 
-// A further 180deg turns the same corner into one pointing the other way,
-// so opening the item is what flips the chevron - no separate open/closed
-// glyph to keep in sync with the "[open]" attribute.
-.theme-accordion__item[open] > .theme-accordion__summary::after {
-    transform: rotate(225deg);
+// The chevron: the "chevron-down" icon of the set, at the inline end of the
+// summary. It used to be two borders of a square turned 45deg on "::after";
+// it is an icon of the set now, like every other glyph of the theme.
+.theme-accordion__marker {
+    color: var(--theme-accordion-marker-color);
+    transition: transform var(--theme-duration-base, 200ms) var(--theme-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+}
+
+// Half a turn points the same icon the other way, so opening the item is
+// what flips the chevron - no second icon to keep in sync with "[open]".
+.theme-accordion__item[open] > .theme-accordion__summary > .theme-accordion__marker {
+    transform: rotate(180deg);
 }
 
 .theme-accordion__panel {

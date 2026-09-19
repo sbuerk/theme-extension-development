@@ -3,7 +3,7 @@
 // Markup contract:
 //
 //     <div class="theme-alert theme-alert--warning" role="alert">
-//         <span class="theme-alert__icon" aria-hidden="true">…</span>
+//         <span class="theme-alert__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg></span>
 //         <div class="theme-alert__body">
 //             <p class="theme-alert__title">…</p>
 //             <p class="theme-alert__text">…</p>
@@ -35,9 +35,9 @@
 // border and the icon accent all repoint to the same semantic trio. A reader
 // who cannot distinguish those colours - low vision, colour blindness, a
 // black-and-white printout - is left with nothing if colour is the only
-// carrier. It is not: "theme-alert__icon" holds a distinct glyph per
-// severity, chosen by whatever renders the markup (an icon ViewHelper, most
-// likely). That glyph, not the colour, is what actually communicates
+// carrier. It is not: "theme-alert__icon" holds a distinct icon per kind,
+// which "Partials/ContentElement/AlertIcon.html" picks and "<theme:icon>"
+// renders. That icon, not the colour, is what actually communicates
 // severity; this stylesheet only sizes and tints the slot it sits in.
 //
 // Body text is deliberately left out of the repointing. "--theme-alert-text"
@@ -73,9 +73,10 @@
     align-items: center;
     justify-content: center;
 
-    // A square slot, not a font-size: the glyph inside is whatever markup
-    // put there (inline SVG, most likely) and scales to fill it via its own
-    // "width"/"height", same as "img" in "base/_elements.scss".
+    // A square slot, not a font-size: the icon inside takes the size of the
+    // slot through "--theme-icon-size", see "components/_icon.scss".
+    --theme-icon-size: var(--theme-alert-icon-size);
+
     width: var(--theme-alert-icon-size);
     height: var(--theme-alert-icon-size);
     color: var(--theme-alert-accent);

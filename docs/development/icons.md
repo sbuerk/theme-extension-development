@@ -107,6 +107,165 @@ committed content and run no build — see
 The package is a `devDependency`: nothing that installs the extension ever runs
 `npm`, and `node_modules/` is git-ignored and `export-ignore`d.
 
+## Rendering an icon
+
+`<theme:icon>` —
+[`Classes/ViewHelpers/IconViewHelper.php`](../../Classes/ViewHelpers/IconViewHelper.php)
+— is the one way an icon reaches a page. A template declares the namespace
+with the URL form and names the icon by its file name:
+
+```html
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<theme:icon name="circle-info" />
+<theme:icon name="gear" class="theme-settings__icon" />
+<theme:icon name="circle-info" label="Information" />
+```
+
+| Argument | Required | Does                                                                                                   |
+|----------|----------|--------------------------------------------------------------------------------------------------------|
+| `name`   | yes      | The icon: a file name below `Solid/` without `.svg`. `a-z`, `0-9` and `-` only.                        |
+| `label`  | no       | An accessible name. With one the icon is `role="img"` with `aria-label`; without, it is `aria-hidden`. |
+| `class`  | no       | Classes added after `theme-icon`, for the slot a component gives it.                                   |
+
+It renders the file as shipped, attribution comment included, with three
+attributes added to the root element and nothing else changed:
+
+```html
+<svg class="theme-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - … Copyright 2026 Fonticons, Inc. --><path fill="currentColor" d="…"/></svg>
+```
+
+The comment goes into the page with every icon. The icons are CC BY 4.0, and
+whoever shares them carries the attribution — a public page shows them — and
+the licence asks that the comment is not removed from files, "especially code"
+(see [Licence and attribution](#licence-and-attribution)). The cost is about
+210 bytes per icon on the page, accepted as the price of that attribution.
+`Tests/Functional/AppearanceRenderingTest` requires the comment on a rendered
+page.
+
+Almost every icon is decoration — next to text, or inside a button named by its
+`aria-label` or its own text — and takes no `label`. A label is for the rare
+icon that is the only thing telling a reader something.
+
+`label` and `class` are text, and are escaped once more on the way out, the way
+Fluid's own `TagBuilder::addAttribute()` escapes an attribute value: an entity
+written into the template, `label="Tom &amp; Jerry"`, arrives in the page as
+`aria-label="Tom &amp;amp; Jerry"` and is read out with the entity spelled.
+Write the character itself, `label="Tom & Jerry"`, or pass a variable.
+
+A name that is malformed or not in the set throws an `\InvalidArgumentException`
+— code `1789218001` and `1789218002` — rather than rendering nothing, and a file
+that does not start and end as an `<svg>` element throws
+`\UnexpectedValueException` `1789218003`: the attributes go in right after
+`<svg`, so an XML declaration or a comment in front of the root element would
+break the markup. The name is checked against `\A[a-z0-9-]+\z` before it
+becomes part of a path, so no name reaches a file outside `Solid/`.
+
+`IconSet` takes the directory it reads as a constructor argument that defaults
+to the shipped set. Nothing but `IconSetTest` passes one, to reach that last
+exception with a fixture; the object holds the path and nothing else.
+
+What an icon looks like is [`components/_icon.scss`](../../Resources/Private/Scss/components/_icon.scss):
+a square one em wide, filled with the text colour. A component that gives icons
+a slot sets `--theme-icon-size` on it — see
+[Component library § Icon](component-library.md#icon).
+
+### Plain Fluid, for the standalone renderer
+
+The styleguide partials use the ViewHelper, and
+[the visual suite](../testing/visual-tests.md) renders them with standalone
+`typo3fluid/fluid` and no TYPO3 bootstrap. So the ViewHelper is a plain Fluid
+ViewHelper and has to stay one:
+
+- It uses no TYPO3 API. The set it reads, `Classes/Icon/IconSet.php`, finds
+  `Solid/` relative to its own class file, not through
+  `ExtensionManagementUtility` or a resource path.
+- Its namespace is declared per template with
+  `http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers`. Both Fluid
+  2 (TYPO3 v12) and Fluid 4 (TYPO3 v13) turn that URL into the PHP namespace by
+  themselves, so neither TYPO3 nor `renderStyleguideFixtures.php` registers it,
+  and no global namespace is added to every template of an installation.
+- One class works on both Fluid versions. Neither Fluid 2 nor Fluid 4 types
+  `initializeArguments()` or `render()`, and `$escapeOutput` is untyped in
+  both, so `initializeArguments(): void`, `render(): string` and an untyped
+  `$escapeOutput` satisfy both — no split into `Core12/` and `Core13/` is
+  needed.
+- It is `final`, not `readonly`: the parent keeps the arguments of the current
+  call in mutable properties. It keeps nothing of its own between calls. TYPO3
+  creates a new instance per use (EXT:fluid tags every ViewHelper
+  `fluid.viewhelper` and marks it non-shared), and the constructor defaults the
+  `IconSet` for the standalone renderer, which has no container.
+
+`Tests/Unit/ViewHelpers/IconViewHelperTest` renders it with standalone Fluid;
+the functional tests render it through TYPO3.
+
+## Picking an icon in the backend
+
+Letting an editor pick an icon is a later step. What it needs from the set is
+already here:
+[`Classes/Tca/IconItems.php`](../../Classes/Tca/IconItems.php), an
+`itemsProcFunc` that appends every shipped icon, sorted, to the items of a
+select field. A content element that offers a choice of icon declares:
+
+```php
+'tx_theme_icon' => [
+    'label' => '…',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'items' => [
+            ['label' => '…', 'value' => ''],
+        ],
+        'itemsProcFunc' => \SBUERK\ThemeExtensionDevelopment\Tca\IconItems::class . '->addItems',
+    ],
+],
+```
+
+and renders the stored name with `<theme:icon name="{data.tx_theme_icon}" />`
+inside an `f:if` on the field. `IconItems` is public in the container, because
+TYPO3 fetches an `itemsProcFunc` by its class name. Label and value are both
+the icon name; a searchable gallery to pick from comes with that step.
+
+## The rule
+
+Icons come **only** from the vendored Font Awesome Free solid set, and **only**
+through `<theme:icon>`. No SVG drawn into a template by hand, no icon as CSS
+generated content, no webfont, no sprite, no CDN.
+
+An icon is a glyph that stands for something — a kind of message, an action,
+a state. The stylesheet still draws a few shapes of its own, and they are
+**component geometry, not icons**. These, and only these, stay CSS:
+
+| Shape                             | Where                         | Why it is not an icon                                                          |
+|-----------------------------------|-------------------------------|--------------------------------------------------------------------------------|
+| The arrow of the tooltip bubble   | `components/_tooltip.scss`    | Part of the bubble's outline, pointing at its trigger; it means nothing alone. |
+| The spinner of a busy button      | `components/_button.scss`     | An animated ring over `[aria-busy='true']`; the label says what happens.       |
+| The track and thumb of the switch | `forms/_controls.scss`        | The control itself, drawn on the native checkbox.                              |
+| The `/` between breadcrumb items  | `components/_breadcrumb.scss` | A text separator in `content`, not a glyph.                                    |
+| The arrow of a native select      | the browser                   | The user agent's own indicator, left in place on purpose.                      |
+
+The accordion chevron and the check mark of the chosen palette were drawn from
+borders as well; they are icons of the set now — `chevron-down` and `check`.
+The other pseudo elements of the stylesheet draw no shape at all: the hit area
+of a linked card and the hover bridge of the tooltip are invisible, and the
+`CType` label of the content-element outline and the quotation marks are text.
+A new shape drawn in CSS is either one of the kinds above or an icon.
+
+`Tests/Unit/IconUsageTest` holds the templates and the stylesheets to it:
+
+| Test                                                          | Guards                                                                                                            |
+|---------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `everyIconATemplateNamesIsShipped`                            | Every `name` a template passes is a file of the set — an icon a version bump renamed fails here, not on a page.   |
+| `noTemplateDrawsAnSvgOfItsOwn`                                | No template below `Resources/Private/` contains an `<svg>` element.                                               |
+| `noStylesheetDrawsAGlyphAsGeneratedContent`                   | Every quoted `content` in the SCSS sources is empty or the breadcrumb's `/` — no `⚠`, no `✓`.                     |
+| `theStyleguideListsTheIconsTheTemplatesUseAndTheSizeOfTheSet` | The icon table of the styleguide lists exactly the icons the templates use, and the count it states is the set's. |
+| `theShippedSetIsThePinnedVersion`                             | The pin is exact, the lockfile agrees, and `ATTRIBUTION.txt` and every shipped file name that version.            |
+
+`checkIconsBuild` proves the files equal the package; these prove that what
+refers to the files is still right.
+
 ## Updating the pinned version
 
 1. Pick the version and read its `LICENSE.txt` — the licence of the icons has to
@@ -117,11 +276,17 @@ The package is a `devDependency`: nothing that installs the extension ever runs
    `ATTRIBUTION.txt`.
 4. `Build/Scripts/runTests.sh -s checkIconsBuild`.
 5. Look at the diff of `Solid/`. Font Awesome renames and removes icons between
-   versions, a major one in particular, so a name the theme uses may be gone.
+   versions, a major one in particular, so a name the theme uses may be gone:
+   `-s unit` names it, see [the rule](#the-rule). Change the count the
+   styleguide states, and run `-s visual` — a redrawn icon changes pixels.
 6. Commit the lockfile, `package.json`, the set and both text files together.
 
 ## See also
 
+- [Component library § Icon](component-library.md#icon) — the markup contract,
+  and which components use icons.
+- [Styleguide page](styleguide.md) — the `icons` section shows every icon the
+  theme uses, by name.
 - [Frontend assets](frontend-assets.md)
 - [Quality gates](quality-gates.md)
 - [`DESIGN.md`](../../DESIGN.md#icons)

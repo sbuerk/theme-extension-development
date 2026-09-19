@@ -101,8 +101,8 @@
         block-size: var(--theme-tooltip-offset);
     }
 
-    // The arrow: one visible side of a transparent box, the same technique as
-    // the accordion chevron, so no asset.
+    // The arrow: one visible side of a transparent box - component geometry
+    // listed as not being an icon in "docs/development/icons.md".
     &::after {
         content: '';
         position: absolute;

@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     Main navigation, rendered from "Partials/Page/Header.html" on every page
@@ -50,6 +51,7 @@
 <f:if condition="{mainMenu}">
     <nav class="theme-nav-main" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.navMainLabel')}">
         <button type="button" class="theme-nav-main__toggle" aria-expanded="false" aria-controls="nav-main">
+            <theme:icon name="bars" />
             <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.navMainToggle" />
         </button>
         <ul class="theme-nav-main__list" id="nav-main">
