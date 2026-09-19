@@ -9,7 +9,9 @@
 //
 // Modifiers: "--horizontal" sets terms and descriptions side by side from
 // "bp.$md" up, stacked below it; "--truncate", with "--horizontal", keeps
-// every term on one line and cuts it with an ellipsis.
+// every term on one line and cuts it with an ellipsis; "--divided" draws a
+// hairline between one term and the next - the key and value look of the
+// details of a record, with "--horizontal" or without it.
 //
 // "<dt>"/"<dd>" are bare and selected as direct children, like the items of
 // ".theme-list": a nested "<dl>" inside a description keeps the element
@@ -39,6 +41,7 @@
     --theme-dl-term-width: 14rem;
     --theme-dl-column-gap: var(--theme-space-4, 1.25rem);
     --theme-dl-row-gap: var(--theme-space-2, 0.625rem);
+    --theme-dl-rule-color: var(--theme-color-border, #d6dce6);
 
     margin: 0 0 var(--theme-space-4, 1.25rem);
 
@@ -81,4 +84,22 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
+    // Side by side, a term and its first description share a row, so the
+    // line runs across both columns. A further description of the same term
+    // follows in the second column without one.
+    .theme-dl--horizontal.theme-dl--divided > dt:not(:first-child) + dd {
+        padding-block-start: var(--theme-dl-row-gap);
+        border-block-start: var(--theme-border-width, 1px) solid var(--theme-dl-rule-color);
+    }
+}
+
+// Key and value: a hairline between one term and the next, in the decorative
+// border colour - it separates pairs, it bounds nothing. The line sits above
+// every term but the first, with the row gap on either side of it: the
+// description before it keeps its bottom margin stacked, the grid gap keeps
+// it side by side.
+.theme-dl--divided > dt:not(:first-child) {
+    padding-block-start: var(--theme-dl-row-gap);
+    border-block-start: var(--theme-border-width, 1px) solid var(--theme-dl-rule-color);
 }
