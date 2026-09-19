@@ -35,7 +35,7 @@ What the library contains
             count or as a row that scrolls sideways -, code block, description
             list - with a divided variant for key and value - call to action,
             divider, feature and feature grid, figure, file list, hero, list,
-            list group, media object, panel, quote, stats, steps, table,
+            list group, media object, panel, pricing, quote, stats, steps, table,
             teaser, timeline, and the text roles display, lead and eyebrow
     *   -   Data display
         -   Avatar and avatar group, tag list, progress bar, meter

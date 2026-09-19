@@ -167,6 +167,14 @@
                     CType = theme_notice
                 }
             }
+            theme_pricing {
+                iconIdentifier = content-store
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_pricing.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_pricing.description
+                tt_content_defValues {
+                    CType = theme_pricing
+                }
+            }
             theme_sociallinks {
                 iconIdentifier = content-listgroup
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_sociallinks.label

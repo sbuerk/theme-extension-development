@@ -6,6 +6,7 @@ namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
 use Doctrine\DBAL\Types\DateType;
 use Doctrine\DBAL\Types\IntegerType;
+use Doctrine\DBAL\Types\SmallIntType;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\TextType;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -141,6 +142,14 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
             'table' => 'tx_theme_list_item',
             'column' => 'tone',
             'type' => StringType::class,
+        ];
+        // The one "type=check" column of this extension: v13.4.35 derives a
+        // SMALLINT with the TCA default from it ("case 'check'"), and v12.4
+        // derives nothing for a check field either.
+        yield 'tx_theme_list_item.highlighted is a small integer' => [
+            'table' => 'tx_theme_list_item',
+            'column' => 'highlighted',
+            'type' => SmallIntType::class,
         ];
         yield 'tt_content.tx_theme_link is a text' => [
             'table' => 'tt_content',

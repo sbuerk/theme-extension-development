@@ -1,0 +1,102 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    "theme_pricing" - pricing plans side by side, on ".theme-pricing"
+    (Resources/Private/Scss/components/_pricing.scss).
+
+    The plans are "tx_theme_list_items", resolved the way "ThemeLinklist.html"
+    resolves its rows - "tt_content.theme_pricing" is a reference to
+    "tt_content.theme_linklist", the query without the nested "FilesProcessor",
+    because a plan has no image. So "item.data.&lt;column&gt;" is the raw row of the
+    child table and there is no "item.files".
+
+    The columns of a plan, relabelled for this relation in
+    "Configuration/TCA/Overrides/tt_content_theme_pricing.php": "header" is the
+    name, "subheader" the price, "meta" what the price is per, "text" the
+    features and "highlighted" the plan a site recommends. The link is the
+    "theme_link_style" palette of the child, rendered as a button through
+    "Partials/ContentElement/LinkButton.html" like a card of the card group.
+
+    The plans are the items of a "ul", and their names sit one level below the
+    heading of the element ("Partials/ContentElement/ItemHeading.html").
+
+    --- The features are one per line, and "f:split" needs a real newline -----
+
+    "text" is the plain text column of the child table, and a feature is a line
+    of it - the convention the bullet list already uses for its own "bodytext",
+    where the core "SplitProcessor" does the splitting. There is no processor
+    for a column of a child row, so the template splits, with "f:split". The
+    view helper belongs to Fluid rather than to TYPO3 and arrived in Fluid
+    Standalone 2.11, so what decides whether it exists is the Fluid version,
+    not the core one: "typo3/cms-fluid" requires "typo3fluid/fluid ^2.15.0"
+    from 12.4.22 - the floor of this extension's own constraint - and
+    "^4.0.1" and up on 13.4, so it is present on every version this branch
+    supports.
+
+    The separator below is a **literal line break inside the attribute value**,
+    and it has to be: Fluid does not decode XML character references in an
+    attribute, so "separator="&amp;#10;"" splits on the five characters of the
+    reference and returns the whole value as one unsplit feature - a plan whose
+    features render as a single run-on line. Verified by rendering all three
+    spellings through standalone Fluid before this was written; the tag content
+    form ("&lt;f:split&gt;&lt;/f:split&gt;") throws, because "separator" is required.
+    Do not "tidy" the line break away.
+
+    An empty line is skipped rather than rendered as an empty item, so a
+    trailing newline an editor left behind costs nothing.
+
+    A feature a plan does **not** include is left out of its list. The
+    alternative - a crossed out line, "xmark" - needs a per line syntax saying
+    which is which ("- Audit log"), and inventing a micro format no editor is
+    told about is the same mistake the definition list refused to make (see
+    "docs/architecture/content-elements.md", the bullets section). A plan lists
+    what it includes; the plan beside it is the comparison.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+
+    <f:if condition="{listItems}">
+        <ul class="theme-pricing">
+            <f:for each="{listItems}" as="item">
+                <f:if condition="{item.data.highlighted}">
+                    <f:then><f:variable name="highlighted" value=" theme-pricing__plan--highlighted" /></f:then>
+                    <f:else><f:variable name="highlighted" value="" /></f:else>
+                </f:if>
+                <li class="theme-pricing__plan{highlighted}">
+                    <f:if condition="{item.data.header}">
+                        <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-pricing__name', title: item.data.header}" />
+                    </f:if>
+                    <f:if condition="{item.data.subheader}">
+                        <p class="theme-pricing__price">
+                            {item.data.subheader}
+                            <f:if condition="{item.data.meta}">
+                                <span class="theme-pricing__period">{item.data.meta}</span>
+                            </f:if>
+                        </p>
+                    </f:if>
+                    <f:if condition="{item.data.text}">
+                        <f:variable name="features"><f:split value="{item.data.text}" separator="
+" /></f:variable>
+                        <ul class="theme-list theme-list--check theme-pricing__features">
+                            <f:for each="{features}" as="feature">
+                                <f:if condition="{feature}">
+                                    <li>{feature}</li>
+                                </f:if>
+                            </f:for>
+                        </ul>
+                    </f:if>
+                    <f:if condition="{item.data.link}">
+                        <div class="theme-pricing__actions">
+                            <f:render partial="ContentElement/LinkButton" arguments="{link: item.data.link, label: item.data.link_label, variant: item.data.link_variant, icon: item.data.link_icon}" />
+                        </div>
+                    </f:if>
+                </li>
+            </f:for>
+        </ul>
+    </f:if>
+</f:section>
+
+</html>

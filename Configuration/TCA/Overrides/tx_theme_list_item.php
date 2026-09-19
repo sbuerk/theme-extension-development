@@ -27,6 +27,29 @@ ExtensionManagementUtility::addTCAcolumns('tx_theme_list_item', [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.link_variant',
         'config' => $GLOBALS['TCA']['tt_content']['columns']['tx_theme_link_variant']['config'],
     ],
+    // The one item of a list singled out from the others - the recommended
+    // plan of "theme_pricing", rendered as ".theme-pricing__plan--highlighted".
+    //
+    // Named for what it does to any item rather than for the one element that
+    // shows it so far, like "subheader" and "date" before it: a later element
+    // that emphasises one of its items offers the same column. Only the
+    // relation of "theme_pricing" puts it in its "showitem", so no editor is
+    // offered a switch nothing renders.
+    //
+    // "type => check" with the default 0. v13.4.35's "DefaultTcaSchema"
+    // derives an unsigned SMALLINT NOT NULL with the TCA default from it
+    // ("case 'check'", read in .Build/vendor); v12.4.45 has no branch for a
+    // check field at all, so "ext_tables.sql" declares exactly that column,
+    // like every other one of this extension.
+    'highlighted' => [
+        'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.highlighted',
+        'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.highlighted.description',
+        'config' => [
+            'type' => 'check',
+            'renderType' => 'checkboxToggle',
+            'default' => 0,
+        ],
+    ],
 ]);
 
 $GLOBALS['TCA']['tx_theme_list_item']['palettes']['theme_link_style'] = [

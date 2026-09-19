@@ -154,5 +154,6 @@ CREATE TABLE tx_theme_list_item (
 	meta varchar(255) DEFAULT '' NOT NULL,
 	link_variant varchar(255) DEFAULT '' NOT NULL,
 	caption_position varchar(255) DEFAULT '' NOT NULL,
-	tone varchar(255) DEFAULT '' NOT NULL
+	tone varchar(255) DEFAULT '' NOT NULL,
+	highlighted smallint(5) unsigned DEFAULT '0' NOT NULL
 );

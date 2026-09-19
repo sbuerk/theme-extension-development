@@ -136,7 +136,7 @@ final class ThemeContentElementObjectTest extends AbstractFunctionalTestCase
             'theme_media_teaser_grid', 'theme_notice', 'theme_tabs',
             'theme_accordion', 'theme_cta', 'theme_card_group',
             'theme_timeline', 'theme_teaser_list', 'theme_carousel',
-            'theme_split_tiles',
+            'theme_split_tiles', 'theme_pricing',
         ] as $ctype) {
             $this->assertStringContainsString(sprintf('data-ctype="%s"', $ctype), $cleared, sprintf('"%s" did not render.', $ctype));
         }

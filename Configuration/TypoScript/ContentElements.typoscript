@@ -1205,6 +1205,14 @@ tt_content.theme_stats.templateName = ContentElements/ThemeStats
 tt_content.theme_steps =< tt_content.theme_linklist
 tt_content.theme_steps.templateName = ContentElements/ThemeSteps
 
+# Pricing plans. The plans are rows of "tx_theme_list_items" with no image of
+# their own, which is the query of the link list rather than the one of the
+# teaser grid: a plan is a name, a price, a period, its features and a link,
+# and a nested "FilesProcessor" would be a query per plan for a column the
+# template never reads.
+tt_content.theme_pricing =< tt_content.theme_linklist
+tt_content.theme_pricing.templateName = ContentElements/ThemePricing
+
 # A card group, a timeline and a teaser list. All three read
 # "tx_theme_list_items" with the image of every row, exactly the way
 # "tt_content.theme_media_teaser_grid" does - the same query and the same
