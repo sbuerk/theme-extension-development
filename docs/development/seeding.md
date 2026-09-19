@@ -77,7 +77,7 @@ the `table` element need nothing from the tool.
 |----------------------|--------------------------------------------------------------------------------------------------------------|
 | `pages`              | 1 to 10, then 30 to 39, 50 to 59 and 70 to 79 — every other decade, see [below](#why-new-pages-skip-decades) |
 | `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502              |
-| `tx_theme_list_item` | 1 to 18 on page 8, in declaration order                                                                      |
+| `tx_theme_list_item` | 1 to 18 on page 8, and 100 to 149 on the pages below it, in declaration order                                |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -172,22 +172,22 @@ The first ten pages carry between them every backend layout the extension
 registers and every `CType` it renders; the pages below them show every
 classic `CType` in its variants, and every appearance value:
 
-| uid       | Title                   | Slug                     | `backend_layout`  | What it is for                                                                             |
-|-----------|-------------------------|--------------------------|-------------------|--------------------------------------------------------------------------------------------|
-| 1         | Theme demo              | `/`                      | `start`           | The site root, and the footer columns.                                                     |
-| 2         | Typography              | `/typography`            | `content`         | Running text, the four bands with header positions, looks and spacing; parent of 52 to 56. |
-| 52–56     | Text … Article          | `/typography/<page>`     | `content`         | Text, lists, tables, quotes and code, and a long article — rich text and elements.         |
-| 3         | Media                   | `/media`                 | `content`         | One image, and a two column gallery.                                                       |
-| 4         | Empty page              | `/empty`                 | *(none)*          | The `default` layout fallback; `nav_hide`, reached by URL and from page 8.                 |
-| 5         | Elements                | `/elements`              | `content`         | The showcase branch, parent of 6 to 8 and 51.                                              |
-| 6         | Core elements           | `/elements/core`         | `content_sidebar` | Every classic `CType` the theme renders, once each; parent of 30 to 39 and 50.             |
-| 30–39, 50 | Header … Insert records | `/elements/core/<CType>` | `content_sidebar` | One page per classic `CType`, every value of the fields that change how it looks.          |
-| 7         | Menu elements           | `/elements/menu`         | `content_sidebar` | The eleven `menu_*` elements.                                                              |
-| 8         | Theme elements          | `/elements/theme`        | `content`         | The first thirteen `theme_*` elements; parent of 70 and up.                                |
-| 70        | Text and icon           | `/elements/theme/<name>` | `content_sidebar` | One page per theme element with icons, every value of the fields that change its look.     |
-| 51        | Frames                  | `/elements/frames`       | `content`         | Every frame, spacing, header alignment and header look of the Appearance tab.              |
-| 9         | Styleguide              | `/styleguide`            | `styleguide`      | The component library, straight from Fluid.                                                |
-| 10        | Forms                   | `/forms`                 | `forms`           | The form showcase, straight from Fluid.                                                    |
+| uid       | Title                   | Slug                     | `backend_layout`                | What it is for                                                                                                                                |
+|-----------|-------------------------|--------------------------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| 1         | Theme demo              | `/`                      | `start`                         | The site root, and the footer columns.                                                                                                        |
+| 2         | Typography              | `/typography`            | `content`                       | Running text, the four bands with header positions, looks and spacing; parent of 52 to 56.                                                    |
+| 52–56     | Text … Article          | `/typography/<page>`     | `content`                       | Text, lists, tables, quotes and code, and a long article — rich text and elements.                                                            |
+| 3         | Media                   | `/media`                 | `content`                       | One image, and a two column gallery.                                                                                                          |
+| 4         | Empty page              | `/empty`                 | *(none)*                        | The `default` layout fallback; `nav_hide`, reached by URL and from page 8.                                                                    |
+| 5         | Elements                | `/elements`              | `content`                       | The showcase branch, parent of 6 to 8 and 51.                                                                                                 |
+| 6         | Core elements           | `/elements/core`         | `content_sidebar`               | Every classic `CType` the theme renders, once each; parent of 30 to 39 and 50.                                                                |
+| 30–39, 50 | Header … Insert records | `/elements/core/<CType>` | `content_sidebar`               | One page per classic `CType`, every value of the fields that change how it looks.                                                             |
+| 7         | Menu elements           | `/elements/menu`         | `content_sidebar`               | The eleven `menu_*` elements.                                                                                                                 |
+| 8         | Theme elements          | `/elements/theme`        | `content`                       | The first thirteen `theme_*` elements; parent of 70 and up.                                                                                   |
+| 70–73     | Text and icon … Steps   | `/elements/theme/<name>` | `content_sidebar`, 71 `content` | One page per theme element with icons, every value of the fields that change its look; 71 without a sidebar, which four feature columns need. |
+| 51        | Frames                  | `/elements/frames`       | `content`                       | Every frame, spacing, header alignment and header look of the Appearance tab.                                                                 |
+| 9         | Styleguide              | `/styleguide`            | `styleguide`                    | The component library, straight from Fluid.                                                                                                   |
+| 10        | Forms                   | `/forms`                 | `forms`                         | The form showcase, straight from Fluid.                                                                                                       |
 
 Four properties of that tree are deliberate, and are asserted by
 `Tests/Functional/ShowcaseTreeTest.php` rather than left to a reader to

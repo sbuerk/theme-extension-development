@@ -174,4 +174,132 @@ final class IconContentElementRenderingTest extends AbstractFunctionalTestCase
             $this->assertStringNotContainsString('theme-media-object__icon', $element, sprintf('c%d renders an icon slot.', $uid));
         }
     }
+
+    /**
+     * @return \Generator<string, array<string, int|string|bool>>
+     */
+    public static function featureLayouts(): \Generator
+    {
+        foreach (['theme' => 'theme delivery', 'static' => 'static include'] as $path => $label) {
+            foreach ([
+                'columns, three' => ['uid' => 1110, 'grid' => 'theme-feature-grid theme-feature-grid--columns-3', 'item' => 'theme-feature theme-feature--column', 'intro' => false],
+                'hanging, two' => ['uid' => 1120, 'grid' => 'theme-feature-grid theme-feature-grid--columns-2', 'item' => 'theme-feature theme-feature--hanging', 'intro' => false],
+                'tiles, four' => ['uid' => 1130, 'grid' => 'theme-feature-grid theme-feature-grid--columns-4', 'item' => 'theme-feature theme-feature--tile', 'intro' => false],
+                'with an introduction, two' => ['uid' => 1140, 'grid' => 'theme-feature-grid theme-feature-grid--columns-2', 'item' => 'theme-feature theme-feature--hanging', 'intro' => true],
+                // Layout 9 and 0 columns - what v12.4 and v13.4 store for a
+                // record written outside the form - are the defaults.
+                'values nothing offers' => ['uid' => 1150, 'grid' => 'theme-feature-grid theme-feature-grid--columns-3', 'item' => 'theme-feature theme-feature--column', 'intro' => false],
+            ] as $name => $case) {
+                yield $name . ', ' . $label => ['path' => $path] + $case;
+            }
+        }
+    }
+
+    /**
+     * "layout" picks the item layout, "tx_theme_columns" the most columns of
+     * the grid; the fourth layout sets the heading and the text of the element
+     * beside the grid instead of above it.
+     */
+    #[DataProvider('featureLayouts')]
+    #[Test]
+    public function featuresTakeTheLayoutAndTheColumnsOfTheirFields(string $path, int $uid, string $grid, string $item, bool $intro): void
+    {
+        $element = $this->element($this->render($path), $uid);
+
+        $this->assertStringContainsString(sprintf('<div class="%s">', $grid), $element);
+        $this->assertStringContainsString(sprintf('<div class="%s">', $item), $element);
+        if ($intro) {
+            $this->assertMatchesRegularExpression(
+                '#<div class="theme-feature-intro">\s*<div class="theme-feature-intro__text">\s*<header class="theme-content-element__header">.*?Features with an introduction.*?The introduction beside the grid\..*?</div>\s*</div>\s*<div class="theme-feature-grid#s',
+                $element,
+            );
+        } else {
+            $this->assertStringNotContainsString('theme-feature-intro', $element);
+        }
+    }
+
+    /**
+     * A feature: the icon as decoration, the title one level below the
+     * element's heading, the plain text, the resolved link; a feature without
+     * an icon has no slot for one.
+     */
+    #[DataProvider('deliveryPaths')]
+    #[Test]
+    public function aFeatureRendersItsIconTitleTextAndLink(string $path): void
+    {
+        $element = $this->element($this->render($path), 1110);
+
+        $this->assertMatchesRegularExpression(
+            '#<div class="theme-feature theme-feature--column">\s*<span class="theme-feature__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" [^>]*>.*?</svg></span>\s*<div class="theme-feature__body">\s*<h3 class="theme-feature__title">Install</h3>\s*<p class="theme-feature__text">Require the package\.</p>\s*<a [^>]*class="theme-feature__link"[^>]*>\s*Read on#s',
+            $element,
+        );
+        $this->assertSame(2, substr_count($element, 'class="theme-feature__title"'));
+        $this->assertSame(1, substr_count($element, 'theme-feature__icon'), 'The feature without an icon renders a slot.');
+        $this->assertStringNotContainsString('t3://', $element);
+    }
+
+    /**
+     * A figure is a pair of a description list: what it counts is the term,
+     * the figure its description, the icon decoration before the figure and
+     * the sentence a second description - only where there is one.
+     */
+    #[DataProvider('deliveryPaths')]
+    #[Test]
+    public function aFigureIsATermAndItsDescriptions(string $path): void
+    {
+        $element = $this->element($this->render($path), 1210);
+
+        $this->assertStringContainsString('<dl class="theme-stats">', $element);
+        $this->assertSame(3, substr_count($element, '<div class="theme-stat">'));
+        $this->assertStringContainsString('<dt class="theme-stat__label">Icons shipped</dt>', $element);
+        $this->assertMatchesRegularExpression(
+            '#<dd class="theme-stat__value"><span class="theme-stat__icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" [^>]*>.*?</svg></span>2001</dd>#s',
+            $element,
+        );
+        $this->assertStringContainsString('<dd class="theme-stat__text">The whole solid set.</dd>', $element);
+        $this->assertStringContainsString('<dt class="theme-stat__label">Palettes</dt>', $element);
+        $this->assertStringContainsString('<dd class="theme-stat__value">5</dd>', $element);
+        $this->assertSame(1, substr_count($element, 'theme-stat__text'), 'A figure without a sentence renders an empty description.');
+    }
+
+    /**
+     * A row without what it counts, or without its figure, is no pair of a
+     * description list: it renders nothing, rather than an empty term or an
+     * empty description. A figure "0" is a figure all the same.
+     */
+    #[DataProvider('deliveryPaths')]
+    #[Test]
+    public function aFigureWithoutItsTermOrItsFigureIsSkipped(string $path): void
+    {
+        $element = $this->element($this->render($path), 1210);
+
+        $this->assertStringContainsString('<dt class="theme-stat__label">Open issues</dt>', $element);
+        $this->assertStringContainsString('<dd class="theme-stat__value">0</dd>', $element);
+
+        $this->assertStringNotContainsString('<dt class="theme-stat__label"></dt>', $element);
+        $this->assertStringNotContainsString('<dd class="theme-stat__value"></dd>', $element);
+        $this->assertStringNotContainsString('Nothing says what this counts.', $element);
+        $this->assertStringNotContainsString('Counted without a figure', $element);
+    }
+
+    /**
+     * The steps are an ordered list. A marker is empty for the stylesheet to
+     * number, or holds the icon of its step and says so with its modifier.
+     */
+    #[DataProvider('deliveryPaths')]
+    #[Test]
+    public function stepsAreAnOrderedListWithNumberedOrIconMarkers(string $path): void
+    {
+        $element = $this->element($this->render($path), 1310);
+
+        $this->assertStringContainsString('<ol class="theme-steps">', $element);
+        $this->assertSame(2, substr_count($element, '<li class="theme-steps__step">'));
+        $this->assertStringContainsString('<span class="theme-steps__marker" aria-hidden="true"></span>', $element);
+        $this->assertMatchesRegularExpression(
+            '#<span class="theme-steps__marker theme-steps__marker--icon" aria-hidden="true"><svg class="theme-icon" aria-hidden="true" focusable="false" [^>]*>.*?</svg></span>#s',
+            $element,
+        );
+        $this->assertStringContainsString('<h3 class="theme-steps__title">Clone</h3>', $element);
+        $this->assertStringContainsString('<p class="theme-steps__text">Clone the repository.</p>', $element);
+    }
 }

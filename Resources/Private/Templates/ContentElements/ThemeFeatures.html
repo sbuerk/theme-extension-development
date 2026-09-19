@@ -1,0 +1,111 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    "theme_features" - one feature per row of "tx_theme_list_items", on
+    ".theme-feature" in a ".theme-feature-grid"
+    (Resources/Private/Scss/components/_feature.scss). The "features" examples
+    of Bootstrap, the "icon group" of bootstrap_package.
+
+    --- "layout" is the item layout -----------------------------------------
+
+    The core column "layout", re-enabled and relabelled for this CType in
+    "Configuration/PageTsConfig/ContentElementAppearance.tsconfig":
+
+      0  Columns        ".theme-feature--column", the icon on a tile above
+      1  Hanging icons  ".theme-feature--hanging", a framed tile beside
+      2  Icon tiles     ".theme-feature--tile", every feature a framed box
+      3  With an intro  ".theme-feature--hanging" in a ".theme-feature-intro",
+                        the heading and the text of the element beside the grid
+
+    "tx_theme_columns" is the most columns the grid takes, "--columns-2" to
+    "--columns-4". Any other value of either - 0 included, the database
+    default of the integer column on v12.4 and v13.4 alike, which a record
+    written outside the form carries - renders the first case: layout 0 and
+    three columns, the TCA defaults.
+    "ContentElementContractTest" holds every class written here to the
+    compiled stylesheet.
+
+    --- An item ---------------------------------------------------------------
+
+    "item.data.*" and not "item.*": "DatabaseQueryProcessor" wraps every row,
+    see "ThemeMediaTeaserGrid.html". The title is one level below the
+    element's heading ("Partials/ContentElement/ItemHeading.html"). The text is
+    the child's plain "text", rendered through "f:format.nl2br" as in the
+    teaser grid. The icon is the child's "icon", an editor's pick rendered with
+    "optional", into a variable first so an item without a usable icon renders
+    no empty tile - see "ThemeTextIcon.html" for the "f:format.raw". The link is
+    the child's "theme_link" palette, rendered as the card link is.
+</f:comment>
+<f:layout name="ContentElement" />
+
+<f:section name="Main">
+    <f:switch expression="{data.layout}">
+        <f:case value="1"><f:variable name="itemLayout" value=" theme-feature--hanging" /></f:case>
+        <f:case value="2"><f:variable name="itemLayout" value=" theme-feature--tile" /></f:case>
+        <f:case value="3"><f:variable name="itemLayout" value=" theme-feature--hanging" /></f:case>
+        <f:defaultCase><f:variable name="itemLayout" value=" theme-feature--column" /></f:defaultCase>
+    </f:switch>
+    <f:switch expression="{data.tx_theme_columns}">
+        <f:case value="2"><f:variable name="columns" value=" theme-feature-grid--columns-2" /></f:case>
+        <f:case value="4"><f:variable name="columns" value=" theme-feature-grid--columns-4" /></f:case>
+        <f:defaultCase><f:variable name="columns" value=" theme-feature-grid--columns-3" /></f:defaultCase>
+    </f:switch>
+
+    <f:if condition="{data.layout} == 3">
+        <f:then>
+            <div class="theme-feature-intro">
+                <div class="theme-feature-intro__text">
+                    <f:render section="Intro" arguments="{_all}" />
+                </div>
+                <f:render section="Grid" arguments="{data: data, listItems: listItems, itemLayout: itemLayout, columns: columns}" />
+            </div>
+        </f:then>
+        <f:else>
+            <f:render section="Intro" arguments="{_all}" />
+            <f:render section="Grid" arguments="{data: data, listItems: listItems, itemLayout: itemLayout, columns: columns}" />
+        </f:else>
+    </f:if>
+</f:section>
+
+<f:section name="Intro">
+    <f:render partial="ContentElement/Header" arguments="{_all}" />
+    <f:if condition="{data.bodytext}">
+        <div class="theme-content-element__body">
+            <f:format.html>{data.bodytext}</f:format.html>
+        </div>
+    </f:if>
+</f:section>
+
+<f:section name="Grid">
+    <f:if condition="{listItems}">
+        <div class="theme-feature-grid{columns}">
+            <f:for each="{listItems}" as="item">
+                <f:variable name="icon"><f:if condition="{item.data.icon}"><theme:icon name="{item.data.icon}" optional="1" /></f:if></f:variable>
+                <div class="theme-feature{itemLayout}">
+                    <f:if condition="{icon}">
+                        <span class="theme-feature__icon" aria-hidden="true">{icon -> f:format.raw()}</span>
+                    </f:if>
+                    <div class="theme-feature__body">
+                        <f:render partial="ContentElement/ItemHeading" arguments="{data: data, class: 'theme-feature__title', title: item.data.header}" />
+                        <f:if condition="{item.data.text}">
+                            <p class="theme-feature__text"><f:format.nl2br>{item.data.text}</f:format.nl2br></p>
+                        </f:if>
+                        <f:if condition="{item.data.link}">
+                            <f:link.typolink parameter="{item.data.link}" class="theme-feature__link">
+                                <f:if condition="{item.data.link_icon}"><theme:icon name="{item.data.link_icon}" optional="1" /></f:if>
+                                <f:if condition="{item.data.link_label}">
+                                    <f:then>{item.data.link_label}</f:then>
+                                    <f:else><f:uri.typolink parameter="{item.data.link}" /></f:else>
+                                </f:if>
+                            </f:link.typolink>
+                        </f:if>
+                    </div>
+                </div>
+            </f:for>
+        </div>
+    </f:if>
+</f:section>
+
+</html>

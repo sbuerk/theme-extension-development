@@ -45,6 +45,19 @@ TCEFORM.tt_content {
         }
     }
 
+    # "theme_features" maps it onto the item layout of ".theme-feature"
+    # ("Templates/ContentElements/ThemeFeatures.html"); the same four values,
+    # labelled for features.
+    layout.types.theme_features {
+        disabled = 0
+        altLabels {
+            0 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_features.I.0
+            1 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_features.I.1
+            2 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_features.I.2
+            3 = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.layout.theme_features.I.3
+        }
+    }
+
     # The section index and the link to the top of the page are a later
     # addition: a table of contents built from "sectionIndex" and a "back to
     # top" link behind "linkToTop". Until then both would be switches that
