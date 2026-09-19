@@ -1,0 +1,106 @@
+# The rich text preset of the theme.
+#
+# Registered as "theme" in "ext_localconf.php" - only while rte_ckeditor is
+# loaded, because the imports below are files of that extension - and selected
+# for every rich text field by "Configuration/PageTsConfig/Rte.tsconfig".
+# See "docs/development/rte.md".
+#
+# Why a preset of its own: the core "Default.yaml" offers the styles and the
+# alignment of Bootstrap - "p.lead", "span.text-muted", "text-start",
+# "text-center", "text-end", "text-justify". This theme styles none of those
+# classes, so an editor using them would write markup that matches no rule and
+# changes nothing on the page. Every class this preset can write is one of the
+# theme's own, and "Tests/Unit/RichTextPresetTest" holds each of them to the
+# compiled stylesheet.
+#
+# The imports are the core files that carry no style and no alignment: the
+# processing rules for saving ("Processing.yaml"), the editor basics and the
+# TYPO3 plugins. "Default.yaml" is deliberately not imported: the YAML loader
+# appends lists of an imported file to those of the importing one, so its
+# Bootstrap styles would come back next to the ones below.
+imports:
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Processing.yaml' }
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Editor/Base.yaml' }
+  - { resource: 'EXT:rte_ckeditor/Configuration/RTE/Editor/Plugins.yaml' }
+
+editor:
+  config:
+    toolbar:
+      items:
+        - style
+        - heading
+        - '|'
+        - bold
+        - italic
+        - subscript
+        - superscript
+        - softhyphen
+        - '|'
+        - bulletedList
+        - numberedList
+        - blockQuote
+        - alignment
+        - '|'
+        - findAndReplace
+        - link
+        - '|'
+        - removeFormat
+        - undo
+        - redo
+        - '|'
+        - insertTable
+        - '|'
+        - specialCharacters
+        - horizontalLine
+        - sourceEditing
+
+    # The levels below the page title, as in the core preset. "pre" is styled
+    # by the element baseline of the theme.
+    heading:
+      options:
+        - { model: 'paragraph', title: 'Paragraph' }
+        - { model: 'heading2', view: 'h2', title: 'Heading 2' }
+        - { model: 'heading3', view: 'h3', title: 'Heading 3' }
+        - { model: 'formatted', view: 'pre', title: 'Pre-Formatted Text' }
+
+    # The two text roles of "components/_text.scss" that belong in running
+    # text, and four inline elements the element baseline styles by their tag
+    # ("base/_elements.scss"). No "abbr": the baseline styles "abbr[title]",
+    # and a style can set no title, so it would write an abbreviation no rule
+    # matches. No muted text: the theme has no muted text role.
+    style:
+      definitions:
+        - { name: 'Lead', element: 'p', classes: ['theme-lead'] }
+        - { name: 'Eyebrow', element: 'p', classes: ['theme-eyebrow'] }
+        - { name: 'Small print', element: 'small' }
+        - { name: 'Marked', element: 'mark' }
+        - { name: 'Keyboard input', element: 'kbd' }
+        - { name: 'Code', element: 'code' }
+
+    # The alignments of "components/_text.scss". The plugin writes one class per
+    # option, and "left" and "right" are its names for the two edges; the
+    # classes are the logical ones, so a right-to-left text keeps its start.
+    #
+    # "justify" is mapped because it cannot be left out. "CKEditor5Migrator"
+    # runs over every resolved preset - called by the core "Richtext" on
+    # v12.4 and v13.4 - and while the alignment plugin is loaded it
+    # always writes all four options - an option
+    # the preset does not name gets Bootstrap's class, "text-justify" for this
+    # one. So the theme names it, and styles it with hyphenation.
+    alignment:
+      options:
+        - { name: 'left', className: 'theme-text--start' }
+        - { name: 'center', className: 'theme-text--center' }
+        - { name: 'right', className: 'theme-text--end' }
+        - { name: 'justify', className: 'theme-text--justify' }
+
+    # No table and cell properties: they write inline styles, and "style" is
+    # not an allowed attribute of "Processing.yaml", so the save would strip
+    # what the editor just set.
+    table:
+      defaultHeadings: { rows: 1 }
+      contentToolbar:
+        - tableColumn
+        - tableRow
+        - mergeTableCells
+        - toggleTableCaption

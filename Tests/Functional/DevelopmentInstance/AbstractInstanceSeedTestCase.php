@@ -44,6 +44,11 @@ abstract class AbstractInstanceSeedTestCase extends AbstractFunctionalTestCase
      */
     protected array $coreExtensionsToLoad = [
         'typo3/cms-felogin',
+        // The instances require rte_ckeditor, so the rich text preset of the
+        // theme is registered there, and a save keeps what its processing
+        // allows rather than the core's short default list. The seed is
+        // written through the same processing here.
+        'typo3/cms-rte-ckeditor',
     ];
 
     protected array $testExtensionsToLoad = [

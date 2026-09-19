@@ -107,6 +107,11 @@ Only what describes an instance, never what an install produces:
 | `config/sites/demo/`               | The site of the `/` tree — **not identical between the two**, see below. |
 | `config/sites/demo-legacy/`        | The site of the `/legacy/` tree, delivered through `sys_template`.       |
 
+Both `composer.json` require `typo3/cms-rte-ckeditor` besides the core and
+felogin, so rich text fields get an editor and the theme's rich text preset is
+registered — see [Rich text preset](rte.md). It is a requirement of the
+instances only; the extension suggests it.
+
 Generated and git-ignored: `vendor/`, `public/`, `var/`, `.cache/`,
 `composer.lock`, `config/system/settings.php` and
 `config/system/additional/*.php`.
