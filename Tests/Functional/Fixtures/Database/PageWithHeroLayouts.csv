@@ -1,0 +1,26 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,bodytext,tx_theme_hero_layout,tx_theme_eyebrow
+,10,1,0,0,0,10,theme_hero,The default,2,<p>Beside the image.</p>,,Release 2.0
+,20,1,0,0,0,20,theme_hero,Centred,2,<p>On one axis.</p>,centred,
+,30,1,0,0,0,30,theme_hero,Image at the end,2,<p>The image follows.</p>,image-end,
+,40,1,0,0,0,40,theme_hero,Screenshot,2,<p>The image below.</p>,screenshot,
+,50,1,0,0,0,50,theme_hero,Cropped,2,<p>The image cut off.</p>,bordered,
+,60,1,0,0,0,60,theme_hero,Image at the end without an image,2,<p>Nothing to move.</p>,image-end,
+,70,1,0,0,0,70,theme_hero,Screenshot without an image,2,<p>Centred.</p>,screenshot,
+,80,1,0,0,0,80,theme_hero,Cropped without an image,2,<p>Nothing to crop.</p>,bordered,
+,90,1,0,0,0,90,theme_hero,A layout nothing offers,2,<p>Unknown.</p>,sideways,
+,100,1,0,0,0,100,theme_hero_small,A reduced centred hero,2,<p>Compact.</p>,centred,
+,110,1,0,0,0,110,theme_hero_text_only,A centred hero without media,2,<p>Text only.</p>,centred,
+,120,1,0,0,0,120,theme_hero,An eyebrow is text,2,<p>Escaped.</p>,,<b>Typed</b>
+sys_file_reference,,,,,,,
+,uid,pid,uid_local,uid_foreign,tablenames,fieldname,sorting_foreign
+,1,1,1,10,tt_content,image,1
+,2,1,1,20,tt_content,image,1
+,3,1,1,30,tt_content,image,1
+,4,1,1,40,tt_content,image,1
+,5,1,1,50,tt_content,image,1
+,6,1,1,90,tt_content,image,1
+,7,1,1,100,tt_content,image,1

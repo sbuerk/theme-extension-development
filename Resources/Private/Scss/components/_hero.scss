@@ -131,3 +131,116 @@
     --theme-hero-padding-block: var(--theme-space-5, 1.5625rem);
     --theme-hero-title-font-size: var(--theme-font-size-2xl, 2.125rem);
 }
+
+// --- Layouts ----------------------------------------------------------------
+//
+// The layouts of the hero content elements, "tx_theme_hero_layout", each a
+// modifier next to "--media" and "--compact". They come after "--media" in
+// this file on purpose: two of them undo its row, and a rule of the same
+// specificity has to follow the one it replaces.
+//
+//   --image-end    the image beside the text at the end of the line
+//   --centred      everything centred, the image above the text
+//   --screenshot   centred, the image below the text and cut off by the
+//                  bottom edge of the panel - a screenshot of an application
+//                  that continues below
+//   --bordered     the image at the end, cut off by the end and the bottom
+//                  edges of the panel, framed by a hairline on the two edges
+//                  that stay inside it
+//
+// Below "bp.$md" every layout stacks, like "--media": the image above the
+// text, except "--screenshot", whose image follows the text in the markup.
+
+// The image moves to the end of the row. The markup keeps it first, like
+// ".theme-teaser--reversed".
+.theme-hero--image-end {
+    @media (min-width: bp.$md) {
+        flex-direction: row-reverse;
+    }
+}
+
+// Centred: text, actions and image on one axis, at every width. The image is
+// no wider than the reading measure, so it does not outgrow the text below it.
+.theme-hero--centred,
+.theme-hero--screenshot {
+    --theme-hero-centred-media-width: var(--theme-measure, 68ch);
+
+    align-items: center;
+    text-align: center;
+
+    .theme-hero__body {
+        align-items: center;
+    }
+
+    .theme-hero__actions {
+        justify-content: center;
+    }
+
+    .theme-hero__media {
+        inline-size: min(100%, var(--theme-hero-centred-media-width));
+    }
+
+    @media (min-width: bp.$md) {
+        flex-direction: column;
+
+        .theme-hero__media {
+            flex: none;
+        }
+    }
+}
+
+// The image rests on the bottom edge of the panel: no padding below it, and
+// a box of a fixed ratio the image fills from the top, so what does not fit
+// is cut off by that edge. The hairline frames the three sides of the image
+// that stay inside the panel; the fourth is the panel's own.
+.theme-hero--screenshot {
+    --theme-hero-screenshot-ratio: 2 / 1;
+    --theme-hero-media-border-color: var(--theme-color-border, #d6dce6);
+
+    padding-block-end: 0;
+    overflow: hidden;
+
+    .theme-hero__media {
+        aspect-ratio: var(--theme-hero-screenshot-ratio);
+        overflow: hidden;
+        border: var(--theme-border-width, 1px) solid var(--theme-hero-media-border-color);
+        border-block-end: 0;
+        border-start-start-radius: var(--theme-hero-radius);
+        border-start-end-radius: var(--theme-hero-radius);
+
+        img {
+            object-position: top;
+        }
+    }
+}
+
+// The image at the end, running out of the panel at its end and bottom edges.
+// From "bp.$md" up only: stacked, there is no edge for it to run out of.
+.theme-hero--bordered {
+    --theme-hero-media-border-color: var(--theme-color-border, #d6dce6);
+
+    @media (min-width: bp.$md) {
+        flex-direction: row-reverse;
+        align-items: stretch;
+        padding-block-end: 0;
+        padding-inline-end: 0;
+        overflow: hidden;
+
+        .theme-hero__body {
+            align-self: center;
+            padding-block-end: var(--theme-hero-padding-block);
+        }
+
+        .theme-hero__media {
+            align-self: flex-end;
+            overflow: hidden;
+            border-block-start: var(--theme-border-width, 1px) solid var(--theme-hero-media-border-color);
+            border-inline-start: var(--theme-border-width, 1px) solid var(--theme-hero-media-border-color);
+            border-start-start-radius: var(--theme-hero-radius);
+
+            img {
+                object-position: top left;
+            }
+        }
+    }
+}

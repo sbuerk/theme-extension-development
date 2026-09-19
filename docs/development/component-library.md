@@ -631,7 +631,14 @@ hairline, like `.theme-list--divided`:
 ```
 
 Hero. Modifiers: default (text only), `--media` (adds `theme-hero__media`),
-`--compact`:
+`--compact`, and the layouts of the hero elements, which combine with both:
+`--image-end` (the image at the end of the row, still first in the markup),
+`--centred` (text, actions and image on one axis, the image no wider than the
+measure), `--screenshot` (centred, the image after the text in the markup, in
+a 2:1 box resting on the bottom edge, which cuts it off) and `--bordered` (the
+image at the end, running out of the end and bottom edges, a hairline on its
+two inner edges). The layouts come after `--media` in the file because two of
+them undo its row. `__eyebrow` is filled by the field `tx_theme_eyebrow`:
 
 ```html
 <section class="theme-hero theme-hero--media">

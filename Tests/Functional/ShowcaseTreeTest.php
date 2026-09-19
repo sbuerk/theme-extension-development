@@ -124,6 +124,9 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         'theme_features' => 'features',
         'theme_stats' => 'stats',
         'theme_steps' => 'steps',
+        'theme_hero' => 'hero',
+        'theme_hero_small' => 'hero',
+        'theme_hero_text_only' => 'hero',
     ];
 
     /**
@@ -133,6 +136,9 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     private const THEME_VARIANT_FIELDS = [
         'theme_text_icon' => ['tx_theme_icon_position', 'tx_theme_icon_shape', 'tx_theme_icon_size'],
         'theme_features' => ['layout', 'tx_theme_columns'],
+        'theme_hero' => ['tx_theme_hero_layout'],
+        'theme_hero_small' => ['tx_theme_hero_layout'],
+        'theme_hero_text_only' => ['tx_theme_hero_layout'],
     ];
 
     protected const LANGUAGE_PRESETS = [
