@@ -1,0 +1,9 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,header_layout,layout,bodytext
+,10,1,0,0,0,10,text,Running text,2,0,<p>One column.</p>
+,20,1,0,0,0,20,text,Columns,2,1,<h3>A heading inside</h3><p>Two columns.</p>
+,30,1,0,0,0,30,text,A layout the page TSconfig removed,2,3,<p>Stored before the select was narrowed.</p>
+,40,1,0,0,0,40,text,A layout nothing offers,2,7,<p>Unknown.</p>

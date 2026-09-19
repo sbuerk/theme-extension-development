@@ -109,6 +109,58 @@
     hyphens: auto;
 }
 
+// Running text set in columns, as the text element writes it for its layout
+// "Columns":
+//
+//     <div class="theme-content-element__body theme-text--columns">…rich text…</div>
+//
+// A modifier that stands on its own, like the alignments above: the class
+// goes on the block holding the rich text, which has no ".theme-text" of its
+// own to sit beside.
+//
+// "columns" takes a count and a width together, and treats the count as a
+// maximum and the width as a minimum, the rule of ".theme-list--columns-2":
+// two columns where both get at least 30ch, one where they would not. 30ch
+// rather than the 20ch a list item can live with - two columns of 20ch still
+// fit the column of a phone, and running text in a column of 20 characters
+// breaks a line every three words. The rule between the columns is the
+// hairline of the Frame language, in the decorative border colour: it
+// separates, it does not have to be seen to be understood.
+//
+// Nothing that reads as one piece is split: a heading stays with the start of
+// what it heads ("break-after: avoid"), and a figure, a table, a quotation, a
+// code block and a list item move to the next column whole rather than
+// breaking across two. The first child loses its top margin, which would
+// otherwise open the first column lower than the second. "orphans" and
+// "widows" keep at least two lines of a paragraph on either side of a column
+// break.
+.theme-text--columns {
+    --theme-text-columns-count: 2;
+    --theme-text-columns-min-width: 30ch;
+    --theme-text-columns-gap: var(--theme-space-7, 2.5rem);
+    --theme-text-columns-rule-color: var(--theme-color-border, #d6dce6);
+
+    columns: var(--theme-text-columns-count) var(--theme-text-columns-min-width);
+    column-gap: var(--theme-text-columns-gap);
+    column-rule: var(--theme-border-width, 1px) solid var(--theme-text-columns-rule-color);
+    orphans: 2;
+    widows: 2;
+
+    > :first-child {
+        margin-block-start: 0;
+    }
+
+    > :is(h2, h3, h4, h5, h6) {
+        break-after: avoid;
+        break-inside: avoid;
+    }
+
+    > :is(figure, table, blockquote, pre, dl, .theme-table-wrapper, .theme-code),
+    > :is(ul, ol) > li {
+        break-inside: avoid;
+    }
+}
+
 // The short label above a heading. Uppercase at the caption size, so it takes
 // the caps tracking that "h5" and "h6" use rather than the +0.05em mixed case
 // is set at.

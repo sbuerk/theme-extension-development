@@ -64,12 +64,12 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      * so a value added to the TCA or the page TSconfig without an element
      * showing it fails here.
      *
-     * The CTypes left out have no such field: `text`, `textmedia` (the
-     * orientations are the ones of `textpic`, shown there), `div`, `html`
-     * and `shortcut`.
+     * The CTypes left out have no such field: `textmedia` (the orientations
+     * are the ones of `textpic`, shown there), `div`, `html` and `shortcut`.
      */
     private const VARIANT_FIELDS = [
         'header' => ['header_layout', 'header_position'],
+        'text' => ['layout'],
         'textpic' => ['imageorient'],
         'image' => ['imagecols'],
         'bullets' => ['layout', 'bullets_type'],

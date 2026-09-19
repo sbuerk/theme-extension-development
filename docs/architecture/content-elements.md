@@ -203,6 +203,40 @@ form to offering `layout` and the icon on this CType, under these labels, and
 on no other, and `IconPickerFormEngineTest` holds the icon field to the
 curated list and to the whole set without it.
 
+## `text`: `layout` sets the text in columns
+
+The text element has one look besides running text, and `layout` picks it.
+`layout.types.text` re-enables the field for this CType the way the bullet list
+does, relabels the two values it renders and takes the other two out of the
+select with `removeItems = 2, 3` — offered, they would be layouts that look like
+the default.
+
+| `layout` | Label        | Modifier on `.theme-content-element__body`       |
+|----------|--------------|--------------------------------------------------|
+| `0`      | Running text | none                                             |
+| `1`      | Columns      | `.theme-text--columns` (`components/_text.scss`) |
+
+`Text.html` matches `1` alone. `2` and `3` — removed from the select, but still
+on a record saved before — and any value nothing offered render running text.
+The modifier goes on the block holding the rich text, not on the wrapper: the
+header stays one line across the columns, and a rich text block elsewhere can
+take the same class.
+
+The columns are CSS `columns: 2 30ch` — at most two, each at least 30
+characters wide, so a phone and a narrow sidebar get one. The minimum is wider
+than the 12rem of `.theme-list--columns-2` because a column of prose needs more
+room than a list item. It is 30ch rather than 20ch because two columns of 20
+characters still fit the column of a phone, and prose broken every three words
+is harder to read than a single column. A heading does not end a column
+(`break-after: avoid`), and a figure, a table, a quotation, a code block and a
+list item move to the next column whole. The rule between the columns is the
+decorative border colour, like every hairline of the Frame language.
+
+`TextLayoutRenderingTest` holds the four cases through the set and the static
+include, `ContentElementAppearanceFormEngineTest` the form to offering `0` and
+`1` under these labels on this CType, and `ContentElementContractTest` the
+modifier to a rule of the stylesheet.
+
 ## `table`: why a real `DataProcessor` was necessary
 
 `bodytext` for `table` is delimited/enclosed text, shaped by five fields:
@@ -1234,7 +1268,7 @@ is left in the form with no effect.
 | `space_after_class`     | `--space-after-{extra-small … extra-large}`                                              | `Layouts/ContentElement.html`         |
 | `header_position`       | `__header--center`, `--end` for `right`, `--start` for `left`                            | `Partials/ContentElement/Header.html` |
 | `tx_theme_header_style` | `.theme-display`, or `__heading--h1` … `--h5`                                            | `Partials/ContentElement/Header.html` |
-| `layout`                | disabled                                                                                 | page TSconfig                         |
+| `layout`                | per CType: `bullets` and `text` render it, every other type has it disabled              | page TSconfig, the element template   |
 | `sectionIndex`          | disabled                                                                                 | page TSconfig                         |
 | `linkToTop`             | disabled                                                                                 | page TSconfig                         |
 
@@ -1272,9 +1306,10 @@ level: an `h3` in the look of heading 1 is still an `h3` in the outline.
 `display` reuses the text role `.theme-display` instead of repeating its
 metrics.
 
-**Disabled, not rendered.** `layout` has no rendering yet. The later list,
-table and column layouts will re-enable it per type. `sectionIndex` and
-`linkToTop` wait for a table of contents and a link back to the top.
+**Disabled, not rendered.** `layout` is disabled for every CType and
+re-enabled per type where a template renders it: the bullet list and the text
+element, above. `sectionIndex` and `linkToTop` wait for a table of contents
+and a link back to the top.
 `sectionIndex` keeps its TCA default of `1`, so elements created meanwhile
 are already part of that index. `header_position` and `tx_theme_header_style`
 are disabled per type for the CTypes that render their title outside the
