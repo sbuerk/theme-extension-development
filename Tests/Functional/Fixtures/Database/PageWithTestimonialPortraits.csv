@@ -1,0 +1,14 @@
+pages,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug
+,1,0,0,0,0,1,1,Theme root,/
+tt_content,,,,,,,,,,,
+,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,subheader,bodytext,tx_theme_quote_style
+,10,1,0,0,0,10,theme_testimonial,Ada Example,Engineer,<p>With a portrait.</p>,
+,20,1,0,0,0,20,theme_testimonial,,A role without a name,<p>A portrait without a name.</p>,
+,30,1,0,0,0,30,theme_testimonial,Bea Sample,Designer,<p>No portrait.</p>,
+,40,1,0,0,0,40,theme_testimonial,Carl Placeholder,Editor,<p>A pull quote with a portrait.</p>,pull
+sys_file_reference,,,,,,,,
+,uid,pid,uid_local,uid_foreign,tablenames,fieldname,sorting_foreign,alternative
+,1,1,1,10,tt_content,image,1,An alternative text the portrait must not use
+,2,1,1,20,tt_content,image,1,An alternative text the portrait must not use
+,3,1,1,40,tt_content,image,1,An alternative text the portrait must not use

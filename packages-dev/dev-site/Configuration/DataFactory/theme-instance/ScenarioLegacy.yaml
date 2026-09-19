@@ -2160,6 +2160,14 @@ entities:
                           header: 'The centred quotation'
                           subheader: 'On one axis, held to the measure'
                           bodytext: "<p>A quotation that stands on its own between two sections of\na page, centred below its mark and never wider than the\nreading measure.</p>\n"
+                      -
+                        self:
+                          id: 12206
+                          CType: theme_testimonial
+                          tx_theme_quote_style: ''
+                          header: 'With a portrait'
+                          subheader: 'An avatar before the name'
+                          bodytext: "<p>A picture of the person quoted, as a round avatar at the\nstart of the attribution. It stands beside the name, so it\ncarries no text of its own.</p>\n"
             -
               self:
                 id: 1051
