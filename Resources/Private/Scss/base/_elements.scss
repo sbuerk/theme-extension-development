@@ -542,11 +542,26 @@ progress {
     }
 }
 
+// The browser colours the fill of a meter by the region its value falls in -
+// "low", "high", "optimum" - and "accent-color" does not reach it: tried in
+// the pinned Playwright image, a meter looks the same with and without it, so
+// it is not declared. Chromium lays the bar out in a flex row of the inner
+// element, and left to it the fill covers the upper half of the track;
+// stretched as the one flex item of that row it takes the full height, as in
+// "components/_meter.scss".
 meter {
     display: block;
     width: 100%;
     height: var(--theme-space-2);
-    accent-color: var(--theme-color-primary);
+
+    &::-webkit-meter-inner-element {
+        display: flex;
+        block-size: 100%;
+    }
+
+    &::-webkit-meter-bar {
+        flex: 1;
+    }
 }
 
 // --- Dialog ------------------------------------------------------------
