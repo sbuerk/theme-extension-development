@@ -3,17 +3,38 @@
 // Markup contract:
 //
 //     <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="…">
-//         <table class="theme-table">
+//         <table class="theme-table theme-table--striped">
 //             <caption class="theme-table__caption">…</caption>
-//             <thead>…</thead><tbody>…</tbody>
+//             <thead>…</thead>
+//             <tbody>…</tbody>
+//             <tbody>…</tbody>
+//             <tfoot>…</tfoot>
 //         </table>
 //     </div>
 //
+// Modifiers on ".theme-table": "--striped" (every other row on the surface
+// tint), "--striped-columns" (every other column), "--hover" (the row under
+// the pointer takes a tint of the primary accent), "--bordered" (a rule
+// between columns as well), "--borderless" (no rules at all), "--compact"
+// (half the cell padding), "--sticky-header" (the header row stays in view
+// while the wrapper scrolls vertically), "--caption-bottom" (the caption
+// below the table). They combine, except "--bordered" with "--borderless".
+//
 // Helper: "theme-table__cell--numeric" on a "<td>"/"<th>" that holds a number.
-// "<thead>"/"<tbody>"/"<th>"/"<td>" are styled through plain element selectors
-// scoped under "theme-table", not through a BEM class each - the markup
-// contract does not name one, and adding classes the contract does not ask
-// for would make this file diverge from what it documents.
+// "<thead>"/"<tbody>"/"<tfoot>"/"<th>"/"<td>" are styled through plain element
+// selectors scoped under "theme-table", not through a BEM class each - the
+// markup contract does not name one, and adding classes the contract does not
+// ask for would make this file diverge from what it documents. A "<th
+// scope=row>" in the body is a row header and is set at the medium weight; a
+// second "<tbody>" starts a group, drawn with the strong rule the header
+// ends on; a "<tfoot>" holds totals and sits on the header's tint under the
+// same rule.
+//
+// The content element maps its "table_class" field onto these modifiers
+// one to one - "Templates/ContentElements/Table.html", and the page TSconfig
+// "Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig" for the values the
+// core does not offer. A value that names no modifier renders a class that
+// matches nothing, which is how a site package adds a table style of its own.
 //
 // --- Why "tabindex=0" + "role=region" + "aria-label" on the wrapper --------
 //
@@ -31,6 +52,29 @@
 // scrollable-region-focusable pattern, applied here in markup - this file only
 // styles what the markup already declares.
 //
+// --- Modifiers re-point tokens --------------------------------------------
+//
+// Every rule width, padding and fill below is read through a token of this
+// file's own layer, and a modifier changes the token rather than the rule.
+// That keeps the modifiers independent of how specific the rule they affect
+// happens to be: "--borderless" sets the rule widths to zero and every rule
+// in the table goes, the header and the group rules included, without a
+// selector for each.
+//
+// Rules: the rows are separated in the decorative "--theme-color-border"; the
+// header, a group and the totals are closed in "--theme-color-border-strong",
+// as the element baseline does for "thead" and "tfoot". None of them bounds a
+// control, so none is held to 3:1 - they structure the table, and "--bordered"
+// adds the decorative colour between columns.
+//
+// Colour: stripes are the surface tint, which the header row sits on too;
+// hover is the primary accent mixed 12% into the background, the formula the
+// tip alert already uses for its tint, so it follows the palette without a
+// token of its own. Contrast of every text colour on both is in DESIGN.md
+// "Table rows". Under forced colours a stripe is lost with every other fill -
+// it is a reading aid, not a state - while the hovered row, which is a state,
+// is drawn in the system highlight colour.
+//
 // Structural variant: Frame, the same box "_card.scss"/"_hero.scss"/
 // "_teaser.scss" use, applied to the wrapper. The wrapper's own fill is
 // "--theme-color-background", not "--theme-color-surface": the header row is
@@ -44,12 +88,22 @@
     --theme-table-wrapper-background: var(--theme-color-background, #ffffff);
     --theme-table-wrapper-border-color: var(--theme-color-border, #d6dce6);
     --theme-table-wrapper-radius: var(--theme-radius-sm, 5px);
+    --theme-table-wrapper-sticky-max-block-size: 25rem;
 
     overflow-x: auto;
 
     background-color: var(--theme-table-wrapper-background);
     border: var(--theme-border-width) solid var(--theme-table-wrapper-border-color);
     border-radius: var(--theme-table-wrapper-radius);
+}
+
+// A sticky header needs a box that scrolls vertically to stick in; the wrapper
+// already scrolls horizontally and is the keyboard reachable region, so it is
+// the one that gets a height. Keyed on the table inside it, so the modifier
+// stays on the table like every other one.
+.theme-table-wrapper:has(> .theme-table--sticky-header) {
+    max-block-size: var(--theme-table-wrapper-sticky-max-block-size);
+    overflow-y: auto;
 }
 
 .theme-table__caption {
@@ -61,39 +115,90 @@
 }
 
 .theme-table {
+    --theme-table-cell-padding-block: var(--theme-space-3, 0.9375rem);
+    --theme-table-cell-padding-inline: var(--theme-space-4, 1.25rem);
+    --theme-table-rule-width: var(--theme-border-width, 1px);
+    --theme-table-rule-color: var(--theme-color-border, #d6dce6);
+    --theme-table-strong-rule-width: var(--theme-border-width-strong, 2px);
+    --theme-table-strong-rule-color: var(--theme-color-border-strong, #828d9f);
+    --theme-table-column-rule-width: 0;
+    --theme-table-header-background: var(--theme-color-surface, #f4f6fa);
+    --theme-table-stripe-background: var(--theme-color-surface, #f4f6fa);
+    --theme-table-hover-background: color-mix(in oklab, var(--theme-color-primary, #0b57d0) 12%, var(--theme-color-background, #ffffff));
+
     width: 100%;
+    // The element baseline gives a bare "table" the bottom margin of a prose
+    // block. Inside the wrapper that margin is an empty strip between the
+    // last row and the frame; the wrapper is the block in the flow now.
+    margin: 0;
     border-collapse: collapse;
     color: var(--theme-color-text-primary, #14181f);
     font-size: var(--theme-font-size-sm, 0.875rem);
 
-    thead {
-        // The one place this file is told a colour by name rather than
-        // choosing one: "--theme-color-surface" on the header row is a design
-        // requirement, not a default this file picked.
-        background-color: var(--theme-color-surface, #f4f6fa);
+    // The element baseline rules rows and the footer on "tr" and "tfoot"
+    // themselves. Here every rule is a cell border read from the tokens, so
+    // "--borderless" and the sticky header can reach all of them; the element
+    // rules are cleared rather than left to coincide with the cell borders.
+    tr,
+    tfoot {
+        border: 0;
+    }
 
-        th {
-            padding: var(--theme-space-3, 0.9375rem) var(--theme-space-4, 1.25rem);
-            border-bottom: var(--theme-border-width-strong, 2px) solid var(--theme-color-border-strong, #828d9f);
-            font-weight: var(--theme-font-weight-bold, 800);
-            letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
-            text-align: start;
+    th,
+    td {
+        padding: var(--theme-table-cell-padding-block) var(--theme-table-cell-padding-inline);
+        border-inline: var(--theme-table-column-rule-width) solid var(--theme-table-rule-color);
+        text-align: start;
+
+        // The wrapper draws the outer frame, so a column rule on the outer
+        // edges would double it.
+        &:first-child {
+            border-inline-start: 0;
+        }
+
+        &:last-child {
+            border-inline-end: 0;
         }
     }
 
-    tbody {
-        // Zebra striping. "nth-child(even)" rather than a class, so the
-        // markup contract stays exactly the four elements listed above and
-        // striping keeps working for a row inserted or removed at runtime.
-        tr:nth-child(even) {
-            background-color: var(--theme-color-surface, #f4f6fa);
-        }
+    thead th {
+        // The one place this file is told a colour by name rather than
+        // choosing one: "--theme-color-surface" on the header row is a design
+        // requirement, not a default this file picked. It is on the cells
+        // rather than on "thead", so it moves with a sticky header cell.
+        border-bottom: var(--theme-table-strong-rule-width) solid var(--theme-table-strong-rule-color);
+        background-color: var(--theme-table-header-background);
+        font-weight: var(--theme-font-weight-bold, 800);
+        letter-spacing: var(--theme-letter-spacing-wide, 0.05em);
+    }
 
+    tbody {
         th,
         td {
-            padding: var(--theme-space-3, 0.9375rem) var(--theme-space-4, 1.25rem);
-            border-bottom: var(--theme-border-width, 1px) solid var(--theme-color-border, #d6dce6);
-            text-align: start;
+            border-bottom: var(--theme-table-rule-width) solid var(--theme-table-rule-color);
+        }
+
+        // A row header labels its row; the medium weight keeps it apart from
+        // the data without competing with the bold column headers above.
+        th {
+            font-weight: var(--theme-font-weight-medium, 500);
+        }
+    }
+
+    // A second body is a group of rows. It opens with the rule the header
+    // closes on, so the groups read as sections of one table.
+    tbody + tbody > tr:first-child > * {
+        border-top: var(--theme-table-strong-rule-width) solid var(--theme-table-strong-rule-color);
+    }
+
+    // Totals: under the strong rule, on the header's tint, in the bold weight
+    // the header uses.
+    tfoot {
+        th,
+        td {
+            border-top: var(--theme-table-strong-rule-width) solid var(--theme-table-strong-rule-color);
+            background-color: var(--theme-table-header-background);
+            font-weight: var(--theme-font-weight-bold, 800);
         }
     }
 }
@@ -103,4 +208,81 @@
 .theme-table__cell--numeric {
     font-variant-numeric: tabular-nums;
     text-align: end;
+}
+
+// --- Modifiers ----------------------------------------------------------------
+
+// Rows and columns are striped by position rather than by a class, so the
+// stripe stays right for a row inserted or removed.
+.theme-table--striped > tbody > tr:nth-child(even) > * {
+    background-color: var(--theme-table-stripe-background);
+}
+
+.theme-table--striped-columns > tbody > tr > :nth-child(even) {
+    background-color: var(--theme-table-stripe-background);
+}
+
+// After the stripes, so a hovered striped row shows the hover tint. On the
+// cells, not the row: a striped column paints its cells over the row's own
+// background.
+.theme-table--hover > tbody > tr:hover > * {
+    background-color: var(--theme-table-hover-background);
+}
+
+.theme-table--bordered {
+    --theme-table-column-rule-width: var(--theme-border-width, 1px);
+}
+
+.theme-table--borderless {
+    --theme-table-rule-width: 0;
+    --theme-table-strong-rule-width: 0;
+    --theme-table-column-rule-width: 0;
+}
+
+.theme-table--compact {
+    --theme-table-cell-padding-block: var(--theme-space-1, 0.3125rem);
+    --theme-table-cell-padding-inline: var(--theme-space-2, 0.625rem);
+}
+
+// "separate" with no spacing looks the same as "collapse", and it is what
+// makes a sticky header work: a collapsed border belongs to the table, not to
+// the cell, and stays behind when the cell sticks. Separated, every rule is
+// the cell's own and moves with it.
+//
+// Separated borders no longer merge where two cells meet, so every rule that
+// two neighbours both draw would come out twice as thick. The modifier draws
+// each of them once: a column rule from the end edge of the cell before it
+// only ("--bordered"), and the strong rule opening a group or the totals
+// without the hairline of the row above it.
+.theme-table--sticky-header {
+    border-collapse: separate;
+    border-spacing: 0;
+
+    thead th {
+        position: sticky;
+        inset-block-start: 0;
+    }
+
+    th,
+    td {
+        border-inline-start-width: 0;
+    }
+
+    > tbody:has(+ tbody, + tfoot) > tr:last-child > * {
+        border-bottom-width: 0;
+    }
+}
+
+.theme-table--caption-bottom > .theme-table__caption {
+    caption-side: bottom;
+}
+
+@media (forced-colors: active) {
+    // Forced colours repaint every fill to the canvas, which would leave the
+    // hovered row looking like every other one.
+    .theme-table--hover > tbody > tr:hover > * {
+        forced-color-adjust: none;
+        background-color: Highlight;
+        color: HighlightText;
+    }
 }

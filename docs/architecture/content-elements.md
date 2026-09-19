@@ -211,6 +211,54 @@ instead: a single byte `fgetcsv()` accepts without complaint, and one an
 editor typing into the backend's textarea will not produce, so it behaves as
 "no enclosure" in practice while never throwing.
 
+### `table_class`: the modifier of the same name
+
+`Table.html` renders `table_class` as `.theme-table--{table_class}`, one to
+one, and without a list of allowed values:
+
+| `table_class`     | Offered by                      | Renders                         |
+|-------------------|---------------------------------|---------------------------------|
+| *(empty)*         | core, the default               | `.theme-table`, rows ruled only |
+| `striped`         | core TCA                        | `.theme-table--striped`         |
+| `bordered`        | core TCA                        | `.theme-table--bordered`        |
+| `striped-columns` | theme page TSconfig, `addItems` | `.theme-table--striped-columns` |
+| `hover`           | theme page TSconfig, `addItems` | `.theme-table--hover`           |
+| `borderless`      | theme page TSconfig, `addItems` | `.theme-table--borderless`      |
+| `compact`         | theme page TSconfig, `addItems` | `.theme-table--compact`         |
+| `sticky-header`   | theme page TSconfig, `addItems` | `.theme-table--sticky-header`   |
+
+The core items are identical on both core versions: EXT:frontend declares
+them in `Configuration/TCA/tt_content.php` on v12.4 and in
+`Configuration/TCA/Overrides/240-tt_content-content_type-table.php` on v13.4
+(read in `.Build/vendor` after the `composerUpdate` of each). The theme adds its
+own through page TSconfig,
+[`Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig`](../../Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig),
+imported from `Configuration/page.tsconfig` like the backend layouts, so it
+applies through the site set and the static include alike. That is the route
+the core documents for this very field — "Edit predefined options" in
+Feature #79622, "Introducing Table Class for Fluid Styled Content" — rather
+than a TCA override, and it keeps a site package able to `removeItems` in the
+same place. DataHandler stores a static select value without checking it
+against the items on either version (`checkValueForGroupFolderSelect()` in
+`DataHandler.php`, read on v12.4 and v13.4), so a value added in TSconfig saves
+like a TCA one.
+
+The value is passed through rather than checked against the list, as the
+core's own rendering did (`ce-table-{table_class}`): a site package that adds
+an item of its own gets the class for it and styles it. It is escaped like any
+attribute value. The field is a single select, so an element carries one
+modifier; the styleguide combines them, an editor cannot.
+
+A table without a class is **no longer striped**: the stripes used to be the
+default of `.theme-table`, which made the core's "Striped" item change nothing.
+They are `--striped` now, and the default rows are separated by rules only.
+
+`Tests/Functional/TableClassRenderingTest.php` reads the offered values the way
+the backend does — the TCA items plus the `addItems` of the page TSconfig
+loaded for the page — asserts the list, and renders one element per value;
+`Tests/Unit/ComponentLibraryTest::everyTableClassAnEditorCanPickIsStyled` holds
+every value to a compiled `.theme-table--<value>` rule.
+
 ## `shortcut`: recursion, broken structurally rather than by a register
 
 `records` holds one or more `tt_content_<uid>` references (the TCA `group`
