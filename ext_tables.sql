@@ -10,7 +10,7 @@
 # category|datetime|slug|json|uuid and MM tables - it has no branch for
 # "input", "text", "link", "file", "inline" or a "select" without an MM table,
 # and it only touches tables that an ext_tables.sql defined in the first
-# place. Without this file the tx_theme_list_item table and the twenty-one
+# place. Without this file the tx_theme_list_item table and the twenty-two
 # tx_theme_* columns on tt_content are never created on v12, and every theme
 # element using them fails.
 #
@@ -26,7 +26,9 @@
 # the t3ver_* fields - plus the "parent", "translation_source" and
 # "t3ver_oid" indexes are derived from "ctrl" by both versions and are
 # deliberately absent here, exactly as core's own ext_tables.sql leaves them
-# out for sys_file_reference.
+# out for sys_file_reference. So is "tx_theme_list_item.date": a "datetime"
+# field with the "dbType" "date", which v12.4.45 and v13.4.35 both derive as
+# the same nullable DATE column from that "dbType".
 #
 # ---------------------------------------------------------------------------
 # Why the "link" columns are nullable
@@ -116,7 +118,8 @@ CREATE TABLE tt_content (
 	tx_theme_secondary_link text,
 	tx_theme_secondary_link_label varchar(255) DEFAULT '' NOT NULL,
 	tx_theme_secondary_link_variant varchar(255) DEFAULT '' NOT NULL,
-	tx_theme_secondary_link_icon text
+	tx_theme_secondary_link_icon text,
+	tx_theme_sort_direction varchar(255) DEFAULT '' NOT NULL
 );
 
 #
@@ -136,5 +139,7 @@ CREATE TABLE tx_theme_list_item (
 	link_label varchar(255) DEFAULT '' NOT NULL,
 	subheader varchar(255) DEFAULT '' NOT NULL,
 	link_icon text,
-	icon text
+	icon text,
+	meta varchar(255) DEFAULT '' NOT NULL,
+	link_variant varchar(255) DEFAULT '' NOT NULL
 );

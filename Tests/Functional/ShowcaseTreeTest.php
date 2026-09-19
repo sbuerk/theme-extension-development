@@ -129,6 +129,9 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         'theme_hero_text_only' => 'hero',
         'theme_cta' => 'cta',
         'theme_testimonial' => 'quote',
+        'theme_card_group' => 'card-group',
+        'theme_timeline' => 'timeline',
+        'theme_teaser_list' => 'teaser-list',
     ];
 
     /**
@@ -143,6 +146,8 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         'theme_hero_text_only' => ['tx_theme_hero_layout'],
         'theme_cta' => ['tx_theme_cta_tone', 'tx_theme_cta_width'],
         'theme_testimonial' => ['tx_theme_quote_style'],
+        'theme_card_group' => ['layout', 'tx_theme_columns'],
+        'theme_timeline' => ['tx_theme_sort_direction'],
     ];
 
     protected const LANGUAGE_PRESETS = [

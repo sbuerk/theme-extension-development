@@ -71,6 +71,14 @@
                     CType = theme_author
                 }
             }
+            theme_card_group {
+                iconIdentifier = content-card-group
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_card_group.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_card_group.description
+                tt_content_defValues {
+                    CType = theme_card_group
+                }
+            }
             theme_cta {
                 iconIdentifier = content-widget-calltoaction
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_cta.label
@@ -183,6 +191,14 @@
                     CType = theme_teaser
                 }
             }
+            theme_teaser_list {
+                iconIdentifier = content-listgroup
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_teaser_list.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_teaser_list.description
+                tt_content_defValues {
+                    CType = theme_teaser_list
+                }
+            }
             theme_testimonial {
                 iconIdentifier = content-quote
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_testimonial.label
@@ -197,6 +213,14 @@
                 description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_text_icon.description
                 tt_content_defValues {
                     CType = theme_text_icon
+                }
+            }
+            theme_timeline {
+                iconIdentifier = content-timeline
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_timeline.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_timeline.description
+                tt_content_defValues {
+                    CType = theme_timeline
                 }
             }
         }
