@@ -146,6 +146,72 @@ test.describe('the gallery lightbox', () => {
     });
 });
 
+/**
+ * The external media element: nothing of the other site is requested until the
+ * button is pressed, and then exactly one iframe appears.
+ *
+ * The provider is blocked at the route rather than actually contacted - what
+ * is under test is which address the page asks for, not the other site.
+ */
+test.describe('the external media content element', () => {
+    test('loads no iframe until the button is pressed', async ({ page }) => {
+        const requested: string[] = [];
+        await page.route(/youtube-nocookie\.com|player\.vimeo\.com/, (route) => {
+            requested.push(route.request().url());
+            return route.abort();
+        });
+
+        await page.goto('/elements/theme/external-media');
+        const embed = page.locator('#c13002 .theme-embed');
+        await expect(embed).toHaveAttribute('data-theme-embed-bound', '');
+        await expect(embed.locator('.theme-embed__poster')).toBeVisible();
+        await expect(page.locator('iframe')).toHaveCount(0);
+        expect(requested, 'the page contacted the provider before the button was pressed').toEqual([]);
+
+        await embed.getByRole('button').click();
+        const iframe = embed.locator('iframe');
+        await expect(iframe).toHaveCount(1);
+        await expect(iframe).toHaveAttribute('src', /^https:\/\/www\.youtube-nocookie\.com\/embed\/dQw4w9WgXcQ\?autoplay=1$/);
+        // An iframe is a document of its own and needs a name of its own.
+        await expect(iframe).toHaveAttribute('title', /\S/);
+        // The poster it replaced is gone, not merely covered.
+        await expect(embed.locator('.theme-embed__poster')).toHaveCount(0);
+    });
+
+    test('a host that is not recognised offers no button at all', async ({ page }) => {
+        await page.goto('/elements/theme/external-media');
+        const embed = page.locator('#c13005 .theme-embed');
+
+        await expect(embed.locator('.theme-embed__button')).toHaveCount(0);
+        await expect(embed.locator('.theme-embed__source')).toBeVisible();
+        await expect(embed.locator('.theme-embed__source')).toHaveAttribute('href', 'https://media.example.org/videos/the-launch');
+    });
+
+    test('without JavaScript there is no button, and the link is the way to the video', async ({ browser }) => {
+        const context = await browser.newContext({ javaScriptEnabled: false });
+        const page = await context.newPage();
+        await page.goto('/elements/theme/external-media');
+
+        const embed = page.locator('#c13002 .theme-embed');
+        await expect(embed).not.toHaveAttribute('data-theme-embed-bound', /.*/);
+        await expect(embed.locator('.theme-embed__button')).toBeHidden();
+        await expect(embed.locator('.theme-embed__source')).toBeVisible();
+        await expect(page.locator('iframe')).toHaveCount(0);
+        await context.close();
+    });
+
+    test('a page whose theme.js never loads offers no button either', async ({ page }) => {
+        await page.route(/\/JavaScript\/theme\.js/, (route) => route.abort());
+        await page.goto('/elements/theme/external-media');
+
+        // The inline head script ran and announced a script; the one that
+        // would have bound the button never arrived.
+        await expect(page.locator('html')).toHaveAttribute('data-js', '');
+        await expect(page.locator('#c13002 .theme-embed__button')).toBeHidden();
+        await expect(page.locator('#c13002 .theme-embed__source')).toBeVisible();
+    });
+});
+
 test.describe('the notice content element', () => {
     test('draws all six kinds, each with its own glyph', async ({ page }) => {
         await page.goto('/elements/theme');

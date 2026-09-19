@@ -515,6 +515,64 @@ $additionalColumns['tx_theme_secondary_link_icon'] = [
     'config' => IconItems::selectConfig(),
 ];
 
+// The three fields of "theme_external_media": the address of the video, the
+// name of the frame it is loaded into, and the shape of that frame.
+//
+// "tx_theme_embed_url" is an "input" rather than a TCA "link". A link field
+// stores a typolink parameter string - the page/file/url/email/record syntax
+// "LinkService" writes - and what an iframe source needs is the plain URL, so
+// a link field would have to be decoded again on the way out, and its page,
+// file, email and record forms are all values this element cannot do anything
+// with. The field takes any URL; which ones become an embed is decided in
+// "Classes/DataProcessing/ExternalMediaProcessor.php", and a host it does not
+// recognise renders the link to the source instead.
+$additionalColumns['tx_theme_embed_url'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_embed_url',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_embed_url.description',
+    'config' => [
+        'type' => 'input',
+        'size' => 50,
+        'max' => 1024,
+        'eval' => 'trim',
+    ],
+];
+// The accessible name of the frame. An iframe needs one - it is a document of
+// its own in the page, and a screen reader announces it by this - and "video"
+// is not a name. It falls back to the heading of the element in the template.
+$additionalColumns['tx_theme_embed_title'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_embed_title',
+    'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_embed_title.description',
+    'config' => [
+        'type' => 'input',
+        'size' => 30,
+        'max' => 255,
+        'eval' => 'trim',
+    ],
+];
+// The two ratios the component draws, "--16-9" and "--4-3" of ".theme-embed".
+// The value is the modifier, as everywhere else in this extension, and the
+// template maps anything it does not know onto the default - a record from
+// before a value was removed renders the usual shape rather than a frame of no
+// height.
+$additionalColumns['tx_theme_embed_ratio'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_embed_ratio',
+    'config' => [
+        'type' => 'select',
+        'renderType' => 'selectSingle',
+        'default' => '16-9',
+        'items' => [
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_embed_ratio.I.16-9',
+                'value' => '16-9',
+            ],
+            [
+                'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tx_theme_embed_ratio.I.4-3',
+                'value' => '4-3',
+            ],
+        ],
+    ],
+];
+
 ExtensionManagementUtility::addTCAcolumns('tt_content', $additionalColumns);
 
 // The icon of the layout "Icons" of the bullet list, next to the list type.
@@ -549,6 +607,12 @@ $GLOBALS['TCA']['tt_content']['palettes']['theme_icon'] = [
 $GLOBALS['TCA']['tt_content']['palettes']['theme_grid'] = [
     'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_grid',
     'showitem' => 'layout, tx_theme_columns',
+];
+
+// The address of an external video, the name of its frame and the shape of it.
+$GLOBALS['TCA']['tt_content']['palettes']['theme_embed'] = [
+    'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.palette.theme_embed',
+    'showitem' => 'tx_theme_embed_url, --linebreak--, tx_theme_embed_title, tx_theme_embed_ratio',
 ];
 
 $GLOBALS['TCA']['tt_content']['palettes']['theme_secondary_link'] = [

@@ -60,6 +60,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'divided description list' => '.theme-dl--divided',
             'dialog' => '.theme-dialog',
             'divider' => '.theme-divider',
+            'embed' => '.theme-embed',
             'feature' => '.theme-feature',
             'feature grid' => '.theme-feature-grid',
             'feature introduction' => '.theme-feature-intro',
@@ -285,6 +286,46 @@ final class ComponentLibraryTest extends UnitTestCase
             ':root:not([data-js]) [data-theme-dialog-open]{display:none}',
             $this->stylesheet(),
             'An opener without the script marker is a button that does nothing.',
+        );
+    }
+
+    /**
+     * The embed offers no play button until the script has bound it.
+     *
+     * Gated on the embed's own `data-theme-embed-bound`, which only "theme.js"
+     * sets, and not on the root's `data-js` - the distinction the tabs are
+     * gated on for the same reason: `data-js` says the inline head script ran,
+     * not that "theme.js" did, and a page whose "theme.js" failed to load
+     * would show a play button that does nothing over a video nothing else
+     * leads to.
+     *
+     * The link to the source is **not** hidden with it: it is the way to the
+     * video when there is no script, which is why the second assertion is
+     * there at all. See "components/_embed.scss".
+     */
+    #[Test]
+    public function anEmbedOffersNoPlayButtonUntilTheScriptHasBoundIt(): void
+    {
+        $css = $this->stylesheet();
+
+        $this->assertStringContainsString(
+            '.theme-embed__button{display:none;',
+            $css,
+            'A play button without the script is a button that does nothing.',
+        );
+        $this->assertStringContainsString(
+            '.theme-embed[data-theme-embed-bound] .theme-embed__button{display:flex}',
+            $css,
+        );
+        $this->assertStringNotContainsString(
+            '[data-js] .theme-embed',
+            $css,
+            'The embed must not be gated on the root marker: it does not say that "theme.js" ran.',
+        );
+        $this->assertStringNotContainsString(
+            '.theme-embed__source{display:none',
+            $css,
+            'The link to the source is what a page without a script is left with; it may not be hidden.',
         );
     }
 

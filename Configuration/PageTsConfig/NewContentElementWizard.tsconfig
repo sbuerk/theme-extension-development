@@ -95,6 +95,14 @@
                     CType = theme_cta
                 }
             }
+            theme_external_media {
+                iconIdentifier = content-media
+                title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_external_media.label
+                description = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_external_media.description
+                tt_content_defValues {
+                    CType = theme_external_media
+                }
+            }
             theme_features {
                 iconIdentifier = content-widget-list
                 title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.CType.theme_features.label

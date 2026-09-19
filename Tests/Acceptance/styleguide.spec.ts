@@ -180,6 +180,40 @@ test.describe('the styleguide with JavaScript', () => {
         await expect(page.locator('#sg-carousel-slide-3')).toBeInViewport();
     });
 
+    test('the embed offers its play button only where the script marker is set', async ({ page }) => {
+        // Two specimens of the same component: the first as a page without the
+        // script shows it, the second carrying "data-theme-embed-bound" by
+        // hand. Neither is wired to a provider - see the partial - so this is
+        // the one place the two states can be compared side by side.
+        const embeds = page.locator('#interactive .theme-embed');
+        await expect(embeds).toHaveCount(2);
+
+        const unbound = embeds.nth(0);
+        await expect(unbound).not.toHaveAttribute('data-theme-embed-bound', /.*/);
+        await expect(unbound.locator('.theme-embed__button')).toBeHidden();
+        // What is left is the whole of the component without a script: the
+        // poster, the note and the link to the source.
+        await expect(unbound.locator('.theme-embed__poster')).toBeVisible();
+        await expect(unbound.locator('.theme-embed__source')).toBeVisible();
+
+        const bound = embeds.nth(1);
+        await expect(bound).toHaveAttribute('data-theme-embed-bound', '');
+        await expect(bound.locator('.theme-embed__button')).toBeVisible();
+        await expect(bound.locator('.theme-embed__source')).toBeVisible();
+
+        // The frame keeps its ratio whether it holds the poster or an iframe,
+        // which is what stops the page from jumping when the one replaces the
+        // other. 16/9 and 4/3 are the two the form offers.
+        for (const [embed, ratio] of [[unbound, 16 / 9], [bound, 4 / 3]] as const) {
+            const box = await embed.locator('.theme-embed__frame').boundingBox();
+            expect(box).not.toBeNull();
+            expect(box!.width / box!.height).toBeCloseTo(ratio, 1);
+        }
+
+        // Nothing of another site is in the page.
+        await expect(page.locator('#interactive iframe')).toHaveCount(0);
+    });
+
     test('a tooltip shows on focus, and Escape hides it without moving focus', async ({ page }) => {
         const trigger = page.getByRole('button', { name: 'Element outlines', exact: true });
         const bubble = page.locator('#sg-tooltip-outline');

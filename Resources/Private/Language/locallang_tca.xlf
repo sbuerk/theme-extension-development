@@ -626,6 +626,46 @@
 				<source>Rows</source>
 			</trans-unit>
 
+
+			<trans-unit id="tt_content.CType.theme_external_media.label">
+				<source>External media</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.theme_external_media.description">
+				<source>A video of another site, shown as a poster with a play button. Nothing is loaded from that site until a visitor presses it.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tab.embed">
+				<source>Video</source>
+			</trans-unit>
+			<trans-unit id="tt_content.palette.theme_embed">
+				<source>Video</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_embed_url">
+				<source>Address of the video</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_embed_url.description">
+				<source>The page of the video, as you copied it: a YouTube or Vimeo address is rewritten to the form that sets no cookie. Any other address is shown as a link instead of being embedded.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_embed_title">
+				<source>Name of the video</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_embed_title.description">
+				<source>Announced to a screen reader in place of the frame the video is loaded into. The heading of the element is used where this is empty.</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_embed_ratio">
+				<source>Shape</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_embed_ratio.I.16-9">
+				<source>Widescreen (16:9)</source>
+			</trans-unit>
+			<trans-unit id="tt_content.tx_theme_embed_ratio.I.4-3">
+				<source>Classic (4:3)</source>
+			</trans-unit>
+			<trans-unit id="tt_content.image.types.theme_external_media.label">
+				<source>Poster</source>
+			</trans-unit>
+			<trans-unit id="tt_content.image.types.theme_external_media.description">
+				<source>Shown in place of the video until it is played. Without one the frame stays empty.</source>
+			</trans-unit>
 			<!-- tx_theme_list_item -->
 			<trans-unit id="tx_theme_list_item">
 				<source>Theme: List item</source>

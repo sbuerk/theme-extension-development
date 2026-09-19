@@ -10,7 +10,7 @@
 # category|datetime|slug|json|uuid and MM tables - it has no branch for
 # "input", "text", "link", "file", "inline" or a "select" without an MM table,
 # and it only touches tables that an ext_tables.sql defined in the first
-# place. Without this file the tx_theme_list_item table and the twenty-two
+# place. Without this file the tx_theme_list_item table and the twenty-five
 # tx_theme_* columns on tt_content are never created on v12, and every theme
 # element using them fails.
 #
@@ -31,7 +31,7 @@
 # the same nullable DATE column from that "dbType".
 #
 # ---------------------------------------------------------------------------
-# Why the "link" columns are nullable
+# Why the "link" columns and "tx_theme_embed_url" are nullable
 # ---------------------------------------------------------------------------
 #
 # "tt_content.tx_theme_link", "tt_content.tx_theme_secondary_link" and
@@ -74,6 +74,13 @@
 # edited through the TCA, which does not declare it nullable. The schema
 # analyzer stays quiet on both versions, because it compares the database
 # against this file and not against the TCA.
+#
+# "tt_content.tx_theme_embed_url" is in the same position without being a
+# "link": it is a TCA "type=input" with "max = 1024", and v13's
+# DefaultTcaSchema sends every input longer than 255 down the same
+# "TEXT DEFAULT '' NOT NULL" branch ("case 'input'"). So it hits the same
+# MySQL wall on v12 and is declared the same way, nullable and without a
+# default.
 #
 # @todo Drop the nullability together with this file. Once v12 is gone the
 #       derived definition applies again and the columns become
@@ -119,7 +126,10 @@ CREATE TABLE tt_content (
 	tx_theme_secondary_link_label varchar(255) DEFAULT '' NOT NULL,
 	tx_theme_secondary_link_variant varchar(255) DEFAULT '' NOT NULL,
 	tx_theme_secondary_link_icon text,
-	tx_theme_sort_direction varchar(255) DEFAULT '' NOT NULL
+	tx_theme_sort_direction varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_embed_url text,
+	tx_theme_embed_title varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_embed_ratio varchar(255) DEFAULT '' NOT NULL
 );
 
 #
