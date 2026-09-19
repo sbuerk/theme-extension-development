@@ -646,13 +646,11 @@ entities:
               title: 'Empty page'
               slug: '/empty'
               # Out of the menus: it is a fixture of the layout fallback, not
-              # a page a reviewer navigates to. With the three showcase
-              # sections in the main navigation it would be the sixth top
-              # level link - the menu renders none for the start page - and
-              # six push the site title of the header onto a second line at
-              # 1280 pixels (the acceptance test of the header row; see the
-              # @todo in "layout/_site-header.scss"). Reached by URL and by
-              # the links of the theme elements on page 8.
+              # a page a reviewer navigates to. The header would hold it - the
+              # acceptance test of the header row holds seven top level
+              # entries at 1280 pixels - but a reviewer has no reason to
+              # open it from the menu. Reached by URL and by the links of the
+              # theme elements on page 8.
               nav_hide: 1
 
         # The showcase branch. Its three children each demonstrate one family of

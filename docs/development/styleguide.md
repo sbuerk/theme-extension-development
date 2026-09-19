@@ -134,7 +134,7 @@ two side by side, `.theme-styleguide__toc` makes the index sticky — page
 furniture in `layout/_styleguide.scss`, like the rest of this page. Below
 `bp.$md` the index is the list above the sections it always was and scrolls
 away with them: sticky on a phone, it would cover the section it just jumped
-to. The theme's one breakpoint rather than a second one for this page — the
+to. The theme's breakpoint rather than one of its own for this page — the
 index column is narrow, and the specimens that need width scroll in their own
 regions already. The sections stay single partials inside
 `.theme-styleguide__sections`, so the visual suite, which renders each partial

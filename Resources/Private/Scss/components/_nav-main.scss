@@ -140,6 +140,17 @@
     }
 }
 
+// In a row the gap spaces the entries, and the bottom margin every "li" takes
+// from the element baseline - all but the last one - only moves them: an
+// entry is centred in its row by its margin box, so the last one sat half a
+// margin lower than the others. Stacked, below the breakpoint, the margin
+// still adds to the gap as before.
+@media (min-width: bp.$md) {
+    .theme-nav-main > .theme-nav-main__list > .theme-nav-main__item {
+        margin-block-end: 0;
+    }
+}
+
 // Collapsing, as an enhancement. Both conditions have to hold: a script has
 // announced itself on the root, and the viewport is narrow enough for the row
 // layout not to apply. The selector hides what is *not* disclosed, so the
