@@ -158,6 +158,7 @@ opened it rather than a screenshot much later.
 | axe, WCAG 2.2 AA       | every section × light, dark × every palette                                                                                                         | sections × 2 × 5         |
 | Screenshot, clipped    | every section × light, dark in `neutral`; the accent swatches and the focus ring of `tokens` and the whole of `buttons` × light, dark × four others | sections × 2 + 3 × 2 × 4 |
 | Info follows primary   | the `info` swatch of `tokens` shows the primary accent, every appearance and palette                                                                | 2 × 5                    |
+| Switch thumb           | the switch of `forms` that is off paints its thumb at the start of the track, the one that is on at the end, every appearance and palette           | 2 × 5                    |
 | Palette sections exist | `tokens` and `buttons` are sections of the manifest                                                                                                 | 1                        |
 
 axe runs everywhere because it is cheap and writes no files, and because colour
@@ -183,6 +184,18 @@ in the default palette, clipped to the section element.
 aliases the primary accent, and neither clipped specimen shows its swatch.
 Rather than widening a clip for one swatch, the spec asserts on every `tokens`
 page that the `info` swatch computes to the same colour as the `primary` one.
+
+The switch is the one control whose state is only a position, and neither
+other check can see it. The `forms` baselines were once captured with the
+thumb in the middle of the track whether the switch was on or off, and the
+suite passed *because* of it: a screenshot proves a page looks as it did, not
+that it looks right. The computed `background-position` could not tell either
+— it flipped from `0% 50%` to `100% 50%` all along, over a gradient as wide as
+the track that had nowhere to go. So the spec screenshots each switch, decodes
+the picture on a canvas in the page, finds the thumb as the pixels of the
+middle row that differ from the track, and requires their centre to lie in
+the first 40% of the width when off and the last 40% when on. On the old
+stylesheet it reads `0.5` for both.
 
 Pixel relevant settings are fixed in the configuration rather than left to a
 default: 1280 × 800 viewport, scale factor 1, reduced motion, animations
