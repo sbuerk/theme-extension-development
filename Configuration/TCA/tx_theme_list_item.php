@@ -190,6 +190,38 @@ return [
             'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.icon',
             'config' => IconItems::selectConfig(),
         ],
+        // Where the caption of a slide of "theme_carousel" sits against its
+        // image: below it (the default), above it, or laid over its foot.
+        // Named for the item and not for the element, like every other column
+        // here; a later element with a captioned picture uses the same one.
+        //
+        // The values are the names of the modifiers they select in
+        // "components/_carousel.scss", the rule the theme's own columns follow
+        // - see "tt_content.tx_theme_hero_layout". The default is the empty
+        // value, so a slide created without a choice reads as the plain class.
+        'caption_position' => [
+            'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.caption_position',
+            'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.caption_position.description',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'default' => '',
+                'items' => [
+                    [
+                        'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.caption_position.I.below',
+                        'value' => '',
+                    ],
+                    [
+                        'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.caption_position.I.above',
+                        'value' => 'above',
+                    ],
+                    [
+                        'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.caption_position.I.overlay',
+                        'value' => 'overlay',
+                    ],
+                ],
+            ],
+        ],
     ],
     'palettes' => [
         'theme_link' => [

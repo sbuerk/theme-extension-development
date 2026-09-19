@@ -92,7 +92,7 @@ and then one `f:render partial` per section, in this order:
 | `DataDisplay.html` | `data-display` | `.theme-avatar` in every size and shape, with initials, and `.theme-avatar-group`; `.theme-tag-list`, plain and linked; `.theme-progress`, determinate and not; `.theme-meter` in its three regions.                                                                                                                                                                                                                                                                              |
 | `Features.html`    | `features`     | `.theme-media-object` in every position, shape and size, `.theme-feature` in its three layouts in `.theme-feature-grid` and `.theme-feature-intro`, `.theme-stat` in `.theme-stats`, and `.theme-steps` numbered and with icons.                                                                                                                                                                                                                                                  |
 | `Collections.html` | `collections`  | `.theme-card-grid` with a column count and as a `.theme-card-scroller`, cards with a subtitle and a button, cards whose title is the link, `.theme-timeline` with and without an icon, `.theme-list-group` with and without a link.                                                                                                                                                                                                                                               |
-| `Interactive.html` | `interactive`  | The three components that need the theme's script — `.theme-tabs`, `.theme-dialog`, `.theme-tooltip` — and what each does without it.                                                                                                                                                                                                                                                                                                                                             |
+| `Interactive.html` | `interactive`  | The four components that need the theme's script — `.theme-tabs`, `.theme-dialog`, `.theme-carousel`, `.theme-tooltip` — and what each does without it.                                                                                                                                                                                                                                                                                                                           |
 | `Forms.html`       | `forms`        | The whole `forms/` contract, selector by selector, including the validation states, `.theme-input-group` and `.theme-choice-group`.                                                                                                                                                                                                                                                                                                                                               |
 | `Navigation.html`  | `navigation`   | `.theme-nav-main`, `.theme-nav-sub`, `.theme-breadcrumb`, `.theme-pagination`, `.theme-content-menu`.                                                                                                                                                                                                                                                                                                                                                                             |
 | `Media.html`       | `media`        | `.theme-gallery` in one, two and three columns and floated in text, `.theme-figure` with its caption, credit and floats, and `.theme-content-element` with its outline switch, its bands, header positions and header looks.                                                                                                                                                                                                                                                      |
@@ -115,11 +115,16 @@ see [Icons](icons.md#picking-an-icon-in-the-backend).
 render and the number it states to the number of files shipped — both are
 literals, because the partial also renders without TYPO3.
 
-`Interactive.html` is a section of its own rather than three more specimens in
+`Interactive.html` is a section of its own rather than four more specimens in
 `Boxes.html` because what it demonstrates is not a shape but a behaviour, and
 the behaviour has two states: the page with the script, and the page without
-it. Keeping the three components that depend on `theme.js` together is what
-makes "switch JavaScript off and reload" one check instead of three. A dialog
+it. Keeping the four components that depend on `theme.js` together is what
+makes "switch JavaScript off and reload" one check instead of four. The
+carousel is the one that depends on it least, and it is in this section for
+exactly that reason: only its previous and next buttons need the script, while
+its track still scrolls and its indicators still move the reader from slide to
+slide without one, so "what it does without the script" is the interesting
+half of it. A dialog
 is only ever drawn in the top layer — closed it renders nothing, open it covers
 the page — so the section also carries a still picture of it on
 `.theme-styleguide__stage`, a scrim-coloured box in the flow. The stage is

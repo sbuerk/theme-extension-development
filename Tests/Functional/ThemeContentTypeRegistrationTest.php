@@ -44,6 +44,7 @@ final class ThemeContentTypeRegistrationTest extends AbstractFunctionalTestCase
         'theme_accordion',
         'theme_author',
         'theme_card_group',
+        'theme_carousel',
         'theme_cta',
         'theme_features',
         'theme_hero',

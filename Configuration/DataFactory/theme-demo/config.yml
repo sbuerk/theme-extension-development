@@ -287,3 +287,12 @@ references:
   - {file: placeholder-portrait, table: tx_theme_list_item, uid: 173, field: image, values: {alternative: 'A placeholder portrait'}}
   - {file: placeholder-portrait, table: tx_theme_list_item, uid: 174, field: image, values: {alternative: 'A placeholder portrait'}}
   - {file: placeholder-portrait, table: tx_theme_list_item, uid: 175, field: image, values: {alternative: 'A placeholder portrait'}}
+
+  # Page 150: the page media the menus on page 7 show, and the pictures of the
+  # slides of the carousel - 465 has none on purpose.
+  - {file: placeholder, table: pages, uid: 150, field: media, values: {alternative: 'A placeholder graphic standing in for the carousel'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 460, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 461, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 462, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 463, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 464, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
