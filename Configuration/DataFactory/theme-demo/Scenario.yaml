@@ -1922,6 +1922,40 @@ entities:
                         selected_categories: 0
                         category_field: 'categories'
 
+                  # The card and thumbnail layouts of the two page menus -
+                  # "layout" 1 and 2, enabled for these two CTypes only. The
+                  # three pages below "Theme elements" carry page media and an
+                  # abstract, which is what a card shows; "menu_subpages" of
+                  # page 8 lists every page below it, with media or without.
+                  - self:
+                        id: 713
+                        CType: 'menu_pages'
+                        header: 'menu_pages as cards: page media, title and abstract'
+                        header_layout: 2
+                        layout: 1
+                        pages: '90,91,92'
+                  - self:
+                        id: 714
+                        CType: 'menu_pages'
+                        header: 'menu_pages as thumbnails: page media and title'
+                        header_layout: 2
+                        layout: 2
+                        pages: '90,91,92'
+                  - self:
+                        id: 715
+                        CType: 'menu_subpages'
+                        header: 'menu_subpages as cards: the pages below one page'
+                        header_layout: 2
+                        layout: 1
+                        pages: '8'
+                  - self:
+                        id: 716
+                        CType: 'menu_subpages'
+                        header: 'menu_subpages as thumbnails'
+                        header_layout: 2
+                        layout: 2
+                        pages: '8'
+
             # The content elements this extension registers itself, one each,
             # so the "theme_*" CTypes can be looked at side by side rather than
             # one fixture at a time. The layouts of the heroes, the call to
