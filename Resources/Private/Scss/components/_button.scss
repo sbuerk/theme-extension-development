@@ -231,11 +231,16 @@
 
 // A row of buttons. Wraps rather than overflowing, because the labels are
 // translated and a German label is routinely half again as long.
+//
+// A block of its own, so it keeps the bottom margin every block of the library
+// ends on - a list, a figure, a code block - and whatever follows it does not
+// touch the buttons.
 .theme-button-group {
     display: flex;
     flex-wrap: wrap;
     gap: var(--theme-space-3);
     align-items: center;
+    margin: 0 0 var(--theme-space-4, 1.25rem);
 }
 
 // One control in several parts - a set of "aria-pressed" toggles, a

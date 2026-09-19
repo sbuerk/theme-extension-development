@@ -443,6 +443,47 @@ final class ComponentLibraryTest extends UnitTestCase
         );
     }
 
+    /**
+     * @return \Generator<string, array{selector: string}>
+     */
+    public static function blockComponents(): \Generator
+    {
+        // The blocks that sit in a column of content between other blocks.
+        // The first ones set the rhythm; the button group and the table
+        // wrapper ended without a margin, and the component after them
+        // touched them.
+        yield 'list' => ['selector' => '.theme-list'];
+        yield 'description list' => ['selector' => '.theme-dl'];
+        yield 'code block' => ['selector' => '.theme-code'];
+        yield 'figure' => ['selector' => '.theme-figure'];
+        yield 'button group' => ['selector' => '.theme-button-group'];
+        yield 'table wrapper' => ['selector' => '.theme-table-wrapper'];
+    }
+
+    /**
+     * Every block ends on the same bottom margin, so whatever follows keeps
+     * the same distance from it. Read off the base rule of the compiled
+     * stylesheet - the rule whose selector is the class alone.
+     */
+    #[DataProvider('blockComponents')]
+    #[Test]
+    public function aBlockKeepsItsDistanceToWhatFollows(string $selector): void
+    {
+        preg_match(
+            '/(?:^|[{};])' . preg_quote($selector, '/') . '\{([^}]*)\}/',
+            $this->stylesheet(),
+            $rule,
+        );
+        $this->assertArrayHasKey(1, $rule, sprintf('The compiled stylesheet has no base rule for "%s".', $selector));
+
+        $declarations = (string)preg_replace('/\s+/', '', $rule[1]);
+        $this->assertStringContainsString(
+            'margin:00var(--theme-space-4,1.25rem)',
+            $declarations,
+            sprintf('"%s" has to end on the bottom margin of every other block.', $selector),
+        );
+    }
+
     private function withoutComments(string $scss): string
     {
         $scss = (string)preg_replace('#/\*.*?\*/#s', '', $scss);
