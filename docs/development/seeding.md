@@ -143,18 +143,18 @@ Not a sample of the format — the frontend this extension is developed against.
 Ten pages, and between them every backend layout the extension registers and
 every `CType` it renders:
 
-| uid | Title          | Slug              | `backend_layout`  | What it is for                              |
-|-----|----------------|-------------------|-------------------|---------------------------------------------|
-| 1   | Theme demo     | `/`               | `start`           | The site root, and the footer columns.      |
-| 2   | Typography     | `/typography`     | `content`         | Headings, running text, the inline cases.   |
-| 3   | Media          | `/media`          | `content`         | One image, and a two column gallery.        |
-| 4   | Empty page     | `/empty`          | *(none)*          | The `default` layout fallback.              |
-| 5   | Elements       | `/elements`       | `content`         | The showcase branch, parent of 6 to 8.      |
-| 6   | Core elements  | `/elements/core`  | `content_sidebar` | Every classic `CType` the theme renders.    |
-| 7   | Menu elements  | `/elements/menu`  | `content_sidebar` | The eleven `menu_*` elements.               |
-| 8   | Theme elements | `/elements/theme` | `content`         | The thirteen `theme_*` elements.            |
-| 9   | Styleguide     | `/styleguide`     | `styleguide`      | The component library, straight from Fluid. |
-| 10  | Forms          | `/forms`          | `forms`           | The form showcase, straight from Fluid.     |
+| uid | Title          | Slug              | `backend_layout`  | What it is for                                                                             |
+|-----|----------------|-------------------|-------------------|--------------------------------------------------------------------------------------------|
+| 1   | Theme demo     | `/`               | `start`           | The site root, and the footer columns.                                                     |
+| 2   | Typography     | `/typography`     | `content`         | Running text, and the four content element bands with header positions, looks and spacing. |
+| 3   | Media          | `/media`          | `content`         | One image, and a two column gallery.                                                       |
+| 4   | Empty page     | `/empty`          | *(none)*          | The `default` layout fallback.                                                             |
+| 5   | Elements       | `/elements`       | `content`         | The showcase branch, parent of 6 to 8.                                                     |
+| 6   | Core elements  | `/elements/core`  | `content_sidebar` | Every classic `CType` the theme renders.                                                   |
+| 7   | Menu elements  | `/elements/menu`  | `content_sidebar` | The eleven `menu_*` elements.                                                              |
+| 8   | Theme elements | `/elements/theme` | `content`         | The thirteen `theme_*` elements.                                                           |
+| 9   | Styleguide     | `/styleguide`     | `styleguide`      | The component library, straight from Fluid.                                                |
+| 10  | Forms          | `/forms`          | `forms`           | The form showcase, straight from Fluid.                                                    |
 
 Four properties of that tree are deliberate, and are asserted by
 `Tests/Functional/ShowcaseTreeTest.php` rather than left to a reader to

@@ -8,10 +8,11 @@
 # (.Build/vendor/typo3/cms-core/Classes/Database/Schema/DefaultTcaSchema.php)
 # only derives the management columns from "ctrl", the types
 # category|datetime|slug|json|uuid and MM tables - it has no branch for
-# "input", "text", "link", "file" or "inline", and it only touches tables that
-# an ext_tables.sql defined in the first place. Without this file the
-# tx_theme_list_item table and the five tx_theme_* columns on tt_content are
-# never created on v12, and every theme element using them fails.
+# "input", "text", "link", "file", "inline" or a "select" without an MM table,
+# and it only touches tables that an ext_tables.sql defined in the first
+# place. Without this file the tx_theme_list_item table and the six
+# tx_theme_* columns on tt_content are never created on v12, and every theme
+# element using them fails.
 #
 # The definitions below are not written by hand: except for the two "link"
 # columns, which the next paragraph is about, they reproduce column for column
@@ -82,7 +83,8 @@ CREATE TABLE tt_content (
 	tx_theme_link_label varchar(255) DEFAULT '' NOT NULL,
 	tx_theme_link_variant varchar(255) DEFAULT '' NOT NULL,
 	tx_theme_list_items int(11) unsigned DEFAULT '0' NOT NULL,
-	tx_theme_notice_kind varchar(255) DEFAULT '' NOT NULL
+	tx_theme_notice_kind varchar(255) DEFAULT '' NOT NULL,
+	tx_theme_header_style varchar(255) DEFAULT '' NOT NULL
 );
 
 #

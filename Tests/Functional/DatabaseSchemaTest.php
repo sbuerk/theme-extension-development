@@ -19,9 +19,10 @@ use PHPUnit\Framework\Attributes\Test;
  * entry (Feature #101553, extended by #104311 in 13.3), so the extension needs
  * no `ext_tables.sql` there at all. TYPO3 v12.4 derives only the management
  * columns from `ctrl`, the types `category|datetime|slug|json|uuid` and MM
- * tables — it has no branch for `input`, `text`, `link`, `file` or `inline`,
- * and it only enriches tables some `ext_tables.sql` defined in the first place.
- * On v12 the whole `tx_theme_list_item` table and the five `tx_theme_*` columns
+ * tables — it has no branch for `input`, `text`, `link`, `file`, `inline` or a
+ * `select` without an MM table, and it only enriches tables some
+ * `ext_tables.sql` defined in the first place.
+ * On v12 the whole `tx_theme_list_item` table and the six `tx_theme_*` columns
  * on `tt_content` therefore exist only because `ext_tables.sql` declares them.
  *
  * A missing column is not loud: nothing in the extension references it at boot,
@@ -45,7 +46,7 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
      * Every column `Configuration/TCA/tx_theme_list_item.php` declares, plus
      * the two columns the `tx_theme_list_items` inline relation on the parent
      * side writes into the child table (`foreign_field` and
-     * `foreign_table_field`), and the five columns
+     * `foreign_table_field`), and the six columns
      * `Configuration/TCA/Overrides/tt_content.php` adds to `tt_content`.
      *
      * The management columns — `uid`, `pid`, `tstamp`, `crdate`, `deleted`,
@@ -120,6 +121,11 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
         yield 'tt_content.tx_theme_notice_kind is a string' => [
             'table' => 'tt_content',
             'column' => 'tx_theme_notice_kind',
+            'type' => StringType::class,
+        ];
+        yield 'tt_content.tx_theme_header_style is a string' => [
+            'table' => 'tt_content',
+            'column' => 'tx_theme_header_style',
             'type' => StringType::class,
         ];
     }

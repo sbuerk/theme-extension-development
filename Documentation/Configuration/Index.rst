@@ -258,6 +258,11 @@ development and test instances do not install it. What that covers:
     :ref:`feature-extbase-plugin-rendering` — on both delivery paths, the
     site set and the static include.
 
+The fields of the :guilabel:`Appearance` tab - frame, space before and after -
+and the alignment and style of the header change how an element looks, and the
+page TSconfig of the theme takes the ones it does not render out of the form -
+see :ref:`feature-content-element-appearance`.
+
 Nothing an editor can create is left without a rendering definition, and a test
 asserts exactly that: it walks the content types registered in TCA and fails if
 the core's "no rendering definition" notice appears for any of them.

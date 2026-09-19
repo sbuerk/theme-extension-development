@@ -869,6 +869,67 @@ still works, and is what `--plain` re-points for a single element — it simply
 is not the documented global switch, because on its own it cannot take the
 label with it.
 
+### Content element appearance
+
+The appearance fields of a record become modifiers of the wrapper and of its
+header. `Layouts/ContentElement.html` and `Partials/ContentElement/Header.html`
+write them, and [Content elements](../architecture/content-elements.md#appearance-fields)
+has the mapping from field to class:
+
+```html
+<div class="theme-content-element theme-content-element--text theme-content-element--frame-inverse theme-content-element--space-after-large" id="c123" data-ctype="text">
+    <div class="theme-content-element__inner">
+        <header class="theme-content-element__header theme-content-element__header--center">
+            <h2 class="theme-content-element__heading theme-content-element__heading--h4">…</h2>
+        </header>
+        …
+    </div>
+</div>
+```
+
+**Bands** are the Frame language applied to one element: a fill, the hairline
+and the 5px radius. A band belongs to the element, not to the column around it,
+so no element has to know which band it sits in. That was the architectural
+cost DESIGN.md held against the full-bleed "Band" variant, and it does not
+arise here. The development outline sits on top of the hairline. The global
+switch and `--plain` still remove outline and chip, and the band stays,
+because it is content.
+
+| Modifier          | Fill                                                 |
+|-------------------|------------------------------------------------------|
+| `--frame-surface` | `--theme-color-surface`                              |
+| `--frame-raised`  | `--theme-color-surface-raised`                       |
+| `--frame-accent`  | the primary accent at 5% in the background, in Oklab |
+| `--frame-inverse` | the background of the other appearance               |
+| `--frame-none`    | none; the inner padding is `0`, the outline stays    |
+
+**The inverse band re-points no token.** Every colour token is a
+`light-dark()` held by an unregistered custom property. It inherits as written
+and resolves against the `color-scheme` of the element that reads it. The band
+sets the opposite scheme, so its whole subtree takes the other appearance:
+text, surfaces, the accents of the palette, the semantic colours and the
+controls the browser draws. Any component in it is then exactly as readable as
+on a page in that appearance, and nothing has to be declared twice. CSS cannot
+read back which scheme the page resolved to, so the three ways it can get one
+are answered separately: `data-theme="dark"`, the operating system when no
+`data-theme` is set, and dark as the inverse of the default light.
+
+**The accent band is a tint** for the reason recorded in
+[`DESIGN.md`](../../DESIGN.md#content-element-bands): a solid fill would need
+every component inside it re-pointed to a second palette.
+
+**Spacing** re-points `--theme-content-element-spacing`, the token the element
+reads for the gap before itself, as `--spaced-loose` does. It also states the
+top margin, so the first element of a column gets the space an editor asked
+for. Space after is a bottom margin. Neighbouring margins collapse, so the
+space after one element and before the next is the larger of the two, not the
+sum.
+
+**Header looks** restate the metrics of `base/_elements.scss` per level,
+including `text-transform` and the tracking. An `h5` in the look of heading 1
+therefore loses its capitals. The display look is the text role
+`.theme-display`.
+
 ### The `data-js` marker
 
 `components/_nav-main.scss` collapses the main navigation behind a toggle
