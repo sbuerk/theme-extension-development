@@ -14,6 +14,10 @@
 //         </div>
 //     </div>
 //
+// An item of a "textmedia" gallery may be a video or an audio file instead of
+// an image, and is then a ".theme-media" as well as a ".theme-figure" - see
+// "components/_media.scss". The caption stays the gallery's.
+//
 // "__zoom" is the editor's "Enlarge on click", and it is a link to the file
 // first: the lightbox ("components/_lightbox.scss") is what a script makes of
 // it, and the "__zoom-hint" badge is the affordance that says so. The badge is
@@ -125,6 +129,14 @@
     // standing on its own.
     inline-size: auto;
     max-inline-size: none;
+}
+
+// A gallery item may also be a ".theme-media" - a video or an audio file of a
+// "textmedia" element - whose own bottom margin is meant for a media figure
+// standing on its own. Inside a row the gap is the row's. Two classes, so this
+// wins on specificity rather than on the order of the two files.
+.theme-gallery__item.theme-media {
+    margin: 0;
 }
 
 .theme-gallery__zoom {

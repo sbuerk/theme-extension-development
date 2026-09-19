@@ -792,6 +792,24 @@ entities:
                           imageorient: 8
                           imagecols: 3
                           bodytext: "<p>The same gallery as \"Text &amp; Images\", read from the\n<em>assets</em> field, which also takes a video or an audio\nfile. Orientation and columns are the values in the heading.</p>"
+                      -
+                        self:
+                          id: 4306
+                          CType: textmedia
+                          header: 'A video, with a caption track'
+                          header_layout: 2
+                          imageorient: 0
+                          imagecols: 1
+                          bodytext: '<p>A video file in the <em>assets</em> field renders as a native player with its controls, and the WebVTT file of the same name becomes its caption track. The file itself is a placeholder that carries no picture, so the player shows its controls and nothing else.</p>'
+                      -
+                        self:
+                          id: 4307
+                          CType: textmedia
+                          header: 'An audio file'
+                          header_layout: 2
+                          imageorient: 0
+                          imagecols: 1
+                          bodytext: "<p>An audio file renders as a native player as well. It draws no picture, so its height is the browser's and only its width is the theme's. This one is a second of a 440&nbsp;Hz tone.</p>"
                 -
                   self:
                     id: 1034

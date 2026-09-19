@@ -58,6 +58,7 @@ against, and the rename was cheap while only one template depended on it.
 | Link decoration         | `.theme-link`             | `components/_link.scss`             |
 | List                    | `.theme-list`             | `components/_list.scss`             |
 | List group              | `.theme-list-group`       | `components/_list-group.scss`       |
+| Media                   | `.theme-media`            | `components/_media.scss`            |
 | Media object            | `.theme-media-object`     | `components/_media-object.scss`     |
 | Main navigation         | `.theme-nav-main`         | `components/_nav-main.scss`         |
 | Meter                   | `.theme-meter`            | `components/_meter.scss`            |
@@ -1094,6 +1095,31 @@ h1 to h5 — states `text-transform: none`. The element baseline sets `h5` and
 pick that up on level five.
 `Tests/Unit/ComponentLibraryTest::aTitleOnAnyHeadingLevelKeepsItsOwnCase`
 holds both to it.
+
+Media — a video or an audio file, played in place. The modifier is not
+decoration: the two elements need opposite sizing rules, and a video is
+letterboxed into `--theme-media-ratio` until its own dimensions are known,
+because FAL records none for a video file and `GalleryProcessor` would
+otherwise compute a box of no height for it. Inside a gallery the item is a
+`.theme-media` **as well as** a `.theme-figure`, so the caption stays the
+gallery's own:
+
+```html
+<figure class="theme-media theme-media--video">
+    <video class="theme-media__player" controls preload="metadata" playsinline>
+        <source src="…" type="video/mp4">
+        <track kind="captions" src="…" label="…">
+    </video>
+    <figcaption class="theme-media__caption">…</figcaption>
+</figure>
+```
+
+The tag is written in the template rather than left to `f:media`, and that is
+the point of the component: the core's `AudioTagRenderer` and `VideoTagRenderer`
+both emit `<video controls><source …></video>` and **neither has any notion of
+a text track** — there is no `track` in either class, on 12.4.45 or 13.4.35. A
+caption track is the one part of a media element that is not decoration (WCAG
+1.2.2), so it cannot be left to a renderer that cannot produce one.
 
 Embed — a video of another site, which is not requested until the reader asks
 for it. The markup carries no `iframe`, no preconnect and no image of the other

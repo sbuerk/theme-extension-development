@@ -292,6 +292,59 @@
         </p>
     </div>
 
+    <h3>Video and audio</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_media.scss.
+
+            Both players carry "preload=none" and a "data:" source, for the
+            reason the images of this partial are data URIs (contract D2): a
+            specimen has no FAL record, and the theme has to render with no
+            network at all. "preload=none" is what keeps the browser from
+            trying to decode the stub source, so the players draw their
+            controls and nothing else happens.
+
+            Each carries a caption track. That is not decoration on a
+            specimen: a media element without one fails WCAG 1.2.2, and the
+            axe run of the visual suite checks every fixture page.
+        </f:comment>
+        <p>
+            What a "Text &amp; Media" element renders for a file that is not an
+            image. The player is the browser's own - the controls, the
+            keyboard handling and the full screen button are all the user
+            agent's - and the component gives it the box, the surface and the
+            caption below it.
+        </p>
+        <p>
+            A caption track is the one part that is not decoration, and there
+            is nowhere in the core to keep one: a file reference has a title, a
+            description, an alternative text and a crop, and nothing that could
+            hold a WebVTT file. The theme adds a field for it, and a caption
+            file belongs to the media file of the same name.
+        </p>
+        <figure class="theme-media theme-media--video">
+            <video class="theme-media__player" controls preload="none" playsinline
+                   poster="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%209'%3E%3Crect%20width='16'%20height='9'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%209%206%203.5%209%206%2016%201%2016%209z'%20fill='%238b96ab'/%3E%3C/svg%3E">
+                <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVl" type="video/mp4" />
+                <track kind="captions" src="data:text/vtt,WEBVTT" label="English" />
+            </video>
+            <figcaption class="theme-media__caption">
+                A video, in the box the component keeps for it until the file's
+                own ratio is known.
+            </figcaption>
+        </figure>
+        <figure class="theme-media theme-media--audio">
+            <audio class="theme-media__player" controls preload="none">
+                <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
+                <track kind="captions" src="data:text/vtt,WEBVTT" label="English" />
+            </audio>
+            <figcaption class="theme-media__caption">
+                An audio file. It draws no picture, so the height is the user
+                agent's and only the width is the component's.
+            </figcaption>
+        </figure>
+    </div>
+
     <h3>Content element wrapper</h3>
     <div class="theme-styleguide__specimen">
         <p>

@@ -306,6 +306,21 @@ tt_content.textmedia {
             columnSpacing = 0
             as = gallery
         }
+
+        # The caption files of "tx_theme_captions", a field of this extension -
+        # see its comment in "Configuration/TCA/Overrides/tt_content.php" for
+        # why a file reference cannot carry one. They deliberately do not go
+        # through "GalleryProcessor", which would lay them out as media of
+        # their own: the gallery partial pairs each with the medium of the same
+        # name and renders it as a "track" of that player.
+        #
+        # "textmedia" is the only CType with the field, because it is the only
+        # one whose media field takes a video or an audio file at all.
+        30 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+        30 {
+            references.fieldName = tx_theme_captions
+            as = captions
+        }
     }
 }
 

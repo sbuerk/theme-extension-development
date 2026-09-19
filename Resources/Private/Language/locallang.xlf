@@ -201,6 +201,9 @@
 			<trans-unit id="theme.lightboxNext">
 				<source>Next image</source>
 			</trans-unit>
+			<trans-unit id="theme.mediaCaptions">
+				<source>Captions</source>
+			</trans-unit>
 			<trans-unit id="theme.embedPlay">
 				<source>Play the video</source>
 			</trans-unit>
