@@ -396,9 +396,19 @@ tt_content.shortcut =< lib.contentElement
 tt_content.shortcut {
     templateName = ContentElements/Shortcut
 
+    # "shortcuts", although the column it reads is "records". That is the name
+    # "fluid_styled_content" assigns the rendered markup to - its
+    # "Configuration/TypoScript/ContentElement/Shortcut.typoscript" declares
+    # "variables.shortcuts" and its "Resources/Private/Templates/Shortcut.html"
+    # renders "{shortcuts}", byte for byte the same in its 12.4 and its 13.4
+    # release, read in both - and the two names were gratuitously different
+    # for a variable holding the same thing. A template written against either
+    # contract now reads the same variable, which is what makes the classic
+    # templates usable next to that extension; see
+    # "docs/architecture/content-elements.md".
     variables {
-        records = RECORDS
-        records {
+        shortcuts = RECORDS
+        shortcuts {
             tables = tt_content
             source.field = records
             conf.tt_content =< tt_content
