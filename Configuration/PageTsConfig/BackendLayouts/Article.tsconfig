@@ -1,0 +1,44 @@
+# A long read: the article held to the reading measure, with an aside of
+# notes beside it.
+#
+# The aside is colPos 1, the "sidebar" slot of "ContentSidebar.tsconfig", and
+# not a number of its own. It is the same thing to an editor - material that
+# belongs beside the running text rather than in it - and reusing the number
+# means a page moved between the two layouts keeps it.
+#
+# What differs is the frontend, and only there: on "content_sidebar" the slot
+# is rendered into the page shell's own ".theme-page__aside", the fixed width
+# navigation column that also carries the sub navigation and the table of
+# contents. An article's aside is editorial, follows the article in reading
+# order and carries no navigation, so "Templates/Page/Article.html" renders it
+# as a column of the article grid instead. See that template.
+mod.web_layout.BackendLayouts.article {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.article.title
+    config.backend_layout {
+        colCount = 3
+        rowCount = 2
+        rows {
+            1.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.stage.name
+                identifier = stage
+                colPos = 2
+                colspan = 3
+            }
+            2 {
+                columns {
+                    1 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+                        identifier = main
+                        colPos = 0
+                        colspan = 2
+                    }
+                    2 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.sidebar.name
+                        identifier = sidebar
+                        colPos = 1
+                    }
+                }
+            }
+        }
+    }
+}

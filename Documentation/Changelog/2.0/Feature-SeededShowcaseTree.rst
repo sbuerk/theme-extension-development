@@ -63,8 +63,10 @@ The tree demonstrates the whole theme rather than a handful of pages:
         -   A request form built from the form components, see
             :ref:`feature-form-showcase`.
 
-Between them the pages use every backend layout the extension registers and
-carry every content type it renders, so a single seeded instance answers what
+Between them the pages carry every content type the extension renders, and the
+layouts listed above; the multi column, article, cover and band layouts have a
+demo page each in the :guilabel:`Layouts` section, see
+:ref:`feature-column-page-layouts`. So a single seeded instance answers what
 the theme does with each. Two of the pages are deliberate special cases:
 :guilabel:`Empty page` selects no backend layout at all, which is the only way
 to see the default fallback. :guilabel:`Styleguide` and :guilabel:`Forms` are

@@ -1,0 +1,29 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Backend layout "cover" (Configuration/PageTsConfig/BackendLayouts/Cover.tsconfig)
+    - "main" (colPos 0) alone, centred in what is left of the viewport between
+    the header and the footer.
+
+    No breadcrumb and no stage. A cover page is the top of whatever it
+    announces, so a trail above it would lead nowhere worth going, and the
+    banner *is* the page rather than something above it.
+
+    The centring is not a height in this file. ".theme-page" is a flex column
+    with a minimum height of 100dvh and ".theme-page__body" takes the
+    remaining space, so ".theme-page__main" already fills the viewport; what
+    "layout/_page.scss" adds is "align-content: center" on the main element
+    when it holds a cover. A fixed "min-height" here would have to guess the
+    height of the header and the footer and would be wrong the moment either
+    changed.
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <div class="theme-page__cover">
+        <f:cObject typoscriptObjectPath="lib.content.main" />
+    </div>
+</f:section>
+
+</html>

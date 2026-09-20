@@ -47,12 +47,14 @@ in a frontend rather than only in a test assertion:
     :file:`fluid_styled_content` — that extension is not a dependency here. An
     installation that has it anyway enables a bridge set, which keeps the
     rendering the theme's own — see
-    :ref:`feature-fluid-styled-content-bridge`. It ships six backend layouts, a
-    main menu, a section menu and a breadcrumb, and a light/dark appearance
-    switch. A seeded ``/styleguide`` page renders the whole component library
-    on one page, so the theme can be looked at without building content for it
-    first — see :ref:`feature-styleguide`. This chapter is extended along with
-    the implemented features.
+    :ref:`feature-fluid-styled-content-bridge`. It ships a set of backend
+    layouts, from a bare single column through two and three column grids to
+    an article, a cover page and a stack of full width bands. It renders a
+    main menu, a section menu and a breadcrumb, and it offers a light/dark
+    appearance switch. A seeded ``/styleguide`` page renders the whole
+    component library on one page, so the theme can be looked at without
+    building content for it first — see :ref:`feature-styleguide`. This
+    chapter is extended along with the implemented features.
 
     Underneath that sits the foundation: TYPO3 v13 and v14 support from one code
     base with :ref:`core version aware <introduction-core-version-aware>`

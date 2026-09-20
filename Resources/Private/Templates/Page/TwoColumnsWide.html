@@ -1,0 +1,32 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Backend layout "two_columns_wide"
+    (Configuration/PageTsConfig/BackendLayouts/TwoColumnsWide.tsconfig) - the
+    same two slots as "Templates/Page/TwoColumns.html", with the first column
+    twice as wide as the second.
+
+    Only the modifier differs, and the file exists anyway: a site package
+    overrides one layout without touching the other, which is the same reason
+    "Start.html" is a file of its own although it renders what "Content.html"
+    renders. See "TwoColumns.html" for why the grid sits inside
+    ".theme-page__main" rather than on it, and why each column is wrapped.
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <f:render partial="Page/Breadcrumb" arguments="{_all}" />
+    <f:render partial="Page/Stage" arguments="{_all}" />
+
+    <div class="theme-page__columns theme-page__columns--wide-start">
+        <div class="theme-page__column">
+            <f:cObject typoscriptObjectPath="lib.content.main" />
+        </div>
+        <div class="theme-page__column">
+            <f:cObject typoscriptObjectPath="lib.content.secondary" />
+        </div>
+    </div>
+</f:section>
+
+</html>

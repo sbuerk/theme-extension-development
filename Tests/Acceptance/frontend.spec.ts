@@ -36,6 +36,13 @@ const showcase = [
     '/elements/core/html',
     '/elements/core/shortcut',
     '/elements/frames',
+    '/layouts',
+    '/layouts/two-columns',
+    '/layouts/two-columns-wide',
+    '/layouts/three-columns',
+    '/layouts/article',
+    '/layouts/cover',
+    '/layouts/bands',
 ];
 
 const trees = [
@@ -90,10 +97,32 @@ for (const tree of trees) {
             }
         });
 
+        // The band layout is the one that deliberately leaves the content
+        // container, and the reason the stylesheet widens the body instead of
+        // letting a band break out with "width: 100vw" and a negative margin
+        // is that "100vw" includes the scrollbar ("layout/_page.scss"). That
+        // reasoning names this measurement, so the measurement has to be
+        // pointed at a band page: the other two "scrollWidth" assertions in
+        // this file are both on "/typography", which renders through
+        // "content" and never leaves the container at all.
+        test(`${tree.prefix}/layouts/bands spans the row without spilling sideways`, async ({ page }) => {
+            await page.setViewportSize({ width: 1280, height: 800 });
+            await page.goto(`${tree.prefix}/layouts/bands`);
+
+            // The bands really are out of the container - otherwise the
+            // overflow check below would hold for a page that never went wide.
+            const bands = page.locator('.theme-page__bands');
+            await expect(bands).toHaveCount(1);
+            const available = await page.evaluate(() => document.documentElement.clientWidth);
+            expect(await bands.evaluate((element) => element.getBoundingClientRect().width)).toBeCloseTo(available, 0);
+
+            expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(available);
+        });
+
         test(`${tree.prefix}/ shows the showcase sections in the main navigation and nothing else`, async ({ page }) => {
             await page.goto(`${tree.prefix}/`);
             const navigation = page.locator('nav.theme-nav-main');
-            for (const section of ['Elements', 'Typography', 'Styleguide', 'Forms']) {
+            for (const section of ['Elements', 'Typography', 'Layouts', 'Styleguide', 'Forms']) {
                 await expect(navigation.getByRole('link', { name: section, exact: true })).toHaveCount(1);
             }
             // The layout fallback fixture and the account pages stay out.
@@ -102,7 +131,7 @@ for (const tree of trees) {
             }
         });
 
-        // The showcase has five top level entries; a site has fewer or more.
+        // The showcase has six top level entries; a site has fewer or more.
         // From the breakpoint up the header holds them in one row with the
         // title of this tree and never spills sideways. On a wide row the
         // title keeps its line and the menu wraps; on a narrow one the menu
@@ -304,15 +333,47 @@ test.describe('the display settings', () => {
         }
 
         // Nothing squeezed: the site title keeps one line - it wrapped onto
-        // five beside the old button groups - and the top level of the menu
-        // one row.
+        // five beside the old button groups.
         const lineHeight = await brandLocator.evaluate((element) => parseFloat(getComputedStyle(element).lineHeight));
         expect(brand.height).toBeLessThan(lineHeight * 1.5);
-        const tops = await page.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item').evaluateAll(
-            (items) => items.map((item) => item.getBoundingClientRect().top),
+
+        // The menu itself may wrap, and above "bp.$lg" that is the contract:
+        // on a wide row the title keeps its line and the menu gives way, on a
+        // narrow one the other way round ("abstracts/_breakpoints.scss"). This
+        // used to assert one row, which held only while the showcase had five
+        // sections; it has six since the page layouts were added, and the
+        // header scenarios above cover both row counts deliberately, at three
+        // and at seven entries. What must still hold here is that nothing
+        // overlaps, that the entries of one row share it, and that the menu
+        // stays within the two rows the contract allows it.
+        const boxes = await page.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item').evaluateAll(
+            (items) => items.map((item) => {
+                const box = item.getBoundingClientRect();
+                return { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+            }),
         );
-        expect(tops.length).toBeGreaterThan(1);
-        expect(Math.max(...tops) - Math.min(...tops)).toBeLessThan(8);
+        expect(boxes.length).toBeGreaterThan(1);
+        for (const [index, box] of boxes.entries()) {
+            for (const other of boxes.slice(index + 1)) {
+                const apart = box.right <= other.left || other.right <= box.left || box.bottom <= other.top || other.bottom <= box.top;
+                expect(apart).toBe(true);
+                if (box.top < other.bottom && other.top < box.bottom) {
+                    expect(Math.abs(box.top - other.top)).toBeLessThan(0.5);
+                }
+            }
+        }
+
+        // Without a bound on the number of rows the two checks above are
+        // satisfied by six entries on six rows: no pair then shares a row, so
+        // the shared top never fires, and "apart" is all but tautological for
+        // flex items. So the rows are counted. The six top level entries of
+        // the showcase occupy exactly two at 1280 pixels - measured, not
+        // assumed, and the number "docs/development/component-library.md"
+        // documents. The bound is an upper one because a menu that gets back
+        // into one row is not a regression; three rows beside a one line title
+        // is.
+        const rows = new Set(boxes.map((box) => Math.round(box.top)));
+        expect(rows.size).toBeLessThanOrEqual(2);
     });
 
     test('keep the chosen options visible in forced colours', async ({ page }) => {
