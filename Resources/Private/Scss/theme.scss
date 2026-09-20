@@ -73,6 +73,7 @@
 @use 'components/description-list';
 @use 'components/dialog';
 @use 'components/divider';
+@use 'components/dropdown';
 @use 'components/embed';
 @use 'components/feature';
 @use 'components/figure';
@@ -105,6 +106,7 @@
 @use 'components/teaser';
 @use 'components/text';
 @use 'components/timeline';
+@use 'components/toggletip';
 @use 'components/tooltip';
 
 @use 'layout/page';

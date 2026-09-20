@@ -1,0 +1,61 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    A labelled button that discloses a panel below it. Markup contract:
+    "components/_dropdown.scss".
+
+    Arguments:
+
+      id       the id of the panel, which the trigger's "popovertarget" names.
+               Required, and unique on the page: two dropdowns sharing one
+               would point the second trigger at the first panel.
+      label    the text of the trigger. Visually hidden, like the name of the
+               settings cog - the header row has no width for a second piece
+               of visible text - but real text, so it is translated with the
+               page and by a browser's own page translation.
+      icon     an icon of the set before the label. Optional.
+      content  the markup of the panel, already rendered.
+
+    "content" is an argument rather than the tag content of the partial,
+    because a partial has no children: "f:render partial" renders the file and
+    discards whatever stands between its tags, and "f:renderChildren" only
+    resolves inside a ViewHelper. The caller renders its panel into a variable
+    and hands it over - see "Partials/Page/Header.html". So the dropdown still
+    knows nothing about what it holds.
+
+    Caller contract, because this partial escapes neither of them: "id" is
+    written into "popovertarget" and into the panel's "id", and "content" is
+    rendered with "f:format.raw". Both callers are templates of this
+    extension, and both values have to stay that way - "id" a literal the
+    template controls, "content" markup a partial of this extension rendered
+    and escaped on the way in. Neither may ever carry a value that reached the
+    template from a record, a request or an editor.
+
+    --- The browser opens it ---------------------------------------------------
+
+    "popovertarget" on the button and "popover" on the panel are the whole
+    mechanism: the browser opens and closes the panel, puts it in the top
+    layer, and closes it on Escape or a click outside. No script is needed for
+    any of that, which is why this control is rendered unconditionally rather
+    than being hidden until "data-js" the way the display settings are.
+
+    "aria-expanded" starts "false" and is mirrored from the panel's own
+    "toggle" event by "Resources/Public/JavaScript/theme.js" - the Popover API
+    says nothing to assistive technology about the trigger. The script only
+    reports the state; it never changes it.
+</f:comment>
+<div class="theme-dropdown">
+    <button class="theme-dropdown__trigger" type="button" popovertarget="{id}" aria-expanded="false">
+        <f:if condition="{icon}">
+            <theme:icon name="{icon}" optional="1" />
+        </f:if>
+        <span class="theme-dropdown__label">{label}</span>
+        <theme:icon name="chevron-down" class="theme-dropdown__marker" />
+    </button>
+
+    <div class="theme-dropdown__panel" id="{id}" popover>{content -> f:format.raw()}</div>
+</div>
+
+</html>

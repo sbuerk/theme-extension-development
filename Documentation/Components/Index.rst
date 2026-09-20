@@ -45,13 +45,13 @@ What the library contains
     *   -   Icons
         -   The solid icons of Font Awesome Free, inline, see :ref:`icons`
     *   -   Interactive
-        -   Tabs, dialog, tooltip
+        -   Tabs, dialog, tooltip, toggletip
     *   -   Forms
         -   Controls, field, input group, choice group, validation
     *   -   Navigation and page
         -   Main and sub navigation, breadcrumb, pagination, content menu,
-            skip link, gallery, the content element wrapper, site header and
-            site footer
+            dropdown, skip link, gallery, the content element wrapper, site
+            header and site footer
 
 ..  _icons:
 
