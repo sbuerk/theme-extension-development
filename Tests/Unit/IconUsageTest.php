@@ -45,26 +45,53 @@ final class IconUsageTest extends UnitTestCase
     }
 
     /**
-     * The icon names each template renders, by path.
+     * The icon names each template renders, by path, with the set each one is
+     * from - "solid" unless the tag says "brands".
      *
      * A name that is a variable - "{data.tx_theme_link_icon}" - is not one of
      * them: it is whatever an editor picked, from a field that offers only
      * names of the set. It is held to "optional" by
      * "aNameAnEditorPickedIsRenderedAsOptional()" instead.
      *
-     * @return array<string, list<string>>
+     * @return array<string, list<array{set: string, name: string}>>
      */
     private function iconsByTemplate(): array
     {
         $icons = [];
         foreach ($this->templates() as $path => $source) {
-            preg_match_all('#<theme:icon\b[^>]*?\bname="([^"{]*)"#', $source, $matches);
-            if ($matches[1] !== []) {
-                $icons[$path] = $matches[1];
+            preg_match_all('#<theme:icon\b[^>]*?/?>#', $source, $tags);
+            foreach ($tags[0] as $tag) {
+                if (preg_match('#\bname="([^"{]*)"#', $tag, $name) !== 1) {
+                    continue;
+                }
+                $set = preg_match('#\bset="([a-z]+)"#', $tag, $matched) === 1 ? $matched[1] : 'solid';
+                $icons[$path][] = ['set' => $set, 'name' => $name[1]];
             }
         }
 
         return $icons;
+    }
+
+    /**
+     * The names of one set, as the templates use it.
+     *
+     * @param array<string, list<array{set: string, name: string}>> $icons
+     * @return list<string>
+     */
+    private function namesOfSet(array $icons, string $set): array
+    {
+        $names = [];
+        foreach ($icons as $used) {
+            foreach ($used as $icon) {
+                if ($icon['set'] === $set) {
+                    $names[] = $icon['name'];
+                }
+            }
+        }
+        $names = array_values(array_unique($names));
+        sort($names);
+
+        return $names;
     }
 
     /**
@@ -128,12 +155,15 @@ final class IconUsageTest extends UnitTestCase
     #[Test]
     public function everyIconATemplateNamesIsShipped(): void
     {
-        $shipped = (new IconSet())->names();
+        $shipped = [
+            'solid' => (new IconSet())->names(),
+            'brands' => IconSet::brands()->names(),
+        ];
         $missing = [];
-        foreach ($this->iconsByTemplate() as $path => $names) {
-            foreach ($names as $name) {
-                if (!in_array($name, $shipped, true)) {
-                    $missing[] = $path . ': ' . $name;
+        foreach ($this->iconsByTemplate() as $path => $icons) {
+            foreach ($icons as $icon) {
+                if (!in_array($icon['name'], $shipped[$icon['set']] ?? [], true)) {
+                    $missing[] = $path . ': ' . $icon['set'] . '/' . $icon['name'];
                 }
             }
         }
@@ -230,6 +260,11 @@ final class IconUsageTest extends UnitTestCase
      * The icon table of the styleguide lists exactly the icons the templates
      * render, and states the size of the set - both literals in a partial the
      * visual suite renders without TYPO3, so both are checked here.
+     *
+     * The brand logos are a table of their own, and the whole allowlist is in
+     * it rather than only the names a template writes out: the set exists to
+     * be picked from in the backend, so the styleguide shows what an editor
+     * can pick, the way the solid table shows what the theme itself draws.
      */
     #[Test]
     public function theStyleguideListsTheIconsTheTemplatesUseAndTheSizeOfTheSet(): void
@@ -237,20 +272,43 @@ final class IconUsageTest extends UnitTestCase
         $path = 'Resources/Private/Partials/Styleguide/Icons.html';
         $icons = $this->iconsByTemplate();
         $source = $this->templates()[$path] ?? '';
-
-        preg_match_all('#<td><code>([a-z0-9-]+)</code></td>#', $source, $listed);
-        $listed = array_unique($listed[1]);
-        sort($listed);
+        [$solidTable, $brandsTable] = $this->iconTablesOfTheStyleguide($source);
 
         unset($icons[$path]);
-        $used = array_unique(array_merge($this->iconsTheStylesheetsMask(), ...array_values($icons)));
+        $used = array_unique(array_merge($this->iconsTheStylesheetsMask(), $this->namesOfSet($icons, 'solid')));
         sort($used);
 
-        $this->assertSame($used, $listed, 'The icon table of the styleguide does not list the icons the templates use.');
+        $this->assertSame($used, $solidTable, 'The icon table of the styleguide does not list the icons the templates use.');
+        $this->assertSame(IconSet::brands()->names(), $brandsTable, 'The brand table of the styleguide does not list the shipped brand logos.');
 
         $this->assertMatchesRegularExpression('#<strong>(\d+)</strong> icons#', $source);
         preg_match('#<strong>(\d+)</strong> icons#', $source, $count);
         $this->assertSame(count((new IconSet())->names()), (int)($count[1] ?? 0), 'The styleguide states a different number of icons than ship.');
+    }
+
+    /**
+     * The names listed in the two icon tables of the styleguide section, in
+     * the order the section renders them: the solid one first, the brands one
+     * after it.
+     *
+     * @return array{list<string>, list<string>}
+     */
+    private function iconTablesOfTheStyleguide(string $source): array
+    {
+        $tables = [];
+        preg_match_all('#<table\b.*?</table>#s', $source, $matches);
+        foreach ($matches[0] as $table) {
+            preg_match_all('#<td><code>([a-z0-9-]+)</code></td>#', $table, $names);
+            if ($names[1] === []) {
+                continue;
+            }
+            $listed = array_values(array_unique($names[1]));
+            sort($listed);
+            $tables[] = $listed;
+        }
+        $this->assertCount(2, $tables, 'The icons section does not render one table of solid names and one of brand names.');
+
+        return [$tables[0], $tables[1]];
     }
 
     /**
@@ -273,11 +331,56 @@ final class IconUsageTest extends UnitTestCase
         $this->assertStringContainsString('Font Awesome Free ' . $pinned . ' ', $attribution);
 
         $stale = [];
-        foreach (glob(self::ROOT . '/Resources/Public/Icons/FontAwesome/Solid/*.svg') ?: [] as $file) {
-            if (!str_contains((string)file_get_contents($file), '<!--! Font Awesome Free ' . $pinned . ' ')) {
-                $stale[] = basename($file);
+        foreach (['Solid', 'Brands'] as $set) {
+            foreach (glob(self::ROOT . '/Resources/Public/Icons/FontAwesome/' . $set . '/*.svg') ?: [] as $file) {
+                if (!str_contains((string)file_get_contents($file), '<!--! Font Awesome Free ' . $pinned . ' ')) {
+                    $stale[] = $set . '/' . basename($file);
+                }
             }
         }
         $this->assertSame([], $stale, 'These files do not come from ' . $pinned . ' - run "runTests.sh -s buildIcons".');
+    }
+
+    /**
+     * The brand logos are an allowlist, not a style copied whole: 609 brand
+     * files ship with the package and fifteen of them are here, named one by
+     * one in "package.json" so adding a platform is a decision somebody wrote
+     * down rather than a side effect of a version bump.
+     *
+     * "checkIconsBuild" proves the committed directory equals that allowlist
+     * applied to the pinned package. What it cannot see is the list itself
+     * drifting into an unsorted, duplicated heap, which is what this holds.
+     */
+    #[Test]
+    public function theBrandLogosAreTheAllowlistOfThePackageManifest(): void
+    {
+        $package = json_decode((string)file_get_contents(self::ROOT . '/package.json'), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertIsArray($package);
+        $allowed = $package['fontAwesomeBrands'] ?? null;
+
+        $this->assertIsArray($allowed);
+        $this->assertNotSame([], $allowed, 'The brand allowlist is empty.');
+        $this->assertSame(array_values(array_unique($allowed)), $allowed, 'The brand allowlist names a platform twice.');
+        $sorted = $allowed;
+        sort($sorted, SORT_STRING);
+        $this->assertSame($sorted, $allowed, 'The brand allowlist is not sorted, which makes every addition a diff of its own.');
+        $this->assertLessThanOrEqual(15, count($allowed), 'The brand set is a curated subset, not a copy of the brands style.');
+
+        $this->assertSame($sorted, IconSet::brands()->names(), 'The committed brand logos are not the allowlist - run "runTests.sh -s buildIcons".');
+    }
+
+    /**
+     * A brand logo is a trademark of its owner, and Font Awesome's licence
+     * asks that it is used only to refer to the platform it names. The
+     * attribution that ships beside the files has to say so: it is the file
+     * that travels into the composer dist archive and the TER artifact.
+     */
+    #[Test]
+    public function theAttributionNamesTheTrademarkRestrictionOfTheBrandLogos(): void
+    {
+        $attribution = (string)file_get_contents(self::ROOT . '/Resources/Public/Icons/FontAwesome/ATTRIBUTION.txt');
+
+        $this->assertStringContainsString('Brands/', $attribution);
+        $this->assertStringContainsString('trademarks of their respective owners', $attribution);
     }
 }

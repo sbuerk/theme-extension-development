@@ -1,10 +1,16 @@
 # Icons
 
-Every icon the theme draws comes from **Font Awesome Free, solid style only**.
-The full solid set of one pinned version of the npm package
-`@fortawesome/fontawesome-free` is copied into the extension and committed, and
-a page gets the icons it uses as **inline SVG**. There is no webfont, no CDN,
-no sprite and no request for an icon of any kind.
+Every icon the theme draws comes from **Font Awesome Free**. The full solid
+set of one pinned version of the npm package `@fortawesome/fontawesome-free`
+is copied into the extension and committed, together with **fifteen named
+logos of its brands style**, and a page gets the icons it uses as **inline
+SVG**. There is no webfont, no CDN, no sprite and no request for an icon of
+any kind.
+
+The solid set is the theme's icons. The brand logos are not: they exist for
+one job — [naming the platform a social link leads to](#brand-logos) — and
+they are a trademark of somebody else, which is why they are an allowlist
+rather than a style copied whole.
 
 ```bash
 # Copy the solid icons of the pinned version into the extension.
@@ -14,13 +20,14 @@ Build/Scripts/runTests.sh -s buildIcons
 Build/Scripts/runTests.sh -s checkIconsBuild
 ```
 
-| Path                                                 | Is                                                                    |
-|------------------------------------------------------|-----------------------------------------------------------------------|
-| `Resources/Public/Icons/FontAwesome/Solid/`          | The 2001 files of `svgs/solid/` of 7.3.1, 1 648 470 bytes, unchanged. |
-| `Resources/Public/Icons/FontAwesome/LICENSE.txt`     | The licence of the package, copied from the same version.             |
-| `Resources/Public/Icons/FontAwesome/categories.yml`  | `metadata/categories.yml` of the same version: the backend groups.    |
-| `Resources/Public/Icons/FontAwesome/ATTRIBUTION.txt` | The attribution, written by hand: set, version, author, licence.      |
-| `package.json`, `package-lock.json`                  | The exact pin — `"7.3.1"`, no range — and its integrity hash.         |
+| Path                                                 | Is                                                                                         |
+|------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `Resources/Public/Icons/FontAwesome/Solid/`          | The 2001 files of `svgs/solid/` of 7.3.1, 1 648 470 bytes, unchanged.                      |
+| `Resources/Public/Icons/FontAwesome/Brands/`         | The fifteen files of `svgs/brands/` that `fontAwesomeBrands` names, unchanged.             |
+| `Resources/Public/Icons/FontAwesome/LICENSE.txt`     | The licence of the package, copied from the same version.                                  |
+| `Resources/Public/Icons/FontAwesome/categories.yml`  | `metadata/categories.yml` of the same version: the backend groups.                         |
+| `Resources/Public/Icons/FontAwesome/ATTRIBUTION.txt` | The attribution, written by hand: both sets, version, author, licence, the trademark note. |
+| `package.json`, `package-lock.json`                  | The exact pin — `"7.3.1"`, no range — its integrity hash, and the brand allowlist.         |
 
 ## Why the whole set, and why inline
 
@@ -43,6 +50,66 @@ and nothing from a font:
   request, has to be same origin, and puts the icon into a shadow tree the page
   stylesheet reaches only through inherited properties. A file of the set is
   824 bytes on average; the few a page uses cost less inlined than a request.
+
+## Brand logos
+
+The brands style of Font Awesome Free is 609 files, and fifteen of them ship:
+
+```json
+"fontAwesomeBrands": [
+    "bluesky", "discord", "facebook", "github", "gitlab", "instagram",
+    "linkedin", "mastodon", "pinterest", "threads", "tiktok", "whatsapp",
+    "x-twitter", "xing", "youtube"
+]
+```
+
+That list is in the root `package.json`, next to the version pin, and it is
+the whole mechanism: `build:icons:brands` copies exactly those files, and
+`build:icons:brands:verify` fails when the directory and the list disagree.
+Adding a platform is one line plus a rebuild plus a commit, and it is visible
+in a diff as a decision somebody made.
+
+**Why an allowlist and not the style.** Three reasons, in the order they
+matter:
+
+- **A brand logo is a trademark of its owner**, and Font Awesome's licence
+  asks in so many words that it is used *only to represent the company,
+  product or service it refers to*. Shipping 609 of them into every
+  installation of the theme invites exactly the use the licence asks against —
+  a logo as decoration, next to a feature, in a card. Fifteen, reachable from
+  one field on one content element, is a set whose only use is the one that is
+  allowed.
+- **The solid set is the theme's icon language**, and it stays that. A brand
+  logo is never an alternative to `circle-info` or `chevron-down`; there is no
+  overlap to choose from.
+- **Size.** The whole brands style of 7.3.1 is 765 101 bytes in 609 files,
+  against the 1 648 470 bytes of solid icons that already ship. The fifteen
+  taken from it are 13 194 bytes. All of it would travel into the composer
+  dist archive and the TER artifact.
+
+They are rendered exactly like any other icon, through the same ViewHelper,
+with `set="brands"`:
+
+```html
+<theme:icon set="brands" name="mastodon" />
+<theme:icon set="brands" name="{item.brand_icon}" optional="1" />
+```
+
+`set` takes `solid` (the default) or `brands`, and nothing else — a third
+value throws `\InvalidArgumentException` `1789218004` rather than falling back
+to the default, because `set="brand"` would otherwise look for a platform logo
+among the solid icons and report *the name* as missing.
+
+An icon-only social link is **never** a link without a name. A template that
+renders a brand logo keeps the platform name in the markup and hides it
+visually; the logo itself stays `aria-hidden`, like every other decorative
+icon.
+
+`Tests/Unit/IconUsageTest::theBrandLogosAreTheAllowlistOfThePackageManifest`
+holds the list to being sorted, free of duplicates, at most fifteen entries
+long and equal to the committed directory;
+`theAttributionNamesTheTrademarkRestrictionOfTheBrandLogos` holds
+`ATTRIBUTION.txt` to naming the restriction.
 
 ## Licence and attribution
 
@@ -72,28 +139,52 @@ Two things meet that requirement, and both ship:
   `Resources/Public/`, which is not `export-ignore`d: they reach the composer
   dist archive and the TER artifact together with the icons.
 
+The same file adds a condition that CC BY 4.0 does not, for the brands style
+alone:
+
+> All brand icons are trademarks of their respective owners. The use of these
+> trademarks does not indicate endorsement of the trademark holder by Font
+> Awesome, nor vice versa. **Please do not use brand logos for any purpose
+> except to represent the company, product, or service to which they refer.**
+
+`ATTRIBUTION.txt` repeats it beside the files, because that is the copy that
+travels with the extension.
+
 ## The build and the gate
 
-The build is two npm scripts in the root `package.json`, next to the CSS build,
-run in the same node image through `runTests.sh`:
+The build is npm scripts in the root `package.json`, next to the CSS build,
+run in the same node image through `runTests.sh`. Two of them are the entry
+points the suites call; the rest are the steps they chain:
 
-| Script               | Suite             | Does                                                                                                                                        |
-|----------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `build:icons`        | `buildIcons`      | Empties `Solid/`, copies `svgs/solid/*.svg`, `LICENSE.txt` and `metadata/categories.yml` of the installed package into place, nothing else. |
-| `build:icons:verify` | `checkIconsBuild` | `diff -r` of the installed `svgs/solid/` against `Solid/`, and `diff -u` of the two licence files and of the two category files.            |
+| Script                      | Suite             | Does                                                                                                  |
+|-----------------------------|-------------------|-------------------------------------------------------------------------------------------------------|
+| `build:icons`               | `buildIcons`      | The three below, in order.                                                                            |
+| `build:icons:solid`         | —                 | Empties `Solid/` and copies `svgs/solid/*.svg` of the installed package into it, nothing else.        |
+| `build:icons:brands`        | —                 | Empties `Brands/` and copies the files `fontAwesomeBrands` names out of `svgs/brands/`, nothing else. |
+| `build:icons:meta`          | —                 | Copies `LICENSE.txt` and `metadata/categories.yml` of the installed package into place.               |
+| `build:icons:verify`        | `checkIconsBuild` | The three below, in order.                                                                            |
+| `build:icons:solid:verify`  | —                 | `diff -r` of the installed `svgs/solid/` against `Solid/`.                                            |
+| `build:icons:brands:verify` | —                 | Copies the allowlist into `.Build/icons-verify/Brands` and `diff -r`s that against `Brands/`.         |
+| `build:icons:meta:verify`   | —                 | `diff -u` of the two licence files and of the two category files.                                     |
 
 Both start with `npm ci`, which installs exactly the version of
 `package-lock.json` and refuses a tarball whose integrity hash does not match.
 The comparison fails in every direction: an edited file, a file missing from
 the committed set and a file in the committed set that the package does not
 have — a hand-drawn icon dropped next to the vendored ones — each make it exit
-non-zero. It is the icon counterpart of
+non-zero. `Brands/` is compared against the **allowlist applied to the
+package** rather than against the whole brands style, so it fails on the same
+three plus a fourth: a name added to or dropped from `fontAwesomeBrands`
+without running the build. It is the icon counterpart of
 [`checkCssBuild`](frontend-assets.md#the-checkcssbuild-gate), and like it
 compares files instead of asking `git`, for the same reason.
 
 The scripts are plain shell in `package.json` rather than a script below
 `Build/`, because `Build/` is `export-ignore`d and `package.json` ships: the
-rebuild path travels with the sources, as it does for the stylesheet.
+rebuild path travels with the sources, as it does for the stylesheet. The
+brand step is the one that cannot be shell alone — it reads a JSON array out
+of `package.json`, and the container images ship no `jq` — so it is a `node
+-e` expression, in the image that is already running `npm`.
 `ATTRIBUTION.txt` is not written by the build; it names the version and has to
 be changed by hand when the pin moves.
 
@@ -128,7 +219,8 @@ with the URL form and names the icon by its file name:
 
 | Argument   | Required | Does                                                                                                   |
 |------------|----------|--------------------------------------------------------------------------------------------------------|
-| `name`     | yes      | The icon: a file name below `Solid/` without `.svg`. `a-z`, `0-9` and `-` only.                        |
+| `name`     | yes      | The icon: a file name below the set's directory without `.svg`. `a-z`, `0-9` and `-` only.             |
+| `set`      | no       | `solid` (the default) or `brands`. Anything else throws — see [Brand logos](#brand-logos).             |
 | `label`    | no       | An accessible name. With one the icon is `role="img"` with `aria-label`; without, it is `aria-hidden`. |
 | `class`    | no       | Classes added after `theme-icon`, for the slot a component gives it.                                   |
 | `optional` | no       | Render nothing for an empty name or a name the set does not have. For a name read from a record.       |
@@ -325,9 +417,10 @@ every item.
 
 ## The rule
 
-Icons come **only** from the vendored Font Awesome Free solid set, and **only**
-through `<theme:icon>`. No SVG drawn into a template by hand, no icon as CSS
-generated content, no webfont, no sprite, no CDN.
+Icons come **only** from the vendored Font Awesome Free sets — the solid set
+for everything the theme means, the fifteen brand logos for naming a platform
+— and **only** through `<theme:icon>`. No SVG drawn into a template by hand,
+no icon as CSS generated content, no webfont, no sprite, no CDN.
 
 An icon is a glyph that stands for something — a kind of message, an action,
 a state. The stylesheet still draws a few shapes of its own, and they are
@@ -382,13 +475,15 @@ fails on any other `url()`.
 
 | Test                                                          | Guards                                                                                                                                     |
 |---------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `everyIconATemplateNamesIsShipped`                            | Every `name` a template passes is a file of the set — an icon a version bump renamed fails here, not on a page.                            |
+| `everyIconATemplateNamesIsShipped`                            | Every `name` a template passes is a file of the set its `set` names — an icon a version bump renamed fails here, not on a page.            |
 | `noTemplateDrawsAnSvgOfItsOwn`                                | No template below `Resources/Private/` contains an `<svg>` element.                                                                        |
 | `noStylesheetDrawsAGlyphAsGeneratedContent`                   | Every quoted `content` in the SCSS sources is empty or the breadcrumb's `/` — no `⚠`, no `✓`.                                              |
 | `aNameAnEditorPickedIsRenderedAsOptional`                     | Every `name` that is a variable carries `optional`, so a name a later version dropped costs the icon, not the page.                        |
 | `aStylesheetReferencesOnlyFilesOfTheIconSet`                  | Every `url()` of the SCSS sources is a file of `Solid/` by its path relative to the compiled stylesheet — no `data:` URI, no own image.    |
 | `theStyleguideListsTheIconsTheTemplatesUseAndTheSizeOfTheSet` | The icon table of the styleguide lists exactly the icons the templates use and the stylesheets mask, and the count it states is the set's. |
-| `theShippedSetIsThePinnedVersion`                             | The pin is exact, the lockfile agrees, and `ATTRIBUTION.txt` and every shipped file name that version.                                     |
+| `theShippedSetIsThePinnedVersion`                             | The pin is exact, the lockfile agrees, and `ATTRIBUTION.txt` and every shipped file of both sets name that version.                        |
+| `theBrandLogosAreTheAllowlistOfThePackageManifest`            | `fontAwesomeBrands` is sorted, unique, at most fifteen long, and equal to the committed `Brands/`.                                         |
+| `theAttributionNamesTheTrademarkRestrictionOfTheBrandLogos`   | `ATTRIBUTION.txt` names `Brands/` and the trademark restriction that travels with those files.                                             |
 
 `checkIconsBuild` proves the files equal the package; these prove that what
 refers to the files is still right.
@@ -402,11 +497,14 @@ refers to the files is still right.
 3. `Build/Scripts/runTests.sh -s buildIcons`, and change the version in
    `ATTRIBUTION.txt`.
 4. `Build/Scripts/runTests.sh -s checkIconsBuild`.
-5. Look at the diff of `Solid/`. Font Awesome renames and removes icons between
-   versions, a major one in particular, so a name the theme uses may be gone:
-   `-s unit` names it, see [the rule](#the-rule). Change the count the
-   styleguide states, and run `-s visual` — a redrawn icon changes pixels.
-6. Commit the lockfile, `package.json`, the set and both text files together.
+5. Look at the diff of `Solid/` and of `Brands/`. Font Awesome renames and
+   removes icons between versions, a major one in particular, so a name the
+   theme uses may be gone — and a name of `fontAwesomeBrands` that the new
+   version no longer has makes `buildIcons` itself fail, on the copy, naming
+   the file. `-s unit` names a template's icon that went missing, see
+   [the rule](#the-rule). Change the count the styleguide states, and run
+   `-s visual` — a redrawn icon changes pixels.
+6. Commit the lockfile, `package.json`, both sets and both text files together.
 
 ## See also
 
