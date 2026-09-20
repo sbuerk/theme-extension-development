@@ -1,0 +1,132 @@
+# The bridge to "fluid_styled_content".
+#
+# Read by the static include registered from
+# "Configuration/TCA/Overrides/sys_template.php" and, on TYPO3 v13, by the site
+# set "sbuerk/theme-extension-development-fsc" pointing at the same path - the
+# two delivery mechanisms the theme already has, see
+# "docs/architecture/typoscript-delivery.md".
+#
+# On v12 the static include is the only one of the two: site sets arrived in
+# v13.1 (#103437), and "fluid_styled_content" 12.4 ships no
+# "Configuration/Sets/" of its own either, so there is no
+# "typo3/fluid-styled-content" set to depend on there. The set beside this file
+# is inert on v12 rather than wrong, exactly as the theme's own set is.
+# @todo Fold the set back into the only delivery when v12 support is dropped.
+#
+# --- What this is for -------------------------------------------------------
+#
+# The theme renders every classic content element itself and does not depend on
+# "fluid_styled_content". Installed side by side, the two are not merely
+# redundant, they are order dependent: that extension starts its own rendering
+# with "lib.contentElement >" and rebuilds the object from nothing, so loaded
+# after the theme it takes the theme's Fluid paths with it, and loaded before
+# it leaves its own per-element data processing behind underneath the theme's.
+# Neither outcome is anything an integrator chose.
+#
+# This file makes the combination defined: the classic branches are cleared and
+# then declared again from the theme's own file, so the result is the rendering
+# the theme produces on its own, whichever of the two extensions was loaded
+# first.
+#
+# --- Why the branches are cleared rather than merged ------------------------
+#
+# "=<" and a plain assignment keep the children already on a path; only ">"
+# removes them ("AbstractAstBuilder::handleIdentifierUnsetLine()"). Re-declaring
+# "tt_content.textmedia" over the one "fluid_styled_content" left behind would
+# therefore inherit whatever the theme does not happen to overwrite, key by
+# key, and the leftovers are not cosmetic:
+#
+#   - "textmedia"/"textpic"/"image" keep that extension's "borderWidth" and
+#     "borderPadding" on "GalleryProcessor", which the theme never sets;
+#   - "table" is fed by "comma-separated-value" there and by this theme's own
+#     "TableProcessor" here, and the two produce different shapes - a flat list
+#     of rows against "{table.headerRow}"/"{table.bodyRows}"/"{table.footerRow}";
+#   - "menu_categorized_content" is assigned to "content" there and to "items"
+#     here, and its query is a join rather than the portable subquery this
+#     theme uses;
+#   - the nine "MenuProcessor" menus differ in "special", "levels" and sorting.
+#
+# A merged branch renders empty or wrong for each of those, and it does so
+# silently. Clearing first is what makes the bridged rendering identical to the
+# standalone rendering rather than approximately like it - which is exactly
+# what "FluidStyledContentBridgeTest" asserts, byte for byte.
+#
+# --- Which branches, and which one is left alone ----------------------------
+#
+# "fluid_styled_content" declares twenty-THREE branches in its own
+# "Configuration/TypoScript/setup.typoscript", and the same twenty-three in its
+# 12.4 and its 13.4 release - the two files are identical, read in both rather
+# than assumed from one. The twenty-two below are all of them but one.
+#
+# The one left out is "ContentElement/List.typoscript", and that is deliberate
+# and safe, read rather than assumed: it is "tt_content.list =<
+# lib.contentElement" plus "templateName = List" and nothing else on both
+# versions, and the re-import at the bottom of this file declares
+# "tt_content.list" with "templateName = Generic", which overwrites it. Nothing
+# of that branch survives, so clearing it would buy nothing and would cost the
+# plugin registrations described below.
+#
+# They are not all equally load bearing, and the difference was measured rather
+# than assumed. "header", "text", "div" and "html" get nothing from that
+# extension but a "templateName", which this theme overwrites when it declares
+# its own - removing their ">" lines changes no rendered byte, and they are kept
+# as a defence against that extension gaining data processing for them later.
+# The branches that genuinely leak are the ones carrying a "dataProcessing" or
+# "variables" block: the galleries, "bullets", "table", "uploads", "shortcut"
+# and the menus. "menu_categorized_content" is the sharpest of them - both
+# extensions wire "DatabaseQueryProcessor" there and the merged keys compose one
+# query out of two, which fails as a SQL syntax error rather than as wrong
+# markup.
+#
+# "tt_content.list" is deliberately NOT cleared. It is the historical plugin
+# CType, and "ExtensionUtility::configurePlugin()" writes straight into it -
+# "tt_content.list.20.<signature> = EXTBASEPLUGIN" - through
+# "defaultContentRendering", on v12.4 and v13.4 alike, at a point this file
+# cannot see. Clearing it could drop a third-party plugin's own registration,
+# which is a far worse failure than the leftover it would prevent. The CType is
+# still in EXT:frontend's TCA on both versions - deprecated on 13.4 by #105076,
+# not deprecated at all on 12.4.
+
+tt_content.header >
+tt_content.text >
+tt_content.image >
+tt_content.textpic >
+tt_content.textmedia >
+tt_content.bullets >
+tt_content.table >
+tt_content.uploads >
+tt_content.div >
+tt_content.html >
+tt_content.shortcut >
+tt_content.menu_pages >
+tt_content.menu_subpages >
+tt_content.menu_section >
+tt_content.menu_section_pages >
+tt_content.menu_sitemap >
+tt_content.menu_sitemap_pages >
+tt_content.menu_abstract >
+tt_content.menu_recently_updated >
+tt_content.menu_related_pages >
+tt_content.menu_categorized_pages >
+tt_content.menu_categorized_content >
+
+# The theme's own rendering, declared again on the cleared branches. This is
+# the very file the theme's own setup imports, so there is one definition of
+# the classic elements and not a second copy to keep in step.
+#
+# It re-declares "lib.contentElement = FLUIDTEMPLATE" as a plain assignment,
+# which keeps every child "fluid_styled_content" put there - its templates at
+# index "0", the integrator's "{$styles.templates.*}" at "10" and its
+# "settings" - and adds the theme's own paths at "5", between the two. See the
+# comment on that object for why "5".
+#
+# On both supported versions that is all it put there:
+# "Helper/ContentElement.typoscript" of 12.4 and of 13.4 carries no
+# "dataProcessing" on "lib.contentElement" at all, verified by a grep for
+# "dataProcessing" across that extension's whole TypoScript in both releases -
+# it matches only per-element branches. The "record-transformation" processor
+# that extension puts on the object is a v14 addition and is nothing this
+# branch has to reason about: the processor class itself arrived in 13.2
+# (#103783 "RecordTransformation data processor"), does not exist on 12.4 at
+# all, and fsc 13.4 does not use it.
+@import 'EXT:theme_extension_development/Configuration/TypoScript/ContentElements.typoscript'

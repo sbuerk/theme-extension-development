@@ -138,13 +138,14 @@ that the harness arranged what it claims — a record and no `dependencies` vers
 `dependencies` and no record. A harness that silently arranges nothing is
 exactly the failure mode a rendering suite cannot detect on its own.
 
-### No rendering test carries a core version group
+### A rendering test carries a core version group only when the set is its subject
 
-`#[Group('not-core-12')]` on the eleven tests would have been the short way to
+`#[Group('not-core-12')]` on all of them would have been the short way to
 green, and it would have deleted two thirds of the v12 coverage. The group
 belongs only where the **subject** is version specific:
-`SiteSetRenderingTest` and `StaticIncludeGuardTest`, whose subject is the site
-set, and the two version specific assertions of
+`SiteSetRenderingTest`, `StaticIncludeGuardTest` and
+`Core13/FluidStyledContentBridgeSetTest`, whose subject is the site set, and
+the two version specific assertions of
 `Tests/ExtensionCoreVersionCompatTestsTrait`.
 → [Dual core setup](../development/dual-core-setup.md#test-grouping)
 

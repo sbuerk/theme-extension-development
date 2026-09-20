@@ -206,8 +206,9 @@ Note the inverted logic: the group names the core version the test must **not**
 run on, so a test without any group runs everywhere.
 
 The group is used sparingly and deliberately. It belongs on a test whose
-**subject** is version specific — `SiteSetRenderingTest`, because site sets do
-not exist on v12, and the two version specific assertions of
+**subject** is version specific — `SiteSetRenderingTest`,
+`StaticIncludeGuardTest` and `Core13/FluidStyledContentBridgeSetTest`, because
+site sets do not exist on v12, and the two version specific assertions of
 [`ExtensionCoreVersionCompatTestsTrait`](../../Tests/ExtensionCoreVersionCompatTestsTrait.php).
 It does **not** belong on a test that merely needs the theme set up, because
 that would delete the test on the other version. Those go through

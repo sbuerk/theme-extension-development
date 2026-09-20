@@ -33,7 +33,7 @@ Documentation for people **using** the extension lives in
 | [Core version aware code](architecture/core-version-aware-code.md) | `Classes/` vs `Core12/` vs `Core13/`, how the right variant is selected, the configuration exception.                 |
 | [Dependency injection](architecture/dependency-injection.md)       | Symfony DI attributes, stateless services, the rules that apply.                                                      |
 | [Class design](architecture/class-design.md)                       | `final` with `readonly` properties, method injection in abstract classes, data objects, the accepted PHPStan ignores. |
-| [TypoScript delivery](architecture/typoscript-delivery.md)         | Site set on v13, the classic static include on both, the guard condition, page rendering.                             |
+| [TypoScript delivery](architecture/typoscript-delivery.md)         | Site set on v13, the classic static include on both, the guard condition, the `fluid_styled_content` bridge.          |
 | [Page rendering](architecture/page-rendering.md)                   | Backend layout registration, template name resolution, content slots, the Fluid structure.                            |
 | [Navigation](architecture/navigation.md)                           | Main menu, sub navigation, breadcrumb, the fixed rootline position, placement, accessibility.                         |
 | [Content elements](architecture/content-elements.md)               | Classic `CType` coverage, the `table` and `shortcut` decisions, escaping, a Fluid `&&` gotcha.                        |

@@ -4,15 +4,15 @@ How the code base is organised and which design rules apply to it. These are the
 rules this extension itself follows — the shipped `Example` classes exist to
 demonstrate them and are meant to be deleted once real code arrives.
 
-| Page                                                  | Contents                                                                                                                                                                            |
-|-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Core version aware code](core-version-aware-code.md) | `Classes/` vs `Core<major>/`, container based selection of the right variant, the interface + abstract + implementation pattern, the configuration exception.                       |
-| [Dependency injection](dependency-injection.md)       | Symfony DI attributes instead of `Services.yaml`, stateless services, private by default, `#[AsAlias]`, non-shared services.                                                        |
-| [Class design](class-design.md)                       | `final` with `readonly` properties and why the keyword is not on the class here, method injection in abstract classes, data objects vs services, the two accepted PHPStan ignores.  |
-| [TypoScript delivery](typoscript-delivery.md)         | The site set and the classic static include — one delivery path per supported core version — why `addStaticFile()` sits in a TCA override, and page rendering with `FLUIDTEMPLATE`. |
-| [Page rendering](page-rendering.md)                   | Why `FLUIDTEMPLATE` over `PAGEVIEW`, backend layout registration, template name resolution, content slots, the Fluid structure.                                                     |
-| [Navigation](navigation.md)                           | Main menu, sub navigation and breadcrumb, the fixed-rootline `leveluid:1` resolution, placement by backend layout, accessibility.                                                   |
-| [Content elements](content-elements.md)               | Classic `CType` coverage, why `table` needed a `DataProcessor`, `shortcut` recursion, escaping, a Fluid `&&` gotcha.                                                                |
+| Page                                                  | Contents                                                                                                                                                                           |
+|-------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Core version aware code](core-version-aware-code.md) | `Classes/` vs `Core<major>/`, container based selection of the right variant, the interface + abstract + implementation pattern, the configuration exception.                      |
+| [Dependency injection](dependency-injection.md)       | Symfony DI attributes instead of `Services.yaml`, stateless services, private by default, `#[AsAlias]`, non-shared services.                                                       |
+| [Class design](class-design.md)                       | `final` with `readonly` properties and why the keyword is not on the class here, method injection in abstract classes, data objects vs services, the two accepted PHPStan ignores. |
+| [TypoScript delivery](typoscript-delivery.md)         | The site set and the classic static include — one delivery path per supported core version — the `fluid_styled_content` bridge, and page rendering with `FLUIDTEMPLATE`.           |
+| [Page rendering](page-rendering.md)                   | Why `FLUIDTEMPLATE` over `PAGEVIEW`, backend layout registration, template name resolution, content slots, the Fluid structure.                                                    |
+| [Navigation](navigation.md)                           | Main menu, sub navigation and breadcrumb, the fixed-rootline `leveluid:1` resolution, placement by backend layout, accessibility.                                                  |
+| [Content elements](content-elements.md)               | Classic `CType` coverage, why `table` needed a `DataProcessor`, `shortcut` recursion, escaping, a Fluid `&&` gotcha.                                                               |
 
 ## The short version
 

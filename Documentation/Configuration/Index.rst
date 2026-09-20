@@ -243,7 +243,9 @@ Content elements
 
 The theme brings its own content element rendering and does **not** depend on
 :file:`fluid_styled_content` — that extension is not required here, and the
-development and test instances do not install it. What that covers:
+development instances do not install it. An installation that has it anyway
+enables the bridge instead, see :ref:`feature-fluid-styled-content-bridge`.
+What the theme's own rendering covers:
 
 *   Every classic content element :file:`EXT:frontend` registers, including
     :guilabel:`Text & Media`, :guilabel:`Bullet List`, :guilabel:`Table`,

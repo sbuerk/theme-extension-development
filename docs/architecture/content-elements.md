@@ -566,8 +566,9 @@ disagreeing on purpose, because there the shapes behind the names differ too
 (see [the two categorized types](#the-two-categorized-types-are-built-differently--deliberately)),
 and renaming either would advertise a shared contract that does not hold.
 `shortcut` is the one element where only the spelling differed, so the theme
-adopted that name so that a
-template written against either contract reads the same variable.
+adopted that name so that a template written against either contract reads the
+same variable — see
+[the bridge](typoscript-delivery.md#the-fluid_styled_content-bridge).
 
 `conf.tt_content =< tt_content` is what makes a referenced record render
 **exactly as it would on its own**: it copies the whole `tt_content` `CASE`
@@ -1047,10 +1048,17 @@ reasoning already written there.
 
 ### `lib.themeContentElement`: their own frame, not `lib.contentElement`
 
-All of them are `=< lib.themeContentElement`, a `FLUIDTEMPLATE` with the same
-three root paths `lib.contentElement` has — the `theme.*RootPath` constants at
-index `10` — and nothing else. The classic set above stays on
-`lib.contentElement`.
+All of them are `=< lib.themeContentElement`, a `FLUIDTEMPLATE` carrying the
+same three `theme.*RootPath` constants `lib.contentElement` carries, and nothing
+else. The classic set above stays on `lib.contentElement`.
+
+The two objects put those constants at **different indices**, deliberately.
+`lib.themeContentElement` uses `10`; `lib.contentElement` uses `5`, to leave
+room for `fluid_styled_content`'s own templates at `0` and an integrator's
+`{$styles.templates.*}` at `10` — see
+[the bridge](typoscript-delivery.md#the-fluid_styled_content-bridge). Nothing
+but this theme ever writes to an object of the theme's own name, so on that one
+there is no precedence to leave room for.
 
 The reason is `fluid_styled_content`. Its
 `Configuration/TypoScript/Helper/ContentElement.typoscript` starts with
@@ -1062,10 +1070,11 @@ fluid_styled_content's templates and fail. Nothing clears an object of the
 theme's own name, so these elements render the same whether that extension is
 installed or not, and in whichever order the two are loaded.
 
-The split also decides what a later bridge to fluid_styled_content has to do:
-add root paths to `lib.contentElement` at an index between its own `0` and the
-`10` of its `styles.templates.*` constants, for the classic set only. It never
-has to touch a `theme_*` element.
+The split is what the bridge to fluid_styled_content is built on: it adds root
+paths to `lib.contentElement` at an index between that extension's own `0` and
+the `10` of its `styles.templates.*` constants, and clears the classic branches
+before re-declaring them — for the classic set only. It never touches a
+`theme_*` element.
 
 Two objects rather than `lib.contentElement =< lib.themeContentElement`: the
 root paths are the whole definition, and a reference would make one object

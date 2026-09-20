@@ -46,13 +46,15 @@ in a frontend rather than only in a test assertion:
     :ref:`configuration`. It covers **every classic content element**
     :file:`EXT:frontend` registers, the eleven menu elements, the elements of
     its own, and third-party Extbase plugins, none of which requires
-    :file:`fluid_styled_content` — that extension is not a dependency here, and
-    the development and test instances do not install it. It ships six backend
-    layouts, a main menu, a section menu and a breadcrumb, and a light/dark
-    appearance switch. A seeded ``/styleguide`` page renders the whole component
-    library on one page, so the theme can be looked at without building content
-    for it first — see :ref:`feature-styleguide`. This chapter is extended along
-    with the implemented features.
+    :file:`fluid_styled_content` — that extension is not a dependency here and
+    the development instances do not install it. An installation that has it
+    anyway enables a bridge, which keeps the rendering the theme's own — see
+    :ref:`feature-fluid-styled-content-bridge`. It ships six backend layouts, a
+    main menu, a section menu and a breadcrumb, and a light/dark appearance
+    switch. A seeded ``/styleguide`` page renders the whole component library
+    on one page, so the theme can be looked at without building content for it
+    first — see :ref:`feature-styleguide`. This chapter is extended along with
+    the implemented features.
 
     Underneath that sits the foundation: TYPO3 v12 and v13 support from one
     code base with :ref:`core version aware <introduction-core-version-aware>`
