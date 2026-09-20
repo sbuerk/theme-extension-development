@@ -160,8 +160,34 @@ final class ContentElementAppearanceFormEngineTest extends AbstractFunctionalTes
     public static function fieldsWithoutRendering(): \Generator
     {
         yield 'layout' => ['field' => 'layout', 'uid' => 920];
-        yield 'sectionIndex' => ['field' => 'sectionIndex', 'uid' => 10];
-        yield 'linkToTop' => ['field' => 'linkToTop', 'uid' => 10];
+    }
+
+    /**
+     * `sectionIndex` and `linkToTop` were disabled for as long as the theme
+     * rendered neither. It renders both now - the table of contents of the
+     * aside is an `HMENU` with `sectionIndex = 1`
+     * (`Configuration/TypoScript/Navigation.typoscript`), and the link back to
+     * the top is `Layouts/ContentElement.html` - so both are offered again.
+     *
+     * Asserted as a pair with the negative case above: a `disabled` left in
+     * the page TSconfig, or a value misspelt there, raises nothing at all and
+     * simply leaves the two switches out of the form, which is exactly the
+     * state this change ends.
+     *
+     * @return \Generator<string, array{field: string}>
+     */
+    public static function fieldsTheThemeRenders(): \Generator
+    {
+        yield 'sectionIndex' => ['field' => 'sectionIndex'];
+        yield 'linkToTop' => ['field' => 'linkToTop'];
+    }
+
+    #[DataProvider('fieldsTheThemeRenders')]
+    #[Test]
+    public function aFieldTheThemeRendersIsOfferedAgain(string $field): void
+    {
+        $this->assertFalse(self::isDisabled($this->compile(10), $field), sprintf('"%s" is not offered.', $field));
+        $this->assertStringContainsString(self::inputName(10, $field), $this->renderedForm(10), sprintf('"%s" is not in the form.', $field));
     }
 
     #[DataProvider('fieldsWithoutRendering')]

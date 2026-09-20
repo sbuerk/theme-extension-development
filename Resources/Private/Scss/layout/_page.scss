@@ -71,6 +71,46 @@
     min-width: 0;
 }
 
+// The table of contents in the aside. The list itself is
+// ".theme-content-menu" - the component a flat list of links already is, the
+// same reuse "Templates/Page/Styleguide.html" makes for its own index - so
+// what this layout file owns is only where the block sits and the label above
+// it, never how the links look.
+//
+// It sticks while the page scrolls past it, from "bp.$md" up, where the aside
+// is a column of its own; below that the aside is stacked above the content
+// and there is nothing to stick to. The offset and the maximum height are the
+// pattern "layout/_styleguide.scss" uses for the styleguide index, so a long
+// table of contents scrolls inside its own column instead of running past the
+// bottom of the viewport.
+.theme-page__toc {
+    --theme-page-toc-spacing: var(--theme-space-6, 1.875rem);
+    --theme-page-toc-offset: var(--theme-space-4, 1.25rem);
+    --theme-page-toc-heading-color: var(--theme-color-text-secondary, #4a5567);
+
+    display: block;
+    margin-block-start: var(--theme-page-toc-spacing);
+
+    @media (min-width: bp.$md) {
+        position: sticky;
+        inset-block-start: var(--theme-page-toc-offset);
+        max-block-size: calc(100vh - 2 * var(--theme-page-toc-offset));
+        overflow-y: auto;
+    }
+}
+
+// A paragraph rather than a heading - see the partial for why the contents of
+// a page do not take a place in that page's outline. Set like the legend of
+// the display settings, which is the other label of a block of chrome.
+.theme-page__toc-heading {
+    margin: 0 0 var(--theme-space-2, 0.625rem);
+    color: var(--theme-page-toc-heading-color);
+    font-size: var(--theme-font-size-xs, 0.75rem);
+    font-weight: var(--theme-font-weight-bold, 800);
+    letter-spacing: var(--theme-letter-spacing-caps, 0.08em);
+    text-transform: uppercase;
+}
+
 // The vertical rhythm between whatever ".theme-page__main" holds is owned by
 // "components/_content-element.scss", not by this file: a "main" is not
 // guaranteed to hold content elements only (a form, a card grid, …), and a

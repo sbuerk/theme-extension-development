@@ -265,6 +265,12 @@ development and test instances do not install it. What that covers:
     :ref:`feature-gallery-lightbox`.
 *   Audio and video files in :guilabel:`Text & Media`, with a caption track —
     see :ref:`feature-audio-and-video`.
+*   A language menu in the site header, which shows a language the current page
+    is not translated into as unavailable rather than hiding it — see
+    :ref:`feature-language-menu`.
+*   A table of contents in the sidebar and a :guilabel:`Back to top` link, both
+    from the fields of the :guilabel:`Appearance` tab — see
+    :ref:`feature-table-of-contents-and-link-to-top`.
 *   Third-party Extbase plugins, which render through a generic template
     without any per-plugin configuration — see
     :ref:`feature-extbase-plugin-rendering` — on both delivery paths, the

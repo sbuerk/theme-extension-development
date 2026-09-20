@@ -1,0 +1,57 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The table of contents of the current page - one entry per content element
+    that is in the section index and has a header.
+
+    Rendered from "Partials/Page/Sidebar.html", so it appears on the
+    "content_sidebar" backend layout and nowhere else, for the reason the sub
+    navigation appears there: that is the layout with a column to put it in,
+    and choosing the layout is how an editor asks for one. A page without the
+    sidebar renders no aside at all ("Layouts/Default.html"), and a table of
+    contents floating in the content column would be a second, narrower
+    version of the page.
+
+    "{tableOfContents}" is built in "Configuration/TypoScript/Navigation.typoscript"
+    by an "HMENU" with "sectionIndex = 1" - see that file for why it cannot be
+    a "MenuProcessor" and what "useColPos" and "type" decide. It arrives as
+    markup, one "li.theme-content-menu__item" per entry, because a menu built
+    from an HMENU renders its own items; this partial owns the "nav" and the
+    "ul" around them so the landmark, its name and the list live in Fluid like
+    every other navigation of the theme.
+
+    "f:format.raw" renders this value as markup, so what goes into it has to
+    be escaped before it arrives. The structure is markup this extension's own
+    TypoScript produced; the one part that comes from the database is the
+    header of an element, and that is escaped by
+    "NO.stdWrap.htmlSpecialChars = 1" in the menu definition.
+
+    That escaping is not the core's doing and must not be dropped:
+    "sectionIndex()" assigns "$row['header']" to the item title verbatim, and
+    nothing in "ContentObject/Menu/" escapes a title at any point. Remove the
+    "stdWrap" and an editor's header of "<img src=x onerror=...>" becomes
+    stored XSS on every page that renders a table of contents.
+
+    Empty guard, as in the other three navigation partials: a page whose
+    elements are all out of the index, or all without a header, renders no
+    "nav" at all rather than an empty one. The heading is a "p" rather than an
+    "hN" - the aside sits beside the content, and a heading here would claim a
+    place in the page outline that the contents of the page do not have.
+
+    The landmark is named by that heading with "aria-labelledby", not by an
+    "aria-label" repeating it. The two carried the same words, so a reader
+    moving by landmark heard "On this page" and then read it again on screen.
+    One name, taken from the text that is already visible, and no second
+    string for a translator to keep in step with the first.
+</f:comment>
+<f:if condition="{tableOfContents}">
+    <nav class="theme-content-menu theme-page__toc" aria-labelledby="theme-page-toc-heading">
+        <p class="theme-page__toc-heading" id="theme-page-toc-heading">
+            <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.tableOfContentsHeading" />
+        </p>
+        <ul class="theme-content-menu__list">{tableOfContents -> f:format.raw()}</ul>
+    </nav>
+</f:if>
+
+</html>

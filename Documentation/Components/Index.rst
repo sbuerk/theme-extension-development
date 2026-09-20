@@ -49,9 +49,10 @@ What the library contains
     *   -   Forms
         -   Controls, field, input group, choice group, validation
     *   -   Navigation and page
-        -   Main and sub navigation, breadcrumb, pagination, content menu,
-            language menu, dropdown, skip link, gallery, the content element
-            wrapper, site header and site footer
+        -   Main and sub navigation, breadcrumb, pagination, content menu -
+            which is also the table of contents of a page - language menu,
+            dropdown, skip link, gallery, the content element wrapper, site
+            header and site footer
 
 ..  _icons:
 
