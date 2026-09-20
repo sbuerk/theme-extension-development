@@ -43,8 +43,10 @@ grows from one page per family of content elements to one page per element:
 Three sections are in the main navigation: :guilabel:`Elements`,
 :guilabel:`Typography`, and the component library on :guilabel:`Styleguide`
 with the form showcase on :guilabel:`Forms`, which used to be left out of every
-menu. The pages of a section are its sub pages, two levels deep in the main
-navigation and in the sub navigation of the section. :guilabel:`Empty page`,
+menu. :guilabel:`Layouts` joined them with the page layouts, see
+:ref:`feature-column-page-layouts`. The pages of a section are its sub pages,
+two levels deep in the main navigation and in the sub navigation of the
+section. :guilabel:`Empty page`,
 which exists to show the default layout, left the menus instead: it is reached
 by its URL and from the theme elements, and as a sixth top level entry it
 pushed the site title of the header onto a second line on a wide screen.

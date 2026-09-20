@@ -387,6 +387,13 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             '/elements/core' => 'content_sidebar',
             '/elements/menu' => 'content_sidebar',
             '/elements/theme' => 'content',
+            '/layouts' => 'content',
+            '/layouts/two-columns' => 'two_columns',
+            '/layouts/two-columns-wide' => 'two_columns_wide',
+            '/layouts/three-columns' => 'three_columns',
+            '/layouts/article' => 'article',
+            '/layouts/cover' => 'cover',
+            '/layouts/bands' => 'bands',
             '/styleguide' => 'styleguide',
             '/forms' => 'forms',
         ] as $path => $layout) {
@@ -425,6 +432,54 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * @return \Generator<string, array{path: string, labels: list<string>}>
+     */
+    public static function layoutDemoPages(): \Generator
+    {
+        // The label of every box, which names the slot and the colPos it was
+        // seeded into. They are the headers of ordinary content elements, so
+        // a label appearing in the rendered page means that element reached
+        // the column its layout declares and that the template reads it.
+        foreach ([
+            '/layouts/two-columns' => ['Stage - colPos 2', 'Main content - colPos 0', 'Second column - colPos 3'],
+            '/layouts/two-columns-wide' => ['Stage - colPos 2', 'Main content - colPos 0', 'Second column - colPos 3'],
+            '/layouts/three-columns' => ['Stage - colPos 2', 'Main content - colPos 0', 'Second column - colPos 3', 'Third column - colPos 4'],
+            '/layouts/article' => ['Stage - colPos 2', 'The article - colPos 0', 'The aside - colPos 1'],
+            '/layouts/cover' => ['Cover - colPos 0'],
+            '/layouts/bands' => ['First band - colPos 0', 'Second band - colPos 3', 'Third band - colPos 4'],
+        ] as $path => $labels) {
+            yield $path => ['path' => $path, 'labels' => $labels];
+        }
+    }
+
+    /**
+     * Every column a layout declares is labelled on its demo page.
+     *
+     * This is what makes the section readable as a wireframe - a look at the
+     * page says which colPos is which - and it is the only assertion that
+     * covers the seeded records reaching colPos 3 and 4 at all. `colPos` is
+     * an ordinary field written as the scenario declares it, so an element
+     * that never arrived in its column is a page missing one box, which
+     * nothing else here would notice.
+     *
+     * @param list<string> $labels
+     */
+    #[DataProvider('layoutDemoPages')]
+    #[Test]
+    public function aLayoutDemoPageLabelsEveryColumnItDeclares(string $path, array $labels): void
+    {
+        $body = $this->render($path);
+
+        foreach ($labels as $label) {
+            $this->assertStringContainsString(
+                $label,
+                $body,
+                sprintf('The page "%s" does not label the column "%s".', $path, $label),
+            );
+        }
+    }
+
+    /**
      * The styleguide renders through its own layout, not the 404 page - a
      * page that is `hidden` rather than merely out of a menu would answer
      * 404, which is why the two are asserted apart from the navigation.
@@ -443,10 +498,10 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      */
     public static function showcaseSections(): \Generator
     {
-        // The three sections the maintainer chose to have in the navigation:
-        // the content elements, the typography, and the component library
-        // with the form showcase.
-        foreach (['/elements', '/typography', '/styleguide', '/forms'] as $path) {
+        // The sections the maintainer chose to have in the navigation: the
+        // content elements, the typography, the page layouts, and the
+        // component library with the form showcase.
+        foreach (['/elements', '/typography', '/layouts', '/styleguide', '/forms'] as $path) {
             yield $path => ['path' => $path];
         }
     }
@@ -479,8 +534,11 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         foreach (['/typography/text', '/typography/article', '/elements/core', '/elements/frames'] as $path) {
             $this->assertStringContainsString(sprintf('href="%s"', $path), $menu, sprintf('"%s" is not in the main navigation.', $path));
         }
-        // The layout fallback fixture is reached by URL, not from the menu:
-        // a sixth top level link does not fit the header row.
+        // The layout fallback fixture is reached by URL, not from the menu.
+        // Not for want of room - the acceptance test of the header row holds
+        // seven top level entries at 1280 pixels and the showcase has six -
+        // but because a reviewer has no reason to open a page that exists to
+        // prove a fallback.
         $this->assertStringNotContainsString('href="/empty"', $menu);
 
         $sub = $this->navigation($this->render('/elements/core/bullets'), 'theme-nav-sub');

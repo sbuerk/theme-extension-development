@@ -1,0 +1,25 @@
+# A landing page that fills the viewport: one column, centred between the
+# header and the footer, and nothing else.
+#
+# No stage. The stage exists to carry a banner above the content of a page,
+# and a cover page is the banner - a second slot above it would only be a
+# second place to put the same element in, with no rendering to tell the two
+# apart.
+#
+# No footer columns either, for the reason "TwoColumns.tsconfig" gives.
+#
+# The centring is "Templates/Page/Cover.html" plus the ":has()" rule in
+# "layout/_page.scss"; the layout below only says that the page has one
+# column.
+mod.web_layout.BackendLayouts.cover {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.cover.title
+    config.backend_layout {
+        colCount = 1
+        rowCount = 1
+        rows.1.columns.1 {
+            name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+            identifier = main
+            colPos = 0
+        }
+    }
+}

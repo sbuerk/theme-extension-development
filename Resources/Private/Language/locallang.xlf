@@ -114,6 +114,24 @@
 			<trans-unit id="backendLayout.start.title">
 				<source>Start page</source>
 			</trans-unit>
+			<trans-unit id="backendLayout.twoColumns.title">
+				<source>Two columns (50/50)</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.twoColumnsWide.title">
+				<source>Two columns (66/33)</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.threeColumns.title">
+				<source>Three columns</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.article.title">
+				<source>Article</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.cover.title">
+				<source>Cover page</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.bands.title">
+				<source>Full-width bands</source>
+			</trans-unit>
 			<trans-unit id="backendLayout.styleguide.title">
 				<source>Styleguide</source>
 			</trans-unit>
@@ -125,6 +143,12 @@
 			</trans-unit>
 			<trans-unit id="backendLayout.colPos.sidebar.name">
 				<source>Sidebar</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.secondary.name">
+				<source>Second column</source>
+			</trans-unit>
+			<trans-unit id="backendLayout.colPos.tertiary.name">
+				<source>Third column</source>
 			</trans-unit>
 			<trans-unit id="backendLayout.colPos.stage.name">
 				<source>Stage</source>

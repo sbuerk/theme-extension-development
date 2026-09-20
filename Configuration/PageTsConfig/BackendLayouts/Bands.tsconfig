@@ -1,0 +1,40 @@
+# Three full width bands, stacked.
+#
+# The columns are the ones the column layouts already have - main (0),
+# secondary (3), tertiary (4) - laid out one below the other instead of side
+# by side, so a page moved between "three_columns" and "bands" changes how it
+# reads and not where its content sits. The numbering is the whole point of
+# reusing them; see "ThreeColumns.tsconfig".
+#
+# Three rather than one: a band is a section of a landing page, and an editor
+# who wants to reorder two sections should move a handful of elements between
+# two columns rather than drag every element of one section past every element
+# of the other inside a single column.
+#
+# "Full width" is the frontend's doing, not this file's: the page body drops
+# its content container when it holds a band stack - see "layout/_page.scss"
+# and "Templates/Page/Bands.html". The page module has no width to express.
+mod.web_layout.BackendLayouts.bands {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.bands.title
+    config.backend_layout {
+        colCount = 1
+        rowCount = 3
+        rows {
+            1.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+                identifier = main
+                colPos = 0
+            }
+            2.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.secondary.name
+                identifier = secondary
+                colPos = 3
+            }
+            3.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.tertiary.name
+                identifier = tertiary
+                colPos = 4
+            }
+        }
+    }
+}

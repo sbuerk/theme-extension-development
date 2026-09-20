@@ -22,6 +22,12 @@
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Content.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/ContentSidebar.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Start.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/TwoColumns.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/TwoColumnsWide.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/ThreeColumns.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Article.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Cover.tsconfig'
+@import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Bands.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Styleguide.tsconfig'
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Forms.tsconfig'
 

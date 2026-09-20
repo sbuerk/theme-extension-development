@@ -134,6 +134,54 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * The structures the multi column, cover and band page layouts are built
+     * from, asserted here and deliberately **not** in `shippedComponents()`.
+     *
+     * That provider is shared with
+     * `StyleguideRenderingTest::everyComponentOfTheLibraryIsShownOnTheStyleguide()`,
+     * which is the point of it: a component in the bundle that no specimen
+     * shows is a component nobody looks at. These are not components. They
+     * are page structure, written by `Templates/Page/*.html` and driven by the
+     * backend layout of the page, and the styleguide page renders through the
+     * `styleguide` layout, which has none of them. Putting them in that list
+     * would demand a specimen that fakes a page layout inside a page.
+     *
+     * What they still need is the guarantee the rest of that provider gives:
+     * that the rule reached the compiled bundle at all. Dropping a `@use` from
+     * `theme.scss` is otherwise invisible until someone opens a page on one of
+     * those layouts. `Tests/Functional/BackendLayoutRenderingTest` covers the
+     * other side, that the markup carries these class names.
+     *
+     * The opening brace is part of every string asserted, and it is not
+     * decoration: these names nest - `.theme-page__column` is a prefix of
+     * `.theme-page__columns`, which is a prefix of `.theme-page__columns--article` -
+     * so a bare substring check passes for a selector that was renamed,
+     * misspelled or never written, as long as a longer one containing it
+     * exists. It is the same trap `shippedComponents()` names for
+     * `.theme-media`, here for a whole family at once.
+     */
+    #[Test]
+    public function thePageLayoutStructuresArePartOfTheBundle(): void
+    {
+        $css = $this->stylesheet();
+
+        foreach ([
+            '.theme-page__columns{',
+            '.theme-page__columns--halves{',
+            '.theme-page__columns--wide-start{',
+            '.theme-page__columns--thirds{',
+            '.theme-page__columns--article{',
+            '.theme-page__column{',
+            '.theme-page__column--measure{',
+            '.theme-page__cover{',
+            '.theme-page__bands{',
+            '.theme-page__band{',
+        ] as $selector) {
+            $this->assertStringContainsString($selector, $css, sprintf('"%s" is not a rule of the compiled stylesheet.', $selector));
+        }
+    }
+
+    /**
      * The main navigation must be usable with no JavaScript at all.
      *
      * The toggle is a plain button, so it only does anything once a script

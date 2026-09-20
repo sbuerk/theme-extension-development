@@ -65,14 +65,20 @@ TypoScript itself.
 
 ## The layout table
 
-| Identifier        | Title                     | Template resolved          |
-|-------------------|---------------------------|----------------------------|
-| `default`         | Default                   | `Page/Default.html`        |
-| `content`         | Content page              | `Page/Content.html`        |
-| `content_sidebar` | Content page with sidebar | `Page/ContentSidebar.html` |
-| `start`           | Start page                | `Page/Start.html`          |
-| `styleguide`      | Styleguide                | `Page/Styleguide.html`     |
-| `forms`           | Form showcase             | `Page/Forms.html`          |
+| Identifier         | Title                     | Template resolved          |
+|--------------------|---------------------------|----------------------------|
+| `default`          | Default                   | `Page/Default.html`        |
+| `content`          | Content page              | `Page/Content.html`        |
+| `content_sidebar`  | Content page with sidebar | `Page/ContentSidebar.html` |
+| `start`            | Start page                | `Page/Start.html`          |
+| `two_columns`      | Two columns (50/50)       | `Page/TwoColumns.html`     |
+| `two_columns_wide` | Two columns (66/33)       | `Page/TwoColumnsWide.html` |
+| `three_columns`    | Three columns             | `Page/ThreeColumns.html`   |
+| `article`          | Article                   | `Page/Article.html`        |
+| `cover`            | Cover page                | `Page/Cover.html`          |
+| `bands`            | Full-width bands          | `Page/Bands.html`          |
+| `styleguide`       | Styleguide                | `Page/Styleguide.html`     |
+| `forms`            | Form showcase             | `Page/Forms.html`          |
 
 `default` is also the literal fallback identifier
 `PageLayoutResolver::getLayoutIdentifierForPage()` returns when neither a
@@ -85,16 +91,45 @@ selectable.
 Column numbers mirror `EXT:theme_camino`, so content is portable between the
 two themes:
 
-| Slot         | colPos | In layouts                            |
-|--------------|--------|---------------------------------------|
-| `main`       | 0      | all except `styleguide` and `forms`   |
-| `sidebar`    | 1      | `content_sidebar`                     |
-| `stage`      | 2      | `content`, `content_sidebar`, `start` |
-| `footermeta` | 10     | `content`, `content_sidebar`, `start` |
-| `footer1`    | 11     | `content`, `content_sidebar`, `start` |
-| `footer2`    | 12     | `content`, `content_sidebar`, `start` |
-| `footer3`    | 13     | `content`, `content_sidebar`, `start` |
-| `footer4`    | 14     | `content`, `content_sidebar`, `start` |
+| Slot         | colPos | In layouts                                                           |
+|--------------|--------|----------------------------------------------------------------------|
+| `main`       | 0      | all except `styleguide` and `forms`                                  |
+| `sidebar`    | 1      | `content_sidebar`, `article`                                         |
+| `stage`      | 2      | `content`, `content_sidebar`, `start`, the column layouts, `article` |
+| `secondary`  | 3      | `two_columns`, `two_columns_wide`, `three_columns`, `bands`          |
+| `tertiary`   | 4      | `three_columns`, `bands`                                             |
+| `footermeta` | 10     | `content`, `content_sidebar`, `start`                                |
+| `footer1`    | 11     | `content`, `content_sidebar`, `start`                                |
+| `footer2`    | 12     | `content`, `content_sidebar`, `start`                                |
+| `footer3`    | 13     | `content`, `content_sidebar`, `start`                                |
+| `footer4`    | 14     | `content`, `content_sidebar`, `start`                                |
+
+`secondary` and `tertiary` continue the numbering rather than starting a range
+of their own, and the three column layouts share them: a page moved from
+`three_columns` to `two_columns` keeps colPos 0 and 3 where they are and leaves
+colPos 4 unrendered, instead of reshuffling the first two columns. The page
+module shows content in a column the layout does not declare under *unused*,
+which an editor can recover; content silently rendered in another column is not
+recoverable, because nothing reports it.
+
+None of the layouts added after `start` carries **footer columns**. Those are
+edited once on the site root, which uses `start`, and slide down the rootline
+from there — a layout that repeats them offers five grid cells a sub page has
+no reason to fill.
+
+`article` reads `sidebar` (colPos 1) like `content_sidebar` does, so material
+moved between the two layouts stays where it is — but it renders it somewhere
+else, as a column of the article grid rather than as the page shell's
+navigation column. See
+[The article aside is not the shell's aside](#the-article-aside-is-not-the-shells-aside).
+
+`bands` reads the three *column* slots of `three_columns` — main (0),
+secondary (3) and tertiary (4) — stacked instead of side by side, so content
+moved between the two layouts stays in the slot it was in. The two are not
+interchangeable: `three_columns` declares a fourth area, `stage` (colPos 2),
+which `bands` has not got, so a page moved onto `bands` stops rendering its
+stage content. That content is not lost — the page module reports it as
+unused, the same way it reports colPos 4 on a two column page.
 
 `default` has **only** `main`. `styleguide` declares one column at `colPos
 999` — deliberately outside the range any `lib.content.*` object reads —
@@ -260,6 +295,12 @@ Templates/Page/Default.html
 Templates/Page/Content.html
 Templates/Page/ContentSidebar.html
 Templates/Page/Start.html
+Templates/Page/TwoColumns.html
+Templates/Page/TwoColumnsWide.html
+Templates/Page/ThreeColumns.html
+Templates/Page/Article.html
+Templates/Page/Cover.html
+Templates/Page/Bands.html
 Templates/Page/Styleguide.html
 Partials/Page/Header.html
 Partials/Page/Footer.html
@@ -292,6 +333,92 @@ entirely, which is what the selector actually needs.
 `BackendLayoutRenderingTest::onlyTheSidebarLayoutEmitsAnAside()` asserts
 exactly this: an aside on `/own` (`content_sidebar`), and none on any of the
 other layouts.
+
+## The column grid sits inside `.theme-page__main`, not on it
+
+`two_columns`, `two_columns_wide` and `three_columns` render their slots side
+by side. The grid that does it is a `.theme-page__columns` element **inside**
+`.theme-page__main`, not `.theme-page__main` itself, and that is forced rather
+than preferred: `.theme-page__main` is written once by `Layouts/Default.html`
+and holds more than the columns. The breadcrumb and the stage render into it
+first. Were it the grid, both would become items of the column track — the
+breadcrumb in the first of two columns, the stage in the second.
+
+Each column is a wrapper element of its own for the same kind of reason:
+`lib.content.<slot>` renders one `.theme-content-element` per record straight
+into its parent, so without a wrapper every element would be a grid item and
+two columns of three elements each would interleave row by row instead of
+stacking.
+
+The modifier carries the **ratio**, not the count — `--halves`, `--wide-start`,
+`--thirds` — because the count is already in the markup: the number of
+`.theme-page__column` children is what the template wrote, and only the track
+sizing differs between a layout of two equal columns and one of two unequal
+ones. That is also why
+`BackendLayoutRenderingTest::aColumnLayoutRendersEachSlotInItsOwnColumn()`
+asserts the modifier beside the content: `two_columns` and `two_columns_wide`
+produce identical markup apart from it, so a content-only check would pass with
+the two templates swapped.
+
+Below `bp.$md` every column layout is a single stacked column. Two columns of
+body text at 40rem are two columns of five words.
+
+## The article aside is not the shell's aside
+
+`article` and `content_sidebar` both read colPos 1, and they render it as two
+different things.
+
+`Layouts/Default.html` emits `.theme-page__aside` for any template that defines
+the `Aside` section, and `Templates/Page/ContentSidebar.html` is the only one
+that does: that element is the **navigation** column. It precedes the content
+in the source order, it is a fixed 15rem, and through
+`Partials/Page/Sidebar.html` it carries the sub navigation and the table of
+contents above whatever an editor placed in the slot.
+
+An article's aside is editorial. It has to follow the article in reading order,
+it carries no navigation, and it is sized against the article rather than
+against the page. So `Templates/Page/Article.html` does not define the `Aside`
+section at all and renders an `<aside class="theme-page__column">` inside its
+own grid instead — which also keeps `:has(.theme-page__aside)` on
+`.theme-page__body` out of it.
+
+The colPos is shared deliberately: to an editor both are "material that belongs
+beside the running text", and sharing the number means a page moved between the
+two layouts keeps its content. `BackendLayoutRenderingTest` pins both halves —
+`theArticleAsideIsAColumnAndNotTheShellAside()` for what it is, and
+`/article` in the list of `onlyTheSidebarLayoutEmitsAnAside()` for what it is
+not.
+
+The reading measure is a cap on the column (`.theme-page__column--measure`)
+rather than a grid track sized `minmax(0, var(--theme-measure))`. Both produce
+the same picture for prose, but the measure is a property of the text: a column
+holding a table or a gallery still gets the whole track.
+
+## Full width bands leave the content container
+
+`bands` is the one layout whose content is not inside the page's content
+container. `.theme-page__body:has(.theme-page__bands)` drops `max-width` and
+the inline padding, so each band spans the viewport; the header and the footer
+keep their own containers, so only the main area goes wide.
+
+The alternative — a band breaking out with `width: 100vw` and
+`margin-inline: calc(50% - 50vw)` — was rejected because `100vw` includes the
+scrollbar. On every platform that reserves one, such a band overflows by its
+width, and `Tests/Acceptance/frontend.spec.ts` measures exactly that with
+`document.documentElement.scrollWidth` — on `/layouts/bands`, the only page of
+the showcase that leaves the container, beside the assertion that the band
+stack really is as wide as the document. Widening the container instead cannot
+overflow: the body is still 100% of its parent.
+
+What holds the text off the viewport edge is the padding a content element
+already has inside its own box. How wide the **reading line** is inside a band
+stays the business of what an editor puts there — a call to action and a hero
+both hold their own text to the measure.
+
+The bands are flush against each other, which is what makes them read as bands.
+`.theme-page__bands` is a grid rather than plain block flow so the margin of
+the last element of one band cannot collapse through into the next; the space
+between two bands is the *space after* an editor sets on the element above.
 
 ## `data-theme-page-layout` on `.theme-page`
 

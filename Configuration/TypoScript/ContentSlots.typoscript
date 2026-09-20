@@ -34,6 +34,34 @@ lib.content.sidebar {
     }
 }
 
+# The second and third content column of the multi column page layouts
+# ("two_columns", "two_columns_wide", "three_columns"). They carry no name of
+# their own beyond their position: a column that is called "teaser" or "news"
+# is a column a template has to know the purpose of, and these are decided by
+# whatever an editor puts in them.
+#
+# No "slide": unlike the footer columns below, these are page content and an
+# empty second column on a sub page means the page has none, not that it
+# should show its parent's.
+
+lib.content.secondary = CONTENT
+lib.content.secondary {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=3
+    }
+}
+
+lib.content.tertiary = CONTENT
+lib.content.tertiary {
+    table = tt_content
+    select {
+        orderBy = sorting
+        where = {#colPos}=4
+    }
+}
+
 lib.content.stage = CONTENT
 lib.content.stage {
     table = tt_content
