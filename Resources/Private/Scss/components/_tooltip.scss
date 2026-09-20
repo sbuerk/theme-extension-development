@@ -38,8 +38,8 @@
 //
 // There is no collision handling beyond that. Keeping the bubble inside the
 // viewport whatever the trigger is what CSS anchor positioning is for, and
-// that is outside the browser floor DESIGN.md writes this stylesheet against,
-// so a trigger at the inline end of a narrow viewport is a placement to avoid.
+// that is still above the browser floor of DESIGN.md - Firefox 125 - so a
+// trigger at the inline end of a narrow viewport is a placement to avoid.
 //
 // See "components/_button.scss" for why every component declares its own
 // token layer with a fallback.

@@ -60,6 +60,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'divided description list' => '.theme-dl--divided',
             'dialog' => '.theme-dialog',
             'divider' => '.theme-divider',
+            'dropdown' => '.theme-dropdown',
             'embed' => '.theme-embed',
             'feature' => '.theme-feature',
             'feature grid' => '.theme-feature-grid',
@@ -107,6 +108,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'eyebrow text role' => '.theme-eyebrow',
             'lead text role' => '.theme-lead',
             'timeline' => '.theme-timeline',
+            'toggletip' => '.theme-toggletip',
             'tooltip' => '.theme-tooltip',
             'form field' => '.theme-field',
             'form input' => '.theme-input',
@@ -434,9 +436,11 @@ final class ComponentLibraryTest extends UnitTestCase
      * A row of the list group is the target of its link, so the link gives up
      * the ring around its title and the row carries it. It is drawn on the
      * link's own `::after`, the hit area covering the row, and not through
-     * `:has()` on the row: DESIGN.md sets the browser floor at Firefox 120,
-     * `:has()` arrived in 121, and a rule of the row alone would leave the
-     * keyboard focus invisible there (WCAG 2.4.7).
+     * `:has()` on the row. That began as a browser floor decision - the floor
+     * was Firefox 120 and `:has()` arrived in 121 - and the floor has since
+     * moved to 125, so the original reason no longer holds. The rule is kept
+     * because it depends on nothing but the link having `:focus-visible`,
+     * which is the simpler dependency for an indicator WCAG 2.4.7 requires.
      */
     #[Test]
     public function aListGroupRowShowsItsFocusRingWithoutHas(): void

@@ -36,10 +36,14 @@
 // on the "::after" of the link, the hit area that already covers the row, and
 // inset by the width of the outline so the frame of the list does not cut it
 // off. It depends on nothing but the link having ":focus-visible": the ring
-// must not be drawn through ":has()" on the row, because the browser floor of
-// DESIGN.md is Firefox 120 and ":has()" arrived in 121 - with the link's own
-// ring removed, focus would be invisible there. The hover fill does use
-// ":has()"; without it, the underline of the title is what hover shows.
+// is deliberately not drawn through ":has()" on the row. That began as a
+// browser floor decision - the floor was Firefox 120 and ":has()" arrived in
+// 121 - and the floor has since moved to 125, so ":has()" is inside it and the
+// reason no longer holds. The rule stays as it is anyway: it depends on
+// nothing but the link having ":focus-visible", which is the simpler
+// dependency, and rewriting a correct focus indicator buys nothing. The hover
+// fill does use ":has()"; without it, the underline of the title is what hover
+// shows.
 //
 // The image of a row is an avatar, ".theme-avatar" of "_avatar.scss", as a
 // direct child of the row. It sits beside the visible title, so it takes the
