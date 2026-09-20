@@ -567,7 +567,7 @@ references:
   -
     file: placeholder-portrait
     table: tt_content
-    uid: 6604
+    uid: 6605
     field: image
     values:
       alternative: 'A placeholder graphic in portrait format'

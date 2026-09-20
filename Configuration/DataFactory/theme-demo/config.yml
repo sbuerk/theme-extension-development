@@ -307,7 +307,7 @@ references:
   # Page 112, "Quotation styles": the portrait next to the attributed name.
   - {file: placeholder-portrait, table: tt_content, uid: 11206, field: image, values: {alternative: 'A placeholder portrait'}}
   # Page 56, "Article": the image the text flows around.
-  - {file: placeholder-portrait, table: tt_content, uid: 5604, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'Placed in the text, at the end of the line'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 5605, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'Placed in the text, at the end of the line'}}
 
   # Pages 90 to 92, below "Theme elements": the page media the card and
   # thumbnail layouts of the page menus on page 7 show, and the images of the

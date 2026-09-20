@@ -490,7 +490,14 @@ entities:
                   id: 56
                   title: 'Article'
                   slug: '/typography/article'
-                  backend_layout: 'content'
+                  # The one page of the typography section with a sidebar, and
+                  # the reason is the table of contents: the "HMENU" with
+                  # "sectionIndex = 1" of "Configuration/TypoScript/Navigation.typoscript"
+                  # is rendered by "Partials/Page/Sidebar.html", which only the
+                  # "content_sidebar" layout defines a column for. A long text
+                  # is where a reader wants one; its sibling pages are short
+                  # enough to read straight through and keep "content".
+                  backend_layout: 'content_sidebar'
               entities:
                 content:
                   - self:
@@ -498,8 +505,30 @@ entities:
                         CType: 'header'
                         header: 'How a content element reaches the page'
                         header_layout: 1
+                        # The title of the article, out of the table of
+                        # contents of the article: with it in, the first entry
+                        # of "On this page" is the page the reader is already
+                        # looking at. This is the core field an editor sets on
+                        # the Appearance tab, seeded to show what it does.
+                        sectionIndex: 0
+                  # The byline. An "html" element, because ".theme-byline" is
+                  # markup with no content element of its own - a site that
+                  # publishes articles would give it one, a theme showing the
+                  # component does not need to. "html" renders "bodytext" raw
+                  # and shows no header, which is what this needs.
                   - self:
                         id: 5602
+                        CType: 'html'
+                        header: 'Byline (not visible in the frontend)'
+                        sectionIndex: 0
+                        bodytext: |
+                          <p class="theme-byline">
+                              <span class="theme-byline__item">By <span class="theme-byline__author">The theme team</span></span>
+                              <time class="theme-byline__item" datetime="2026-09-20">20 September 2026</time>
+                              <span class="theme-byline__item">Six minutes</span>
+                          </p>
+                  - self:
+                        id: 5603
                         CType: 'text'
                         bodytext: |
                           <p class="theme-lead">An editor fills in a form and saves it. A
@@ -512,7 +541,7 @@ entities:
                           figures, tables and code can be read as a whole rather than one
                           specimen at a time.</p>
                   - self:
-                        id: 5603
+                        id: 5604
                         CType: 'text'
                         header: 'The record'
                         header_layout: 2
@@ -526,9 +555,10 @@ entities:
                           element belongs to, its position in the column and its language are
                           written by the backend itself. They matter just as much: a content
                           element is rendered because a page asks for the content of one of
-                          its columns, not because the element exists.</p>
+                          its columns<sup class="theme-footnote-ref" id="fnref1"><a href="#fn1">1</a></sup>,
+                          not because the element exists.</p>
                   - self:
-                        id: 5604
+                        id: 5605
                         CType: 'textpic'
                         header: 'The frame'
                         header_layout: 2
@@ -549,7 +579,7 @@ entities:
                           and the number of columns, and the theme floats it, so this text
                           flows around it and continues under it once it is past.</p>
                   - self:
-                        id: 5605
+                        id: 5606
                         CType: 'bullets'
                         header: 'What the frame reads'
                         header_layout: 2
@@ -561,7 +591,7 @@ entities:
                           The alignment and the look of the header
                           The CType, for the modifier and the outline
                   - self:
-                        id: 5606
+                        id: 5607
                         CType: 'text'
                         header: 'The template'
                         header_layout: 2
@@ -574,9 +604,10 @@ entities:
                           computes what a processor could hand it.</p></blockquote>
                           <p>That division is the reason a table element and a table of the
                           rich text look the same: both end in the same component, one from
-                          a processor, the other from the source view of the editor.</p>
+                          a processor, the other from the source view of the
+                          editor<sup class="theme-footnote-ref" id="fnref2"><a href="#fn2">2</a></sup>.</p>
                   - self:
-                        id: 5607
+                        id: 5608
                         CType: 'table'
                         header: 'The fields of a table element'
                         header_layout: 3
@@ -591,10 +622,16 @@ entities:
                           table_delimiter|The character code of the column separator|TableProcessor
                           table_header_position|Header row, header column, or none|TableProcessor
                           table_class|The look of the table|Table.html
+                  # Out of the table of contents, like the byline and the
+                  # notes and for the same reason: "html" renders no header,
+                  # so an entry for this element would name a heading that is
+                  # nowhere on the page. Moving the article to a layout with a
+                  # table of contents is what made that visible.
                   - self:
-                        id: 5608
+                        id: 5609
                         CType: 'html'
                         header: 'The TypoScript of the bullet list (name only, not rendered)'
+                        sectionIndex: 0
                         bodytext: |
                           <figure class="theme-code">
                               <figcaption class="theme-code__caption">
@@ -607,7 +644,7 @@ entities:
                           }</code></pre>
                           </figure>
                   - self:
-                        id: 5609
+                        id: 5610
                         CType: 'text'
                         header: 'What is left to the editor'
                         header_layout: 2
@@ -619,6 +656,38 @@ entities:
                           <p>Everything else - the markup, the spacing, the colours in both
                           appearances - follows from the theme, which is what lets a page of
                           many elements read as one page.</p>
+                  # The notes the two references above point at, and a link
+                  # back to the top of the page. "linkToTop" is seeded on the
+                  # card group page as well (element 9005). What is new on this
+                  # page is "sectionIndex", which no element of the set carried
+                  # before it.
+                  #
+                  # Out of the table of contents: it is the end of the page,
+                  # not a section of it, and the reader arrives there by
+                  # following a reference rather than by picking it from a
+                  # list.
+                  - self:
+                        id: 5611
+                        CType: 'html'
+                        header: 'Footnotes (not visible in the frontend)'
+                        sectionIndex: 0
+                        linkToTop: 1
+                        bodytext: |
+                          <aside class="theme-footnotes" aria-labelledby="article-footnotes-heading">
+                              <h2 class="theme-footnotes__heading" id="article-footnotes-heading">Notes</h2>
+                              <ol class="theme-footnotes__list">
+                                  <li class="theme-footnotes__item" id="fn1">
+                                      1. The column is the <code>colPos</code> of the element, and the backend
+                                      layout of the page decides which columns exist at all.
+                                      <a class="theme-footnotes__backlink" href="#fnref1" aria-label="Back to reference 1"></a>
+                                  </li>
+                                  <li class="theme-footnotes__item" id="fn2">
+                                      2. Which is also why an element moved into a column the layout of its
+                                      page does not have disappears from the page without being deleted.
+                                      <a class="theme-footnotes__backlink" href="#fnref2" aria-label="Back to reference 2"></a>
+                                  </li>
+                              </ol>
+                          </aside>
 
         - self:
               id: 3
@@ -2886,11 +2955,14 @@ entities:
                             layout: 1
                             tx_theme_columns: 3
                             tx_theme_list_items: '159,160,161,162,163'
-                            # The one seeded element with a link back to the
-                            # top of the page: it is the last element of a
-                            # "content_sidebar" page, which is where such a
-                            # link is worth anything. Every other element keeps
-                            # the TCA default of 0.
+                            # A link back to the top of the page, because this
+                            # is the last element of a long "content_sidebar"
+                            # page - which is where such a link is worth
+                            # anything, and the only reason the field is
+                            # seeded anywhere. The other elements that carry
+                            # it are the last ones of the article and of the
+                            # cheatsheet, for the same reason; everything else
+                            # keeps the TCA default of 0.
                             linkToTop: 1
                       # "layout" 2 is the wall: the cards keep their own
                       # heights and stack into columns, filled top to bottom.
