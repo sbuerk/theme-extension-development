@@ -152,13 +152,16 @@
 }
 
 // A narrow row: the menu does not shrink below its one row width as long as
-// that is at most 60% of the row, and wraps inside that width beyond it; the
-// brand shrinks and wraps. 60% leaves the brand the room of its longest word
-// with seven entries at 768 pixels, so nothing spills sideways.
+// that is at most half the row, and wraps inside that width beyond it; the
+// brand shrinks and wraps. It was 60% while the actions slot held one control,
+// the settings cog. The language dropdown is a second one, and 60% then left
+// the brand less than its longest word with seven entries at 768 pixels and
+// the row spilled sideways. 50% is what the two controls leave, checked at 768
+// and at 900 pixels by "Tests/Acceptance/frontend.spec.ts".
 @media (min-width: bp.$md) and (max-width: bp.$lg-max) {
     .theme-site-header .theme-nav-main {
         flex: none;
-        max-inline-size: 60%;
+        max-inline-size: 50%;
     }
 }
 
@@ -193,4 +196,15 @@
     flex: none;
     align-items: center;
     gap: var(--theme-space-3, 0.9375rem);
+
+    // Below the breakpoint the row holds the brand, the menu toggle and two
+    // controls - the language dropdown and the settings cog - and at 375
+    // pixels that came to 375.3: a third of a pixel of sideways scroll, which
+    // "Tests/Acceptance/frontend.spec.ts" measures on "scrollWidth" and which
+    // no eye would catch. The slot tightens its own gap there rather than the
+    // header tightening everything: the two controls are what was added, so
+    // they are what gives the width back.
+    @media (max-width: bp.$md-max) {
+        gap: var(--theme-space-1, 0.3125rem);
+    }
 }

@@ -70,6 +70,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'gallery' => '.theme-gallery',
             'hero' => '.theme-hero',
             'icon' => '.theme-icon',
+            'language menu' => '.theme-language-menu',
             'lightbox' => '.theme-lightbox',
             'link decoration' => '.theme-link',
             'list' => '.theme-list',

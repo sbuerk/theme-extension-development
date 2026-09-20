@@ -33,3 +33,36 @@ languages:
     navigationTitle: English
     flag: us
     websiteTitle: ''
+  # A second language, so the language menu of the header has something to
+  # show. The showcase is seeded in English only, and that is deliberate:
+  # "sbuerk/data-factory" declares records through "self", "children" and
+  # "entities" and has no way to express a translation, so a German page tree
+  # cannot be seeded at all.
+  #
+  # The honest result is what the menu renders. Every page of the demo is
+  # untranslated, so "LanguageMenuProcessor" reports "available = 0" for this
+  # language on every page and "Partials/Navigation/Language.html" shows it as
+  # plain text rather than a link. "fallbackType: strict" is what says so:
+  # there is no fallback, and a reader is not sent to an English page dressed
+  # as a German one.
+  #
+  # "fallbackType: fallback" with "fallbacks: 0" would not change the menu
+  # either - "PageRepository::getPageOverlaysForLanguage()" filters the default
+  # language out of the overlay chain, so there would still be no overlay and
+  # the entry would still be unavailable. It would only change what the page
+  # itself renders.
+  #
+  # No "sys_language" record is needed: that table was removed in TYPO3 v12,
+  # and a site language is the site configuration alone.
+  -
+    title: German
+    enabled: true
+    languageId: 1
+    base: /de/
+    locale: de_DE.UTF-8
+    navigationTitle: Deutsch
+    flag: de
+    websiteTitle: ''
+    hreflang: de-DE
+    fallbackType: strict
+    fallbacks: ''

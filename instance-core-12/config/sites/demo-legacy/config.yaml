@@ -27,3 +27,19 @@ languages:
     navigationTitle: English
     flag: us
     websiteTitle: ''
+  # The second language of the mirror, matching the "demo" site - see the
+  # comment there. The legacy tree is the same showcase delivered through a
+  # "sys_template" record, so it carries the same languages and renders the
+  # same honest "unavailable" state for every one of its untranslated pages.
+  -
+    title: German
+    enabled: true
+    languageId: 1
+    base: /de/
+    locale: de_DE.UTF-8
+    navigationTitle: Deutsch
+    flag: de
+    websiteTitle: ''
+    hreflang: de-DE
+    fallbackType: strict
+    fallbacks: ''

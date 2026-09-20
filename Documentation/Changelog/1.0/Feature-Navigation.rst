@@ -109,5 +109,5 @@ the intended, working state without JavaScript, not a degraded one. See
 
 ..  note::
 
-    There is no language navigation. Nothing in this release asks for one, and
-    the theme has no multi-language story yet.
+    The language navigation is a feature of its own - see
+    :ref:`feature-language-menu`.

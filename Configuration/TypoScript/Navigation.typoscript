@@ -135,4 +135,23 @@ page.10.dataProcessing {
         special = rootline
         special.range = 0|-1
     }
+
+    # The languages of the site, for "Partials/Navigation/Language.html".
+    #
+    # "LanguageMenuProcessor" is stock core and takes four keys only - "if",
+    # "languages", "as" and "addQueryString"; anything else throws
+    # (1522959188), which is why there is no "special" here: the processor
+    # sets "special = language" itself.
+    #
+    # It is a fourth numbered key for the reason the three above are numbered:
+    # a site package drops "page.10.dataProcessing.40 >" and keeps the rest.
+    #
+    # An untranslated page comes out of it with "available = 0", and the
+    # partial renders that state rather than hiding the language - see the
+    # comment there for why "fallbackType" cannot change it.
+    40 = TYPO3\CMS\Frontend\DataProcessing\LanguageMenuProcessor
+    40 {
+        as = languageMenu
+    }
 }
+
