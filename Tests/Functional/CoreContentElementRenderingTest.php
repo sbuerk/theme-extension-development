@@ -163,7 +163,7 @@ final class CoreContentElementRenderingTest extends AbstractFunctionalTestCase
     /**
      * The markup of one content element, by its CType.
      *
-     * The page renders twenty-five elements across twenty-two CTypes, so
+     * The page renders twenty-six elements across twenty-two CTypes, so
      * asserting against the whole response cannot tell "this menu selected it"
      * from "some other element on the page happens to contain it".
      *
@@ -282,6 +282,37 @@ final class CoreContentElementRenderingTest extends AbstractFunctionalTestCase
             2,
             substr_count($this->render(), 'First item'),
             'The shortcut did not render the record it references.',
+        );
+    }
+
+    /**
+     * The theme's own cycle break, pinned by what only it can produce.
+     *
+     * Inside a shortcut, the `shortcut` branch of the content element `CASE`
+     * is overridden to render nothing. The fixture therefore holds a chain
+     * rather than a cycle: uid 84 references uid 80, which references the
+     * bullet list. Nothing about that chain is circular, so a register
+     * tracking already-rendered records would happily render all three levels
+     * and the bullet list would appear a third time.
+     *
+     * It appears twice - in its own place and through uid 80 - because the
+     * second level renders nothing at all.
+     *
+     * This is the distinguishing observation, and it is why the test exists
+     * beside `aCircularShortcutDoesNotTakeTheRequestDown`: that one passes on
+     * v13.4 whether or not this theme breaks the cycle, because the core's own
+     * `RecordsContentObject` register (`$recordRegister`) already keeps a
+     * *cycle* from taking the request down there. Verified by removing
+     * `conf.tt_content.shortcut` from the rendering definition and watching it
+     * stay green on v13. This test goes red there instead.
+     */
+    #[Test]
+    public function aShortcutInsideAShortcutRendersNothing(): void
+    {
+        $this->assertSame(
+            2,
+            substr_count($this->render(), 'First item'),
+            'A shortcut nested in a shortcut rendered its target instead of nothing.',
         );
     }
 
