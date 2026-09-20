@@ -163,9 +163,11 @@ return [
         // icon: "Partials/ContentElement/LinkList.html" and
         // "Templates/ContentElements/ThemeMediaTeaserGrid.html".
         //
-        // A "selectSingle" of string values: "DefaultTcaSchema" derives a
-        // "VARCHAR(255) DEFAULT ''" column from it on v13.4 and v14.3, so like
-        // every other column here it needs no "ext_tables.sql".
+        // A "selectSingle" of string values, but with an "itemsProcFunc":
+        // "DefaultTcaSchema" cannot know what such a field persists, skips the
+        // item branch and falls through to a nullable "TEXT" on v13.4 and
+        // v14.3 alike - measured in both, not inferred from the item values.
+        // Like every other column here it needs no "ext_tables.sql".
         'link_icon' => [
             'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.link_icon',
             'config' => IconItems::selectConfig(),
@@ -181,9 +183,9 @@ return [
         // Named for the item and not for one element, so every element with an
         // icon per item uses this one column. The icons it offers by default
         // are the curated list of "Configuration/PageTsConfig/IconPicker.tsconfig".
-        // A "selectSingle" of string values, so "DefaultTcaSchema" derives a
-        // "VARCHAR(255) DEFAULT ''" column on v13.4 and v14.3, as for
-        // "link_icon".
+        // A "selectSingle" with an "itemsProcFunc", so "DefaultTcaSchema"
+        // derives a nullable "TEXT" column on v13.4 and v14.3, as for
+        // "link_icon" above.
         'icon' => [
             'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.icon',
             'config' => IconItems::selectConfig(),

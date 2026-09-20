@@ -36,9 +36,10 @@ ExtensionManagementUtility::addTCAcolumns('tx_theme_list_item', [
     // relation of "theme_pricing" puts it in its "showitem", so no editor is
     // offered a switch nothing renders.
     //
-    // "type => check" with the default 0: "DefaultTcaSchema" derives a
-    // "SMALLINT DEFAULT 0" column from it on v13.4 and v14.3, so it needs no
-    // "ext_tables.sql" like every other column here.
+    // "type => check" with the default 0: "DefaultTcaSchema" derives an
+    // unsigned "SMALLINT NOT NULL DEFAULT 0" column from it on v13.4 and
+    // v14.3 - the default comes from the TCA, the rest is fixed - so it needs
+    // no "ext_tables.sql" like every other column here.
     'highlighted' => [
         'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.highlighted',
         'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.highlighted.description',

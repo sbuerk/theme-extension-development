@@ -228,8 +228,8 @@ final class LinkDecorationTest extends UnitTestCase
     }
 
     /**
-     * A "FrontendTypoScript" whose "config." was never set up throws when it is
-     * read. That is a request that is not a page rendering, and it must not
+     * A content object renderer without a request throws when it is asked for
+     * one. That is a link built outside a page rendering, and it must not
      * break the link.
      */
     #[Test]
