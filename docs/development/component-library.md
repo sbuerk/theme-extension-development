@@ -1383,10 +1383,14 @@ way when the row gets tight depends on its width:
   half the row, and the navigation shrinks down to its widest entry and wraps.
   That holds seven top level entries beside the title of the showcase at 1280
   pixels, where a sixth used to push the title onto a second line.
-- Between `bp.$md` and `bp.$lg` the menu keeps its row, up to 60% of the row,
+- Between `bp.$md` and `bp.$lg` the menu keeps its row, up to 50% of the row,
   and the brand wraps beside it — held to one line there, the title left a
   menu of three entries on two rows next to a title on two lines anyway. A
-  menu wider than 60% wraps inside that width, so nothing spills sideways.
+  menu wider than 50% wraps inside that width, so nothing spills sideways. It
+  was 60% while the actions slot held one control, the settings cog; the
+  language dropdown is a second one, and 60% then left the brand less than
+  its longest word with seven entries at 768 pixels and the row spilled
+  sideways — `layout/_site-header.scss` says so at the rule.
 
 The showcase itself has **six** top level entries since the page layouts were
 added, and its own menu therefore takes two rows at 1280 pixels beside a title
