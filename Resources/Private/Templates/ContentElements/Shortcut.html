@@ -15,11 +15,12 @@
     column it comes from - see "ContentElements.typoscript" for why.
 
     Rendering another content element risks recursion: a shortcut pointing at
-    itself, or at a shortcut that points back. See
-    "Configuration/TypoScript/ContentElements.typoscript" for what was
-    verified about the core's guard against exactly that, in
-    "RecordsContentObject::render()" - this template does not add one of its
-    own because the core one already covers it.
+    itself, or at a shortcut that points back. The cycle is broken in
+    "Configuration/TypoScript/ContentElements.typoscript", not here - inside a
+    shortcut, the shortcut branch of the content element "CASE" renders
+    nothing, so no chain of references can return to its start. That file also
+    records what was verified about the core's own guard, which exists on
+    v13.4 and was removed with "TypoScriptFrontendController" on v14.
 
     "header" is not rendered, same reasoning as "div" and "html":
     EXT:frontend's language file overrides its label to "Name (not visible in
