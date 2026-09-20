@@ -1,0 +1,44 @@
+# A stage banner and three content columns of equal width: the two of
+# "TwoColumns.tsconfig" and colPos 4 ("tertiary") beside them.
+#
+# The columns keep their numbers across the three column layouts on purpose -
+# 0, then 3, then 4 - so moving a page between them never moves content: a
+# page switched from "three_columns" to "two_columns" keeps colPos 0 and 3
+# where they are and leaves colPos 4 unrendered rather than reshuffling the
+# first two. The page module shows an element in a column the layout does not
+# declare under "unused", which is recoverable; content silently rendered in
+# another column is not.
+mod.web_layout.BackendLayouts.three_columns {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.threeColumns.title
+    config.backend_layout {
+        colCount = 3
+        rowCount = 2
+        rows {
+            1.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.stage.name
+                identifier = stage
+                colPos = 2
+                colspan = 3
+            }
+            2 {
+                columns {
+                    1 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+                        identifier = main
+                        colPos = 0
+                    }
+                    2 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.secondary.name
+                        identifier = secondary
+                        colPos = 3
+                    }
+                    3 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.tertiary.name
+                        identifier = tertiary
+                        colPos = 4
+                    }
+                }
+            }
+        }
+    }
+}

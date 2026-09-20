@@ -1,0 +1,46 @@
+# A stage banner and two content columns of equal width.
+#
+# The second column is colPos 3 ("secondary"), the third colPos 4
+# ("tertiary") - see "ThreeColumns.tsconfig". They continue the numbering of
+# the columns the theme already had (0 main, 1 sidebar, 2 stage, 10-14 the
+# footer) rather than starting a range of their own, so an editor who moves a
+# page from "two_columns" to "three_columns" keeps the content of both columns
+# where it was.
+#
+# No footer columns. They are edited once on the site root, which carries the
+# "start" layout, and slide down the rootline from there
+# ("Configuration/TypoScript/ContentSlots.typoscript") - repeating them here
+# would offer five grid cells an editor has no reason to fill on a sub page.
+#
+# The grid the frontend draws is "theme-page__columns--halves" in
+# "Templates/Page/TwoColumns.html"; the backend layout below is what the page
+# module offers, and the two are only related by the colPos numbers.
+mod.web_layout.BackendLayouts.two_columns {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.twoColumns.title
+    config.backend_layout {
+        colCount = 2
+        rowCount = 2
+        rows {
+            1.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.stage.name
+                identifier = stage
+                colPos = 2
+                colspan = 2
+            }
+            2 {
+                columns {
+                    1 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+                        identifier = main
+                        colPos = 0
+                    }
+                    2 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.secondary.name
+                        identifier = secondary
+                        colPos = 3
+                    }
+                }
+            }
+        }
+    }
+}

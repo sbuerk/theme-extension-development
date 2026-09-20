@@ -1,0 +1,44 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Backend layout "bands" (Configuration/PageTsConfig/BackendLayouts/Bands.tsconfig)
+    - "main" (colPos 0), "secondary" (colPos 3) and "tertiary" (colPos 4) as
+    three full width bands, one below the other.
+
+    No breadcrumb and no stage: this is a landing layout, and its first band
+    is what a stage would otherwise hold.
+
+    ".theme-page__bands" is what takes the page out of its content container.
+    "layout/_page.scss" reacts to it with ":has()" on ".theme-page__body" -
+    the same way the shell reacts to an aside - rather than this template
+    setting a modifier on an element it does not write. The alternative, a
+    band breaking out with "width: 100vw" and a negative margin, was rejected:
+    "100vw" includes the scrollbar, so it overflows by its width on every
+    platform that reserves one, and the acceptance suite measures exactly that
+    on "/layouts/bands" itself ("document.documentElement.scrollWidth" in
+    "Tests/Acceptance/frontend.spec.ts").
+
+    Each band is an element of its own so a band can be spaced without
+    reaching into the content elements inside it. The bands themselves are
+    flush, which is what makes them read as bands; the space between two of
+    them is the "space after" an editor sets on the last element of the one
+    above.
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <div class="theme-page__bands">
+        <div class="theme-page__band">
+            <f:cObject typoscriptObjectPath="lib.content.main" />
+        </div>
+        <div class="theme-page__band">
+            <f:cObject typoscriptObjectPath="lib.content.secondary" />
+        </div>
+        <div class="theme-page__band">
+            <f:cObject typoscriptObjectPath="lib.content.tertiary" />
+        </div>
+    </div>
+</f:section>
+
+</html>

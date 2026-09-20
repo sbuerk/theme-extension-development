@@ -9,8 +9,9 @@ Feature: Backend layouts decide the page template
 Description
 ===========
 
-The theme ships **six backend layouts**, and the layout selected on a page now
+The theme ships **backend layouts**, and the layout selected on a page now
 decides which template renders it. Until now every page rendered the same file.
+The six this step adds:
 
 ..  list-table::
     :header-rows: 1

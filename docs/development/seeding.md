@@ -84,11 +84,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                                                                                                                                                                        |
-|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 151 and 170 — forty-one pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                             |
-| `tx_theme_list_item` | 1 to 18 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                |
+| Table                | Uids                                                                                                                                                                                                                 |
+|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 151 and 170 to 177 — forty-eight pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                      |
+| `tx_theme_list_item` | 1 to 18 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                         |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -212,9 +212,12 @@ instance does not load.
 ## The demo tree
 
 Not a sample of the format — the frontend this extension is developed against.
-The first ten pages carry between them every backend layout the extension
-registers and every `CType` it renders; the pages below them show every
-classic `CType` in its variants, and every appearance value:
+The first ten pages carry between them every `CType` the extension renders and
+six of the twelve backend layouts it registers — `start`, `content`,
+`content_sidebar`, the `default` fallback, `styleguide` and `forms`. The other
+six are the multi column, article, cover and band layouts, which have a demo
+page each below `/layouts`. The pages below the first ten show every classic
+`CType` in its variants, and every appearance value:
 
 | uid       | Title                    | Slug                             | `backend_layout`                | What it is for                                                                                                                                |
 |-----------|--------------------------|----------------------------------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -237,6 +240,8 @@ classic `CType` in its variants, and every appearance value:
 | 130       | External media           | `/elements/theme/external-media` | `content_sidebar`               | Both shapes of the embed, an element without a poster, and a host that is not embedded at all.                                                |
 | 170       | Pricing                  | `/elements/theme/pricing`        | `content`                       | Plans side by side, each with a price, a period, a feature list and a link; no sidebar, which the plan columns need.                          |
 | 51        | Frames                   | `/elements/frames`               | `content`                       | Every frame, spacing, header alignment and header look of the Appearance tab.                                                                 |
+| 171       | Layouts                  | `/layouts`                       | `content`                       | The page layout branch: what a backend layout decides, and a menu of 172 to 177.                                                              |
+| 172–177   | Two columns … Bands      | `/layouts/<layout>`              | `two_columns` … `bands`         | One page per multi column, article, cover and band layout, with a labelled box in every column that layout declares.                          |
 | 9         | Styleguide               | `/styleguide`                    | `styleguide`                    | The component library, straight from Fluid.                                                                                                   |
 | 10        | Forms                    | `/forms`                         | `forms`                         | The form showcase, straight from Fluid.                                                                                                       |
 
@@ -251,8 +256,9 @@ preserve:
 - **Pages 6 and 7 use `content_sidebar` and their sibling 8 does not.** Two
   pages under one parent rendering with and without the sub navigation is what
   proves the layout is resolved per page rather than inherited down the branch.
-- **The three showcase sections are in the main navigation** — `/elements`,
-  `/typography`, and `/styleguide` with `/forms` — and no page is `hidden`. A
+- **The five showcase sections are in the main navigation** — `/elements`,
+  `/typography`, `/layouts`, and `/styleguide` with `/forms` — and no page is
+  `hidden`, which `ShowcaseTreeTest::showcaseSections()` holds the tree to. A
   hidden page returns 404 in the frontend and is only reachable through a
   backend preview link carrying a valid hash, which defeats the point of
   seeding a page that exists to be opened.
@@ -261,6 +267,22 @@ preserve:
   `Configuration/PageTsConfig/BackendLayouts/` and the content types from the
   TypoScript. A layout or an element added without a demo page then fails there,
   instead of shipping undemonstrated.
+
+> [!NOTE]
+> **An unexplained observation, recorded rather than diagnosed.** While the
+> `/layouts` pages were being seeded, an element written into a `colPos` no
+> layout of the page declares once made that page answer 404, *No site
+> configuration found*, rather than merely leaving the element unrendered.
+> It did not reproduce, and it cannot be caused by this extension: the theme
+> reads its columns through `lib.content.*` `CONTENT` objects with a fixed
+> `where`, so a `colPos` nothing selects is simply never queried; the
+> frontend of TYPO3 v12.4 reads nothing of a layout but its identifier, and
+> v13.4 collects the columns of the layout structure without checking any
+> content against them; and `DataHandler` validates no `colPos` against the
+> layout of its page, neither in 12.4.45 nor in 13.4.35.
+> The likely cause is an import that aborted part way and left the page
+> record without its site-resolvable state. Recorded here so the next person
+> who sees it knows it has been looked at — not as a known defect.
 
 ## The instance set: the showcase, delivered twice
 

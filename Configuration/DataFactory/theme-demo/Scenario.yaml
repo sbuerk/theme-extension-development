@@ -7,11 +7,11 @@
 # sequence:
 #
 #   pages               1-10, the first tree, and 30-39, 50-56, 70-73,
-#                       90-92, 110-112, 130, 150-151 and 170 - the pages
-#                       added below its sections, forty-one in all. The odd
-#                       decades from 30 up are reserved; the ids actually
-#                       used are fewer - see below for why the new ones skip
-#                       decades
+#                       90-92, 110-112, 130, 150-151 and 170-177 - the
+#                       pages added below its sections, forty-eight in all.
+#                       The odd decades from 30 up are reserved; the ids
+#                       actually used are fewer - see below for why the new
+#                       ones skip decades
 #   tt_content          the uid of its page times 100, plus its position on
 #                       that page: the third element of page 6 is 603, the
 #                       second of page 35 is 3502
@@ -3961,6 +3961,342 @@ entities:
                         header_layout: 3
                         tx_theme_header_style: 'h5'
                         bodytext: *headerBody
+
+        # The page layouts. One page per backend layout the theme registers
+        # beyond the four a content page uses, each of them a wireframe: one
+        # content element per column, labelled with the name of the slot and
+        # the colPos it sits in, so the page itself answers which column is
+        # which without opening the page module.
+        #
+        # The boxes are not drawn by anything new. Every content element
+        # already carries the dashed outline and the CType chip of the Frame
+        # variant, and "frame_class" tints it - so a wireframe box is an
+        # ordinary "text" element with an appearance an editor can set.
+        #
+        # "ShowcaseTreeTest::everyRegisteredBackendLayoutIsUsedByASeededPage"
+        # is what keeps this section complete: a layout registered in
+        # "Configuration/PageTsConfig/BackendLayouts" with no seeded page
+        # using it fails that test.
+        - self:
+              id: 171
+              title: 'Layouts'
+              slug: '/layouts'
+              backend_layout: 'content'
+          entities:
+            content:
+              - self:
+                    id: 17101
+                    CType: 'header'
+                    header: 'Page layouts'
+                    header_layout: 1
+              - self:
+                    id: 17102
+                    CType: 'text'
+                    header: 'What a backend layout decides'
+                    header_layout: 2
+                    bodytext: |
+                      <p>A page's backend layout decides two separate things: which
+                      columns the page module offers an editor, and which template the
+                      frontend renders. The first is page TSconfig, the second is the
+                      file named after the layout in
+                      <code>Resources/Private/Templates/Page/</code>, and the colPos
+                      numbers are the only thing that connects them.</p>
+                      <p>Each page below shows one layout, with a labelled box in every
+                      column it declares. The boxes are ordinary content elements: the
+                      dashed outline and the type chip around them are the theme's own
+                      development affordance, which the display settings in the header
+                      switch off.</p>
+              - self:
+                    id: 17103
+                    CType: 'menu_subpages'
+                    header: 'One page per layout'
+                    header_layout: 2
+                    pages: '171'
+          children:
+            # "two_columns": stage above, then two equal columns. The second
+            # element in the main column is there to show that a column
+            # stacks its elements rather than turning each into a grid item -
+            # the failure mode the column wrapper in
+            # "Templates/Page/TwoColumns.html" exists to prevent.
+            - self:
+                  id: 172
+                  title: 'Two columns'
+                  slug: '/layouts/two-columns'
+                  backend_layout: 'two_columns'
+                  abstract: 'Two content columns of equal width, below a full width stage.'
+              entities:
+                content:
+                  - self:
+                        id: 17201
+                        CType: 'text'
+                        colPos: 2
+                        frame_class: 'accent'
+                        header: 'Stage - colPos 2'
+                        header_layout: 1
+                        bodytext: |
+                          <p>The full width row above the columns. It is the same slot
+                          the content page and the start page use, so a hero placed
+                          here renders the same way on all three.</p>
+                  - self:
+                        id: 17202
+                        CType: 'text'
+                        colPos: 0
+                        frame_class: 'surface'
+                        header: 'Main content - colPos 0'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The first column, and the column every other layout has as
+                          well. Content moved here from a content page keeps its colPos
+                          and stays where it was.</p>
+                  - self:
+                        id: 17203
+                        CType: 'text'
+                        colPos: 0
+                        frame_class: 'surface'
+                        header: 'A second element in the same column'
+                        header_layout: 3
+                        bodytext: |
+                          <p>Elements of one column stack; they do not become columns of
+                          their own. The column is a wrapper in the markup for exactly
+                          this reason.</p>
+                  - self:
+                        id: 17204
+                        CType: 'text'
+                        colPos: 3
+                        frame_class: 'raised'
+                        header: 'Second column - colPos 3'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The second column of this layout and of the two below it.
+                          Both columns are half the content width from 768 pixels up and
+                          stacked below that.</p>
+
+            # "two_columns_wide": the same two slots, 2fr to 1fr. Same colPos
+            # numbers as the page above, which is the point of the numbering.
+            - self:
+                  id: 173
+                  title: 'Two columns, wide first'
+                  slug: '/layouts/two-columns-wide'
+                  backend_layout: 'two_columns_wide'
+                  abstract: 'The same two columns, the first one twice as wide as the second.'
+              entities:
+                content:
+                  - self:
+                        id: 17301
+                        CType: 'text'
+                        colPos: 2
+                        frame_class: 'accent'
+                        header: 'Stage - colPos 2'
+                        header_layout: 1
+                        bodytext: |
+                          <p>The same stage slot as on every other layout that has
+                          one.</p>
+                  - self:
+                        id: 17302
+                        CType: 'text'
+                        colPos: 0
+                        frame_class: 'surface'
+                        header: 'Main content - colPos 0'
+                        header_layout: 2
+                        bodytext: |
+                          <p>Two thirds of the content width. The ratio is stated twice -
+                          as a three column page module grid this column spans two of,
+                          and as a grid fraction in the template - because the page
+                          module has whole columns to work with and the frontend has
+                          fractions.</p>
+                  - self:
+                        id: 17303
+                        CType: 'text'
+                        colPos: 3
+                        frame_class: 'raised'
+                        header: 'Second column - colPos 3'
+                        header_layout: 2
+                        bodytext: |
+                          <p>One third. Switching this page to the equal column layout
+                          moves nothing: both layouts read colPos 0 and colPos 3.</p>
+
+            # "three_columns": colPos 4 joins the two above it.
+            - self:
+                  id: 174
+                  title: 'Three columns'
+                  slug: '/layouts/three-columns'
+                  backend_layout: 'three_columns'
+                  abstract: 'Three content columns of equal width, below a full width stage.'
+              entities:
+                content:
+                  - self:
+                        id: 17401
+                        CType: 'text'
+                        colPos: 2
+                        frame_class: 'accent'
+                        header: 'Stage - colPos 2'
+                        header_layout: 1
+                        bodytext: |
+                          <p>The stage spans all three columns.</p>
+                  - self:
+                        id: 17402
+                        CType: 'text'
+                        colPos: 0
+                        frame_class: 'surface'
+                        header: 'Main content - colPos 0'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The first of three equal columns.</p>
+                  - self:
+                        id: 17403
+                        CType: 'text'
+                        colPos: 3
+                        frame_class: 'raised'
+                        header: 'Second column - colPos 3'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The second. A page switched from here to one of the two
+                          column layouts keeps this column where it is and leaves the
+                          third unrendered, rather than reshuffling the first two.</p>
+                  - self:
+                        id: 17404
+                        CType: 'text'
+                        colPos: 4
+                        frame_class: 'default'
+                        header: 'Third column - colPos 4'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The third, and the only column of the theme that no other
+                          layout declares. Left with the default appearance, so the
+                          dashed outline is all that draws this box.</p>
+
+            # "article": the running text held to the reading measure, with
+            # the aside beside it. The aside is colPos 1, the same slot the
+            # sidebar layout uses - see "Article.tsconfig" for why the number
+            # is shared and the rendering is not.
+            - self:
+                  id: 175
+                  title: 'Article'
+                  slug: '/layouts/article'
+                  backend_layout: 'article'
+                  abstract: 'A long read at the reading measure, with an aside of notes beside it.'
+              entities:
+                content:
+                  - self:
+                        id: 17501
+                        CType: 'text'
+                        colPos: 2
+                        frame_class: 'accent'
+                        header: 'Stage - colPos 2'
+                        header_layout: 1
+                        bodytext: |
+                          <p>The stage spans the article and its aside.</p>
+                  - self:
+                        id: 17502
+                        CType: 'text'
+                        colPos: 0
+                        frame_class: 'surface'
+                        header: 'The article - colPos 0'
+                        header_layout: 2
+                        bodytext: |
+                          <p>Held to the reading measure, the same 68 characters the
+                          lead of a hero and the running text of a quotation are held
+                          to. The column may be wider than that; the text is not.</p>
+                          <p>The measure is a property of the text rather than of the
+                          layout, which is why it is a cap on this column and not a
+                          grid track: a column holding something that is not prose - a
+                          table, a gallery - still has the whole track to use.</p>
+                  - self:
+                        id: 17503
+                        CType: 'text'
+                        colPos: 1
+                        frame_class: 'raised'
+                        header: 'The aside - colPos 1'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The same column number as the sidebar of the sidebar
+                          layout, so material moved between the two layouts stays where
+                          it was. What differs is the rendering: there the slot goes
+                          into the navigation column of the page shell, which also
+                          carries the sub navigation and the table of contents; here it
+                          is a column of the article grid that follows the article in
+                          reading order and carries nothing but what an editor puts in
+                          it.</p>
+
+            # "cover": one column, centred in what the shell leaves between the
+            # header and the footer. No stage and no breadcrumb.
+            - self:
+                  id: 176
+                  title: 'Cover'
+                  slug: '/layouts/cover'
+                  backend_layout: 'cover'
+                  abstract: 'A landing page of one column, centred in the viewport.'
+              entities:
+                content:
+                  - self:
+                        id: 17601
+                        CType: 'text'
+                        colPos: 0
+                        frame_class: 'accent'
+                        header: 'Cover - colPos 0'
+                        header_layout: 1
+                        bodytext: |
+                          <p>The only column of this layout, centred between the header
+                          and the footer. The page is as tall as the viewport whatever
+                          is placed here, so a short cover sits in the middle of the
+                          screen rather than under the header.</p>
+                  - self:
+                        id: 17602
+                        CType: 'text'
+                        colPos: 0
+                        header: 'No stage, and no breadcrumb'
+                        header_layout: 2
+                        bodytext: |
+                          <p>A cover page is the top of whatever it announces: a trail
+                          above it would lead nowhere worth going, and a stage would be
+                          a second place to put the banner that this page already is.</p>
+
+            # "bands": the three columns of "three_columns", stacked and taken
+            # out of the content container. The third band is "inverse", which
+            # is the band that makes the full width obvious at a glance.
+            - self:
+                  id: 177
+                  title: 'Full-width bands'
+                  slug: '/layouts/bands'
+                  backend_layout: 'bands'
+                  abstract: 'Three bands, stacked, each spanning the full width of the viewport.'
+              entities:
+                content:
+                  - self:
+                        id: 17701
+                        CType: 'text'
+                        colPos: 0
+                        frame_class: 'surface'
+                        header: 'First band - colPos 0'
+                        header_layout: 1
+                        bodytext: |
+                          <p>The page gives up its content container while it holds a
+                          band stack, so a band reaches both edges of the viewport. The
+                          header and the footer keep theirs.</p>
+                  - self:
+                        id: 17702
+                        CType: 'text'
+                        colPos: 3
+                        frame_class: 'accent'
+                        header: 'Second band - colPos 3'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The same column numbers as the three column layout, laid
+                          out one below the other instead of side by side - so a page
+                          moved between the two changes how it reads and not where its
+                          content sits.</p>
+                  - self:
+                        id: 17703
+                        CType: 'text'
+                        colPos: 4
+                        frame_class: 'inverse'
+                        header: 'Third band - colPos 4'
+                        header_layout: 2
+                        bodytext: |
+                          <p>An inverted band, which is the appearance that makes the
+                          width obvious at a glance. Bands are flush against each
+                          other; the space between two of them is the space after the
+                          last element of the one above.</p>
 
         # The styleguide. Not a showcase of content elements: the "styleguide"
         # backend layout declares no usable content column at all, and

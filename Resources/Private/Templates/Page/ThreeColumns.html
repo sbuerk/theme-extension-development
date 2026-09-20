@@ -1,0 +1,32 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Backend layout "three_columns"
+    (Configuration/PageTsConfig/BackendLayouts/ThreeColumns.tsconfig) -
+    "stage" (colPos 2) above, then "main" (colPos 0), "secondary" (colPos 3)
+    and "tertiary" (colPos 4) in three equal columns.
+
+    See "TwoColumns.html" for why the grid sits inside ".theme-page__main"
+    rather than on it, and why each column is wrapped.
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <f:render partial="Page/Breadcrumb" arguments="{_all}" />
+    <f:render partial="Page/Stage" arguments="{_all}" />
+
+    <div class="theme-page__columns theme-page__columns--thirds">
+        <div class="theme-page__column">
+            <f:cObject typoscriptObjectPath="lib.content.main" />
+        </div>
+        <div class="theme-page__column">
+            <f:cObject typoscriptObjectPath="lib.content.secondary" />
+        </div>
+        <div class="theme-page__column">
+            <f:cObject typoscriptObjectPath="lib.content.tertiary" />
+        </div>
+    </div>
+</f:section>
+
+</html>

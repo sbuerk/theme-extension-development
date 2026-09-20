@@ -1,0 +1,41 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Backend layout "article" (Configuration/PageTsConfig/BackendLayouts/Article.tsconfig)
+    - "stage" (colPos 2) above, then "main" (colPos 0) held to the reading
+    measure with "sidebar" (colPos 1) beside it.
+
+    THE ASIDE IS NOT THE SHELL'S ASIDE
+    "Layouts/Default.html" renders a ".theme-page__aside" for any template
+    that defines the "Aside" section, and "Templates/Page/ContentSidebar.html"
+    is the one that does. This template deliberately does not, although it
+    reads the same colPos 1: that element is the navigation column - fixed
+    width, before the main content in the source order, and carrying the sub
+    navigation and the table of contents through "Partials/Page/Sidebar.html".
+    An article's aside is editorial, has to follow the article in reading
+    order, and carries no navigation at all. So it is an ordinary column of
+    the article grid that happens to be an "aside" element, and the shell's
+    two column rule ":has(.theme-page__aside)" stays out of it.
+
+    The measure is a modifier on the column rather than a rule on the grid
+    track: the track has to be able to grow into the space the aside does not
+    use, while the text inside it must not - see "layout/_page.scss".
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <f:render partial="Page/Breadcrumb" arguments="{_all}" />
+    <f:render partial="Page/Stage" arguments="{_all}" />
+
+    <div class="theme-page__columns theme-page__columns--article">
+        <div class="theme-page__column theme-page__column--measure">
+            <f:cObject typoscriptObjectPath="lib.content.main" />
+        </div>
+        <aside class="theme-page__column">
+            <f:cObject typoscriptObjectPath="lib.content.sidebar" />
+        </aside>
+    </div>
+</f:section>
+
+</html>
