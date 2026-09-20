@@ -33,11 +33,30 @@
 # The equivalent of "lib.contentElement" from "fluid_styled_content": the frame
 # every content element is rendered through. Consumers of this theme can
 # override the Fluid paths through the constants rather than this object.
+#
+# Index "5", not "10", and the reason is "fluid_styled_content" rather than
+# anything of this theme's own. That extension builds the same object with its
+# own templates at "0" and the integrator's "{$styles.templates.*}" at "10" -
+# "Configuration/TypoScript/Helper/ContentElement.typoscript", the same two
+# indices in its 12.4 and its 13.4 release, read in both rather than assumed
+# from one. Fluid tries the root paths from the highest index down - the core
+# sorts them by integer key ("TemplatePaths::setTemplateRootPaths()" ->
+# "ArrayUtility::sortArrayWithIntegerKeys()") and the engine walks them
+# reversed ("typo3fluid/fluid", "TemplatePaths::resolveFileInPaths()") - so at
+# "5" the theme's templates beat that extension's while an integrator who sets
+# "styles.templates.templateRootPath" still beats both. At "10" the theme would
+# silently outrank the documented override of an extension it is standing next
+# to. Nothing else writes to these indices, so standalone this is the same
+# single entry it always was.
+#
+# "lib.themeContentElement" below stays at "10" deliberately: no other
+# extension ever writes to an object of that name, so there is no precedence to
+# leave room for.
 lib.contentElement = FLUIDTEMPLATE
 lib.contentElement {
-    templateRootPaths.10 = {$theme.templateRootPath}
-    partialRootPaths.10 = {$theme.partialRootPath}
-    layoutRootPaths.10 = {$theme.layoutRootPath}
+    templateRootPaths.5 = {$theme.templateRootPath}
+    partialRootPaths.5 = {$theme.partialRootPath}
+    layoutRootPaths.5 = {$theme.layoutRootPath}
 }
 
 # The frame of the theme's own content elements - every "theme_*" CType below

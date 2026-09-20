@@ -229,6 +229,97 @@ that extension is the wrong place for elements only the theme can render — see
 Both delivery paths read the same `ContentElements.typoscript`, so neither needs
 anything of its own for it.
 
+## The `fluid_styled_content` bridge
+
+The theme does not depend on `fluid_styled_content` and renders every classic
+element itself. Installed **beside** it, the two are not merely redundant —
+they are order dependent, and both orders are wrong:
+
+| `fluid_styled_content` loads | What happens                                                                                                                                                                   |
+|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **after** the theme          | Its `lib.contentElement >` clears the object, taking the theme's Fluid paths with it. The theme's branches then look for `ContentElements/…` among that extension's templates. |
+| **before** the theme         | Its per-element `dataProcessing` stays underneath the theme's branches: `=<` and a plain assignment keep every key the theme does not overwrite.                               |
+
+The second is the quiet one, and it is not quiet in practice. Both extensions
+wire `menu_categorized_content` through `DatabaseQueryProcessor` and configure
+it differently — that extension with `join` and `where.wrap`, the theme with a
+portable `where.cObject` subquery (see
+[the two categorized types](content-elements.md#the-two-categorized-types-are-built-differently--deliberately)).
+The surviving keys compose one query out of two, and the page dies on a SQL
+syntax error rather than rendering something slightly wrong. It was found by
+running it, not by reading it.
+
+The bridge makes the combination **defined**, and it is delivered the same two
+ways the theme itself is, both reading
+`Configuration/TypoScript/Fsc/setup.typoscript`:
+
+| Core version | Bridge set                               | Bridge static include                             |
+|--------------|------------------------------------------|---------------------------------------------------|
+| v12.4        | — (no site sets, and fsc 12.4 has none)  | the only way                                      |
+| v13.4        | `sbuerk/theme-extension-development-fsc` | supported, and the one a `sys_template` site uses |
+
+On v13 a site enables it in place of the theme's own set:
+
+```yaml
+dependencies:
+  - sbuerk/theme-extension-development-fsc
+```
+
+On v12 it is the static template *Theme Extension Development
+(fluid_styled_content)*, selected last in `include_static_file`. `fluid_styled_content`
+12.4 ships no `Configuration/Sets/` at all, so there is no
+`typo3/fluid-styled-content` set to depend on there even if the mechanism
+existed; the set file beside the TypoScript is inert on v12, exactly as the
+theme's own set is.
+
+That file clears the twenty-two classic `tt_content` branches and then imports
+the theme's own `ContentElements.typoscript` again, last. The result is the
+rendering the theme produces on its own — **byte for byte**, whichever
+extension was loaded first.
+
+Three details carry the weight:
+
+- **Clearing, not merging.** Only `>` removes children
+  (`AbstractAstBuilder::handleIdentifierUnsetLine()`), so re-declaring a branch
+  over the other extension's would inherit whatever the theme does not happen
+  to overwrite, key by key — the border settings of `GalleryProcessor`, a
+  `table` fed by `comma-separated-value` against the theme's own
+  `TableProcessor`, a `menu` with a different `special`.
+- **Root path index `5`.** `lib.contentElement` carries that extension's
+  templates at `0` and the integrator's `{$styles.templates.*}` at `10` — the
+  same two indices in its **12.4 and 13.4** releases, read in both rather than
+  assumed from one, and both ship those templates as `*.html`. Fluid tries root
+  paths from the highest index down — the core sorts them by integer key and
+  the engine walks them reversed — so at `5` the theme's templates beat that
+  extension's while an integrator's documented override still beats both.
+  Standalone this is the same single entry it always was.
+- **`optionalDependencies`, not `dependencies`** — on v13, where the set is
+  read at all. A missing entry under `dependencies` makes the whole set
+  invalid: `SetRegistry::computeOrderedSets()` drops it and logs an error, so a
+  hard dependency would turn this set into an error message in every
+  installation of the theme that does not have that extension. An optional one
+  is skipped when absent and, when present, both orders the theme after it and
+  activates it for the site (`hasDependency()` counts optional dependencies).
+
+`tt_content.list` is deliberately **not** cleared. It is the historical plugin
+CType, and `configurePlugin()` writes straight into it through
+`defaultContentRendering` on v12.4 and v13.4 alike, at a point this file cannot
+see — clearing it could drop a third-party plugin's own registration, a worse
+failure than the leftover it would prevent. Both versions still carry the CType
+in `EXT:frontend`'s TCA; it is deprecated on 13.4 (#105076) and not deprecated
+at all on 12.4.
+
+On the static path the order is the integrator's, and the bridge has to be
+**last**, after both `Fluid Content Elements` and `Theme Extension Development`.
+
+`FluidStyledContentBridgeTest` holds the byte-for-byte promise on that path, on
+both versions, with a control pair that drives the two broken load orders
+through `include_static_file` — the one place the order is specified.
+`Core13/FluidStyledContentBridgeSetTest` does the same on the set path and is
+`#[Group('not-core-12')]` for the reason `SiteSetRenderingTest` is: its subject
+is the set. It sits below `Core13/` because it names `SetRegistry`, which v12
+does not have, and the v12 PHPStan configuration excludes that directory.
+
 ## Plugins, and the static include as a content rendering template
 
 `ExtensionUtility::configurePlugin()` adds the rendering of every plugin
@@ -373,6 +464,8 @@ site package makes it.
 | `DevelopmentInstance/LegacyDeliveryTest`          | The seeded showcase renders the same markup in its two trees, page by page.                           | both     |
 | `DevelopmentInstance/DeliveryRegistrationTest`    | Every static include of every seeded `sys_template` root resolves and is registered.                  | both     |
 | `Core12/DevelopmentInstance/InstanceDeliveryTest` | Both tree roots of the v12 instance carry the `sys_template` record, and no site declares a set.      | v12 only |
+| `FluidStyledContentBridgeTest`                    | The bridged page is byte for byte the page the theme renders alone, on the static include path.       | both     |
+| `Core13/FluidStyledContentBridgeSetTest`          | The same on the site set path, and that the bridge set really activates that extension.               | v13 only |
 
 `SiteSetRenderingTest` and `StaticFileIncludeRenderingTest` are deliberately the
 same three assertions on the two delivery paths, so the paths are held to
@@ -383,16 +476,19 @@ takes a different code path, writing `@import` lines into `sys_template.config`
 rather than letting `SysTemplateTreeBuilder::handleSingleIncludeStaticFile()`
 resolve the registered directory.
 
-The two version specific tests are the only ones in the rendering suite carrying
-`#[Group('not-core-12')]`, and both because their **subject** is the site set.
-Everything else arranges the theme through
+The three version specific tests are the only ones in the rendering suite
+carrying `#[Group('not-core-12')]`, and all three because their **subject** is
+the site set. Everything else arranges the theme through
 [`ThemeSiteTrait`](../testing/site-based-tests.md#arranging-the-theme-themesitetrait)
 and runs on both versions.
 
 Each covers a break that is easy to produce on purpose: renaming the set breaks
 `SiteSetRenderingTest`, inverting the guard condition breaks the static ones and
-`StaticIncludeGuardTest` in opposite directions, and removing the `?: []`
-fallback breaks `StaticFileIncludeRenderingTest` on v12 with the `TypeError`.
+`StaticIncludeGuardTest` in opposite directions, removing the `?: []`
+fallback breaks `StaticFileIncludeRenderingTest` on v12 with the `TypeError`,
+and dropping `optionalDependencies` from the bridge set breaks
+`Core13/FluidStyledContentBridgeSetTest` on the one assertion the rendered
+markup cannot make.
 
 `ImageElementRenderingTest` was shown to fail twice, in the two ways that
 matter: removing the `tt_content.image` branch turns all eight tests red, and

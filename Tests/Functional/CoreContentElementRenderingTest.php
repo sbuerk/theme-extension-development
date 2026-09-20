@@ -146,9 +146,17 @@ final class CoreContentElementRenderingTest extends AbstractFunctionalTestCase
     /**
      * The markup of one content element, by its CType.
      *
-     * The page renders nineteen elements, so asserting against the whole
-     * response cannot tell "this menu selected it" from "some other element on
-     * the page happens to contain it".
+     * The page renders twenty-six elements across twenty-two CTypes, so
+     * asserting against the whole response cannot tell "this menu selected it"
+     * from "some other element on the page happens to contain it".
+     *
+     * The fixture is shared with `FluidStyledContentBridgeTest`, which needs a
+     * record of every CType that bridge clears - which is why `header`, `text`
+     * and `image` are on the page. `coveredContentTypes()` below deliberately
+     * still enumerates the nineteen this test was written for: the three
+     * additions are swept by `noRenderedElementFallsBackToTheCoreNotice()` and
+     * asserted per CType by the bridge test, so a wrapper assertion here would
+     * only duplicate that.
      */
     private function contentElement(string $body, string $ctype): string
     {

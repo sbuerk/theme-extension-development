@@ -20,3 +20,19 @@ ExtensionManagementUtility::addStaticFile(
     'Configuration/TypoScript/Static',
     'Theme Extension Development',
 );
+
+// The bridge to "fluid_styled_content", for a "sys_template" installation that
+// has both extensions. It reads the very same file the site set
+// "sbuerk/theme-extension-development-fsc" points at, and it is the only way
+// to the bridge on TYPO3 v12, which has no site sets at all.
+//
+// It is included *in addition to* the two above and has to come last, after
+// both "Fluid Content Elements" and "Theme Extension Development": it clears
+// the classic "tt_content" branches and declares them again from the theme's
+// own file, which only settles the order if nothing writes to them afterwards.
+// The order of "include_static_file" is the order of that field.
+ExtensionManagementUtility::addStaticFile(
+    'theme_extension_development',
+    'Configuration/TypoScript/Fsc',
+    'Theme Extension Development (fluid_styled_content)',
+);
