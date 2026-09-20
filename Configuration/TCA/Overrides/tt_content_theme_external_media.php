@@ -34,7 +34,7 @@ ContentTypeRegistration::addRecordType(
         --palette--;;headers,
         --div--;LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tt_content.tab.embed,
         --palette--;;theme_embed,
-        --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:images,
+        --div--;LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:tabs.images,
         image,
     ',
     [
