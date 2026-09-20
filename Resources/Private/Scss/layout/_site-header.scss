@@ -10,6 +10,30 @@
 //         </div>
 //     </header>
 //
+// That is the default arrangement, "simple". Three more are selected by the
+// site setting "theme.header.variant", each a modifier on the header and one
+// partial below "Partials/Page/Header/":
+//
+//     <header class="theme-site-header theme-site-header--centred">
+//         <div class="theme-site-header__inner theme-site-header__inner--brand">brand, actions</div>
+//         <div class="theme-site-header__inner theme-site-header__inner--navigation">nav</div>
+//     </header>
+//
+//     <header class="theme-site-header theme-site-header--actions">
+//         <div class="theme-site-header__inner theme-site-header__inner--brand">brand, <a class="theme-site-header__action">…</a>, actions</div>
+//         <div class="theme-site-header__inner theme-site-header__inner--navigation">nav</div>
+//     </header>
+//
+//     <header class="theme-site-header theme-site-header--two-tier">
+//         <div class="theme-site-header__meta">
+//             <div class="theme-site-header__inner theme-site-header__inner--meta">actions</div>
+//         </div>
+//         <div class="theme-site-header__inner theme-site-header__inner--main">brand, nav</div>
+//     </header>
+//
+// The rules for them are at the end of this file; everything between here and
+// there is the default, which they build on rather than replace.
+//
 // Add ".theme-site-header--sticky" to pin the header to the top of the
 // viewport; the modifier is opt-in rather than the default because a sticky
 // header steals viewport height on every scroll position, which is not
@@ -29,7 +53,8 @@
 // onto a second line. Between the two breakpoints the row is too narrow for
 // that trade: a title held to one line there left a menu of three entries on
 // two rows beside a title on two lines anyway. So there the menu keeps its
-// row, up to 60% of it, and the title wraps, as it always did. Below "bp.$md"
+// row, up to 50% of it - see the rule itself for why it is not the 60% it
+// started as - and the title wraps, as it always did. Below "bp.$md"
 // the row holds the brand, the menu toggle and the settings cog, and the menu
 // - once its toggle is expanded - drops down under the header as a full-width
 // band instead of unfolding inside the narrow slot the toggle occupies, which
@@ -206,5 +231,139 @@
     // they are what gives the width back.
     @media (max-width: bp.$md-max) {
         gap: var(--theme-space-1, 0.3125rem);
+    }
+}
+
+// --- The three variants ------------------------------------------------------
+//
+// "theme.header.variant" picks one of four arrangements, one partial each
+// below "Partials/Page/Header/" (see "Partials/Page/Header.html"). The
+// default, "simple", is everything above this line and carries no modifier:
+// a site that never touches the setting gets the rules, and the measured
+// behaviour, it had before the variants existed.
+//
+// The other three each give the title or the menu a row of its own, so the
+// 50% cap above - which is what holds seven entries beside a title between
+// the two breakpoints - never has to arbitrate a row that grew a third
+// thing. That is the design rule of this block, and the reason the
+// acceptance tests that measure the default row still measure the header
+// they were written for. "ComponentLibraryTest" holds the variants to not
+// widening the cap.
+//
+// Each variant lays out rows, and nothing else: the brand, the navigation
+// and the controls are the same elements with the same rules in all four.
+
+// A variant with more than one row draws its hairline once, under the last
+// of them, and the rows keep the vertical rhythm of the single row by
+// halving their own padding.
+.theme-site-header--centred,
+.theme-site-header--actions {
+    .theme-site-header__inner {
+        padding-block: calc(var(--theme-site-header-padding-block) / 2);
+    }
+}
+
+.theme-site-header__inner--brand,
+.theme-site-header__inner--meta,
+.theme-site-header__inner--main {
+    flex-wrap: wrap;
+}
+
+// "centred": the title is centred in its row with the controls at the end of
+// it, and the navigation is centred below.
+//
+// The controls are taken out of the flow with "position: absolute" so the
+// title is centred against the row rather than against the space the
+// controls leave - a title centred in the remainder sits visibly left of
+// centre. The row keeps space for them with a padding equal to their width,
+// which is what "--theme-site-header-controls-space" is; below the
+// breakpoint the controls return to the flow, because at that width a title
+// centred between the screen edge and a cog has no room to be centred in.
+.theme-site-header--centred {
+    --theme-site-header-controls-space: 6rem;
+
+    .theme-site-header__inner--brand {
+        position: relative;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .theme-site-header__inner--navigation {
+        justify-content: center;
+    }
+
+    .theme-nav-main {
+        margin-inline-start: 0;
+    }
+
+    @media (min-width: bp.$md) {
+        .theme-site-header__inner--brand {
+            padding-inline-end: calc(var(--theme-space-4) + var(--theme-site-header-controls-space));
+        }
+
+        .theme-site-header__actions {
+            position: absolute;
+            inset-inline-end: var(--theme-space-4);
+            inset-block: 0;
+        }
+
+        // Not ".theme-site-header .theme-nav-main > ul" as well: this block
+        // is already inside ".theme-site-header--centred", so that selector
+        // would ask for a site header inside a site header and never match.
+        .theme-nav-main > ul {
+            justify-content: center;
+        }
+    }
+}
+
+// "actions": the title, the call to action and the controls share the first
+// row, the navigation has the second. The call to action is pushed to the
+// end of the first row together with the controls - "margin-inline-start:
+// auto" on it consumes the free space the same way the navigation does in
+// the default header.
+.theme-site-header--actions {
+    // The call to action and the controls travel to the end of the row
+    // together, and exactly one of them consumes the free space in front of
+    // the pair - otherwise flexbox splits that space between two auto
+    // margins and the call to action lands in the middle of the row.
+    //
+    // Which one it is depends on whether a call to action was configured at
+    // all, and the adjacent sibling is what asks that question: the order in
+    // "Page/Header/Actions.html" is brand, call to action, controls, and the
+    // call to action renders nothing when its settings are not filled in. So
+    // ".theme-site-header__brand + .theme-site-header__actions" matches only
+    // when nothing stands between the two, which is only when there is no
+    // call to action.
+    //
+    // ":first-of-type" was the first attempt and is a trap: it selects per
+    // element TYPE, the controls slot is the only "div" among those
+    // children, so it matched whether or not a call to action was there.
+    .theme-site-header__action {
+        margin-inline-start: auto;
+    }
+
+    .theme-site-header__brand + .theme-site-header__actions {
+        margin-inline-start: auto;
+    }
+
+    .theme-nav-main {
+        margin-inline-start: 0;
+    }
+}
+
+// "two-tier": a tinted meta row above the title and the navigation. The meta
+// row is a band of its own, so it carries the surface colour across the full
+// width and a hairline under itself, and its own row is short - two
+// controls, pushed to the end.
+.theme-site-header--two-tier {
+    .theme-site-header__meta {
+        border-block-end: var(--theme-border-width) solid var(--theme-site-header-border-color);
+        background-color: var(--theme-color-surface, #f4f6fa);
+    }
+
+    .theme-site-header__inner--meta {
+        justify-content: flex-end;
+        min-height: 0;
+        padding-block: var(--theme-space-1, 0.3125rem);
     }
 }

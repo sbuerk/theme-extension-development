@@ -1,0 +1,17 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The site title as a link to the root of the site, shared by all four
+    header variants.
+
+    "siteRootUrl" is resolved in "Page.typoscript" from "site:rootPageId",
+    never written as "/": the root of a site whose base has a path is that
+    path, and a literal "/" links every page of such a site out of it. See
+    the comment there, and "Tests/Functional/SiteHeaderRenderingTest.php".
+</f:comment>
+<a class="theme-site-header__brand" href="{siteRootUrl}">
+    <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.title" />
+</a>
+
+</html>

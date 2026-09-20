@@ -1,0 +1,32 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Header variant "actions": the site title, a call to action and the
+    controls in the first row, the main navigation on a second row below.
+
+    The call to action is the point of the variant, and it is why the
+    navigation moves down: the one-row header is measured with two controls
+    beside the menu, and a third thing in that row would have to be measured
+    again - see "Partials/Page/Header.html". Here it is the navigation that
+    leaves, so the row the call to action joins holds the title and the
+    controls and nothing else.
+
+    "Page/Header/Action.html" renders nothing at all unless both of its
+    settings are configured, so this variant without a configured call to
+    action is simply a two-row header. That is a usable state rather than a
+    broken one, and it is what a site gets that switches the variant on
+    before filling in the two values.
+</f:comment>
+<header class="theme-site-header theme-site-header--actions">
+    <div class="theme-site-header__inner theme-site-header__inner--brand">
+        <f:render partial="Page/Header/Brand" arguments="{_all}" />
+        <f:render partial="Page/Header/Action" arguments="{_all}" />
+        <f:render partial="Page/Header/Controls" arguments="{_all}" />
+    </div>
+    <div class="theme-site-header__inner theme-site-header__inner--navigation">
+        <f:render partial="Navigation/Main" arguments="{_all}" />
+    </div>
+</header>
+
+</html>

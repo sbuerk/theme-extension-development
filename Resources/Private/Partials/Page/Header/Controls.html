@@ -1,0 +1,38 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The controls slot of the site header: the language dropdown and the
+    display settings, in that order, shared by all four header variants.
+
+    ".theme-site-header__actions" is the slot the markup contract documents -
+    see "docs/development/component-library.md#layout". It keeps that name in
+    every variant, including "two-tier", where it sits in the meta row rather
+    than beside the navigation: the class names the slot, not the row.
+
+    The language menu is in a dropdown so the header row keeps its width
+    whatever the site's languages are called.
+
+    The guard counts the languages rather than testing the menu for
+    emptiness. "LanguageMenuProcessor" defaults "special.value" to "auto" and
+    returns early only for a site with no language at all, so a one language
+    site produces a menu of exactly one item - the language already being
+    read. That is a control offering the reader nothing, so the whole
+    dropdown is left out below two languages.
+
+    The dropdown itself needs no script and is never hidden behind "data-js":
+    the browser opens and closes the popover. See "Partials/Page/Dropdown.html".
+
+    It sits before the display settings: the language is a property of the
+    page, the settings are a property of the reader.
+</f:comment>
+<div class="theme-site-header__actions">
+    <f:if condition="{languageMenu -> f:count()} > 1">
+        <f:variable name="languagePanel"><f:render partial="Navigation/Language" arguments="{_all}" /></f:variable>
+        <f:variable name="languageLabel"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.languageMenuLabel" /></f:variable>
+        <f:render partial="Page/Dropdown" arguments="{id: 'theme-language-panel', label: languageLabel, icon: 'globe', content: languagePanel}" />
+    </f:if>
+    <f:render partial="Page/Settings" arguments="{_all}" />
+</div>
+
+</html>

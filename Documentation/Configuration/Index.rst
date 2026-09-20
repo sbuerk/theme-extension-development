@@ -19,8 +19,14 @@ its :file:`config/sites/<identifier>/config.yaml`:
 
 Nothing else is required. The set brings the TypoScript, the page rendering and
 the stylesheet with it, and no :guilabel:`sys_template` record is needed. The
-set itself declares neither dependencies nor settings — everything an
-integrator changes is a TypoScript constant, and those are described below.
+set declares no dependencies of its own.
+
+What an integrator changes is **either a site setting or a TypoScript
+constant, and for most of it both**: every site setting the theme declares is
+also a constant of the same name and the same default, so a site on the site
+set edits it in :guilabel:`Site Management > Sites` while a site on the
+classic static include below sets the constant. Where a value exists as both,
+the setting wins — see :ref:`configuration-site-settings`.
 
 In the backend the same set can be selected under
 :guilabel:`Site Management > Sites` in the :guilabel:`Sets` field of the site.
@@ -46,6 +52,54 @@ Both paths read the same TypoScript files, so what they deliver is identical.
     that pulls the theme in transitively, by depending on another set which in
     turn depends on this one, is not covered: there the static include has to
     stay out of the :guilabel:`sys_template` record.
+
+..  _configuration-site-settings:
+
+Site settings
+=============
+
+A site that depends on the set can edit these in the backend, under
+:guilabel:`Site Management > Sites`, in the :guilabel:`Settings` tab of the
+site:
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Setting
+        -   Default
+        -   Is
+
+    *   -   ``theme.header.variant``
+        -   ``simple``
+        -   How the site header arranges the title, the navigation and the
+            controls: ``simple``, ``centred``, ``actions`` or ``two-tier`` —
+            see :ref:`feature-header-variants`.
+
+    *   -   ``theme.header.actionPage``
+        -   ``0``
+        -   The page the call to action of the ``actions`` header leads to.
+            ``0`` renders no call to action.
+
+    *   -   ``theme.header.actionLabel``
+        -   *(empty)*
+        -   The text of that call to action. An empty label renders no call to
+            action.
+
+Each of them is a TypoScript constant of the same name as well, so a site that
+takes the theme through the static include configures it there instead:
+
+..  code-block:: typoscript
+
+    theme.header.variant = two-tier
+
+..  note::
+
+    The labels of these settings are English in the backend, in both supported
+    TYPO3 versions. A site set can carry a :file:`labels.xlf`, and the label
+    and the description of a setting are taken from it on both — but the
+    **options of a selection** only from TYPO3 v14.2 on. On TYPO3 v13.4 a
+    reference written there is printed to the integrator verbatim, and the
+    settings here are selections whose options are what an integrator reads.
 
 Templates and stylesheet
 ========================

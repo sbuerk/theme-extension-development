@@ -1,0 +1,31 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Header variant "two-tier": a tinted meta row carrying the controls, and
+    the site title with the main navigation in the row below it.
+
+    The meta row is where the language dropdown and the display settings go,
+    which is what makes this variant roomier than the default rather than
+    tighter: the row the measured 50% cap governs holds the title and the
+    menu and nothing else here - see "Partials/Page/Header.html".
+
+    The meta row is a "div", not a second "nav" or a "header": it is a slot
+    holding two controls that name themselves, and an extra landmark would
+    show up in a screen reader's landmark list with nothing useful to say.
+    The header element itself is the landmark, and there is exactly one of
+    it in every variant.
+</f:comment>
+<header class="theme-site-header theme-site-header--two-tier">
+    <div class="theme-site-header__meta">
+        <div class="theme-site-header__inner theme-site-header__inner--meta">
+            <f:render partial="Page/Header/Controls" arguments="{_all}" />
+        </div>
+    </div>
+    <div class="theme-site-header__inner theme-site-header__inner--main">
+        <f:render partial="Page/Header/Brand" arguments="{_all}" />
+        <f:render partial="Navigation/Main" arguments="{_all}" />
+    </div>
+</header>
+
+</html>

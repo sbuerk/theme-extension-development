@@ -1,0 +1,31 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Header variant "centred": the site title centred on a row of its own,
+    with the controls at the end of that row, and the main navigation centred
+    on a second row below it.
+
+    Two rows, so two "__inner" blocks rather than one with a wrapping flex
+    layout: each row is centred and spaced on its own terms, and a reader of
+    the markup can see which things share a row. "layout/_site-header.scss"
+    styles them through the "--centred" modifier on the header.
+
+    The title keeps a whole row here, so the 50% cap the one-row header needs
+    between the two breakpoints does not apply - see "Partials/Page/Header.html".
+
+    The controls sit in the title's row and not in the navigation's, because
+    they belong to the site rather than to the menu, and because the
+    navigation row is the one that grows with the number of entries.
+</f:comment>
+<header class="theme-site-header theme-site-header--centred">
+    <div class="theme-site-header__inner theme-site-header__inner--brand">
+        <f:render partial="Page/Header/Brand" arguments="{_all}" />
+        <f:render partial="Page/Header/Controls" arguments="{_all}" />
+    </div>
+    <div class="theme-site-header__inner theme-site-header__inner--navigation">
+        <f:render partial="Navigation/Main" arguments="{_all}" />
+    </div>
+</header>
+
+</html>
