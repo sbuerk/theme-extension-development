@@ -104,7 +104,11 @@ rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
 asserts every selector above is actually compiled into
 `Resources/Public/Css/theme.css`, and the two display sizes that are not the
-bare class besides.
+bare class besides. It matches on a **token boundary**: `.theme-card` is not
+counted as found because `.theme-card-scroller` is in the file, so a selector
+of that table has to be declared under exactly the name the table gives it.
+That is also why the table names `.theme-pagination__list` and not the nav
+around it.
 
 The **page column grid is not in that table** and not in that provider, which
 is shared with

@@ -69,14 +69,24 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
         yield from ComponentLibraryTest::shippedComponents();
     }
 
+    /**
+     * The class name has to stand on its own in the markup.
+     *
+     * The same trap as in `ComponentLibraryTest::everyComponentIsPartOfTheBundle()`,
+     * and worse here: a substring check finds `theme-card` in every
+     * `theme-card-scroller__item` of the page, so a specimen that was dropped
+     * is invisible as long as a component with a longer name is still shown.
+     * Both boundaries are needed, because there is no leading `.` on this
+     * side to separate a name from what precedes it.
+     */
     #[DataProvider('everyShippedComponent')]
     #[Test]
     public function everyComponentOfTheLibraryIsShownOnTheStyleguide(string $selector): void
     {
-        $this->assertStringContainsString(
+        $this->assertMatchesRegularExpression(
             // The provider yields CSS selectors; on the page they are class
             // attribute values.
-            ltrim($selector, '.'),
+            sprintf('/(?<![\w-])%s(?![\w-])/', preg_quote(ltrim($selector, '.'), '/')),
             $this->render(),
             sprintf('The styleguide does not demonstrate "%s".', $selector),
         );
