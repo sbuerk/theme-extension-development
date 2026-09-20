@@ -38,6 +38,12 @@ final class ComponentLibraryTest extends UnitTestCase
         // template rendering one of these expects the rule to exist; dropping
         // a "@use" from "theme.scss" is otherwise invisible until someone
         // looks at the page.
+        //
+        // Both consumers match these on a token boundary, so an entry has to
+        // name a class the stylesheet really declares and the styleguide
+        // really carries - not one that happens to be the beginning of a
+        // longer name. Where a component's root element carries no rule of
+        // its own, the entry names the element that does.
         foreach ([
             'accordion' => '.theme-accordion',
             'alert' => '.theme-alert',
@@ -75,16 +81,18 @@ final class ComponentLibraryTest extends UnitTestCase
             'link decoration' => '.theme-link',
             'list' => '.theme-list',
             'list group' => '.theme-list-group',
-            // The modifier rather than the bare ".theme-media" the docs name:
-            // this is a substring check, and ".theme-media" is also a
-            // substring of ".theme-media-object", which is a different
-            // component and would satisfy the assertion on its own.
-            'media' => '.theme-media--video',
+            'media' => '.theme-media',
             'media object' => '.theme-media-object',
             'meter' => '.theme-meter',
             'main navigation' => '.theme-nav-main',
             'sub navigation' => '.theme-nav-sub',
-            'pagination' => '.theme-pagination',
+            // The list, not the ".theme-pagination" nav around it: that nav
+            // is a cluster of individual controls rather than a content
+            // panel and deliberately carries no box of its own, so
+            // "_pagination.scss" declares no rule for it and there is
+            // nothing for an assertion to find. The list is the outermost
+            // element the component does style.
+            'pagination' => '.theme-pagination__list',
             'panel' => '.theme-panel',
             'pricing' => '.theme-pricing',
             'pricing plan' => '.theme-pricing__plan',
@@ -126,11 +134,35 @@ final class ComponentLibraryTest extends UnitTestCase
         }
     }
 
+    /**
+     * The selector has to end where the entry ends.
+     *
+     * A plain substring check is satisfied by any longer class name
+     * containing the entry, and most of the entries above have such a longer
+     * sibling: `.theme-card` in `.theme-card-scroller`, `.theme-list` in
+     * `.theme-list-group`, `.theme-stat` in `.theme-stats`, `.theme-tag` in
+     * `.theme-tag-list`. An entry with one cannot detect a rename of the
+     * component it names.
+     *
+     * A trailing `{` would be the obvious guard and does not work here:
+     * dart-sass emits grouped selectors, so `.theme-input` occurs three times
+     * as `.theme-input,` and never as `.theme-input{` - and the same provider
+     * is matched against markup in `StyleguideRenderingTest`, where there is
+     * no brace at all. A lookahead for what may not follow works in both.
+     *
+     * No lookbehind: the leading `.` is the boundary on this side, and
+     * requiring a non-word character before it would reject a compound
+     * selector such as `.theme-frame.theme-card`.
+     */
     #[DataProvider('shippedComponents')]
     #[Test]
     public function everyComponentIsPartOfTheBundle(string $selector): void
     {
-        $this->assertStringContainsString($selector, $this->stylesheet());
+        $this->assertMatchesRegularExpression(
+            sprintf('/%s(?![\w-])/', preg_quote($selector, '/')),
+            $this->stylesheet(),
+            sprintf('"%s" is not a selector of the compiled stylesheet.', $selector),
+        );
     }
 
     /**
@@ -157,8 +189,11 @@ final class ComponentLibraryTest extends UnitTestCase
      * `.theme-page__columns`, which is a prefix of `.theme-page__columns--article` -
      * so a bare substring check passes for a selector that was renamed,
      * misspelled or never written, as long as a longer one containing it
-     * exists. It is the same trap `shippedComponents()` names for
-     * `.theme-media`, here for a whole family at once.
+     * exists. It is the trap `everyComponentIsPartOfTheBundle()` keeps out
+     * with a token boundary; the brace is available here, because each of
+     * these is a rule of its own rather than one of a grouped selector, and
+     * it is the stricter of the two - it asserts a rule and not merely an
+     * occurrence.
      */
     #[Test]
     public function thePageLayoutStructuresArePartOfTheBundle(): void

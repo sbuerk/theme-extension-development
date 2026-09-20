@@ -267,7 +267,11 @@ list written next to the assertion, and that is the point of both:
   silently — a component missing from the styleguide looks exactly like a
   styleguide that is simply shorter than it used to be. Reusing the provider is
   the link between the two, so a component added to the library without a
-  specimen fails here. Five entries are satisfied by the page frame rather than
+  specimen fails here. The class name is matched on a **token boundary** there
+  as well, and it matters more on this side: a substring check finds
+  `theme-card` in every `theme-card-scroller__item` of the page, so a specimen
+  that was dropped stays invisible as long as a component with a longer name is
+  still shown. Five entries are satisfied by the page frame rather than
   by a specimen — `.theme-page`, `.theme-site-header`, `.theme-site-footer`,
   `.theme-skip-link`, and `.theme-settings` with the `.theme-segmented` and
   `.theme-swatch` controls inside it — which is correct: they
