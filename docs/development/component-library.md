@@ -104,7 +104,20 @@ rather than a modifier class. `theme.scss` is the authoritative list and the
 cascade order; `Tests/Unit/ComponentLibraryTest::everyComponentIsPartOfTheBundle`
 asserts every selector above is actually compiled into
 `Resources/Public/Css/theme.css`, and the two display sizes that are not the
-bare class besides. The palette swatch is covered twice over,
+bare class besides.
+
+The **page column grid is not in that table** and not in that provider, which
+is shared with
+`StyleguideRenderingTest::everyComponentOfTheLibraryIsShownOnTheStyleguide` —
+every entry there has to appear on the styleguide page. `.theme-page__columns`,
+`.theme-page__cover` and `.theme-page__bands` are page structure written by
+`Templates/Page/*.html` and chosen by the backend layout of the page; the
+styleguide renders through the `styleguide` layout and has none of them, and a
+specimen faking a page layout inside a page would demonstrate nothing. That
+they reach the bundle is asserted by
+`ComponentLibraryTest::thePageLayoutStructuresArePartOfTheBundle` instead, and
+that the markup carries them by
+`Tests/Functional/BackendLayoutRenderingTest`. The palette swatch is covered twice over,
 because it duplicates colour that lives in `abstracts/_palettes.scss` and
 `abstracts/_tokens.scss` — see
 [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).
@@ -1287,6 +1300,62 @@ The two-column split is `:has(.theme-page__aside)` on `.theme-page__body`, not
 a page-level modifier class — whether the grid applies follows the markup
 rather than a class kept in sync with it.
 
+Page column grid — the multi column page layouts, inside `.theme-page__main`
+rather than on it, because the breadcrumb and the stage render into `__main`
+first and would otherwise become columns:
+
+```html
+<main class="theme-page__main" id="content">
+    <nav class="theme-breadcrumb">…</nav>
+    <div class="theme-page__columns theme-page__columns--halves">
+        <div class="theme-page__column">…</div>
+        <div class="theme-page__column">…</div>
+    </div>
+</main>
+```
+
+`--halves`, `--wide-start`, `--thirds` and `--article` size the tracks; the
+number of columns is the number of children the template wrote. Every track is
+`minmax(0, …)` so a wide child — a table, a code block, an unbroken URL —
+shrinks its track rather than pushing the row past the page. Stacked below
+`bp.$md`. Why the grid is there and not on `__main`:
+[page rendering](../architecture/page-rendering.md#the-column-grid-sits-inside-theme-page__main-not-on-it).
+
+`--article` pairs a column capped at the reading measure with a fixed aside.
+The aside is an `<aside class="theme-page__column">` of that grid and **not**
+`.theme-page__aside`, which is the navigation column of the shell:
+
+```html
+<div class="theme-page__columns theme-page__columns--article">
+    <div class="theme-page__column theme-page__column--measure">…</div>
+    <aside class="theme-page__column">…</aside>
+</div>
+```
+
+Cover — one slot, centred in what the shell leaves between header and footer.
+`.theme-page__main:has(.theme-page__cover)` becomes the grid that centres it;
+no height is stated anywhere, because `.theme-page` is already at least
+`100dvh` tall:
+
+```html
+<main class="theme-page__main" id="content">
+    <div class="theme-page__cover">…</div>
+</main>
+```
+
+Band stack — the one structure that leaves the content container.
+`.theme-page__body:has(.theme-page__bands)` drops `max-width` and the inline
+padding, so each band spans the viewport while the header and the footer keep
+theirs. Bands are flush; `.theme-page__bands` is a grid so the last margin of
+one band cannot collapse into the next:
+
+```html
+<div class="theme-page__bands">
+    <div class="theme-page__band">…</div>
+    <div class="theme-page__band">…</div>
+</div>
+```
+
 Site header. `--sticky` is opt-in, because a sticky header steals viewport
 height on every scroll position:
 
@@ -1315,9 +1384,18 @@ way when the row gets tight depends on its width:
   menu of three entries on two rows next to a title on two lines anyway. A
   menu wider than 60% wraps inside that width, so nothing spills sideways.
 
+The showcase itself has **six** top level entries since the page layouts were
+added, and its own menu therefore takes two rows at 1280 pixels beside a title
+that keeps its line — five entries on the first row and the sixth on the
+second, measured in the browser, not deduced. That is the first of those two
+rules working, not a defect.
+
 `Tests/Acceptance/frontend.spec.ts` asserts both, in both trees: seven entries
 beside a one line title at 1280 pixels, three in one row at 768 pixels, and
-seven without spilling sideways at 768 and 900 pixels. Below `bp.$md` the
+seven without spilling sideways at 768 and 900 pixels. It also holds the six
+entries of the showcase to **at most two rows** at 1280: without a bound on the
+rows, the checks that no two entries overlap and that the entries of one row
+share their top are all satisfied by six entries on six rows. Below `bp.$md` the
 expanded navigation drops down under the header as a full-width band, behind
 `data-js` like the collapse itself.
 

@@ -6,3 +6,25 @@
 ,12,1,0,0,0,1,0,"Layout set to none","/none","-1",""
 ,13,1,0,0,0,1,0,"Declares start","/start","pagets__start",""
 ,20,10,0,0,0,1,0,"Two levels down","/inherits/deeper","",""
+,14,1,0,0,0,1,0,"Two equal columns","/two-columns","pagets__two_columns",""
+,15,1,0,0,0,1,0,"Two columns, wide first","/two-columns-wide","pagets__two_columns_wide",""
+,16,1,0,0,0,1,0,"Three columns","/three-columns","pagets__three_columns",""
+,17,1,0,0,0,1,0,"Article","/article","pagets__article",""
+,18,1,0,0,0,1,0,"Cover","/cover","pagets__cover",""
+,19,1,0,0,0,1,0,"Bands","/bands","pagets__bands",""
+"tt_content",,,,,,,,,
+,"uid","pid","sys_language_uid","l18n_parent","colPos","sorting","CType","header","header_layout"
+,1401,14,0,0,0,10,"header","In the main column",2
+,1402,14,0,0,3,20,"header","In the second column",2
+,1403,14,0,0,4,30,"header","In a column this layout has not got",2
+,1501,15,0,0,0,10,"header","In the wide column",2
+,1502,15,0,0,3,20,"header","In the narrow column",2
+,1601,16,0,0,0,10,"header","In the first of three",2
+,1602,16,0,0,3,20,"header","In the second of three",2
+,1603,16,0,0,4,30,"header","In the third of three",2
+,1701,17,0,0,0,10,"header","In the article",2
+,1702,17,0,0,1,20,"header","In the notes beside it",2
+,1801,18,0,0,0,10,"header","On the cover",2
+,1901,19,0,0,0,10,"header","In the first band",2
+,1902,19,0,0,3,20,"header","In the second band",2
+,1903,19,0,0,4,30,"header","In the third band",2

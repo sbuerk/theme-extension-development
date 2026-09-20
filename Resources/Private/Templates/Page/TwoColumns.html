@@ -1,0 +1,44 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Backend layout "two_columns"
+    (Configuration/PageTsConfig/BackendLayouts/TwoColumns.tsconfig) - "stage"
+    (colPos 2) above, then "main" (colPos 0) and "secondary" (colPos 3) side
+    by side in equal columns.
+
+    THE GRID IS INSIDE ".theme-page__main", NOT ON IT
+    ".theme-page__main" is written once by "Layouts/Default.html" and it holds
+    more than the columns: the breadcrumb and the stage render into it ahead of
+    them. Making that element the grid would make the breadcrumb and the stage
+    grid items of the column track - a breadcrumb in the first of two columns,
+    the stage in the second. So the columns get an element of their own,
+    ".theme-page__columns", and the shell stays a single column the way every
+    other layout leaves it.
+
+    Each column is wrapped, because "lib.content.*" renders one
+    ".theme-content-element" per record straight into its parent: without a
+    wrapper every element would be a grid item of its own and the two columns
+    would interleave row by row.
+
+    The breadcrumb renders here for the same reason as on
+    "Templates/Page/Content.html" - this is a content page with a trail worth
+    showing; see that template and "Partials/Page/Breadcrumb.html".
+</f:comment>
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <f:render partial="Page/Breadcrumb" arguments="{_all}" />
+    <f:render partial="Page/Stage" arguments="{_all}" />
+
+    <div class="theme-page__columns theme-page__columns--halves">
+        <div class="theme-page__column">
+            <f:cObject typoscriptObjectPath="lib.content.main" />
+        </div>
+        <div class="theme-page__column">
+            <f:cObject typoscriptObjectPath="lib.content.secondary" />
+        </div>
+    </div>
+</f:section>
+
+</html>

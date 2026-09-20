@@ -124,6 +124,145 @@
     min-width: 0;
 }
 
+// The column grid of the page layouts that put slots side by side -
+// "two_columns", "two_columns_wide", "three_columns" and "article".
+//
+// Inside ".theme-page__main", not on it. The shell writes "__main" once for
+// every layout and more than the columns renders into it: the breadcrumb and
+// the stage come first. Were "__main" the grid, both would become items of
+// the column track - the breadcrumb in the first column, the stage in the
+// second - so the columns get an element of their own and the shell keeps a
+// single flow. The page templates say the same in their comments.
+//
+// Each column is a wrapper in the markup because "lib.content.*" renders one
+// ".theme-content-element" per record straight into its parent: without one,
+// every element would be a grid item and two columns would interleave row by
+// row rather than stack.
+//
+// The modifier carries the ratio rather than a count, because the count is
+// already in the markup: ".theme-page__columns--halves" and "--thirds" differ
+// in how a track is sized, not in how many children the template wrote.
+.theme-page__columns {
+    --theme-page-columns-gap: var(--theme-space-6, 1.875rem);
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--theme-page-columns-gap);
+}
+
+// "minmax(0, …)" rather than a bare fraction on every track: a grid item's
+// automatic minimum size is its content, so a wide child - a table, a code
+// block, a long unbroken URL - pushes its track past the fraction it was
+// given and the row spills sideways. The zero minimum lets the track shrink
+// and the child scroll or wrap inside it instead.
+//
+// Stacked below "bp.$md", the breakpoint of the library: two columns of body
+// text at 40rem are two columns of five words.
+.theme-page__columns--halves {
+    @media (min-width: bp.$md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.theme-page__columns--wide-start {
+    @media (min-width: bp.$md) {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+}
+
+.theme-page__columns--thirds {
+    @media (min-width: bp.$md) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+// The same "min-width: 0" as ".theme-page__main" and for the same reason: the
+// column is a grid item, and a block formatting context keeps a child's top
+// margin from collapsing out of the column into the row.
+.theme-page__column {
+    display: flow-root;
+    min-width: 0;
+}
+
+// The article grid: the running text and an aside of notes beside it. The
+// aside is a column here rather than the page shell's ".theme-page__aside" -
+// that element is the navigation column, it precedes the content in the
+// source order, and an article's notes have to follow the article. See
+// "Templates/Page/Article.html".
+.theme-page__columns--article {
+    --theme-page-article-aside-width: 16rem;
+
+    @media (min-width: bp.$md) {
+        grid-template-columns: minmax(0, 1fr) var(--theme-page-article-aside-width);
+    }
+}
+
+// The reading measure, on the column rather than on the grid track.
+//
+// A track sized "minmax(0, var(--theme-measure))" would reach the same width
+// and leave the rest of the row empty, which is the same picture - but the
+// measure is a property of the text, not of the layout, and a column that
+// holds something wider than prose (a table, a gallery) still has the whole
+// track to use. The cap is what stops the prose; the track is what the column
+// may use.
+.theme-page__column--measure {
+    max-inline-size: var(--theme-measure, 68ch);
+}
+
+// The cover page: the content centred in what the shell leaves between the
+// header and the footer.
+//
+// No height is stated. ".theme-page" is a flex column with "min-height:
+// 100dvh" and ".theme-page__body" takes the remaining space, so
+// ".theme-page__main" already fills the viewport - all this adds is where its
+// content sits inside it. A "min-height" of its own would have to guess the
+// height of the header and the footer.
+//
+// ":has()" rather than a modifier on "__main", which the page shell writes
+// for every layout alike and which no page template can reach - the same
+// reason ".theme-page__body" reacts to the aside that way. Replacing
+// "flow-root" with "grid" keeps the block formatting context the base rule
+// wants: a grid container establishes one as well.
+.theme-page__main:has(.theme-page__cover) {
+    display: grid;
+    align-content: center;
+}
+
+.theme-page__cover {
+    min-width: 0;
+}
+
+// Full width bands: the page body gives up its content container while it
+// holds a band stack, so each band spans the viewport.
+//
+// Widening the body rather than letting a band break out of it with "width:
+// 100vw" and a negative margin: "100vw" includes the scrollbar, so such a
+// band overflows by its width wherever the platform reserves one, and the
+// acceptance suite measures "document.documentElement.scrollWidth" on
+// "/layouts/bands" for exactly that. The header and the footer keep their own
+// containers, so only the main area goes wide.
+//
+// What holds the text off the edge is the padding a content element already
+// has inside its own box. How wide the *reading* line is inside a band stays
+// the business of what an editor puts there - a call to action and a hero
+// both hold their text to the measure by themselves.
+.theme-page__body:has(.theme-page__bands) {
+    max-width: none;
+    padding-inline: 0;
+}
+
+// A grid rather than plain block flow, so the margin of the last element of
+// one band cannot collapse through into the next band. Bands are flush on
+// purpose - that is what makes them read as bands - and the space between two
+// of them is the "space after" an editor sets on the element above.
+.theme-page__bands {
+    display: grid;
+}
+
+.theme-page__band {
+    min-width: 0;
+}
+
 // Rendered only by the "default" page template, which has no stage slot for
 // editorial content to carry a heading - see the comment in
 // "Templates/Page/Default.html". The layouts that do have one leave the

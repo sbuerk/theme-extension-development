@@ -188,7 +188,7 @@ See :ref:`feature-display-settings` for the display settings,
 Backend layouts and page templates
 ==================================
 
-The theme ships six backend layouts through page TSconfig, and the layout an
+The theme ships its backend layouts through page TSconfig, and the layout an
 editor selects picks the Fluid template the page is rendered with:
 
 ..  list-table::
@@ -215,6 +215,30 @@ editor selects picks the Fluid template the page is rendered with:
         -   :guilabel:`Start page`
         -   stage (2), main (0), footer 1-4 (11-14), footer meta (10)
         -   :file:`Page/Start.html`
+    *   -   ``two_columns``
+        -   :guilabel:`Two columns (50/50)`
+        -   stage (2), main (0), second column (3)
+        -   :file:`Page/TwoColumns.html`
+    *   -   ``two_columns_wide``
+        -   :guilabel:`Two columns (66/33)`
+        -   stage (2), main (0), second column (3)
+        -   :file:`Page/TwoColumnsWide.html`
+    *   -   ``three_columns``
+        -   :guilabel:`Three columns`
+        -   stage (2), main (0), second column (3), third column (4)
+        -   :file:`Page/ThreeColumns.html`
+    *   -   ``article``
+        -   :guilabel:`Article`
+        -   stage (2), main (0), sidebar (1)
+        -   :file:`Page/Article.html`
+    *   -   ``cover``
+        -   :guilabel:`Cover page`
+        -   main (0)
+        -   :file:`Page/Cover.html`
+    *   -   ``bands``
+        -   :guilabel:`Full-width bands`
+        -   main (0), second column (3), third column (4)
+        -   :file:`Page/Bands.html`
     *   -   ``styleguide``
         -   :guilabel:`Styleguide`
         -   unused (999)
@@ -236,7 +260,8 @@ TSconfig file and a template of the matching name and nothing else. A page
 without a layout, and a page whose layout is TYPO3's built-in
 :guilabel:`[None]`, both render with :file:`Page/Default.html`.
 
-See :ref:`feature-backend-layouts`.
+See :ref:`feature-backend-layouts`, :ref:`feature-column-page-layouts` and
+:ref:`feature-cover-article-and-band-layouts`.
 
 Content elements
 ================
@@ -319,7 +344,8 @@ which is suggested rather than required:
 
 The set seeds a start page, pages for typography and media, one page
 deliberately without a backend layout, a ``/elements`` branch carrying every
-content type, and a ``/styleguide`` page rendering the whole component library
+content type, a ``/layouts`` branch with one wireframe page per backend layout,
+and a ``/styleguide`` page rendering the whole component library
 — see :ref:`feature-seeded-showcase-tree` and :ref:`feature-styleguide`. Its
 records declare their uids and point at each other by them, so it is imported
 into an installation where those uids are free. The set declares no site

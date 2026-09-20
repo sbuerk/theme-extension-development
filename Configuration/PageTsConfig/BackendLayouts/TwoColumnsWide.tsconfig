@@ -1,0 +1,43 @@
+# The same two columns as "TwoColumns.tsconfig" - same colPos numbers, same
+# stage - with the first one twice as wide as the second.
+#
+# The page module grid says so with a three column grid the main column spans
+# two of; the frontend says so with "theme-page__columns--wide-start" in
+# "Templates/Page/TwoColumnsWide.html". Neither derives from the other: the
+# page module grid has integer columns to work with, the frontend has
+# fractions, and the ratio has to be expressed twice.
+#
+# A layout of its own rather than a field on "two_columns", because the
+# backend layout is what "PageLayoutResolver" resolves and what an editor
+# picks; a second select beside it would be a second thing to keep in step
+# with the template name.
+mod.web_layout.BackendLayouts.two_columns_wide {
+    title = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.twoColumnsWide.title
+    config.backend_layout {
+        colCount = 3
+        rowCount = 2
+        rows {
+            1.columns.1 {
+                name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.stage.name
+                identifier = stage
+                colPos = 2
+                colspan = 3
+            }
+            2 {
+                columns {
+                    1 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.main.name
+                        identifier = main
+                        colPos = 0
+                        colspan = 2
+                    }
+                    2 {
+                        name = LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:backendLayout.colPos.secondary.name
+                        identifier = secondary
+                        colPos = 3
+                    }
+                }
+            }
+        }
+    }
+}
