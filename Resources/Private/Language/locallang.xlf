@@ -30,6 +30,9 @@
 			<trans-unit id="theme.navSubHeading">
 				<source>In this section</source>
 			</trans-unit>
+			<trans-unit id="theme.navSubBranchLabel">
+				<source>Pages below %s</source>
+			</trans-unit>
 			<trans-unit id="theme.breadcrumbLabel">
 				<source>Breadcrumb</source>
 			</trans-unit>

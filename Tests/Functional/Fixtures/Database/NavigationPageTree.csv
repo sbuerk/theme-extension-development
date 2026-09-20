@@ -7,4 +7,5 @@
 ,100,10,0,0,0,1,0,"A page in the first section","/first/a","","",0
 ,101,10,0,0,0,1,0,"Another page in the first section","/first/b","","",0
 ,1000,100,0,0,0,1,0,"Three levels down","/first/a/deep","","",0
+,1001,101,0,0,0,1,0,"Below the other page","/first/b/deep","","",0
 ,200,11,0,0,0,1,0,"A page in the second section","/second/a","","",0
