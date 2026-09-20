@@ -116,11 +116,12 @@ see [Icons](icons.md#picking-an-icon-in-the-backend).
 render and the number it states to the number of files shipped — both are
 literals, because the partial also renders without TYPO3.
 
-`Interactive.html` is a section of its own rather than four more specimens in
+`Interactive.html` is a section of its own rather than seven more specimens in
 `Boxes.html` because what it demonstrates is not a shape but a behaviour, and
 the behaviour has two states: the page with the script, and the page without
-it. Keeping the four components that depend on `theme.js` together is what
-makes "switch JavaScript off and reload" one check instead of four. The
+it. Six of its seven specimens depend on `theme.js` — every one but the
+toggletip, which is the Popover API alone — and keeping them together is what
+makes "switch JavaScript off and reload" one check instead of six. The
 carousel is the one that depends on it least, and it is in this section for
 exactly that reason: only its previous and next buttons need the script, while
 its track still scrolls and its indicators still move the reader from slide to
