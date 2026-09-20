@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 /**
  * The seeded showcase in a real browser, in both delivery trees.
@@ -71,7 +71,12 @@ for (const tree of trees) {
                 const response = await page.goto(url);
                 expect(response?.status()).toBe(200);
                 await expect(page.locator('[data-theme-page-layout]')).toHaveCount(1);
-                await expect(page.locator('.theme-site-header__brand')).toHaveAttribute('href', `${tree.prefix}/`);
+                // The page's own header, not any header on it: the styleguide
+                // section "chrome" renders four specimen headers inside
+                // "main", with the same classes, because that is what a
+                // specimen of the real markup is. The real one is the direct
+                // child of ".theme-page".
+                await expect(page.locator('.theme-page > .theme-site-header .theme-site-header__brand')).toHaveAttribute('href', `${tree.prefix}/`);
                 await expect(page.getByText('has no rendering definition')).toHaveCount(0);
 
                 // The inline head script of the theme ran: it marks the root
@@ -514,4 +519,74 @@ test('the second level of the main menu stays closed until hovered, on a wide sc
     await item.hover();
     await expect(secondLevel).toBeVisible();
     await expect(secondLevel.getByRole('link', { name: 'Core elements' })).toBeVisible();
+});
+
+/**
+ * The sub navigation tree, on a page that has one.
+ *
+ * `/elements/core` is a second-level page of the "Elements" section, so its
+ * sidebar lists that section: the pages below it, two of which have children of
+ * their own and are therefore branches. "Core elements" is the branch the
+ * reader is in, "Theme elements" is the other one.
+ *
+ * What a browser shows and the markup cannot: that a branch really opens and
+ * closes, that it does so with JavaScript disabled - the tree is built on
+ * `details`, and nothing about it waits for a script - and that the branch page
+ * is still reachable beside its toggle.
+ */
+test.describe('the sub navigation tree', () => {
+    const branch = (page: Page, title: string) => page
+        .locator('.theme-nav-sub__item--branch')
+        .filter({ has: page.getByRole('link', { name: title, exact: true }) });
+
+    test('opens the branch the reader is in and leaves the other folded', async ({ page }) => {
+        await page.goto('/elements/core');
+
+        await expect(branch(page, 'Core elements').locator('details')).toHaveAttribute('open', '');
+        await expect(branch(page, 'Theme elements').locator('details')).not.toHaveAttribute('open', '');
+        await expect(branch(page, 'Theme elements').getByRole('link', { name: 'Text and icon', exact: true })).toBeHidden();
+    });
+
+    test('folds and unfolds a branch with JavaScript disabled', async ({ browser }) => {
+        const context = await browser.newContext({ javaScriptEnabled: false });
+        const page = await context.newPage();
+        await page.goto('/elements/core');
+
+        const themeElements = branch(page, 'Theme elements');
+        const toggle = themeElements.locator('summary.theme-nav-sub__toggle');
+        const child = themeElements.getByRole('link', { name: 'Text and icon', exact: true });
+
+        await expect(child).toBeHidden();
+        await toggle.click();
+        await expect(child).toBeVisible();
+        await toggle.click();
+        await expect(child).toBeHidden();
+
+        await context.close();
+    });
+
+    // The toggle is a "summary", so Enter and Space are the element's own
+    // behaviour rather than anything the theme wires up - which is exactly
+    // why it is worth one assertion: the design was chosen for that, and a
+    // future toggle built out of a div would pass every other test here.
+    test('opens a branch from the keyboard', async ({ page }) => {
+        await page.goto('/elements/core');
+
+        const themeElements = branch(page, 'Theme elements');
+        const child = themeElements.getByRole('link', { name: 'Text and icon', exact: true });
+
+        await expect(child).toBeHidden();
+        await themeElements.locator('summary.theme-nav-sub__toggle').focus();
+        await page.keyboard.press('Enter');
+        await expect(child).toBeVisible();
+        await page.keyboard.press('Space');
+        await expect(child).toBeHidden();
+    });
+
+    test('keeps the branch page reachable beside its toggle', async ({ page }) => {
+        await page.goto('/elements/core');
+
+        await branch(page, 'Theme elements').getByRole('link', { name: 'Theme elements', exact: true }).click();
+        await expect(page).toHaveURL(/\/elements\/theme$/);
+    });
 });

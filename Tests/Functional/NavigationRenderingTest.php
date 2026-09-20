@@ -147,6 +147,103 @@ final class NavigationRenderingTest extends AbstractFunctionalTestCase
         }
     }
 
+    /**
+     * An item with children is a branch, and a branch is a native
+     * `details`/`summary` pair - the whole of the collapsible tree, with no
+     * script and no attribute a script would have to set. A button with
+     * `aria-expanded` would need one, and the tree would then be inert on a
+     * page whose JavaScript never arrived.
+     */
+    #[Test]
+    public function aBranchOfTheSubNavigationIsADetailsElement(): void
+    {
+        $subNavigation = $this->navigation($this->render('/first/a'), 'theme-nav-sub');
+
+        $this->assertStringContainsString('<details class="theme-nav-sub__branch"', $subNavigation);
+        $this->assertStringContainsString('<summary class="theme-nav-sub__toggle">', $subNavigation);
+        $this->assertStringNotContainsString('aria-expanded', $subNavigation);
+        $this->assertStringNotContainsString('<button', $subNavigation);
+        $this->assertStringNotContainsString('data-js', $subNavigation);
+    }
+
+    /**
+     * The branch the reader is inside is open, every other branch is folded.
+     *
+     * `open` is true whatever its value - the empty string included - so a
+     * conditional attribute value would leave every branch open, and a test
+     * looking only for the open one would pass. Both halves are asserted.
+     */
+    #[Test]
+    public function onlyTheBranchHoldingTheCurrentPageIsOpen(): void
+    {
+        $subNavigation = $this->navigation($this->render('/first/a/deep'), 'theme-nav-sub');
+
+        $matched = preg_match_all('#<details class="theme-nav-sub__branch"( open)?>(.*?)</details>#s', $subNavigation, $branches, PREG_SET_ORDER);
+        $this->assertSame(2, $matched, 'The fixture has two branches in this section.');
+
+        $open = [];
+        foreach ($branches as $branch) {
+            if ($branch[1] !== '') {
+                $open[] = $branch[2];
+            }
+        }
+        $this->assertCount(1, $open, 'Exactly the branch of the current page is open.');
+        $this->assertStringContainsString('A page in the first section', $open[0]);
+    }
+
+    /**
+     * A branch page is still a page: its link is a sibling of the toggle, and
+     * the toggle is not inside it either. The two being nested in either
+     * direction is what axe reports as a nested interactive control, and it
+     * is why the markup is shaped this way at all.
+     */
+    #[Test]
+    public function aBranchLinksToItsOwnPageBesideItsToggle(): void
+    {
+        $subNavigation = $this->navigation($this->render('/first/a'), 'theme-nav-sub');
+
+        $this->assertMatchesRegularExpression(
+            '#<li class="theme-nav-sub__item theme-nav-sub__item--branch">\s*'
+            . '<a class="theme-nav-sub__link" href="[^"]*/first/a"[^>]*>\s*A page in the first section\s*</a>\s*'
+            . '<details class="theme-nav-sub__branch"#s',
+            $subNavigation,
+        );
+    }
+
+    /**
+     * The toggle is named, and named after its branch: its accessible name is
+     * the text inside it, which the stylesheet hides from sight. An icon-only
+     * control with no text and no label is a control a screen reader
+     * announces as "disclosure triangle" and nothing else.
+     */
+    #[Test]
+    public function theBranchToggleIsNamedAfterItsBranch(): void
+    {
+        $subNavigation = $this->navigation($this->render('/first/a'), 'theme-nav-sub');
+
+        $this->assertStringContainsString(
+            '<span class="theme-nav-sub__toggle-label">Pages below A page in the first section</span>',
+            $subNavigation,
+        );
+        // Not on the summary: an "aria-label" there is an attribute on an
+        // element whose role is not the theme's to guess at. The "<nav>" has
+        // one, which is why this looks for the summary rather than the string.
+        $this->assertStringNotContainsString('<summary class="theme-nav-sub__toggle" aria-label', $subNavigation);
+    }
+
+    /**
+     * An item without children is not wrapped in anything: a `details` around
+     * a leaf would be a disclosure control that discloses nothing.
+     */
+    #[Test]
+    public function aLeafOfTheSubNavigationIsAPlainListItem(): void
+    {
+        $subNavigation = $this->navigation($this->render('/second/a'), 'theme-nav-sub');
+
+        $this->assertStringContainsString('A page in the second section', $subNavigation);
+        $this->assertStringNotContainsString('<details', $subNavigation);
+    }
+
     #[Test]
     public function theCurrentPageIsMarkedForAssistiveTechnology(): void
     {

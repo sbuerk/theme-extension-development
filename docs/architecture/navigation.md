@@ -65,6 +65,37 @@ own children — the site root's top-level pages. Harmless in practice: the sub
 navigation is rendered only on the `content_sidebar` backend layout, and
 nothing requires the site root to use it.
 
+## A branch of the sub navigation folds, and no script is involved
+
+An item of `subMenu` that has children is rendered as a native
+`<details>`/`<summary>` pair beside its link, so a reader can fold that branch
+away. The element carries the state, the keyboard handling and the announced
+expanded/collapsed semantics; the theme adds a chevron and a hidden name and
+nothing else. Nothing is gated behind `data-js`, because nothing about folding
+a branch waits for a script — the tree works on a page whose JavaScript never
+arrived, which is the reason it is built on `details` rather than on a button
+and a class.
+
+**The branch holding the current page is `open`, every other one starts
+folded.** `MenuProcessor` marks it `active` (an ancestor) or `current` (the
+page itself). The attribute is assembled as a string and interpolated rather
+than written as `open="{…}"`, because `open` is true whatever its value —
+`open=""` included — so a conditional *value* would leave every branch open and
+a test looking only for the open one would pass.
+
+**The branch link is a sibling of the summary, not a child of it.** The first
+version had the link inside the summary, which named the disclosure control by
+the branch's own title and needed no extra text at all. axe refuses it:
+`nested-interactive`, serious, on every appearance and palette of the
+styleguide fixture, because a summary is a widget and a focusable descendant
+inside one is a control a reader cannot predict. The toggle is therefore named
+by a visually hidden span — subtree text is the naming method a `<summary>`
+has — and it names the branch rather than the action: "Pages below Analytics".
+
+The layout of those two controls is in
+[Component library § Navigation](../development/component-library.md#navigation),
+including why a grid on the `<details>` does not arrange them.
+
 ## Three independent processors, three independent overrides
 
 Each navigation is its own numbered key under `page.10.dataProcessing`
@@ -298,17 +329,22 @@ records the same reuse for its own index.
 `Tests/Functional/NavigationRenderingTest.php`, against the three-level
 fixture in `NavigationPageTree.csv`:
 
-| Test                                                     | Guards                                                                    |
-|----------------------------------------------------------|---------------------------------------------------------------------------|
-| `theMainMenuListsTheTopLevelOfTheSite`                   | The top level renders, from the site root regardless of the current page. |
-| `theMainMenuLeavesOutAPageHiddenFromNavigation`          | `nav_hide` is honoured.                                                   |
-| `theMainMenuCarriesASecondLevel`                         | `expandAll = 1` puts the second level in the markup unconditionally.      |
-| `theSubNavigationShowsTheSectionOnEveryLevelOfIt`        | The `leveluid:1` fix, asserted at all three page depths at once.          |
-| `theCurrentPageIsMarkedForAssistiveTechnology`           | `aria-current="page"` is present on the current page's link.              |
-| `theBreadcrumbShowsTheTrailAndDoesNotLinkTheCurrentPage` | The trail order, and that the last item is not an anchor.                 |
-| `everyNavigationLandmarkIsLabelled`                      | No `<nav>` without an `aria-label`.                                       |
-| `theMenuToggleIsWiredToTheListItControls`                | The button's `aria-controls` names an `id` that actually exists.          |
-| `onlyTheSidebarLayoutCarriesTheSubNavigation`            | The sub navigation appears on `content_sidebar` and nowhere else.         |
+| Test                                                     | Guards                                                                         |
+|----------------------------------------------------------|--------------------------------------------------------------------------------|
+| `theMainMenuListsTheTopLevelOfTheSite`                   | The top level renders, from the site root regardless of the current page.      |
+| `theMainMenuLeavesOutAPageHiddenFromNavigation`          | `nav_hide` is honoured.                                                        |
+| `theMainMenuCarriesASecondLevel`                         | `expandAll = 1` puts the second level in the markup unconditionally.           |
+| `theSubNavigationShowsTheSectionOnEveryLevelOfIt`        | The `leveluid:1` fix, asserted at all three page depths at once.               |
+| `aBranchOfTheSubNavigationIsADetailsElement`             | A branch is `details`/`summary` — no button, no `aria-expanded`, no `data-js`. |
+| `onlyTheBranchHoldingTheCurrentPageIsOpen`               | Exactly one branch is `open`, and it is the one the reader is in.              |
+| `aBranchLinksToItsOwnPageBesideItsToggle`                | The branch link and the toggle are siblings, neither inside the other.         |
+| `theBranchToggleIsNamedAfterItsBranch`                   | The toggle's name is hidden text naming the branch, not an `aria-label`.       |
+| `aLeafOfTheSubNavigationIsAPlainListItem`                | An item without children is wrapped in nothing.                                |
+| `theCurrentPageIsMarkedForAssistiveTechnology`           | `aria-current="page"` is present on the current page's link.                   |
+| `theBreadcrumbShowsTheTrailAndDoesNotLinkTheCurrentPage` | The trail order, and that the last item is not an anchor.                      |
+| `everyNavigationLandmarkIsLabelled`                      | No `<nav>` without an `aria-label`.                                            |
+| `theMenuToggleIsWiredToTheListItControls`                | The button's `aria-controls` names an `id` that actually exists.               |
+| `onlyTheSidebarLayoutCarriesTheSubNavigation`            | The sub navigation appears on `content_sidebar` and nowhere else.              |
 
 The accessible state is asserted throughout, not the visual one — asserting a
 modifier class instead of `[aria-current='page']` would let the two drift
