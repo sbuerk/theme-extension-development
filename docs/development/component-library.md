@@ -1451,6 +1451,50 @@ share their top are all satisfied by six entries on six rows. Below `bp.$md` the
 expanded navigation drops down under the header as a full-width band, behind
 `data-js` like the collapse itself.
 
+#### Header variants
+
+The arrangement above is one of four, and the one a site gets unless it says
+otherwise. The site setting `theme.header.variant` selects the others; each is
+a partial below `Partials/Page/Header/` and a modifier on the header, and
+`Partials/Page/Header.html` is a switch over literal partial names — the value
+of the setting never becomes part of a path.
+
+| Value      | Rows                                                                  | Modifier     |
+|------------|-----------------------------------------------------------------------|--------------|
+| `simple`   | Title, navigation and controls in one row. **The default.**           | none         |
+| `centred`  | Title centred with the controls at the end; navigation centred below. | `--centred`  |
+| `actions`  | Title, call to action and controls; navigation below.                 | `--actions`  |
+| `two-tier` | A tinted meta row of controls above title and navigation.             | `--two-tier` |
+
+```html
+<header class="theme-site-header theme-site-header--two-tier">
+    <div class="theme-site-header__meta">
+        <div class="theme-site-header__inner theme-site-header__inner--meta">…controls…</div>
+    </div>
+    <div class="theme-site-header__inner theme-site-header__inner--main">…brand, nav…</div>
+</header>
+```
+
+**None of the three re-opens the width budget above.** That budget is measured
+in a browser and holds for the single row; a variant that put a third thing in
+that row would have to be measured again. Instead each of them takes something
+*out* of it — `centred` gives the title a row, `actions` gives the navigation
+one and puts the call to action in the space it leaves, `two-tier` moves both
+controls into a meta row. `ComponentLibraryTest::aHeaderVariantDoesNotChangeTheMeasuredWidthBudget`
+fails on a variant rule that sets a width on the navigation or the brand, which
+is the way that promise breaks silently: the acceptance tests render the
+default and would stay green.
+
+The call to action of `actions` takes two more settings, `theme.header.actionPage`
+and `theme.header.actionLabel`, and renders nothing unless both are set. The
+destination is a **page uid, not a link** — nothing an integrator writes into
+the setting can become the scheme of that `href`, which a link setting would
+allow. The cost is that the call to action cannot leave the site.
+
+The styleguide section `chrome` shows all four; `SiteHeaderVariantRenderingTest`
+renders each one from the setting, and asserts that a value the switch does not
+know falls back to the default.
+
 ### Display settings
 
 The cog at the end of the site header and the panel it discloses —

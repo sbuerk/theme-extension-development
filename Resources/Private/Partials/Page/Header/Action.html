@@ -1,0 +1,42 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The call to action of the "actions" header variant - a button leading to
+    one page of the site.
+
+    Both values are site settings: "theme.header.actionPage", the uid of the
+    page, and "theme.header.actionLabel", its text. Either one left at its
+    default renders nothing at all, rather than a button with no destination
+    or a button with no name. An integrator who configures one half has
+    configured nothing, which is the honest outcome and the one that cannot
+    put an unnamed control in the header.
+
+    A PAGE UID, NOT A LINK. The destination is an integer that "f:link.typolink"
+    resolves as a page. A link setting would accept "javascript:" - the same
+    defect the external media element documents in
+    "Classes/DataProcessing/ExternalMediaProcessor.php" - and a site setting is
+    edited in a form, which is exactly where a value nobody looks at twice
+    comes from. Declared "type: int", the core validates it, so the form
+    cannot deliver a scheme here.
+
+    That is a statement about the form, not about every path: the TypoScript
+    constant of the same name is free text like every constant, so a site
+    package that writes "theme.header.actionPage = javascript:..." reaches
+    "f:link.typolink" with it. That is integrator-level trust, the same trust
+    every constant of this theme already carries; what the "int" buys is the
+    one editor-facing path that is not.
+
+    The cost is that the call to action cannot leave the site; that is a
+    deliberate limit of this variant, not an oversight.
+
+    An uid that is not a page renders an empty "href": "typolink" cannot
+    resolve it, and "f:link.typolink" then writes the label without a link
+    target. That is the core's behaviour for every broken page reference in
+    the theme and is left as it is.
+</f:comment>
+<f:if condition="{headerActionPage} > 0 && {headerActionLabel}">
+    <f:link.typolink parameter="{headerActionPage}" class="theme-button theme-button--primary theme-site-header__action">{headerActionLabel}</f:link.typolink>
+</f:if>
+
+</html>

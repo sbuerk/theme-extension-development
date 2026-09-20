@@ -1,0 +1,43 @@
+# The site settings of the theme.
+#
+# A setting is what an integrator changes per site, in the backend module
+# "Site Management > Sites" or in the site's own "settings.yaml". Everything
+# here is also a TypoScript constant of the same name, declared with the same
+# default in "Configuration/TypoScript/constants.typoscript" - the core
+# overrules a set constant with a site setting of the same key whenever the
+# site uses the set, so the classic static include still works with constants
+# alone and a site set installation gets an edited form. That is the
+# compatibility path the core documents for settings themselves (see
+# "Feature: #103439 - TypoScript provider for sites and sets").
+#
+# LABELS ARE WRITTEN OUT HERE, NOT TAKEN FROM AN XLIFF FILE. A set may carry a
+# "labels.xlf", and the label and the description of a setting do come from it
+# on both cores - but the OPTIONS of an enum only from TYPO3 v14.2 on
+# ("Feature: #106640"). On v13.4 the enum is handed over exactly as written
+# here, so a "LLL:" reference inside it reaches the settings editor spelled
+# out. The settings here are enums and their options are the text an
+# integrator reads, so translating everything but them would split one form's
+# strings across two files. See "docs/architecture/site-settings.md".
+settings:
+  theme.header.variant:
+    label: 'Header layout'
+    description: 'How the site header arranges the title, the navigation and the controls.'
+    type: string
+    default: simple
+    enum:
+      simple: 'Simple - title, navigation and controls in one row'
+      centred: 'Centred - the title on its own row above a centred navigation'
+      actions: 'With actions - a call to action beside the controls, navigation on its own row'
+      two-tier: 'Two tier - a meta row of controls above the title and the navigation'
+
+  theme.header.actionPage:
+    label: 'Call to action: page'
+    description: 'The page the call to action of the "With actions" header leads to. 0 renders no call to action.'
+    type: int
+    default: 0
+
+  theme.header.actionLabel:
+    label: 'Call to action: label'
+    description: 'The text of the call to action of the "With actions" header. An empty label renders no call to action.'
+    type: string
+    default: ''

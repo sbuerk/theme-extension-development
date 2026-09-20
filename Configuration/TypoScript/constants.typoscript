@@ -21,6 +21,26 @@ theme {
     # "Configuration/TypoScript/LinkDecoration.typoscript".
     linkDecoration = 1
 
+    header {
+        # How the site header arranges the title, the navigation and the
+        # controls: "simple" (one row, the default), "centred", "actions" or
+        # "two-tier". See "Partials/Page/Header.html", which renders one
+        # partial per value, and "layout/_site-header.scss".
+        #
+        # This is also a site setting of the same name
+        # ("Configuration/Sets/ThemeExtensionDevelopment/settings.definitions.yaml").
+        # A site that uses the set gets the setting, which overrules this
+        # constant; a site on the classic static include gets this constant.
+        variant = simple
+
+        # The call to action of the "actions" header: the uid of the page it
+        # leads to, and its text. A page uid rather than a link, so nothing
+        # but a page can reach that "href" - a link field would accept a
+        # scheme. Either left at its default renders no call to action.
+        actionPage = 0
+        actionLabel =
+    }
+
     media {
         # The width in pixels the image gallery is computed for. No image is
         # processed wider than this, so it should match the width the layout
