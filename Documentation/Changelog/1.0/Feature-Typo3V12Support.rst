@@ -68,11 +68,9 @@ and MM tables, and nothing else.
 The extension therefore ships an :file:`ext_tables.sql` declaring what TYPO3
 v13 would have generated:
 
-*   the table :sql:`tx_theme_list_item`, holding the entries of the two link
-    list elements,
-*   the columns :sql:`tx_theme_link`, :sql:`tx_theme_link_label`,
-    :sql:`tx_theme_link_variant` and :sql:`tx_theme_list_items` on
-    :sql:`tt_content`.
+*   the table :sql:`tx_theme_list_item`, holding the entries of the list and
+    card elements, with every column those elements need,
+*   every :sql:`tx_theme_*` column this extension adds to :sql:`tt_content`.
 
 The file is not version aware: :issue:`101553` states that an explicit
 definition takes precedence over the derived one, so one file serves both
@@ -82,8 +80,8 @@ versions. On TYPO3 v13 it is redundant and changes nothing.
 
     Run the database analyser (:guilabel:`Admin Tools > Maintenance >
     Analyze Database Structure`, or ``vendor/bin/typo3 extension:setup``) after
-    updating on TYPO3 v12. Without the table and the four columns the theme's
-    hero, teaser and link list elements cannot store their data.
+    updating on TYPO3 v12. Without the table and those columns the theme's
+    own content elements cannot store their data.
 
 Rich text and plugin rendering on TYPO3 v12
 ===========================================
