@@ -78,11 +78,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                                                                                                                                                                                |
-|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 152 and 170 to 177 — forty-nine pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                     |
-| `tx_theme_list_item` | 1 to 19 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                        |
+| Table                | Uids                                                                                                                                                                                                           |
+|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 153 and 170 to 177 — fifty pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                |
+| `tx_theme_list_item` | 1 to 19 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                   |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -230,6 +230,7 @@ page each below `/layouts`. The pages below the first ten show every classic
 | 130       | External media           | `/elements/theme/external-media` | `content_sidebar`               | Both shapes of the embed, an element without a poster, and a host that is not embedded at all.                                                |
 | 170       | Pricing                  | `/elements/theme/pricing`        | `content`                       | Plans side by side, each with a price, a period, a feature list and a link; no sidebar, which the plan columns need.                          |
 | 51        | Frames                   | `/elements/frames`               | `content`                       | Every frame, spacing, header alignment and header look of the Appearance tab.                                                                 |
+| 153       | Cheatsheet               | `/elements/cheatsheet`           | `content`                       | Every element and every variant on one page, gathered with *Insert records* rather than copied.                                               |
 | 171       | Layouts                  | `/layouts`                       | `content`                       | The page layout branch: what a backend layout decides, and a menu of 172 to 177.                                                              |
 | 172–177   | Two columns … Bands      | `/layouts/<layout>`              | `two_columns` … `bands`         | One page per multi column, article, cover and band layout, with a labelled box in every column that layout declares.                          |
 | 9         | Styleguide               | `/styleguide`                    | `styleguide`                    | The component library, straight from Fluid.                                                                                                   |
@@ -271,6 +272,43 @@ preserve:
 > The likely cause is an import that aborted part way and left the page
 > record without its site-resolvable state. Recorded here so the next person
 > who sees it knows it has been looked at — not as a known defect.
+
+### The cheatsheet gathers, it does not copy
+
+`/elements/cheatsheet` (page 153) shows every content element the theme renders
+and every variant of one, on a single page. It holds no element of its own:
+each family on it is an *Insert records* element whose `records` names the
+elements of one page of the showcase, under a `header` element that says which
+family it is.
+
+Copying the elements onto it would make a second definition of every one of
+them, and the two would drift the first time one was changed — silently, since
+a cheatsheet that is one variant short still looks like a cheatsheet. A
+reference cannot drift. It also means the page demonstrates the element it is
+made of.
+
+Three things follow, and all three are asserted by
+`Tests/Functional/CheatsheetRenderingTest`:
+
+- **It cannot show *Insert records*.** A shortcut reached through a shortcut
+  renders nothing, deliberately — see `tt_content.shortcut` in
+  `Configuration/TypoScript/ContentElements.typoscript` for the recursion the
+  theme refuses to leave to the core. The elements of page 50 are therefore not
+  referenced, and the last element of the page says so.
+- **Completeness is read from the TypoScript**, as it is in `ShowcaseTreeTest`:
+  a content type the theme starts to render and nobody adds to the cheatsheet
+  fails the test rather than quietly not being on the page. A reference that
+  resolves to nothing fails it too — an empty shortcut looks exactly like a
+  family that is simply short.
+- **No element is gathered twice.** Two families naming one element would put
+  the same `id` on the page twice, and the second anchor of that id is
+  unreachable.
+
+The page declares no sidebar. Beside one, the main column is narrower, and a
+features element of four columns, a pricing element of three plans and a hero
+all render differently in it — a cheatsheet whose elements do not look the way
+they look on their own pages is worth less than the table of contents a sidebar
+would add.
 
 ## The instance set: the showcase, delivered twice
 
