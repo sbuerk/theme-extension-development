@@ -144,4 +144,43 @@ final class IconViewHelperTest extends UnitTestCase
     {
         $this->assertSame('', $this->render('<theme:icon name="../LICENSE" optional="1" />'));
     }
+
+    #[Test]
+    public function aBrandLogoIsRenderedFromTheBrandsSet(): void
+    {
+        $markup = IconSet::brands()->markup('mastodon');
+
+        $this->assertSame(
+            '<svg class="theme-icon" aria-hidden="true" focusable="false"' . substr($markup, 4),
+            $this->render('<theme:icon set="brands" name="mastodon" />'),
+        );
+    }
+
+    /**
+     * The two sets are separate directories, and a name is looked up in the
+     * one the tag asked for - not in both. A solid name asked for as a brand
+     * is missing, exactly like a name that does not exist at all.
+     */
+    #[Test]
+    public function aSolidNameIsNotFoundInTheBrandsSet(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionCode(1789218002);
+
+        $this->render('<theme:icon set="brands" name="gear" />');
+    }
+
+    /**
+     * A misspelled set is a mistake in the template, not a request for the
+     * default: falling back to "solid" would report the platform logo as an
+     * icon that does not exist and point at the wrong thing.
+     */
+    #[Test]
+    public function aSetTheExtensionDoesNotShipThrows(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionCode(1789218004);
+
+        $this->render('<theme:icon set="brand" name="mastodon" />');
+    }
 }

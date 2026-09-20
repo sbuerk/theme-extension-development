@@ -5,11 +5,19 @@ declare(strict_types=1);
 namespace SBUERK\ThemeExtensionDevelopment\Icon;
 
 /**
- * The Font Awesome Free solid icons this extension ships.
+ * The Font Awesome Free icons this extension ships.
  *
  * The set is the committed copy below "Resources/Public/Icons/FontAwesome/Solid/"
  * ("runTests.sh -s buildIcons", see "docs/development/icons.md"), and an icon's
  * name is its file name without ".svg".
+ *
+ * "Brands/" is the second directory this class can read: the curated handful of
+ * platform logos of the brands style, named one by one in "fontAwesomeBrands"
+ * of the root "package.json" and copied by the same build. It is a set of the
+ * same shape - file name is icon name, "fill=currentColor", the attribution
+ * comment inside - so it needs no second class, only a second directory. Use
+ * "IconSet::brands()" rather than the constructor argument, which exists for
+ * the tests.
  *
  * The directory is resolved relative to this file, not through a TYPO3 API:
  * "IconViewHelper" renders through this class, and the styleguide partials it is
@@ -28,6 +36,11 @@ final readonly class IconSet
     public const DIRECTORY = __DIR__ . '/../../Resources/Public/Icons/FontAwesome/Solid';
 
     /**
+     * The shipped brand logos, the allowlist of "package.json".
+     */
+    public const BRANDS_DIRECTORY = __DIR__ . '/../../Resources/Public/Icons/FontAwesome/Brands';
+
+    /**
      * What a name may consist of. Checked before a name becomes part of a path,
      * so no name can leave the directory. "\z" rather than "$", which also
      * matches before a trailing line break.
@@ -42,6 +55,20 @@ final readonly class IconSet
     public function __construct(
         private string $directory = self::DIRECTORY,
     ) {}
+
+    /**
+     * The brand logos, as their own set.
+     *
+     * A named constructor rather than a second service: the two differ in one
+     * string, and the container has no reason to know about either directory -
+     * the ViewHelper renders through this class with no TYPO3 API in reach
+     * (see the class comment), and asking a container for the brands set would
+     * be the one thing it cannot do in the standalone renderer.
+     */
+    public static function brands(): self
+    {
+        return new self(self::BRANDS_DIRECTORY);
+    }
 
     /**
      * Every icon of the set, by name, sorted.
@@ -88,9 +115,10 @@ final readonly class IconSet
         if (!is_file($file)) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'There is no icon "%s" in the Font Awesome Free solid set this extension ships.'
-                    . ' The names are the file names below "Resources/Public/Icons/FontAwesome/Solid/".',
+                    'There is no icon "%s" in the Font Awesome Free set this extension ships below'
+                    . ' "Resources/Public/Icons/FontAwesome/%s/". The names are the file names there.',
                     $name,
+                    basename($this->directory),
                 ),
                 1789218002,
             );

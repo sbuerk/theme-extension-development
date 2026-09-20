@@ -6,6 +6,23 @@
     "engines": {
         "node": ">=20"
     },
+    "fontAwesomeBrands": [
+        "bluesky",
+        "discord",
+        "facebook",
+        "github",
+        "gitlab",
+        "instagram",
+        "linkedin",
+        "mastodon",
+        "pinterest",
+        "threads",
+        "tiktok",
+        "whatsapp",
+        "x-twitter",
+        "xing",
+        "youtube"
+    ],
     "devDependencies": {
         "@fortawesome/fontawesome-free": "7.3.1",
         "sass": "^1.102.0"
@@ -15,7 +32,14 @@
         "build:dev": "sass --load-path=Resources/Private/Scss --no-charset --style=expanded --source-map --embed-sources Resources/Private/Scss/theme.scss:Resources/Public/Css/theme.css",
         "build:verify": "sass --load-path=Resources/Private/Scss --no-charset --style=compressed --no-source-map Resources/Private/Scss/theme.scss:.Build/css-verify/theme.css && diff -u Resources/Public/Css/theme.css .Build/css-verify/theme.css",
         "watch": "npm run build:dev -- --watch",
-        "build:icons": "rm -rf Resources/Public/Icons/FontAwesome/Solid && mkdir -p Resources/Public/Icons/FontAwesome/Solid && cp node_modules/@fortawesome/fontawesome-free/svgs/solid/*.svg Resources/Public/Icons/FontAwesome/Solid/ && cp node_modules/@fortawesome/fontawesome-free/LICENSE.txt Resources/Public/Icons/FontAwesome/LICENSE.txt && cp node_modules/@fortawesome/fontawesome-free/metadata/categories.yml Resources/Public/Icons/FontAwesome/categories.yml",
-        "build:icons:verify": "diff -r node_modules/@fortawesome/fontawesome-free/svgs/solid Resources/Public/Icons/FontAwesome/Solid && diff -u node_modules/@fortawesome/fontawesome-free/LICENSE.txt Resources/Public/Icons/FontAwesome/LICENSE.txt && diff -u node_modules/@fortawesome/fontawesome-free/metadata/categories.yml Resources/Public/Icons/FontAwesome/categories.yml"
+        "build:icons": "npm run build:icons:solid && npm run build:icons:brands && npm run build:icons:meta",
+        "build:icons:solid": "rm -rf Resources/Public/Icons/FontAwesome/Solid && mkdir -p Resources/Public/Icons/FontAwesome/Solid && cp node_modules/@fortawesome/fontawesome-free/svgs/solid/*.svg Resources/Public/Icons/FontAwesome/Solid/",
+        "build:icons:brands": "THEME_BRANDS_DIR=Resources/Public/Icons/FontAwesome/Brands npm run build:icons:brands:copy",
+        "build:icons:brands:copy": "node -e \"const f=require('node:fs'),d=process.env.THEME_BRANDS_DIR,n=require('./package.json').fontAwesomeBrands;if(!Array.isArray(n)||n.length===0){throw new Error('package.json has no \\\"fontAwesomeBrands\\\" allowlist.')}f.rmSync(d,{recursive:true,force:true});f.mkdirSync(d,{recursive:true});for(const b of n){f.copyFileSync('node_modules/@fortawesome/fontawesome-free/svgs/brands/'+b+'.svg',d+'/'+b+'.svg')}\"",
+        "build:icons:meta": "cp node_modules/@fortawesome/fontawesome-free/LICENSE.txt Resources/Public/Icons/FontAwesome/LICENSE.txt && cp node_modules/@fortawesome/fontawesome-free/metadata/categories.yml Resources/Public/Icons/FontAwesome/categories.yml",
+        "build:icons:verify": "npm run build:icons:solid:verify && npm run build:icons:brands:verify && npm run build:icons:meta:verify",
+        "build:icons:solid:verify": "diff -r node_modules/@fortawesome/fontawesome-free/svgs/solid Resources/Public/Icons/FontAwesome/Solid",
+        "build:icons:brands:verify": "THEME_BRANDS_DIR=.Build/icons-verify/Brands npm run build:icons:brands:copy && diff -r .Build/icons-verify/Brands Resources/Public/Icons/FontAwesome/Brands",
+        "build:icons:meta:verify": "diff -u node_modules/@fortawesome/fontawesome-free/LICENSE.txt Resources/Public/Icons/FontAwesome/LICENSE.txt && diff -u node_modules/@fortawesome/fontawesome-free/metadata/categories.yml Resources/Public/Icons/FontAwesome/categories.yml"
     }
 }
