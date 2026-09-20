@@ -5,8 +5,10 @@
 <f:comment>
     Shared list rendering for every content element that resolves its own
     "tx_theme_list_items" inline relation into a plain list of links -
-    "theme_linklist", "theme_sociallinks" and the profile/contact links of
-    "theme_author". Reuses ".theme-content-menu"
+    "theme_linklist" and the profile/contact links of "theme_author".
+    ("theme_sociallinks" used this partial too until it got platform logos;
+    it renders "ContentElement/SocialLinks.html" now, which is a row rather
+    than a list.) Reuses ".theme-content-menu"
     (see "docs/development/component-library.md#content") rather than a
     component of its own: structurally this is exactly the same shape as the
     "menu_*" family already rendered through it - authored content in the
@@ -37,10 +39,9 @@
 
     A row without a usable "link" renders nothing rather than an empty
     "<li>": "link" is required on every relation that reaches this partial
-    (see the "overrideChildTca" of "tt_content_theme_linklist.php",
-    "tt_content_theme_sociallinks.php" and "tt_content_theme_author.php"), so
-    an empty value here means a record still mid-edit, not a shape this
-    partial has to design for.
+    (see the "overrideChildTca" of "tt_content_theme_linklist.php" and
+    "tt_content_theme_author.php"), so an empty value here means a record
+    still mid-edit, not a shape this partial has to design for.
 
     "link_label" is not required, so a row without one falls back to the
     resolved URL itself via "f:uri.typolink" - visible and honest about where

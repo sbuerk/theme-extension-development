@@ -1,0 +1,57 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    The entries of "theme_sociallinks", rendered as a row of platform logos.
+    Markup contract: docs/development/component-library.md#social-links,
+    styled by "components/_social-links.scss". The "<nav>" around it and its
+    "aria-label" belong to "Templates/ContentElements/ThemeSociallinks.html",
+    the same split "ContentElement/LinkList.html" uses.
+
+    Not "ContentElement/LinkList.html", which this element used while it had
+    no logos: that partial renders a vertical ".theme-content-menu" whose
+    entries are labels, and this one renders a horizontal row whose entries
+    collapse to a square holding a logo. The shape differs, not the colour.
+
+    Each item is one row of "tx_theme_list_item" wrapped by
+    "DatabaseQueryProcessor" as "['data' => $row]", so every field is read as
+    "item.data.*" - see "ContentElement/LinkList.html" for that and for why
+    "link" goes through "f:link.typolink" rather than into a bare "href".
+
+    THE NAME IS ALWAYS IN THE MARKUP. "__label" carries the platform's name as
+    text on every entry, whether a logo was picked or not; where one was,
+    "components/_social-links.scss" hides that text visually and it goes on
+    naming the link. An icon is never the accessible name of anything here -
+    the logo itself is rendered "aria-hidden", like every other decorative
+    icon of the theme.
+
+    "link_label" is what an editor typed, and it is not required, so a row
+    without one falls back to the resolved URL - the same fallback the link
+    list makes, and for the same reason: visible and honest about where the
+    link goes beats an empty or generic label. Note that this fallback is the
+    only text such an entry has, so it is what a screen reader reads out.
+
+    "brand_icon" is a name an editor picked, so it is rendered "optional":
+    a logo a later Font Awesome version dropped costs the logo, not the page,
+    and the entry then falls back to the visible label by itself - the
+    stylesheet hides the label with ":has(.theme-icon)", which is false
+    exactly when nothing was rendered.
+</f:comment>
+
+<f:if condition="{items}">
+    <ul class="theme-social-links__list">
+        <f:for each="{items}" as="item">
+            <f:if condition="{item.data.link}">
+                <li class="theme-social-links__item">
+                    <f:link.typolink parameter="{item.data.link}" class="theme-social-links__link">
+                        <theme:icon set="brands" name="{item.data.brand_icon}" optional="1" />
+                        <span class="theme-social-links__label"><f:if condition="{item.data.link_label}"><f:then>{item.data.link_label}</f:then><f:else><f:uri.typolink parameter="{item.data.link}" /></f:else></f:if></span>
+                    </f:link.typolink>
+                </li>
+            </f:if>
+        </f:for>
+    </ul>
+</f:if>
+
+</html>

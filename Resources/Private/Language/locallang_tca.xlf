@@ -762,6 +762,12 @@
 			<trans-unit id="tx_theme_list_item.icon">
 				<source>Icon</source>
 			</trans-unit>
+			<trans-unit id="tx_theme_list_item.brand_icon">
+				<source>Platform logo</source>
+			</trans-unit>
+			<trans-unit id="tx_theme_list_item.brand_icon.description">
+				<source>The logo of the platform this link leads to. A logo is a trademark of its owner and may only be used to refer to that platform.</source>
+			</trans-unit>
 			<trans-unit id="tx_theme_list_item.subheader">
 				<source>Subheader</source>
 			</trans-unit>
@@ -775,6 +781,9 @@
 			<!-- The icon picker, shared by every icon column -->
 			<trans-unit id="icon.I.none">
 				<source>No icon</source>
+			</trans-unit>
+			<trans-unit id="icon.I.noLogo">
+				<source>No logo</source>
 			</trans-unit>
 			<trans-unit id="icon.group.uncategorised">
 				<source>Without a category</source>

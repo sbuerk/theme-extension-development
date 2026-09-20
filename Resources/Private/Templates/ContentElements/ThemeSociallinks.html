@@ -2,21 +2,21 @@
       xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
 
 <f:comment>
-    "theme_sociallinks" - the same list of links as "theme_linklist"
-    ("ThemeLinklist.html"), rendered through the identical
-    ".theme-content-menu"/"ContentElement/LinkList" pair rather than a
-    component of its own - the two CTypes only differ in the child table's
-    "link" restriction ("allowedTypes" in
-    "Configuration/TCA/Overrides/tt_content_theme_sociallinks.php") and the
-    "aria-label" below, not in shape.
+    "theme_sociallinks" - a row of links to the site's profiles on other
+    platforms, each named by a logo of the vendored Font Awesome Free brands
+    set ("docs/development/icons.md"). Markup contract:
+    docs/development/component-library.md#social-links.
 
-    Every entry renders as a text label, "link_label" standing in for what
-    would otherwise be a platform icon ("Mastodon", "LinkedIn", ...). The
-    theme's icons are the solid style of Font Awesome Free, and platform logos
-    are in its brands style, which is deliberately not vendored - see
-    "docs/development/icons.md". Recorded here as the gap it is: an icon-driven
-    variant is not something this template approximates with a Unicode glyph
-    or a look-alike solid icon, it is simply not rendered.
+    It shares the child table with "theme_linklist" ("ThemeLinklist.html") and
+    differs from it in three things, which is why it has a component of its
+    own rather than the ".theme-content-menu" it used before the logos were
+    vendored: the child's "link" is restricted to the types a profile link can
+    have ("allowedTypes" in
+    "Configuration/TCA/Overrides/tt_content_theme_sociallinks.php"), the row
+    is horizontal, and an entry with a logo collapses to a square.
+
+    The "<nav>" and its "aria-label" are this template's, the list is
+    "ContentElement/SocialLinks.html" - the same split the link list uses.
 </f:comment>
 <f:layout name="ContentElement" />
 
@@ -24,8 +24,8 @@
     <f:render partial="ContentElement/Header" arguments="{_all}" />
 
     <f:if condition="{listItems}">
-        <nav class="theme-content-menu" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.sociallinksLabel')}">
-            <f:render partial="ContentElement/LinkList" arguments="{items: listItems}" />
+        <nav class="theme-social-links" aria-label="{f:translate(key: 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.sociallinksLabel')}">
+            <f:render partial="ContentElement/SocialLinks" arguments="{items: listItems}" />
         </nav>
     </f:if>
 </f:section>

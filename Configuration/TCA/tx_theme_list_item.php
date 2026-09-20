@@ -190,6 +190,32 @@ return [
             'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.icon',
             'config' => IconItems::selectConfig(),
         ],
+        // The platform a social link leads to, as one of the fifteen brand
+        // logos the extension vendors - "docs/development/icons.md". Its own
+        // column and not "link_icon": that one offers the solid set, which has
+        // no platform logo in it, and the two lists must not be one field an
+        // editor can pick the wrong half of.
+        //
+        // Deliberately not part of the "theme_link" palette. A brand logo may
+        // be used only to represent the platform it names (the licence says
+        // so), so the field is shown by the one relation that renders it -
+        // "Configuration/TCA/Overrides/tt_content_theme_sociallinks.php" - and
+        // by the default type below, which is the record edited on its own.
+        //
+        // A "selectSingle" of string values with static items and no
+        // "itemsProcFunc", so "DefaultTcaSchema" derives a
+        // "VARCHAR(255) DEFAULT ''" column on v13.4.35 and v14.3.7.
+        //
+        // NOT "as for link_icon and icon", which is the comparison that
+        // suggests itself and is wrong: both of those take their config from
+        // "IconItems::selectConfig()", which sets an "itemsProcFunc", and the
+        // schema builder skips the item branch entirely for such a column and
+        // falls through to the nullable "TEXT" default - on both cores.
+        'brand_icon' => [
+            'label' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.brand_icon',
+            'description' => 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:tx_theme_list_item.brand_icon.description',
+            'config' => IconItems::brandSelectConfig(),
+        ],
         // Where the caption of a slide of "theme_carousel" sits against its
         // image: below it (the default), above it, or laid over its foot.
         // Named for the item and not for the element, like every other column
@@ -242,6 +268,8 @@ return [
                 text,
                 --linebreak--,
                 icon,
+                --linebreak--,
+                brand_icon,
                 --linebreak--,
                 image,
                 --linebreak--,
