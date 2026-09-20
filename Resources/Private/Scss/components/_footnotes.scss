@@ -1,0 +1,141 @@
+// Footnotes, and the reference that points at one.
+//
+// Markup contract:
+//
+//     <p>… a sentence<sup class="theme-footnote-ref" id="fnref1"><a href="#fn1">1</a></sup>.</p>
+//
+//     <aside class="theme-footnotes" aria-labelledby="…">
+//         <hN class="theme-footnotes__heading" id="…">Notes</hN>
+//         <ol class="theme-footnotes__list">
+//             <li class="theme-footnotes__item" id="fn1">
+//                 The note. <a class="theme-footnotes__backlink" href="#fnref1" aria-label="…"></a>
+//             </li>
+//         </ol>
+//     </aside>
+//
+// Two blocks that only work as a pair, so they share a file: the superscript
+// number in the running text, and the list of notes at the end of it. The
+// reference is a block of its own rather than "theme-footnotes__ref" because
+// it never sits inside ".theme-footnotes" - it sits in a paragraph, several
+// content elements above it.
+//
+// --- Why the numbers are in the markup ---------------------------------------
+//
+// An "ol" numbers itself, and a CSS counter could number the references to
+// match. Neither number would then be in the text: a reader copying a
+// paragraph out of the page would copy a superscript with nothing in it, and
+// a screen reader announces list markers inconsistently between browsers. The
+// number is content here - it is what the reference and the note have in
+// common - so both carry it literally, and the list is an "ol" for the
+// semantics rather than for the marker, which is why "list-style" is dropped.
+//
+// --- The back link -----------------------------------------------------------
+//
+// The arrow of the back link is the vendored "arrow-turn-up", referenced as a
+// mask the way the markers of a decorated link are and for the same reason:
+// no template of the theme writes this markup at all. It comes out of a rich
+// text or an "html" element, where "<theme:icon>" cannot be called - see
+// "docs/development/icons.md". The link is named by "aria-label", because its
+// only content is that mask, and the mask is a background: forced colours
+// mode therefore needs the rule at the bottom of this file, which keeps the
+// arrow the colour of its link rather than painting it "CanvasText" - a link
+// marker has to stay a link.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-footnote-ref {
+    --theme-footnote-ref-color: var(--theme-color-primary, #0b57d0);
+
+    // "sup" already raises and shrinks the text in the element baseline; what
+    // is added here is the target size of the link inside it. A superscript
+    // digit is the smallest link on a page of running text, so the padding
+    // buys back the part of the hit area the font size took away, without
+    // changing the line box - the padding is inline and the line height of a
+    // "sup" is set from the line it sits in.
+    padding-inline: 0.15em;
+
+    // Underlined, and not only coloured. The accent against the running text
+    // is between 1.46:1 and 2.79:1 across the five palettes in both
+    // appearances - every one of them under the 3:1 that WCAG 1.4.1 asks of a
+    // colour that is the only thing distinguishing a link from the text
+    // around it, and what axe's "link-in-text-block" tests. G183 takes 3:1
+    // *and* a cue on hover and focus; this takes the other road of the same
+    // technique, an underline that is always there, and thickens it on hover
+    // and focus so the state is still visible.
+    //
+    // "text-underline-offset" rather than the default: a superscript digit
+    // sits high in its line, and an underline at the default offset touches
+    // the glyph.
+    > a {
+        color: var(--theme-footnote-ref-color);
+        text-decoration: underline;
+        text-underline-offset: 0.15em;
+
+        &:hover,
+        &:focus-visible {
+            text-decoration-thickness: 0.125em;
+        }
+    }
+}
+
+.theme-footnotes {
+    --theme-footnotes-gap: var(--theme-space-2, 0.625rem);
+    --theme-footnotes-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-footnotes-rule-color: var(--theme-color-border, #d5dae2);
+    --theme-footnotes-backlink-size: 0.75em;
+
+    border-block-start: var(--theme-border-width, 1px) solid var(--theme-footnotes-rule-color);
+    padding-block-start: var(--theme-space-4, 1.25rem);
+    color: var(--theme-footnotes-color);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+}
+
+.theme-footnotes__heading {
+    margin: 0 0 var(--theme-space-3, 0.9375rem);
+    color: var(--theme-color-text-primary, #14181f);
+    font-size: var(--theme-font-size-md, 1rem);
+    font-weight: var(--theme-font-weight-bold, 700);
+    letter-spacing: var(--theme-letter-spacing-caps, 0.08em);
+    text-transform: uppercase;
+}
+
+.theme-footnotes__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-footnotes-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+// The number is in the text of the note, so the item indents its wrapped
+// lines past it with a hanging indent rather than with a marker box: two
+// digits and a full stop are about two characters wide in the running font.
+.theme-footnotes__item {
+    padding-inline-start: 2ch;
+    text-indent: -2ch;
+}
+
+.theme-footnotes__backlink {
+    display: inline-block;
+    inline-size: var(--theme-footnotes-backlink-size);
+    block-size: var(--theme-footnotes-backlink-size);
+    margin-inline-start: 0.35em;
+    vertical-align: -0.05em;
+    background-color: currentColor;
+    mask-image: url('../Icons/FontAwesome/Solid/arrow-turn-up.svg');
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    // The hanging indent of the item applies to its first line only, and the
+    // back link sits on the last one; without this the arrow of a one-line
+    // note would be pulled two characters to the start with the number.
+    text-indent: 0;
+}
+
+@media (forced-colors: active) {
+    .theme-footnotes__backlink {
+        forced-color-adjust: none;
+    }
+}
