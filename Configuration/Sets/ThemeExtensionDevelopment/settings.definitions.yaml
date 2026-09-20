@@ -41,3 +41,36 @@ settings:
     description: 'The text of the call to action of the "With actions" header. An empty label renders no call to action.'
     type: string
     default: ''
+
+  theme.footer.variant:
+    label: 'Footer layout'
+    description: 'How the site footer arranges its content columns and its meta row.'
+    type: string
+    default: columns
+    enum:
+      columns: 'Columns - four content columns above a meta row'
+      newsletter: 'Newsletter - a newsletter band above the columns and the meta row'
+
+  theme.footer.newsletterHeading:
+    label: 'Newsletter: heading'
+    description: 'The heading of the newsletter band of the "Newsletter" footer. Without it the band is not rendered.'
+    type: string
+    default: ''
+
+  theme.footer.newsletterText:
+    label: 'Newsletter: text'
+    description: 'One line under the heading of the newsletter band. Optional.'
+    type: string
+    default: ''
+
+  theme.footer.newsletterPage:
+    label: 'Newsletter: page'
+    description: 'The page carrying the subscription form the newsletter band leads to. 0 renders no band.'
+    type: int
+    default: 0
+
+  theme.footer.newsletterLabel:
+    label: 'Newsletter: button label'
+    description: 'The text of the button of the newsletter band. Without it the band is not rendered.'
+    type: string
+    default: ''
