@@ -33,7 +33,7 @@ ContentTypeRegistration::addRecordType(
         tx_theme_quote_style,
         bodytext,
         --palette--;;headers,
-        --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:images,
+        --div--;LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:tabs.images,
         image,
     ',
     [
