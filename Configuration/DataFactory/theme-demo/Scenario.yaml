@@ -7,8 +7,8 @@
 # sequence:
 #
 #   pages               1-10, the first tree, and 30-39, 50-56, 70-73,
-#                       90-92, 110-112, 130, 150-152 and 170-177 - the
-#                       pages added below its sections, forty-nine in all.
+#                       90-92, 110-112, 130, 150-153 and 170-177 - the
+#                       pages added below its sections, fifty in all.
 #                       The odd decades from 30 up are reserved; the ids
 #                       actually used are fewer - see below for why the new
 #                       ones skip decades
@@ -4222,6 +4222,421 @@ entities:
                         header_layout: 3
                         tx_theme_header_style: 'h5'
                         bodytext: *headerBody
+
+            # The cheatsheet: every content element the theme renders, and
+            # every variant of one, on a single page.
+            #
+            # Built out of "Insert records" elements rather than out of copies.
+            # A copy of every element would be a second definition of the same
+            # thing, and the two would drift the first time one of them was
+            # changed; a reference cannot. It also means the page demonstrates
+            # the element it is made of: each family below is one "shortcut"
+            # record naming the elements of one page, under a header element
+            # that says which family it is.
+            #
+            # What that costs is the one element it cannot show. A shortcut
+            # reached through a shortcut renders nothing - deliberately, see
+            # "tt_content.shortcut" in
+            # "Configuration/TypoScript/ContentElements.typoscript" - so the
+            # "Insert records" elements of page 50 are not referenced here, and
+            # the last element of the page says so.
+            #
+            # No sidebar. The main column beside one is narrower, and a
+            # features element of four columns, a pricing element of three
+            # plans and a hero all render differently in it. A cheatsheet whose
+            # elements do not look the way they look on their own pages is
+            # worth less than the table of contents a sidebar would add.
+            #
+            # The header of each family carries "space_before_class", which is
+            # the one appearance field that earns its place here: without it
+            # the families run into each other.
+            - self:
+                  id: 153
+                  title: 'Cheatsheet'
+                  slug: '/elements/cheatsheet'
+                  backend_layout: 'content'
+              entities:
+                content:
+                  - self:
+                        id: 15301
+                        CType: 'header'
+                        header: 'Cheatsheet'
+                        header_layout: 1
+                  - self:
+                        id: 15302
+                        CType: 'text'
+                        bodytext: |
+                          <p class="theme-lead">Every content element the theme renders, and every
+                          variant of one, on a single page. The pages below
+                          <a href="t3://page?uid=5">Elements</a> show the same elements one family
+                          at a time, with the prose that explains them; this page is the one to
+                          scroll through, or to search in the browser.</p>
+                          <p>It holds no element of its own. Each family below is an
+                          <em>Insert records</em> element naming the elements of one page, so the
+                          page cannot drift from what it shows - and it demonstrates that element
+                          by being made of it.</p>
+                  - self:
+                        id: 15303
+                        CType: 'header'
+                        header: 'Header'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15304
+                        CType: 'shortcut'
+                        header: 'Header: header'
+                        records: 'tt_content_3003,tt_content_3004,tt_content_3005,tt_content_3006,tt_content_3007,tt_content_3008,tt_content_3009,tt_content_3010,tt_content_3011,tt_content_3012'
+                  - self:
+                        id: 15305
+                        CType: 'header'
+                        header: 'Text'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15306
+                        CType: 'shortcut'
+                        header: 'Text: text'
+                        records: 'tt_content_3102,tt_content_3103,tt_content_3104,tt_content_3105'
+                  - self:
+                        id: 15307
+                        CType: 'header'
+                        header: 'Text & Images'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15308
+                        CType: 'shortcut'
+                        header: 'Text & Images: textpic'
+                        records: 'tt_content_3202,tt_content_3203,tt_content_3204,tt_content_3205,tt_content_3206,tt_content_3207,tt_content_3208,tt_content_3209,tt_content_3210,tt_content_3211'
+                  - self:
+                        id: 15309
+                        CType: 'header'
+                        header: 'Text & Media'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15310
+                        CType: 'shortcut'
+                        header: 'Text & Media: textmedia'
+                        records: 'tt_content_3302,tt_content_3303,tt_content_3304,tt_content_3305,tt_content_3306,tt_content_3307'
+                  - self:
+                        id: 15311
+                        CType: 'header'
+                        header: 'Images'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15312
+                        CType: 'shortcut'
+                        header: 'Images: image'
+                        records: 'tt_content_3402,tt_content_3403,tt_content_3404,tt_content_3405,tt_content_3406'
+                  - self:
+                        id: 15313
+                        CType: 'header'
+                        header: 'Bullet list'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15314
+                        CType: 'shortcut'
+                        header: 'Bullet list: bullets'
+                        records: 'tt_content_3502,tt_content_3503,tt_content_3504,tt_content_3505,tt_content_3506,tt_content_3507,tt_content_3508'
+                  - self:
+                        id: 15315
+                        CType: 'header'
+                        header: 'Table'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15316
+                        CType: 'shortcut'
+                        header: 'Table: table'
+                        records: 'tt_content_3602,tt_content_3603,tt_content_3604,tt_content_3605,tt_content_3606,tt_content_3607,tt_content_3608,tt_content_3609'
+                  - self:
+                        id: 15317
+                        CType: 'header'
+                        header: 'File links'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15318
+                        CType: 'shortcut'
+                        header: 'File links: uploads'
+                        records: 'tt_content_3702,tt_content_3703,tt_content_3704,tt_content_3705,tt_content_3706'
+                  - self:
+                        id: 15319
+                        CType: 'header'
+                        header: 'Divider'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15320
+                        CType: 'shortcut'
+                        header: 'Divider: div'
+                        records: 'tt_content_3802,tt_content_3803,tt_content_3804'
+                  - self:
+                        id: 15321
+                        CType: 'header'
+                        header: 'Plain HTML'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15322
+                        CType: 'shortcut'
+                        header: 'Plain HTML: html'
+                        records: 'tt_content_3902'
+                  - self:
+                        id: 15323
+                        CType: 'header'
+                        header: 'Menus'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15324
+                        CType: 'shortcut'
+                        header: 'Menus: the eleven menu elements, and two of them as cards and as thumbnails'
+                        records: 'tt_content_702,tt_content_703,tt_content_704,tt_content_705,tt_content_706,tt_content_707,tt_content_708,tt_content_709,tt_content_710,tt_content_711,tt_content_712,tt_content_713,tt_content_714,tt_content_715,tt_content_716'
+                  - self:
+                        id: 15325
+                        CType: 'header'
+                        header: 'Heroes'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15326
+                        CType: 'shortcut'
+                        header: 'Heroes: theme_hero, theme_hero_small, theme_hero_text_only'
+                        records: 'tt_content_11002,tt_content_11003,tt_content_11004,tt_content_11005,tt_content_11006,tt_content_11007,tt_content_11008,tt_content_11009,tt_content_11010,tt_content_11011'
+                  - self:
+                        id: 15327
+                        CType: 'header'
+                        header: 'Teasers'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15328
+                        CType: 'shortcut'
+                        header: 'Teasers: theme_teaser, theme_media_teaser'
+                        records: 'tt_content_804,tt_content_805'
+                  - self:
+                        id: 15329
+                        CType: 'header'
+                        header: 'Text and icon'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15330
+                        CType: 'shortcut'
+                        header: 'Text and icon: theme_text_icon'
+                        records: 'tt_content_7003,tt_content_7004,tt_content_7005,tt_content_7006,tt_content_7007,tt_content_7008'
+                  - self:
+                        id: 15331
+                        CType: 'header'
+                        header: 'Features'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15332
+                        CType: 'shortcut'
+                        header: 'Features: theme_features'
+                        records: 'tt_content_7103,tt_content_7104,tt_content_7105,tt_content_7106'
+                  - self:
+                        id: 15333
+                        CType: 'header'
+                        header: 'Stats'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15334
+                        CType: 'shortcut'
+                        header: 'Stats: theme_stats'
+                        records: 'tt_content_7203,tt_content_7204'
+                  - self:
+                        id: 15335
+                        CType: 'header'
+                        header: 'Steps'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15336
+                        CType: 'shortcut'
+                        header: 'Steps: theme_steps'
+                        records: 'tt_content_7303,tt_content_7304'
+                  - self:
+                        id: 15337
+                        CType: 'header'
+                        header: 'Card group'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15338
+                        CType: 'shortcut'
+                        header: 'Card group: theme_card_group'
+                        records: 'tt_content_9002,tt_content_9003,tt_content_9004,tt_content_9005,tt_content_9006'
+                  - self:
+                        id: 15339
+                        CType: 'header'
+                        header: 'Timeline'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15340
+                        CType: 'shortcut'
+                        header: 'Timeline: theme_timeline'
+                        records: 'tt_content_9102,tt_content_9103'
+                  - self:
+                        id: 15341
+                        CType: 'header'
+                        header: 'Teaser list'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15342
+                        CType: 'shortcut'
+                        header: 'Teaser list: theme_teaser_list'
+                        records: 'tt_content_9202'
+                  - self:
+                        id: 15343
+                        CType: 'header'
+                        header: 'Carousel'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15344
+                        CType: 'shortcut'
+                        header: 'Carousel: theme_carousel'
+                        records: 'tt_content_15002,tt_content_15003'
+                  - self:
+                        id: 15345
+                        CType: 'header'
+                        header: 'Split tiles'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15346
+                        CType: 'shortcut'
+                        header: 'Split tiles: theme_split_tiles'
+                        records: 'tt_content_15102,tt_content_15103'
+                  - self:
+                        id: 15347
+                        CType: 'header'
+                        header: 'External media'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15348
+                        CType: 'shortcut'
+                        header: 'External media: theme_external_media'
+                        records: 'tt_content_13002,tt_content_13003,tt_content_13004,tt_content_13005'
+                  - self:
+                        id: 15349
+                        CType: 'header'
+                        header: 'Pricing'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15350
+                        CType: 'shortcut'
+                        header: 'Pricing: theme_pricing'
+                        records: 'tt_content_17002,tt_content_17003'
+                  - self:
+                        id: 15351
+                        CType: 'header'
+                        header: 'Calls to action'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15352
+                        CType: 'shortcut'
+                        header: 'Calls to action: theme_cta'
+                        records: 'tt_content_11102,tt_content_11103,tt_content_11104,tt_content_11105'
+                  - self:
+                        id: 15353
+                        CType: 'header'
+                        header: 'Quotations'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15354
+                        CType: 'shortcut'
+                        header: 'Quotations: theme_testimonial'
+                        records: 'tt_content_11203,tt_content_11204,tt_content_11205,tt_content_11206'
+                  - self:
+                        id: 15355
+                        CType: 'header'
+                        header: 'Author, link list and social links'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15356
+                        CType: 'shortcut'
+                        header: 'Author, link list and social links: theme_author, theme_linklist, theme_sociallinks'
+                        records: 'tt_content_807,tt_content_808,tt_content_809'
+                  - self:
+                        id: 15357
+                        CType: 'header'
+                        header: 'Media teaser grid'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15358
+                        CType: 'shortcut'
+                        header: 'Media teaser grid: theme_media_teaser_grid'
+                        records: 'tt_content_810'
+                  - self:
+                        id: 15359
+                        CType: 'header'
+                        header: 'Notices'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15360
+                        CType: 'shortcut'
+                        header: 'Notices: theme_notice'
+                        records: 'tt_content_811,tt_content_812,tt_content_813,tt_content_814,tt_content_815,tt_content_816'
+                  - self:
+                        id: 15361
+                        CType: 'header'
+                        header: 'Tabs and accordion'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15362
+                        CType: 'shortcut'
+                        header: 'Tabs and accordion: theme_tabs, theme_accordion'
+                        records: 'tt_content_817,tt_content_818'
+                  - self:
+                        id: 15363
+                        CType: 'header'
+                        header: 'Frames, spacing and header looks'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                  - self:
+                        id: 15364
+                        CType: 'shortcut'
+                        header: 'Frames, spacing and header looks: the Appearance tab of every element'
+                        records: 'tt_content_5103,tt_content_5104,tt_content_5105,tt_content_5106,tt_content_5107,tt_content_5108,tt_content_5109,tt_content_5110,tt_content_5111,tt_content_5112,tt_content_5113,tt_content_5114,tt_content_5115,tt_content_5116,tt_content_5117,tt_content_5118,tt_content_5119,tt_content_5120,tt_content_5121,tt_content_5122'
+                  - self:
+                        id: 15365
+                        CType: 'text'
+                        header: 'What is not on this page'
+                        header_layout: 2
+                        space_before_class: 'extra-large'
+                        linkToTop: 1
+                        bodytext: |
+                          <p><em>Insert records</em> itself. This page is built out of that element,
+                          and a shortcut reached through a shortcut renders nothing on purpose - it
+                          is how the theme makes a reference cycle impossible on both core
+                          versions. Its own page, <a href="t3://page?uid=50">Insert records</a>,
+                          shows what it does.</p>
+                          <p>The backend layouts. A layout is a property of a page, so one page can
+                          only ever show one of them; the pages of the showcase carry them between
+                          them instead.</p>
+                          <p>The component library and the form showcase. Both are rendered from
+                          Fluid rather than from records - see
+                          <a href="t3://page?uid=9">Styleguide</a> and
+                          <a href="t3://page?uid=10">Forms</a> - so there is nothing here to
+                          reference.</p>
 
         # The page layouts. One page per backend layout the theme registers
         # beyond the four a content page uses, each of them a wireframe: one
