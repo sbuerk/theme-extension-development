@@ -82,7 +82,7 @@ the `table` element need nothing from the tool.
 |----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 151 and 170 to 177 — forty-eight pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
 | `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                      |
-| `tx_theme_list_item` | 1 to 18 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                         |
+| `tx_theme_list_item` | 1 to 19 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                         |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:

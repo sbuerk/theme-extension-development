@@ -1400,7 +1400,7 @@ entities:
                       id: 1809
                       CType: theme_sociallinks
                       header: Elsewhere
-                      tx_theme_list_items: '1007,1008,1009'
+                      tx_theme_list_items: '1007,1019,1008,1009'
                   -
                     self:
                       id: 1810
@@ -1498,8 +1498,15 @@ entities:
                   -
                     self:
                       id: 1007
-                      link: 'https://typo3.org/'
-                      link_label: 'TYPO3 on the web'
+                      link: 'https://mastodon.example/@theme'
+                      link_label: Mastodon
+                      brand_icon: mastodon
+                  -
+                    self:
+                      id: 1019
+                      link: 'https://github.example/theme'
+                      link_label: GitHub
+                      brand_icon: github
                   -
                     self:
                       id: 1008

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SBUERK\ThemeExtensionDevelopment\Tca;
 
 use SBUERK\ThemeExtensionDevelopment\Icon\IconCatalogue;
+use SBUERK\ThemeExtensionDevelopment\Icon\IconSet;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
@@ -51,7 +52,14 @@ final readonly class IconItems
      */
     public const ICON_PATH = 'EXT:theme_extension_development/Resources/Public/Icons/FontAwesome/Solid/';
 
+    /**
+     * The same, for the brand logos.
+     */
+    public const BRAND_ICON_PATH = 'EXT:theme_extension_development/Resources/Public/Icons/FontAwesome/Brands/';
+
     public const NONE_LABEL = 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:icon.I.none';
+
+    public const NO_LOGO_LABEL = 'LLL:EXT:theme_extension_development/Resources/Private/Language/locallang_tca.xlf:icon.I.noLogo';
 
     private const CACHE_PREFIX = 'theme_icon_items_';
 
@@ -88,6 +96,55 @@ final readonly class IconItems
             ],
             'itemGroups' => (new IconCatalogue())->groups(),
             'itemsProcFunc' => self::class . '->addItems',
+            'fieldWizard' => [
+                'selectIcons' => [
+                    'disabled' => false,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * The "config" of a TCA column an editor picks a brand logo with.
+     *
+     * Static items, not an "itemsProcFunc": the brands set is fifteen files,
+     * which is a few hundred bytes of cached TCA - the reason the solid
+     * catalogue is built per form does not apply at this size, and static
+     * items keep the list readable in a TCA dump and reachable without a
+     * container. The names are read from the shipped directory rather than
+     * repeated here, so the allowlist of "package.json" stays the one place a
+     * platform is added.
+     *
+     * The label is the name, exactly as the solid picker labels its items:
+     * a translated label per platform would be a second list to keep in step
+     * with the allowlist, and "mastodon" next to the logo is not ambiguous.
+     *
+     * @return array{
+     *     type: 'select',
+     *     renderType: 'selectSingle',
+     *     default: '',
+     *     items: list<array{label: string, value: string, icon?: string}>,
+     *     fieldWizard: array{selectIcons: array{disabled: false}},
+     * }
+     */
+    public static function brandSelectConfig(): array
+    {
+        $items = [
+            ['label' => self::NO_LOGO_LABEL, 'value' => ''],
+        ];
+        foreach (IconSet::brands()->names() as $name) {
+            $items[] = [
+                'label' => $name,
+                'value' => $name,
+                'icon' => self::BRAND_ICON_PATH . $name . '.svg',
+            ];
+        }
+
+        return [
+            'type' => 'select',
+            'renderType' => 'selectSingle',
+            'default' => '',
+            'items' => $items,
             'fieldWizard' => [
                 'selectIcons' => [
                     'disabled' => false,
