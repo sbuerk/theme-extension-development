@@ -262,3 +262,69 @@ to Firefox 125.
 The language menu inside it is a plain `<nav>` that renders anywhere; the
 dropdown only decides where it sits in the header row.
 
+## The table of contents
+
+`page.10.variables.tableOfContents` is an `HMENU` with `sectionIndex = 1`,
+rendered by `Partials/Navigation/TableOfContents.html` into the aside of the
+`content_sidebar` layout — the one layout with a column for it, the same
+placement rule the sub navigation follows.
+
+**It cannot be a `MenuProcessor`.** `sectionIndex` is not one of that
+processor's `allowedConfigurationKeys`, and passing it throws `1478806566`. The
+section index is an HMENU option read off the configuration of the menu level in
+`AbstractMenuContentObject::prepareMenuItems()`, so the menu has to be built as
+one and assigned as a template variable — there is no processor to hand the
+result over.
+
+Two options decide what a reader gets:
+
+| Option                   | Value    | Why                                                                                                                                     |
+|--------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| `sectionIndex.useColPos` | `-1`     | Lifts the column restriction. The default is `0`, so an element in the sidebar or the stage would be missing from its own page's index. |
+| `sectionIndex.type`      | `header` | Drops an element whose header is empty or whose `header_layout` is `100`. The default type keeps both, as entries with no text.         |
+
+**The order is `sorting`, across every column at once.** `sectionIndex()` orders
+by the menu's `alternativeSortingField`, which defaults to `sorting`, and the
+column is a `WHERE` rather than part of the `ORDER BY` — so with `useColPos = -1`
+the columns are *interleaved* by `sorting`, not listed one after the other. An
+element of the sidebar can therefore sit between two elements of the main
+column, which is worth knowing before someone reads it as a bug.
+
+The anchor needs
+nothing: `sectionIndex()` puts the content uid in `sectionIndex_uid`, `link()`
+copies it into `conf.section`, and `PageLinkBuilder::calculateUrlFragment()`
+prefixes a numeric fragment with `c` — so the href is `#c<uid>`, exactly the id
+`Layouts/ContentElement.html` writes. **Changing that id breaks every entry.**
+
+The list is `.theme-content-menu`, not a component of its own: a flat list of
+links is what that component is, and `Templates/Page/Styleguide.html` already
+records the same reuse for its own index.
+
+## What the tests cover
+
+`Tests/Functional/NavigationRenderingTest.php`, against the three-level
+fixture in `NavigationPageTree.csv`:
+
+| Test                                                     | Guards                                                                    |
+|----------------------------------------------------------|---------------------------------------------------------------------------|
+| `theMainMenuListsTheTopLevelOfTheSite`                   | The top level renders, from the site root regardless of the current page. |
+| `theMainMenuLeavesOutAPageHiddenFromNavigation`          | `nav_hide` is honoured.                                                   |
+| `theMainMenuCarriesASecondLevel`                         | `expandAll = 1` puts the second level in the markup unconditionally.      |
+| `theSubNavigationShowsTheSectionOnEveryLevelOfIt`        | The `leveluid:1` fix, asserted at all three page depths at once.          |
+| `theCurrentPageIsMarkedForAssistiveTechnology`           | `aria-current="page"` is present on the current page's link.              |
+| `theBreadcrumbShowsTheTrailAndDoesNotLinkTheCurrentPage` | The trail order, and that the last item is not an anchor.                 |
+| `everyNavigationLandmarkIsLabelled`                      | No `<nav>` without an `aria-label`.                                       |
+| `theMenuToggleIsWiredToTheListItControls`                | The button's `aria-controls` names an `id` that actually exists.          |
+| `onlyTheSidebarLayoutCarriesTheSubNavigation`            | The sub navigation appears on `content_sidebar` and nowhere else.         |
+
+The accessible state is asserted throughout, not the visual one — asserting a
+modifier class instead of `[aria-current='page']` would let the two drift
+apart without any test noticing, since the stylesheet reads the attribute, not
+a class.
+
+## See also
+
+- [Page rendering](page-rendering.md)
+- [Component library](../development/component-library.md)
+- [`DESIGN.md`](../../DESIGN.md)
+- [Functional tests](../testing/functional-tests.md)

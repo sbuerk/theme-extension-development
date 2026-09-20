@@ -354,6 +354,35 @@
 // The core values "left" and "right" arrive as "--start" and "--end": the
 // stylesheet is written in logical properties, and the side an editor chose
 // stays that side of the line in a right-to-left language.
+// The "back to top" link of "linkToTop", after the element's inner box.
+//
+// Outside "__inner" in the markup, so it is not painted by a band and does not
+// sit inside the band's padding - it belongs to the page, not to the content.
+// Aligned to the end of the line with "margin-inline-start: auto" in a flex
+// box rather than "text-align", so it follows the reading direction.
+//
+// The arrow is an icon of the set ("arrow-up"), decoration beside the text
+// that names the link.
+.theme-content-element__to-top {
+    --theme-content-element-to-top-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-content-element-to-top-color-hover: var(--theme-color-primary, #0b57d0);
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--theme-space-2, 0.625rem);
+    min-height: var(--theme-tap-target-min);
+    color: var(--theme-content-element-to-top-color);
+    font-size: var(--theme-font-size-sm);
+    font-weight: var(--theme-font-weight-medium);
+    text-decoration: none;
+
+    &:hover {
+        color: var(--theme-content-element-to-top-color-hover);
+        text-decoration: underline;
+    }
+}
+
 .theme-content-element__header--start {
     text-align: start;
 }

@@ -136,13 +136,22 @@ TCEFORM.tt_content {
         }
     }
 
-    # The section index and the link to the top of the page are a later
-    # addition: a table of contents built from "sectionIndex" and a "back to
-    # top" link behind "linkToTop". Until then both would be switches that
-    # switch nothing. The "sectionIndex" column keeps its TCA default of 1, so
-    # every element created meanwhile is part of the index once there is one.
-    sectionIndex.disabled = 1
-    linkToTop.disabled = 1
+    # The section index and the link to the top of the page are both rendered
+    # now, so both are offered.
+    #
+    # "sectionIndex" feeds the table of contents of the aside - the "HMENU"
+    # with "sectionIndex = 1" in "Configuration/TypoScript/Navigation.typoscript",
+    # rendered by "Partials/Navigation/TableOfContents.html" on the
+    # "content_sidebar" layout. The column keeps its TCA default of 1, so every
+    # element written before this existed is already part of the index; an
+    # editor switches one out rather than having to switch the rest in.
+    #
+    # "linkToTop" appends a link back to the top of the page to the element -
+    # "Layouts/ContentElement.html". The core renders nothing for either field:
+    # both were fluid_styled_content's, which this theme does not install, so
+    # the rendering is the theme's own.
+    sectionIndex.disabled = 0
+    linkToTop.disabled = 0
 
     # These CTypes carry the core "headers" palette but render their title in
     # a component of their own, outside the shared header partial, so neither

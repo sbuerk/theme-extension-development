@@ -2871,6 +2871,12 @@ entities:
                             layout: 1
                             tx_theme_columns: 3
                             tx_theme_list_items: '159,160,161,162,163'
+                            # The one seeded element with a link back to the
+                            # top of the page: it is the last element of a
+                            # "content_sidebar" page, which is where such a
+                            # link is worth anything. Every other element keeps
+                            # the TCA default of 0.
+                            linkToTop: 1
                       # "layout" 2 is the wall: the cards keep their own
                       # heights and stack into columns, filled top to bottom.
                       # The texts are deliberately of very different lengths,
