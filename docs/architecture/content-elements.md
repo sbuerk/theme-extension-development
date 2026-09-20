@@ -1785,8 +1785,9 @@ invented — every identifier is one the core registers (`content-header`,
 `content-message`, `content-tab`, `content-accordion` for the notice, the
 tabs and the accordion, `content-idea` for the text and icon element, and
 `content-widget-list`, `content-widget-number` and `content-target` for the
-features, the figures and the steps, and `content-timeline` for the
-timeline), verified present in the core's own icon registry
+features, the figures and the steps, `content-timeline` for the timeline and
+`content-widget-calltoaction` for the call to action), verified present in
+the core's own icon registry
 (`.Build/vendor/typo3/cms-core/Resources/Public/Icons/T3Icons/icons.json`),
 not shipped as image files of this extension's own. An identifier that is
 *not* registered does not fail quietly: `IconRegistry::getIconConfigurationByIdentifier()`
