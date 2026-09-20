@@ -70,7 +70,7 @@ and not at the framework class.
 
 ## Arranging the theme: `ThemeSiteTrait`
 
-Eleven functional tests need the same thing — "a site rooted at page N whose
+Most functional tests need the same thing — "a site rooted at page N whose
 pages render through this theme" — and **how** a site delivers the theme is the
 one thing about them that depends on the core version:
 
