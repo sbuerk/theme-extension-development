@@ -216,6 +216,12 @@
 			<trans-unit id="theme.embedSource">
 				<source>Watch it on the source site</source>
 			</trans-unit>
+			<trans-unit id="theme.languageMenuLabel">
+				<source>Language</source>
+			</trans-unit>
+			<trans-unit id="theme.languageMenuListLabel">
+				<source>Languages</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
