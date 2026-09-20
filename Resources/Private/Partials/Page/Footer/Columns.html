@@ -1,0 +1,18 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Footer variant "columns", the default: the four content columns above the
+    meta row, and nothing else.
+
+    This is the footer the theme had before the variants, unchanged - which
+    is the point. It carries no modifier class, so a site that never touches
+    "theme.footer.variant" gets exactly the markup it had before.
+</f:comment>
+<footer class="theme-site-footer" data-theme="theme_extension_development">
+    <div class="theme-site-footer__inner">
+        <f:render partial="Page/Footer/Body" arguments="{_all}" />
+    </div>
+</footer>
+
+</html>

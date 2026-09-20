@@ -1,0 +1,20 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Footer variant "newsletter": a band inviting the reader to subscribe,
+    above the four content columns and the meta row.
+
+    The band is "Page/Footer/Signup.html" and renders nothing at all unless
+    it is configured, so this variant switched on with none of its settings
+    filled in is the "columns" footer with a modifier class. That is a usable
+    state rather than a broken one.
+</f:comment>
+<footer class="theme-site-footer theme-site-footer--newsletter" data-theme="theme_extension_development">
+    <f:render partial="Page/Footer/Signup" arguments="{_all}" />
+    <div class="theme-site-footer__inner">
+        <f:render partial="Page/Footer/Body" arguments="{_all}" />
+    </div>
+</footer>
+
+</html>

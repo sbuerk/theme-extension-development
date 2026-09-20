@@ -1,0 +1,44 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    The newsletter band of the "newsletter" footer variant: a heading, an
+    optional line of text, and a button leading to the page that carries the
+    actual subscription form.
+
+    A LINK, NOT A FORM. A newsletter form needs somewhere to post to, and the
+    theme has nowhere - it ships no controller, no storage and no double
+    opt-in, and every one of those is a requirement rather than a detail for
+    an address somebody types in. A form field that looks like a subscription
+    and drops what is typed into it is worse than no field at all, so the
+    band leads to the page where the real form lives, whichever extension
+    renders it there.
+
+    Three settings, and the band needs all three:
+    "theme.footer.newsletterHeading", "theme.footer.newsletterPage" and
+    "theme.footer.newsletterLabel". A fourth, "newsletterText", is the one
+    optional part - a band with a heading and a button says enough on its
+    own. Missing any of the three renders nothing: a band with no heading has
+    nothing to say, and a band whose button has no destination or no name is
+    a control that misleads. See "Partials/Page/Header/Action.html" for the
+    same rule and for why the destination is a page uid rather than a link.
+
+    The heading level is "h2": the band sits in the footer, outside the
+    content of the page, and is a section of the document rather than a part
+    of the article - the site footer carries no other heading to nest under.
+</f:comment>
+<f:if condition="{footerNewsletterHeading} && {footerNewsletterPage} > 0 && {footerNewsletterLabel}">
+    <div class="theme-site-footer__newsletter">
+        <div class="theme-site-footer__inner theme-site-footer__inner--newsletter">
+            <div class="theme-site-footer__newsletter-text">
+                <h2 class="theme-site-footer__newsletter-heading">{footerNewsletterHeading}</h2>
+                <f:if condition="{footerNewsletterText}">
+                    <p>{footerNewsletterText}</p>
+                </f:if>
+            </div>
+            <f:link.typolink parameter="{footerNewsletterPage}" class="theme-button theme-button--primary theme-site-footer__newsletter-action">{footerNewsletterLabel}</f:link.typolink>
+        </div>
+    </div>
+</f:if>
+
+</html>

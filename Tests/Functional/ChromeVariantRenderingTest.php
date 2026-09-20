@@ -11,7 +11,9 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
- * The site setting `theme.header.variant` picks one of four header partials.
+ * The site settings that pick a header and a footer partial.
+ *
+ * `theme.header.variant` picks one of four header partials.
  *
  * The interesting part of this feature is not that four arrangements exist -
  * it is that the value of an editable setting decides which template renders,
@@ -26,7 +28,7 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * the other three variants are built so that they never put a third thing in
  * that row - see `Partials/Page/Header.html`.
  */
-final class SiteHeaderVariantRenderingTest extends AbstractFunctionalTestCase
+final class ChromeVariantRenderingTest extends AbstractFunctionalTestCase
 {
     use SiteBasedTestTrait;
 
@@ -173,6 +175,86 @@ final class SiteHeaderVariantRenderingTest extends AbstractFunctionalTestCase
         // Not "theme-site-header__action": the controls slot is
         // "theme-site-header__actions", which contains it.
         $this->assertStringNotContainsString('theme-button--primary theme-site-header__action', $body);
+    }
+
+    /**
+     * The footer takes its own setting, and it works exactly like the
+     * header's - same switch, same default with no modifier on it, same
+     * fallback for a value nothing matches.
+     */
+    #[Test]
+    public function theSettingSelectsTheFooterVariant(): void
+    {
+        $body = $this->renderWithSettings(['theme.footer.variant' => 'newsletter']);
+
+        $this->assertStringContainsString('<footer class="theme-site-footer theme-site-footer--newsletter"', $body);
+    }
+
+    #[Test]
+    public function aSiteWithoutTheSettingGetsTheColumnsFooter(): void
+    {
+        $body = $this->renderWithSettings([]);
+
+        $this->assertStringContainsString('<footer class="theme-site-footer"', $body);
+        $this->assertStringNotContainsString('theme-site-footer--', $body);
+    }
+
+    /**
+     * The newsletter band needs a heading, a page and a label. One of the
+     * three missing leaves a band with nothing to say, or a control that
+     * points nowhere or has no name, so the band is not rendered at all.
+     *
+     * @return \Generator<string, array{settings: array<string, string|int>}>
+     */
+    public static function incompleteNewsletterSettings(): \Generator
+    {
+        $complete = [
+            'theme.footer.variant' => 'newsletter',
+            'theme.footer.newsletterHeading' => 'Read along',
+            'theme.footer.newsletterPage' => 10,
+            'theme.footer.newsletterLabel' => 'Subscribe',
+        ];
+        foreach (['theme.footer.newsletterHeading', 'theme.footer.newsletterPage', 'theme.footer.newsletterLabel'] as $missing) {
+            $settings = $complete;
+            $settings[$missing] = $missing === 'theme.footer.newsletterPage' ? 0 : '';
+            yield 'without ' . $missing => ['settings' => $settings];
+        }
+    }
+
+    /**
+     * @param array<string, string|int> $settings
+     */
+    #[DataProvider('incompleteNewsletterSettings')]
+    #[Test]
+    public function theNewsletterBandNeedsAllThreeOfItsSettings(array $settings): void
+    {
+        $body = $this->renderWithSettings($settings);
+
+        $this->assertStringContainsString('theme-site-footer--newsletter', $body);
+        $this->assertStringNotContainsString('theme-site-footer__newsletter', $body);
+    }
+
+    #[Test]
+    public function theNewsletterBandLinksToTheConfiguredPage(): void
+    {
+        $body = $this->renderWithSettings([
+            'theme.footer.variant' => 'newsletter',
+            'theme.footer.newsletterHeading' => 'Read along',
+            'theme.footer.newsletterText' => 'One mail per release.',
+            'theme.footer.newsletterPage' => 10,
+            'theme.footer.newsletterLabel' => 'Subscribe',
+        ]);
+
+        $this->assertStringContainsString('<h2 class="theme-site-footer__newsletter-heading">Read along</h2>', $body);
+        $this->assertStringContainsString('<p>One mail per release.</p>', $body);
+
+        $matched = preg_match(
+            '#<a href="([^"]*)" class="theme-button theme-button--primary theme-site-footer__newsletter-action">Subscribe</a>#',
+            $body,
+            $matches,
+        );
+        $this->assertSame(1, $matched, 'The newsletter button was not rendered.');
+        $this->assertStringStartsWith('/', $matches[1], 'The newsletter button does not lead to a page of the site.');
     }
 
     #[Test]
