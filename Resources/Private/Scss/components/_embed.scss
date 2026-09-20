@@ -199,3 +199,10 @@
         border: var(--theme-border-width, 1px) solid CanvasText;
     }
 }
+
+// The link to the source site carries the same "arrow-up-right-from-square"
+// the external link marker does, here as an icon in the markup rather than as
+// a mask, and it mirrors for the same reason - see "components/_link.scss".
+:dir(rtl) .theme-embed__source .theme-icon {
+    scale: -1 1;
+}

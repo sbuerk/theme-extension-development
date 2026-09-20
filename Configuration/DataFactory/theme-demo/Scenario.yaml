@@ -7,8 +7,8 @@
 # sequence:
 #
 #   pages               1-10, the first tree, and 30-39, 50-56, 70-73,
-#                       90-92, 110-112, 130, 150-151 and 170-177 - the
-#                       pages added below its sections, forty-eight in all.
+#                       90-92, 110-112, 130, 150-152 and 170-177 - the
+#                       pages added below its sections, forty-nine in all.
 #                       The odd decades from 30 up are reserved; the ids
 #                       actually used are fewer - see below for why the new
 #                       ones skip decades
@@ -688,6 +688,186 @@ entities:
                                   </li>
                               </ol>
                           </aside>
+
+            # A right-to-left page. The direction comes from a wrapper on each
+            # block, not from a site language: a language is a property of the
+            # installation, it needs a site configuration and a translation of
+            # every record, and neither travels with a seed set. A wrapper is
+            # what an editor has as well - "dir" is an allowed attribute of the
+            # rich text preset - and it puts both directions on one page, which
+            # is what makes a difference between them visible at all.
+            #
+            # The footnote ids below are names of their own ("rtl-fn1"), never
+            # a content element anchor ("#c15204"). A raw "#c<uid>" in a value
+            # is a pointer "Build/Scripts/generateLegacyScenario.php" does not
+            # recognise: it would reach the mirror unrewritten and link back
+            # into the "/" tree, which is what
+            # "LegacyDeliveryTest::noPageLinkOfTheLegacyTreeLeavesIt" is for.
+            #
+            # Three of the four wrappers are in "html" elements (15203,
+            # 15204, 15206), which render "bodytext" raw, and one is rich text
+            # (15205), which goes through "lib.parseFunc_RTE" and its
+            # sanitizer. The split is not arbitrary: each raw element carries
+            # something the theme's rich text preset cannot write - a check
+            # list and a table component, a footnote block, a "bdi" - while
+            # 15205 is the proof that "dir" and "lang" survive the path an
+            # editor's own text takes ("allowAttributes" of the imported
+            # "Processing.yaml" lists both).
+            #
+            # What it costs is the components a record builds rather than
+            # writes: a notice, a carousel or an embed is markup the template
+            # produces, and nothing can wrap that in a "div" from a field. The
+            # last element of the page says so, and "/styleguide#direction"
+            # shows those side by side instead.
+            - self:
+                  id: 152
+                  title: 'Right to left'
+                  slug: '/typography/right-to-left'
+                  backend_layout: 'content'
+              entities:
+                content:
+                  - self:
+                        id: 15201
+                        CType: 'header'
+                        header: 'Right to left'
+                        header_layout: 1
+                        sectionIndex: 0
+                  - self:
+                        id: 15202
+                        CType: 'text'
+                        bodytext: |
+                          <p class="theme-lead">Every spacing, border and float of the theme is
+                          written as a logical property, and every glyph that points somewhere is
+                          mirrored by a rule of its own. This page is where that is looked at: the
+                          same components as everywhere else, in a right-to-left context.</p>
+                          <p>The Arabic below is a specimen rather than a translation, and each
+                          block is glossed in English underneath, so a reader who does not read
+                          Arabic can still see which edge a line starts at. What is demonstrated is
+                          the direction, not the copy.</p>
+                  - self:
+                        id: 15203
+                        CType: 'html'
+                        header: 'Running text, a list and a quotation (not visible in the frontend)'
+                        bodytext: |
+                          <h2>Running text, a list and a quotation</h2>
+                          <div dir="rtl" lang="ar">
+                              <p>النص العربي يبدأ من اليمين.</p>
+                              <p>هذه قائمة قصيرة:</p>
+                              <ul>
+                                  <li>العنصر الأول</li>
+                                  <li>العنصر الثاني</li>
+                                  <li>العنصر الثالث</li>
+                              </ul>
+                              <blockquote><p>اقتباس قصير.</p></blockquote>
+                          </div>
+                          <p><small>"Arabic text starts from the right.", "This is a short list:",
+                          the first, second and third item, and "A short quotation." Nothing here
+                          carries a class: the list marker, the indent of the quotation and the edge
+                          every line starts at come from the element baseline.</small></p>
+                  - self:
+                        id: 15204
+                        CType: 'html'
+                        header: 'Components (not visible in the frontend)'
+                        bodytext: |
+                          <h2>Components</h2>
+                          <div dir="rtl" lang="ar">
+                              <p>العنصر الأول<sup class="theme-footnote-ref" id="rtl-fnref1"><a href="#rtl-fn1">1</a></sup></p>
+                              <ul class="theme-list theme-list--check">
+                                  <li>العنصر الأول</li>
+                                  <li>العنصر الثاني</li>
+                              </ul>
+                              <p class="theme-byline">
+                                  <span class="theme-byline__item">العنصر الأول</span>
+                                  <span class="theme-byline__item">العنصر الثاني</span>
+                              </p>
+                              <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="A table in a right-to-left context">
+                                  <table class="theme-table theme-table--striped">
+                                      <caption class="theme-table__caption">العنصر الأول</caption>
+                                      <thead>
+                                          <tr><th scope="col">العنصر الأول</th><th scope="col">العنصر الثاني</th></tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr><td>العنصر الأول</td><td>العنصر الثاني</td></tr>
+                                          <tr><td>العنصر الأول</td><td>العنصر الثاني</td></tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                              <div class="theme-footnotes">
+                                  <ol class="theme-footnotes__list">
+                                      <li class="theme-footnotes__item" id="rtl-fn1">
+                                          1. العنصر الأول
+                                          <a class="theme-footnotes__backlink" href="#rtl-fnref1" aria-label="Back to reference 1"></a>
+                                      </li>
+                                  </ol>
+                              </div>
+                          </div>
+                          <p><small>The superscript reference, the check mark of the list, the rule
+                          between two byline items, the caption and the cells of the table and the
+                          hanging indent of the note all sit at the right edge, and none of them has
+                          a rule for it: they are placed with <code>inset-inline-start</code>,
+                          <code>border-inline-start</code>, <code>padding-inline-start</code> and
+                          <code>text-align: start</code>. The arrow back from the note is mirrored,
+                          because it points somewhere.</small></p>
+                  - self:
+                        id: 15205
+                        CType: 'text'
+                        header: 'A link that leaves the site'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The marker after a link to another site is built by the theme rather
+                          than written into the text, which is why this block is rich text and not
+                          raw markup: the marker only exists once TYPO3 has built the link.</p>
+                          <div dir="rtl" lang="ar">
+                              <p><a href="https://example.org/">العنصر الأول</a></p>
+                          </div>
+                          <p><small>The arrow points up and to the left, because the text it
+                          belongs to runs the other way. The same rule turns the arrow back from a
+                          footnote and the two chevrons of a carousel around, and the
+                          <em>Reading direction</em> section of the styleguide shows all of them
+                          side by side.</small></p>
+                  # Raw markup, and it has to be. "bdi" is in the allow list of
+                  # the frontend sanitizer
+                  # ("CommonBuilder::createBasicTags()") but *not* in the
+                  # "allowTags" of "EXT:rte_ckeditor/Configuration/RTE/Processing.yaml",
+                  # which the theme's preset imports - so the save
+                  # transformation strips the tag on the way into the database
+                  # and a rich text element could not carry this specimen at
+                  # all. It is the concrete case of "a seeded value can show
+                  # more than an editor can produce", which the lead of the
+                  # page says. "RichTextPresetTest" pins the gap.
+                  - self:
+                        id: 15206
+                        CType: 'html'
+                        header: 'Numbers and Latin in a right-to-left line (not visible in the frontend)'
+                        bodytext: |
+                          <h2>Numbers and Latin in a right-to-left line</h2>
+                          <div dir="rtl" lang="ar">
+                              <p>TYPO3 <bdi>العنصر الأول</bdi> 13.4</p>
+                          </div>
+                          <p><small>Direction is resolved per run of text, not per element, so the
+                          browser keeps the Latin word and the version number running the other way
+                          by itself. <code>bdi</code> is what says where a run of user data begins,
+                          so a name starting with a strong right-to-left character cannot reorder
+                          the sentence around it.</small></p>
+                  - self:
+                        id: 15207
+                        CType: 'text'
+                        header: 'What this page does not cover'
+                        header_layout: 2
+                        bodytext: |
+                          <p>The page chrome is not in the wrapper. The site header, the main
+                          navigation, the breadcrumb and the footer are rendered once per page and
+                          stay left to right here, because the page itself is an English one. A site
+                          that is Arabic sets the direction on the <code>html</code> element through
+                          its site language, and everything below it then follows the same rules
+                          this page shows.</p>
+                          <p>Neither are the components a record builds rather than writes: a
+                          notice, a carousel or an embed is markup a template produces, and no field
+                          of the element can wrap that in a <code>div</code>. The styleguide has
+                          them, in a section of its own.</p>
+                          <p>An arrow an editor puts into a button label is content rather than
+                          furniture of the theme, and the theme does not turn it around. Only the
+                          glyphs the theme draws itself are mirrored.</p>
 
         - self:
               id: 3

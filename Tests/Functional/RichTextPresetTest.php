@@ -150,4 +150,38 @@ final class RichTextPresetTest extends AbstractFunctionalTestCase
             $this->assertStringContainsString($expected, $stored);
         }
     }
+
+    /**
+     * The preset cannot write an isolated bidirectional run.
+     *
+     * `bdi` marks where a run of user data begins, so a value starting with a
+     * strong right-to-left character cannot reorder the sentence around it. The
+     * **frontend** keeps it - `typo3/html-sanitizer`'s common behaviour lists
+     * `bdi` and `bdo` among its basic tags - but the **save** transformation
+     * does not: the `allowTags` of
+     * `EXT:rte_ckeditor/Configuration/RTE/Processing.yaml`, which this preset
+     * imports unchanged, has neither, so the tag is stripped on the way into
+     * the database and never reaches a rich text field at all.
+     *
+     * That is why the right-to-left page of the showcase writes its isolated
+     * run as a `Plain HTML` element rather than as rich text, and this is the
+     * assertion that keeps that decision honest: a core release adding the tag
+     * turns this red, and the specimen can then move into a `text` element and
+     * prove the frontend path as well.
+     *
+     * Read off the resolved preset rather than off the file, because the
+     * resolution is what an editor's save actually uses - `CKEditor5Migrator`
+     * runs over it, and an import could have added the tag back.
+     */
+    #[Test]
+    public function thePresetCannotWriteAnIsolatedRun(): void
+    {
+        $allowed = $this->bodytextConfiguration()['processing']['allowTags'] ?? null;
+
+        $this->assertIsArray($allowed, 'The resolved preset declares no "allowTags" at all.');
+        $this->assertContains('span', $allowed, 'The tag list was read from the wrong place.');
+
+        $this->assertNotContains('bdi', $allowed);
+        $this->assertNotContains('bdo', $allowed);
+    }
 }
