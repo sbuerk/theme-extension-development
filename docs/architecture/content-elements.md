@@ -590,38 +590,55 @@ verified in source rather than assumed, against
    `tt_content:A` is still registered — A has not finished rendering yet —
    so that reference is skipped the same way a direct self-reference is.
 
-No guard of this extension's own is added on that basis: the core's already
-covers both the direct and the indirect case — **on v13.4**.
+**That guard does not exist on TYPO3 v14.** `$recordRegister` was one of the
+properties `Breaking-107831-RemovedTypoScriptFrontendController.rst` took off
+`TypoScriptFrontendController` in v14.0 — "All remaining properties have been
+removed … making the class a readonly internal service used by the TYPO3 Core
+only", with the class itself announced there for full removal in a later v14
+release. What matters here is the register, and it is gone: verified against
+the installed v14.3 frontend package, neither `RecordsContentObject` nor
+`ContentContentObject` references `recordRegister`, `currentRecord` or any
+replacement recursion tracking, and `grep -r recordRegister` over this
+extension's own v14 dependency set finds the name only in the changelog entries
+that removed it. That set has no `cms-install`; a tree that does would also
+match its ExtensionScanner rules, which are a list of removed names rather than
+a use of one. There is no fallback either — the older `cObjectDepthCounter` was
+dropped in v11.4 (`Deprecation-94957`) on the stated basis that "PHP will now
+stop with a fatal PHP nesting level error at some point, instead TYPO3 frontend
+rendering silently stopping". So on v14 an editor pointing a shortcut at itself
+takes the request down.
 
-> [!IMPORTANT]
-> **Discrepancy found against the contract this page was written from.**
-> The guard above does not exist on TYPO3 v14. `TypoScriptFrontendController`
-> — and `$recordRegister` with it — was fully removed in v14.0
-> (`Breaking-107831-RemovedTypoScriptFrontendController.rst`: "All remaining
-> properties have been removed … making the class a readonly internal
-> service used by the TYPO3 Core only"). Verified directly: with v14.3.6
-> installed (`.Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php`
-> and `ContentContentObject.php`), neither class references
-> `recordRegister`, `currentRecord`, or any replacement recursion tracking —
-> a `grep -r recordRegister` across the entire installed v14 core and
-> frontend package tree returns nothing. There is also no fallback: the
-> older `TypoScriptFrontendController->cObjectDepthCounter` guard against
-> content-object recursion was itself removed back in v11.4
-> (`Deprecation-94957`), on the stated basis that "PHP will now stop with a
-> fatal PHP nesting level error at some point, instead [of] TYPO3 frontend
-> rendering silently stopping" — which is the actual behaviour a
-> self-referencing or cyclic `shortcut` should be expected to hit on v14: an
-> uncontrolled recursion ending in a PHP fatal error, not a silently skipped
-> reference.
->
-> `Tests/Functional/CoreContentElementRenderingTest.php` does not exercise
-> this: its one shortcut fixture (`tt_content` uid 80) references a
-> non-recursive record (uid 10, the bullet list), so the gap is untested on
-> both core versions. No guard of this extension's own has been added here
-> either — that would be new behaviour beyond what step 5a asked for — but
-> anyone relying on "the core already guards recursive shortcuts" should
-> read that as **v13.4 only** until this is re-verified or a test is added
-> that would catch it on v14.
+**The theme therefore breaks the cycle itself**, in the rendering definition
+rather than with a register:
+
+```typoscript
+conf.tt_content.shortcut = TEXT
+conf.tt_content.shortcut.value =
+```
+
+Inside a shortcut, the `shortcut` branch of the `CASE` renders nothing at all,
+so no chain of references can return to its start. The break is structural: it
+needs no per-request state, it behaves the same on both core versions, and it
+costs the one thing a shortcut nested in a shortcut could have done — which is
+not what the element is for. One level of indirection is followed, a second is
+refused.
+
+`Tests/Functional/CoreContentElementRenderingTest` covers both halves, and the
+two tests are deliberately different:
+
+| Test                                         | Fixture                                                          | Would pass without the break                                                |
+|----------------------------------------------|------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `aShortcutInsideAShortcutRendersNothing`     | a **chain**: uid 84 → uid 80 → the bullet list                   | No — a register renders all three levels, and the list appears a third time |
+| `aCircularShortcutDoesNotTakeTheRequestDown` | a shortcut pointing at itself, and a pair pointing at each other | On v13.4 yes, because the core's register already stops a cycle there       |
+
+The chain is the distinguishing observation: it is not circular, so a guard
+built on "has this record been rendered already" would let it through. That
+test goes red on v13 with `conf.tt_content.shortcut` removed, which was
+verified by removing it.
+
+It is also why `/elements/cheatsheet` — which is built out of *Insert records*
+elements — cannot show the *Insert records* element itself; see
+[Seeding](../development/seeding.md#the-cheatsheet-gathers-it-does-not-copy).
 
 ## The eleven `menu_*` types
 
