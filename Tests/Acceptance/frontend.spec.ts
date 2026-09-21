@@ -610,3 +610,215 @@ test.describe('the sub navigation tree', () => {
         await expect(page).toHaveURL(/\/elements\/theme$/);
     });
 });
+
+/**
+ * The language dropdown at the end of the header row.
+ *
+ * Nothing opened it before: the markup was asserted by
+ * `Tests/Functional/LanguageMenuRenderingTest`, and the browser checks of the
+ * instances confirmed that the trigger *renders*. A panel that opens over the
+ * control that opened it, over the settings cog and over the end of the main
+ * navigation passed every one of those, on both cores and at both widths.
+ *
+ * So what is measured here is where the panel lands, against the boxes it must
+ * not land on. The header is the page's own, not a specimen of one - the
+ * styleguide renders four of those inside `main`.
+ */
+test.describe('the header language dropdown', () => {
+    const header = (page: Page) => page.locator('.theme-page > .theme-site-header');
+    const trigger = (page: Page) => header(page).locator('.theme-dropdown__trigger');
+    const panel = (page: Page) => header(page).locator('#theme-language-panel');
+
+    const boxOf = async (locator: ReturnType<Page['locator']>, what: string) => {
+        const box = await locator.boundingBox();
+        if (box === null) {
+            throw new Error(`${what} is not rendered.`);
+        }
+        return box;
+    };
+
+    // The inline end of the header's content container - its right edge in a
+    // left-to-right page and its left one in a right-to-left page, inside the
+    // gutter either way. That is the edge the panel is pinned to, and reading
+    // it off the element rather than writing the number down here is what
+    // makes the same assertion hold at both widths and in both directions.
+    const inlineEndOfTheRow = (page: Page) => header(page).locator('.theme-site-header__inner').evaluate((element) => {
+        const box = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        const padding = parseFloat(style.paddingInlineEnd);
+
+        return style.direction === 'rtl' ? box.left + padding : box.right - padding;
+    });
+
+    // 1280 has the menu beside the title, 375 has it behind its toggle, and
+    // the header is a different height in each - which is the whole reason a
+    // panel in the top layer cannot be pinned under it by a constant.
+    for (const width of [1280, 375]) {
+        test(`opens under the header row and covers no control of it at ${width} pixels`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto('/typography');
+
+            await expect(panel(page)).toBeHidden();
+            await trigger(page).click();
+            await expect(panel(page)).toBeVisible();
+
+            const panelBox = await boxOf(panel(page), 'The language panel');
+            const triggerBox = await boxOf(trigger(page), 'The language trigger');
+            const headerBox = await boxOf(header(page), 'The site header');
+
+            // Under the row, not over it. This is the measurement that was
+            // missing: the panel used to start at the top edge of the
+            // viewport. Under the *trigger* is not enough - at 1280 the menu
+            // takes a second row inside the header that reaches below it.
+            expect(panelBox.y).toBeGreaterThanOrEqual(triggerBox.y + triggerBox.height);
+            expect(panelBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
+
+            // And over nothing else in the header either - the brand, every
+            // entry of the main navigation, the menu toggle and the settings
+            // cog. Each is looked up as it exists at this width: the toggle
+            // only exists below the breakpoint, the entries only above it.
+            const covered = await header(page).evaluate((element, panelSelector) => {
+                const panelElement = element.querySelector(panelSelector);
+                if (panelElement === null) {
+                    return ['the panel disappeared'];
+                }
+                const box = panelElement.getBoundingClientRect();
+                const selectors = [
+                    '.theme-site-header__brand',
+                    '.theme-nav-main__toggle',
+                    '.theme-nav-main__link',
+                    '.theme-settings__trigger',
+                    '.theme-dropdown__trigger',
+                ];
+                const hits: string[] = [];
+                for (const selector of selectors) {
+                    element.querySelectorAll(selector).forEach((control) => {
+                        const other = control.getBoundingClientRect();
+                        if (other.width === 0 && other.height === 0) {
+                            return;
+                        }
+                        const apart = box.right <= other.left || other.right <= box.left
+                            || box.bottom <= other.top || other.bottom <= box.top;
+                        if (!apart) {
+                            hits.push(`${selector} (${other.left}..${other.right} x ${other.top}..${other.bottom})`);
+                        }
+                    });
+                }
+                return hits;
+            }, '#theme-language-panel');
+            expect(covered).toEqual([]);
+
+            // At the end of the row: the panel's end edge is the end of the
+            // content container of the header, not the edge of the viewport -
+            // 60 pixels in from it at 1280, the page gutter at 375. At 1280
+            // that is also where the last control of the row ends; at 375 the
+            // row has no slack left and the cog reaches a few pixels past its
+            // own container, which is a squeeze of the header row rather than
+            // a placement of this panel.
+            expect(panelBox.x + panelBox.width).toBeCloseTo(await inlineEndOfTheRow(page), 0);
+            expect(panelBox.x).toBeGreaterThanOrEqual(0);
+            expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        });
+    }
+
+    // The trigger moves to the left of the row in a right-to-left document and
+    // the panel has to go with it. It used to stay on the right, pinned there
+    // by the second value of an "inset" shorthand.
+    test('follows its trigger in a right-to-left document', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.goto('/typography');
+        await page.locator('html').evaluate((element) => element.setAttribute('dir', 'rtl'));
+
+        await trigger(page).click();
+        await expect(panel(page)).toBeVisible();
+
+        const panelBox = await boxOf(panel(page), 'The language panel');
+        const triggerBox = await boxOf(trigger(page), 'The language trigger');
+        const headerBox = await boxOf(header(page), 'The site header');
+
+        // The row is mirrored, so the trigger is now near the left edge.
+        expect(triggerBox.x).toBeLessThan(1280 / 2);
+        // And the end of the row is its left edge, which is where the panel
+        // ends too. It used to stay on the right, pinned there by the second
+        // value of an "inset" shorthand.
+        expect(panelBox.x).toBeCloseTo(await inlineEndOfTheRow(page), 0);
+        expect(panelBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
+    });
+
+    test('closes on Escape, on a click outside and when focus leaves it', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.goto('/typography');
+
+        await trigger(page).click();
+        await expect(panel(page)).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(panel(page)).toBeHidden();
+        await expect(trigger(page)).toBeFocused();
+
+        await trigger(page).click();
+        await expect(panel(page)).toBeVisible();
+        await page.locator('main').click({ position: { x: 5, y: 5 } });
+        await expect(panel(page)).toBeHidden();
+
+        await trigger(page).click();
+        await expect(panel(page)).toBeVisible();
+        // Past the last link of the panel: the panel must not stay open over
+        // whatever now has focus (WCAG 2.2, 2.4.11).
+        await panel(page).getByRole('link').last().focus();
+        await page.keyboard.press('Tab');
+        await expect(panel(page)).toBeHidden();
+    });
+
+    // The whole argument for taking this panel out of the top layer is that
+    // the element opens it without a script. That claim needs the test the
+    // sub navigation tree already has for its own "details" branches, and for
+    // the same reason: every other test in this block runs with the script,
+    // and a dropdown rebuilt out of a div and a click handler would pass all
+    // of them.
+    test('opens and closes with JavaScript disabled, under the header row', async ({ browser }) => {
+        const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 375, height: 740 } });
+        const page = await context.newPage();
+        await page.goto('/typography');
+
+        await expect(panel(page)).toBeHidden();
+        await trigger(page).click();
+        await expect(panel(page)).toBeVisible();
+
+        // Without "data-js" the main navigation stays in the flow, so the
+        // header is as tall as the whole menu and the panel drops under all
+        // of it - far from its trigger, and over nothing. That distance is
+        // the trade this anchor makes and it is written out in
+        // "components/_dropdown.scss"; what has to hold is the contract.
+        const panelBox = await boxOf(panel(page), 'The language panel');
+        const headerBox = await boxOf(header(page), 'The site header');
+        const triggerBox = await boxOf(trigger(page), 'The language trigger');
+        expect(panelBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
+        expect(panelBox.x).toBeGreaterThanOrEqual(0);
+        expect(panelBox.x + panelBox.width).toBeCloseTo(await inlineEndOfTheRow(page), 0);
+        expect(triggerBox.y).toBeLessThan(panelBox.y);
+
+        await trigger(page).click();
+        await expect(panel(page)).toBeHidden();
+
+        await context.close();
+    });
+
+    // The trigger is a "summary", so Enter and Space are the element's own
+    // behaviour rather than anything this theme wires up - which is exactly
+    // why it is worth one assertion, the same one the sub navigation tree
+    // carries: the design was chosen for that, and a trigger built out of a
+    // div would pass every other test here.
+    test('opens and closes from the keyboard', async ({ page }) => {
+        await page.goto('/typography');
+
+        await expect(panel(page)).toBeHidden();
+        await trigger(page).focus();
+        await page.keyboard.press('Enter');
+        await expect(panel(page)).toBeVisible();
+        await page.keyboard.press('Space');
+        await expect(panel(page)).toBeHidden();
+        // Focus stays on the trigger throughout: a summary is the focused
+        // element, not a wrapper that hands focus somewhere else.
+        await expect(trigger(page)).toBeFocused();
+    });
+});
