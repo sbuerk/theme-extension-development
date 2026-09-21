@@ -6,9 +6,11 @@
     both footer variants.
 
     Each is its own TypoScript object under "lib.content." (see the step 2
-    contract's "Content slots" table) and each carries "select.slide = -1" -
-    the content lives on the site root and is inherited by every page below
-    it, independent of that page's own backend layout.
+    contract's "Content slots" table) and each carries "slide = -1" - on the
+    object itself, not inside its "select", which is where all five of them
+    had it while none of them slid. The content lives on the site root and is
+    inherited by every page below it, independent of that page's own backend
+    layout.
 
     A COLUMN IS WHERE THE SOCIAL LINKS GO. "theme_sociallinks" placed in one
     of the four columns is how a site gets a row of platform logos into its

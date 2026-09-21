@@ -56,7 +56,65 @@ entities:
               CType: text
               header: 'What this is'
               header_layout: 2
-              bodytext: "<p>This page tree is seeded from a definition in the repository, so a\ndevelopment instance can be rebuilt from nothing without clicking a\npage tree together by hand.</p>\n<p>The navigation holds the sections of the showcase: the\n<a href=\"t3://page?uid=1005\">content elements</a>, one page per\nelement with its variants; the\n<a href=\"t3://page?uid=1002\">typography</a>, from rich text and\nelements; the <a href=\"t3://page?uid=1171\">page layouts</a>, one\nwireframe page per backend layout; the\n<a href=\"t3://page?uid=1113\">examples</a>, whole pages composed\nfrom the elements above; and the\n<a href=\"t3://page?uid=1009\">styleguide</a>, which renders every\ncomponent of the library, with the\n<a href=\"t3://page?uid=1010\">form showcase</a>, a request form put\ntogether from the form components alone.</p>"
+              bodytext: "<p>This page tree is seeded from a definition in the repository, so a\ndevelopment instance can be rebuilt from nothing without clicking a\npage tree together by hand.</p>\n<p>The navigation holds the sections of the showcase: the\n<a href=\"t3://page?uid=1005\">content elements</a>, one page per\nelement with its variants; the\n<a href=\"t3://page?uid=1002\">typography</a>, from rich text and\nelements; the <a href=\"t3://page?uid=1171\">page layouts</a>, one\nwireframe page per backend layout; the\n<a href=\"t3://page?uid=1113\">examples</a>, whole pages composed\nfrom the elements above; and the\n<a href=\"t3://page?uid=1009\">styleguide</a>, which renders every\ncomponent of the library, with the\n<a href=\"t3://page?uid=1010\">form showcase</a>, a request form put\ntogether from the form components alone.</p>\n"
+          -
+            self:
+              id: 1103
+              colPos: 11
+              CType: text
+              header: About
+              header_layout: 2
+              bodytext: "<p>A theme built to be read, in a repository built to be reviewed.\nEvery decision it makes is written down next to the code that makes\nit.</p>"
+          -
+            self:
+              id: 1104
+              colPos: 12
+              CType: menu_pages
+              header: Sections
+              header_layout: 2
+              pages: '1005,1002,1171,1113'
+          -
+            self:
+              id: 1105
+              colPos: 13
+              CType: text
+              header: Reference
+              header_layout: 2
+              bodytext: "<p>The <a href=\"t3://page?uid=1009\">styleguide</a> renders every\ncomponent straight from Fluid, the\n<a href=\"t3://page?uid=1010\">form showcase</a> puts a request form\ntogether from the form components alone, and the\n<a href=\"t3://page?uid=1153\">cheatsheet</a> gathers every element\non one page.</p>"
+          -
+            self:
+              id: 1106
+              colPos: 14
+              CType: theme_sociallinks
+              header: Elsewhere
+              header_layout: 2
+              tx_theme_list_items: '1700,1701,1702'
+          -
+            self:
+              id: 1107
+              colPos: 10
+              CType: text
+              header: 'Footer meta'
+              header_layout: 100
+              bodytext: "<p>Seeded from\n<code>Configuration/DataFactory/theme-demo/</code>. This row and the\nfour columns above it are edited once, on the\n<a href=\"t3://page?uid=1001\">site root</a>, and every page below it\nrenders them: the five footer slots are the only content objects of\nthe theme that slide down the rootline.</p>\n"
+        listItem:
+          -
+            self:
+              id: 1700
+              link: 'https://mastodon.example/@theme'
+              link_label: Mastodon
+              brand_icon: mastodon
+          -
+            self:
+              id: 1701
+              link: 'https://github.example/theme'
+              link_label: GitHub
+              brand_icon: github
+          -
+            self:
+              id: 1702
+              link: 'mailto:hello@example.org'
+              link_label: 'Send an email'
       children:
         -
           self:

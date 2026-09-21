@@ -242,15 +242,15 @@ QueryBuilder's field quoting rather than a bare `colPos=0` string
 concatenation.
 
 The five footer slots — `footermeta`, `footer1`–`footer4` — additionally
-carry `select.slide = -1`:
+carry `slide = -1`:
 
 ```typoscript
 lib.content.footermeta {
     table = tt_content
+    slide = -1
     select {
         orderBy = sorting
         where = {#colPos}=10
-        slide = -1
     }
 }
 ```
@@ -266,6 +266,19 @@ This reproduces what `EXT:theme_camino` gets for the same columns from
 `CONTENT` object does it — this theme does not depend on
 `fluid_styled_content`, so there is no `lib.contentElement` to configure a
 slide mode on.
+
+> [!IMPORTANT]
+> **`slide` belongs to the `CONTENT` object, not to `select`.** This page and
+> all five slots carried it inside `select {}` until the footer was seeded.
+> `ContentContentObject::render()` reads `slide` off the object's own
+> configuration, and the query builder ignores a key it does not recognise —
+> so nothing failed, nothing was logged, and nothing slid. It could not be
+> seen from the frontend either, because no page of the showcase had anything
+> in these columns to slide in the first place. Both halves are fixed
+> together, and
+> `ShowcaseTreeTest::theFooterColumnsAreSeededOnTheSiteRootAndSlideDownToEveryPageBelowIt`
+> renders a page four levels below the root and looks for the root's footer in
+> it.
 
 ## Column identifiers are mandatory
 

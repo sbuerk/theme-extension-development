@@ -78,11 +78,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                                                                                                                                                                                        |
-|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 119, 130 to 131, 150 to 153 and 170 to 177 — fifty-eight pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                             |
-| `tx_theme_list_item` | 1 to 19 on page 8 and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it; 600 to 677 on the composed pages below `/examples`. In declaration order                             |
+| Table                | Uids                                                                                                                                                                                                                                       |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 119, 130 to 131, 150 to 153 and 170 to 177 — fifty-eight pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades)                |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                                            |
+| `tx_theme_list_item` | 1 to 19 on page 8 and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it; 600 to 677 on the composed pages below `/examples`; 700 to 702 in the footer of the site root. In declaration order |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -209,7 +209,7 @@ page each below `/layouts`. The pages below the first ten show every classic
 
 | uid       | Title                    | Slug                             | `backend_layout`                | What it is for                                                                                                                                |
 |-----------|--------------------------|----------------------------------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| 1         | Theme demo               | `/`                              | `start`                         | The site root, and the footer columns.                                                                                                        |
+| 1         | Theme demo               | `/`                              | `start`                         | The site root, and the only page that fills the four footer columns and the meta row — which every page below it then renders.                |
 | 2         | Typography               | `/typography`                    | `content`                       | Running text, the four bands with header positions, looks and spacing; parent of 52 to 56.                                                    |
 | 52–55     | Text … Quotes and code   | `/typography/<page>`             | `content`                       | Text, lists, tables, quotes and code — rich text and elements.                                                                                |
 | 56        | Article                  | `/typography/article`            | `content_sidebar`               | A long article: a byline, footnotes, and the `sectionIndex` table of contents the sidebar layout is chosen for.                               |
@@ -262,6 +262,16 @@ preserve:
   `Configuration/PageTsConfig/BackendLayouts/` and the content types from the
   TypoScript. A layout or an element added without a demo page then fails there,
   instead of shipping undemonstrated.
+- **Only page 1 fills colPos 10 to 14.** The four footer columns and the meta
+  row are the five slots that slide down the rootline
+  ([Page rendering](../architecture/page-rendering.md#content-slots)), and a
+  second page filling them would stop the slide there and hide the mechanism
+  the site root exists to demonstrate. `ShowcaseTreeTest` reads the scenario
+  for that, and then renders a page four levels below the root to check that
+  the root's footer really arrives in it — which is what the columns are
+  seeded for. They were empty until they were not: the footer of all
+  fifty-eight pages was a blank band, and the `slide` that would have carried
+  them sat in `select {}`, where a `CONTENT` object never reads it.
 
 > [!NOTE]
 > **An unexplained observation, recorded rather than diagnosed.** While the
