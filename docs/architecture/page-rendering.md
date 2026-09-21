@@ -405,10 +405,13 @@ The alternative — a band breaking out with `width: 100vw` and
 `margin-inline: calc(50% - 50vw)` — was rejected because `100vw` includes the
 scrollbar. On every platform that reserves one, such a band overflows by its
 width, and `Tests/Acceptance/frontend.spec.ts` measures exactly that with
-`document.documentElement.scrollWidth` — on `/layouts/bands`, the only page of
-the showcase that leaves the container, beside the assertion that the band
-stack really is as wide as the document. Widening the container instead cannot
-overflow: the body is still 100% of its parent.
+`document.documentElement.scrollWidth` — on each of the three pages of the
+showcase that leave the container, beside the assertion that the band stack
+really is as wide as the document. `/layouts/bands` is the wireframe one and
+holds nothing but text; `/examples/product` and `/examples/carousel-landing`
+put a hero with a cropped image and a sideways scrolling carousel track into a
+band, which is where an overflow would actually come from. Widening the
+container instead cannot overflow: the body is still 100% of its parent.
 
 What holds the text off the viewport edge is the padding a content element
 already has inside its own box. How wide the **reading line** is inside a band

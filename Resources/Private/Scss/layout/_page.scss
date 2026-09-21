@@ -238,9 +238,10 @@
 // Widening the body rather than letting a band break out of it with "width:
 // 100vw" and a negative margin: "100vw" includes the scrollbar, so such a
 // band overflows by its width wherever the platform reserves one, and the
-// acceptance suite measures "document.documentElement.scrollWidth" on
-// "/layouts/bands" for exactly that. The header and the footer keep their own
-// containers, so only the main area goes wide.
+// acceptance suite measures "document.documentElement.scrollWidth" for
+// exactly that, on every page of the showcase that uses the band layout. The
+// header and the footer keep their own containers, so only the main area goes
+// wide.
 //
 // What holds the text off the edge is the padding a content element already
 // has inside its own box. How wide the *reading* line is inside a band stays

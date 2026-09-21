@@ -393,8 +393,10 @@ which is suggested rather than required:
 The set seeds a start page, pages for typography and media, one page
 deliberately without a backend layout, a ``/elements`` branch carrying every
 content type, a ``/layouts`` branch with one wireframe page per backend layout,
+an ``/examples`` branch of whole pages composed from those elements,
 and a ``/styleguide`` page rendering the whole component library
-— see :ref:`feature-seeded-showcase-tree` and :ref:`feature-styleguide`. Its
+— see :ref:`feature-seeded-showcase-tree`, :ref:`feature-composed-example-pages`
+and :ref:`feature-styleguide`. Its
 records declare their uids and point at each other by them, so it is imported
 into an installation where those uids are free. The set declares no site
 configuration: create one with root page ``1`` afterwards, which is also what

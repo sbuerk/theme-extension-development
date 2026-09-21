@@ -43,6 +43,14 @@ const showcase = [
     '/layouts/article',
     '/layouts/cover',
     '/layouts/bands',
+    '/examples',
+    '/examples/album',
+    '/examples/pricing',
+    '/examples/journal',
+    '/examples/journal/composing-a-page',
+    '/examples/product',
+    '/examples/campaign',
+    '/examples/carousel-landing',
 ];
 
 const trees = [
@@ -110,24 +118,32 @@ for (const tree of trees) {
         // pointed at a band page: the other two "scrollWidth" assertions in
         // this file are both on "/typography", which renders through
         // "content" and never leaves the container at all.
-        test(`${tree.prefix}/layouts/bands spans the row without spilling sideways`, async ({ page }) => {
-            await page.setViewportSize({ width: 1280, height: 800 });
-            await page.goto(`${tree.prefix}/layouts/bands`);
+        //
+        // All three band pages are measured, not only the wireframe one.
+        // "/layouts/bands" holds nothing but text elements; the composed
+        // pages put a hero with a cropped image and a carousel - a track
+        // that scrolls sideways by design - into a band, and a component
+        // that overflows its band is exactly what this measurement is for.
+        for (const path of ['/layouts/bands', '/examples/product', '/examples/carousel-landing']) {
+            test(`${tree.prefix}${path} spans the row without spilling sideways`, async ({ page }) => {
+                await page.setViewportSize({ width: 1280, height: 800 });
+                await page.goto(`${tree.prefix}${path}`);
 
-            // The bands really are out of the container - otherwise the
-            // overflow check below would hold for a page that never went wide.
-            const bands = page.locator('.theme-page__bands');
-            await expect(bands).toHaveCount(1);
-            const available = await page.evaluate(() => document.documentElement.clientWidth);
-            expect(await bands.evaluate((element) => element.getBoundingClientRect().width)).toBeCloseTo(available, 0);
+                // The bands really are out of the container - otherwise the
+                // overflow check below would hold for a page that never went wide.
+                const bands = page.locator('.theme-page__bands');
+                await expect(bands).toHaveCount(1);
+                const available = await page.evaluate(() => document.documentElement.clientWidth);
+                expect(await bands.evaluate((element) => element.getBoundingClientRect().width)).toBeCloseTo(available, 0);
 
-            expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(available);
-        });
+                expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(available);
+            });
+        }
 
         test(`${tree.prefix}/ shows the showcase sections in the main navigation and nothing else`, async ({ page }) => {
             await page.goto(`${tree.prefix}/`);
             const navigation = page.locator('nav.theme-nav-main');
-            for (const section of ['Elements', 'Typography', 'Layouts', 'Styleguide', 'Forms']) {
+            for (const section of ['Elements', 'Typography', 'Layouts', 'Examples', 'Styleguide', 'Forms']) {
                 await expect(navigation.getByRole('link', { name: section, exact: true })).toHaveCount(1);
             }
             // The layout fallback fixture and the account pages stay out.
@@ -136,7 +152,7 @@ for (const tree of trees) {
             }
         });
 
-        // The showcase has six top level entries; a site has fewer or more.
+        // The showcase has seven top level entries; a site has fewer or more.
         // From the breakpoint up the header holds them in one row with the
         // title of this tree and never spills sideways. On a wide row the
         // title keeps its line and the menu wraps; on a narrow one the menu
@@ -161,7 +177,11 @@ for (const tree of trees) {
                     while (list.children.length > entries && list.lastElementChild !== null) {
                         list.lastElementChild.remove();
                     }
-                    const labels = ['Examples', 'Documentation', 'Downloads'];
+                    // Names no section of the showcase carries, so a synthetic
+                    // entry can never be mistaken for a real one in a failure
+                    // message. "Examples" was in this list until the composed
+                    // pages made it a real section.
+                    const labels = ['Documentation', 'Downloads', 'Support'];
                     const template = list.lastElementChild;
                     while (template !== null && list.children.length < entries) {
                         const item = template.cloneNode(true) as HTMLElement;
@@ -369,10 +389,10 @@ test.describe('the display settings', () => {
         }
 
         // Without a bound on the number of rows the two checks above are
-        // satisfied by six entries on six rows: no pair then shares a row, so
-        // the shared top never fires, and "apart" is all but tautological for
-        // flex items. So the rows are counted. The six top level entries of
-        // the showcase occupy exactly two at 1280 pixels - measured, not
+        // satisfied by seven entries on seven rows: no pair then shares a row,
+        // so the shared top never fires, and "apart" is all but tautological
+        // for flex items. So the rows are counted. The seven top level entries
+        // of the showcase occupy two at 1280 pixels - measured, not
         // assumed, and the number "docs/development/component-library.md"
         // documents. The bound is an upper one because a menu that gets back
         // into one row is not a regression; three rows beside a one line title

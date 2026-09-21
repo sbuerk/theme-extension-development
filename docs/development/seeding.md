@@ -78,11 +78,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                                                                                                                                                                           |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 153 and 170 to 177 — fifty pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                |
-| `tx_theme_list_item` | 1 to 19 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                   |
+| Table                | Uids                                                                                                                                                                                                                        |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 119, 130 to 131, 150 to 153 and 170 to 177 — fifty-eight pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                             |
+| `tx_theme_list_item` | 1 to 19 on page 8 and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it; 600 to 677 on the composed pages below `/examples`. In declaration order                             |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -233,6 +233,9 @@ page each below `/layouts`. The pages below the first ten show every classic
 | 153       | Cheatsheet               | `/elements/cheatsheet`           | `content`                       | Every element and every variant on one page, gathered with *Insert records* rather than copied.                                               |
 | 171       | Layouts                  | `/layouts`                       | `content`                       | The page layout branch: what a backend layout decides, and a menu of 172 to 177.                                                              |
 | 172–177   | Two columns … Bands      | `/layouts/<layout>`              | `two_columns` … `bands`         | One page per multi column, article, cover and band layout, with a labelled box in every column that layout declares.                          |
+| 113       | Examples                 | `/examples`                      | `content`                       | The composed pages: what the section is for, and an abstract menu of the pages below it.                                                      |
+| 114–119   | Album … Campaign         | `/examples/<page>`               | `content` … `cover`             | Whole pages composed from elements that already ship; 117 is `/examples/journal/composing-a-page`, a child of 116.                            |
+| 131       | Carousel landing         | `/examples/carousel-landing`     | `bands`                         | A carousel as the first band, across the full width of the viewport.                                                                          |
 | 9         | Styleguide               | `/styleguide`                    | `styleguide`                    | The component library, straight from Fluid.                                                                                                   |
 | 10        | Forms                    | `/forms`                         | `forms`                         | The form showcase, straight from Fluid.                                                                                                       |
 
@@ -247,8 +250,9 @@ preserve:
 - **Pages 6 and 7 use `content_sidebar` and their sibling 8 does not.** Two
   pages under one parent rendering with and without the sub navigation is what
   proves the layout is resolved per page rather than inherited down the branch.
-- **The five showcase sections are in the main navigation** — `/elements`,
-  `/typography`, `/layouts`, and `/styleguide` with `/forms` — and no page is
+- **The six showcase sections are in the main navigation** — `/elements`,
+  `/typography`, `/layouts`, `/examples`, and `/styleguide` with `/forms` — and
+  no page is
   `hidden`, which `ShowcaseTreeTest::showcaseSections()` holds the tree to. A
   hidden page returns 404 in the frontend and is only reachable through a
   backend preview link carrying a valid hash, which defeats the point of
@@ -309,6 +313,57 @@ features element of four columns, a pricing element of three plans and a hero
 all render differently in it — a cheatsheet whose elements do not look the way
 they look on their own pages is worth less than the table of contents a sidebar
 would add.
+
+### The composed pages, and what they promise
+
+Every other section of the tree shows **one thing at a time**: a page per
+content element, a page per backend layout, a page per value of a field. That
+is what a showcase has to do first, and it is not what an editor ever builds.
+`/examples` is the other half — whole pages, each of them something somebody
+might publish, and each made of nothing that is not demonstrated singly
+somewhere else in the tree.
+
+| Page | Layout            | Composed of                                                                                       |
+|------|-------------------|---------------------------------------------------------------------------------------------------|
+| 113  | `content`         | The section itself: a text, and `menu_abstract` over the pages below it.                          |
+| 114  | `content`         | A reduced hero in the stage, the core `image` element in three columns, a card group, a band CTA. |
+| 115  | `content`         | A text hero, the pricing element, a feature grid, an accordion, a boxed CTA.                      |
+| 116  | `content_sidebar` | A media teaser in the stage, a teaser list, a card wall, and three elements in the sidebar.       |
+| 117  | `article`         | Texts, a `textpic`, a pull quote and an author — with a notice and a link list in the aside.      |
+| 118  | `bands`           | A hero, split tiles and the figures with a CTA, one band each.                                    |
+| 119  | `cover`           | A hero without media and one call to action.                                                      |
+| 131  | `bands`           | A carousel as the first band, a four column feature grid, a CTA.                                  |
+
+Two rules keep the section honest, and both are asserted by
+`ShowcaseTreeTest`:
+
+- **It introduces no content type of its own.** Every `CType` used on a page
+  below `/examples` is seeded somewhere else in the tree as well
+  (`theExamplesSectionIntroducesNoContentTypeOfItsOwn()`). A composed page that
+  needs something the theme has not got is a finding to report, not a reason to
+  add an element.
+- **Every page is made of several kinds of element**
+  (`anExamplePageIsMadeOfSeveralKindsOfElement()`). A page of one repeated
+  element is a specimen page, and there is a section full of those already.
+
+The last element of every composed page — 114 and below, not the section index
+on 113 — is a notice naming what that page is made of, so the section reads as
+documentation of composition rather than as decoration.
+
+Two things the section deliberately does **not** do:
+
+- **No gallery of header or footer variants.** `Partials/Styleguide/Chrome.html`
+  already carries all six arrangements as specimens, and
+  `ChromeVariantRenderingTest` drives each of them from its setting, so a
+  gallery of pages would restate what is shown and tested already. It would
+  also cost more than it looks: `theme.header.variant` and
+  `theme.footer.variant` are read once into a TypoScript variable in
+  `Page.typoscript`, so a page choosing its own needs a setup condition on the
+  page uid — a per-page override of a site-wide setting, seeded into the
+  showcase, that no site would write.
+- **No gallery of heroes or features.** Pages 110 and 71 already show every
+  layout of each, one element per value. Repeating them composed would restate
+  what those pages say without adding a page shape.
 
 ## The instance set: the showcase, delivered twice
 
