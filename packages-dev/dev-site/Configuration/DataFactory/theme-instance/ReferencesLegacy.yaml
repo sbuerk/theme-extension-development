@@ -761,3 +761,160 @@ references:
     field: image
     values:
       alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12401
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12403
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+      description: 'The site as it was'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 12403
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12403
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 12403
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12403
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 12403
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: 'The last of six, in three columns'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1600
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1601
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12602
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 1630
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 1631
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder-portrait
+    table: tx_theme_list_item
+    uid: 1632
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 12703
+    field: image
+    values:
+      alternative: 'A placeholder graphic in portrait format'
+      description: 'Placed in the text, at the end of the line'
+  -
+    file: placeholder-portrait
+    table: tt_content
+    uid: 12706
+    field: image
+    values:
+      alternative: 'A placeholder portrait'
+  -
+    file: placeholder
+    table: tt_content
+    uid: 12801
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format, cut off at two edges'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1660
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1661
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1662
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1670
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1671
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'
+  -
+    file: placeholder
+    table: tx_theme_list_item
+    uid: 1672
+    field: image
+    values:
+      alternative: 'A placeholder graphic in landscape format'

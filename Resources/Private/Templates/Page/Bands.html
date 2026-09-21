@@ -16,8 +16,10 @@
     band breaking out with "width: 100vw" and a negative margin, was rejected:
     "100vw" includes the scrollbar, so it overflows by its width on every
     platform that reserves one, and the acceptance suite measures exactly that
-    on "/layouts/bands" itself ("document.documentElement.scrollWidth" in
-    "Tests/Acceptance/frontend.spec.ts").
+    ("document.documentElement.scrollWidth" in
+    "Tests/Acceptance/frontend.spec.ts") on every page of the showcase that
+    uses this layout - the wireframe one and the two composed pages that put
+    a cropped image and a sideways scrolling track into a band.
 
     Each band is an element of its own so a band can be spaced without
     reaching into the content elements inside it. The bands themselves are

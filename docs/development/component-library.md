@@ -1527,10 +1527,10 @@ rules working, not a defect.
 
 `Tests/Acceptance/frontend.spec.ts` asserts both, in both trees: seven entries
 beside a one line title at 1280 pixels, three in one row at 768 pixels, and
-seven without spilling sideways at 768 and 900 pixels. It also holds the six
+seven without spilling sideways at 768 and 900 pixels. It also holds the seven
 entries of the showcase to **at most two rows** at 1280: without a bound on the
 rows, the checks that no two entries overlap and that the entries of one row
-share their top are all satisfied by six entries on six rows. Below `bp.$md` the
+share their top are all satisfied by seven entries on seven rows. Below `bp.$md` the
 expanded navigation drops down under the header as a full-width band, behind
 `data-js` like the collapse itself.
 

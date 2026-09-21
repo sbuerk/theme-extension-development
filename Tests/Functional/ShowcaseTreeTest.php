@@ -115,6 +115,18 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     private const THEME_ELEMENTS_PAGE = 8;
 
     /**
+     * The section of composed pages - whole pages built from elements that
+     * are demonstrated one at a time elsewhere in the tree.
+     */
+    private const EXAMPLES_SECTION = '/examples';
+
+    /**
+     * The fewest kinds of content element a composed page is made of - see
+     * `anExamplePageIsMadeOfSeveralKindsOfElement()` for why it is three.
+     */
+    private const EXAMPLE_PAGE_MINIMUM_KINDS = 3;
+
+    /**
      * The theme elements that have a page of their own below "Theme
      * elements", by the last segment of its slug.
      */
@@ -394,6 +406,19 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             '/layouts/article' => 'article',
             '/layouts/cover' => 'cover',
             '/layouts/bands' => 'bands',
+            // The composed pages. They are the one part of the tree that
+            // picks a layout for what the page is rather than to demonstrate
+            // the layout, so which one each of them picked is worth pinning
+            // down: a composed page silently falling back to "content" would
+            // still render and would stop being what it is for.
+            '/examples' => 'content',
+            '/examples/album' => 'content',
+            '/examples/pricing' => 'content',
+            '/examples/journal' => 'content_sidebar',
+            '/examples/journal/composing-a-page' => 'article',
+            '/examples/product' => 'bands',
+            '/examples/campaign' => 'cover',
+            '/examples/carousel-landing' => 'bands',
             '/styleguide' => 'styleguide',
             '/forms' => 'forms',
         ] as $path => $layout) {
@@ -499,9 +524,9 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     public static function showcaseSections(): \Generator
     {
         // The sections the maintainer chose to have in the navigation: the
-        // content elements, the typography, the page layouts, and the
-        // component library with the form showcase.
-        foreach (['/elements', '/typography', '/layouts', '/styleguide', '/forms'] as $path) {
+        // content elements, the typography, the page layouts, the composed
+        // example pages, and the component library with the form showcase.
+        foreach (['/elements', '/typography', '/layouts', '/examples', '/styleguide', '/forms'] as $path) {
             yield $path => ['path' => $path];
         }
     }
@@ -534,11 +559,13 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         foreach (['/typography/text', '/typography/article', '/elements/core', '/elements/frames'] as $path) {
             $this->assertStringContainsString(sprintf('href="%s"', $path), $menu, sprintf('"%s" is not in the main navigation.', $path));
         }
-        // The layout fallback fixture is reached by URL, not from the menu.
-        // Not for want of room - the acceptance test of the header row holds
-        // seven top level entries at 1280 pixels and the showcase has six -
-        // but because a reviewer has no reason to open a page that exists to
-        // prove a fallback.
+        // The layout fallback fixture is reached by URL, not from the menu,
+        // because a reviewer has no reason to open a page that exists to
+        // prove a fallback. Room is no longer the spare argument it was: the
+        // showcase has seven top level entries since the composed pages
+        // joined it, and seven is what the acceptance test of the header row
+        // measures at 1280 pixels, so putting "/empty" back would be the
+        // eighth and would need measuring again.
         $this->assertStringNotContainsString('href="/empty"', $menu);
 
         $sub = $this->navigation($this->render('/elements/core/bullets'), 'theme-nav-sub');
@@ -608,6 +635,14 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      * them is a URL rather than the declared value, so they say nothing about
      * order without hard coding the resolved link.
      *
+     * Only the link list of "Theme elements" is read. That is the one whose
+     * relation deliberately names its children out of uid order, and it is the
+     * page the fragment below is taken from; the composed pages of
+     * `/examples` use the element as an ordinary archive list, in uid order,
+     * which would prove nothing here. Labels are collected from the whole
+     * tree, because a child is an ordinary record and nothing but the relation
+     * ties it to its parent.
+     *
      * @return list<string>
      */
     private function declaredLinkListLabels(): array
@@ -616,35 +651,55 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
         $relations = [];
         $labels = [];
 
-        $walk = static function (array $items) use (&$walk, &$relations, &$labels): void {
+        $walk = static function (array $items, int $page) use (&$walk, &$relations, &$labels): void {
             foreach ($items as $item) {
                 if (!is_array($item)) {
                     continue;
                 }
                 $self = is_array($item['self'] ?? null) ? $item['self'] : [];
-                if (($self['CType'] ?? null) === 'theme_linklist') {
+                if (($self['CType'] ?? null) === 'theme_linklist' && $page === self::THEME_ELEMENTS_PAGE) {
                     $relations[] = (string)($self['tx_theme_list_items'] ?? '');
                 }
                 if (array_key_exists('link', $self) && isset($self['id'])) {
                     $labels[(int)$self['id']] = (string)($self['link_label'] ?? '');
                 }
+                // A "page" entity carries an id of its own; every other entity
+                // belongs to the page it was declared under.
+                $below = isset($self['slug']) && isset($self['id']) ? (int)$self['id'] : $page;
                 foreach ($item['entities'] ?? [] as $nested) {
                     if (is_array($nested)) {
-                        $walk($nested);
+                        $walk($nested, $below);
                     }
                 }
                 if (is_array($item['children'] ?? null)) {
-                    $walk($item['children']);
+                    $walk($item['children'], $below);
                 }
             }
         };
-        $walk($scenario['entities']['page'] ?? []);
+        $walk($scenario['entities']['page'] ?? [], 0);
 
         // One element, because the rendered fragment below is looked up once.
-        $this->assertCount(1, $relations, 'The scenario has to declare exactly one "theme_linklist" element.');
+        $this->assertCount(1, $relations, 'The "Theme elements" page has to declare exactly one "theme_linklist" element.');
+
+        $children = array_map('intval', explode(',', $relations[0]));
+
+        // The whole test rests on this relation naming its children out of
+        // uid order. Uid order is also creation order and therefore the
+        // "sorting" order, so a relation that happens to be ascending is
+        // rendered the same way by a template that reads the relation and by
+        // one that ignores it - and the assertion below would pass either
+        // way, silently. Renumbering the seeded list to "3,4,5,6" is exactly
+        // the change that would do that, which is why it fails here instead.
+        $ascending = $children;
+        sort($ascending);
+        $this->assertNotSame(
+            $ascending,
+            $children,
+            'The link list of "Theme elements" names its children in uid order, so the rendered order proves nothing about the relation.',
+        );
 
         $found = [];
-        foreach (array_map('intval', explode(',', $relations[0])) as $uid) {
+        foreach ($children as $uid) {
             // A relation naming a child the scenario does not declare would
             // otherwise shorten the list instead of failing.
             $this->assertArrayHasKey($uid, $labels, sprintf('The link list names list item %d, which is not declared.', $uid));
@@ -1092,6 +1147,160 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             [],
             self::unshownValues($this->elementsOn($page['uid'], 'text'), $page['uid'], 'text', $field),
             sprintf('No text element on the Frames page shows these values of "%s".', $field),
+        );
+    }
+
+    /**
+     * The `CType` of every element of the `Examples` section, by the uid of
+     * the page it sits on - the pages below `/examples`, at any depth, and
+     * not the section index itself. One entry per element, repeats included,
+     * because how often one kind occurs is half of what is asserted below.
+     *
+     * @return array<int, list<string>>
+     */
+    private function contentTypesOfTheExamples(): array
+    {
+        $section = $this->pageBySlug(self::EXAMPLES_SECTION);
+        $this->assertNotNull($section, 'The "Examples" section is missing.');
+
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('pages');
+        $queryBuilder->getRestrictions()->removeAll();
+        /** @var list<array<string, mixed>> $pages */
+        $pages = $queryBuilder
+            ->select('uid', 'pid', 'slug')
+            ->from('pages')
+            ->orderBy('uid')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $below = [$section['uid']];
+        // The section is two levels deep - the journal entry is a child of the
+        // journal - so the walk repeats until it finds nothing new rather than
+        // assuming a depth.
+        do {
+            $found = false;
+            foreach ($pages as $page) {
+                if (in_array((int)$page['pid'], $below, true) && !in_array((int)$page['uid'], $below, true)) {
+                    $below[] = (int)$page['uid'];
+                    $found = true;
+                }
+            }
+        } while ($found);
+        array_shift($below);
+        $this->assertNotSame([], $below, 'The "Examples" section has no pages below it.');
+
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('tt_content');
+        $queryBuilder->getRestrictions()->removeAll();
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $queryBuilder
+            ->select('pid', 'CType')
+            ->from('tt_content')
+            ->where($queryBuilder->expr()->in('pid', $queryBuilder->createNamedParameter($below, Connection::PARAM_INT_ARRAY)))
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $types = [];
+        foreach ($rows as $row) {
+            $types[(int)$row['pid']][] = (string)$row['CType'];
+        }
+
+        return $types;
+    }
+
+    /**
+     * A page of the `Examples` section is a composition, and a composition of
+     * one element repeated is a specimen page - of which the tree has a
+     * section full already.
+     *
+     * Two things are asserted, and the count alone is not enough for either.
+     *
+     * **At least three kinds.** Three, not more, because the campaign page on
+     * the `cover` layout is the floor of the section and is meant to be: one
+     * hero, one call to action, and the notice that names them. A cover page
+     * padded out to pass a higher bound would stop being the thing it
+     * demonstrates.
+     *
+     * **No kind is more than half the page.** On its own the bound above does
+     * not say what it sounds like it says: with the notice every page carries
+     * and the heading several open with, "three kinds" is satisfied by a hero,
+     * five card groups and a notice - which is exactly the specimen page the
+     * bound exists to reject. The share is what rejects it, and it needs no
+     * list of which types count as scaffolding.
+     */
+    #[Test]
+    public function anExamplePageIsMadeOfSeveralKindsOfElement(): void
+    {
+        $thin = [];
+        $lopsided = [];
+        foreach ($this->contentTypesOfTheExamples() as $pid => $types) {
+            $kinds = array_count_values($types);
+            if (count($kinds) < self::EXAMPLE_PAGE_MINIMUM_KINDS) {
+                $thin[] = sprintf('page %d: %s', $pid, implode(', ', array_keys($kinds)));
+            }
+            arsort($kinds);
+            $most = (int)reset($kinds);
+            if ($most * 2 > count($types)) {
+                $lopsided[] = sprintf('page %d: %d of %d elements are "%s"', $pid, $most, count($types), (string)key($kinds));
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $thin,
+            sprintf("These pages of \"Examples\" are made of fewer than %d kinds of element:\n  ", self::EXAMPLE_PAGE_MINIMUM_KINDS) . implode("\n  ", $thin),
+        );
+        $this->assertSame(
+            [],
+            $lopsided,
+            "These pages of \"Examples\" are mostly one kind of element, which is a specimen page:\n  " . implode("\n  ", $lopsided),
+        );
+    }
+
+    /**
+     * The promise of the section: it composes what the theme already has and
+     * introduces nothing.
+     *
+     * An element type that appears only there would mean the composition
+     * reached for something the single-element pages never show - which is
+     * either a content type nobody demonstrated, or a component added to make
+     * one page work. Both are findings rather than features, and this is where
+     * they surface.
+     */
+    #[Test]
+    public function theExamplesSectionIntroducesNoContentTypeOfItsOwn(): void
+    {
+        $inTheSection = [];
+        foreach ($this->contentTypesOfTheExamples() as $types) {
+            foreach ($types as $type) {
+                $inTheSection[$type] = true;
+            }
+        }
+        $this->assertNotSame([], $inTheSection, 'The "Examples" section seeds no content element at all.');
+
+        $section = $this->pageBySlug(self::EXAMPLES_SECTION);
+        $this->assertNotNull($section);
+
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('tt_content');
+        $queryBuilder->getRestrictions()->removeAll();
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $queryBuilder
+            ->select('c.CType')
+            ->from('tt_content', 'c')
+            ->innerJoin('c', 'pages', 'p', 'p.uid = c.pid')
+            ->where(
+                $queryBuilder->expr()->notLike('p.slug', $queryBuilder->createNamedParameter(self::EXAMPLES_SECTION . '%')),
+            )
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $elsewhere = array_unique(array_map(static fn(array $row): string => (string)$row['CType'], $rows));
+        $only = array_values(array_diff(array_keys($inTheSection), $elsewhere));
+        sort($only);
+
+        $this->assertSame(
+            [],
+            $only,
+            'These content types are seeded on the composed pages and nowhere else: ' . implode(', ', $only),
         );
     }
 }
