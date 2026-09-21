@@ -211,12 +211,19 @@ Safari 17.5 — Baseline since May 2024.
 
 **The floor is Firefox 125, Chrome and Edge 125, Safari 17.5.**
 
-It moved up from Firefox 120 for the Popover API, which the toggletip and the
-header dropdown are built on: `popover` needs Firefox 125, and those two
-components are not worth a hand-rolled script and a second set of dismissal
-rules when the platform has the behaviour. Everything the stylesheet used
-before — `light-dark()`, `:has()`, logical properties, `color-mix()` — is
-below that line and unaffected.
+It moved up from Firefox 120 for the Popover API, which the **toggletip** is
+built on: `popover` needs Firefox 125, and a bubble a reader summons is not
+worth a hand-rolled script and a second set of dismissal rules when the
+platform has the behaviour. Everything the stylesheet used before —
+`light-dark()`, `:has()`, logical properties, `color-mix()` — is below that
+line and unaffected.
+
+The **header dropdown** was built on it too, and is not any more. A popover is
+in the top layer, and a top layer box is positioned against the viewport
+whatever it is nested in — so its panel could not be placed under its own
+trigger, and opened over it instead. It is a `details`/`summary` pair now, with
+the dismissal written out in `theme.js`; the floor stays where the toggletip
+put it. See `components/_dropdown.scss`.
 
 The floor is chosen the same way it always was: the oldest version of each
 engine that supports every feature the theme actually relies on, never a
@@ -226,10 +233,11 @@ see `Documentation/Changelog/2.0/`.
 
 Two features stay out of the stylesheet even though the floor moved, and
 neither is in scope here: CSS **anchor positioning** (what the tooltip would
-need to keep its bubble inside the viewport) and **invoker commands**
-(`command`/`commandfor`, what the dialog would need to open declaratively).
-Both are still above Firefox 125; each is a follow-up of its own, not a
-consequence of this move.
+need to keep its bubble inside the viewport, and what a popover would need to
+open under its trigger — the dropdown left the top layer instead) and **invoker
+commands** (`command`/`commandfor`, what the dialog would need to open
+declaratively). Both are still above Firefox 125; each is a follow-up of its
+own, not a consequence of this move.
 
 ### Light
 

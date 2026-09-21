@@ -484,35 +484,26 @@ final class ComponentLibraryTest extends UnitTestCase
      * the file - so a value that happens to contain the word (`background:
      * right center`) is not a hit, and neither is `border-radius`.
      *
-     * Two shapes are **not** covered, because catching either needs a value
-     * parser rather than a pattern:
+     * One shape is **not** covered here, and one that used to be is covered by
+     * `noInsetShorthandPlacesABoxByAPhysicalEdge` below.
      *
-     * - an asymmetric four value `margin`/`padding` shorthand, whose second
-     *   and fourth values are the right and the left edge. Counting values
-     *   with a regular expression is not safe here, because a value is often
-     *   `var(--token, 1rem)`, which contains a space and a comma of its own.
-     *   The bundle has no four value `margin` or `padding` today.
-     * - an asymmetric `inset` shorthand. The `offset` entry below catches
-     *   `left:` and `right:` as properties; it does not look inside
-     *   `inset: auto 1rem auto auto`.
+     * Not covered: an asymmetric four value `margin`/`padding` shorthand,
+     * whose second and fourth values are the right and the left edge.
+     * Counting values with a regular expression is not safe, because a value
+     * is often `var(--token, 1rem)`, which contains a space and a comma of its
+     * own - so this needs the same splitter the `inset` assertion below
+     * carries. The bundle has no four value `margin` or `padding` today, which
+     * is why that assertion covers `inset` alone rather than every shorthand
+     * with four edges in it: a gate written for a shape nothing has is a gate
+     * nothing holds up.
      *
-     * The second of those is not hypothetical. Six `inset` shorthands are
-     * compiled and **two of them name a physical edge**:
-     *
-     * | Declaration                                         | Where                     | Effect                                                    |
-     * |-----------------------------------------------------|---------------------------|-----------------------------------------------------------|
-     * | `inset: auto var(--theme-dropdown-panel-gutter) auto auto` | `_dropdown.scss:134` | Pins the popover to the **right** edge of the viewport.   |
-     * | `inset: var(--theme-space-7) auto auto 50%`         | `_toggletip.scss:116`     | `left: 50%` with `translate: -50% 0` - a centred box, so the same either way. |
-     *
-     * The dropdown one is a genuine right-to-left defect: the panel belongs
-     * under its trigger, the trigger sits at the *logical* end of the header
-     * row, and in a right-to-left document that is the left edge while the
-     * panel stays on the right. It predates the reading-direction work -
-     * the declaration arrived with the component itself - and it is **not
-     * fixed here**: pinning a popover that lives in the top layer, without
-     * anchor positioning, is a decision about that component rather than
-     * about this assertion. Gating it would only force that decision into
-     * an unrelated change. It is recorded instead.
+     * The `inset` shorthand was recorded here as ungated until the header
+     * dropdown was fixed. It named the physical right edge of the viewport -
+     * `inset: auto var(--theme-dropdown-panel-gutter) auto auto` - which left
+     * the panel on the right of a right-to-left header while its trigger moved
+     * to the left. That declaration is gone; the panel is placed against its
+     * own component with `inset-inline-end`, which the `offset` entry below
+     * already reaches. So the shape is now gated rather than recorded.
      *
      * @return \Generator<string, array{pattern: string, logical: string}>
      */
@@ -538,6 +529,145 @@ final class ComponentLibraryTest extends UnitTestCase
         preg_match_all('/(?:\A|[{;])\s*' . $declaration . '/', $this->stylesheet(), $physical);
 
         $this->assertSame([], $physical[0], sprintf('Use "%s" - a physical edge does not follow the direction of the text.', $logical));
+    }
+
+    /**
+     * No `inset` shorthand places a box by a physical edge either.
+     *
+     * The assertion above matches property *names*, and an `inset` shorthand
+     * hides its edges in its **value**: `inset: auto 1rem auto auto` is
+     * `right: 1rem`, and the `offset` entry never sees it. That was recorded
+     * in the docblock above as not gated, because splitting a CSS value with a
+     * regular expression is not safe - `var(--theme-space-7, 2.5rem)` carries
+     * a space and a comma of its own, and a pattern counting values would read
+     * it as two.
+     *
+     * So the value is split rather than matched. `topLevelValues()` walks the
+     * characters and counts parentheses, so a `var()`, a `calc()` or a `min()`
+     * is one value however much white space is inside it.
+     *
+     * Only a **four** value shorthand can be asymmetric: one value sets all
+     * four edges, two set block and inline, three set block-start, inline and
+     * block-end - each of them the same box in either direction by
+     * construction. Four are `top right bottom left`, and only a second and a
+     * fourth value that are equal survive a change of reading direction.
+     *
+     * **One declaration is allowed to be asymmetric, and it is named below.**
+     * `.theme-toggletip__bubble` is `inset: <block-start> auto auto 50%` with
+     * `translate: -50% 0`: `left: 50%` pulled back by half its own width, the
+     * usual way to centre a box whose width nobody knows. Both halves are
+     * physical on purpose, and the logical spelling is the broken one here -
+     * `inset-inline-start: 50%` turns around with the text and `translate`
+     * does not, so a right-to-left page would displace the bubble by its own
+     * width, off the screen near an edge. A centred box is the same box in
+     * either direction, which is what this assertion is looking for; that one
+     * reaches the state by a route the assertion cannot see. It is a named
+     * exception with a reason rather than an allowlist: the selector is
+     * compared whole, so a rule that merely *contains* that class - a grouped
+     * selector, or `.theme-toggletip__bubbleX` - is not covered by it and
+     * fails like any other.
+     *
+     * **What this still cannot see**, stated rather than implied: a shorthand
+     * whose four values come out of one custom property, `inset: var(--edges)`.
+     * The splitter counts that as one value and the rule above lets a single
+     * value through, because a single value really does set all four edges to
+     * the same thing. Resolving it would mean resolving custom properties,
+     * which is a cascade the stylesheet does not carry and a browser does; the
+     * visual suite screenshots the boxes in both directions and is where a
+     * regression of that shape would show. Nothing in the bundle writes an
+     * `inset` that way today.
+     */
+    #[Test]
+    public function noInsetShorthandPlacesABoxByAPhysicalEdge(): void
+    {
+        $centredByAPhysicalInset = '.theme-toggletip__bubble';
+        $asymmetric = [];
+
+        foreach ($this->rules() as [$selectors, $declarations]) {
+            foreach ($declarations as $declaration) {
+                if (!str_starts_with($declaration, 'inset:')) {
+                    continue;
+                }
+
+                $values = self::topLevelValues(substr($declaration, strlen('inset:')));
+                if (count($values) !== 4 || $values[1] === $values[3]) {
+                    continue;
+                }
+                // The whole selector, not a part of it: a grouped selector
+                // carrying the bubble and something else is a rule for
+                // something else as well.
+                if ($selectors === $centredByAPhysicalInset) {
+                    continue;
+                }
+
+                $asymmetric[] = sprintf('%s { %s }', $selectors, $declaration);
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $asymmetric,
+            'The second and the fourth value of an "inset" are the right and the left edge. '
+            . 'Use "inset-block" and "inset-inline", or "inset-inline-end" alone - a physical edge does not follow the direction of the text.',
+        );
+    }
+
+    /**
+     * The compiled stylesheet as a list of `[selectors, declarations]`.
+     *
+     * The bundle is minified to one rule per line, so a rule is everything
+     * between a `{` and the next `}` and nothing nests inside it but an
+     * at-rule's block, whose own rules are matched in turn. Declarations are
+     * split on `;`, which no value of this bundle contains.
+     *
+     * @return \Generator<int, array{0: string, 1: list<string>}>
+     */
+    private function rules(): \Generator
+    {
+        preg_match_all('/([^{}]+)\{([^{}]*)\}/', $this->stylesheet(), $rules, PREG_SET_ORDER);
+
+        foreach ($rules as $rule) {
+            $declarations = array_values(array_filter(array_map('trim', explode(';', $rule[2])), static fn(string $value): bool => $value !== ''));
+
+            yield [trim($rule[1]), $declarations];
+        }
+    }
+
+    /**
+     * A CSS value split into its top level parts, with everything inside
+     * parentheses left alone.
+     *
+     * @return list<string>
+     */
+    private static function topLevelValues(string $value): array
+    {
+        $values = [];
+        $current = '';
+        $depth = 0;
+
+        foreach (str_split(trim($value)) as $character) {
+            if ($character === '(') {
+                $depth++;
+            } elseif ($character === ')') {
+                $depth--;
+            }
+
+            if ($depth === 0 && ($character === ' ' || $character === "\t" || $character === "\n")) {
+                if ($current !== '') {
+                    $values[] = $current;
+                    $current = '';
+                }
+                continue;
+            }
+
+            $current .= $character;
+        }
+
+        if ($current !== '') {
+            $values[] = $current;
+        }
+
+        return $values;
     }
 
     /**

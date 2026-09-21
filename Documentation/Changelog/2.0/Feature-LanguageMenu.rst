@@ -32,19 +32,19 @@ count as translated - the default language is filtered out of the overlay chain
 The dropdown
 ------------
 
-The menu sits behind a labelled button in the header that discloses a panel
-below it. The panel is a native :html:`popover`, so the browser opens it,
-closes it and puts it in the top layer: :kbd:`Escape` and a click outside
-dismiss it. :kbd:`Tab` does **not** close it - light dismiss reacts to those
-two routes, not to focus leaving the panel.
+The menu sits behind a labelled trigger in the header that discloses a panel
+under it. The component is a native :html:`details` / :html:`summary` pair, so
+the browser opens it, closes it and announces the expanded state; the panel is
+placed against its own trigger, at the end of the header row, in either reading
+direction.
 
 The dropdown works without the theme's JavaScript and is rendered whether the
-script loaded or not. The one thing the script adds is
-:html:`aria-expanded` on the button, mirrored from the panel's own
-:html:`toggle` event, because the Popover API tells assistive technology
-nothing about the trigger. A page whose script failed to load therefore has a
-working dropdown whose button reports a stale state, rather than a dead
-button.
+script loaded or not. What the script adds is the dismissal: :kbd:`Escape`, a
+click outside, and focus leaving the control - the last of them so that an open
+panel never sits over the element that has just taken focus (WCAG 2.2, 2.4.11).
+A page whose script failed to load therefore has a dropdown that still opens
+and closes from its own trigger, and stays open until that trigger is used
+again.
 
 Impact
 ======
@@ -65,7 +65,10 @@ Its markup is :file:`Partials/Navigation/Language.html`, the dropdown around it
 :file:`Partials/Page/Dropdown.html`.
 
 Two new components ship: :css:`.theme-language-menu` and the generic
-:css:`.theme-dropdown` - see :ref:`components`. The dropdown is built on the
-native :html:`popover` attribute, which is what moved the theme's browser
-floor to Firefox 125 - see
-:ref:`important-browser-floor-moves-to-firefox-125`.
+:css:`.theme-dropdown` - see :ref:`components`. The dropdown is a native
+:html:`details` / :html:`summary` pair, so the browser opens it, closes it and
+announces the expanded state without a script; :file:`theme.js` adds only the
+dismissal - Escape, a click outside, and focus leaving the control. The panel
+is placed under its own trigger, which is why it is not a :html:`popover`: a
+popover is in the top layer, and a top layer box is positioned against the
+viewport rather than against whatever it sits in.

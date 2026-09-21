@@ -1,49 +1,111 @@
-// Dropdown - a labelled button that discloses a panel below it.
+// Dropdown - a labelled trigger that discloses a panel under it.
 //
 // Markup contract:
 //
-//     <div class="theme-dropdown">
-//         <button class="theme-dropdown__trigger" type="button" popovertarget="theme-language-panel" aria-expanded="false">
+//     <details class="theme-dropdown">
+//         <summary class="theme-dropdown__trigger">
 //             <svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg>
 //             <span class="theme-dropdown__label">…</span>
 //             <svg class="theme-icon theme-dropdown__marker" aria-hidden="true" focusable="false" …>…</svg>
-//         </button>
-//         <div class="theme-dropdown__panel" id="theme-language-panel" popover>…</div>
-//     </div>
+//         </summary>
+//         <div class="theme-dropdown__panel" id="theme-language-panel">…</div>
+//     </details>
 //
 // The generic disclosure of the site header. ".theme-settings" is the same
 // shape built for one purpose - it owns three form groups and their server
 // defaults, and predates this - and this is the version with nothing in it,
 // for a panel whose content is someone else's component.
 //
-// --- The Popover API does the showing and hiding ----------------------------
+// --- Why this is a "details" and not a popover ------------------------------
 //
-// The panel carries "popover" and the trigger "popovertarget": the browser
-// opens and closes it, puts it in the top layer, and gives it light dismiss -
-// Escape and a click anywhere outside close it, with no script and no
-// listeners of this theme's own. That is why the panel needs no "hidden"
-// attribute and no rule to hide it: "[popover]" is "display: none" until the
-// browser opens it.
+// It was a popover, and the panel opened over the trigger that opened it.
 //
-// The Popover API is what moved the browser floor of DESIGN.md to Firefox 125.
+// A popover is in the **top layer**, and the containing block of a top layer
+// element is the initial containing block - the viewport - whatever is
+// positioned around it in the document. "position: absolute" inside the
+// component does not reach the component: a percentage in an "inset" resolves
+// against the viewport, measured in the pinned browser of the acceptance
+// suite. So a popover panel can only be pinned to a viewport coordinate, and
+// the coordinate this one wants - the bottom edge of the header row - is not
+// one CSS can name. The header's height depends on its content: the site
+// title wraps, and the main menu wraps onto a second row from "bp.$md" up
+// ("layout/_site-header.scss"). Every constant is therefore wrong for some
+// site, and the one that shipped - none at all - put the panel at the top of
+// the viewport, over its own trigger, the settings cog and the end of the
+// menu.
 //
-// **Do not give this element a "display" of its own.** An author "display" on
-// ".theme-dropdown__panel" outranks the user agent's "[popover] { display:
-// none }" and the panel never closes - the same trap "components/_settings.scss"
-// documents for "[hidden]". The panel below therefore sets its box with
-// "padding", "border" and sizing only, and the one "display" it needs while
-// open is written under ":popover-open".
+// Pinning a box to another box is what CSS **anchor positioning** is for, and
+// that is above the browser floor of "DESIGN.md" - which is why the panel is
+// not in the top layer any more. As an ordinary absolutely positioned child
+// of the component it is placed against the component, which is where its
+// trigger is, in logical properties, at any header height and at any scroll
+// position. ".theme-settings__panel" is placed the same way, and in the
+// header row it is placed that way *too simply*: measured at 1280 pixels with
+// the seven sections of the showcase, its panel starts at y 104.5 inside a
+// 146 pixel header and lies over the second row of the menu. That is the same
+// trap this panel fell into on the way here - see "layout/_site-header.scss",
+// which anchors this one on the header for exactly that reason. The settings
+// panel is **not** changed here: it is a different component and a change of
+// its own.
 //
-// --- "aria-expanded" is still mirrored --------------------------------------
+// What the top layer and the Popover API gave, and what replaces it:
 //
-// The Popover API tells assistive technology nothing about the trigger, so
-// "Resources/Public/JavaScript/theme.js" mirrors the open state onto
-// "aria-expanded" from the panel's own "toggle" event. The script does not
-// open or close anything - it only reports what the browser already did - so a
-// page whose script failed to load still has a working dropdown, with a
-// trigger whose "aria-expanded" is stale. That is why this component is not
-// hidden behind "data-js" the way the display settings and the dialog opener
-// are: those need their script to work at all, and this one does not.
+//   the top layer       -> "z-index: var(--theme-z-overlay)" inside the
+//                          header, which is already the positioning context
+//                          of the settings panel and of the drop-down menu
+//                          below "bp.$md". Nothing on a page of this theme
+//                          clips or out-stacks it.
+//   opening and closing -> "details"/"summary". Still the browser's, still no
+//                          script, and the expanded state is announced by the
+//                          element rather than mirrored onto an attribute -
+//                          so "aria-expanded" is gone from the markup and
+//                          from "theme.js".
+//   light dismiss       -> Escape, a click outside and focus leaving the
+//                          control, in "Resources/Public/JavaScript/theme.js".
+//                          Those are the three rules the display settings
+//                          already carry, and the third of them is WCAG 2.2
+//                          2.4.11: a panel left open over the element that now
+//                          has focus obscures it.
+//
+// **Without a script the dropdown still opens and closes**, which is why this
+// component is not hidden behind "data-js" the way the display settings and
+// the dialog opener are: what a page whose script never arrived loses is the
+// light dismiss, not the control.
+//
+// It loses one more thing below "bp.$md", and that is worth stating plainly
+// rather than leaving it to be discovered. Without "data-js" the main
+// navigation stays in the flow ("components/_nav-main.scss"), so the header is
+// as tall as the whole menu with its second levels open - and a panel anchored
+// on the header drops under all of it. Measured on "/typography" at 375 pixels
+// in the pinned browser:
+//
+//   with the script     header 133px tall, trigger at y 44, panel at y 142 -
+//                       54 pixels under the trigger.
+//   without it          header 2180px tall, the trigger 1067 pixels down the
+//                       document and the panel 2189 - about 1077 pixels below
+//                       the control that opened it, and the browser scrolls
+//                       when the summary is activated.
+//
+// The panel still opens, still closes, is still the next thing in the tab
+// order and still covers nothing. It is simply a long way from its trigger.
+//
+// Anchoring on the component below "bp.$md" instead was measured and
+// rejected: with the script it would put the panel at y 98 against a 133 pixel
+// header, which is 35 pixels *inside* the header band. That buys the degraded
+// case a nicety by giving the common one a smaller version of the defect this
+// whole change exists to remove. "Tests/Acceptance/frontend.spec.ts" renders
+// the page with JavaScript disabled and holds the contract that is left: the
+// panel opens, closes, lands under the header row whatever that row's height
+// is, and ends at the end of the row.
+//
+// --- The "display" trap, in its "details" form ------------------------------
+//
+// A browser hides the content of a closed "details" itself - through
+// "::details-content" or, in an older engine, by not laying the slot out at
+// all - and an author "display" on the panel does not out-rank either. The
+// panel therefore still declares no "display" of its own, the same rule the
+// popover version had for the same practical reason, and one it shares with
+// the "[hidden]" trap "components/_settings.scss" documents.
 //
 // See "components/_button.scss" for why every component declares its own token
 // layer with a fallback.
@@ -59,14 +121,33 @@
     --theme-dropdown-radius: var(--theme-radius-sm, 5px);
     --theme-dropdown-panel-width: 12rem;
     --theme-dropdown-panel-gutter: var(--theme-space-4, 1.25rem);
+    --theme-dropdown-panel-offset: var(--theme-space-2, 0.625rem);
     --theme-dropdown-panel-padding: var(--theme-space-2, 0.625rem);
     --theme-dropdown-panel-background: var(--theme-color-surface-raised, #ffffff);
     --theme-dropdown-panel-foreground: var(--theme-color-text-primary, #14181f);
     --theme-dropdown-panel-border-color: var(--theme-color-border-strong, #828d9f);
     --theme-dropdown-panel-radius: var(--theme-radius-md, 10px);
+    --theme-dropdown-panel-z-index: var(--theme-z-overlay, 200);
+
+    // The anchor of the panel below.
+    position: relative;
 
     display: inline-flex;
     flex: none;
+
+    // The element baseline gives every "details" a box, a margin and a gap
+    // under an open summary ("base/_elements.scss") - the treatment a bare
+    // disclosure in running text wants. Here it would draw a frame around the
+    // trigger's own, so it is reset, the same thing "_nav-sub.scss" and
+    // "_accordion.scss" do for theirs.
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+
+    &[open] > .theme-dropdown__trigger {
+        margin-bottom: 0;
+    }
 }
 
 // Icon only in the site header, like the settings cog beside it: the label is
@@ -94,14 +175,28 @@
         border-color var(--theme-duration-fast) var(--theme-easing-standard),
         color var(--theme-duration-fast) var(--theme-easing-standard);
 
+    // A summary draws a disclosure triangle of its own, in three spellings
+    // across the engines - the same three "_nav-sub.scss" turns off for its
+    // branch toggle. The marker of this control is the chevron in its label.
+    list-style: none;
+
+    &::-webkit-details-marker {
+        display: none;
+    }
+
+    &::marker {
+        content: '';
+    }
+
     &:hover {
         border-color: var(--theme-dropdown-border-color-hover);
         color: var(--theme-dropdown-foreground-active);
     }
 
-    // The open state, read off the attribute a screen reader announces. The
-    // script mirrors it from the panel's "toggle" event.
-    &[aria-expanded='true'] {
+    // The open state, read off the element that holds it. It used to be read
+    // off "aria-expanded", which a script had to keep in step; a "details"
+    // carries its own.
+    .theme-dropdown[open] > & {
         border-color: var(--theme-dropdown-foreground-active);
         background-color: var(--theme-dropdown-background-active);
         color: var(--theme-dropdown-foreground-active);
@@ -119,19 +214,40 @@
 .theme-dropdown__marker {
     transition: transform var(--theme-duration-base) var(--theme-easing-standard);
 
-    .theme-dropdown__trigger[aria-expanded='true'] & {
+    .theme-dropdown[open] > .theme-dropdown__trigger & {
         transform: rotate(180deg);
     }
 }
 
-// No "display" here - see the header. The popover is in the top layer, so it
-// is positioned against the viewport rather than against the trigger: without
-// anchor positioning, which is still above the floor, "position: absolute"
-// inside the component would be ignored. It is pinned under the header at the
-// end of the row instead, which is where the trigger is.
+// No "display" here - see the header. Under the trigger and aligned to the end
+// of it: the component is the positioning context, so the panel follows its
+// trigger at any scroll position and in either reading direction, wherever the
+// component stands - the styleguide specimen sits in the middle of a page and
+// opens under itself.
+//
+// **In the site header it is anchored one level further out**, on the header,
+// so that it drops under the whole row rather than into it: the row is as tall
+// as its tallest child and the menu may take two rows inside it, so a panel
+// starting just under the 44 pixel trigger would cover the second one. That
+// override, and why both of its offsets are exact, is in
+// "layout/_site-header.scss".
+//
+// Never wider than the viewport less a gutter on either side, so a narrow
+// screen narrows the panel instead of spilling sideways. That clamp is the
+// one place in this component that still measures in "100vw", which counts
+// the scrollbar - the trap "layout/_page.scss" records, and the one the
+// header override deliberately avoids for the *offsets* by using a percentage
+// of the header. It is kept here because the component has no box to take a
+// percentage of when it stands outside a header, and because the clamp only
+// binds below about 232 pixels, where the gutter has already stopped being
+// the thing that decides the width. If it ever binds on a real screen, it
+// takes a scrollbar's width off a panel that was going to be too narrow
+// anyway.
 .theme-dropdown__panel {
-    position: fixed;
-    inset: auto var(--theme-dropdown-panel-gutter) auto auto;
+    position: absolute;
+    inset-block-start: calc(100% + var(--theme-dropdown-panel-offset));
+    inset-inline-end: 0;
+    z-index: var(--theme-dropdown-panel-z-index);
     margin: 0;
 
     inline-size: min(var(--theme-dropdown-panel-width), calc(100vw - 2 * var(--theme-dropdown-panel-gutter)));
@@ -141,8 +257,4 @@
     border-radius: var(--theme-dropdown-panel-radius);
     background-color: var(--theme-dropdown-panel-background);
     color: var(--theme-dropdown-panel-foreground);
-
-    &:popover-open {
-        display: block;
-    }
 }

@@ -144,34 +144,41 @@ final class LanguageMenuRenderingTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * The menu sits in the header dropdown, and the pairing the script and
-     * assistive technology both rely on has to be right: the trigger names a
-     * panel that exists, and the panel is a popover, so the browser keeps it
-     * closed until the trigger opens it.
+     * The menu sits in the header dropdown, and the dropdown is the native
+     * disclosure it claims to be: a `details` with its `summary` as the
+     * trigger and the panel beside it, closed until the browser opens it.
      *
-     * `popovertarget` is what pairs the two - not `aria-controls`, which the
-     * hand-rolled disclosure used before the Popover API replaced it.
-     * `aria-expanded` is still on the trigger and still starts `false`; the
-     * script mirrors it from the panel's `toggle` event and never sets it
-     * here, so the server-rendered value is the one asserted.
+     * The pairing needs no attribute at all any more. The trigger used to
+     * carry `popovertarget` at a panel carrying `popover` - the version that
+     * opened over its own trigger, because a top layer box is positioned
+     * against the viewport - and, before that, `aria-controls` at a
+     * hand-rolled disclosure. What is asserted instead is the containment the
+     * element gives for free.
+     *
+     * No `aria-expanded` either: a `summary` carries the expanded state of its
+     * `details`, and an authored copy would be a second source of it. Its
+     * *absence* is asserted, because an attribute nobody keeps in step is
+     * worse than none.
      */
     #[Test]
     public function theMenuSitsInADropdownWiredToItsPanel(): void
     {
         $body = $this->render('/translated');
 
-        $matched = preg_match('#<button[^>]*class="theme-dropdown__trigger"[^>]*>#', $body, $button);
-        $this->assertSame(1, $matched, 'The header has no dropdown trigger.');
-        $this->assertStringContainsString('aria-expanded="false"', $button[0]);
-        $this->assertSame(1, preg_match('#popovertarget="([^"]+)"#', $button[0], $controls));
+        $matched = preg_match('#<details class="theme-dropdown">\s*<summary class="theme-dropdown__trigger">(.*?)</summary>#s', $body, $trigger);
+        $this->assertSame(1, $matched, 'The header has no dropdown trigger, or the dropdown is not a "details".');
+        $this->assertStringNotContainsString('aria-expanded', $trigger[0], 'The trigger carries an "aria-expanded" a "summary" already has.');
+        $this->assertStringNotContainsString('popovertarget', $trigger[0], 'The dropdown is a popover again, which cannot be placed under its trigger.');
 
+        // The panel is the next element of the "details", the menu is inside
+        // the panel rather than loose in the header, and the panel carries its
+        // id and nothing else - a "popover" attribute would put it back in the
+        // top layer, where it cannot be placed against its trigger.
         $this->assertMatchesRegularExpression(
-            sprintf('#<div class="theme-dropdown__panel" id="%s" popover>#', preg_quote($controls[1], '#')),
+            '#</summary>\s*<div class="theme-dropdown__panel" id="theme-language-panel">\s*<nav class="theme-language-menu"#',
             $body,
-            'The trigger points at an id no panel carries, or the panel is not a popover.',
+            'The panel is not the next element of the dropdown, or the menu is not inside it.',
         );
-        // The menu is inside that panel, not loose in the header.
-        $this->assertMatchesRegularExpression('#<div class="theme-dropdown__panel"[^>]*>\s*<nav class="theme-language-menu"#', $body);
     }
 
     /**
