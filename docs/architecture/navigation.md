@@ -286,10 +286,21 @@ header row — is not a coordinate CSS can name, because the header's height
 depends on its content (the title wraps, the menu wraps onto a second row).
 Pinning a box to another box is what CSS anchor positioning is for, and that is
 above the [browser floor](../../DESIGN.md#the-browser-floor). Out of the top
-layer the panel is an ordinary absolutely positioned child of the component and
-is placed against its own trigger, in logical properties, at any header height
-and in either reading direction — the way `.theme-settings__panel` always was.
-The reasoning is written out in `components/_dropdown.scss`.
+layer the panel is an ordinary absolutely positioned child of the component,
+in logical properties, at any header height and in either reading direction —
+the way `.theme-settings__panel` always was. The reasoning is written out in
+`components/_dropdown.scss`.
+
+**In the header row neither panel is placed against its own component.** The
+row is as tall as its tallest child and the main navigation wraps onto a second
+line inside it from `bp.$md` up, so a panel that starts under its own 44 pixel
+trigger starts inside the row and covers what wrapped. Both are anchored on
+`.theme-site-header` instead and drop under the whole row, with both offsets
+derived — `calc(100% + <the component's own gap>)` for the block axis, and one
+shared expression for the inline axis that reads the end of the content
+container off its own `max-width` and padding. `layout/_site-header.scss`
+carries the rule and the measurements; `ComponentLibraryTest` holds the two to
+the same edge, and the acceptance suite opens both and measures where they land.
 
 What the change costs is the **light dismiss** the Popover API gave for free.
 `theme.js` writes it back: Escape, a click outside, and focus leaving the

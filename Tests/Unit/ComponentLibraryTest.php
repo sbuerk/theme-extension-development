@@ -613,6 +613,112 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * Both disclosures of the header controls slot drop their panel under the
+     * whole header row, to the same edge.
+     *
+     * The slot holds the language dropdown and the display settings. Each
+     * component places its own panel with `position: absolute` against itself,
+     * which is right wherever it stands alone - the styleguide specimen of the
+     * dropdown, a second settings instance with an `idPrefix` of its own. In
+     * the header it is wrong for both, and for a reason no property name and
+     * no value gives away: the row is as tall as its tallest child and the
+     * menu may take two rows inside it, so a panel that starts under its own
+     * 44 pixel trigger starts *inside* the row and covers what wrapped. The
+     * dropdown was fixed for that; the cog beside it kept the placement and
+     * opened at y 104.5 in a 146 pixel header, over two navigation links.
+     *
+     * **What this gate can and cannot see.** It cannot see the geometry - no
+     * stylesheet says how tall a header is, and that measurement belongs to
+     * `Tests/Acceptance/frontend.spec.ts`, which opens both panels at two
+     * widths and in both reading directions. What it can see is the *shape*
+     * the geometry needs and the agreement between the two, which is the part
+     * that rotted: two components, two copies of one placement, and only one
+     * of them corrected. So it asserts, per panel, that the component is not
+     * the containing block in the header, that the block offset is derived
+     * from the header's own height rather than named as a constant, and that
+     * both panels take their inline offset from the same expression.
+     *
+     * It is deliberately a gate on the pair, not a pattern over the bundle. A
+     * general rule - "no absolutely positioned panel is anchored on a
+     * component inside a wrapping row" - has no expression in CSS: the row,
+     * the wrap and the panel are all runtime facts. A third control in this
+     * slot is caught by the list below needing a line, which is a review of
+     * one line rather than a silent pass.
+     */
+    #[Test]
+    public function bothPanelsOfTheHeaderControlsSlotDropUnderTheHeaderRow(): void
+    {
+        $slot = [
+            '.theme-dropdown' => '.theme-dropdown__panel',
+            '.theme-settings' => '.theme-settings__panel',
+        ];
+
+        // The last declared value per selector and property, which is the one
+        // that wins for these rules: none of them is in a media query, and no
+        // two of them have the same specificity.
+        $declared = [];
+        foreach ($this->rules() as [$selectors, $declarations]) {
+            foreach (array_map('trim', explode(',', $selectors)) as $selector) {
+                foreach ($declarations as $declaration) {
+                    [$property, $value] = array_pad(array_map('trim', explode(':', $declaration, 2)), 2, '');
+                    $declared[$selector][$property] = $value;
+                }
+            }
+        }
+
+        $findings = [];
+        $inlineEnds = [];
+
+        foreach ($slot as $component => $panel) {
+            $componentInTheHeader = '.theme-site-header ' . $component;
+            $panelInTheHeader = '.theme-site-header ' . $panel;
+
+            // On its own the component is the containing block, and the panel
+            // is placed against it - which is what makes the override the
+            // thing that decides where the panel lands in the header.
+            if (($declared[$component]['position'] ?? '') !== 'relative') {
+                $findings[] = sprintf('"%s" does not anchor its own panel when it stands outside the header.', $component);
+            }
+            if (($declared[$panel]['position'] ?? '') !== 'absolute') {
+                $findings[] = sprintf('"%s" is not placed against a containing block at all.', $panel);
+            }
+
+            // Inside the header it is not, so "100%" below is the height of
+            // the row rather than the height of the trigger.
+            if (($declared[$componentInTheHeader]['position'] ?? '') !== 'static') {
+                $findings[] = sprintf('"%s" is not "position: static", so the panel is anchored on the trigger and drops into the row.', $componentInTheHeader);
+            }
+            if (!str_starts_with($declared[$panelInTheHeader]['inset-block-start'] ?? '', 'calc(100%')) {
+                $findings[] = sprintf('"%s" needs "inset-block-start: calc(100%% + …)" - a constant is wrong for some site.', $panelInTheHeader);
+            }
+
+            $inlineEnds[$component] = $declared[$panelInTheHeader]['inset-inline-end'] ?? '(nothing)';
+        }
+
+        $this->assertSame(
+            [],
+            $findings,
+            'The panels of the header controls slot drop under the whole header row, not under their own triggers.',
+        );
+
+        // One expression for both, not two that agree today. They did not
+        // agree, which is how the two panels of one slot came to drop to
+        // y 104.5 and to y 155 at the same width.
+        $this->assertCount(
+            1,
+            array_unique($inlineEnds),
+            sprintf('Both panels of the header controls slot end at the same edge: %s.', json_encode($inlineEnds, JSON_UNESCAPED_SLASHES)),
+        );
+        // And derived from the content container rather than chosen: a length
+        // written out here would be wrong at every width but one.
+        $this->assertStringContainsString(
+            'var(',
+            (string)reset($inlineEnds),
+            'The inline offset of the panels is read off the content container, not written down.',
+        );
+    }
+
+    /**
      * The compiled stylesheet as a list of `[selectors, declarations]`.
      *
      * The bundle is minified to one rule per line, so a rule is everything

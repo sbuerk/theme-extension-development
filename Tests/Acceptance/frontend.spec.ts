@@ -822,3 +822,200 @@ test.describe('the header language dropdown', () => {
         await expect(trigger(page)).toBeFocused();
     });
 });
+
+/**
+ * The display settings panel, measured against the header row it drops out of.
+ *
+ * `the display settings` above exercises the control thoroughly - what a choice
+ * applies, what a reset forgets, what survives a reload, how the panel is
+ * dismissed - and never asks where the panel lands. So the cog kept the defect
+ * the language dropdown beside it was fixed for: anchored on its own component,
+ * the panel starts just under the 44 pixel trigger, which is *inside* a header
+ * row that is as tall as its tallest child and may hold two rows of menu
+ * entries. Measured at 1280 pixels before this change, the panel ran
+ * x 916..1220 by y 104.5..587 in a 146 pixel header, over two links of the
+ * second navigation row.
+ *
+ * The assertions mirror `the header language dropdown` above deliberately: the
+ * two controls share the slot, so what holds for one holds for the other, and
+ * `drop to the same edge as the language dropdown` says that in one test rather
+ * than leaving it to two sets of numbers that happen to agree.
+ */
+test.describe('the display settings panel', () => {
+    const header = (page: Page) => page.locator('.theme-page > .theme-site-header');
+    const trigger = (page: Page) => header(page).locator('.theme-settings__trigger');
+    const panel = (page: Page) => header(page).locator('#theme-settings-panel');
+
+    const boxOf = async (locator: ReturnType<Page['locator']>, what: string) => {
+        const box = await locator.boundingBox();
+        if (box === null) {
+            throw new Error(`${what} is not rendered.`);
+        }
+        return box;
+    };
+
+    // The inline end of the header's content container, read off the element
+    // rather than written down here, so the same assertion holds at both widths
+    // and in both reading directions. The same helper the dropdown block
+    // carries - the two panels are pinned to the same edge, which is the point.
+    const inlineEndOfTheRow = (page: Page) => header(page).locator('.theme-site-header__inner').evaluate((element) => {
+        const box = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        const padding = parseFloat(style.paddingInlineEnd);
+
+        return style.direction === 'rtl' ? box.left + padding : box.right - padding;
+    });
+
+    // 1280 has the menu beside the title and wrapped onto a second row inside
+    // the header; 375 has it behind its toggle. The header is a different
+    // height in each, which is why the block offset has to be derived from the
+    // header rather than chosen.
+    for (const width of [1280, 375]) {
+        test(`opens under the header row and covers no control of it at ${width} pixels`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto('/typography');
+
+            await expect(panel(page)).toBeHidden();
+            await trigger(page).click();
+            await expect(panel(page)).toBeVisible();
+
+            const panelBox = await boxOf(panel(page), 'The settings panel');
+            const triggerBox = await boxOf(trigger(page), 'The settings cog');
+            const headerBox = await boxOf(header(page), 'The site header');
+
+            // Under the row, not into it. Under the *trigger* is what shipped
+            // and is not enough: at 1280 the menu takes a second row inside the
+            // header that reaches below the cog.
+            expect(panelBox.y).toBeGreaterThanOrEqual(triggerBox.y + triggerBox.height);
+            expect(panelBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
+
+            // And over nothing else in the header either - the brand, every
+            // entry of the main navigation, the menu toggle, the language
+            // trigger and the cog itself. Each is looked up as it exists at
+            // this width: the toggle only below the breakpoint, the entries
+            // only above it.
+            const covered = await header(page).evaluate((element, panelSelector) => {
+                const panelElement = element.querySelector(panelSelector);
+                if (panelElement === null) {
+                    return ['the panel disappeared'];
+                }
+                const box = panelElement.getBoundingClientRect();
+                const selectors = [
+                    '.theme-site-header__brand',
+                    '.theme-nav-main__toggle',
+                    '.theme-nav-main__link',
+                    '.theme-settings__trigger',
+                    '.theme-dropdown__trigger',
+                ];
+                const hits: string[] = [];
+                for (const selector of selectors) {
+                    element.querySelectorAll(selector).forEach((control) => {
+                        const other = control.getBoundingClientRect();
+                        if (other.width === 0 && other.height === 0) {
+                            return;
+                        }
+                        const apart = box.right <= other.left || other.right <= box.left
+                            || box.bottom <= other.top || other.bottom <= box.top;
+                        if (!apart) {
+                            hits.push(`${selector} (${other.left}..${other.right} x ${other.top}..${other.bottom})`);
+                        }
+                    });
+                }
+                return hits;
+            }, '#theme-settings-panel');
+            expect(covered).toEqual([]);
+
+            // At the end of the row: the panel's end edge is the end of the
+            // header's content container, not the edge of the viewport and not
+            // the edge of the cog. At 1280 the last two coincide; at 375 the
+            // row has no slack left and the cog reaches a few pixels past its
+            // own container, which is the row being squeezed rather than this
+            // panel being misplaced - see "layout/_site-header.scss".
+            expect(panelBox.x + panelBox.width).toBeCloseTo(await inlineEndOfTheRow(page), 0);
+            expect(panelBox.x).toBeGreaterThanOrEqual(0);
+            expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        });
+    }
+
+    // The cog moves to the left of the row in a right-to-left document. The
+    // panel followed it before this change - "inset-inline-end: 0" on the
+    // component is direction aware - and has to keep doing so now that it is
+    // pinned to the container edge instead.
+    test('follows its trigger in a right-to-left document', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.goto('/typography');
+        await page.locator('html').evaluate((element) => element.setAttribute('dir', 'rtl'));
+
+        await trigger(page).click();
+        await expect(panel(page)).toBeVisible();
+
+        const panelBox = await boxOf(panel(page), 'The settings panel');
+        const triggerBox = await boxOf(trigger(page), 'The settings cog');
+        const headerBox = await boxOf(header(page), 'The site header');
+
+        expect(triggerBox.x).toBeLessThan(1280 / 2);
+        expect(panelBox.x).toBeCloseTo(await inlineEndOfTheRow(page), 0);
+        expect(panelBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
+    });
+
+    // Why this defect is a commit rather than a note: the two controls sit in
+    // the same slot and dropped to visibly different heights, 104.5 against
+    // 155 at 1280. Neither number belongs in a test - what has to hold is that
+    // they agree, whatever the row does to its own height.
+    test('drops to the same edge as the language dropdown', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.goto('/typography');
+
+        const languagePanel = header(page).locator('#theme-language-panel');
+        await header(page).locator('.theme-dropdown__trigger').click();
+        const dropdownBox = await boxOf(languagePanel, 'The language panel');
+
+        // Opening the cog closes the dropdown by itself: a click on the cog is
+        // a click outside the dropdown, which is one of its three dismissal
+        // rules. The two panels are never open at once, which is what lets
+        // them share an edge without sharing a place.
+        await trigger(page).click();
+        await expect(languagePanel).toBeHidden();
+        const settingsBox = await boxOf(panel(page), 'The settings panel');
+
+        expect(settingsBox.y).toBeCloseTo(dropdownBox.y, 0);
+        expect(settingsBox.x + settingsBox.width).toBeCloseTo(dropdownBox.x + dropdownBox.width, 0);
+    });
+
+    // The trigger is a plain button, so Enter and Space are the element's own
+    // behaviour - worth the single assertion the dropdown's summary and the sub
+    // navigation's branches carry, for their reason: every other test in this
+    // block clicks, and a trigger rebuilt out of a div with a click handler
+    // would pass all of them.
+    test('opens and closes from the keyboard', async ({ page }) => {
+        await page.goto('/typography');
+
+        await expect(panel(page)).toBeHidden();
+        await trigger(page).focus();
+        await page.keyboard.press('Enter');
+        await expect(panel(page)).toBeVisible();
+        await page.keyboard.press('Space');
+        await expect(panel(page)).toBeHidden();
+        await expect(trigger(page)).toBeFocused();
+    });
+
+    // The counterpart of the dropdown's "opens and closes with JavaScript
+    // disabled", and deliberately the opposite assertion. This control has no
+    // no-script state: "components/_settings.scss" hides the whole of it until
+    // "data-js" is on the root, because the cog discloses nothing and no choice
+    // applies without the module script. So the header anchor costs this panel
+    // nothing - the degraded case the dropdown had to trade against, where an
+    // unscripted menu stays in the flow and the header grows to the height of
+    // the whole site tree, cannot arise here: there is no cog in it to click.
+    test('is not rendered at all with JavaScript disabled', async ({ browser }) => {
+        const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 375, height: 740 } });
+        const page = await context.newPage();
+        await page.goto('/typography');
+
+        await expect(header(page).locator('.theme-settings')).toBeHidden();
+        await expect(trigger(page)).toBeHidden();
+        await expect(panel(page)).toBeHidden();
+
+        await context.close();
+    });
+});

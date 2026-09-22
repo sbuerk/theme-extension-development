@@ -39,14 +39,10 @@
 // not in the top layer any more. As an ordinary absolutely positioned child
 // of the component it is placed against the component, which is where its
 // trigger is, in logical properties, at any header height and at any scroll
-// position. ".theme-settings__panel" is placed the same way, and in the
-// header row it is placed that way *too simply*: measured at 1280 pixels with
-// the seven sections of the showcase, its panel starts at y 104.5 inside a
-// 146 pixel header and lies over the second row of the menu. That is the same
-// trap this panel fell into on the way here - see "layout/_site-header.scss",
-// which anchors this one on the header for exactly that reason. The settings
-// panel is **not** changed here: it is a different component and a change of
-// its own.
+// position. ".theme-settings__panel" is placed the same way, and in the header
+// row that is *too simply* for either of them: a panel under the trigger is
+// still inside the row. "layout/_site-header.scss" anchors both on the header
+// for that reason, in one rule with one shared inline offset.
 //
 // What the top layer and the Popover API gave, and what replaces it:
 //
