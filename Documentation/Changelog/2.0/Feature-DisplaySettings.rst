@@ -40,6 +40,13 @@ switch paint with system colours, so they stay distinguishable. The panel id
 and the radio names derive from the optional partial argument ``idPrefix``
 (``theme-settings`` by default), so a page can carry a second instance.
 
+In the header the panel drops under the whole header row and ends at the end
+of the content container, exactly where the language dropdown beside it opens
+- the row is as tall as its tallest child and the main navigation may wrap
+onto a second line inside it, so a panel placed under the cog alone would
+cover what wrapped. An instance rendered elsewhere with an ``idPrefix`` of its
+own still opens under its own trigger.
+
 The defaults of the site
 ========================
 
