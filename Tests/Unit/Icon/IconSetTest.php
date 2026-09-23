@@ -12,6 +12,43 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 final class IconSetTest extends UnitTestCase
 {
     private const DIRECTORY = __DIR__ . '/../../../Resources/Public/Icons/FontAwesome/Solid';
+    private const BRANDS_DIRECTORY = __DIR__ . '/../../../Resources/Public/Icons/FontAwesome/Brands';
+
+    /**
+     * The brand logos are the same kind of set in a second directory - not a
+     * second implementation - and "brands()" is the only way to reach it that
+     * the theme itself uses.
+     */
+    #[Test]
+    public function theBrandsSetReadsTheBrandsDirectory(): void
+    {
+        $files = array_values(array_diff(scandir(self::BRANDS_DIRECTORY) ?: [], ['.', '..']));
+        $expected = array_map(static fn(string $file): string => basename($file, '.svg'), $files);
+        sort($expected, SORT_STRING);
+
+        $names = IconSet::brands()->names();
+
+        $this->assertNotSame([], $names, 'No brand logo was found - run "runTests.sh -s buildIcons".');
+        $this->assertSame($expected, $names);
+        $this->assertNotSame((new IconSet())->names(), $names, 'The brands set reads the solid directory.');
+    }
+
+    /**
+     * A brand logo is a file of the package like any other icon, attribution
+     * comment and "currentColor" fill included, so it renders through the same
+     * ViewHelper with no special case in it.
+     */
+    #[Test]
+    public function aBrandLogoIsTheFileAsShippedWithItsAttribution(): void
+    {
+        $file = (string)file_get_contents(self::BRANDS_DIRECTORY . '/mastodon.svg');
+
+        $markup = IconSet::brands()->markup('mastodon');
+
+        $this->assertSame(trim($file), $markup);
+        $this->assertStringContainsString('<!--! Font Awesome Free ', $markup);
+        $this->assertStringContainsString('<path fill="currentColor" d="', $markup);
+    }
 
     #[Test]
     public function theNamesAreEveryShippedFileSortedAndWithoutExtension(): void

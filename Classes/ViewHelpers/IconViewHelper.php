@@ -8,7 +8,7 @@ use SBUERK\ThemeExtensionDevelopment\Icon\IconSet;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
- * Renders one icon of the shipped Font Awesome Free solid set as inline SVG.
+ * Renders one icon of the shipped Font Awesome Free set as inline SVG.
  *
  *     <html xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers"
  *           data-namespace-typo3-fluid="true">
@@ -16,6 +16,13 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  *     <theme:icon name="circle-info" />
  *     <theme:icon name="gear" class="theme-settings__icon" />
  *     <theme:icon name="magnifying-glass" label="Search" />
+ *     <theme:icon set="brands" name="mastodon" />
+ *
+ * "set" is "solid", the default and nearly every use, or "brands" - the
+ * curated platform logos of "Resources/Public/Icons/FontAwesome/Brands/",
+ * which exist for one job, naming the platform a social link leads to. A
+ * brand logo is a trademark of its owner and may be used only to refer to
+ * that platform; see "docs/development/icons.md".
  *
  * Without "label" the icon is decoration, the case of nearly every icon: it
  * sits next to text, or in a control that is named by "aria-label" or by its
@@ -67,6 +74,14 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 final class IconViewHelper extends AbstractViewHelper
 {
     /**
+     * The two sets "set" names. A third value is a typo, not a request for the
+     * default: "set=brand" would otherwise look for a platform logo among the
+     * solid icons and report the name as missing, which points at the wrong
+     * thing.
+     */
+    private const SETS = ['solid', 'brands'];
+
+    /**
      * The output is markup. Every argument that reaches it is escaped in
      * "render()".
      *
@@ -80,7 +95,8 @@ final class IconViewHelper extends AbstractViewHelper
 
     public function initializeArguments(): void
     {
-        $this->registerArgument('name', 'string', 'The icon: a file name below "Resources/Public/Icons/FontAwesome/Solid/", without ".svg".', true);
+        $this->registerArgument('name', 'string', 'The icon: a file name below "Resources/Public/Icons/FontAwesome/<Set>/", without ".svg".', true);
+        $this->registerArgument('set', 'string', 'Which shipped set the name is from: "solid" (the default) or "brands".', false, 'solid');
         $this->registerArgument('label', 'string', 'An accessible name. Without one the icon is decoration and hidden from assistive technology.', false, '');
         $this->registerArgument('class', 'string', 'Classes added to "theme-icon".', false, '');
         $this->registerArgument('optional', 'bool', 'Render nothing for an empty name or a name the set does not have, instead of throwing. For a name read from a record.', false, false);
@@ -90,11 +106,22 @@ final class IconViewHelper extends AbstractViewHelper
     {
         $name = (string)$this->arguments['name'];
         $optional = (bool)$this->arguments['optional'];
+        $set = (string)$this->arguments['set'];
+        if (!in_array($set, self::SETS, true)) {
+            throw new \InvalidArgumentException(
+                sprintf('"%s" is not a set this extension ships. Use "%s".', $set, implode('" or "', self::SETS)),
+                1789218004,
+            );
+        }
         if ($optional && $name === '') {
             return '';
         }
+        // A new "IconSet" per brand icon rather than a second injected one:
+        // the object holds a directory string and nothing else, and two
+        // constructor arguments of the same type cannot both be autowired.
+        $iconSet = $set === 'brands' ? IconSet::brands() : $this->iconSet;
         try {
-            $markup = $this->iconSet->markup($name);
+            $markup = $iconSet->markup($name);
         } catch (\InvalidArgumentException $exception) {
             if ($optional && in_array($exception->getCode(), [1789218001, 1789218002], true)) {
                 return '';

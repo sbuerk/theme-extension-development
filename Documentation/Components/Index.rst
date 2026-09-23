@@ -43,7 +43,8 @@ What the library contains
         -   Button - with a link and an icon variant, pressed and busy states,
             and an attached button group - and the close button
     *   -   Icons
-        -   The solid icons of Font Awesome Free, inline, see :ref:`icons`
+        -   The solid icons of Font Awesome Free and fifteen of its brand
+            logos, inline, see :ref:`icons`
     *   -   Interactive
         -   Tabs, dialog, tooltip, toggletip
     *   -   Forms
@@ -96,6 +97,22 @@ In the backend, an editor picks an icon from a select list grouped by the
 categories of Font Awesome, with a grid of the icons under it; page TSconfig
 :typoscript:`keepItems` narrows the list per field - see
 :ref:`feature-icon-picker`.
+
+..  _icons-brands:
+
+Brand logos
+-----------
+
+Fifteen logos of the brands style ship as well, below
+:file:`Resources/Public/Icons/FontAwesome/Brands/`, and a template renders one
+with :html:`<theme:icon set="brands" name="mastodon" />`. They are an
+allowlist named in the root :file:`package.json`, not the style copied whole -
+see :ref:`feature-brand-logos`.
+
+A brand logo is a **trademark of its owner**, and Font Awesome's licence asks
+that it is used only to represent the company, product or service it refers
+to. In this theme that is the platform a social link leads to, and nothing
+else. :file:`ATTRIBUTION.txt` next to the files says so.
 
 Components that need JavaScript
 ===============================
