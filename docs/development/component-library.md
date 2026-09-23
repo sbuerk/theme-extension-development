@@ -1660,10 +1660,17 @@ server defaults the `data-theme-default-*` attributes carry:
 </div>
 ```
 
-The whole control is hidden until `data-js`, like the navigation toggle. It is
-a disclosure holding native radios and a switch, not an ARIA menu: the radios
+The whole control is hidden until `data-js`, like the navigation toggle — so
+unlike the dropdown beside it, this one has no no-script state at all, and the
+header of a page whose script never arrived has no cog in it. It is a
+disclosure holding native radios and a switch, not an ARIA menu: the radios
 stay in the document, stretched over their labels at zero opacity, and the
-labels draw their state off the input with `:has()`. The panel is flat —
+labels draw their state off the input with `:has()`. In the header the panel
+drops under the whole header row rather than under the cog, to the same edge as
+the language dropdown — see
+[the header dropdown](../architecture/navigation.md#the-header-dropdown-is-a-details-and-was-a-popover)
+for why, and `layout/_site-header.scss` for the rule that places both. The
+panel is flat —
 `--theme-color-surface-raised` inside a `--theme-color-border-strong` border,
 stacked with `--theme-z-overlay` — and never wider than the viewport less a
 gutter on either side. Under `forced-colors: active` the segment labels and
@@ -1891,6 +1898,13 @@ rejected, because in the *scripted* case it would put the panel 35 px inside
 the header band — the trade is written out in `components/_dropdown.scss`, and
 `Tests/Acceptance/frontend.spec.ts` renders the page with JavaScript disabled
 and holds what is left of the contract.
+
+**The display settings panel shares the anchor and not the trade.** It is
+placed against the header by the same rule, for the same reason, and drops to
+the same edge — but the whole control is hidden until `data-js`, so the tall
+unscripted header above cannot arise for it: there is no cog in it to open. Its
+counterpart of the JavaScript-disabled test asserts exactly that, the absence
+of the control rather than its behaviour.
 
 **Tabs.** The markup keeps three rules that the stylesheet and the script both
 depend on: the first tab is the selected one and every other tab carries
@@ -2141,25 +2155,26 @@ CSS, but **moving a breakpoint means recompiling the SCSS**.
 documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 (colour, light/dark) separately:
 
-| Test                                                   | Guards                                                                                                                                                                                                                             |
-|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `everyComponentIsPartOfTheBundle`                      | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.                                |
-| `collapsingTheMainNavigationRequiresTheScriptMarker`   | The `[data-js]` gate on the navigation collapse still holds — see [the `data-js` marker](#the-data-js-marker).                                                                                                                     |
-| `theContentElementOutlineSwitchesOffCompletely`        | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                                          |
-| `anElementWithoutPaddingKeepsItsContentClearOfTheChip` | `--frame-none` starts its content below the CType chip by `--theme-content-element-chip-clearance`, and the global switch and `--plain`, which remove the chip, set the clearance to `0`.                                          |
-| `everyPaletteHasASwatchWithItsOwnColours`              | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).                 |
-| `tabsShowEveryPanelUntilTheScriptHasBoundThem`         | The tab list is hidden and the panel headings shown until the group carries `data-theme-tabs-bound`, and nothing about the tabs is gated on `[data-js]` — see [Components that need the script](#components-that-need-the-script). |
-| `aDialogOpenerIsHiddenWithoutTheScriptMarker`          | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                    |
-| `textIsAlignedToTheStartOrTheEndOfTheLine`             | No `text-align: left` or `right` is compiled — a physical alignment puts the text of a right-to-left page against the wrong edge, and the element baseline carried two until they were found.                                      |
-| `noBoxIsPlacedByAPhysicalEdge`                         | No `margin-`, `padding-`, `border-`, `left`/`right` offset, `float` or `clear` names a physical edge — the sibling of the rule above, for where a box sits rather than where its text sits.                                        |
-| `aDirectionAwareIconIsMirroredInARightToLeftText`      | Every glyph that points somewhere carries a `:dir(rtl)` rule mirroring it — see [Reading direction](#reading-direction).                                                                                                           |
-| `aTitleOnAnyHeadingLevelKeepsItsOwnCase`               | `.theme-hero__title`, `.theme-teaser__title`, `.theme-feature__title` and `.theme-steps__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                             |
-| `noComponentReferencesAnUndeclaredToken`               | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                         |
-| `aListItemHoldingAFloatKeepsItsMarker`                 | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                            |
-| `aControlDrawsItsBoundaryInTheStrongBorderColour`      | The text input, the input group addon, the switch track and the tracks of progress and meter default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                         |
-| `aHoveredTextInputChangesItsBorder`                    | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                    |
-| `everyTableClassAnEditorCanPickIsStyled`               | Every `table_class` an editor can pick — the core's `striped` and `bordered` and the `addItems` of `Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig` — has a compiled `.theme-table--<value>` rule.                         |
-| `aBlockKeepsItsDistanceToWhatFollows`                  | The list, the description list, the code block, the figure, the button group and the table wrapper each end on `margin: 0 0 var(--theme-space-4)` in their base rule, so the next component never touches them.                    |
+| Test                                                     | Guards                                                                                                                                                                                                                                                                                                                                              |
+|----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `everyComponentIsPartOfTheBundle`                        | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.                                                                                                                                                 |
+| `collapsingTheMainNavigationRequiresTheScriptMarker`     | The `[data-js]` gate on the navigation collapse still holds — see [the `data-js` marker](#the-data-js-marker).                                                                                                                                                                                                                                      |
+| `theContentElementOutlineSwitchesOffCompletely`          | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                                                                                                                                                           |
+| `anElementWithoutPaddingKeepsItsContentClearOfTheChip`   | `--frame-none` starts its content below the CType chip by `--theme-content-element-chip-clearance`, and the global switch and `--plain`, which remove the chip, set the clearance to `0`.                                                                                                                                                           |
+| `everyPaletteHasASwatchWithItsOwnColours`                | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).                                                                                                                                  |
+| `tabsShowEveryPanelUntilTheScriptHasBoundThem`           | The tab list is hidden and the panel headings shown until the group carries `data-theme-tabs-bound`, and nothing about the tabs is gated on `[data-js]` — see [Components that need the script](#components-that-need-the-script).                                                                                                                  |
+| `aDialogOpenerIsHiddenWithoutTheScriptMarker`            | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                                                                                                                                     |
+| `textIsAlignedToTheStartOrTheEndOfTheLine`               | No `text-align: left` or `right` is compiled — a physical alignment puts the text of a right-to-left page against the wrong edge, and the element baseline carried two until they were found.                                                                                                                                                       |
+| `noBoxIsPlacedByAPhysicalEdge`                           | No `margin-`, `padding-`, `border-`, `left`/`right` offset, `float` or `clear` names a physical edge — the sibling of the rule above, for where a box sits rather than where its text sits.                                                                                                                                                         |
+| `bothPanelsOfTheHeaderControlsSlotDropUnderTheHeaderRow` | The language dropdown and the display settings are `position: static` inside the header, both panels take `inset-block-start: calc(100% + …)` of the header, and both take their inline offset from the same expression. No stylesheet can state the geometry — the measurement is in the acceptance suite; this holds the shape and the agreement. |
+| `aDirectionAwareIconIsMirroredInARightToLeftText`        | Every glyph that points somewhere carries a `:dir(rtl)` rule mirroring it — see [Reading direction](#reading-direction).                                                                                                                                                                                                                            |
+| `aTitleOnAnyHeadingLevelKeepsItsOwnCase`                 | `.theme-hero__title`, `.theme-teaser__title`, `.theme-feature__title` and `.theme-steps__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                                                                                                                                              |
+| `noComponentReferencesAnUndeclaredToken`                 | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                                                                                                                                          |
+| `aListItemHoldingAFloatKeepsItsMarker`                   | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                                                                                                                                             |
+| `aControlDrawsItsBoundaryInTheStrongBorderColour`        | The text input, the input group addon, the switch track and the tracks of progress and meter default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                                                                                                                                          |
+| `aHoveredTextInputChangesItsBorder`                      | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                                                                                                                                     |
+| `everyTableClassAnEditorCanPickIsStyled`                 | Every `table_class` an editor can pick — the core's `striped` and `bordered` and the `addItems` of `Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig` — has a compiled `.theme-table--<value>` rule.                                                                                                                                          |
+| `aBlockKeepsItsDistanceToWhatFollows`                    | The list, the description list, the code block, the figure, the button group and the table wrapper each end on `margin: 0 0 var(--theme-space-4)` in their base rule, so the next component never touches them.                                                                                                                                     |
 
 The last one strips comments before scanning, which matters here specifically:
 the comment documenting why a breakpoint cannot be a custom property spells
