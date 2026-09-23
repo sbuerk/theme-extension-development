@@ -74,10 +74,10 @@
     --theme-site-header-gap: var(--theme-space-4, 1.25rem);
     --theme-site-header-padding-block: var(--theme-space-3, 0.9375rem);
 
-    // The anchor of the drop-down menu below "bp.$md", and of the dropdown
-    // panel - see "The dropdown panel drops under the row" at the end of this
-    // file. "--sticky" replaces it with "sticky", which anchors an absolutely
-    // positioned descendant just the same.
+    // The anchor of the drop-down menu below "bp.$md", and of both panels of
+    // the controls slot - see "The panels drop under the row" at the end of
+    // this file. "--sticky" replaces it with "sticky", which anchors an
+    // absolutely positioned descendant just the same.
     position: relative;
 
     // Bottom hairline only: the header is a band, not a card, so it does not
@@ -370,30 +370,39 @@
     }
 }
 
-// --- The dropdown panel drops under the row, not under its own trigger -------
+// --- The panels drop under the row, not under their own triggers -------------
 //
-// "components/_dropdown.scss" places its panel against the component, which is
-// right everywhere a dropdown can stand on its own - the styleguide specimen
-// sits in the middle of a page and opens under itself.
+// The controls slot holds two disclosures - the language dropdown and the
+// display settings - and each places its panel against its own component:
+// "components/_dropdown.scss" and "components/_settings.scss" both write
+// "position: absolute" with "inset-block-start: calc(100% + <offset>)". That
+// is right everywhere either component can stand on its own: the styleguide
+// specimen of the dropdown sits in the middle of a page and opens under
+// itself, and a second settings instance rendered with an "idPrefix" of its
+// own does the same.
 //
-// In this row it is not enough. The controls slot is at the end of a row whose
-// height is its tallest child, and from "bp.$md" up the menu may take two rows
-// inside it (see "One row" above) - so a panel that starts just under the
-// 44 pixel trigger starts *inside* the header and covers the second row of the
-// menu. Measured at 1280 pixels with the seven sections of the showcase: the
-// trigger ends at 94, the second row of entries runs to 119.
+// In this row it is not enough. The slot is at the end of a row whose height
+// is its tallest child, and from "bp.$md" up the menu may take two rows inside
+// it (see "One row" above) - so a panel that starts just under the 44 pixel
+// trigger starts *inside* the header and covers the second row of the menu.
+// Measured at 1280 pixels with the seven sections of the showcase: a trigger
+// ends at 94 and the second row of entries runs to 119, and the settings panel
+// - the one that kept this placement longest - opened at 104.5 over the links
+// at x 884..984 and x 1004..1075.
 //
-// So in the header the panel is anchored on the header itself, which is
+// So in the header both panels are anchored on the header itself, which is
 // already positioned for the drop-down menu, and pinned under all of it. That
-// is what the component's comment always claimed and what the popover it used
-// to be could never do.
+// is what the components' comments always claimed and what the popover the
+// dropdown used to be could never do.
 //
 // Both offsets are exact and need no constant:
 //
 //   block    "100%" of the header's padding box, which is its own height,
-//            whatever the title and the menu did to it.
-//   inline   the end of the content container - the same edge the settings
-//            panel reaches with "inset-inline-end: 0", because the cog is the
+//            whatever the title and the menu did to it. Each panel keeps its
+//            own gap token, because the gap is the component's own spacing
+//            decision and not this row's.
+//   inline   the end of the content container - the edge the settings panel
+//            used to reach with "inset-inline-end: 0", because the cog is the
 //            last thing in the row. "@include mixins.content-container" is
 //            "max-width" plus "padding-inline", so the distance from the end
 //            of the header to the end of the container is half of whatever
@@ -404,31 +413,66 @@
 //            so this stays right with a classic scrollbar on the page - which
 //            is the trap "layout/_page.scss" records for "100vw".
 //
+// It is one declaration for both, in a custom property, rather than the same
+// expression written twice: the two controls share a slot, and two copies are
+// two things to keep in step. They were not in step, which is how the cog
+// came to drop to 104.5 while the globe beside it dropped to 155.
+//
 // The container's end is not always the last control's end. At 375 pixels
 // this row has no slack left: the brand, the toggle and the cog do not fit
 // between the gutters, and the cog spills past the container's content edge -
 // measured at 366.3 against a content edge at 355, inside the viewport, so
-// nothing scrolls sideways and no overflow check has ever seen it. The panel
-// is pinned to the container edge rather than to the cog, so at that width it
-// ends a few pixels before the cog does. That is the row being squeezed, not
-// the panel being misplaced, and it is recorded here because the CSS is where
+// nothing scrolls sideways and no overflow check has ever seen it. The panels
+// are pinned to the container edge rather than to the cog, so at that width
+// they end a few pixels before it does. That is the row being squeezed, not a
+// panel being misplaced, and it is recorded here because the CSS is where
 // someone will ask.
 //
 // The "two-tier" variant puts the controls in the meta row above the title.
-// The panel still drops under the whole header there, which is further from
-// its trigger than in the other three arrangements and still over nothing.
+// The panels still drop under the whole header there, which is further from
+// their triggers than in the other three arrangements and still over nothing.
 //
 // Below "bp.$md" without a script the header is as tall as the whole menu,
-// and this anchor puts the panel under all of it - see the header of
+// and this anchor puts a panel under all of it - see the header of
 // "components/_dropdown.scss" for the measurements and for why anchoring on
-// the component there was rejected rather than forgotten.
+// the component there was rejected rather than forgotten. That trade is the
+// dropdown's alone: the display settings are hidden until "data-js", so a
+// header without a script has no cog in it to open.
+//
+// --- The one box in this row that keeps its own anchor, on purpose ----------
+//
+// The second level of the main menu is the same shape and is **not** moved:
+// "components/_nav-main.scss" gives it "inset-block-start: 100%" of its own
+// ".theme-nav-main__item" from "bp.$md" up, so a first row entry opens it over
+// the second row. Measured at 1280 pixels on the showcase, with the menu on
+// two rows: hovering "Layouts" covers "Styleguide" and "Forms", and hovering
+// "Examples" covers those two and the language trigger.
+//
+// That is not this defect wearing another hat. A panel in the controls slot
+// belongs to the row; a submenu belongs to the entry above it, and pinning it
+// under the whole header would detach it from the only thing that says what it
+// is. It also costs nothing to a keyboard: the panel is shown by
+// ":focus-within", so it is gone by the time focus reaches an entry it was
+// lying over, and WCAG 2.2 2.4.11 is about the element that *has* focus.
+// What is left is a pointer wart - a hover panel over the row it wrapped out
+// of - and the fix for that is a menu that does not wrap, not an anchor.
+// Recorded here, measured, because this is the file someone will read when
+// they notice it.
 .theme-site-header {
-    .theme-dropdown {
+    --theme-site-header-panel-inline-end: calc(max(0px, (100% - var(--theme-content-max-width, 75rem)) / 2) + var(--theme-space-4, 1.25rem));
+
+    .theme-dropdown,
+    .theme-settings {
         position: static;
     }
 
     .theme-dropdown__panel {
         inset-block-start: calc(100% + var(--theme-dropdown-panel-offset));
-        inset-inline-end: calc(max(0px, (100% - var(--theme-content-max-width, 75rem)) / 2) + var(--theme-space-4, 1.25rem));
+        inset-inline-end: var(--theme-site-header-panel-inline-end);
+    }
+
+    .theme-settings__panel {
+        inset-block-start: calc(100% + var(--theme-settings-panel-offset));
+        inset-inline-end: var(--theme-site-header-panel-inline-end);
     }
 }

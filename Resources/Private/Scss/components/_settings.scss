@@ -115,7 +115,10 @@
     --theme-settings-legend-color: var(--theme-color-text-secondary, #4a5567);
     --theme-settings-divider-color: var(--theme-color-border, #d6dce6);
 
-    // The anchor of the panel below.
+    // The anchor of the panel below, wherever this control stands on its own.
+    // **In the site header it is not the anchor**: the panel is placed against
+    // the header there, and "layout/_site-header.scss" turns this off. See the
+    // panel's own comment.
     position: relative;
     flex: none;
 
@@ -175,10 +178,29 @@
     @include mixins.visually-hidden;
 }
 
-// Right aligned under the cog, which sits at the end of the header, so the
-// panel grows towards the page rather than out of it. Never wider than the
-// viewport less a gutter on either side: at 360px that still leaves the full
-// 19rem, below it the panel narrows instead of overflowing.
+// Under the trigger and aligned to the end of it, so the panel grows towards
+// the page rather than out of it: the component is the positioning context,
+// which is what a control standing on its own wants - a second instance
+// rendered with an "idPrefix" of its own, anywhere on a page.
+//
+// **In the site header it is anchored one level further out**, on the header,
+// so that it drops under the whole row rather than into it. The row is as tall
+// as its tallest child and the menu may take two rows inside it, so a panel
+// starting just under the 44 pixel cog covered them: measured at 1280 pixels,
+// it opened at y 104.5 in a 146 pixel header, over two entries of the second
+// row. That override, and why both of its offsets are derived rather than
+// chosen, is in "layout/_site-header.scss", which places the dropdown beside
+// this control with the same declarations.
+//
+// Never wider than the viewport less a gutter on either side: at 360px that
+// still leaves the full 19rem, below it the panel narrows instead of
+// overflowing. That clamp is the one place in this component that measures in
+// "100vw", which counts the scrollbar - the trap "layout/_page.scss" records,
+// and the one the header override avoids for the *offsets* by taking a
+// percentage of the header. It is kept because the component has no box to
+// take a percentage of when it stands outside a header, and because it only
+// binds below about 344 pixels, where the gutter has already stopped being the
+// thing that decides the width.
 .theme-settings__panel {
     position: absolute;
     inset-block-start: calc(100% + var(--theme-settings-panel-offset));
