@@ -11,9 +11,19 @@
 //         </div>
 //     </footer>
 //
+// That is the default arrangement, "columns". "theme.footer.variant" - a
+// site setting on TYPO3 v13, the constant of the same name on v12 - selects
+// one more, "newsletter", which adds a band above the columns; its markup
+// and its rules are at the end of this file.
+//
+// A row of platform logos in the footer is not a slot of its own: it is the
+// content element "theme_sociallinks" placed in one of the four columns -
+// see "components/_social-links.scss".
+//
 // See "components/_button.scss" for why every component declares its own
 // token layer with a fallback.
 
+@use '../abstracts/breakpoints' as bp;
 @use '../abstracts/mixins' as mixins;
 
 .theme-site-footer {
@@ -81,4 +91,75 @@
             color: var(--theme-color-primary, #0b57d0);
         }
     }
+}
+
+// --- The newsletter variant --------------------------------------------------
+//
+// "theme.footer.variant" picks one of two arrangements, one partial each
+// below "Partials/Page/Footer/" (see "Partials/Page/Footer.html"). The
+// default, "columns", is everything above this line and carries no modifier.
+//
+//     <footer class="theme-site-footer theme-site-footer--newsletter">
+//         <div class="theme-site-footer__newsletter">
+//             <div class="theme-site-footer__inner theme-site-footer__inner--newsletter">
+//                 <div class="theme-site-footer__newsletter-text">
+//                     <h2 class="theme-site-footer__newsletter-heading">…</h2>
+//                     <p>…</p>
+//                 </div>
+//                 <a class="theme-button theme-button--primary theme-site-footer__newsletter-action">…</a>
+//             </div>
+//         </div>
+//         <div class="theme-site-footer__inner">…columns, meta…</div>
+//     </footer>
+//
+// "--newsletter" on the footer itself carries no rule here, and that is
+// deliberate rather than missing: the band styles itself, and the columns
+// below it are the default footer unchanged. The modifier stays in the markup
+// as the hook a site package needs to reach them together, and as the one
+// place the rendered page says which variant it got - the same affordance
+// "data-theme-page-layout" is on ".theme-page". The header variants do carry
+// rules, because there the modifier is what rearranges the rows.
+//
+// The band is a band and not a first column: it spans the full width of the
+// footer, carries a background of its own and a hairline under itself, and
+// the columns below it keep the layout they have in the default footer. Its
+// own row is the text and the button side by side from "bp.$md" up, stacked
+// below it - two lines of text next to a button in a phone-width column
+// leaves neither enough room.
+
+.theme-site-footer__newsletter {
+    border-block-end: var(--theme-border-width) solid var(--theme-site-footer-border-color);
+    background-color: var(--theme-color-surface-raised, #ffffff);
+    color: var(--theme-color-text-primary, #14181f);
+}
+
+.theme-site-footer__inner--newsletter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-space-4, 1.25rem);
+
+    // Half the footer's own padding: the band is a strip above the columns,
+    // not a second footer.
+    padding-block: calc(var(--theme-site-footer-padding-block) / 2);
+
+    @media (min-width: bp.$md) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.theme-site-footer__newsletter-heading {
+    margin-block: 0 var(--theme-space-2, 0.625rem);
+    font-size: var(--theme-font-size-lg, 1.25rem);
+}
+
+.theme-site-footer__newsletter-text > p:last-child {
+    margin-block-end: 0;
+}
+
+// The button never shrinks below its label: a two word call to action wrapped
+// onto two lines beside a paragraph reads as a mistake.
+.theme-site-footer__newsletter-action {
+    flex: none;
 }

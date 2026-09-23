@@ -681,6 +681,12 @@ final class ComponentLibraryTest extends UnitTestCase
             'Page/Header/Controls.html',
             'Page/Header/Action.html',
         ]];
+        yield 'the footer variants' => ['partials' => [
+            'Page/Footer/Columns.html',
+            'Page/Footer/Newsletter.html',
+            'Page/Footer/Body.html',
+            'Page/Footer/Signup.html',
+        ]];
     }
 
     /**

@@ -115,6 +115,30 @@ the site:
         -   The text of that call to action. An empty label renders no call to
             action.
 
+    *   -   ``theme.footer.variant``
+        -   ``columns``
+        -   How the site footer arranges its content: ``columns`` or
+            ``newsletter`` — see :ref:`feature-footer-variants`.
+
+    *   -   ``theme.footer.newsletterHeading``
+        -   *(empty)*
+        -   The heading of the newsletter band. Without it the band is not
+            rendered.
+
+    *   -   ``theme.footer.newsletterText``
+        -   *(empty)*
+        -   One optional line under that heading.
+
+    *   -   ``theme.footer.newsletterPage``
+        -   ``0``
+        -   The page carrying the subscription form the band leads to. ``0``
+            renders no band.
+
+    *   -   ``theme.footer.newsletterLabel``
+        -   *(empty)*
+        -   The text of the band's button. Without it the band is not
+            rendered.
+
 Each of them is a TypoScript constant of the same name as well, so a site that
 takes the theme through the static include configures it there instead — on
 TYPO3 v12, which has no site sets and no settings editor, that is the only

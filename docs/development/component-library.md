@@ -1493,9 +1493,49 @@ destination is a **page uid, not a link** — nothing an integrator writes into
 the setting can become the scheme of that `href`, which a link setting would
 allow. The cost is that the call to action cannot leave the site.
 
-The styleguide section `chrome` shows all four; `SiteHeaderVariantRenderingTest`
+The styleguide section `chrome` shows all four; `ChromeVariantRenderingTest`
 renders each one from the setting, and asserts that a value the switch does not
 know falls back to the default.
+
+#### Footer variants
+
+The footer has two arrangements, selected by `theme.footer.variant` the same
+way the header's are, with the same rules — a partial each below
+`Partials/Page/Footer/`, a switch over literal names in
+`Partials/Page/Footer.html`, and a default that carries no modifier.
+
+| Value        | The footer is                                                 | Modifier       |
+|--------------|---------------------------------------------------------------|----------------|
+| `columns`    | The four content columns above the meta row. **The default.** | none           |
+| `newsletter` | A newsletter band above those.                                | `--newsletter` |
+
+```html
+<footer class="theme-site-footer theme-site-footer--newsletter">
+    <div class="theme-site-footer__newsletter">
+        <div class="theme-site-footer__inner theme-site-footer__inner--newsletter">
+            <div class="theme-site-footer__newsletter-text">
+                <h2 class="theme-site-footer__newsletter-heading">…</h2>
+                <p>…</p>
+            </div>
+            <a class="theme-button theme-button--primary theme-site-footer__newsletter-action">…</a>
+        </div>
+    </div>
+    <div class="theme-site-footer__inner">…columns, meta…</div>
+</footer>
+```
+
+**The band is a link, not a form.** A subscription form needs somewhere to
+post to, and the theme has nowhere — no controller, no storage, no double opt
+in — so the band leads to the page that carries the real form. A field that
+looks like a subscription and drops what is typed into it is worse than no
+field. The heading, that page and the button's label are all required; the
+one line of text under the heading is optional, and the band renders nothing
+at all if any of the three is missing.
+
+**Social icons are content, not a slot.** A row of platform logos in the
+footer is the `theme_sociallinks` element placed in one of the four columns —
+see [Social links](#social-links). The theme adds no footer slot for it,
+because a column already is one.
 
 ### Display settings
 
