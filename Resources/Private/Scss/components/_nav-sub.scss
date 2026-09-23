@@ -5,15 +5,18 @@
 //     <nav class="theme-nav-sub" aria-label="Section">
 //         <p class="theme-nav-sub__heading">…</p>
 //         <ul class="theme-nav-sub__list">
-//             <li class="theme-nav-sub__item"><a class="theme-nav-sub__link" href="…" aria-current="page">…</a>
-//                 <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">…</ul>
-//             </li>
+//             <li class="theme-nav-sub__item"><a class="theme-nav-sub__link" href="…" aria-current="page">…</a></li>
 //         </ul>
 //     </nav>
 //
-// Vertical and always expanded: unlike "_nav-main.scss" this is a fixed,
-// left-hand block, not a bar that has to collapse behind a toggle, so there is
-// no breakpoint and no disclosure state to read here at all.
+// An item with children is a branch and folds - the "details" markup is at
+// the end of this file.
+//
+// Vertical and never collapsed as a whole: unlike "_nav-main.scss" this is a
+// fixed, left-hand block, not a bar that has to fold away behind a toggle, so
+// there is no breakpoint and no "data-js" gate here. A single branch does
+// open and close, and that is the element's own state rather than one this
+// file reads.
 //
 // No "--active" modifier. "_nav-main.scss" needs one because its current page
 // can be nested two levels under a top item that is not itself current.
@@ -25,6 +28,8 @@
 // token layer with a fallback. The container box repeats the "Frame"
 // treatment from "_nav-main.scss" - every component sits in one, per
 // DESIGN.md.
+
+@use '../abstracts/mixins' as mixins;
 
 .theme-nav-sub {
     --theme-nav-sub-background: var(--theme-color-surface, #f4f6fa);
@@ -103,4 +108,121 @@
             color: var(--theme-nav-sub-current-foreground);
         }
     }
+}
+
+// --- A branch folds, with no script ------------------------------------------
+//
+// An item that has children carries a native "details"/"summary" pair beside
+// its link:
+//
+//     <li class="theme-nav-sub__item theme-nav-sub__item--branch">
+//         <a class="theme-nav-sub__link" href="…">…</a>
+//         <details class="theme-nav-sub__branch" open>
+//             <summary class="theme-nav-sub__toggle">
+//                 <span class="theme-nav-sub__toggle-label">Pages below …</span>
+//                 <svg class="theme-icon theme-nav-sub__marker" …>…</svg>
+//             </summary>
+//             <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">…</ul>
+//         </details>
+//     </li>
+//
+// The element carries the state, the keyboard handling and the announced
+// expanded/collapsed semantics; this file only places the two controls and
+// turns the marker. Nothing here is gated behind "data-js", because nothing
+// about folding a branch waits for a script - see
+// "Partials/Navigation/Sub.html", which also says why the link is a sibling
+// of the summary rather than inside it.
+//
+// --- Why the toggle is positioned, and not laid out ------------------------
+//
+// The list the summary discloses is inside the "details", and the toggle has
+// to sit beside the branch link rather than above it - so the two cannot
+// simply follow each other in the flow.
+//
+// A grid on the "details" does not arrange that, and it is worth writing down
+// why: a browser wraps the content of a "details" in slots of its own shadow
+// tree, so the grid items of a "details" are those slots and not the summary
+// and the list. Placing either with "grid-area" does nothing; the two slots
+// auto-place instead, and the list lands beside the summary rather than under
+// it. Checked in the styleguide fixture, which is where it showed.
+//
+// So the item is the positioning context, the toggle is taken out of the flow
+// into its top corner, and the "details" itself stays an ordinary block: when
+// the branch is closed it has no height at all, and the item is the link with
+// a toggle over its end. The link reserves that end with a padding, so a long
+// title wraps before it reaches the toggle rather than under it.
+
+.theme-nav-sub__item--branch {
+    position: relative;
+}
+
+.theme-nav-sub__item--branch > .theme-nav-sub__link {
+    padding-inline-end: calc(var(--theme-tap-target-min) + var(--theme-space-2));
+}
+
+// The element baseline gives every "details" a box, a margin and a gap under
+// an open summary ("base/_elements.scss") - the treatment a bare disclosure in
+// running text wants. Here it would draw a second frame inside the navigation
+// frame, so it is reset, the same thing "_accordion.scss" does for its items.
+.theme-nav-sub__branch {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+
+    &[open] > .theme-nav-sub__toggle {
+        margin-bottom: 0;
+    }
+}
+
+// A square of the minimum target size: it is a control of its own, and WCAG
+// 2.2 target size (2.5.8) applies to it like it does to every other one.
+.theme-nav-sub__toggle {
+    // The marker icon takes its size from here, see "components/_icon.scss".
+    --theme-icon-size: var(--theme-font-size-sm, 0.875rem);
+
+    display: flex;
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--theme-tap-target-min);
+    block-size: var(--theme-tap-target-min);
+    border-radius: var(--theme-nav-sub-radius);
+    color: var(--theme-color-text-secondary, #4a5567);
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+        display: none;
+    }
+
+    &::marker {
+        content: '';
+    }
+
+    &:hover {
+        color: var(--theme-nav-sub-link-color-hover);
+    }
+}
+
+// The accessible name of the toggle, which is its subtree text. Hidden from
+// sight rather than replaced by an "aria-label" - see
+// "Partials/Navigation/Sub.html".
+.theme-nav-sub__toggle-label {
+    @include mixins.visually-hidden;
+}
+
+.theme-nav-sub__marker {
+    flex: none;
+    rotate: -90deg;
+    transition: rotate var(--theme-duration-fast) var(--theme-easing-standard);
+}
+
+// Pointing down once the branch is open, the way the accordion marker does.
+// No "prefers-reduced-motion" query: "base/_reset.scss" collapses every
+// transition duration globally - see "components/_accordion.scss".
+.theme-nav-sub__branch[open] > .theme-nav-sub__toggle .theme-nav-sub__marker {
+    rotate: 0deg;
 }

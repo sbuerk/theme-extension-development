@@ -100,13 +100,27 @@
     <div class="theme-styleguide__specimen">
         <h3>Sub navigation</h3>
         <p>
-            The current section rather than the whole site: vertical, always expanded,
-            no toggle and no breakpoint. There is no <code>--active</code> modifier
-            either — the list is scoped to one section, so
-            <code>aria-current="page"</code> alone marks the current page wherever it
-            sits, here on a second-level item. The heading is a
+            The current section rather than the whole site: vertical, no breakpoint
+            and no toggle over the block as a whole. There is no
+            <code>--active</code> modifier either — the list is scoped to one
+            section, so <code>aria-current="page"</code> alone marks the current
+            page wherever it sits, here on a second-level item. The heading is a
             <code>&lt;p&gt;</code>, not an <code>&lt;hN&gt;</code>: the section title
             above the block already carries the real heading.
+        </p>
+        <p>
+            An item that has children is a <strong>branch</strong>: its link keeps the
+            row and a native <code>&lt;details&gt;</code> puts a toggle at the end of
+            it, over the list that toggle discloses. That is the whole of it — the
+            element carries the state, the keyboard handling and the expanded and
+            collapsed semantics, so the tree folds on a page whose JavaScript never
+            arrived. The toggle is named by a visually hidden span naming the branch,
+            not by an <code>aria-label</code>, because subtree text is the naming
+            method a <code>&lt;summary&gt;</code> has. The branch link is deliberately
+            <em>not</em> inside the summary: axe reports a focusable descendant of a
+            summary as a nested interactive control. The branch holding the current
+            page is <code>open</code>, every other one starts folded — below,
+            “Analytics” is open and “Support” is not.
         </p>
         <nav class="theme-nav-sub" aria-label="Section navigation specimen">
             <p class="theme-nav-sub__heading">In this section</p>
@@ -114,16 +128,36 @@
                 <li class="theme-nav-sub__item">
                     <a class="theme-nav-sub__link" href="#">Overview</a>
                 </li>
-                <li class="theme-nav-sub__item">
+                <li class="theme-nav-sub__item theme-nav-sub__item--branch">
                     <a class="theme-nav-sub__link" href="#">Analytics</a>
-                    <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">
-                        <li class="theme-nav-sub__item">
-                            <a class="theme-nav-sub__link" href="#" aria-current="page">Reports</a>
-                        </li>
-                        <li class="theme-nav-sub__item">
-                            <a class="theme-nav-sub__link" href="#">Dashboards</a>
-                        </li>
-                    </ul>
+                    <details class="theme-nav-sub__branch" open>
+                        <summary class="theme-nav-sub__toggle">
+                            <span class="theme-nav-sub__toggle-label">Pages below Analytics</span>
+                            <theme:icon name="chevron-down" class="theme-nav-sub__marker" />
+                        </summary>
+                        <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">
+                            <li class="theme-nav-sub__item">
+                                <a class="theme-nav-sub__link" href="#" aria-current="page">Reports</a>
+                            </li>
+                            <li class="theme-nav-sub__item">
+                                <a class="theme-nav-sub__link" href="#">Dashboards</a>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
+                <li class="theme-nav-sub__item theme-nav-sub__item--branch">
+                    <a class="theme-nav-sub__link" href="#">Support</a>
+                    <details class="theme-nav-sub__branch">
+                        <summary class="theme-nav-sub__toggle">
+                            <span class="theme-nav-sub__toggle-label">Pages below Support</span>
+                            <theme:icon name="chevron-down" class="theme-nav-sub__marker" />
+                        </summary>
+                        <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">
+                            <li class="theme-nav-sub__item">
+                                <a class="theme-nav-sub__link" href="#">Contact</a>
+                            </li>
+                        </ul>
+                    </details>
                 </li>
                 <li class="theme-nav-sub__item">
                     <a class="theme-nav-sub__link" href="#">Pricing</a>

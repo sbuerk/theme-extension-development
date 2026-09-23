@@ -251,12 +251,48 @@ is enough wherever it sits:
 <nav class="theme-nav-sub" aria-label="Section">
     <p class="theme-nav-sub__heading">…</p>
     <ul class="theme-nav-sub__list">
-        <li class="theme-nav-sub__item"><a class="theme-nav-sub__link" href="…" aria-current="page">…</a>
-            <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">…</ul>
+        <li class="theme-nav-sub__item"><a class="theme-nav-sub__link" href="…" aria-current="page">…</a></li>
+        <li class="theme-nav-sub__item theme-nav-sub__item--branch">
+            <a class="theme-nav-sub__link" href="…">…</a>
+            <details class="theme-nav-sub__branch" open>
+                <summary class="theme-nav-sub__toggle">
+                    <span class="theme-nav-sub__toggle-label">Pages below …</span>
+                    <svg class="theme-icon theme-nav-sub__marker" aria-hidden="true" focusable="false" …>…</svg>
+                </summary>
+                <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">…</ul>
+            </details>
         </li>
     </ul>
 </nav>
 ```
+
+An item with children is a **branch** and folds. It is a native
+`<details>`/`<summary>` and nothing else — no script, no `data-js` gate, no
+`aria-expanded` for a script to keep in step: the element carries the state,
+the keyboard handling and the announced semantics, so the tree works on a page
+whose JavaScript never arrived. The branch holding the current page is `open`,
+every other one starts folded.
+
+Three decisions in that markup, each of which was the second attempt:
+
+- **The branch link is not inside the summary.** It was, and a summary names
+  itself by its subtree text, so the branch title would have named the
+  disclosure control for nothing. axe refuses it — `nested-interactive`,
+  serious, in every appearance and palette of the styleguide fixture. So the
+  link and the toggle are siblings.
+- **The toggle is named by hidden text, not by `aria-label`.** Subtree text is
+  the naming method a `<summary>` has, and the name says which branch:
+  "Pages below Analytics".
+- **The toggle is positioned, not laid out.** A grid on the `<details>` does
+  not place its summary and its list, because a browser wraps the content of a
+  `<details>` in slots of its own shadow tree and those slots are the grid
+  items. The item is the positioning context instead, and the toggle sits in
+  its corner over the list it discloses.
+
+`NavigationRenderingTest` holds the markup and which branch is open;
+`Tests/Acceptance/frontend.spec.ts` opens and closes one **with JavaScript
+disabled**, and follows the branch link, because both are browser behaviour
+rather than markup.
 
 Breadcrumb, an `<ol>` because the trail's order — root first, current page
 last — is part of its meaning:

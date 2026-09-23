@@ -1,5 +1,6 @@
 <html data-namespace-typo3-fluid="true"
-      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
     Sub navigation - the current section, not the whole site. Rendered from
@@ -26,6 +27,39 @@
     "Partials/Navigation/Main.html" - see that file's comment.
 
     Empty guard: no "subMenu" means no nav element at all, not an empty one.
+
+    --- A branch is a "details", and there is no script ------------------------
+
+    An item with children is wrapped in a native "details"/"summary" pair, so
+    the reader can fold a branch away. The element does all of it: the state,
+    the keyboard handling and the expanded/collapsed semantics a screen reader
+    announces. No script, no "data-js" gate, and nothing degrades - a page
+    whose JavaScript never loads has a working tree, which is why this is
+    built on "details" rather than on a button and a class.
+
+    THE LINK IS NOT INSIDE THE SUMMARY. It was, in the first version of this:
+    a summary takes phrasing content, its accessible name is its subtree
+    text, and the branch title would have named the disclosure control by
+    itself. axe refuses it - "nested-interactive", serious, on every
+    appearance and palette of the styleguide fixture - because a summary is a
+    widget and a focusable descendant inside one is a control a reader cannot
+    predict. So the branch link and the toggle are siblings: the link is the
+    row, the summary is a square at the end of it, and
+    "components/_nav-sub.scss" lays the two out over the list the summary
+    discloses.
+
+    THE TOGGLE IS NAMED BY TEXT, NOT BY "aria-label". Its name is a visually
+    hidden span inside it - the naming method a summary actually has - and it
+    names the branch rather than the action: "Pages below Analytics", not
+    "Toggle". An "aria-label" would be an attribute on an element whose role
+    is not the theme's to guess at, and the visible chevron stays decoration.
+
+    THE BRANCH THE READER IS IN IS OPEN. "open" is written onto the branch
+    holding the current page, which "MenuProcessor" marks "active" (an
+    ancestor) or "current" (the page itself). Every other branch starts
+    folded. The attribute is built as a variable rather than written as
+    "open="{...}"": an "open" attribute is true whatever its value, empty
+    string included, so a conditional value would leave every branch open.
 </f:comment>
 
 <f:if condition="{subMenu}">
@@ -42,31 +76,48 @@
 </f:if>
 
 <f:section name="Item">
-    <li class="theme-nav-sub__item">
-        <f:if condition="{item.spacer}">
-            <f:then>
-                <span class="theme-nav-sub__link">{item.title}</span>
-            </f:then>
-            <f:else>
-                <f:if condition="{item.current}">
-                    <f:then>
-                        <a class="theme-nav-sub__link" href="{item.link}" aria-current="page">{item.title}</a>
-                    </f:then>
-                    <f:else>
-                        <a class="theme-nav-sub__link" href="{item.link}">{item.title}</a>
-                    </f:else>
-                </f:if>
-            </f:else>
-        </f:if>
+    <f:if condition="{item.children}">
+        <f:then>
+            <f:variable name="branchOpen" value="{f:if(condition: '{item.active} || {item.current}', then: ' open')}" />
+            <li class="theme-nav-sub__item theme-nav-sub__item--branch">
+                <f:render section="Link" arguments="{item: item}" />
+                <details class="theme-nav-sub__branch"{branchOpen}>
+                    <summary class="theme-nav-sub__toggle">
+                        <span class="theme-nav-sub__toggle-label"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.navSubBranchLabel" arguments="{0: item.title}" /></span>
+                        <theme:icon name="chevron-down" class="theme-nav-sub__marker" />
+                    </summary>
+                    <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">
+                        <f:for each="{item.children}" as="childItem">
+                            <f:render section="Item" arguments="{item: childItem}" />
+                        </f:for>
+                    </ul>
+                </details>
+            </li>
+        </f:then>
+        <f:else>
+            <li class="theme-nav-sub__item">
+                <f:render section="Link" arguments="{item: item}" />
+            </li>
+        </f:else>
+    </f:if>
+</f:section>
 
-        <f:if condition="{item.children}">
-            <ul class="theme-nav-sub__list theme-nav-sub__list--level-2">
-                <f:for each="{item.children}" as="childItem">
-                    <f:render section="Item" arguments="{item: childItem}" />
-                </f:for>
-            </ul>
-        </f:if>
-    </li>
+<f:section name="Link">
+    <f:if condition="{item.spacer}">
+        <f:then>
+            <span class="theme-nav-sub__link">{item.title}</span>
+        </f:then>
+        <f:else>
+            <f:if condition="{item.current}">
+                <f:then>
+                    <a class="theme-nav-sub__link" href="{item.link}" aria-current="page">{item.title}</a>
+                </f:then>
+                <f:else>
+                    <a class="theme-nav-sub__link" href="{item.link}">{item.title}</a>
+                </f:else>
+            </f:if>
+        </f:else>
+    </f:if>
 </f:section>
 
 </html>
