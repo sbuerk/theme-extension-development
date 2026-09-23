@@ -71,7 +71,12 @@ for (const tree of trees) {
                 const response = await page.goto(url);
                 expect(response?.status()).toBe(200);
                 await expect(page.locator('[data-theme-page-layout]')).toHaveCount(1);
-                await expect(page.locator('.theme-site-header__brand')).toHaveAttribute('href', `${tree.prefix}/`);
+                // The page's own header, not any header on it: the styleguide
+                // section "chrome" renders four specimen headers inside
+                // "main", with the same classes, because that is what a
+                // specimen of the real markup is. The real one is the direct
+                // child of ".theme-page".
+                await expect(page.locator('.theme-page > .theme-site-header .theme-site-header__brand')).toHaveAttribute('href', `${tree.prefix}/`);
                 await expect(page.getByText('has no rendering definition')).toHaveCount(0);
 
                 // The inline head script of the theme ran: it marks the root

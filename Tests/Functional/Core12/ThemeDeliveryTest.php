@@ -90,4 +90,24 @@ final class ThemeDeliveryTest extends AbstractFunctionalTestCase
     {
         $this->assertSame('theme-instance-core12', $this->themeDelivery()->instanceSeedSet());
     }
+
+    /**
+     * v12 has no site sets, so a setting of the theme is the constant of
+     * the same name, written into the record after its static include - and
+     * nothing of it into the site, where v12 would add it before the static
+     * include and the theme's own default would overrule it.
+     */
+    #[Test]
+    public function aSettingIsWrittenAsAConstantOfTheRecord(): void
+    {
+        $delivery = $this->themeDelivery();
+        $settings = ['theme.header.variant' => 'centred', 'theme.header.actionPage' => 10];
+
+        $this->assertSame(
+            "theme.header.variant = centred\ntheme.header.actionPage = 10\n",
+            $delivery->templateValues($settings)['constants'] ?? null,
+        );
+        $this->assertSame([], $delivery->siteConfiguration($settings));
+        $this->assertArrayNotHasKey('constants', $delivery->templateValues());
+    }
 }

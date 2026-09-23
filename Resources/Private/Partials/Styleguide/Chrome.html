@@ -1,0 +1,177 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    Styleguide section "chrome": the site header in each of the arrangements
+    the site setting "theme.header.variant" can select. Contract:
+    "layout/_site-header.scss" and
+    docs/development/component-library.md#layout.
+
+    Literal markup, like every other specimen of this page - not the real
+    partials. Those read "siteRootUrl", "mainMenu" and "languageMenu", none
+    of which exists without a request, and the visual suite renders this
+    partial with standalone Fluid and no TYPO3 at all. What is copied here is
+    the markup the variant partials produce, which is what the contract in
+    the stylesheet documents.
+
+    --- Two things differ from the real chrome -------------------------------
+
+    Landmarks. A "header" element is the banner landmark only while it is not
+    inside "article", "aside", "main", "nav" or "section" (HTML-AAM). Every
+    specimen here sits inside the page's "main", so none of the four is a
+    landmark and the page keeps the one banner the real site header is. That
+    is also why none of them carries an "aria-label": the attribute is
+    prohibited on the generic role these map to, and the heading above each
+    specimen is what names it. The navigation inside each one IS a landmark,
+    so each of those is labelled, and labelled differently.
+
+    Widths. These headers are rendered inside the content column, not across
+    the page, so what they show is the arrangement of their rows and not the
+    widths the real header negotiates. Those are measured in a browser, at
+    four viewport widths, by "Tests/Acceptance/frontend.spec.ts" - and only
+    for the default variant, which is the one whose single row has a budget
+    to keep.
+
+    Controls. Each specimen stands one icon button in for the controls slot,
+    which in the real header holds the language dropdown and the display
+    settings - two partials of their own, demonstrated in their own specimens.
+    What the chrome section shows is the rows and slots they sit in.
+    "ComponentLibraryTest::theChromeSpecimensCarryEveryClassTheirPartialsWrite"
+    holds these specimens to every class the chrome partials themselves write,
+    so the arrangement cannot drift from them unnoticed.
+
+    Every specimen link points at "#": these demonstrate markup and state.
+</f:comment>
+<section class="theme-styleguide__section" id="chrome">
+    <h2 class="theme-styleguide__heading">Page chrome</h2>
+
+    <p>
+        The site header, in the four arrangements the site setting
+        <code>theme.header.variant</code> selects. Each is a partial of its own
+        below <code>Partials/Page/Header/</code> and a modifier on
+        <code>.theme-site-header</code>; the default carries no modifier at all,
+        so a site that never touches the setting keeps exactly the header it
+        had. The three others each give the title or the navigation a row of
+        its own, which is why none of them has to re-negotiate the width budget
+        the single row keeps.
+    </p>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Simple — the default</h3>
+        <p>
+            Title, navigation and controls in one row. The navigation is pushed
+            to the end by <code>margin-inline-start: auto</code>, and the
+            controls follow it in source order — no spacer element, and nothing
+            to change when the controls slot is empty.
+        </p>
+        <header class="theme-site-header">
+            <div class="theme-site-header__inner">
+                <a class="theme-site-header__brand" href="#">Theme</a>
+                <nav class="theme-nav-main" aria-label="Simple header navigation specimen">
+                    <ul class="theme-nav-main__list">
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Elements</a></li>
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Typography</a></li>
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Styleguide</a></li>
+                    </ul>
+                </nav>
+                <div class="theme-site-header__actions">
+                    <button type="button" class="theme-button theme-button--icon" aria-label="Display settings, simple header specimen"><theme:icon name="gear" /></button>
+                </div>
+            </div>
+        </header>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Centred</h3>
+        <p>
+            The title centred on a row of its own with the controls at the end
+            of it, the navigation centred below. The controls are taken out of
+            the flow from the breakpoint up, so the title is centred against the
+            whole row rather than against the space they leave — centred in the
+            remainder sits visibly left of centre.
+        </p>
+        <header class="theme-site-header theme-site-header--centred">
+            <div class="theme-site-header__inner theme-site-header__inner--brand">
+                <a class="theme-site-header__brand" href="#">Theme</a>
+                <div class="theme-site-header__actions">
+                    <button type="button" class="theme-button theme-button--icon" aria-label="Display settings, centred header specimen"><theme:icon name="gear" /></button>
+                </div>
+            </div>
+            <div class="theme-site-header__inner theme-site-header__inner--navigation">
+                <nav class="theme-nav-main" aria-label="Centred header navigation specimen">
+                    <ul class="theme-nav-main__list">
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Elements</a></li>
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Typography</a></li>
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Styleguide</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>With actions</h3>
+        <p>
+            A call to action beside the controls, and the navigation on a row of
+            its own. Both the target and the text of the call to action are site
+            settings, and the target is a <strong>page uid</strong> rather than
+            a link, so an integrator editing the setting cannot put a scheme into
+            that <code>href</code> — the type is <code>int</code> and the core
+            validates it. The TypoScript constant of the same name is free text,
+            as every constant is, so this narrows the form and not the file.
+            Either setting left at its default renders no call to action at all,
+            and the variant is then simply a two-row header.
+        </p>
+        <header class="theme-site-header theme-site-header--actions">
+            <div class="theme-site-header__inner theme-site-header__inner--brand">
+                <a class="theme-site-header__brand" href="#">Theme</a>
+                <a class="theme-button theme-button--primary theme-site-header__action" href="#">Get in touch</a>
+                <div class="theme-site-header__actions">
+                    <button type="button" class="theme-button theme-button--icon" aria-label="Display settings, header with actions specimen"><theme:icon name="gear" /></button>
+                </div>
+            </div>
+            <div class="theme-site-header__inner theme-site-header__inner--navigation">
+                <nav class="theme-nav-main" aria-label="Header with actions navigation specimen">
+                    <ul class="theme-nav-main__list">
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Elements</a></li>
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Typography</a></li>
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Styleguide</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Two tier</h3>
+        <p>
+            A tinted meta row carrying the controls, with the title and the
+            navigation in the row below. The meta row is a <code>div</code>, not
+            a second landmark: it holds two controls that name themselves, and a
+            landmark with nothing to say is noise in a screen reader's landmark
+            list.
+        </p>
+        <header class="theme-site-header theme-site-header--two-tier">
+            <div class="theme-site-header__meta">
+                <div class="theme-site-header__inner theme-site-header__inner--meta">
+                    <div class="theme-site-header__actions">
+                        <button type="button" class="theme-button theme-button--icon" aria-label="Display settings, two tier header specimen"><theme:icon name="gear" /></button>
+                    </div>
+                </div>
+            </div>
+            <div class="theme-site-header__inner theme-site-header__inner--main">
+                <a class="theme-site-header__brand" href="#">Theme</a>
+                <nav class="theme-nav-main" aria-label="Two tier header navigation specimen">
+                    <ul class="theme-nav-main__list">
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Elements</a></li>
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Typography</a></li>
+                        <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Styleguide</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+    </div>
+</section>
+
+</html>

@@ -540,6 +540,150 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * The single-row site header is measured in a browser at four viewport
+     * widths, and the `max-inline-size: 50%` cap on the navigation between
+     * the two breakpoints is what arranges those measurements - see
+     * `layout/_site-header.scss`. The three header variants the site setting
+     * selects each give the title or the navigation a row of its own instead
+     * of re-negotiating that row, so none of them may touch the cap: a
+     * variant that widened it would change what the acceptance tests measure
+     * without any of them going red, because they render the default.
+     */
+    #[DataProvider('headerVariantModifiers')]
+    #[Test]
+    public function aHeaderVariantDoesNotChangeTheMeasuredWidthBudget(string $modifier): void
+    {
+        $css = $this->stylesheet();
+
+        foreach ($this->declarationBlocksFor($css, $modifier) as $selector => $declarations) {
+            $this->assertStringNotContainsString(
+                'max-inline-size',
+                $declarations,
+                sprintf('The header variant rule "%s" changes a width the default header is measured on.', $selector),
+            );
+            $this->assertStringNotContainsString(
+                'flex:none',
+                $declarations,
+                sprintf('The header variant rule "%s" changes how the default header distributes its row.', $selector),
+            );
+        }
+    }
+
+    /**
+     * @return \Generator<string, array{modifier: string}>
+     */
+    public static function headerVariantModifiers(): \Generator
+    {
+        foreach (['.theme-site-header--centred', '.theme-site-header--actions', '.theme-site-header--two-tier'] as $modifier) {
+            yield $modifier => ['modifier' => $modifier];
+        }
+    }
+
+    /**
+     * Every rule of the compiled stylesheet whose selector names the given
+     * class, as selector => declarations.
+     *
+     * A plain split on the two brace characters. Two things it does not do,
+     * both of which would make it miss a rule rather than report a wrong one:
+     * a chunk that still holds an at-rule (`@media (…){selector{decls`) splits
+     * into three parts and is skipped, and two rules with the same selector
+     * collapse because the result is keyed by selector.
+     *
+     * That is acceptable for what this asserts - no header variant rule may
+     * set a width - only as long as no variant width hides in a media query.
+     * None does today: the three variants are read out in full by
+     * `headerVariantModifiers`, and `assertNotSame([], $blocks)` below fails
+     * if a variant stops matching at all. A variant that needs a media query
+     * needs a better parser here first.
+     *
+     * @return array<string, string>
+     */
+    private function declarationBlocksFor(string $css, string $class): array
+    {
+        $blocks = [];
+        foreach (explode('}', $css) as $block) {
+            $parts = explode('{', $block);
+            if (count($parts) !== 2) {
+                continue;
+            }
+            [$selector, $declarations] = $parts;
+            if (str_contains($selector, $class)) {
+                $blocks[trim($selector)] = $declarations;
+            }
+        }
+        $this->assertNotSame([], $blocks, sprintf('No rule of the stylesheet names "%s" - the variant ships no rules at all.', $class));
+
+        return $blocks;
+    }
+
+    /**
+     * The chrome specimens of the styleguide carry every class the partial
+     * they copy carries.
+     *
+     * `Styleguide/Chrome.html` is hand-written markup, because the real
+     * partials read request data and the visual suite renders the styleguide
+     * without TYPO3 - see the comment at the top of that file. Hand-written
+     * means it can drift, and a drifted specimen is worse than none: it is
+     * what a reader takes the contract to be, and what axe and the screenshot
+     * are run against.
+     *
+     * So every `theme-` class that a header or footer partial writes has to
+     * appear somewhere in the specimens. Two limits, both deliberate:
+     *
+     * - It is one-directional. The specimens legitimately carry classes the
+     *   partials do not - `theme-styleguide__specimen`, and one
+     *   `theme-button--icon` standing in for the controls.
+     * - It reaches only the classes written *in* these files. The controls
+     *   slot renders `Page/Dropdown.html` and `Page/Settings.html`, whose
+     *   classes are theirs and are demonstrated in their own specimens; the
+     *   chrome section shows the rows and slots those two sit in, not the
+     *   two of them again.
+     *
+     * @param list<string> $partials
+     */
+    #[DataProvider('chromePartialsAndTheirSpecimens')]
+    #[Test]
+    public function theChromeSpecimensCarryEveryClassTheirPartialsWrite(array $partials): void
+    {
+        $specimens = (string)file_get_contents(dirname(__DIR__, 2) . '/Resources/Private/Partials/Styleguide/Chrome.html');
+
+        $missing = [];
+        foreach ($partials as $partial) {
+            $file = dirname(__DIR__, 2) . '/Resources/Private/Partials/' . $partial;
+            $this->assertFileExists($file);
+            preg_match_all('/class="([^"{]*)"/', (string)file_get_contents($file), $matches);
+            foreach ($matches[1] as $attribute) {
+                foreach (preg_split('/\s+/', trim($attribute)) ?: [] as $class) {
+                    if ($class === '' || !str_starts_with($class, 'theme-')) {
+                        continue;
+                    }
+                    if (preg_match('/(?<![\w-])' . preg_quote($class, '/') . '(?![\w-])/', $specimens) !== 1) {
+                        $missing[] = $partial . ': ' . $class;
+                    }
+                }
+            }
+        }
+
+        $this->assertSame([], $missing, 'The chrome specimens no longer show these classes: ' . implode(', ', array_unique($missing)));
+    }
+
+    /**
+     * @return \Generator<string, array{partials: list<string>}>
+     */
+    public static function chromePartialsAndTheirSpecimens(): \Generator
+    {
+        yield 'the header variants' => ['partials' => [
+            'Page/Header/Simple.html',
+            'Page/Header/Centred.html',
+            'Page/Header/Actions.html',
+            'Page/Header/TwoTier.html',
+            'Page/Header/Brand.html',
+            'Page/Header/Controls.html',
+            'Page/Header/Action.html',
+        ]];
+    }
+
+    /**
      * A social link whose whole visible content is a platform logo still has
      * an accessible name: the platform's name is in the markup and only
      * hidden visually. That hiding is conditional on an icon actually having

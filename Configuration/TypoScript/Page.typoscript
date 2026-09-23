@@ -82,6 +82,30 @@ page {
                 returnLast = url
             }
 
+            # Which of the four header partials "Partials/Page/Header.html"
+            # renders, and the two values the "actions" one needs.
+            #
+            # Handed over as a template variable rather than read in the
+            # template from "settings.": the "settings" of a FLUIDTEMPLATE is
+            # a TypoScript array assigned per object, not the site settings,
+            # and the display settings already occupy "settings.appearance"
+            # ("Appearance.typoscript"). A constant is what both delivery
+            # paths have - the site set turns the setting of the same name
+            # into it, the static include declares it - so reading the
+            # constant is what makes one template serve both.
+            #
+            # A value the switch in the partial does not know renders the
+            # default partial, and no value ever becomes part of a partial
+            # path: see the comment there.
+            headerVariant = TEXT
+            headerVariant.value = {$theme.header.variant}
+
+            headerActionPage = TEXT
+            headerActionPage.value = {$theme.header.actionPage}
+
+            headerActionLabel = TEXT
+            headerActionLabel.value = {$theme.header.actionLabel}
+
             # The resolved backend layout identifier, in the form the page
             # TSconfig declares it - "content_sidebar", not "ContentSidebar".
             #
