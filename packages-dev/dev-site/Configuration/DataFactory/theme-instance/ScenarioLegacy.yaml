@@ -56,7 +56,7 @@ entities:
               CType: text
               header: 'What this is'
               header_layout: 2
-              bodytext: "<p>This page tree is seeded from a definition in the repository, so a\ndevelopment instance can be rebuilt from nothing without clicking a\npage tree together by hand.</p>\n<p>Three sections are in the navigation: the\n<a href=\"t3://page?uid=1005\">content elements</a>, one page per\nelement with its variants; the\n<a href=\"t3://page?uid=1002\">typography</a>, from rich text and\nelements; and the <a href=\"t3://page?uid=1009\">styleguide</a>, which\nrenders every component of the library, with the\n<a href=\"t3://page?uid=1010\">form showcase</a>, a request form put\ntogether from the form components alone.</p>"
+              bodytext: "<p>This page tree is seeded from a definition in the repository, so a\ndevelopment instance can be rebuilt from nothing without clicking a\npage tree together by hand.</p>\n<p>The navigation holds the sections of the showcase: the\n<a href=\"t3://page?uid=1005\">content elements</a>, one page per\nelement with its variants; the\n<a href=\"t3://page?uid=1002\">typography</a>, from rich text and\nelements; the <a href=\"t3://page?uid=1171\">page layouts</a>, one\nwireframe page per backend layout; the\n<a href=\"t3://page?uid=1113\">examples</a>, whole pages composed\nfrom the elements above; and the\n<a href=\"t3://page?uid=1009\">styleguide</a>, which renders every\ncomponent of the library, with the\n<a href=\"t3://page?uid=1010\">form showcase</a>, a request form put\ntogether from the form components alone.</p>"
       children:
         -
           self:
@@ -3775,6 +3775,823 @@ entities:
                       header: 'Third band - colPos 4'
                       header_layout: 2
                       bodytext: "<p>An inverted band, which is the appearance that makes the\nwidth obvious at a glance. Bands are flush against each\nother; the space between two of them is the space after the\nlast element of the one above.</p>\n"
+        -
+          self:
+            id: 1113
+            title: Examples
+            slug: /examples
+            backend_layout: content
+            abstract: 'Whole pages composed from the elements the theme already ships - an album, a pricing page, a weblog, a product page and three landing pages.'
+            keywords: 'examples, composition'
+          entities:
+            content:
+              -
+                self:
+                  id: 12301
+                  CType: header
+                  header: Examples
+                  header_layout: 1
+              -
+                self:
+                  id: 12302
+                  CType: text
+                  header: 'Pages, not specimens'
+                  header_layout: 2
+                  bodytext: "<p>The rest of this tree takes the theme apart: one page per content\nelement, one per backend layout, one per value of a field. These\npages put it back together. Each of them is a page somebody might\nactually publish, and each is made of nothing but the elements,\nlayouts, frames and appearance values that are demonstrated one at a\ntime elsewhere.</p>\n<p>That is the point of the section. An element looks finished on a\npage that holds nothing else; what it is worth is decided next to\nfive other elements, under a heading, in a column of a real width.\nThe last element of every page below names what that page is made\nof.</p>\n"
+              -
+                self:
+                  id: 12303
+                  CType: menu_abstract
+                  header: 'The pages of this section'
+                  header_layout: 2
+                  pages: '1113'
+          children:
+            -
+              self:
+                id: 1114
+                title: Album
+                slug: /examples/album
+                backend_layout: content
+                abstract: 'A photo collection: a centred reduced hero in the stage, a gallery in three columns, a row of cards and a closing call to action.'
+              entities:
+                content:
+                  -
+                    self:
+                      id: 12401
+                      CType: theme_hero_small
+                      colPos: 2
+                      tx_theme_hero_layout: centred
+                      tx_theme_eyebrow: Album
+                      header: 'Field notes from a relaunch'
+                      header_layout: 1
+                      bodytext: 'Nine months of a site being rebuilt, photographed on the way. The pictures are placeholders; the page around them is not.'
+                      tx_theme_link: 't3://page?uid=1113'
+                      tx_theme_link_label: 'Back to the examples'
+                      tx_theme_link_variant: ghost
+                      tx_theme_link_icon: arrow-left
+                  -
+                    self:
+                      id: 12402
+                      CType: text
+                      header: 'What is in here'
+                      header_layout: 2
+                      bodytext: "<p>A gallery of six pictures in three columns, three collections\nas cards, and one place to ask for the full set. The gallery is\nthe core <em>Images</em> element with <em>imagecols</em> set to\nthree - the same element the media page shows in one, two, three\nand four columns.</p>"
+                  -
+                    self:
+                      id: 12403
+                      CType: image
+                      header: 'Selected pictures'
+                      header_layout: 2
+                      imagecols: 3
+                  -
+                    self:
+                      id: 12404
+                      CType: theme_card_group
+                      header: 'Three collections'
+                      header_layout: 2
+                      layout: 0
+                      tx_theme_columns: 3
+                      tx_theme_list_items: '1600,1601,1602'
+                  -
+                    self:
+                      id: 12405
+                      CType: theme_cta
+                      tx_theme_cta_tone: accent
+                      tx_theme_cta_width: band
+                      tx_theme_icon: camera
+                      header: 'Want the pictures at full size?'
+                      header_layout: 2
+                      bodytext: "<p>The whole set is on request. The form showcase is where such a\nrequest would be sent from.</p>\n"
+                      tx_theme_link: 't3://page?uid=1010'
+                      tx_theme_link_label: 'Ask for the set'
+                      tx_theme_link_icon: envelope
+                      tx_theme_secondary_link: 't3://page?uid=1003'
+                      tx_theme_secondary_link_label: 'How images are rendered'
+                      tx_theme_secondary_link_variant: link
+                  -
+                    self:
+                      id: 12406
+                      CType: theme_notice
+                      tx_theme_notice_kind: note
+                      header: 'What this page is made of'
+                      bodytext: '<p>A reduced hero in the stage, a text, the core <em>Images</em> element in three columns, a card group in the grid layout and a call to action as a band. The backend layout is <em>Content page</em>.</p>'
+                listItem:
+                  -
+                    self:
+                      id: 1600
+                      header: Before
+                      subheader: March
+                      text: 'The site as it was, photographed on the day the rebuild was agreed.'
+                      link: 't3://page?uid=1003'
+                      link_label: Look
+                      link_variant: secondary
+                  -
+                    self:
+                      id: 1601
+                      header: During
+                      subheader: June
+                      text: 'Prototypes on a wall, most of them wrong, two of them kept.'
+                      link: 't3://page?uid=1009'
+                      link_label: Look
+                      link_variant: secondary
+                  -
+                    self:
+                      id: 1602
+                      header: After
+                      subheader: December
+                      text: 'The pictures of this one are not taken yet, so the card carries none.'
+            -
+              self:
+                id: 1115
+                title: Pricing
+                slug: /examples/pricing
+                backend_layout: content
+                abstract: 'A plan comparison: a centred text hero, three plans, the features they share, the questions people ask and a way to get in touch.'
+              entities:
+                content:
+                  -
+                    self:
+                      id: 12501
+                      CType: theme_hero_text_only
+                      colPos: 2
+                      tx_theme_hero_layout: centred
+                      tx_theme_eyebrow: 'Support plans'
+                      header: 'One theme, three ways to be supported'
+                      header_layout: 1
+                      bodytext: 'The theme itself is free and always will be. What is bought here is somebody answering when a site built on it does something unexpected.'
+                  -
+                    self:
+                      id: 12502
+                      CType: theme_pricing
+                      header: 'Choose a plan'
+                      header_layout: 2
+                      tx_theme_list_items: '1610,1611,1612'
+                  -
+                    self:
+                      id: 12503
+                      CType: theme_features
+                      header: 'In every plan'
+                      header_layout: 2
+                      bodytext: "<p>Whichever plan a site is on, these four are part of it.</p>\n"
+                      layout: 1
+                      tx_theme_columns: 2
+                      tx_theme_list_items: '1613,1614,1615,1616'
+                  -
+                    self:
+                      id: 12504
+                      CType: theme_accordion
+                      header: 'Questions people ask before they choose'
+                      header_layout: 2
+                      tx_theme_list_items: '1617,1618,1619'
+                  -
+                    self:
+                      id: 12505
+                      CType: theme_cta
+                      tx_theme_cta_tone: ''
+                      tx_theme_cta_width: boxed
+                      tx_theme_icon: envelope
+                      header: 'Still not sure which one?'
+                      header_layout: 2
+                      bodytext: "<p>Describe the site and how many people edit it, and the plan\npicks itself.</p>\n"
+                      tx_theme_link: 't3://page?uid=1010'
+                      tx_theme_link_label: 'Write to us'
+                      tx_theme_link_icon: arrow-right
+                      tx_theme_secondary_link: 't3://page?uid=1170'
+                      tx_theme_secondary_link_label: 'The pricing element itself'
+                      tx_theme_secondary_link_variant: link
+                  -
+                    self:
+                      id: 12506
+                      CType: theme_notice
+                      tx_theme_notice_kind: note
+                      header: 'What this page is made of'
+                      bodytext: '<p>A hero without media in the stage, the pricing element with three plans, a feature grid with hanging icons, an accordion and a call to action in a box. The backend layout is <em>Content page</em>, without a sidebar, because three plans compared side by side need the full width.</p>'
+                listItem:
+                  -
+                    self:
+                      id: 1610
+                      header: Reading
+                      subheader: '0 €'
+                      meta: 'for ever'
+                      text: "The documentation and this showcase\nIssues in the public tracker"
+                      link: 't3://page?uid=1009'
+                      link_label: 'Start reading'
+                      link_variant: secondary
+                  -
+                    self:
+                      id: 1611
+                      header: Building
+                      subheader: '29 €'
+                      meta: 'per site and month'
+                      highlighted: 1
+                      text: "Everything in Reading\nAn answer within one working day\nA review of your site package\nAn upgrade check per core release"
+                      link: 't3://page?uid=1010'
+                      link_label: 'Choose Building'
+                  -
+                    self:
+                      id: 1612
+                      header: Running
+                      subheader: '89 €'
+                      meta: 'per site and month'
+                      text: "Everything in Building\nAn answer within four hours\nA named contact\nA yearly accessibility audit"
+                      link: 't3://page?uid=1010'
+                      link_label: 'Choose Running'
+                      link_variant: secondary
+                  -
+                    self:
+                      id: 1613
+                      header: 'Both core versions'
+                      text: 'Whatever is supported by the branch you are on is supported by the plan.'
+                      icon: layer-group
+                  -
+                    self:
+                      id: 1614
+                      header: 'Light and dark'
+                      text: 'Every answer is checked in both appearances and all five palettes.'
+                      icon: palette
+                  -
+                    self:
+                      id: 1615
+                      header: 'Accessibility included'
+                      text: 'A reported contrast or keyboard problem is a defect, not a feature request.'
+                      icon: universal-access
+                  -
+                    self:
+                      id: 1616
+                      header: 'No lock-in'
+                      text: 'The theme stays free and the seed set ships with it.'
+                      icon: unlock
+                  -
+                    self:
+                      id: 1617
+                      header: 'Can I change plan later?'
+                      text: '<p>Yes, at the end of any month, in either direction. Nothing is migrated: the plan decides how fast a question is answered, not what the site is allowed to do.</p>'
+                  -
+                    self:
+                      id: 1618
+                      header: 'What counts as one site?'
+                      text: '<p>One TYPO3 installation with one production domain. A staging copy of it is the same site; a second domain with its own editors is a second one.</p>'
+                  -
+                    self:
+                      id: 1619
+                      header: 'Do I need a plan to use the theme?'
+                      text: '<p>No. The theme is <a href="t3://page?uid=1001">free software</a> and complete without one. A plan buys attention, not permission.</p>'
+            -
+              self:
+                id: 1116
+                title: Journal
+                slug: /examples/journal
+                backend_layout: content_sidebar
+                abstract: 'A weblog: the newest entry as a media teaser, the recent ones as a teaser list, the archive as a card wall, and an editorial column beside them.'
+              entities:
+                content:
+                  -
+                    self:
+                      id: 12601
+                      CType: header
+                      colPos: 2
+                      header: 'The theme journal'
+                      header_layout: 1
+                  -
+                    self:
+                      id: 12602
+                      CType: theme_media_teaser
+                      colPos: 2
+                      header: 'Composing a page from elements that already exist'
+                      header_layout: 2
+                      bodytext: 'The newest entry, given the stage of the page rather than the first row of the list below it. A weblog that leads with its latest piece is doing what the stage slot is for.'
+                      tx_theme_link: 't3://page?uid=1117'
+                      tx_theme_link_label: 'Read the entry'
+                      tx_theme_link_variant: ''
+                      tx_theme_link_icon: arrow-right
+                  -
+                    self:
+                      id: 12603
+                      CType: theme_teaser_list
+                      header: 'Recent entries'
+                      header_layout: 2
+                      tx_theme_list_items: '1630,1631,1632,1633,1634'
+                  -
+                    self:
+                      id: 12604
+                      CType: theme_card_group
+                      header: 'From the archive'
+                      header_layout: 2
+                      layout: 2
+                      tx_theme_columns: 2
+                      tx_theme_list_items: '1635,1636,1637,1638,1639'
+                  -
+                    self:
+                      id: 12605
+                      CType: theme_notice
+                      tx_theme_notice_kind: note
+                      header: 'What this page is made of'
+                      bodytext: '<p>A header and a media teaser in the stage, a teaser list and a card group in the wall layout in the main column, and a text, a link list and a row of social links in the sidebar. The backend layout is <em>Content page with sidebar</em>, so the page shell puts its sub navigation and its table of contents above the editor content of that column.</p>'
+                  -
+                    self:
+                      id: 12606
+                      CType: text
+                      colPos: 1
+                      header: 'About the journal'
+                      header_layout: 3
+                      bodytext: "<p>Notes from building sites against this theme. Roughly monthly,\nnever a release announcement.</p>"
+                  -
+                    self:
+                      id: 12607
+                      CType: theme_linklist
+                      colPos: 1
+                      header: Archive
+                      tx_theme_list_items: '1640,1641,1642,1643'
+                  -
+                    self:
+                      id: 12608
+                      CType: theme_sociallinks
+                      colPos: 1
+                      header: Elsewhere
+                      tx_theme_list_items: '1644,1645,1646'
+                listItem:
+                  -
+                    self:
+                      id: 1630
+                      header: 'What a backend layout actually decides'
+                      text: 'Two separate things, and the colPos numbers are all that connects them.'
+                      date: '2026-08-18'
+                      meta: '7 min read'
+                      link: 't3://page?uid=1171'
+                  -
+                    self:
+                      id: 1631
+                      header: 'Frames are an editor decision'
+                      text: 'Why the four bands are values of a field and not four content elements.'
+                      date: '2026-07-21'
+                      meta: '4 min read'
+                      link: 't3://page?uid=1051'
+                  -
+                    self:
+                      id: 1632
+                      header: 'One icon set, picked by name'
+                      text: 'What a vendored set costs, and what a webfont would have cost instead.'
+                      date: '2026-06-30'
+                      meta: '6 min read'
+                      link: 't3://page?uid=1070'
+                  -
+                    self:
+                      id: 1633
+                      header: 'The carousel that moves only when asked'
+                      text: 'Nothing on a page should start moving on its own while somebody is reading it.'
+                      date: '2026-05-26'
+                      link: 't3://page?uid=1150'
+                  -
+                    self:
+                      id: 1634
+                      header: 'Announced: office hours every second Monday'
+                      text: 'Bring a site package and a question about it.'
+                      date: '2026-09-07'
+                      meta: Online
+                  -
+                    self:
+                      id: 1635
+                      header: 'Reading the changelogs instead of remembering them'
+                      text: 'They ship with the core package, so there is never a reason to work from memory about what changed between two versions.'
+                      link: 't3://page?uid=1002'
+                      link_label: Read
+                      link_variant: link
+                  -
+                    self:
+                      id: 1636
+                      header: 'A table that stays readable on a phone'
+                      text: 'A scrolling region with a tab stop.'
+                      link: 't3://page?uid=1054'
+                      link_label: Read
+                      link_variant: link
+                  -
+                    self:
+                      id: 1637
+                      header: 'Why the sub navigation is a tree of details elements'
+                      text: 'A branch that opens and closes without a line of JavaScript, and a state the browser keeps by itself. The alternative was a script that has to run before the menu is usable, on a menu every page of the site renders.'
+                      link: 't3://page?uid=1006'
+                      link_label: Read
+                      link_variant: link
+                  -
+                    self:
+                      id: 1638
+                      header: 'Five palettes, one stylesheet'
+                      text: 'Each varies the accents and nothing else.'
+                      link: 't3://page?uid=1009'
+                      link_label: Read
+                      link_variant: link
+                  -
+                    self:
+                      id: 1639
+                      header: 'The page that proves the fallback'
+                      text: 'One page of the showcase declares no backend layout at all, and that is the whole point of it.'
+                      link: 't3://page?uid=1004'
+                      link_label: Read
+                      link_variant: link
+                  -
+                    self:
+                      id: 1640
+                      link: 't3://page?uid=1113'
+                      link_label: 'Everything since 2026'
+                      link_icon: calendar
+                  -
+                    self:
+                      id: 1641
+                      link: 't3://page?uid=1008'
+                      link_label: 'Entries about elements'
+                  -
+                    self:
+                      id: 1642
+                      link: 't3://page?uid=1171'
+                      link_label: 'Entries about layouts'
+                  -
+                    self:
+                      id: 1643
+                      link: 'https://typo3.org/'
+                  -
+                    self:
+                      id: 1644
+                      link: 'https://mastodon.example/@journal'
+                      link_label: Mastodon
+                      brand_icon: mastodon
+                  -
+                    self:
+                      id: 1645
+                      link: 'https://bluesky.example/journal'
+                      link_label: Bluesky
+                      brand_icon: bluesky
+                  -
+                    self:
+                      id: 1646
+                      link: 'mailto:journal@example.org'
+                      link_label: 'By email'
+              children:
+                -
+                  self:
+                    id: 1117
+                    title: 'Composing a page'
+                    slug: /examples/journal/composing-a-page
+                    backend_layout: article
+                    abstract: 'A long read on the article layout: running text held to the reading measure, a pull quote, a byline, and editorial notes in the aside.'
+                  entities:
+                    content:
+                      -
+                        self:
+                          id: 12701
+                          CType: header
+                          colPos: 2
+                          header: 'Composing a page from elements that already exist'
+                          header_layout: 1
+                      -
+                        self:
+                          id: 12702
+                          CType: text
+                          bodytext: "<p class=\"theme-lead\">Every element of this theme was built to be\nlooked at on its own, and every one of them is wrong on its own.\nA page is the unit that has to work.</p>\n<p>The showcase pages below <a href=\"t3://page?uid=1005\">Elements</a>\ndo what a showcase has to do first: one element at a time, every\nvalue of every field that changes how it looks, nothing else on\nthe page to argue with. That is how a defect in a single element\nis found. It is not how an editor works, and it is not how a\nreader meets the result.</p>\n<h3>What changes when there are six of them</h3>\n<p>Put a hero, a teaser list, a card group and a call to action on\none page and three things go wrong that none of them shows alone:\ntwo headings claim the same level, two elements set the same\nspacing twice, and the eye has no idea which of the four is the\none to act on. None of that is a bug in an element. All of it is\na decision somebody has to make once per page.</p>"
+                      -
+                        self:
+                          id: 12703
+                          CType: textpic
+                          header: 'The order is the argument'
+                          header_layout: 3
+                          imageorient: 17
+                          imagecols: 1
+                          bodytext: "<p>A page is read from the top, so the order of the elements is\nthe order of the claims. The hero says what this is, the text\nsays why it is worth the next minute, the collection shows that\nit exists, and the call to action is the only thing left to do.\nReversed, the same four elements are a page nobody finishes.</p>\n<p>The picture beside this paragraph is the core\n<em>Text &amp; Images</em> element with the image in the text at\nthe end of the line - the same element and the same field the\nmedia pages demonstrate one value at a time.</p>"
+                      -
+                        self:
+                          id: 12704
+                          CType: theme_testimonial
+                          tx_theme_quote_style: pull
+                          header: 'An editor, in a workshop'
+                          subheader: 'On being given twenty content elements'
+                          bodytext: 'I do not need more elements. I need to know which three of these belong on the page I am writing.'
+                      -
+                        self:
+                          id: 12705
+                          CType: text
+                          header: 'What the theme can decide, and what it cannot'
+                          header_layout: 3
+                          bodytext: "<p>The theme can make sure that two elements next to each other\nnever collide: one spacing scale, one heading rhythm, one\nmeasure for running text whatever column it lands in. It does\nthat, and the pages of this section are where it is checked.</p>\n<p>What it cannot decide is which elements a page needs. That is\neditorial, it changes per page, and a theme that decided it\nwould be a template - which is the thing this theme exists not\nto be.</p>"
+                      -
+                        self:
+                          id: 12706
+                          CType: theme_author
+                          header: 'The theme maintainers'
+                          subheader: 'Who writes this journal'
+                          bodytext: 'The people who build sites against this theme and write down what went wrong while they did.'
+                          tx_theme_list_items: '1650,1651'
+                      -
+                        self:
+                          id: 12707
+                          CType: theme_notice
+                          tx_theme_notice_kind: note
+                          header: 'What this page is made of'
+                          bodytext: '<p>A header in the stage, a text with a lead, a <em>Text &amp; Images</em> element with the image in the text, a testimonial in the pull quote style, a second text and an author element - with a notice and a link list in the aside. The backend layout is <em>Article</em>.</p>'
+                      -
+                        self:
+                          id: 12708
+                          CType: theme_notice
+                          colPos: 1
+                          tx_theme_notice_kind: info
+                          header: 'About this entry'
+                          bodytext: '<p>Written after a workshop in which four editors were given every element of this theme and an empty page.</p>'
+                      -
+                        self:
+                          id: 12709
+                          CType: theme_linklist
+                          colPos: 1
+                          header: 'Read next'
+                          tx_theme_list_items: '1652,1653,1654'
+                    listItem:
+                      -
+                        self:
+                          id: 1650
+                          link: 't3://page?uid=1116'
+                          link_label: 'Every entry'
+                          link_icon: newspaper
+                      -
+                        self:
+                          id: 1651
+                          link: 'mailto:journal@example.org'
+                          link_label: 'Write to the editors'
+                      -
+                        self:
+                          id: 1652
+                          link: 't3://page?uid=1118'
+                          link_label: 'A product page in bands'
+                      -
+                        self:
+                          id: 1653
+                          link: 't3://page?uid=1115'
+                          link_label: 'A pricing page'
+                      -
+                        self:
+                          id: 1654
+                          link: 't3://page?uid=1051'
+                          link_label: 'The frames an element can take'
+            -
+              self:
+                id: 1118
+                title: Product
+                slug: /examples/product
+                backend_layout: bands
+                abstract: 'A product page in three full-width bands: a hero, alternating tiles, the figures, and a closing call to action.'
+              entities:
+                content:
+                  -
+                    self:
+                      id: 12801
+                      CType: theme_hero
+                      colPos: 0
+                      tx_theme_hero_layout: bordered
+                      tx_theme_eyebrow: 'Frontend theme'
+                      header: 'A theme you build against, not around'
+                      header_layout: 1
+                      bodytext: 'Every content element, every component and both appearances, neutral enough that the extension you are developing is what people look at.'
+                      tx_theme_link: 't3://page?uid=1005'
+                      tx_theme_link_label: 'See every element'
+                      tx_theme_link_icon: arrow-right
+                  -
+                    self:
+                      id: 12802
+                      CType: theme_split_tiles
+                      colPos: 3
+                      header: 'Three things it does for you'
+                      header_layout: 2
+                      layout: 0
+                      tx_theme_list_items: '1660,1661,1662'
+                  -
+                    self:
+                      id: 12803
+                      CType: theme_stats
+                      colPos: 4
+                      header: 'In figures'
+                      header_layout: 2
+                      tx_theme_list_items: '1663,1664,1665,1666'
+                  -
+                    self:
+                      id: 12804
+                      CType: theme_cta
+                      colPos: 4
+                      tx_theme_cta_tone: inverse
+                      tx_theme_cta_width: band
+                      tx_theme_icon: rocket
+                      header: 'Start with a development instance'
+                      header_layout: 2
+                      bodytext: "<p>One command builds it and seeds this very page tree, on TYPO3\nv12 and on v13 alike.</p>\n"
+                      tx_theme_link: 't3://page?uid=1073'
+                      tx_theme_link_label: 'The four steps'
+                      tx_theme_secondary_link: 't3://page?uid=1009'
+                      tx_theme_secondary_link_label: 'Open the styleguide'
+                      tx_theme_secondary_link_variant: ghost
+                  -
+                    self:
+                      id: 12805
+                      CType: theme_notice
+                      colPos: 4
+                      tx_theme_notice_kind: note
+                      header: 'What this page is made of'
+                      bodytext: '<p>A hero with a cropped image in the first band, split tiles in the second, and the figures, a call to action and this notice in the third. The backend layout is <em>Full-width bands</em>, which has no stage - the hero is the first band instead.</p>'
+                listItem:
+                  -
+                    self:
+                      id: 1660
+                      header: 'It stays out of the way'
+                      text: 'Neutral colours, one radius and one spacing scale, so the extension being demonstrated is what is looked at.'
+                      link: 't3://page?uid=1051'
+                      link_label: 'The frames'
+                  -
+                    self:
+                      id: 1661
+                      header: 'It is finished in both appearances'
+                      text: 'Light and dark are one declaration per token, and every colour is checked against the surface it sits on.'
+                      tone: accent
+                      link: 't3://page?uid=1009'
+                      link_label: 'Open the styleguide'
+                      link_variant: secondary
+                  -
+                    self:
+                      id: 1662
+                      header: 'It renders without a script'
+                      text: 'Every component reads and works with JavaScript switched off, and the few that offer more with it say what they do without it.'
+                      tone: inverse
+                      link: 't3://page?uid=1008'
+                      link_label: 'The theme elements'
+                  -
+                    self:
+                      id: 1663
+                      header: '2'
+                      subheader: 'Core versions'
+                      text: 'TYPO3 v12.4 and v13.4, from one branch.'
+                      icon: layer-group
+                  -
+                    self:
+                      id: 1664
+                      header: '12'
+                      subheader: 'Backend layouts'
+                      text: 'One template each, chosen per page.'
+                      icon: table-cells-large
+                  -
+                    self:
+                      id: 1665
+                      header: '5'
+                      subheader: Palettes
+                      text: 'Each varies the accents only.'
+                      icon: palette
+                  -
+                    self:
+                      id: 1666
+                      header: '0'
+                      subheader: 'Build steps for an integrator'
+                      text: 'The stylesheet and the icons are committed.'
+                      icon: circle-check
+            -
+              self:
+                id: 1119
+                title: Campaign
+                slug: /examples/campaign
+                backend_layout: cover
+                abstract: 'A single-purpose landing page on the cover layout: one hero, one call to action, centred in the viewport.'
+              entities:
+                content:
+                  -
+                    self:
+                      id: 12901
+                      CType: theme_hero_text_only
+                      tx_theme_hero_layout: centred
+                      tx_theme_eyebrow: 'Workshop, 12 November'
+                      header: 'Theme development on TYPO3 v12 and v13'
+                      header_layout: 1
+                      bodytext: 'A day on building a site package against a theme instead of inside one, for people who have shipped at least one TYPO3 site.'
+                      tx_theme_link: 't3://page?uid=1010'
+                      tx_theme_link_label: 'Take a seat'
+                      tx_theme_link_icon: arrow-right
+                  -
+                    self:
+                      id: 12902
+                      CType: theme_cta
+                      tx_theme_cta_tone: accent
+                      tx_theme_cta_width: boxed
+                      tx_theme_icon: calendar
+                      header: 'Twelve seats, one day, Berlin'
+                      header_layout: 2
+                      bodytext: "<p>Lunch and the recording are included. Bring a laptop with\npodman or docker on it.</p>\n"
+                      tx_theme_link: 't3://page?uid=1010'
+                      tx_theme_link_label: 'Ask a question first'
+                      tx_theme_link_variant: secondary
+                      tx_theme_secondary_link: 't3://page?uid=1113'
+                      tx_theme_secondary_link_label: 'Back to the examples'
+                      tx_theme_secondary_link_variant: link
+                  -
+                    self:
+                      id: 12903
+                      CType: theme_notice
+                      tx_theme_notice_kind: note
+                      header: 'What this page is made of'
+                      bodytext: '<p>A hero without media and a call to action in a box - and this notice, which a real campaign page would not carry. The backend layout is <em>Cover page</em>: one column, centred between the header and the footer, with no stage and no breadcrumb.</p>'
+            -
+              self:
+                id: 1131
+                title: 'Carousel landing'
+                slug: /examples/carousel-landing
+                backend_layout: bands
+                abstract: 'A campaign page led by a carousel across the full width of the viewport, with a feature grid and a call to action below it.'
+              entities:
+                content:
+                  -
+                    self:
+                      id: 14101
+                      CType: theme_carousel
+                      colPos: 0
+                      header: 'Four reasons, one at a time'
+                      header_layout: 1
+                      tx_theme_list_items: '1670,1671,1672,1673'
+                  -
+                    self:
+                      id: 14102
+                      CType: theme_features
+                      colPos: 3
+                      header: 'Or all of them at once'
+                      header_layout: 2
+                      bodytext: "<p>The same four claims as the slides above, side by side instead\nof one after the other - which is the choice this page is really\nabout.</p>\n"
+                      layout: 0
+                      tx_theme_columns: 4
+                      tx_theme_list_items: '1674,1675,1676,1677'
+                  -
+                    self:
+                      id: 14103
+                      CType: theme_cta
+                      colPos: 4
+                      tx_theme_cta_tone: ''
+                      tx_theme_cta_width: band
+                      tx_theme_icon: compass
+                      header: 'Find your way around the showcase'
+                      header_layout: 2
+                      bodytext: "<p>Every element has a page of its own, every backend layout has\none, and this section has the pages they add up to.</p>\n"
+                      tx_theme_link: 't3://page?uid=1005'
+                      tx_theme_link_label: 'The elements'
+                      tx_theme_secondary_link: 't3://page?uid=1171'
+                      tx_theme_secondary_link_label: 'The layouts'
+                      tx_theme_secondary_link_variant: secondary
+                  -
+                    self:
+                      id: 14104
+                      CType: theme_notice
+                      colPos: 4
+                      tx_theme_notice_kind: note
+                      header: 'What this page is made of'
+                      bodytext: '<p>A carousel as the first band, a four column feature grid as the second, and a call to action with this notice as the third. The backend layout is <em>Full-width bands</em>: the carousel track reaches both edges of the viewport here, which it cannot do inside the content container.</p>'
+                listItem:
+                  -
+                    self:
+                      id: 1670
+                      header: 'Neutral on purpose'
+                      text: 'The theme is the ground your extension is demonstrated against, so it is built not to be the thing people look at.'
+                      caption_position: overlay
+                      link: 't3://page?uid=1009'
+                      link_label: 'Open the styleguide'
+                  -
+                    self:
+                      id: 1671
+                      header: 'Two core versions, one branch'
+                      text: 'Where v12 and v13 differ, the difference is a second class and never a condition in a shared one.'
+                  -
+                    self:
+                      id: 1672
+                      header: 'Editable, not hard coded'
+                      text: 'Every band, every spacing and every heading style on these pages is a field an editor can set.'
+                      caption_position: above
+                      link: 't3://page?uid=1051'
+                      link_label: 'The frames'
+                      link_variant: secondary
+                  -
+                    self:
+                      id: 1673
+                      header: 'Readable in both appearances'
+                      text: 'Switch the appearance in the header and read this slide again.'
+                  -
+                    self:
+                      id: 1674
+                      header: Neutral
+                      text: 'Nothing on the page competes with what you are showing.'
+                      icon: crop-simple
+                  -
+                    self:
+                      id: 1675
+                      header: Versioned
+                      text: 'One branch per core version tuple, and the differences are split.'
+                      icon: layer-group
+                  -
+                    self:
+                      id: 1676
+                      header: Editable
+                      text: 'The appearance of an element is a field, not a template.'
+                      icon: pen-to-square
+                  -
+                    self:
+                      id: 1677
+                      header: Readable
+                      text: 'Light, dark and five palettes, each checked against its surfaces.'
+                      icon: palette
         -
           self:
             id: 1009

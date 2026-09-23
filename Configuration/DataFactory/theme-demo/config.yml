@@ -343,3 +343,48 @@ references:
   - {file: placeholder, table: tx_theme_list_item, uid: 471, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 472, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
   - {file: placeholder, table: tx_theme_list_item, uid: 474, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+
+  # The "Examples" section, pages 113 to 119 and 131 - whole pages composed
+  # from elements that already ship. Every reference below hangs on a record
+  # this section declares itself; nothing above it moved, because the section
+  # was appended to the tree rather than inserted into an existing page.
+  #
+  # Page 114, "Album": the hero, the six pictures of the gallery and two of
+  # the three cards. The third card has no picture on purpose.
+  - {file: placeholder, table: tt_content, uid: 11401, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tt_content, uid: 11403, field: image, values: {alternative: 'A placeholder graphic in landscape format', description: 'The site as it was'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 11403, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder, table: tt_content, uid: 11403, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 11403, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder, table: tt_content, uid: 11403, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 11403, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'The last of six, in three columns'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 600, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 601, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+
+  # Page 116, "Journal": the featured entry in the stage, and the pictures of
+  # the first three rows of the teaser list. The fourth row has none and the
+  # fifth is an announcement, which are the two shapes that element falls
+  # back to.
+  - {file: placeholder, table: tt_content, uid: 11602, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder-portrait, table: tx_theme_list_item, uid: 630, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder-portrait, table: tx_theme_list_item, uid: 631, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+  - {file: placeholder-portrait, table: tx_theme_list_item, uid: 632, field: image, values: {alternative: 'A placeholder graphic in portrait format'}}
+
+  # Page 117, the journal entry: the picture the running text flows around,
+  # and the portrait of the byline.
+  - {file: placeholder-portrait, table: tt_content, uid: 11703, field: image, values: {alternative: 'A placeholder graphic in portrait format', description: 'Placed in the text, at the end of the line'}}
+  - {file: placeholder-portrait, table: tt_content, uid: 11706, field: image, values: {alternative: 'A placeholder portrait'}}
+
+  # Page 118, "Product": the hero cut off at two edges, and the pictures of
+  # the three tiles.
+  - {file: placeholder, table: tt_content, uid: 11801, field: image, values: {alternative: 'A placeholder graphic in landscape format, cut off at two edges'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 660, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 661, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 662, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+
+  # Page 131, "Carousel landing": three of the four slides. The fourth
+  # carries no picture, so the band shows a caption-only slide at full width
+  # as well.
+  - {file: placeholder, table: tx_theme_list_item, uid: 670, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 671, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
+  - {file: placeholder, table: tx_theme_list_item, uid: 672, field: image, values: {alternative: 'A placeholder graphic in landscape format'}}
