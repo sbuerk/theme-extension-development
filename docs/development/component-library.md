@@ -1862,18 +1862,35 @@ one each component uses:
   control that does nothing on a page whose module never loaded.
 - The lightbox, the tooltip and the dropdown are gated by nothing at all.
   Each degrades to behaviour the platform already provides — a link to the
-  file, a bubble shown on hover and focus, a popover the browser opens — so
+  file, a bubble shown on hover and focus, a `details` the browser opens — so
   there is nothing to hide.
 
-| Component | With the script                                                                                                                          | Without it                                                                                         | Gate in the stylesheet                                                |
-|-----------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
-| Tabs      | WAI-ARIA tabs with automatic activation: arrow keys (mirrored right-to-left), Home, End, a roving tab stop; the panels become tab panels | No tab list; every panel shown, stacked, in its own frame under its heading, with no tab semantics | `.theme-tabs[data-theme-tabs-bound]`, set by `theme.js`               |
-| Dialog    | `data-theme-dialog-open` calls `showModal()`; a click on the backdrop closes it; focus returns to the opener                             | The opener is hidden and the dialog stays closed                                                   | `:root:not([data-js]) [data-theme-dialog-open]`                       |
-| Lightbox  | The gallery's zoom link opens the dialog on the image it names; the arrows and the arrow keys move within it, wrapping                   | The zoom link leads to the file, as it always did; the dialog is closed and renders nothing        | none — the link is the fallback, so nothing is hidden                 |
-| Embed     | The play button builds the `iframe` from `data-theme-embed-src` and replaces the placeholder with it                                     | No play button; the poster, the note and the link to the source                                    | `.theme-embed[data-theme-embed-bound] .theme-embed__button`           |
-| Carousel  | The previous and next buttons scroll the track by one slide, and `aria-current` marks the indicator of the slide in view                 | The track still scrolls and snaps, and the indicators are still links to the slides; no buttons    | `.theme-carousel[data-theme-carousel-bound] .theme-carousel__control` |
-| Tooltip   | Escape sets `data-theme-tooltip-dismissed` until pointer and focus have both left                                                        | Hover and focus still show it; Escape does not hide it                                             | none — the CSS behaviour is the fallback                              |
-| Dropdown  | `aria-expanded` on the trigger is mirrored from the panel's own `toggle` event                                                           | The panel still opens, closes and light-dismisses; `aria-expanded` stays stale                     | none — the Popover API is the behaviour, the script reports it        |
+| Component | With the script                                                                                                                          | Without it                                                                                                                                                               | Gate in the stylesheet                                                |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| Tabs      | WAI-ARIA tabs with automatic activation: arrow keys (mirrored right-to-left), Home, End, a roving tab stop; the panels become tab panels | No tab list; every panel shown, stacked, in its own frame under its heading, with no tab semantics                                                                       | `.theme-tabs[data-theme-tabs-bound]`, set by `theme.js`               |
+| Dialog    | `data-theme-dialog-open` calls `showModal()`; a click on the backdrop closes it; focus returns to the opener                             | The opener is hidden and the dialog stays closed                                                                                                                         | `:root:not([data-js]) [data-theme-dialog-open]`                       |
+| Lightbox  | The gallery's zoom link opens the dialog on the image it names; the arrows and the arrow keys move within it, wrapping                   | The zoom link leads to the file, as it always did; the dialog is closed and renders nothing                                                                              | none — the link is the fallback, so nothing is hidden                 |
+| Embed     | The play button builds the `iframe` from `data-theme-embed-src` and replaces the placeholder with it                                     | No play button; the poster, the note and the link to the source                                                                                                          | `.theme-embed[data-theme-embed-bound] .theme-embed__button`           |
+| Carousel  | The previous and next buttons scroll the track by one slide, and `aria-current` marks the indicator of the slide in view                 | The track still scrolls and snaps, and the indicators are still links to the slides; no buttons                                                                          | `.theme-carousel[data-theme-carousel-bound] .theme-carousel__control` |
+| Tooltip   | Escape sets `data-theme-tooltip-dismissed` until pointer and focus have both left                                                        | Hover and focus still show it; Escape does not hide it                                                                                                                   | none — the CSS behaviour is the fallback                              |
+| Dropdown  | Escape, a click outside and focus leaving the control close the panel                                                                    | The panel still opens and closes from its own summary; it stays open until the summary is used, and below `bp.$md` it lands far below it — see the note under this table | none — `details` is the behaviour, the script adds the dismissal      |
+
+**Dropdown, and the one thing the row above understates.** The panel is
+anchored on the site header, so it drops under the header row whatever that
+row's height is. Below `bp.$md` *without* a script the main navigation stays in
+the flow, so the header is as tall as the whole menu with its second levels
+open — and the panel lands under all of it. Measured on `/typography` at 375
+pixels in the pinned browser: with the script the header is 133 px tall, the
+trigger sits at y 44 and the panel at y 142, 54 px under it; without the script
+the header is 2180 px tall, the trigger is 1067 px down the document and the
+panel 2189 — roughly 1077 px below the control that opened it, and the browser
+scrolls when the summary is activated. The control still works, it is still the
+next thing in the tab order, and it covers nothing; it is simply a long way
+away. Anchoring on the component below the breakpoint was measured and
+rejected, because in the *scripted* case it would put the panel 35 px inside
+the header band — the trade is written out in `components/_dropdown.scss`, and
+`Tests/Acceptance/frontend.spec.ts` renders the page with JavaScript disabled
+and holds what is left of the contract.
 
 **Tabs.** The markup keeps three rules that the stylesheet and the script both
 depend on: the first tab is the selected one and every other tab carries
@@ -2008,19 +2025,21 @@ themselves. Two unit tests hold that:
 `ComponentLibraryTest::textIsAlignedToTheStartOrTheEndOfTheLine` and
 `::noBoxIsPlacedByAPhysicalEdge`, both read off the compiled stylesheet.
 
-**One box is not, and it is known.** `.theme-dropdown__panel` is a popover in
-the top layer, so it is positioned against the viewport rather than against its
-trigger — without anchor positioning, which is above the
-[browser floor](../../DESIGN.md#the-browser-floor), `position: absolute` inside
-the component is ignored. It is pinned with
-`inset: auto var(--theme-dropdown-panel-gutter) auto auto`, and that second
-value is the **right** edge: in a right-to-left document the trigger moves to
-the left of the header row and the panel does not follow it. Neither test above
-catches it, because both match property names and this one hides in the value
-of an `inset` shorthand — see the docblock of `::noBoxIsPlacedByAPhysicalEdge`
-for why that is not gated. `.theme-toggletip__bubble` uses the same shorthand
-and is fine: `left: 50%` with `translate: -50% 0` centres a box, which is the
-same box in either direction.
+**One box was not, and it is now gated.** `.theme-dropdown__panel` was a
+popover in the top layer, pinned with
+`inset: auto var(--theme-dropdown-panel-gutter) auto auto` — and that second
+value is the **right** edge, so in a right-to-left document the trigger moved to
+the left of the header row and the panel stayed on the right. Neither test above
+caught it: both match property names, and this one hid in the *value* of an
+`inset` shorthand. The panel is not a popover any more and is placed with
+`inset-inline-end` against its own component
+([the header dropdown](../architecture/navigation.md#the-header-dropdown-is-a-details-and-was-a-popover)),
+and a third test, `ComponentLibraryTest::noInsetShorthandPlacesABoxByAPhysicalEdge`,
+now splits every `inset` shorthand into its values and fails on a second and a
+fourth that differ. `.theme-toggletip__bubble` is the one named exception and
+says why it is one: `left: 50%` with `translate: -50% 0` centres a box, which
+is the same box in either direction, and the logical spelling would be the
+broken one because `translate` does not turn around with the text.
 
 What does **not** turn around by itself is a glyph. An icon that points
 somewhere means something by where it points, and in a right-to-left text that

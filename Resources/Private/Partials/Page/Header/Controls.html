@@ -21,7 +21,10 @@
     dropdown is left out below two languages.
 
     The dropdown itself needs no script and is never hidden behind "data-js":
-    the browser opens and closes the popover. See "Partials/Page/Dropdown.html".
+    it is a "details", and the browser opens and closes it. What
+    "Resources/Public/JavaScript/theme.js" adds is the dismissal only -
+    Escape, a click outside, and focus leaving the control. See
+    "Partials/Page/Dropdown.html".
 
     It sits before the display settings: the language is a property of the
     page, the settings are a property of the reader.

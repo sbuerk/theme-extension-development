@@ -74,9 +74,10 @@
     --theme-site-header-gap: var(--theme-space-4, 1.25rem);
     --theme-site-header-padding-block: var(--theme-space-3, 0.9375rem);
 
-    // The anchor of the drop-down menu below "bp.$md". "--sticky" replaces it
-    // with "sticky", which anchors an absolutely positioned descendant just
-    // the same.
+    // The anchor of the drop-down menu below "bp.$md", and of the dropdown
+    // panel - see "The dropdown panel drops under the row" at the end of this
+    // file. "--sticky" replaces it with "sticky", which anchors an absolutely
+    // positioned descendant just the same.
     position: relative;
 
     // Bottom hairline only: the header is a band, not a card, so it does not
@@ -366,5 +367,68 @@
         justify-content: flex-end;
         min-height: 0;
         padding-block: var(--theme-space-1, 0.3125rem);
+    }
+}
+
+// --- The dropdown panel drops under the row, not under its own trigger -------
+//
+// "components/_dropdown.scss" places its panel against the component, which is
+// right everywhere a dropdown can stand on its own - the styleguide specimen
+// sits in the middle of a page and opens under itself.
+//
+// In this row it is not enough. The controls slot is at the end of a row whose
+// height is its tallest child, and from "bp.$md" up the menu may take two rows
+// inside it (see "One row" above) - so a panel that starts just under the
+// 44 pixel trigger starts *inside* the header and covers the second row of the
+// menu. Measured at 1280 pixels with the seven sections of the showcase: the
+// trigger ends at 94, the second row of entries runs to 119.
+//
+// So in the header the panel is anchored on the header itself, which is
+// already positioned for the drop-down menu, and pinned under all of it. That
+// is what the component's comment always claimed and what the popover it used
+// to be could never do.
+//
+// Both offsets are exact and need no constant:
+//
+//   block    "100%" of the header's padding box, which is its own height,
+//            whatever the title and the menu did to it.
+//   inline   the end of the content container - the same edge the settings
+//            panel reaches with "inset-inline-end: 0", because the cog is the
+//            last thing in the row. "@include mixins.content-container" is
+//            "max-width" plus "padding-inline", so the distance from the end
+//            of the header to the end of the container is half of whatever
+//            the container did not use, plus that padding. "max()" is the
+//            case where the row is narrower than the maximum and the container
+//            spans it: nothing is left over, and only the padding remains.
+//            A percentage here resolves against the header, not the viewport,
+//            so this stays right with a classic scrollbar on the page - which
+//            is the trap "layout/_page.scss" records for "100vw".
+//
+// The container's end is not always the last control's end. At 375 pixels
+// this row has no slack left: the brand, the toggle and the cog do not fit
+// between the gutters, and the cog spills past the container's content edge -
+// measured at 366.3 against a content edge at 355, inside the viewport, so
+// nothing scrolls sideways and no overflow check has ever seen it. The panel
+// is pinned to the container edge rather than to the cog, so at that width it
+// ends a few pixels before the cog does. That is the row being squeezed, not
+// the panel being misplaced, and it is recorded here because the CSS is where
+// someone will ask.
+//
+// The "two-tier" variant puts the controls in the meta row above the title.
+// The panel still drops under the whole header there, which is further from
+// its trigger than in the other three arrangements and still over nothing.
+//
+// Below "bp.$md" without a script the header is as tall as the whole menu,
+// and this anchor puts the panel under all of it - see the header of
+// "components/_dropdown.scss" for the measurements and for why anchoring on
+// the component there was rejected rather than forgotten.
+.theme-site-header {
+    .theme-dropdown {
+        position: static;
+    }
+
+    .theme-dropdown__panel {
+        inset-block-start: calc(100% + var(--theme-dropdown-panel-offset));
+        inset-inline-end: calc(max(0px, (100% - var(--theme-content-max-width, 75rem)) / 2) + var(--theme-space-4, 1.25rem));
     }
 }
