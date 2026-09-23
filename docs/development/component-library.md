@@ -32,6 +32,7 @@ against, and the rename was cheap while only one template depended on it.
 | Badge                   | `.theme-badge`            | `components/_badge.scss`            |
 | Breadcrumb              | `.theme-breadcrumb`       | `components/_breadcrumb.scss`       |
 | Button                  | `.theme-button`           | `components/_button.scss`           |
+| Byline                  | `.theme-byline`           | `components/_byline.scss`           |
 | Card                    | `.theme-card`             | `components/_card.scss`             |
 | Card scroller           | `.theme-card-scroller`    | `components/_card.scss`             |
 | Card wall               | `.theme-card-grid--wall`  | `components/_card.scss`             |
@@ -52,6 +53,8 @@ against, and the rename was cheap while only one template depended on it.
 | Feature introduction    | `.theme-feature-intro`    | `components/_feature.scss`          |
 | Figure                  | `.theme-figure`           | `components/_figure.scss`           |
 | File list               | `.theme-file-list`        | `components/_file-list.scss`        |
+| Footnote reference      | `.theme-footnote-ref`     | `components/_footnotes.scss`        |
+| Footnotes               | `.theme-footnotes`        | `components/_footnotes.scss`        |
 | Gallery                 | `.theme-gallery`          | `components/_gallery.scss`          |
 | Hero                    | `.theme-hero`             | `components/_hero.scss`             |
 | Icon                    | `.theme-icon`             | `components/_icon.scss`             |
@@ -442,6 +445,25 @@ component's own:
 </div>
 ```
 
+Byline — the credit line of a long text: who wrote it, when, and whatever
+else fits in one short phrase. A `p` rather than a list, because a reader
+hears one line and not three items; the date is a `time` with a machine
+readable `datetime`, the rest are spans. Items are separated by the
+`border-inline-start` of the item that follows, not by a character in
+generated content — see [Icons](icons.md#the-rule). The row wraps, and a rule
+at the start of a wrapped line is accepted rather than worked around: the
+alternative puts a meaningless separator element into every byline. It is not
+`.theme-author`, which is a person with a portrait and a bio, rendered by the
+`theme_author` element:
+
+```html
+<p class="theme-byline">
+    <span class="theme-byline__item">By <span class="theme-byline__author">…</span></span>
+    <time class="theme-byline__item" datetime="2026-09-20">20 September 2026</time>
+    <span class="theme-byline__item">…</span>
+</p>
+```
+
 Avatar — a portrait, or the initials where there is none. `--square` takes
 the system radius instead of the circle, `--small` and `--large` are 30 and
 60 pixels against the default 40, all steps of the spacing scale. The
@@ -813,6 +835,31 @@ hairline, like `.theme-list--divided`:
         </div>
     </li>
 </ul>
+```
+
+Footnotes, and the reference that points at one — two blocks of one file,
+because neither is any use without the other and the reference never sits
+inside the list. The numbers are in the markup rather than in a counter or an
+`ol` marker: the number is what the reference and the note have in common, and
+a reader copying the sentence out copies it with them. `.theme-footnotes__item`
+hangs its wrapped lines two characters past the number. The back link's only
+content is the vendored `arrow-turn-up`, masked by the stylesheet for the
+reason the markers of a decorated link are — no template of the theme writes
+this markup, it comes out of a rich text or an `html` element — so the link is
+named by `aria-label`, and the forced-colours rule keeps it `currentColor`
+rather than `CanvasText`:
+
+```html
+<p>… a sentence<sup class="theme-footnote-ref" id="fnref1"><a href="#fn1">1</a></sup>.</p>
+
+<aside class="theme-footnotes" aria-labelledby="…">
+    <h2 class="theme-footnotes__heading" id="…">Notes</h2>
+    <ol class="theme-footnotes__list">
+        <li class="theme-footnotes__item" id="fn1">
+            1. The note. <a class="theme-footnotes__backlink" href="#fnref1" aria-label="…"></a>
+        </li>
+    </ol>
+</aside>
 ```
 
 Hero. Modifiers: default (text only), `--media` (adds `theme-hero__media`),

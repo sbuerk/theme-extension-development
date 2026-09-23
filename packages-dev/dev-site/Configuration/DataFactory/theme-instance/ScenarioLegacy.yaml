@@ -292,7 +292,7 @@ entities:
                 id: 1056
                 title: Article
                 slug: /typography/article
-                backend_layout: content
+                backend_layout: content_sidebar
               entities:
                 content:
                   -
@@ -301,21 +301,29 @@ entities:
                       CType: header
                       header: 'How a content element reaches the page'
                       header_layout: 1
+                      sectionIndex: 0
                   -
                     self:
                       id: 6602
-                      CType: text
-                      bodytext: "<p class=\"theme-lead\">An editor fills in a form and saves it. A\nmoment later a visitor reads a paragraph. Between the two lie a\ndatabase row, a few lines of configuration and a template - and\neach of them decides something about what the visitor sees.</p>\n<p>This article follows one element along that way. It is also a\nspecimen: a long text, set with the components a site package gets\nfrom the theme, so the rhythm of headings, paragraphs, lists,\nfigures, tables and code can be read as a whole rather than one\nspecimen at a time.</p>"
+                      CType: html
+                      header: 'Byline (not visible in the frontend)'
+                      sectionIndex: 0
+                      bodytext: "<p class=\"theme-byline\">\n    <span class=\"theme-byline__item\">By <span class=\"theme-byline__author\">The theme team</span></span>\n    <time class=\"theme-byline__item\" datetime=\"2026-09-20\">20 September 2026</time>\n    <span class=\"theme-byline__item\">Six minutes</span>\n</p>"
                   -
                     self:
                       id: 6603
                       CType: text
-                      header: 'The record'
-                      header_layout: 2
-                      bodytext: "<p>Everything starts as a row of the table <code>tt_content</code>.\nIts type, the CType, decides which fields the form shows and which\nrendering the frontend picks. The fields an editor fills in are\nplain columns of that row: a header, a text, a layout, a frame.</p>\n<h3>What the form does not show</h3>\n<p>Some columns are there without a field in the form. The page the\nelement belongs to, its position in the column and its language are\nwritten by the backend itself. They matter just as much: a content\nelement is rendered because a page asks for the content of one of\nits columns, not because the element exists.</p>"
+                      bodytext: "<p class=\"theme-lead\">An editor fills in a form and saves it. A\nmoment later a visitor reads a paragraph. Between the two lie a\ndatabase row, a few lines of configuration and a template - and\neach of them decides something about what the visitor sees.</p>\n<p>This article follows one element along that way. It is also a\nspecimen: a long text, set with the components a site package gets\nfrom the theme, so the rhythm of headings, paragraphs, lists,\nfigures, tables and code can be read as a whole rather than one\nspecimen at a time.</p>"
                   -
                     self:
                       id: 6604
+                      CType: text
+                      header: 'The record'
+                      header_layout: 2
+                      bodytext: "<p>Everything starts as a row of the table <code>tt_content</code>.\nIts type, the CType, decides which fields the form shows and which\nrendering the frontend picks. The fields an editor fills in are\nplain columns of that row: a header, a text, a layout, a frame.</p>\n<h3>What the form does not show</h3>\n<p>Some columns are there without a field in the form. The page the\nelement belongs to, its position in the column and its language are\nwritten by the backend itself. They matter just as much: a content\nelement is rendered because a page asks for the content of one of\nits columns<sup class=\"theme-footnote-ref\" id=\"fnref1\"><a href=\"#fn1\">1</a></sup>,\nnot because the element exists.</p>"
+                  -
+                    self:
+                      id: 6605
                       CType: textpic
                       header: 'The frame'
                       header_layout: 2
@@ -324,7 +332,7 @@ entities:
                       bodytext: "<p>Every element is rendered through one frame, the layout\n<code>ContentElement</code> of the theme. It writes the wrapper\nwith the anchor of the element, the CType as a modifier and as an\nattribute, and the modifiers of the appearance fields: the band of\nthe frame, the space before and after.</p>\n<p>The frame is also what the outlines of the development mode\ndraw. Switch them on in the display settings, and every element\nof this article shows its boundary and its CType - the image\nbeside this text belongs to the same element as the text itself.</p>\n<p>The image is placed in the text, at the end of the line. The\ngallery processor of the core computes its width from the column\nand the number of columns, and the theme floats it, so this text\nflows around it and continues under it once it is past.</p>"
                   -
                     self:
-                      id: 6605
+                      id: 6606
                       CType: bullets
                       header: 'What the frame reads'
                       header_layout: 2
@@ -333,14 +341,14 @@ entities:
                       bodytext: "The frame: default, no frame, or one of four bands\nThe space before and after the element\nThe alignment and the look of the header\nThe CType, for the modifier and the outline"
                   -
                     self:
-                      id: 6606
+                      id: 6607
                       CType: text
                       header: 'The template'
                       header_layout: 2
-                      bodytext: "<p>Inside the frame, the template of the CType renders what is\nparticular to it. A text element renders its header and its rich\ntext; a table element renders a table from the lines of its text\nfield, split by a data processor before the template sees them.</p>\n<blockquote><p>A template receives data it can render and never\ncomputes what a processor could hand it.</p></blockquote>\n<p>That division is the reason a table element and a table of the\nrich text look the same: both end in the same component, one from\na processor, the other from the source view of the editor.</p>"
+                      bodytext: "<p>Inside the frame, the template of the CType renders what is\nparticular to it. A text element renders its header and its rich\ntext; a table element renders a table from the lines of its text\nfield, split by a data processor before the template sees them.</p>\n<blockquote><p>A template receives data it can render and never\ncomputes what a processor could hand it.</p></blockquote>\n<p>That division is the reason a table element and a table of the\nrich text look the same: both end in the same component, one from\na processor, the other from the source view of the\neditor<sup class=\"theme-footnote-ref\" id=\"fnref2\"><a href=\"#fn2\">2</a></sup>.</p>"
                   -
                     self:
-                      id: 6607
+                      id: 6608
                       CType: table
                       header: 'The fields of a table element'
                       header_layout: 3
@@ -349,20 +357,29 @@ entities:
                       table_delimiter: 124
                       table_enclosure: 0
                       table_header_position: 1
-                      bodytext: "Field|Holds|Read by\nbodytext|The rows, one per line|TableProcessor\ntable_delimiter|The character code of the column separator|TableProcessor\ntable_header_position|Header row, header column, or none|TableProcessor\ntable_class|The look of the table|Table.html"
-                  -
-                    self:
-                      id: 6608
-                      CType: html
-                      header: 'The TypoScript of the bullet list (name only, not rendered)'
-                      bodytext: "<figure class=\"theme-code\">\n    <figcaption class=\"theme-code__caption\">\n        <span class=\"theme-code__filename\">Configuration/TypoScript/ContentElements.typoscript</span>\n        <span class=\"theme-code__language\">TypoScript</span>\n    </figcaption>\n    <pre class=\"theme-code__block\" role=\"region\" tabindex=\"0\" aria-label=\"Configuration/TypoScript/ContentElements.typoscript\"><code>tt_content.bullets =&lt; lib.contentElement\ntt_content.bullets {\n    templateName = ContentElements/Bullets\n}</code></pre>\n</figure>"
+                      bodytext: "Field|Holds|Read by\nbodytext|The rows, one per line|TableProcessor\ntable_delimiter|The character code of the column separator|TableProcessor\ntable_header_position|Header row, header column, or none|TableProcessor\ntable_class|The look of the table|Table.html\n"
                   -
                     self:
                       id: 6609
+                      CType: html
+                      header: 'The TypoScript of the bullet list (name only, not rendered)'
+                      sectionIndex: 0
+                      bodytext: "<figure class=\"theme-code\">\n    <figcaption class=\"theme-code__caption\">\n        <span class=\"theme-code__filename\">Configuration/TypoScript/ContentElements.typoscript</span>\n        <span class=\"theme-code__language\">TypoScript</span>\n    </figcaption>\n    <pre class=\"theme-code__block\" role=\"region\" tabindex=\"0\" aria-label=\"Configuration/TypoScript/ContentElements.typoscript\"><code>tt_content.bullets =&lt; lib.contentElement\ntt_content.bullets {\n    templateName = ContentElements/Bullets\n}</code></pre>\n</figure>"
+                  -
+                    self:
+                      id: 6610
                       CType: text
                       header: 'What is left to the editor'
                       header_layout: 2
                       bodytext: "<p>The editor chooses the type, fills in the fields and picks from\nthe values the form offers. The theme offers only values it\nrenders: a frame it does not draw is not in the list, and a field\nit does not read is not in the form.</p>\n<p>Everything else - the markup, the spacing, the colours in both\nappearances - follows from the theme, which is what lets a page of\nmany elements read as one page.</p>\n"
+                  -
+                    self:
+                      id: 6611
+                      CType: html
+                      header: 'Footnotes (not visible in the frontend)'
+                      sectionIndex: 0
+                      linkToTop: 1
+                      bodytext: "<aside class=\"theme-footnotes\" aria-labelledby=\"article-footnotes-heading\">\n    <h2 class=\"theme-footnotes__heading\" id=\"article-footnotes-heading\">Notes</h2>\n    <ol class=\"theme-footnotes__list\">\n        <li class=\"theme-footnotes__item\" id=\"fn1\">\n            1. The column is the <code>colPos</code> of the element, and the backend\n            layout of the page decides which columns exist at all.\n            <a class=\"theme-footnotes__backlink\" href=\"#fnref1\" aria-label=\"Back to reference 1\"></a>\n        </li>\n        <li class=\"theme-footnotes__item\" id=\"fn2\">\n            2. Which is also why an element moved into a column the layout of its\n            page does not have disappears from the page without being deleted.\n            <a class=\"theme-footnotes__backlink\" href=\"#fnref2\" aria-label=\"Back to reference 2\"></a>\n        </li>\n    </ol>\n</aside>\n"
         -
           self:
             id: 1003
