@@ -11,7 +11,7 @@ tt_content,,,,,,,,,,,,,,,
 ,60,1,0,0,0,60,theme_testimonial,Ada Lovelace,<p>The Analytical Engine weaves algebraic patterns.</p>,,,,0,0,
 ,70,1,0,0,0,70,theme_author,Grace Hopper,<p>Compiler pioneer.</p>,,,,2,0,
 ,80,1,0,0,0,80,theme_linklist,Some links,,,,,2,0,
-,90,1,0,0,0,90,theme_sociallinks,Elsewhere,,,,,1,0,
+,90,1,0,0,0,90,theme_sociallinks,Elsewhere,,,,,2,0,
 ,100,1,0,0,0,100,theme_media_teaser_grid,A teaser grid,<p>Three of them.</p>,,,,2,0,
 ,110,1,0,0,0,110,theme_notice,A note,<p>Note body with <strong>rich</strong> text.</p>,,,,0,0,note
 ,120,1,0,0,0,120,theme_notice,An information,<p>Info body.</p>,,,,0,0,info
@@ -33,25 +33,26 @@ tt_content,,,,,,,,,,,,,,,
 ,280,1,0,0,0,280,theme_split_tiles,Split tiles,,,,,1,2,
 ,290,1,0,0,0,290,theme_pricing,A pricing table,,,,,1,2,
 tx_theme_list_item,,,,,,,,,,,,,
-,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,text,link,link_label,date
-,1,1,0,0,1,70,tt_content,tx_theme_list_items,,,t3://page?uid=1,Profile,\NULL
-,2,1,0,0,2,70,tt_content,tx_theme_list_items,,,https://example.com/,Homepage,\NULL
-,3,1,0,0,1,80,tt_content,tx_theme_list_items,,,t3://page?uid=1,Documentation,\NULL
-,4,1,0,0,2,80,tt_content,tx_theme_list_items,,,t3://page?uid=1,Changelog,\NULL
-,5,1,0,0,1,90,tt_content,tx_theme_list_items,,,https://example.com/social,Somewhere social,\NULL
-,6,1,0,0,1,100,tt_content,tx_theme_list_items,First teaser,<p>One.</p>,t3://page?uid=1,Open,\NULL
-,7,1,0,0,2,100,tt_content,tx_theme_list_items,Second teaser,<p>Two.</p>,t3://page?uid=1,Open,\NULL
-,8,1,0,0,1,180,tt_content,tx_theme_list_items,Alpha tab,<p>Alpha panel with <strong>rich</strong> text.</p>,,,\NULL
-,9,1,0,0,2,180,tt_content,tx_theme_list_items,Beta tab,<p>Beta panel.</p>,,,\NULL
-,10,1,0,0,1,190,tt_content,tx_theme_list_items,Gamma tab,<p>Gamma panel.</p>,,,\NULL
-,11,1,0,0,2,190,tt_content,tx_theme_list_items,Delta tab,<p>Delta panel.</p>,,,\NULL
-,12,1,0,0,1,200,tt_content,tx_theme_list_items,First question,<p>First answer with <em>rich</em> text.</p>,,,\NULL
-,13,1,0,0,2,200,tt_content,tx_theme_list_items,Second question,<p>Second answer.</p>,,,\NULL
-,14,1,0,0,1,210,tt_content,tx_theme_list_items,Third question,<p>Third answer.</p>,,,\NULL
-,15,1,0,0,2,210,tt_content,tx_theme_list_items,Fourth question,<p>Fourth answer.</p>,,,\NULL
-,16,1,0,0,1,240,tt_content,tx_theme_list_items,A card,One card.,,,\NULL
-,17,1,0,0,1,250,tt_content,tx_theme_list_items,An entry,One entry.,,,2026-01-12
-,18,1,0,0,1,260,tt_content,tx_theme_list_items,A row,One row.,,,\NULL
-,19,1,0,0,1,270,tt_content,tx_theme_list_items,A slide,One slide.,,,\NULL
-,20,1,0,0,1,280,tt_content,tx_theme_list_items,A tile,One tile.,,,\NULL
-,21,1,0,0,1,290,tt_content,tx_theme_list_items,A plan,One feature.,,,\NULL
+,uid,pid,sys_language_uid,l10n_parent,sorting_foreign,uid_foreign,tablename,fieldname,header,text,link,link_label,date,brand_icon
+,1,1,0,0,1,70,tt_content,tx_theme_list_items,,,t3://page?uid=1,Profile,\NULL,
+,2,1,0,0,2,70,tt_content,tx_theme_list_items,,,https://example.com/,Homepage,\NULL,
+,3,1,0,0,1,80,tt_content,tx_theme_list_items,,,t3://page?uid=1,Documentation,\NULL,
+,4,1,0,0,2,80,tt_content,tx_theme_list_items,,,t3://page?uid=1,Changelog,\NULL,
+,5,1,0,0,1,90,tt_content,tx_theme_list_items,,,https://example.com/social,Mastodon,\NULL,mastodon
+,30,1,0,0,2,90,tt_content,tx_theme_list_items,,,mailto:hello@example.com,Send an email,\NULL,
+,6,1,0,0,1,100,tt_content,tx_theme_list_items,First teaser,<p>One.</p>,t3://page?uid=1,Open,\NULL,
+,7,1,0,0,2,100,tt_content,tx_theme_list_items,Second teaser,<p>Two.</p>,t3://page?uid=1,Open,\NULL,
+,8,1,0,0,1,180,tt_content,tx_theme_list_items,Alpha tab,<p>Alpha panel with <strong>rich</strong> text.</p>,,,\NULL,
+,9,1,0,0,2,180,tt_content,tx_theme_list_items,Beta tab,<p>Beta panel.</p>,,,\NULL,
+,10,1,0,0,1,190,tt_content,tx_theme_list_items,Gamma tab,<p>Gamma panel.</p>,,,\NULL,
+,11,1,0,0,2,190,tt_content,tx_theme_list_items,Delta tab,<p>Delta panel.</p>,,,\NULL,
+,12,1,0,0,1,200,tt_content,tx_theme_list_items,First question,<p>First answer with <em>rich</em> text.</p>,,,\NULL,
+,13,1,0,0,2,200,tt_content,tx_theme_list_items,Second question,<p>Second answer.</p>,,,\NULL,
+,14,1,0,0,1,210,tt_content,tx_theme_list_items,Third question,<p>Third answer.</p>,,,\NULL,
+,15,1,0,0,2,210,tt_content,tx_theme_list_items,Fourth question,<p>Fourth answer.</p>,,,\NULL,
+,16,1,0,0,1,240,tt_content,tx_theme_list_items,A card,One card.,,,\NULL,
+,17,1,0,0,1,250,tt_content,tx_theme_list_items,An entry,One entry.,,,2026-01-12,
+,18,1,0,0,1,260,tt_content,tx_theme_list_items,A row,One row.,,,\NULL,
+,19,1,0,0,1,270,tt_content,tx_theme_list_items,A slide,One slide.,,,\NULL,
+,20,1,0,0,1,280,tt_content,tx_theme_list_items,A tile,One tile.,,,\NULL,
+,21,1,0,0,1,290,tt_content,tx_theme_list_items,A plan,One feature.,,,\NULL,

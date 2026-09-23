@@ -100,6 +100,11 @@
 # item values and ends in its final fallback, a nullable TEXT (13.4.35,
 # "case 'select'").
 #
+# "tx_theme_list_item.brand_icon" stores an icon name as well and is a
+# VARCHAR nonetheless: its select has static items and no "itemsProcFunc",
+# and a "selectSingle" whose item values are not all integers is derived as
+# "VARCHAR(255) DEFAULT '' NOT NULL" by the same "case 'select'" of 13.4.35.
+#
 
 #
 # Table structure for table "tt_content"
@@ -151,6 +156,7 @@ CREATE TABLE tx_theme_list_item (
 	subheader varchar(255) DEFAULT '' NOT NULL,
 	link_icon text,
 	icon text,
+	brand_icon varchar(255) DEFAULT '' NOT NULL,
 	meta varchar(255) DEFAULT '' NOT NULL,
 	link_variant varchar(255) DEFAULT '' NOT NULL,
 	caption_position varchar(255) DEFAULT '' NOT NULL,

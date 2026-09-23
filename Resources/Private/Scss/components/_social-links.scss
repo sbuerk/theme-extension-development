@@ -1,0 +1,124 @@
+@use '../abstracts/mixins';
+
+// Social links.
+//
+// Markup contract:
+//
+//     <nav class="theme-social-links" aria-label="…">
+//         <ul class="theme-social-links__list">
+//             <li class="theme-social-links__item">
+//                 <a class="theme-social-links__link" href="…">
+//                     <svg class="theme-icon" aria-hidden="true" …>…</svg>
+//                     <span class="theme-social-links__label">Mastodon</span>
+//                 </a>
+//             </li>
+//         </ul>
+//     </nav>
+//
+// The row of platform links a site puts in its footer. It is its own
+// component rather than ".theme-content-menu" - which "theme_sociallinks"
+// used while it had no logos - for one reason: this list is horizontal and
+// its entries collapse to a square whose whole content is a logo, and that is
+// a different shape, not a different colour.
+//
+// --- The name is always in the markup ---------------------------------------
+//
+// Every entry carries "__label" with the platform's name, as text. Where a
+// logo was picked the label is *visually* hidden and keeps naming the link
+// for assistive technology, for a reader using speech, and for the accessible
+// name every one of the theme's other icon-only controls has.
+//
+// The rule that hides it is ":has(.theme-icon)" on the link, not a modifier
+// class the template writes. The icon is rendered "optional" - a brand name a
+// later Font Awesome version dropped renders nothing at all - and a modifier
+// class decided at template time would then hide the label of a link that has
+// no logo either, leaving an entry with nothing in it. ":has()" asks the
+// question at the only moment it can be answered correctly: an icon actually
+// came out. The browser floor is Firefox 125, see "DESIGN.md"; the page
+// layout already depends on ":has()" for the aside.
+//
+// --- The tap target -------------------------------------------------------
+//
+// An icon-only entry is a square of "--theme-tap-target-min" in both
+// directions, not a one-em glyph: it is a link, and WCAG 2.2 target size
+// (2.5.8) applies to it exactly like it applies to the settings button.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-social-links {
+    --theme-social-links-gap: var(--theme-space-2, 0.625rem);
+    --theme-social-links-icon-size: var(--theme-font-size-lg, 1.25rem);
+    --theme-social-links-color: var(--theme-color-primary, #0b57d0);
+    --theme-social-links-logo-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-social-links-color-hover: var(--theme-color-primary-hover, #0a4bb4);
+    --theme-social-links-radius: var(--theme-radius-sm, 0.25rem);
+}
+
+.theme-social-links__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--theme-social-links-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-social-links__item {
+    display: flex;
+}
+
+.theme-social-links__link {
+    // The icon takes its size from here, see "components/_icon.scss". A
+    // marker the link decoration added is spaced by the "gap" below like the
+    // logo is, so it needs no margin of its own - the same line every other
+    // flex link of the theme carries.
+    --theme-icon-size: var(--theme-social-links-icon-size);
+    --theme-link-marker-gap: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--theme-space-2, 0.625rem);
+    min-width: var(--theme-tap-target-min);
+    min-height: var(--theme-tap-target-min);
+    padding-inline: var(--theme-space-2, 0.625rem);
+    border-radius: var(--theme-social-links-radius);
+    color: var(--theme-social-links-color);
+    text-decoration: none;
+    transition: color var(--theme-duration-fast) var(--theme-easing-standard);
+
+    // The label is hidden only where a logo really came out - see the header
+    // comment. The padding goes with it, so the entry is the square the tap
+    // target rule asks for rather than a square plus two paddings.
+    //
+    // The marker the link decoration adds goes with the label, and for the
+    // same reason it is added at all: it tells a reader that the link leaves
+    // for another site, which is the one thing a platform logo already says.
+    // Next to a hidden label it would be the only visible thing besides the
+    // logo. The hidden hint "_link.scss" adds stays - hiding the glyph
+    // removes nothing an assistive technology was told.
+    //
+    // An entry showing a logo is recognisable as a control by its shape, so
+    // it is drawn in the secondary text colour rather than the link colour -
+    // a row of blue logos reads as a row of pictures somebody coloured in. An
+    // entry showing text has nothing but its colour to say it is a link, and
+    // keeps the link colour above; WCAG 1.4.1 is about exactly that.
+    //
+    // This block sits before ":hover" on purpose. Both selectors weigh the
+    // same, so the later one wins, and a logo entry written after the hover
+    // rule would keep the logo colour while it is hovered.
+    &:has(.theme-icon) {
+        padding-inline: 0;
+        color: var(--theme-social-links-logo-color);
+
+        .theme-social-links__label,
+        .theme-link__marker {
+            @include mixins.visually-hidden;
+        }
+    }
+
+    &:hover {
+        color: var(--theme-social-links-color-hover);
+    }
+}

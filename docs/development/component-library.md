@@ -73,6 +73,7 @@ against, and the rename was cheap while only one template depended on it.
 | Segmented control       | `.theme-segmented`        | `components/_settings.scss`         |
 | Palette swatch          | `.theme-swatch`           | `components/_settings.scss`         |
 | Skip link               | `.theme-skip-link`        | `components/_skip-link.scss`        |
+| Social links            | `.theme-social-links`     | `components/_social-links.scss`     |
 | Split tiles             | `.theme-split-tiles`      | `components/_split-tiles.scss`      |
 | Stat                    | `.theme-stat`             | `components/_stat.scss`             |
 | Stats                   | `.theme-stats`            | `components/_stat.scss`             |
@@ -288,6 +289,49 @@ Skip link, the first focusable element on the page:
 ```html
 <a class="theme-skip-link" href="#content">Skip to content</a>
 ```
+
+#### Social links
+
+The row `theme_sociallinks` renders: one link per platform, carrying the
+platform's logo from the vendored [brand set](icons.md#brand-logos) and the
+platform's name as text.
+
+```html
+<nav class="theme-social-links" aria-label="Social links">
+    <ul class="theme-social-links__list">
+        <li class="theme-social-links__item">
+            <a class="theme-social-links__link" href="…">
+                <svg class="theme-icon" aria-hidden="true" focusable="false" …>…</svg>
+                <span class="theme-social-links__label">Mastodon</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+```
+
+**The name is always in the markup.** A logo is decoration — `aria-hidden`,
+like every other icon of the theme — so `__label` is what names the link.
+Where a logo was rendered the stylesheet hides that label *visually* and the
+link keeps its accessible name; where none was, the label stays visible and
+the entry is an ordinary text link.
+
+The rule that hides it is `:has(.theme-icon)` on the link, **not** a modifier
+class the template writes. The logo comes from a record and is rendered
+`optional`, so a platform name a later Font Awesome version dropped renders
+nothing at all — and a class decided at template time would then hide the
+label of an entry with nothing left in it. `:has()` asks the question at the
+one moment it can be answered: an icon actually came out. The marker the
+[link decoration](#link-decoration) adds is hidden by the same rule, for the
+reason it exists at all — "this leaves for another site" is what a platform
+logo already says, and next to a hidden label the marker would be the only
+other visible thing. Its hidden hint stays.
+
+An entry with a logo is a square of `--theme-tap-target-min` in both
+directions: it is a link, and WCAG 2.2 target size applies to it exactly as
+it does to the settings button.
+
+`ComponentLibraryTest::aSocialLinkHidesItsLabelOnlyWhereALogoWasRendered`
+holds the conditional to the compiled stylesheet.
 
 ### Content
 
