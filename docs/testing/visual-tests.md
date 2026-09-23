@@ -212,7 +212,7 @@ the viewport had arrived is not timing.
 The baselines are the PNGs in
 [`Tests/Acceptance/Visual/Baselines/`](../../Tests/Acceptance/Visual/Baselines),
 named `<section>-<appearance>-<palette>.png`, the two clipped specimens of
-`tokens` as `tokens-accents-…` and `tokens-focus-…` — 22.1 MB for the 58 today.
+`tokens` as `tokens-accents-…` and `tokens-focus-…` — 22.2 MB for the 58 today.
 `Tests/` is `export-ignore`, so they never ship. Growth of the repository on
 every intended visual change is the main ongoing cost of the suite.
 
