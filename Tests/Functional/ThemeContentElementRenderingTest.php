@@ -164,7 +164,62 @@ final class ThemeContentElementRenderingTest extends AbstractFunctionalTestCase
 
         // Its own children only - the other elements' children share the table.
         $this->assertStringNotContainsString('Homepage', $list);
-        $this->assertStringNotContainsString('Somewhere social', $list);
+        $this->assertStringNotContainsString('Send an email', $list);
+    }
+
+    /**
+     * A social link whose logo an editor picked is still a named link: the
+     * platform name is in the markup, as text, and only hidden by the
+     * stylesheet. An icon is never an accessible name here - the logo is
+     * rendered `aria-hidden` like every other icon of the theme - so an
+     * entry that lost its text would be a link a screen reader announces by
+     * its URL.
+     */
+    #[Test]
+    public function aSocialLinkCarriesItsPlatformNameBesideTheLogo(): void
+    {
+        $social = $this->contentElement($this->render(), 'theme_sociallinks');
+
+        $this->assertStringContainsString('theme-social-links', $social);
+        $this->assertMatchesRegularExpression(
+            '#<a[^>]*class="theme-social-links__link[^"]*"[^>]*>\s*<svg[^>]*aria-hidden="true"[^>]*>.*?</svg>\s*'
+            . '<span class="theme-social-links__label">Mastodon</span>#s',
+            $social,
+            'The logo and the platform name are not both in the entry.',
+        );
+    }
+
+    /**
+     * The logo is a file of the vendored brands set, inlined - not a name
+     * that happens to resolve to a solid icon, and not a request.
+     */
+    #[Test]
+    public function aSocialLinkInlinesTheLogoOfTheBrandsSet(): void
+    {
+        $social = $this->contentElement($this->render(), 'theme_sociallinks');
+
+        // The file as shipped, attribution comment included, with only the
+        // three attributes the ViewHelper puts in front of it - which is why
+        // the needle starts after "<svg".
+        $this->assertStringContainsString(substr(IconSet::brands()->markup('mastodon'), 4), $social);
+    }
+
+    /**
+     * An entry without a logo is an ordinary text link. Nothing in the
+     * markup distinguishes the two - the stylesheet asks `:has(.theme-icon)`
+     * - so this is what proves the template writes no modifier of its own.
+     */
+    #[Test]
+    public function aSocialLinkWithoutALogoRendersItsLabelAndNoIcon(): void
+    {
+        $social = $this->contentElement($this->render(), 'theme_sociallinks');
+
+        $matched = preg_match(
+            '#<li class="theme-social-links__item">\s*<a[^>]*>\s*<span class="theme-social-links__label">Send an email</span>#s',
+            $social,
+        );
+        $this->assertSame(1, $matched, 'The entry without a logo did not render as a plain labelled link.');
+        $this->assertSame(1, substr_count($social, '<svg'), 'Only the entry that has a logo renders one.');
     }
 
     #[Test]

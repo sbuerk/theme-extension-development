@@ -116,6 +116,14 @@ final class DatabaseSchemaTest extends AbstractFunctionalTestCase
             'column' => 'icon',
             'type' => TextType::class,
         ];
+        // A "selectSingle" of static string items without an
+        // "itemsProcFunc": v13.4.35 derives a VARCHAR from it, not the
+        // nullable TEXT of the two icon pickers above.
+        yield 'tx_theme_list_item.brand_icon is a string' => [
+            'table' => 'tx_theme_list_item',
+            'column' => 'brand_icon',
+            'type' => StringType::class,
+        ];
         // Not declared in "ext_tables.sql": a "datetime" field with the
         // "dbType" "date", which v12.4 derives as well.
         yield 'tx_theme_list_item.date is a date' => [

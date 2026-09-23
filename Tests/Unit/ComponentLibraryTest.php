@@ -102,6 +102,7 @@ final class ComponentLibraryTest extends UnitTestCase
             'segmented control' => '.theme-segmented',
             'palette swatch' => '.theme-swatch',
             'skip link' => '.theme-skip-link',
+            'social links' => '.theme-social-links',
             'split tiles' => '.theme-split-tiles',
             'stat' => '.theme-stat',
             'stats' => '.theme-stats',
@@ -536,6 +537,37 @@ final class ComponentLibraryTest extends UnitTestCase
             $css,
         );
         $this->assertStringNotContainsString(':has(.theme-list-group__link:focus-visible)', $css);
+    }
+
+    /**
+     * A social link whose whole visible content is a platform logo still has
+     * an accessible name: the platform's name is in the markup and only
+     * hidden visually. That hiding is conditional on an icon actually having
+     * been rendered - the logo comes from a record and is rendered
+     * "optional", so a name a later Font Awesome version dropped renders
+     * nothing, and a modifier class written by the template would then hide
+     * the label of an entry that has nothing left to show.
+     *
+     * Asserted on the compiled stylesheet rather than on the SCSS source:
+     * what reaches a page is the compiled rule, and a `:has()` lost in a
+     * refactoring of the source would still leave a plausible looking SCSS
+     * file behind.
+     */
+    #[Test]
+    public function aSocialLinkHidesItsLabelOnlyWhereALogoWasRendered(): void
+    {
+        $css = $this->stylesheet();
+
+        $this->assertMatchesRegularExpression(
+            '/\.theme-social-links__link:has\(\.theme-icon\) \.theme-social-links__label[^{]*\{[^}]*clip-path:inset\(50%\)/',
+            $css,
+            'The label of a social link is not hidden inside ":has(.theme-icon)".',
+        );
+        $this->assertStringNotContainsString(
+            '.theme-social-links__label{position:absolute',
+            $css,
+            'The label of a social link is hidden unconditionally, so an entry without a logo has nothing to show.',
+        );
     }
 
     /**

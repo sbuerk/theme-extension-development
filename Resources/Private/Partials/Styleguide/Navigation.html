@@ -4,12 +4,13 @@
 
 <f:comment>
     Styleguide section "navigation". Rendered from
-    "Templates/Page/Styleguide.html" together with the other six section
+    "Templates/Page/Styleguide.html" together with the other section
     partials. Every specimen below is copied from the markup contract in the
     component's own SCSS header comment - "components/_nav-main.scss",
-    "_nav-sub.scss", "_breadcrumb.scss", "_pagination.scss" and
-    "_content-menu.scss" - and is literal markup: no content element, no
-    "f:cObject", no data processor, and no translated copy.
+    "_nav-sub.scss", "_breadcrumb.scss", "_pagination.scss",
+    "_content-menu.scss" and "_social-links.scss" - and is literal markup:
+    no content element, no "f:cObject", no data processor, and no translated
+    copy.
 
     --- Four of these are also real page chrome ------------------------------
     ".theme-nav-main", ".theme-nav-sub" and ".theme-breadcrumb" are already on
@@ -293,6 +294,48 @@
                             </ul>
                         </li>
                     </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Social links</h3>
+        <p>
+            The row <code>theme_sociallinks</code> renders: one entry per platform,
+            each a link with the platform's logo from the vendored brands set and the
+            platform's name as text. Where a logo came out the name is hidden
+            visually and goes on naming the link; where none did — no logo was
+            picked, or the set no longer has the name — the name stays visible and
+            the entry is an ordinary text link. The stylesheet decides that with
+            <code>:has(.theme-icon)</code> rather than a class the template writes,
+            because the logo is rendered <code>optional</code> and a class decided
+            earlier would hide the name of an entry that has nothing else. The first
+            two entries below have a logo, the last two have not.
+        </p>
+        <nav class="theme-social-links" aria-label="Social links specimen">
+            <ul class="theme-social-links__list">
+                <li class="theme-social-links__item">
+                    <a class="theme-social-links__link" href="#">
+                        <theme:icon set="brands" name="mastodon" />
+                        <span class="theme-social-links__label">Mastodon</span>
+                    </a>
+                </li>
+                <li class="theme-social-links__item">
+                    <a class="theme-social-links__link" href="#">
+                        <theme:icon set="brands" name="github" />
+                        <span class="theme-social-links__label">GitHub</span>
+                    </a>
+                </li>
+                <li class="theme-social-links__item">
+                    <a class="theme-social-links__link" href="#">
+                        <span class="theme-social-links__label">Send an email</span>
+                    </a>
+                </li>
+                <li class="theme-social-links__item">
+                    <a class="theme-social-links__link" href="#">
+                        <span class="theme-social-links__label">Call the office</span>
+                    </a>
                 </li>
             </ul>
         </nav>
