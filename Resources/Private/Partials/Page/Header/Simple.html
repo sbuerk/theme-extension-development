@@ -1,0 +1,27 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
+
+<f:comment>
+    Header variant "simple", the default: the site title, the main navigation
+    and the controls in one row.
+
+    This is the header the theme had before the variants, unchanged - which
+    is the point. It carries no modifier class, so a site that never touches
+    "theme.header.variant" gets exactly the markup, the stylesheet rules and
+    the measured behaviour it had before, and the four acceptance tests that
+    measure the row keep measuring it.
+
+    Main navigation: "Partials/Navigation/Main.html" renders ".theme-nav-main"
+    itself, including its own empty guard, so it is rendered unconditionally
+    here the same way the brand is - the partial decides whether anything
+    actually appears.
+</f:comment>
+<header class="theme-site-header">
+    <div class="theme-site-header__inner">
+        <f:render partial="Page/Header/Brand" arguments="{_all}" />
+        <f:render partial="Navigation/Main" arguments="{_all}" />
+        <f:render partial="Page/Header/Controls" arguments="{_all}" />
+    </div>
+</header>
+
+</html>

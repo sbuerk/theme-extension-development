@@ -47,9 +47,16 @@ interface ThemeDeliveryInterface
      * Keys added to the site configuration array so the site delivers the
      * theme, empty when the delivery does not go through the site.
      *
+     * `$settings` are the theme's settings a test wants the site to carry,
+     * by their full key - `['theme.header.variant' => 'centred']`. They go
+     * here only where the running core reads them from the site: as site
+     * settings of the set, on v13. A delivery that takes them elsewhere
+     * returns nothing for them here.
+     *
+     * @param array<string, string|int> $settings
      * @return array<string, mixed>
      */
-    public function siteConfiguration(): array;
+    public function siteConfiguration(array $settings = []): array;
 
     /**
      * Field values for the `sys_template` record, empty when none is written.
@@ -57,9 +64,17 @@ interface ThemeDeliveryInterface
      * Passed as the `$templateValues` argument of `setUpFrontendRootPage()`,
      * which merges them over its own defaults.
      *
+     * `$settings` as for {@see siteConfiguration()}: on v12, which has no
+     * site sets, every setting of the theme is the TypoScript constant of the
+     * same name, so they go into the `constants` field of the record - after
+     * the static include, where an integrator writes them. v12 adds the site
+     * settings of the site configuration as constants *before* the static
+     * include, where the theme's defaults would overrule them.
+     *
+     * @param array<string, string|int> $settings
      * @return array<string, mixed>
      */
-    public function templateValues(): array;
+    public function templateValues(array $settings = []): array;
 
     /**
      * Whether a `sys_template` record is written at all — the fourth argument

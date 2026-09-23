@@ -77,4 +77,19 @@ final class ThemeDeliveryTest extends AbstractFunctionalTestCase
     {
         $this->assertSame('theme-instance', $this->themeDelivery()->instanceSeedSet());
     }
+
+    /**
+     * Settings of the theme are site settings of the set on v13, written as
+     * a map of full keys, and nothing of them reaches a record.
+     */
+    #[Test]
+    public function aSettingIsWrittenIntoTheSiteConfiguration(): void
+    {
+        $delivery = $this->themeDelivery();
+        $settings = ['theme.header.variant' => 'centred'];
+
+        $this->assertSame($settings, $delivery->siteConfiguration($settings)['settings'] ?? null);
+        $this->assertSame([], $delivery->templateValues($settings));
+        $this->assertArrayNotHasKey('settings', $delivery->siteConfiguration());
+    }
 }

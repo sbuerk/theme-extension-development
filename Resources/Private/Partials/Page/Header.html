@@ -5,50 +5,49 @@
     The site header, sitewide chrome rendered unconditionally by
     "Layouts/Default.html" for every page template.
 
-    Markup contract: docs/development/component-library.md#layout. Main
-    navigation: "Partials/Navigation/Main.html" renders ".theme-nav-main"
-    itself, including its own empty guard, so it is rendered unconditionally
-    here the same way the brand link is - the partial decides whether
-    anything actually appears. ".theme-site-header__actions" is the slot at
-    the end of the header the contract documents; it holds the display
-    settings, "Partials/Page/Settings.html" - one cog button, so the brand
-    and the main navigation keep the width of the row - which is hidden by
-    its own CSS until a script has run - see that partial's header comment.
+    This file picks one of four arrangements and renders nothing itself. Each
+    one is a partial below "Page/Header/", the shared pieces are "Brand",
+    "Controls" and "Action" next to them, and "layout/_site-header.scss"
+    carries a modifier per variant. That is the shape the rule about version
+    aware code asks for, applied to a different axis: a difference that
+    changes the whole block is a second file, never a condition sprinkled
+    through one.
+
+    WHICH ONE IS A SITE SETTING. "theme.header.variant" - declared in
+    "Configuration/Sets/ThemeExtensionDevelopment/settings.definitions.yaml"
+    and, with the same default, as a TypoScript constant in
+    "constants.typoscript" for a site that takes the theme through the
+    classic static include - on TYPO3 v12, which has no site sets, every
+    site. "Page.typoscript" reads the constant into
+    "headerVariant"; see the comment there for why it is a variable rather
+    than something the template looks up.
+
+    THE VALUE NEVER BECOMES PART OF A PATH. "f:render partial="Page/Header/
+    {headerVariant}"" would be shorter and is exactly the shape that turns an
+    editable setting into a file system lookup. The switch names all four
+    partials as literals, so a value nothing matches renders the default one
+    rather than reaching for a file.
+
+    --- Why none of the three other variants re-opens the header budget ----
+
+    The one-row header is measured: with seven top level entries the title
+    holds its line at 1280 and at 1024 while the menu wraps, and at 800 the
+    title wraps to three lines with no sideways scroll -
+    "Tests/Acceptance/frontend.spec.ts" holds all four measurements, and
+    "layout/_site-header.scss" explains the 50% cap that arranges them. A
+    variant that added a control to that row would have to be measured again.
+
+    None of them does. "centred" gives the title a row of its own, "actions"
+    gives the navigation one, and "two-tier" moves both controls out of the
+    title's row into a meta row above it - so the row the cap governs holds
+    fewer things in every variant, not more. The call to action of "actions"
+    sits in the row the navigation left.
 </f:comment>
-<header class="theme-site-header">
-    <div class="theme-site-header__inner">
-        <a class="theme-site-header__brand" href="{siteRootUrl}">
-            <f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.title" />
-        </a>
-        <f:render partial="Navigation/Main" arguments="{_all}" />
-        <div class="theme-site-header__actions">
-            <f:comment>
-                The language menu, in a dropdown so the header row keeps its
-                width whatever the site's languages are called.
-
-                The guard counts the languages rather than testing the menu
-                for emptiness. "LanguageMenuProcessor" defaults
-                "special.value" to "auto" and returns early only for a site
-                with no language at all, so a one language site produces a
-                menu of exactly one item - the language already being read.
-                That is a control offering the reader nothing, so the whole
-                dropdown is left out below two languages.
-
-                The dropdown itself needs no script and is never hidden behind
-                "data-js": the browser opens and closes the popover. See
-                "Partials/Page/Dropdown.html".
-
-                It sits before the display settings: the language is a property
-                of the page, the settings are a property of the reader.
-            </f:comment>
-            <f:if condition="{languageMenu -> f:count()} > 1">
-                <f:variable name="languagePanel"><f:render partial="Navigation/Language" arguments="{_all}" /></f:variable>
-                <f:variable name="languageLabel"><f:translate key="LLL:EXT:theme_extension_development/Resources/Private/Language/locallang.xlf:theme.languageMenuLabel" /></f:variable>
-                <f:render partial="Page/Dropdown" arguments="{id: 'theme-language-panel', label: languageLabel, icon: 'globe', content: languagePanel}" />
-            </f:if>
-            <f:render partial="Page/Settings" arguments="{_all}" />
-        </div>
-    </div>
-</header>
+<f:switch expression="{headerVariant}">
+    <f:case value="centred"><f:render partial="Page/Header/Centred" arguments="{_all}" /></f:case>
+    <f:case value="actions"><f:render partial="Page/Header/Actions" arguments="{_all}" /></f:case>
+    <f:case value="two-tier"><f:render partial="Page/Header/TwoTier" arguments="{_all}" /></f:case>
+    <f:defaultCase><f:render partial="Page/Header/Simple" arguments="{_all}" /></f:defaultCase>
+</f:switch>
 
 </html>

@@ -69,10 +69,16 @@ trait ThemeSiteTrait
      * configuration nothing can find, and an empty base makes every request
      * miss the site.
      *
+     * `$settings` are settings of the theme by their full key. Where they go
+     * is the delivery's business: site settings of the set on v13, constants
+     * of the `sys_template` record on v12 - see
+     * {@see ThemeDeliveryInterface::siteConfiguration()}.
+     *
      * @param non-empty-string $identifier
      * @param non-empty-string $base
      * @param non-empty-string $websiteTitle
      * @param non-empty-string $languageIdentifier
+     * @param array<string, string|int> $settings
      */
     protected function setUpThemeSite(
         int $rootPageId = 1,
@@ -80,6 +86,7 @@ trait ThemeSiteTrait
         string $base = 'https://theme.example.com/',
         string $websiteTitle = 'Theme',
         string $languageIdentifier = 'EN',
+        array $settings = [],
     ): void {
         $delivery = $this->themeDelivery();
 
@@ -89,7 +96,7 @@ trait ThemeSiteTrait
                 rootPageId: $rootPageId,
                 base: $base,
                 websiteTitle: $websiteTitle,
-            ) + $delivery->siteConfiguration(),
+            ) + $delivery->siteConfiguration($settings),
             [
                 $this->buildDefaultLanguageConfiguration(
                     identifier: $languageIdentifier,
@@ -101,7 +108,7 @@ trait ThemeSiteTrait
         $this->setUpFrontendRootPage(
             $rootPageId,
             [],
-            $delivery->templateValues(),
+            $delivery->templateValues($settings),
             $delivery->createsSysTemplateRecord(),
         );
     }

@@ -34,18 +34,35 @@ final class ThemeDelivery implements ThemeDeliveryInterface
 {
     private const STATIC_INCLUDE = 'EXT:theme_extension_development/Configuration/TypoScript/Static';
 
-    public function siteConfiguration(): array
+    public function siteConfiguration(array $settings = []): array
     {
         // Nothing. A `dependencies` key here would be inert on v12 and would
-        // suggest a delivery that does not happen.
+        // suggest a delivery that does not happen, and so would `settings`:
+        // v12 adds the site settings as constants *before* the static
+        // templates of a clearing record
+        // (`SysTemplateTreeBuilder::handleSysTemplateRecordInclude()`), so
+        // the defaults the theme's `constants.typoscript` declares would
+        // overrule every one of them.
         return [];
     }
 
-    public function templateValues(): array
+    public function templateValues(array $settings = []): array
     {
-        return [
+        $values = [
             'include_static_file' => self::STATIC_INCLUDE,
         ];
+        if ($settings !== []) {
+            // The record's own constants are parsed after its static
+            // includes, so these overrule the defaults the theme declares -
+            // the one place a v12 integrator sets them.
+            $constants = '';
+            foreach ($settings as $key => $value) {
+                $constants .= $key . ' = ' . $value . "\n";
+            }
+            $values['constants'] = $constants;
+        }
+
+        return $values;
     }
 
     public function createsSysTemplateRecord(): bool

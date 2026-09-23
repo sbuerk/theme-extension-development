@@ -31,16 +31,26 @@ final class ThemeDelivery implements ThemeDeliveryInterface
 {
     private const SET = 'sbuerk/theme-extension-development';
 
-    public function siteConfiguration(): array
+    public function siteConfiguration(array $settings = []): array
     {
-        return [
+        $configuration = [
             'dependencies' => [
                 self::SET,
             ],
         ];
+        if ($settings !== []) {
+            // A map of full setting keys, the format the core stores and
+            // advises since TYPO3 v13.4 (#106894, "Site settings.yaml is now
+            // stored as a map"). The core adds them as constants after the
+            // TypoScript of the set, so they overrule the constants of the
+            // same name the theme declares (#103439).
+            $configuration['settings'] = $settings;
+        }
+
+        return $configuration;
     }
 
-    public function templateValues(): array
+    public function templateValues(array $settings = []): array
     {
         return [];
     }

@@ -16,12 +16,12 @@ Half the supported installations reach the theme exclusively through the static
 include. It is a first class delivery path here, tested as such, and the way
 `instance-core-12/` and every functional test on v12 enable the theme.
 
-| Path                                            | Is                                                             |
-|-------------------------------------------------|----------------------------------------------------------------|
-| `Configuration/Sets/ThemeExtensionDevelopment/` | The site set. `config.yaml` is the whole definition. v13 only. |
-| `Configuration/TypoScript/`                     | The actual `setup.typoscript` and `constants.typoscript`.      |
-| `Configuration/TypoScript/Static/`              | The static include: two guarded files importing the two above. |
-| `Configuration/TCA/Overrides/sys_template.php`  | Registers the static include for `sys_template` records.       |
+| Path                                            | Is                                                                                                                                  |
+|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| `Configuration/Sets/ThemeExtensionDevelopment/` | The site set: `config.yaml`, and the [site settings](site-settings.md) in `settings.definitions.yaml`. v13 only; both inert on v12. |
+| `Configuration/TypoScript/`                     | The actual `setup.typoscript` and `constants.typoscript`.                                                                           |
+| `Configuration/TypoScript/Static/`              | The static include: two guarded files importing the two above.                                                                      |
+| `Configuration/TCA/Overrides/sys_template.php`  | Registers the static include for `sys_template` records.                                                                            |
 
 ## The site set
 
