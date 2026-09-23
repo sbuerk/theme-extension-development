@@ -4,6 +4,17 @@ The files below "Solid/" are the solid style SVG icons of the npm package
 "@fortawesome/fontawesome-free" in version 7.3.1, copied unchanged. Each file
 keeps the attribution comment it ships with.
 
+The files below "Brands/" are fifteen of the brands style icons of the same
+package and the same version, copied unchanged as well. They are the platform
+logos named in "fontAwesomeBrands" of the root "package.json", and nothing
+else of that style ships.
+
+All brand icons are trademarks of their respective owners. Their use here
+does not indicate any endorsement, in either direction. Font Awesome asks
+that a brand logo is not used for any purpose except to represent the
+company, product or service it refers to - in this extension that is a link
+to a profile on the platform the logo names, and nothing else.
+
 The icons are licensed under the Creative Commons Attribution 4.0
 International License (CC BY 4.0):
 https://creativecommons.org/licenses/by/4.0/

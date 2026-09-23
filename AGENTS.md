@@ -203,13 +203,15 @@ violation of any of them is a rejected change, not a review comment.
    framework `FunctionalTestCase` directly.
    → [Site based tests](docs/testing/site-based-tests.md#no-test-extends-the-framework-test-case-directly)
 
-7. **Icons come only from the vendored Font Awesome Free solid set** — through
-   `<theme:icon name="…" />`, or, where a component has no markup per item, as
-   a CSS `mask` referencing a file of `Resources/Public/Icons/FontAwesome/Solid/`
-   by its path relative to the compiled stylesheet. Never an SVG drawn into a
-   template by hand, never a glyph in CSS `content`, never a `data:` URI, a
-   webfont, a sprite or a CDN. CSS may draw only the component geometry listed
-   as not being an icon in the table of `docs/development/icons.md` — the
+7. **Icons come only from the vendored Font Awesome Free sets** — the solid
+   set through `<theme:icon name="…" />`, the fifteen brand logos through
+   `<theme:icon set="brands" name="…" />` — or, where a component has no
+   markup per item, as a CSS `mask` referencing a file of
+   `Resources/Public/Icons/FontAwesome/Solid/` by its path relative to the
+   compiled stylesheet. Never an SVG drawn into a template by hand, never a
+   glyph in CSS `content`, never a `data:` URI, a webfont, a sprite or a CDN.
+   CSS may draw only the component geometry listed as not being an icon in the
+   table of `docs/development/icons.md` — the
    tooltip arrow, the busy spinner, the switch thumb, the timeline ring and
    rail, and the few others named there — each with the reason it means
    nothing on its own. A new entry is added to that table in the same change

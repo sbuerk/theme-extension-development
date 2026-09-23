@@ -17,6 +17,10 @@
     templates actually render, and the number below to the number of files
     shipped.
 
+    The brand table is the other way round and lists the whole allowlist: the
+    brands set is fifteen files, it exists to be picked from in the backend,
+    and a template of the theme names none of them itself.
+
     The icons in the table are decoration: the name next to each is the
     content. The one labelled icon further down is the exception it
     demonstrates.
@@ -90,6 +94,48 @@
                     <tr><td><theme:icon name="quote-left" /></td><td><code>quote-left</code></td><td>The mark of a pull quote and a centred quotation</td></tr>
                     <tr><td><theme:icon name="chevron-left" /></td><td><code>chevron-left</code></td><td>The carousel's previous slide button; the lightbox: the image before this one</td></tr>
                     <tr><td><theme:icon name="chevron-right" /></td><td><code>chevron-right</code></td><td>The carousel's next slide button; the lightbox: the image after this one</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h3>Brand logos</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Fifteen logos of the brands style ship beside the solid set, named one
+            by one in <code>package.json</code> and copied by the same build. They
+            are rendered with <code>&lt;theme:icon set="brands" name="…" /&gt;</code>
+            and exist for one job: naming the platform a social link leads to. Every
+            one of them is a <strong>trademark of its owner</strong> and may be used
+            only to refer to that platform &mdash; never as decoration, and never for
+            anything else.
+        </p>
+        <div class="theme-table-wrapper" tabindex="0" role="region" aria-label="Specimen: the brand logos that ship">
+            <table class="theme-table">
+                <caption class="theme-table__caption">Every brand logo the theme ships, by name</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Logo</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Platform</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><theme:icon set="brands" name="bluesky" /></td><td><code>bluesky</code></td><td>Bluesky</td></tr>
+                    <tr><td><theme:icon set="brands" name="discord" /></td><td><code>discord</code></td><td>Discord</td></tr>
+                    <tr><td><theme:icon set="brands" name="facebook" /></td><td><code>facebook</code></td><td>Facebook</td></tr>
+                    <tr><td><theme:icon set="brands" name="github" /></td><td><code>github</code></td><td>GitHub</td></tr>
+                    <tr><td><theme:icon set="brands" name="gitlab" /></td><td><code>gitlab</code></td><td>GitLab</td></tr>
+                    <tr><td><theme:icon set="brands" name="instagram" /></td><td><code>instagram</code></td><td>Instagram</td></tr>
+                    <tr><td><theme:icon set="brands" name="linkedin" /></td><td><code>linkedin</code></td><td>LinkedIn</td></tr>
+                    <tr><td><theme:icon set="brands" name="mastodon" /></td><td><code>mastodon</code></td><td>Mastodon</td></tr>
+                    <tr><td><theme:icon set="brands" name="pinterest" /></td><td><code>pinterest</code></td><td>Pinterest</td></tr>
+                    <tr><td><theme:icon set="brands" name="threads" /></td><td><code>threads</code></td><td>Threads</td></tr>
+                    <tr><td><theme:icon set="brands" name="tiktok" /></td><td><code>tiktok</code></td><td>TikTok</td></tr>
+                    <tr><td><theme:icon set="brands" name="whatsapp" /></td><td><code>whatsapp</code></td><td>WhatsApp</td></tr>
+                    <tr><td><theme:icon set="brands" name="x-twitter" /></td><td><code>x-twitter</code></td><td>X</td></tr>
+                    <tr><td><theme:icon set="brands" name="xing" /></td><td><code>xing</code></td><td>Xing</td></tr>
+                    <tr><td><theme:icon set="brands" name="youtube" /></td><td><code>youtube</code></td><td>YouTube</td></tr>
                 </tbody>
             </table>
         </div>
