@@ -590,45 +590,63 @@ element's `RECORDS` call resolves the same branch.
 
 ### Why not leave it to the core
 
-The core has a guard of its own, and it works. Verified in source against the
-installed v13.4.34 core
-(`.Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php`):
+The core has a guard of its own, and it works on both versions this branch
+supports. Verified in source against the installed v13.4.35 and v12.4.45 cores
+(`.Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php`
+and `ContentContentObject.php`); the line numbers are v13.4.35's, with
+v12.4.45's in brackets where they differ:
 
 1. Before fetching anything, `render()` reads the record currently being
    rendered off `TypoScriptFrontendController::$currentRecord` and registers
    it in `TypoScriptFrontendController::$recordRegister`, keyed `table:uid`,
-   incrementing a counter (lines 59–67). The outer `CONTENT` cObject that
-   dispatches a page's content columns (`ContentContentObject::render()`,
-   lines 47–55) registers the same way, so a shortcut's own record is already
-   registered by the time its own `RECORDS` call runs at all.
-2. Before rendering each fetched item, the loop checks whether that item's
-   own `table:uid` key is already registered (lines 111–114); if it is, the
-   item is skipped — no `cObjGetSingle()` call, nothing appended to the
+   incrementing a counter (lines 59–67 [57–66]). The outer `CONTENT` cObject
+   that dispatches a page's content columns (`ContentContentObject::render()`,
+   lines 47–55 [40–48]) registers the same way, so a shortcut's own record is
+   already registered by the time its own `RECORDS` call runs at all.
+2. Before rendering each fetched item, the loop checks whether that item's own
+   `table:uid` key is already registered (lines 111–114 [110–113]); if it is,
+   the item is skipped — no `cObjGetSingle()` call, nothing appended to the
    output for it. The counter is decremented again once rendering finishes
-   (lines 138–141).
+   (lines 138–141 [137–140]).
 3. `$recordRegister` lives on the frontend controller, not on the `RECORDS`
    call, so it catches an **indirect** cycle too: rendering A registers
    `tt_content:A`, sets `$currentRecord` to `tt_content:B` before registering
-   it in turn (line 120), and by the time B's own reference back to A is
+   it in turn (line 120 [119]), and by the time B's own reference back to A is
    reached, `tt_content:A` is still registered — A has not finished rendering
    yet — so that reference is skipped the same way a direct self-reference is.
 
-That is a guarantee of one core version's frontend controller, held in
-request-scoped state on a class this theme has no contract with. The
-structural break above is a property of **this theme**: it holds wherever the
-theme runs, it is visible in the TypoScript that causes it rather than in
-someone else's `protected` array, and it needs no state at all. Where the core
-guard is present the two agree — a self-reference produces no output for that
-one reference while every other reference in the same `records` field still
-renders — so nothing is lost by not depending on it.
+That is a guarantee of the core's frontend controller, held in request-scoped
+state — `TypoScriptFrontendController::$recordRegister`, a public property on
+both versions — of a class this theme has no contract with. The structural
+break above is a property of **this theme**: it holds wherever the theme runs,
+it is visible in the TypoScript that causes it rather than in someone else's
+property, and it needs no state at all. Where the core guard is present the
+two agree — a self-reference produces no output for that one reference while
+every other reference in the same `records` field still renders — so nothing
+is lost by not depending on it.
 
 The two differ in one respect worth naming: the core guard skips a record that
 is *anywhere* up the current render stack, while the break here refuses the
 `shortcut` branch specifically. A cycle that leaves the branch — a shortcut
 reached through some other content type that references the shortcut back — is
-not closed by this theme; it is closed by the core guard where that exists.
-`Tests/Functional/CoreContentElementRenderingTest.php::aCircularShortcutDoesNotTakeTheRequestDown`
-covers the theme's own break, not the core's.
+not closed by this theme; it is closed by the core guard.
+
+`Tests/Functional/CoreContentElementRenderingTest` covers both halves, and the
+two tests are deliberately different:
+
+| Test                                         | Fixture                                                          | Would pass without the break                                                    |
+|----------------------------------------------|------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| `aShortcutInsideAShortcutRendersNothing`     | a **chain**: uid 84 → uid 80 → the bullet list                   | No — a register renders all three levels, and the list appears a third time     |
+| `aCircularShortcutDoesNotTakeTheRequestDown` | a shortcut pointing at itself, and a pair pointing at each other | On v12.4 and v13.4 yes, because the core's register already stops a cycle there |
+
+The chain is the distinguishing observation: it is not circular, so a guard
+built on "has this record been rendered already" would let it through. That
+test goes red on v12 and on v13 with `conf.tt_content.shortcut` removed, and the
+circular one stays green on both, which was verified by removing it.
+
+It is also why `/elements/cheatsheet` — which is built out of *Insert records*
+elements — cannot show the *Insert records* element itself; see
+[Seeding](../development/seeding.md#the-cheatsheet-gathers-it-does-not-copy).
 
 ## The eleven `menu_*` types
 
