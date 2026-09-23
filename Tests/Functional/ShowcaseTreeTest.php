@@ -490,6 +490,99 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * The footer columns are filled once, on the site root, and every page
+     * below it renders them.
+     *
+     * `lib.content.footer1` to `footer4` and `lib.content.footermeta` are the
+     * five content objects of the theme that carry `slide = -1`: a `CONTENT`
+     * object that finds nothing in its `colPos` walks up the rootline until a
+     * page has something there (`docs/architecture/page-rendering.md`). The
+     * whole point of that is that a site edits its footer once.
+     *
+     * `slide` sits on the object, **not** inside `select` - which is where all
+     * five of them carried it until this test was written, and why none of
+     * them ever slid. Spelling it `select.slide` anywhere is spelling the
+     * defect.
+     *
+     * Nothing demonstrated it and no test covered it. The seed put nothing
+     * into colPos 10 to 14 anywhere, so the `theme-site-footer__inner` of all
+     * fifty-eight pages rendered empty - a blank band, and a mechanism the
+     * documentation described and the branch did not keep.
+     *
+     * Two things have to hold together, which is why they are asserted in one
+     * test: the columns are declared on **one** page, read from the scenario
+     * rather than from a list here; and a page far below that one renders
+     * them anyway. Either alone proves nothing - a footer seeded on every
+     * page would satisfy the second, and a footer seeded on the root and
+     * nowhere else would satisfy the first while rendering on the root only.
+     */
+    #[Test]
+    public function theFooterColumnsAreSeededOnTheSiteRootAndSlideDownToEveryPageBelowIt(): void
+    {
+        $pagesWithFooterContent = [];
+        $walk = static function (array $pages) use (&$walk, &$pagesWithFooterContent): void {
+            foreach ($pages as $page) {
+                $id = (int)($page['self']['id'] ?? 0);
+                foreach ($page['entities']['content'] ?? [] as $element) {
+                    if (in_array((int)($element['self']['colPos'] ?? 0), [10, 11, 12, 13, 14], true)) {
+                        $pagesWithFooterContent[$id] = true;
+                    }
+                }
+                $walk(is_array($page['children'] ?? null) ? $page['children'] : []);
+            }
+        };
+        $walk(Yaml::parseFile(self::extensionPath(self::SCENARIO))['entities']['page'] ?? []);
+
+        $this->assertSame(
+            [1],
+            array_keys($pagesWithFooterContent),
+            'The footer columns are edited once on the site root. A second page filling colPos 10 to 14 stops the slide there and hides the mechanism.',
+        );
+
+        // "/elements/core/header" is four levels below the root, which is as
+        // far from it as the tree goes.
+        $root = $this->footerOf($this->render('/'));
+        $deep = $this->footerOf($this->render('/elements/core/header'));
+
+        foreach (['About', 'Sections', 'Reference', 'Elsewhere'] as $column) {
+            $this->assertStringContainsString($column, $root, sprintf('The site root does not render the footer column "%s".', $column));
+            $this->assertStringContainsString($column, $deep, sprintf('A page four levels below the root does not inherit the footer column "%s".', $column));
+        }
+
+        foreach (['theme-site-footer__columns', 'theme-site-footer__meta'] as $part) {
+            $this->assertStringContainsString($part, $deep, sprintf('The footer of a page below the root renders no "%s".', $part));
+        }
+    }
+
+    /**
+     * The content of a rendered page, without the chrome around it.
+     *
+     * Anything counting the elements of a page has to read this rather than
+     * the document: the footer columns of the site root slide into every page
+     * below it, so the document of a page with four `text` elements on it
+     * carries seven.
+     */
+    private function mainOf(string $body): string
+    {
+        $matched = preg_match('#<main\b[^>]*>(.*)</main>#s', $body, $main);
+        $this->assertSame(1, $matched, 'The page renders no main region at all.');
+
+        return $main[1];
+    }
+
+    /**
+     * The site footer of a rendered page, so an assertion about it cannot be
+     * satisfied by the same words appearing in the content above it.
+     */
+    private function footerOf(string $body): string
+    {
+        $matched = preg_match('#<footer class="theme-site-footer[^"]*"[^>]*>(.*?)</footer>#s', $body, $footer);
+        $this->assertSame(1, $matched, 'The page renders no site footer at all.');
+
+        return $footer[1];
+    }
+
+    /**
      * The styleguide renders through its own layout, not the 404 page - a
      * page that is `hidden` rather than merely out of a menu would answer
      * 404, which is why the two are asserted apart from the navigation.
@@ -907,6 +1000,13 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      * The CTypes are read from the TypoScript, like the completeness check
      * above: a classic type the theme starts rendering fails here until it
      * has its page.
+     *
+     * Counted inside `main`, not in the whole document: the footer columns of
+     * the site root slide into every page below it, and three of those five
+     * elements are `text`. Counted over the document, a page with four `text`
+     * elements on it renders seven - the page's own and the site's footer,
+     * which is not the page's content and is asserted where it belongs, in
+     * `theFooterColumnsAreSeededOnTheSiteRootAndSlideDownToEveryPageBelowIt()`.
      */
     #[Test]
     public function everyClassicContentTypeHasAPageOfItsOwn(): void
@@ -926,7 +1026,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             $this->assertNotSame([], $elements, sprintf('"%s" shows no "%s" element.', $slug, $type));
             $this->assertSame(
                 count($elements),
-                substr_count($this->render($slug), sprintf('data-ctype="%s"', $type)),
+                substr_count($this->mainOf($this->render($slug)), sprintf('data-ctype="%s"', $type)),
                 sprintf('"%s" does not render every "%s" element seeded on it.', $slug, $type),
             );
         }
@@ -1007,7 +1107,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             $this->assertNotSame([], $elements, sprintf('"%s" shows no "%s" element.', $slug, $type));
             $this->assertSame(
                 count($elements),
-                substr_count($this->render($slug), sprintf('data-ctype="%s"', $type)),
+                substr_count($this->mainOf($this->render($slug)), sprintf('data-ctype="%s"', $type)),
                 sprintf('"%s" does not render every "%s" element seeded on it.', $slug, $type),
             );
         }

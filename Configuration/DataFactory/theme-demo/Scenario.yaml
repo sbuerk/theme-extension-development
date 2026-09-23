@@ -125,6 +125,102 @@ entities:
                   component of the library, with the
                   <a href="t3://page?uid=10">form showcase</a>, a request form put
                   together from the form components alone.</p>
+          # --- The footer of the whole tree ---------------------------------
+          #
+          # colPos 11 to 14 are the four footer columns of the "start" layout
+          # and colPos 10 is the meta row under them. Nothing else in the tree
+          # fills them: "lib.content.footer1" to "footer4" and
+          # "lib.content.footermeta" carry "slide = -1" - on the object, not
+          # inside "select" - so a page below
+          # this one walks up the rootline and finds these five elements
+          # ("docs/architecture/page-rendering.md"). Seeded once here, they are
+          # the footer of all fifty-eight pages - and seeding them here is the
+          # only thing that demonstrates the slide at all.
+          #
+          # Appended after 102 rather than inserted between the two: the file
+          # references of "config.yml" name their record by uid, and an insert
+          # would move every uid after it without moving them.
+          #
+          # The four columns mirror the "Footer - columns" specimen of the
+          # styleguide, which draws the same arrangement from Fluid: a short
+          # text, a menu, a text, and a row of platform links. Nothing here
+          # links with a bare "#c<uid>" fragment - the mirror generator rewrites
+          # a "t3://page" link and the anchor of one, and a fragment written by
+          # hand would point into the wrong tree.
+          - self:
+                id: 103
+                colPos: 11
+                CType: 'text'
+                header: 'About'
+                header_layout: 2
+                bodytext: |
+                  <p>A theme built to be read, in a repository built to be reviewed.
+                  Every decision it makes is written down next to the code that makes
+                  it.</p>
+          - self:
+                id: 104
+                colPos: 12
+                CType: 'menu_pages'
+                header: 'Sections'
+                header_layout: 2
+                pages: '5,2,171,113'
+          - self:
+                id: 105
+                colPos: 13
+                CType: 'text'
+                header: 'Reference'
+                header_layout: 2
+                bodytext: |
+                  <p>The <a href="t3://page?uid=9">styleguide</a> renders every
+                  component straight from Fluid, the
+                  <a href="t3://page?uid=10">form showcase</a> puts a request form
+                  together from the form components alone, and the
+                  <a href="t3://page?uid=153">cheatsheet</a> gathers every element
+                  on one page.</p>
+          - self:
+                id: 106
+                colPos: 14
+                CType: 'theme_sociallinks'
+                header: 'Elsewhere'
+                header_layout: 2
+                tx_theme_list_items: '700,701,702'
+          # The meta row: one line under the columns, with no heading of its
+          # own - "header_layout: 100" is "do not render the header", see
+          # "Partials/ContentElement/Header.html".
+          - self:
+                id: 107
+                colPos: 10
+                CType: 'text'
+                header: 'Footer meta'
+                header_layout: 100
+                bodytext: |
+                  <p>Seeded from
+                  <code>Configuration/DataFactory/theme-demo/</code>. This row and the
+                  four columns above it are edited once, on the
+                  <a href="t3://page?uid=1">site root</a>, and every page below it
+                  renders them: the five footer slots are the only content objects of
+                  the theme that slide down the rootline.</p>
+        # The three platform links of the "Elsewhere" column, uid 106. A
+        # relation is not a containment: these are ordinary rows of
+        # "tx_theme_list_item" on this page, and only the relation column
+        # DataHandler writes ties them to the element. 700 and up, because
+        # the list item uids of the showcase run to 677 and the mirror of a
+        # row takes its uid plus 1000.
+        listItem:
+          - self:
+                id: 700
+                link: 'https://mastodon.example/@theme'
+                link_label: 'Mastodon'
+                brand_icon: 'mastodon'
+          - self:
+                id: 701
+                link: 'https://github.example/theme'
+                link_label: 'GitHub'
+                brand_icon: 'github'
+          - self:
+                id: 702
+                link: 'mailto:hello@example.org'
+                link_label: 'Send an email'
       children:
         - self:
               id: 2
