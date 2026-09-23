@@ -84,11 +84,11 @@ the `table` element need nothing from the tool.
 
 ## Uids are declared, and they are a rule
 
-| Table                | Uids                                                                                                                                                                                                                 |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 151 and 170 to 177 — forty-eight pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
-| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                      |
-| `tx_theme_list_item` | 1 to 19 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                         |
+| Table                | Uids                                                                                                                                                                                                                |
+|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `pages`              | 1 to 10, then 30 to 39, 50 to 56, 70 to 73, 90 to 92, 110 to 112, 130, 150 to 152 and 170 to 177 — forty-nine pages; the odd decades are reserved, the ids used are fewer, see [below](#why-new-pages-skip-decades) |
+| `tt_content`         | its page times 100 plus its position: the third of page 6 is 603, the second of page 35 is 3502                                                                                                                     |
+| `tx_theme_list_item` | 1 to 19 on page 8, and 100 to 129, 150 to 177, 450 to 454, 460 to 465, 470 to 474 and 500 to 503 on the pages below it, in declaration order                                                                        |
 
 Every record declares one, because the records point at each other by uid and
 a scenario record has no other handle:
@@ -225,6 +225,7 @@ page each below `/layouts`. The pages below the first ten show every classic
 | 2         | Typography               | `/typography`                    | `content`                       | Running text, the four bands with header positions, looks and spacing; parent of 52 to 56.                                                    |
 | 52–55     | Text … Quotes and code   | `/typography/<page>`             | `content`                       | Text, lists, tables, quotes and code — rich text and elements.                                                                                |
 | 56        | Article                  | `/typography/article`            | `content_sidebar`               | A long article: a byline, footnotes, and the `sectionIndex` table of contents the sidebar layout is chosen for.                               |
+| 152       | Right to left            | `/typography/right-to-left`      | `content`                       | The components in a `dir="rtl"` wrapper: logical spacing, mirrored markers, `bdi` in a bidirectional line.                                    |
 | 3         | Media                    | `/media`                         | `content`                       | One image, and a two column gallery.                                                                                                          |
 | 4         | Empty page               | `/empty`                         | *(none)*                        | The `default` layout fallback; `nav_hide`, reached by URL and from page 8.                                                                    |
 | 5         | Elements                 | `/elements`                      | `content`                       | The showcase branch, parent of 6 to 8 and 51.                                                                                                 |

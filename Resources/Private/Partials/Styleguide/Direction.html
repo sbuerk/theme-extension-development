@@ -1,0 +1,163 @@
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
+
+<f:comment>
+    Styleguide section "Reading direction".
+
+    Every other section of this page is read left to right, which is exactly
+    why a physical edge in the stylesheet is invisible on all of them. This
+    one sets "dir=rtl" on a block and shows what the library does with it:
+    the spacing, the borders, the markers and the floats turn around, because
+    every one of them is written as a logical property, and the glyphs that
+    say a direction are mirrored by a rule of their own.
+
+    Two things are demonstrated and not merely described, because a
+    screenshot of this section is what proves them in a browser rather than
+    in a regular expression over the stylesheet:
+
+    - ":dir(rtl)" resolves at all. It is below the browser floor of
+      DESIGN.md, and the pinned Playwright image is what says so here.
+    - The mirrored markers really are mirrored, rather than being a rule that
+      compiles and matches nothing.
+
+    The Arabic is a specimen, not a translation, and it is glossed in English
+    below each block so a reader who does not read Arabic can still see which
+    edge a line starts at. It is short on purpose: what is under test is the
+    direction, not the copy.
+
+    The section owns no component. Everything in it is a component of another
+    section, put into a right-to-left context - which is the point.
+</f:comment>
+<section class="theme-styleguide__section" id="direction">
+    <h2 class="theme-styleguide__heading">Reading direction</h2>
+
+    <h3>Running text, a list and a quotation</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Nothing below carries a class the rest of the page does not. The
+            block is wrapped in <code>dir="rtl"</code> and
+            <code>lang="ar"</code>, and the element baseline follows: the list
+            marker moves to the right edge, the indent of the quotation moves
+            with it, and the caption of a table starts at the right.
+        </p>
+        <div dir="rtl" lang="ar">
+            <h4>النص العربي</h4>
+            <p>النص العربي يبدأ من اليمين.</p>
+            <p>هذه قائمة قصيرة:</p>
+            <ul>
+                <li>العنصر الأول</li>
+                <li>العنصر الثاني</li>
+                <li>العنصر الثالث</li>
+            </ul>
+            <blockquote>
+                <p>اقتباس قصير.</p>
+            </blockquote>
+        </div>
+        <p class="theme-styleguide__label">
+            "Arabic text", "Arabic text starts from the right.", "This is a
+            short list:", the first, second and third item, and "A short
+            quotation."
+        </p>
+    </div>
+
+    <h3>A list component, and a byline</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            The check mark of <code>.theme-list--check</code> is a mask on the
+            marker box, and the box is placed with
+            <code>inset-inline-start</code>, so it follows the direction
+            without a rule of its own. The byline separates its items with the
+            <code>border-inline-start</code> of the item that follows, which
+            moves to the other edge for the same reason.
+        </p>
+        <div dir="rtl" lang="ar">
+            <ul class="theme-list theme-list--check">
+                <li>العنصر الأول</li>
+                <li>العنصر الثاني</li>
+            </ul>
+            <p class="theme-byline">
+                <span class="theme-byline__item">العنصر الأول</span>
+                <span class="theme-byline__item">العنصر الثاني</span>
+                <span class="theme-byline__item">العنصر الثالث</span>
+            </p>
+        </div>
+    </div>
+
+    <h3>The markers that are mirrored</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            The link markup is written out here the way it is in the link
+            specimen of Typography: the marker span is added by
+            "Classes/EventListener/LinkDecoration.php" to a link TYPO3 builds,
+            and this page renders without TYPO3.
+        </f:comment>
+        <p>
+            A glyph that points somewhere means something by where it points,
+            so it is mirrored rather than left alone:
+            <code>arrow-up-right-from-square</code> on a link that leaves the
+            site, <code>arrow-turn-up</code> on the way back from a footnote,
+            and the two chevrons of a carousel. The mirror is
+            <code>scale: -1 1</code> under <code>:dir(rtl)</code> — the file of
+            the icon set, drawn the other way round.
+        </p>
+        <div dir="rtl" lang="ar">
+            <p>
+                <a class="theme-link theme-link--external" href="#direction">العنصر الأول<span class="theme-link__marker" aria-hidden="true"></span></a>
+            </p>
+            <f:comment>
+                The notes block without its heading and without the
+                "aside" of the contract: what is shown here is the back
+                link, and a second landmark named "Notes" on a page that
+                already has one in Typography would be two landmarks with
+                one name.
+            </f:comment>
+            <div class="theme-footnotes">
+                <ol class="theme-footnotes__list">
+                    <li class="theme-footnotes__item" id="direction-fn1">
+                        1. العنصر الأول
+                        <a class="theme-footnotes__backlink" href="#direction" aria-label="Back to the top of this section"></a>
+                    </li>
+                </ol>
+            </div>
+            <div class="theme-carousel" data-theme-carousel-bound="">
+                <div class="theme-carousel__controls">
+                    <button class="theme-carousel__control theme-carousel__control--previous" type="button" aria-label="Previous slide">
+                        <theme:icon name="chevron-left" />
+                    </button>
+                    <button class="theme-carousel__control theme-carousel__control--next" type="button" aria-label="Next slide">
+                        <theme:icon name="chevron-right" />
+                    </button>
+                </div>
+            </div>
+        </div>
+        <p class="theme-styleguide__label">
+            The arrow of the external link points up and to the left, the
+            footnote arrow turns towards the right edge, and "previous" is the
+            chevron pointing right.
+        </p>
+    </div>
+
+    <h3>Numbers and Latin inside a right-to-left line</h3>
+    <div class="theme-styleguide__specimen">
+        <p>
+            Direction is resolved per run of text, not per element. A Latin
+            word or a number inside an Arabic sentence keeps its own direction,
+            which the browser does by itself; what needs saying in the markup
+            is where a run of user data begins, so a name that starts with a
+            strong right-to-left character cannot reorder the sentence around
+            it. That is <code>bdi</code>, and <code>bdo</code> is the override
+            that forces a direction on a run that does not have it.
+        </p>
+        <div dir="rtl" lang="ar">
+            <p>TYPO3 <bdi>العنصر الأول</bdi> 13.4</p>
+        </div>
+        <p>
+            The same sentence with the override, which reverses the order of
+            the characters rather than the order of the words:
+        </p>
+        <p><bdo dir="rtl">TYPO3 13.4</bdo></p>
+    </div>
+</section>
+
+</html>

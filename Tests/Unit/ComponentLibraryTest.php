@@ -462,6 +462,133 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * No box of the library is placed, spaced or bordered by a physical edge.
+     *
+     * The sibling of the assertion above, for the properties that decide where
+     * a box sits rather than where its text sits. Every one of them has a
+     * logical counterpart the library uses throughout - `margin-inline-start`,
+     * `padding-inline-end`, `border-inline-start`, `inset-inline-start`,
+     * `float: inline-start` - and a physical one is invisible in a
+     * left-to-right page, which is the only page most of this is ever looked
+     * at in.
+     *
+     * The catalogue this work came from recorded three physical declarations
+     * in the sources: two `text-align: left` and a `border-right` on the check
+     * mark of the chosen palette. All three were gone before this was written.
+     * That is exactly the state worth a gate: a property nobody has to fix is
+     * also a property nobody notices coming back.
+     *
+     * Read off the compiled stylesheet, because a mixin or a nested rule could
+     * emit a physical property the sources do not spell out. Each pattern is
+     * anchored at the start of a declaration - `{`, `;` or the beginning of
+     * the file - so a value that happens to contain the word (`background:
+     * right center`) is not a hit, and neither is `border-radius`.
+     *
+     * Two shapes are **not** covered, because catching either needs a value
+     * parser rather than a pattern:
+     *
+     * - an asymmetric four value `margin`/`padding` shorthand, whose second
+     *   and fourth values are the right and the left edge. Counting values
+     *   with a regular expression is not safe here, because a value is often
+     *   `var(--token, 1rem)`, which contains a space and a comma of its own.
+     *   The bundle has no four value `margin` or `padding` today.
+     * - an asymmetric `inset` shorthand. The `offset` entry below catches
+     *   `left:` and `right:` as properties; it does not look inside
+     *   `inset: auto 1rem auto auto`.
+     *
+     * The second of those is not hypothetical. Six `inset` shorthands are
+     * compiled and **two of them name a physical edge**:
+     *
+     * | Declaration                                         | Where                     | Effect                                                    |
+     * |-----------------------------------------------------|---------------------------|-----------------------------------------------------------|
+     * | `inset: auto var(--theme-dropdown-panel-gutter) auto auto` | `_dropdown.scss:134` | Pins the popover to the **right** edge of the viewport.   |
+     * | `inset: var(--theme-space-7) auto auto 50%`         | `_toggletip.scss:116`     | `left: 50%` with `translate: -50% 0` - a centred box, so the same either way. |
+     *
+     * The dropdown one is a genuine right-to-left defect: the panel belongs
+     * under its trigger, the trigger sits at the *logical* end of the header
+     * row, and in a right-to-left document that is the left edge while the
+     * panel stays on the right. It predates the reading-direction work -
+     * the declaration arrived with the component itself - and it is **not
+     * fixed here**: pinning a popover that lives in the top layer, without
+     * anchor positioning, is a decision about that component rather than
+     * about this assertion. Gating it would only force that decision into
+     * an unrelated change. It is recorded instead.
+     *
+     * @return \Generator<string, array{pattern: string, logical: string}>
+     */
+    public static function physicalBoxProperties(): \Generator
+    {
+        yield 'margin' => ['pattern' => 'margin-(?:left|right)', 'logical' => 'margin-inline-start / -end'];
+        yield 'padding' => ['pattern' => 'padding-(?:left|right)', 'logical' => 'padding-inline-start / -end'];
+        yield 'border' => ['pattern' => 'border-(?:left|right)(?:-[a-z]+)?', 'logical' => 'border-inline-start / -end'];
+        // A physical corner, which the entry above does not reach: it is
+        // "border-top-left-radius", not "border-left-…".
+        yield 'corner' => ['pattern' => 'border-(?:top|bottom)-(?:left|right)-radius', 'logical' => 'border-start-start-radius and its three siblings'];
+        yield 'offset' => ['pattern' => '(?:left|right)', 'logical' => 'inset-inline-start / -end'];
+        yield 'float' => ['pattern' => 'float:\s*(?:left|right)', 'logical' => 'float: inline-start / inline-end'];
+        yield 'clear' => ['pattern' => 'clear:\s*(?:left|right)', 'logical' => 'clear: inline-start / inline-end'];
+    }
+
+    #[DataProvider('physicalBoxProperties')]
+    #[Test]
+    public function noBoxIsPlacedByAPhysicalEdge(string $pattern, string $logical): void
+    {
+        $declaration = str_contains($pattern, ':') ? $pattern : $pattern . '\s*:';
+
+        preg_match_all('/(?:\A|[{;])\s*' . $declaration . '/', $this->stylesheet(), $physical);
+
+        $this->assertSame([], $physical[0], sprintf('Use "%s" - a physical edge does not follow the direction of the text.', $logical));
+    }
+
+    /**
+     * Every icon that says a direction is mirrored in a right-to-left text.
+     *
+     * A glyph that points somewhere carries meaning in where it points: the
+     * marker of a link that leaves the site points away from the text, the
+     * chevrons of a carousel point at the slide before and the slide after,
+     * and the arrow of a footnote turns back towards the start of the line.
+     * In a right-to-left page every one of those directions is the other way
+     * round, and the glyph is the only part that does not turn by itself - the
+     * boxes around them are flex rows and logical properties, which do.
+     *
+     * Mirroring rather than a second file keeps the set the vendored one:
+     * `scale: -1 1` draws the file Font Awesome ships, the other way round.
+     *
+     * The icons that are *not* here are as deliberate: `download` points down,
+     * `envelope`, `phone` and `chevron-down` point nowhere horizontal, and an
+     * `arrow-right` an editor put in a button label is the site's content
+     * rather than the theme's furniture.
+     *
+     * `:dir()` and not `[dir='rtl']`, because the direction of an element is
+     * inherited - from the document, from a wrapper, or resolved from `auto` -
+     * and an attribute selector only sees the element that carries the
+     * attribute. It is below the browser floor of `DESIGN.md`, and the visual
+     * suite screenshots the mirrored markers in the pinned browser, so this
+     * assertion is not the only thing standing behind the claim.
+     *
+     * @return \Generator<string, array{selector: string}>
+     */
+    public static function directionAwareIcons(): \Generator
+    {
+        yield 'the marker of a link to another site' => ['selector' => '.theme-link--external .theme-link__marker'];
+        yield 'the back link of a footnote' => ['selector' => '.theme-footnotes__backlink'];
+        yield 'the carousel controls' => ['selector' => '.theme-carousel__control .theme-icon'];
+        yield 'the lightbox controls' => ['selector' => '.theme-lightbox__controls .theme-icon'];
+        yield 'the link to the source of an embed' => ['selector' => '.theme-embed__source .theme-icon'];
+    }
+
+    #[DataProvider('directionAwareIcons')]
+    #[Test]
+    public function aDirectionAwareIconIsMirroredInARightToLeftText(string $selector): void
+    {
+        $this->assertMatchesRegularExpression(
+            '/:dir\(rtl\) ' . preg_quote($selector, '/') . '\{[^}]*scale:\s*-1 1/',
+            $this->stylesheet(),
+            sprintf('"%s" points somewhere, and nothing turns it around in a right-to-left text.', $selector),
+        );
+    }
+
+    /**
      * Every table class an editor can pick has a modifier in the bundle.
      *
      * `Templates/ContentElements/Table.html` turns the `table_class` of the

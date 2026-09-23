@@ -139,3 +139,10 @@
         forced-color-adjust: none;
     }
 }
+
+// The back link is an arrow that turns back towards the start of the line, so
+// it mirrors with the reading direction - see the same rule and the reason
+// for ":dir()" in "components/_link.scss".
+:dir(rtl) .theme-footnotes__backlink {
+    scale: -1 1;
+}
