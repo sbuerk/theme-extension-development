@@ -77,3 +77,24 @@
 .theme-link__hint {
     @include mixins.visually-hidden;
 }
+
+// --- Reading direction --------------------------------------------------------
+//
+// "arrow-up-right-from-square" points away from the text it follows, which is
+// a direction and not a shape: in a right-to-left line the link that leaves
+// the site points up and to the *left*. Mirroring the glyph is the whole fix,
+// and it is a mirror rather than a second file, so the set stays the vendored
+// one - see "docs/development/icons.md".
+//
+// The other three markers are not direction aware. A download arrow points
+// down, an envelope and a handset point nowhere; mirroring them would only
+// turn the flap of the envelope around.
+//
+// ":dir()" rather than "[dir='rtl']": the direction of an element is
+// inherited and can come from the document, from a wrapper or from "auto" on
+// a "bdi", and only ":dir()" sees the resolved value. It is below the browser
+// floor of the theme (DESIGN.md) - Firefox 49, Chrome 120, Safari 16.4 - and
+// the visual suite screenshots the flipped marker in the pinned browser.
+:dir(rtl) .theme-link--external .theme-link__marker {
+    scale: -1 1;
+}

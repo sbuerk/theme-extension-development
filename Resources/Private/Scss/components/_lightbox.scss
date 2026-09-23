@@ -107,3 +107,10 @@
 .theme-lightbox__controls {
     justify-content: space-between;
 }
+
+// The previous and next arrows of the lightbox, mirrored with the reading
+// direction for the reason the carousel's are - see
+// "components/_carousel.scss".
+:dir(rtl) .theme-lightbox__controls .theme-icon {
+    scale: -1 1;
+}

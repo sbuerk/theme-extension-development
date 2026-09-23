@@ -331,3 +331,11 @@
         background-color: Highlight;
     }
 }
+
+// The two chevrons say "the slide before this one" and "the one after it",
+// and before and after are the reading direction. The buttons swap sides by
+// themselves - the row is a flex container - so only the glyphs are left to
+// mirror. See "components/_link.scss" for why this is ":dir()".
+:dir(rtl) .theme-carousel__control .theme-icon {
+    scale: -1 1;
+}

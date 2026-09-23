@@ -1999,6 +1999,64 @@ whatever takes the focus next (WCAG 2.4.11).
 on `/styleguide`, and loads the page once with JavaScript switched off and once
 with `theme.js` blocked — see [Acceptance tests](../testing/acceptance-tests.md).
 
+## Reading direction
+
+Every box of the library is spaced and bordered with logical properties, and
+every alignment is `start` or `end`, so `dir="rtl"` on an element, on a wrapper
+or on the document is nearly all that is required and the boxes turn around by
+themselves. Two unit tests hold that:
+`ComponentLibraryTest::textIsAlignedToTheStartOrTheEndOfTheLine` and
+`::noBoxIsPlacedByAPhysicalEdge`, both read off the compiled stylesheet.
+
+**One box is not, and it is known.** `.theme-dropdown__panel` is a popover in
+the top layer, so it is positioned against the viewport rather than against its
+trigger — without anchor positioning, which is above the
+[browser floor](../../DESIGN.md#the-browser-floor), `position: absolute` inside
+the component is ignored. It is pinned with
+`inset: auto var(--theme-dropdown-panel-gutter) auto auto`, and that second
+value is the **right** edge: in a right-to-left document the trigger moves to
+the left of the header row and the panel does not follow it. Neither test above
+catches it, because both match property names and this one hides in the value
+of an `inset` shorthand — see the docblock of `::noBoxIsPlacedByAPhysicalEdge`
+for why that is not gated. `.theme-toggletip__bubble` uses the same shorthand
+and is fine: `left: 50%` with `translate: -50% 0` centres a box, which is the
+same box in either direction.
+
+What does **not** turn around by itself is a glyph. An icon that points
+somewhere means something by where it points, and in a right-to-left text that
+direction is the other way round. Those are mirrored with `scale: -1 1` under
+`:dir(rtl)`, in the file of the component that uses them:
+
+| Icon                             | Where                                       |
+|----------------------------------|---------------------------------------------|
+| `arrow-up-right-from-square`     | `.theme-link--external .theme-link__marker` |
+| `arrow-turn-up`                  | `.theme-footnotes__backlink`                |
+| `chevron-left` / `chevron-right` | `.theme-carousel__control .theme-icon`      |
+| `chevron-left` / `chevron-right` | `.theme-lightbox__controls .theme-icon`     |
+| `arrow-up-right-from-square`     | `.theme-embed__source .theme-icon`          |
+
+Mirroring rather than a second file keeps the set the vendored one — the shape
+is still Font Awesome's, drawn the other way round, and `checkIconsBuild`
+covers it with the rest. `download`, `envelope`, `phone` and `chevron-down`
+point nowhere horizontal and stay as they are, and an `arrow-right` an editor
+puts in a button label is the site's content rather than the theme's
+furniture.
+
+`:dir()` and not `[dir='rtl']`: the direction of an element is inherited — from
+the document, from a wrapper, or resolved from `auto` — and an attribute
+selector only matches the element that carries the attribute. `:dir()` is below
+the [browser floor](../../DESIGN.md#the-browser-floor) (Firefox 49, Chrome 120,
+Safari 16.4), and the `direction` section of the styleguide is screenshotted by
+the visual suite, so the claim that it resolves rests on a rendered page rather
+than on a version number alone.
+
+The **page chrome is not part of this**. A right-to-left site sets the
+direction on the `html` element through its site language, and the header, the
+navigation, the breadcrumb and the footer follow it there. The showcase page
+`/typography/right-to-left` uses wrappers instead, because a seed set carries
+no site configuration; it says so on itself, and `RightToLeftRenderingTest`
+holds the document to staying left to right.
+
 ## Forced colours
 
 A convention for every component: **a state carried by colour alone gets a
@@ -2074,6 +2132,8 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 | `tabsShowEveryPanelUntilTheScriptHasBoundThem`         | The tab list is hidden and the panel headings shown until the group carries `data-theme-tabs-bound`, and nothing about the tabs is gated on `[data-js]` — see [Components that need the script](#components-that-need-the-script). |
 | `aDialogOpenerIsHiddenWithoutTheScriptMarker`          | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                    |
 | `textIsAlignedToTheStartOrTheEndOfTheLine`             | No `text-align: left` or `right` is compiled — a physical alignment puts the text of a right-to-left page against the wrong edge, and the element baseline carried two until they were found.                                      |
+| `noBoxIsPlacedByAPhysicalEdge`                         | No `margin-`, `padding-`, `border-`, `left`/`right` offset, `float` or `clear` names a physical edge — the sibling of the rule above, for where a box sits rather than where its text sits.                                        |
+| `aDirectionAwareIconIsMirroredInARightToLeftText`      | Every glyph that points somewhere carries a `:dir(rtl)` rule mirroring it — see [Reading direction](#reading-direction).                                                                                                           |
 | `aTitleOnAnyHeadingLevelKeepsItsOwnCase`               | `.theme-hero__title`, `.theme-teaser__title`, `.theme-feature__title` and `.theme-steps__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                             |
 | `noComponentReferencesAnUndeclaredToken`               | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                         |
 | `aListItemHoldingAFloatKeepsItsMarker`                 | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                            |
