@@ -272,23 +272,40 @@ rather than repeating the words in an `aria-label` — see
 its own, that text names it; where it has none, it gets a label that does not
 duplicate its trigger.
 
-### The header dropdown is a popover
+### The header dropdown is a `details`, and was a popover
 
-`Partials/Page/Dropdown.html` is a trigger carrying `popovertarget` over a panel
-carrying `popover`. The browser opens and closes it, puts it in the top layer
-and gives it light dismiss — Escape and a click outside — with no script of the
-theme's own. That is why the dropdown, unlike the display settings, is rendered
-unconditionally rather than hidden until `data-js`: nothing about opening it
-depends on a script having run.
+`Partials/Page/Dropdown.html` is a `<details>` whose `<summary>` is the trigger
+and whose panel is the next element. The browser opens and closes it and
+announces the expanded state, with no script of the theme's own. That is why
+the dropdown, unlike the display settings, is rendered unconditionally rather
+than hidden until `data-js`: nothing about opening it depends on a script having
+run. There is no `aria-expanded` in the markup — a `summary` carries the state
+of its `details`, and an authored copy would be a second one for a script to
+keep in step.
 
-`aria-expanded` is still mirrored onto the trigger, because the Popover API
-tells assistive technology nothing about it. `theme.js` does that from the
-panel's own `toggle` event — it reports the state and never changes it, so a
-page whose script failed to load still has a working dropdown with a stale
-attribute, rather than a dead button.
+It **was** a popover — a trigger carrying `popovertarget` over a panel carrying
+`popover` — and that panel opened over the trigger that opened it, on every page
+with a header. A popover is in the top layer, and the containing block of a top
+layer element is the viewport, whatever it is nested in: `position: absolute`
+inside the component does not reach the component. So the panel could only be
+pinned to a viewport coordinate, and the one it wants — the bottom edge of the
+header row — is not a coordinate CSS can name, because the header's height
+depends on its content (the title wraps, the menu wraps onto a second row).
+Pinning a box to another box is what CSS anchor positioning is for, and that is
+above the [browser floor](../../DESIGN.md#the-browser-floor). Out of the top
+layer the panel is an ordinary absolutely positioned child of the component and
+is placed against its own trigger, in logical properties, at any header height
+and in either reading direction — the way `.theme-settings__panel` always was.
+The reasoning is written out in `components/_dropdown.scss`.
 
-The Popover API is what moved the [browser floor](../../DESIGN.md#the-browser-floor)
-to Firefox 125.
+What the change costs is the **light dismiss** the Popover API gave for free.
+`theme.js` writes it back: Escape, a click outside, and focus leaving the
+control — the same three rules the display settings carry, the last of them
+WCAG 2.2 2.4.11. Without a script the dropdown still opens and closes from its
+own summary; what a reader loses there is the dismissal, not the control.
+
+The Popover API still holds the floor at Firefox 125 — the toggletip is built
+on it, and a toggletip has no placement to get wrong.
 
 The language menu inside it is a plain `<nav>` that renders anywhere; the
 dropdown only decides where it sits in the header row.

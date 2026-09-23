@@ -902,42 +902,66 @@ function bindOneEmbed(button) {
 /**
  * The dropdown of the site header.
  *
- * The opening and closing are the browser's: the trigger carries
- * `popovertarget`, the panel carries `popover`, and the Popover API gives them
- * the top layer, Escape and light dismiss with no script at all. See
- * "components/_dropdown.scss".
+ * The opening and closing are the element's own: the component is a
+ * `details`/`summary` pair, so the browser toggles it, announces the expanded
+ * state and keeps the control working with no script at all - which is why the
+ * dropdown, unlike the display settings and the dialog opener, is rendered
+ * unconditionally rather than hidden until "data-js".
  *
- * What is left for this file is the one thing the platform does not do: the
- * Popover API says nothing to assistive technology about the *trigger*, so the
- * open state is mirrored onto its `aria-expanded` from the panel's own
- * `toggle` event.
+ * What this file adds is the **light dismiss**: Escape, a click outside, and
+ * focus leaving the control. The panel used to be a popover and got all three
+ * from the platform, and lost them together with the top layer when it was
+ * taken out of it so that it could be positioned under its own trigger - see
+ * the header of "components/_dropdown.scss" for why a top layer box cannot be.
  *
- * This only ever *reports* a state the browser already changed. It never opens
- * or closes anything, which is why the dropdown is not hidden behind
- * "data-js" the way the display settings and the dialog opener are: a page
- * whose script never ran still has a working dropdown, with a trigger whose
- * `aria-expanded` is stale - a far smaller failure than a control that does
- * nothing at all.
+ * These are the same three rules `bindDisplaySettings` writes above, against
+ * an element that carries its own state instead of an attribute this file
+ * sets, and the third of them is WCAG 2.2 2.4.11: a panel left open over the
+ * element that now has focus obscures it.
  *
- * `toggle` is bound on the panel rather than `click` on the trigger, because
- * a popover also closes by routes the trigger never sees: Escape, a click
- * anywhere outside, and another popover opening.
+ * A page whose script never ran keeps a dropdown that opens and closes from
+ * its own summary. What it loses is the dismissal, not the control.
  */
 function bindDropdowns() {
-    document.querySelectorAll('.theme-dropdown__trigger').forEach(bindOneDropdownTrigger);
+    document.querySelectorAll('details.theme-dropdown').forEach(bindOneDropdown);
 }
 
-function bindOneDropdownTrigger(trigger) {
-    const panel = document.getElementById(trigger.getAttribute('popovertarget') || '');
-    if (!panel) {
+function bindOneDropdown(dropdown) {
+    const trigger = dropdown.querySelector('.theme-dropdown__trigger');
+    if (!trigger) {
         return;
     }
 
-    // "ToggleEvent.newState" is "open" or "closed". Older engines that have
-    // the Popover API but not the event simply leave the attribute at its
-    // server-rendered "false", which is the same degradation as no script.
-    panel.addEventListener('toggle', function (event) {
-        trigger.setAttribute('aria-expanded', event.newState === 'open' ? 'true' : 'false');
+    document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Escape' || !dropdown.open) {
+            return;
+        }
+
+        // Focus returns to the trigger unless it is on an element elsewhere on
+        // the page - the same rule, and the same reasoning, as the settings
+        // panel above.
+        const active = document.activeElement;
+        const focusIsElsewhere = active !== null && active !== document.body && !dropdown.contains(active);
+        dropdown.open = false;
+        if (!focusIsElsewhere) {
+            trigger.focus();
+        }
+    });
+
+    document.addEventListener('click', function (event) {
+        // "contains()" is also true for a click on the summary, which is what
+        // keeps the browser's own toggle from being undone by this handler on
+        // the same click.
+        if (dropdown.open && !dropdown.contains(event.target)) {
+            dropdown.open = false;
+        }
+    });
+
+    dropdown.addEventListener('focusout', function (event) {
+        const next = event.relatedTarget;
+        if (dropdown.open && next instanceof Node && !dropdown.contains(next)) {
+            dropdown.open = false;
+        }
     });
 }
 

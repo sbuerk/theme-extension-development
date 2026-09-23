@@ -245,33 +245,51 @@
     <div class="theme-styleguide__specimen">
         <h3>Dropdown</h3>
         <p>
-            A labelled button that discloses a panel below it &mdash; the site header
-            puts the language menu in one. The trigger carries
-            <code>popovertarget</code> and the panel <code>popover</code>, so the
-            browser opens it, puts it in the top layer and closes it again on Escape
-            or a click outside, with no script of the theme's own.
+            A labelled trigger that discloses a panel under it &mdash; the site header
+            puts the language menu in one. It is a native
+            <code>details</code>/<code>summary</code> pair, so the browser opens and
+            closes it and announces the expanded state, with no script of the theme's
+            own. <code>theme.js</code> adds only the dismissal: Escape, a click
+            outside, and focus leaving the control.
         </p>
         <p>
             It is a disclosure, not an ARIA menu: the panel holds ordinary links that
-            Tab reaches. <code>aria-expanded</code> is mirrored onto the trigger from
-            the panel's <code>toggle</code> event, because the Popover API tells
-            assistive technology nothing about the trigger &mdash; and that is also
-            what the stylesheet paints the open state from and what turns the chevron.
-            The trigger's name is real text, visually hidden, so the header row keeps
-            its width and the name is still translated with the page.
+            Tab reaches. There is no <code>aria-expanded</code> &mdash; the
+            <code>details</code> carries the state itself, and that is also what the
+            stylesheet paints the open state from and what turns the chevron. The
+            trigger's name is real text, visually hidden, so the header row keeps its
+            width and the name is still translated with the page.
         </p>
         <p class="theme-styleguide__label">
-            The button works on this page. In the screenshots of the visual suite it
-            is shown closed: those pages render with no script, and a popover is
-            closed until something opens it.
+            The panel is an ordinary absolutely positioned child of the component, not
+            a popover in the top layer: a top layer box is positioned against the
+            viewport, and pinning one under its trigger is what CSS anchor positioning
+            is for, which is above the browser floor. So it opens under its trigger
+            here, in the middle of this page, exactly as it does at the end of the
+            header row.
         </p>
-        <div class="theme-dropdown">
-            <button class="theme-dropdown__trigger" type="button" popovertarget="theme-styleguide-dropdown-panel" aria-expanded="false">
+        <p class="theme-styleguide__label">
+            The trigger works on this page. In the screenshots of the visual suite it
+            is shown closed, which is the state it renders in.
+        </p>
+        <f:comment>
+            The panel keeps an id although nothing points at one any more - the
+            "popovertarget" that used to is gone with the popover. It is part of
+            the markup contract ("Partials/Page/Dropdown.html" takes "id" as a
+            required argument), a specimen that dropped it would show a contract
+            the theme does not render, and it is what an acceptance test or a site
+            package addresses one particular panel by.
+            "StyleguideRenderingTest::everyIdReferenceOnThePageResolves" checks
+            references against ids and not the other way round, so nothing here
+            fails either way; this note is why that is deliberate.
+        </f:comment>
+        <details class="theme-dropdown">
+            <summary class="theme-dropdown__trigger">
                 <theme:icon name="globe" />
                 <span class="theme-dropdown__label">Language</span>
                 <theme:icon name="chevron-down" class="theme-dropdown__marker" />
-            </button>
-            <div class="theme-dropdown__panel" id="theme-styleguide-dropdown-panel" popover>
+            </summary>
+            <div class="theme-dropdown__panel" id="theme-styleguide-dropdown-panel">
                 <nav class="theme-language-menu" aria-label="Language dropdown specimen">
                     <ul class="theme-language-menu__list">
                         <li class="theme-language-menu__item">
@@ -283,7 +301,7 @@
                     </ul>
                 </nav>
             </div>
-        </div>
+        </details>
     </div>
 
     <div class="theme-styleguide__specimen">
