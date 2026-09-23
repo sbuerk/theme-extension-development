@@ -1,0 +1,64 @@
+// Byline.
+//
+// Markup contract:
+//
+//     <p class="theme-byline">
+//         <span class="theme-byline__item">By <span class="theme-byline__author">…</span></span>
+//         <time class="theme-byline__item" datetime="2026-09-20">20 September 2026</time>
+//         <span class="theme-byline__item">…</span>
+//     </p>
+//
+// The credit line of a long text: who wrote it, when, and whatever else is
+// worth one short phrase. It sits between the title of an article and its
+// first paragraph, which is why it is a "p" rather than a list - a reader
+// hears one line, not three items - and why the date is a "time" with a
+// machine readable "datetime" while the other parts are spans.
+//
+// --- Not ".theme-author" -----------------------------------------------------
+//
+// "components/_author.scss" is a person: a portrait, a role and a bio, laid
+// out beside each other, rendered by the "theme_author" content element. A
+// byline is the opposite shape - one line of running text, no portrait, and
+// no record of its own. The two would share nothing but the word "author".
+//
+// --- The rule between two items ----------------------------------------------
+//
+// The items are separated by a hairline rather than by a character in
+// "content", for the reason "docs/development/icons.md" gives for every shape
+// the stylesheet draws: a middle dot or a slash in generated content is a
+// glyph the stylesheet invented, and this one is the border of the box that
+// follows it. It is logical - "border-inline-start" - so it stays between the
+// items in a right-to-left text as well.
+//
+// See "components/_button.scss" for why every component declares its own
+// token layer with a fallback.
+
+.theme-byline {
+    --theme-byline-gap: var(--theme-space-3, 0.9375rem);
+    --theme-byline-color: var(--theme-color-text-secondary, #4a5567);
+    --theme-byline-rule-color: var(--theme-color-border, #d5dae2);
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--theme-byline-gap);
+    margin: 0 0 var(--theme-space-4, 1.25rem);
+    color: var(--theme-byline-color);
+    font-size: var(--theme-font-size-sm, 0.875rem);
+}
+
+// The first item has no rule before it, and a wrapped line starts a new
+// group, which the separator cannot know about - a rule at the start of a
+// line is the one place this looks wrong, and a flex row that wraps is
+// exactly where it happens. It is accepted rather than worked around: the
+// alternative is a separator element per gap in the markup, which puts a
+// meaningless span into every byline a site writes.
+.theme-byline__item + .theme-byline__item {
+    border-inline-start: var(--theme-border-width, 1px) solid var(--theme-byline-rule-color);
+    padding-inline-start: var(--theme-byline-gap);
+}
+
+.theme-byline__author {
+    color: var(--theme-color-text-primary, #14181f);
+    font-weight: var(--theme-font-weight-medium, 500);
+}

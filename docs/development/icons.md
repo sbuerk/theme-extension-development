@@ -434,6 +434,7 @@ a state. The stylesheet still draws a few shapes of its own, and they are
 | The ring and rail of a timeline   | `components/_timeline.scss`   | The position of an entry in a sequence; the date says what the ring marks.     |
 | The dot of a carousel indicator   | `components/_carousel.scss`   | The position of a slide in the set; the link around it carries the name.       |
 | The `/` between breadcrumb items  | `components/_breadcrumb.scss` | A text separator in `content`, not a glyph.                                    |
+| The rule between byline items     | `components/_byline.scss`     | The `border-inline-start` of the item after it — a separator, not a glyph.     |
 | The arrow of a native select      | the browser                   | The user agent's own indicator, left in place on purpose.                      |
 
 The accordion chevron and the check mark of the chosen palette were drawn from
@@ -464,6 +465,13 @@ differs from the check list's on purpose: the marker opts out and keeps
 `currentColor`, which is then the link colour the system forces, where the
 check mark paints `CanvasText` — a marker has to stay the colour of its link.
 See [Component library § Link decoration](component-library.md#link-decoration).
+
+The back link of a footnote is the second case again, and takes both rules
+from it: `.theme-footnotes__backlink` masks `arrow-turn-up`, and the markup it
+sits in comes out of a rich text or an `html` content element, where
+`<theme:icon>` cannot be called at all. It opts out of forced colours and
+keeps `currentColor` rather than painting `CanvasText`, because it is the
+marker of a link — see `components/_footnotes.scss`.
 
 The rule is narrow on purpose: a stylesheet references **only files of
 `Resources/Public/Icons/FontAwesome/Solid/`**, by their relative path from the

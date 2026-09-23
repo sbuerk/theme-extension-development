@@ -450,6 +450,70 @@ typoscript: 'EXT:theme_extension_development/Configuration/TypoScript/'</code></
         </figure>
     </div>
 
+    <h3>Byline</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_byline.scss. The
+            items are separated by the border of the item that follows, not
+            by a character in generated content - see docs/development/icons.md.
+        </f:comment>
+        <p>
+            <code>.theme-byline</code> is the credit line between the title of
+            a long text and its first paragraph: who wrote it, when, and
+            whatever else fits in one short phrase. The date is a
+            <code>time</code> with a machine readable <code>datetime</code>;
+            the rest are spans, because a byline is read as one line rather
+            than as a list of three.
+        </p>
+        <p class="theme-byline">
+            <span class="theme-byline__item">By <span class="theme-byline__author">Ada Lovelace</span></span>
+            <time class="theme-byline__item" datetime="2026-09-20">20 September 2026</time>
+            <span class="theme-byline__item">Eight minutes</span>
+        </p>
+    </div>
+
+    <h3>Footnotes</h3>
+    <div class="theme-styleguide__specimen">
+        <f:comment>
+            Contract: Resources/Private/Scss/components/_footnotes.scss. Both
+            blocks live in that one file because neither is any use without
+            the other, and the reference never sits inside the list.
+
+            The ids here are prefixed with the section so they stay unique on
+            a page that renders every specimen at once -
+            StyleguideRenderingTest::everyIdOnThePageIsUnique.
+        </f:comment>
+        <p>
+            A reference is a <code>sup.theme-footnote-ref</code> around a link
+            to the note, and it carries the id the note links back to. The
+            number is in the markup rather than in a counter: it is what the
+            reference and the note have in common, and a reader copying the
+            sentence out copies it with them.
+        </p>
+        <p>
+            An element is rendered because a page asks for the content of one
+            of its columns<sup class="theme-footnote-ref" id="typography-fnref1"><a href="#typography-fn1">1</a></sup>,
+            not because the element
+            exists<sup class="theme-footnote-ref" id="typography-fnref2"><a href="#typography-fn2">2</a></sup>.
+        </p>
+        <aside class="theme-footnotes" aria-labelledby="typography-footnotes-heading">
+            <h4 class="theme-footnotes__heading" id="typography-footnotes-heading">Notes</h4>
+            <ol class="theme-footnotes__list">
+                <li class="theme-footnotes__item" id="typography-fn1">
+                    1. The column is the <code>colPos</code> of the element, and the
+                    backend layout decides which columns a page has at all.
+                    <a class="theme-footnotes__backlink" href="#typography-fnref1" aria-label="Back to reference 1"></a>
+                </li>
+                <li class="theme-footnotes__item" id="typography-fn2">
+                    2. Which is why an element moved into a column the layout of
+                    its page does not have disappears from the page without
+                    being deleted.
+                    <a class="theme-footnotes__backlink" href="#typography-fnref2" aria-label="Back to reference 2"></a>
+                </li>
+            </ol>
+        </aside>
+    </div>
+
     <h3>Horizontal rule</h3>
     <div class="theme-styleguide__specimen">
         <p>
