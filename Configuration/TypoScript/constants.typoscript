@@ -45,6 +45,25 @@ theme {
         actionLabel =
     }
 
+    footer {
+        # How the site footer arranges its content: "columns" (the default) or
+        # "newsletter", which adds a band above them. See
+        # "Partials/Page/Footer.html" and "layout/_site-footer.scss".
+        #
+        # Also a site setting of the same name - see "theme.header.variant"
+        # above for what that means.
+        variant = columns
+
+        # The newsletter band of the "newsletter" footer: its heading, one
+        # optional line of text, and the page and label of the button leading
+        # to the subscription form. Heading, page and label are all required;
+        # without any of them the band is not rendered.
+        newsletterHeading =
+        newsletterText =
+        newsletterPage = 0
+        newsletterLabel =
+    }
+
     media {
         # The width in pixels the image gallery is computed for. No image is
         # processed wider than this, so it should match the width the layout

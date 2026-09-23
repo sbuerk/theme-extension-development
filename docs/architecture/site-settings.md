@@ -154,11 +154,13 @@ twice comes from. Two rules follow:
   a variant switch and turns an editable value into a file system lookup.
   `Partials/Page/Header.html` names its four partials as literals in an
   `f:switch`, so a value nothing matches renders the default.
-  `SiteHeaderVariantRenderingTest::aValueTheSwitchDoesNotKnowRendersTheDefaultHeader`
+  `ChromeVariantRenderingTest::aValueTheSwitchDoesNotKnowRendersTheDefaultHeader`
   is that assertion.
 - **A half-configured feature renders nothing, not half of itself.** The call
-  to action needs both of its settings; with one it is a button with no
-  destination or a button with no name, and either is worse than no button.
+  to action of the `actions` header needs both of its settings and the
+  newsletter band of the `newsletter` footer needs three of its four; with one
+  missing they are a button with no destination, a button with no name or a
+  band with nothing to say, and each is worse than nothing at all.
 
 ## Testing a setting
 
@@ -177,14 +179,14 @@ seam that decides between the set and the static include
   `sys_template` record that selects the static include,
   `theme.header.variant = centred` — where an integrator on v12 writes them.
 
-So `SiteHeaderVariantRenderingTest` proves the setting on v13 and the constant
+So `ChromeVariantRenderingTest` proves the setting on v13 and the constant
 alone on v12, each on the path that version actually has.
 
 **A test class that writes the site more than once has to flush the caches
 between the writes.** Both the resolved site and the TypoScript built from its
 settings are cached, and without the flush every test after the first renders
 the first one's configuration — green, and measuring nothing.
-`SiteHeaderVariantRenderingTest` does it in the helper that writes the site.
+`ChromeVariantRenderingTest` does it in the helper that writes the site.
 
 ## See also
 

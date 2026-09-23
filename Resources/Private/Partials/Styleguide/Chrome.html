@@ -3,9 +3,9 @@
       xmlns:theme="http://typo3.org/ns/SBUERK/ThemeExtensionDevelopment/ViewHelpers">
 
 <f:comment>
-    Styleguide section "chrome": the site header in each of the arrangements
-    the site setting "theme.header.variant" can select. Contract:
-    "layout/_site-header.scss" and
+    Styleguide section "chrome": the site header and the site footer in each
+    of the arrangements their site settings can select. Contract:
+    "layout/_site-header.scss", "layout/_site-footer.scss" and
     docs/development/component-library.md#layout.
 
     Literal markup, like every other specimen of this page - not the real
@@ -55,6 +55,14 @@
         had. The three others each give the title or the navigation a row of
         its own, which is why none of them has to re-negotiate the width budget
         the single row keeps.
+    </p>
+
+    <p>
+        The site footer follows below, in the two arrangements
+        <code>theme.footer.variant</code> selects. Both chrome settings work the
+        same way: a partial per value, a modifier per variant, a default that
+        carries none, and a switch over literal partial names so the value of
+        the setting never becomes part of a path.
     </p>
 
     <div class="theme-styleguide__specimen">
@@ -171,6 +179,115 @@
                 </nav>
             </div>
         </header>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Footer — columns</h3>
+        <p>
+            The four content columns above the meta row, each slid down from the
+            site root so every page shows the same footer. A column is where a
+            row of platform logos goes: the last one below is a
+            <code>theme_sociallinks</code> element, which is all the theme ships
+            for that — a footer slot of its own would be a second name for a
+            column.
+        </p>
+        <footer class="theme-site-footer">
+            <div class="theme-site-footer__inner">
+                <div class="theme-site-footer__columns">
+                    <div class="theme-site-footer__column">
+                        <p class="theme-eyebrow">About</p>
+                        <p>A theme built to be read, in a repository built to be reviewed.</p>
+                    </div>
+                    <div class="theme-site-footer__column">
+                        <p class="theme-eyebrow">Sections</p>
+                        <nav class="theme-content-menu" aria-label="Footer sections specimen">
+                            <ul class="theme-content-menu__list">
+                                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#">Elements</a></li>
+                                <li class="theme-content-menu__item"><a class="theme-content-menu__link" href="#">Typography</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="theme-site-footer__column">
+                        <p class="theme-eyebrow">Contact</p>
+                        <p>Somewhere, some street 1</p>
+                    </div>
+                    <div class="theme-site-footer__column">
+                        <p class="theme-eyebrow">Elsewhere</p>
+                        <nav class="theme-social-links" aria-label="Footer social links specimen">
+                            <ul class="theme-social-links__list">
+                                <li class="theme-social-links__item">
+                                    <a class="theme-social-links__link" href="#">
+                                        <theme:icon set="brands" name="mastodon" />
+                                        <span class="theme-social-links__label">Mastodon</span>
+                                    </a>
+                                </li>
+                                <li class="theme-social-links__item">
+                                    <a class="theme-social-links__link" href="#">
+                                        <theme:icon set="brands" name="github" />
+                                        <span class="theme-social-links__label">GitHub</span>
+                                    </a>
+                                </li>
+                                <li class="theme-social-links__item">
+                                    <a class="theme-social-links__link" href="#">
+                                        <theme:icon set="brands" name="linkedin" />
+                                        <span class="theme-social-links__label">LinkedIn</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="theme-site-footer__meta">
+                    <p>&copy; 2026 &middot; <a href="#">Imprint</a> &middot; <a href="#">Privacy</a></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div class="theme-styleguide__specimen">
+        <h3>Footer — newsletter</h3>
+        <p>
+            The same footer with a band above it. The band is a heading, an
+            optional line and a button leading to the page that carries the
+            actual subscription form — <strong>not a form itself</strong>: the
+            theme has nowhere to post an address to, and a field that looks like
+            a subscription and drops what is typed into it is worse than no
+            field. Heading, page and label are all required, and the band is not
+            rendered without any one of them.
+        </p>
+        <p class="theme-styleguide__label">
+            The band's heading is an <code>&lt;h2&gt;</code> in the real partial, where the
+            footer carries no other heading to nest under. Here it is an
+            <code>&lt;h4&gt;</code>: this specimen sits under the <code>&lt;h3&gt;</code>
+            above it, and an <code>&lt;h2&gt;</code> would claim the band is a sibling of
+            the section.
+        </p>
+        <footer class="theme-site-footer theme-site-footer--newsletter">
+            <div class="theme-site-footer__newsletter">
+                <div class="theme-site-footer__inner theme-site-footer__inner--newsletter">
+                    <div class="theme-site-footer__newsletter-text">
+                        <h4 class="theme-site-footer__newsletter-heading">Read along</h4>
+                        <p>One mail per release, with what changed and why.</p>
+                    </div>
+                    <a class="theme-button theme-button--primary theme-site-footer__newsletter-action" href="#">Subscribe</a>
+                </div>
+            </div>
+            <div class="theme-site-footer__inner">
+                <div class="theme-site-footer__columns">
+                    <div class="theme-site-footer__column">
+                        <p class="theme-eyebrow">About</p>
+                        <p>A theme built to be read, in a repository built to be reviewed.</p>
+                    </div>
+                    <div class="theme-site-footer__column">
+                        <p class="theme-eyebrow">Contact</p>
+                        <p>Somewhere, some street 1</p>
+                    </div>
+                </div>
+                <div class="theme-site-footer__meta">
+                    <p>&copy; 2026 &middot; <a href="#">Imprint</a> &middot; <a href="#">Privacy</a></p>
+                </div>
+            </div>
+        </footer>
     </div>
 </section>
 
