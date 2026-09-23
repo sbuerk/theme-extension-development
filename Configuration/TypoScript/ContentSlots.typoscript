@@ -72,7 +72,7 @@ lib.content.stage {
 }
 
 # The footer slots are edited once, on the site root page, and inherited by
-# every page below it - "select.slide = -1" is what makes that happen.
+# every page below it - "slide = -1" is what makes that happen.
 #
 # A CONTENT object normally reads only the current page's colPos. "slide"
 # makes it walk the rootline instead: a positive number is a level count, and
@@ -83,53 +83,63 @@ lib.content.stage {
 # level up or fifty - which is exactly what camino's "slideMode = slide"
 # gets from EXT:fluid_styled_content's own "lib.contentElement" wiring,
 # reproduced here without depending on that extension.
+#
+# "slide" IS A PROPERTY OF THE CONTENT OBJECT, NOT OF "select". These five
+# carried it inside "select {}" for as long as they existed, where
+# ContentContentObject never looks - it reads "slide" off the object's own
+# configuration ("ContentContentObject::render()", first lines) and the query
+# builder ignores a key it does not know, so nothing failed and nothing slid.
+# It was invisible because no page of the showcase had anything in these
+# columns to slide, which is the other half of the same defect. The gate is
+# "ShowcaseTreeTest", in the test named after this slide: it renders a page
+# four levels below the root and looks for the root's footer in it.
 
 lib.content.footermeta = CONTENT
 lib.content.footermeta {
     table = tt_content
+    slide = -1
     select {
         orderBy = sorting
         where = {#colPos}=10
-        slide = -1
     }
 }
 
 lib.content.footer1 = CONTENT
 lib.content.footer1 {
     table = tt_content
+    slide = -1
     select {
         orderBy = sorting
         where = {#colPos}=11
-        slide = -1
     }
 }
 
 lib.content.footer2 = CONTENT
 lib.content.footer2 {
     table = tt_content
+    slide = -1
     select {
         orderBy = sorting
         where = {#colPos}=12
-        slide = -1
     }
 }
 
 lib.content.footer3 = CONTENT
 lib.content.footer3 {
     table = tt_content
+    slide = -1
     select {
         orderBy = sorting
         where = {#colPos}=13
-        slide = -1
     }
 }
 
 lib.content.footer4 = CONTENT
 lib.content.footer4 {
     table = tt_content
+    slide = -1
     select {
         orderBy = sorting
         where = {#colPos}=14
-        slide = -1
     }
 }

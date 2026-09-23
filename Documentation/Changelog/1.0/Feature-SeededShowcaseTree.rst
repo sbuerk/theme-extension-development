@@ -30,7 +30,10 @@ The tree demonstrates the whole theme rather than a handful of pages:
         -   What it shows
     *   -   :guilabel:`Theme demo` (``/``)
         -   :guilabel:`Start page`
-        -   The site root, and the footer columns that layout adds.
+        -   The site root. It is the only page that fills the four footer
+            columns and the meta row those layouts add, and every page below it
+            renders them - which is what the :typoscript:`slide = -1` of those
+            five slots is for.
     *   -   :guilabel:`Typography` (``/typography``)
         -   :guilabel:`Content page`
         -   Headings, running text and the inline cases a stylesheet has to
