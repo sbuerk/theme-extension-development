@@ -127,7 +127,7 @@ final class SiteSettingsTest extends UnitTestCase
      * Every label an integrator reads is a literal.
      *
      * A set may carry a "labels.xlf", and the label and the description of a
-     * setting are taken from it on both cores - but the options of an enum
+     * setting are taken from it on TYPO3 v13.4 - but the options of an enum
      * only from TYPO3 v14.2 on. On v13.4 the enum is handed over as written,
      * so a "LLL:" reference inside it reaches the settings editor spelled
      * out. The settings here are enums, so all of their text stays literal -
