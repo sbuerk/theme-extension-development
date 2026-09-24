@@ -13,10 +13,11 @@ they are a trademark of somebody else, which is why they are an allowlist
 rather than a style copied whole.
 
 ```bash
-# Copy the solid icons of the pinned version into the extension.
+# Copy the solid icons, the allowlisted brand logos, the licence and the
+# categories of the pinned version into the extension.
 Build/Scripts/runTests.sh -s buildIcons
 
-# Check the committed set still equals the pinned package, as CI does.
+# Check the committed copies still equal the pinned package, as CI does.
 Build/Scripts/runTests.sh -s checkIconsBuild
 ```
 
