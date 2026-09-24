@@ -17,13 +17,15 @@ only, through the historical :guilabel:`General Plugin` / :guilabel:`list`
 registration.
 
 :php:`configurePlugin()` generates :typoscript:`tt_content.<pluginSignature>
-=< lib.contentElement` for every plugin, unconditionally, on both installed
-core versions - even on v14, where nothing outside this theme defines
-:typoscript:`lib.contentElement` at all, because ``fluid_styled_content`` is
-not installed there. Before this change nothing rendered that object's
-:typoscript:`templateName = Generic`, so every such plugin fell through to
-TYPO3's own "no rendering definition" notice, indistinguishable to an editor
-from a broken content element.
+=< lib.contentElement` for every plugin, unconditionally, on both supported
+core versions. Of the TYPO3 system extensions, ``fluid_styled_content``
+defines :typoscript:`lib.contentElement` on TYPO3 v13.4 and v14.3, and on
+v14.3 ``theme_camino`` does as well, since v14.1 (Feature :issue:`108539`),
+each with a ``Generic`` template of its own. On a site that includes the
+TypoScript of neither, nothing rendered that object's
+:typoscript:`templateName = Generic` before this change, so every such plugin
+fell through to TYPO3's own "no rendering definition" notice,
+indistinguishable to an editor from a broken content element.
 
 :file:`Resources/Private/Templates/Generic.html` is the new template that
 fixes that - shared by every plugin regardless of extension, because

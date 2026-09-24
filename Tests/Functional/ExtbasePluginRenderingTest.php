@@ -13,11 +13,13 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  *
  * This is the least visible load-bearing thing in the extension.
  * `ExtensionUtility::configurePlugin()` emits
- * `tt_content.<signature> =< lib.contentElement` for every plugin ever
- * registered, and `lib.contentElement` came from `fluid_styled_content` - which
- * is not a dependency here and, on TYPO3 v14, is not installed at all. Nothing
- * in vanilla v14 defines it. So on a v14 instance using this theme, the theme's
- * own definition is the only reason any Extbase plugin renders.
+ * `tt_content.<signature> =< lib.contentElement` for every plugin registered
+ * as its own CType. Of the TYPO3 system extensions, `fluid_styled_content`
+ * defines `lib.contentElement` on v13.4 and v14.3, and on v14.3 `theme_camino`
+ * does as well, since v14.1 (#108539), each with a `Generic` template of its
+ * own. Neither is a dependency here, and this test loads neither. So on a site
+ * that includes the TypoScript of neither, the theme's own definition is the
+ * only reason any Extbase plugin renders.
  *
  * The fixture extension deliberately ships **no TypoScript of its own**. It
  * registers the plugin and nothing else, so if this passes, it passed because
@@ -74,7 +76,7 @@ final class ExtbasePluginRenderingTest extends AbstractFunctionalTestCase
         $this->assertStringContainsString(
             'Plugin fixture rendered through lib.contentElement',
             $this->render(),
-            'The plugin did not render. Without a "lib.contentElement" of this theme\'s own, nothing would.',
+            'The plugin did not render. Without a "lib.contentElement" of this theme\'s own, nothing in this instance would.',
         );
     }
 
