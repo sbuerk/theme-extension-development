@@ -2062,7 +2062,8 @@ value is the **right** edge, so in a right-to-left document the trigger moved to
 the left of the header row and the panel stayed on the right. Neither test above
 caught it: both match property names, and this one hid in the *value* of an
 `inset` shorthand. The panel is not a popover any more and is placed with
-`inset-inline-end` against its own component
+`inset-inline-end` against its own component, and in the site header against
+the header
 ([the header dropdown](../architecture/navigation.md#the-header-dropdown-is-a-details-and-was-a-popover)),
 and a third test, `ComponentLibraryTest::noInsetShorthandPlacesABoxByAPhysicalEdge`,
 now splits every `inset` shorthand into its values and fails on a second and a
