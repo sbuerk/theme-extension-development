@@ -1019,3 +1019,126 @@ test.describe('the display settings panel', () => {
         await context.close();
     });
 });
+
+/**
+ * Both panels of the controls slot drop under the whole header in every header
+ * variant, not only in the default one the page itself renders.
+ *
+ * The blocks above measure the page's own header, which is `simple`. The
+ * other three arrangements are one site setting away and nothing opened a
+ * panel in them - and `centred` put both panels inside the header, over its
+ * navigation row: its title row was `position: relative` and its controls
+ * `position: absolute`, so the row, not the header, was their containing
+ * block. The stylesheet gate in `ComponentLibraryTest` names the positioned
+ * boxes; this measures what they did.
+ *
+ * The instance renders one variant per site, and a page choosing another
+ * would need a per-page override of a site-wide setting that no site writes
+ * (see the note on the "Examples" section of the showcase scenario). So the
+ * four headers measured are the specimens of the styleguide section `chrome`,
+ * which carry the markup of the variant partials and are held to it by
+ * `ComponentLibraryTest::theChromeSpecimensCarryEveryClassTheirPartialsWrite`.
+ * A specimen stands one icon button in for the controls; the real slot of the
+ * page's own header - the language dropdown and the display settings, as the
+ * instance renders them - is copied into each one first, with its ids made
+ * unique, and both panels are opened.
+ *
+ * The same measurement holds two more promises of the header rows: no title
+ * box reaches under a trigger in any variant, and the title of `centred` sits
+ * on the centre of the content container from `bp.$md` up. Below it the
+ * variant centres the title together with the controls, so 375 checks only
+ * the first. 768 is `bp.$md` itself.
+ */
+test.describe('the header panels in every header variant', () => {
+    for (const width of [1280, 768, 375]) {
+        test(`drop under the whole header and end at its container at ${width} pixels`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto('/styleguide');
+
+            const measured = await page.evaluate(() => {
+                const slot = document.querySelector('.theme-page > .theme-site-header .theme-site-header__actions');
+                if (slot === null) {
+                    throw new Error('The page header has no controls slot to copy.');
+                }
+                const variants: Record<string, Record<string, number>> = {};
+                document.querySelectorAll<HTMLElement>('#chrome .theme-site-header').forEach((header, index) => {
+                    const modifier = [...header.classList].find((name) => name.startsWith('theme-site-header--'));
+                    const variant = modifier === undefined ? 'simple' : modifier.slice('theme-site-header--'.length);
+                    const target = header.querySelector('.theme-site-header__actions');
+                    if (target === null) {
+                        throw new Error(`The "${variant}" specimen has no controls slot.`);
+                    }
+                    target.innerHTML = slot.innerHTML.replaceAll('theme-language-panel', `sg-chrome-${index}-language-panel`)
+                        .replaceAll('theme-settings-', `sg-chrome-${index}-settings-`);
+                    const dropdown = target.querySelector<HTMLDetailsElement>('details.theme-dropdown');
+                    const dropdownPanel = target.querySelector<HTMLElement>('.theme-dropdown__panel');
+                    const settingsPanel = target.querySelector<HTMLElement>('.theme-settings__panel');
+                    if (dropdown === null || dropdownPanel === null || settingsPanel === null) {
+                        throw new Error('The copied controls slot lacks the language dropdown or the display settings.');
+                    }
+                    dropdown.open = true;
+                    settingsPanel.hidden = false;
+
+                    // The content container of the last row: the first row of
+                    // a variant may carry spacing of its own.
+                    const rows = header.querySelectorAll<HTMLElement>('.theme-site-header__inner');
+                    const row = rows[rows.length - 1];
+                    const dropdownBox = dropdownPanel.getBoundingClientRect();
+                    const settingsBox = settingsPanel.getBoundingClientRect();
+                    const rowBox = row.getBoundingClientRect();
+                    const rowStyle = getComputedStyle(row);
+                    const containerStart = rowBox.left + parseFloat(rowStyle.paddingInlineStart);
+                    const containerEnd = rowBox.right - parseFloat(rowStyle.paddingInlineEnd);
+
+                    const brand = header.querySelector('.theme-site-header__brand');
+                    if (brand === null) {
+                        throw new Error(`The "${variant}" specimen has no title.`);
+                    }
+                    const brandBox = brand.getBoundingClientRect();
+                    // The title's box against every trigger of the copied
+                    // slot, as a count of intersecting pairs.
+                    let brandOverTriggers = 0;
+                    target.querySelectorAll('.theme-dropdown__trigger, .theme-settings__trigger').forEach((trigger) => {
+                        const box = trigger.getBoundingClientRect();
+                        if (!(brandBox.right <= box.left || box.right <= brandBox.left || brandBox.bottom <= box.top || box.bottom <= brandBox.top)) {
+                            brandOverTriggers++;
+                        }
+                    });
+
+                    variants[variant] = {
+                        headerBottom: header.getBoundingClientRect().bottom,
+                        containerEnd,
+                        containerCentre: (containerStart + containerEnd) / 2,
+                        brandCentre: (brandBox.left + brandBox.right) / 2,
+                        brandOverTriggers,
+                        dropdownTop: dropdownBox.top,
+                        dropdownEnd: dropdownBox.right,
+                        settingsTop: settingsBox.top,
+                        settingsEnd: settingsBox.right,
+                    };
+                });
+                return variants;
+            });
+
+            expect(Object.keys(measured).sort()).toEqual(['actions', 'centred', 'simple', 'two-tier']);
+            for (const [variant, box] of Object.entries(measured)) {
+                // Under all of the header, which in the three variants with
+                // two rows is under the second row as well.
+                expect.soft(box.dropdownTop, `the top of the language panel of "${variant}"`).toBeGreaterThanOrEqual(box.headerBottom);
+                expect.soft(box.settingsTop, `the top of the display settings panel of "${variant}"`).toBeGreaterThanOrEqual(box.headerBottom);
+                // And at the end of the content container, the edge the header
+                // anchor derives - not the end of a row that captured it.
+                expect.soft(box.dropdownEnd, `the end of the language panel of "${variant}"`).toBeCloseTo(box.containerEnd, 0);
+                expect.soft(box.settingsEnd, `the end of the display settings panel of "${variant}"`).toBeCloseTo(box.containerEnd, 0);
+                // The title's box stays clear of the controls.
+                expect.soft(box.brandOverTriggers, `triggers under the title of "${variant}"`).toBe(0);
+            }
+
+            // The title of "centred" on the centre of the whole row, not of
+            // the space the controls leave.
+            if (width >= 768) {
+                expect.soft(Math.abs(measured.centred.brandCentre - measured.centred.containerCentre), 'the title of "centred" off the centre of its row').toBeLessThanOrEqual(1);
+            }
+        });
+    }
+});

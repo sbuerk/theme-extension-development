@@ -1568,6 +1568,22 @@ fails on a variant rule that sets a width on the navigation or the brand, which
 is the way that promise breaks silently: the acceptance tests render the
 default and would stay green.
 
+**`centred` centres the title against the whole row, without positioning
+anything.** From `bp.$md` up an empty `::before` at the start of the title row
+and the controls slot at its end are both `flex: 1 1 0`, so they take equal
+halves of what the title leaves and the title sits on the centre of the content
+container. The slot keeps its automatic minimum, so a long title moves towards
+the start rather than under the controls. It used to take the controls out of
+the flow with `position: absolute` in a `position: relative` row, which put the
+title 48 pixels off centre, let the box of a long title reach 18 pixels under
+the controls — so a title whose line fills that box ran under them — and,
+worse, captured both panels of the slot, which then opened inside the header.
+No box between the header and its controls slot is positioned in any variant,
+and `ComponentLibraryTest::noBoxBetweenTheHeaderAndItsControlsIsPositioned`
+holds that. The title carries its own `text-align: center`; on the row it was
+inherited by the controls slot and centred the text of both panels. See
+[the header dropdown](../architecture/navigation.md#the-header-dropdown-is-a-details-and-was-a-popover).
+
 The call to action of `actions` takes two more settings, `theme.header.actionPage`
 and `theme.header.actionLabel`, and renders nothing unless both are set. The
 destination is a **page uid, not a link** — nothing an integrator writes into

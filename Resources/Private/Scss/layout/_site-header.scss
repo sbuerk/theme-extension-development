@@ -273,19 +273,50 @@
 // "centred": the title is centred in its row with the controls at the end of
 // it, and the navigation is centred below.
 //
-// The controls are taken out of the flow with "position: absolute" so the
-// title is centred against the row rather than against the space the
-// controls leave - a title centred in the remainder sits visibly left of
-// centre. The row keeps space for them with a padding equal to their width,
-// which is what "--theme-site-header-controls-space" is; below the
-// breakpoint the controls return to the flow, because at that width a title
-// centred between the screen edge and a cog has no room to be centred in.
+// From "bp.$md" up the title is centred against the whole row, not against
+// the space the controls leave - a title centred in the remainder sits
+// visibly off centre. An empty "::before" at the start of the row and the
+// controls slot at its end are both "flex: 1 1 0", so they split the space
+// the title leaves in two equal halves and the title sits between them, on
+// the centre of the content container. The slot is a flex item with an
+// automatic minimum, so it never gets narrower than its controls: when a long
+// title leaves less than that on each side, the counterweight gives way
+// first, and the title moves towards the start rather than under the
+// controls. The title stays a flex item of the row, so the 50% cap of
+// "bp.$lg" above still resolves against the row, as it does in the other
+// three arrangements.
+//
+// **Nothing in this row is positioned, on purpose.** Both panels of the
+// controls slot are placed against ".theme-site-header" - see "The panels
+// drop under the row" at the end of this file - and any positioned box
+// between the header and the slot would capture them. This variant did
+// exactly that: the row was "position: relative" to anchor the controls,
+// which were "position: absolute" from "bp.$md" up, and both panels opened
+// inside the header, over the navigation row: with a one line title and seven
+// entries, a panel top at 57 in a header ending at 129 at 1280 pixels, and at
+// 109.6 in one ending at 182 at 375. With the same absolute controls the box
+// of a long title reached 18 pixels under them at 768 and 900 pixels - the
+// space kept for them was a constant padding of 6rem - so a title whose line
+// fills its box ran under them; and the title sat 48 pixels towards the start
+// of the row at every width from "bp.$md" up, because that padding was on one
+// side only. "ComponentLibraryTest" fails on a positioned row, meta row or
+// controls slot in any arrangement, and the acceptance suite opens both
+// panels in all four.
+//
+// "text-align: center" is on the title and not on the row: set on the row it
+// is inherited by everything in the controls slot, and the two panels, the
+// legends and the language list of "centred" were centred where every other
+// arrangement starts them at the start edge.
+//
+// Below the breakpoint the controls stay in the flow beside the title, and
+// the pair is centred: at that width a title centred between the screen edge
+// and a cog has no room to be centred in.
 .theme-site-header--centred {
-    --theme-site-header-controls-space: 6rem;
-
     .theme-site-header__inner--brand {
-        position: relative;
         justify-content: center;
+    }
+
+    .theme-site-header__brand {
         text-align: center;
     }
 
@@ -299,13 +330,17 @@
 
     @media (min-width: bp.$md) {
         .theme-site-header__inner--brand {
-            padding-inline-end: calc(var(--theme-space-4) + var(--theme-site-header-controls-space));
+            flex-wrap: nowrap;
+
+            &::before {
+                content: '';
+                flex: 1 1 0;
+            }
         }
 
         .theme-site-header__actions {
-            position: absolute;
-            inset-inline-end: var(--theme-space-4);
-            inset-block: 0;
+            flex: 1 1 0;
+            justify-content: flex-end;
         }
 
         // Not ".theme-site-header .theme-nav-main > ul" as well: this block
@@ -427,9 +462,13 @@
 // panel being misplaced, and it is recorded here because the CSS is where
 // someone will ask.
 //
-// The "two-tier" variant puts the controls in the meta row above the title.
-// The panels still drop under the whole header there, which is further from
-// their triggers than in the other three arrangements and still over nothing.
+// The three variants with two rows put the controls in the first of them -
+// "centred" and "actions" beside the title, "two-tier" in the meta row above
+// it. The panels still drop under the whole header there, under the second
+// row as well, which is further from their triggers than in the one row
+// default and still over nothing. That holds only while nothing between the
+// header and the controls slot is positioned: a positioned row captures the
+// panels and they open inside the header - see "centred" above, which did.
 //
 // Below "bp.$md" without a script the header is as tall as the whole menu,
 // and this anchor puts a panel under all of it - see the header of
