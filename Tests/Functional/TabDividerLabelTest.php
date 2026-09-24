@@ -14,15 +14,19 @@ use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
  * A `--div--` whose label does not resolve is the quietest kind of defect this
  * extension can ship: TCA stays valid, no exception is thrown, every other test
  * stays green, and the only symptom is a tab in the backend titled with its own
- * `LLL:` reference. It is also a trap that only springs on one core version -
+ * label reference, or with nothing at all. It is also a trap that only springs
+ * on one core version -
  * `LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:images` is a
  * label of TYPO3 v13.4 that v12.4 does not have, and five element definitions
  * of this branch used it.
  *
- * `LanguageService::sL()` returns a non-empty string for a key it cannot
- * resolve on both versions - the key itself, unchanged - so "it translated to
- * something" is not the assertion. What separates a resolved label from an
- * unresolved one is that the result differs from the reference that went in.
+ * What `LanguageService::sL()` hands back for a label it cannot resolve
+ * depends on the form of the label, on v12.4 and v13.4 alike: an `LLL:`
+ * reference to a missing key yields an empty string, and a string without the
+ * prefix comes back unchanged. So a resolved label is one that is neither
+ * empty nor the string that went in, and the test asserts both. The label
+ * `locallang_tabs.xlf:images` on v12.4 is the first kind, and fails the
+ * second assertion.
  */
 final class TabDividerLabelTest extends AbstractFunctionalTestCase
 {
