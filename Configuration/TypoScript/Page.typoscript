@@ -34,15 +34,16 @@ page {
                 useRegExp = 1
             }
 
-            # "PageLayoutResolver::getLayoutIdentifierForPage()" returns the
-            # literal, unprefixed string "none" - not empty, so "ifEmpty"
-            # above never sees it - when an editor picks TYPO3's own built-in
-            # "[None]" option in the page properties, which every page offers
-            # regardless of which layouts this theme registers. Left alone
-            # that resolves to a "Page/None.html" this theme never ships, and
-            # the request dies rather than degrading. Falling back to
-            # "default" here is the same choice "ifEmpty" already makes for a
-            # page with no layout at all.
+            # "PageLayoutResolver" returns the literal, unprefixed string
+            # "none" - not empty, so "ifEmpty" above never sees it - when an
+            # editor picks TYPO3's own built-in "[None]" option in the page
+            # properties, which every page offers regardless of which layouts
+            # this theme registers. The getter calls "getLayoutForPage()" on
+            # TYPO3 v12.4 and "getLayoutIdentifierForPage()" on v13.4; both
+            # return it. Left alone that resolves to a "Page/None.html" this
+            # theme never ships, and the request dies rather than degrading.
+            # Falling back to "default" here is the same choice "ifEmpty"
+            # already makes for a page with no layout at all.
             replacement.20 {
                 search = #^none$#
                 replace = default

@@ -12,13 +12,16 @@
 # opposed to a "*" wildcard or a directory) includes exactly that file - see
 # "TYPO3\CMS\Core\TypoScript\IncludeTree\TreeFromLineStreamBuilder::processAtImport()".
 #
-# Every column carries an "identifier" as well as a "name" and a "colPos". The
-# core reads it - "GridColumn::__construct()" takes it from the column
+# Every column carries an "identifier" as well as a "name" and a "colPos".
+# TYPO3 v13.4 reads it - "GridColumn::__construct()" takes it from the column
 # definition and "getIdentifierCleaned()" turns it into the
 # "t3-grid-cell-<identifier>" class the page module puts on the column
-# ("Resources/Private/Partials/PageLayout/Grid/Column.html") - so it is a
-# stable hook rather than decoration. The identifiers are the slot names the
-# "lib.content.*" objects use, which is also what a later move to PAGEVIEW
+# ("Resources/Private/Partials/PageLayout/Grid/Column.html") - so there it is
+# a stable hook rather than decoration. TYPO3 v12.4 reads no column
+# identifier: its "GridColumn::__construct()" keeps the column definition but
+# reads only the "colPos", the "name", the "icon" and the spans out of it, so
+# there the key is carried along unused. The identifiers are the slot names
+# the "lib.content.*" objects use, which is also what a later move to PAGEVIEW
 # would address a content area by, so one vocabulary covers the layout
 # definition and the rendering.
 @import 'EXT:theme_extension_development/Configuration/PageTsConfig/BackendLayouts/Default.tsconfig'

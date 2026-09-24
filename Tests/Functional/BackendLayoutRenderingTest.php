@@ -19,8 +19,11 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * test that checked only the explicit case would pass against the broken
  * implementation.
  *
- * `PageLayoutResolver::getLayoutIdentifierForPage()` is the behaviour being
- * relied on, and it has two edges worth pinning down:
+ * The core's `PageLayoutResolver` is the behaviour being relied on -
+ * `getLayoutForPage()` of `TYPO3\CMS\Frontend\Page\PageLayoutResolver` on
+ * TYPO3 v12.4, `getLayoutIdentifierForPage()` of
+ * `TYPO3\CMS\Core\Page\PageLayoutResolver` on v13.4, one method body on both -
+ * and it has two edges worth pinning down:
  *
  *  - it `array_shift()`s the rootline before looking for
  *    `backend_layout_next_level`, so a page's own "next level" setting applies

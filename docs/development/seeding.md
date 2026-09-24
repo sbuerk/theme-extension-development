@@ -256,8 +256,9 @@ Four properties of that tree are deliberate, and are asserted by
 preserve:
 
 - **Page 4 declares no `backend_layout` at all**, and that is the point of it.
-  It is the only page in the tree that reaches the hard-coded `default` in
-  `PageLayoutResolver::getLayoutIdentifierForPage()`, after the
+  It is the only page in the tree that reaches the hard-coded `default` of
+  the core's `PageLayoutResolver` — `getLayoutForPage()` on v12.4,
+  `getLayoutIdentifierForPage()` on v13.4 — after the
   `backend_layout_next_level` walk up the rootline found nothing.
 - **Pages 6 and 7 use `content_sidebar` and their sibling 8 does not.** Two
   pages under one parent rendering with and without the sub navigation is what
