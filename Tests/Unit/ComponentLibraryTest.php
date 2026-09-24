@@ -719,6 +719,99 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * No box between the site header and its controls slot is positioned, in
+     * any header variant and at any width.
+     *
+     * The gate above holds the two panels to `position: static` components
+     * and to offsets of `100%`, which is the header's height only as long as
+     * the header is their containing block. Any positioned box between the
+     * two takes that role over, and it is a quiet takeover: the panels still
+     * open, still close and still end at a derived edge - of the wrong box.
+     * The `centred` variant did exactly that. Its title row was
+     * `position: relative` at every width, to anchor controls that were
+     * `position: absolute` from `bp.$md` up, and both panels opened inside
+     * the header, over the navigation row.
+     *
+     * The boxes that can stand between the two are the rows
+     * (`.theme-site-header__inner` with any modifier), the meta band of
+     * `two-tier` (`.theme-site-header__meta`) and the slot itself
+     * (`.theme-site-header__actions`), so a rule that targets one of them may
+     * not set `position` to anything but `static`. "Targets" is the last
+     * compound of a selector: `.theme-site-header__actions .theme-button` is
+     * a rule for the button. A pseudo-element is not an ancestor of anything,
+     * so a compound naming one is left out. Media queries are not told apart,
+     * and do not need to be: the answer is the same at every width.
+     *
+     * The two components themselves are the other half. The gate above reads
+     * the one selector `.theme-site-header .theme-dropdown` (and
+     * `.theme-settings`) and checks it says `static`; a more specific rule
+     * inside the header - `.theme-site-header--two-tier .theme-settings
+     * { position: relative }` - passes that and wins over it, and anchors the
+     * panel on its own trigger again. So any rule with a
+     * `.theme-site-header` compound in its selector whose last compound is
+     * one of the two components (not one of their elements) may not set
+     * `position` to anything but `static` either.
+     */
+    #[Test]
+    public function noBoxBetweenTheHeaderAndItsControlsIsPositioned(): void
+    {
+        $between = ['.theme-site-header__inner', '.theme-site-header__meta', '.theme-site-header__actions'];
+        $components = ['theme-dropdown', 'theme-settings'];
+
+        $seen = [];
+        $positioned = [];
+        foreach ($this->rules() as [$selectors, $declarations]) {
+            foreach (array_map('trim', explode(',', $selectors)) as $selector) {
+                $compounds = preg_split('/\s*[\s>+~]\s*/', $selector) ?: [];
+                $target = (string)end($compounds);
+                if (str_contains($target, '::')) {
+                    continue;
+                }
+
+                $names = array_filter($between, static fn(string $class): bool => str_contains($target, $class));
+                $seen += array_fill_keys($names, true);
+
+                // One of the two components, inside the header: a class of
+                // the last compound that is the component or a modifier of
+                // it, and a class of the header block anywhere before it.
+                preg_match_all('/\.([\w-]+)/', $target, $targetClasses);
+                preg_match_all('/\.([\w-]+)/', implode(' ', array_slice($compounds, 0, -1)), $ancestorClasses);
+                $isComponent = array_filter(
+                    $targetClasses[1],
+                    static fn(string $class): bool => in_array(preg_replace('/--[\w-]+$/', '', $class), $components, true),
+                ) !== [];
+                $insideTheHeader = array_filter(
+                    $ancestorClasses[1],
+                    static fn(string $class): bool => str_starts_with($class, 'theme-site-header'),
+                ) !== [];
+
+                if ($names === [] && !($isComponent && $insideTheHeader)) {
+                    continue;
+                }
+                foreach ($declarations as $declaration) {
+                    [$property, $value] = array_pad(array_map('trim', explode(':', $declaration, 2)), 2, '');
+                    if ($property === 'position' && $value !== 'static') {
+                        $positioned[] = sprintf('%s { position: %s }', $selector, $value);
+                    }
+                }
+            }
+        }
+
+        $this->assertSame(
+            $between,
+            array_values(array_intersect($between, array_keys($seen))),
+            'A box between the header and its controls is not styled at all any more - the list above is out of date.',
+        );
+        $this->assertSame(
+            [],
+            $positioned,
+            'A positioned box between ".theme-site-header" and the panels of its controls slot - a row, the meta band, '
+            . 'the slot or one of the two components - becomes their containing block, and they open inside the header '
+            . 'instead of under it.',
+        );
+    }
+
+    /**
      * The compiled stylesheet as a list of `[selectors, declarations]`.
      *
      * The bundle is minified to one rule per line, so a rule is everything
