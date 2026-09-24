@@ -93,15 +93,23 @@ lib.themeContentElement {
 #
 # "ExtensionUtility::configurePlugin()"
 # (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php",
-# read on both installed core versions) emits "=< lib.contentElement" /
+# lines 77-79 at v13.4.35, 65-67 at v14.3.7) emits "=< lib.contentElement" /
 # "templateName = Generic" for every plugin registered as its own CType,
-# unconditionally - v14.3.6 emits it even though nothing in a vanilla v14 core
-# defines "lib.contentElement" any more (a "grep -r 'lib.contentElement ='"
-# across the whole installed v14 vendor tree returns nothing outside this
-# extension). This theme is therefore what makes a third-party Extbase plugin
-# render at all, not an optional convenience: without a "Generic" template
-# every such plugin falls through to the core's own "no rendering definition"
-# notice, indistinguishable to an editor from a broken content element.
+# unconditionally. Of the TYPO3 system extensions, "fluid_styled_content"
+# defines "lib.contentElement" on v13.4 and v14.3
+# ("Configuration/TypoScript/Helper/ContentElement.typoscript", lines 2-4 at
+# v13.4.35 and at v14.3.7), and on v14.3 "theme_camino" does as well, since
+# v14.1 (Feature #108539;
+# "Configuration/Sets/camino/TypoScript/content.typoscript", lines 3-4 at
+# v14.3.7). Each brings a "Generic" template of its own. Neither is a
+# dependency of this extension, and an installed one defines nothing until a
+# site includes its TypoScript: the set "typo3/fluid-styled-content" or the
+# static include of "fluid_styled_content", or the set "typo3/theme-camino".
+# For a site that includes the TypoScript of neither, this theme is therefore
+# what makes a third-party Extbase plugin render at all, not an optional
+# convenience: without a "Generic" template every such plugin falls through
+# to the core's own "no rendering definition" notice, indistinguishable to an
+# editor from a broken content element.
 # "Templates/Generic.html" is that template - at the *root* of
 # "templateRootPath", not below "ContentElements/" the way every other
 # template in this file is: "templateName = Generic" is the literal string
