@@ -89,11 +89,13 @@ TypoScript itself.
 | `styleguide`       | Styleguide                | `Page/Styleguide.html`     |
 | `forms`            | Form showcase             | `Page/Forms.html`          |
 
-`default` is also the literal fallback identifier
-`PageLayoutResolver::getLayoutIdentifierForPage()` returns when neither a
-page nor any ancestor has a `backend_layout` set — every page not otherwise
-configured reaches it, so it has to exist as a real layout, not merely be
-selectable.
+`default` is also the literal fallback identifier the core's
+`PageLayoutResolver` returns — `getLayoutForPage()` on v12.4,
+`getLayoutIdentifierForPage()` on v13.4, see
+[Template name resolution](#template-name-resolution) — when neither the
+page's `backend_layout` nor any ancestor's `backend_layout_next_level` is set.
+Every page not otherwise configured reaches it, so it has to exist as a real
+layout, not merely be selectable.
 
 ### Column layout
 
@@ -186,18 +188,23 @@ Four things about it are load-bearing:
   Reading `backend_layout` directly ignores that inheritance entirely, and
   every sub-page of a configured parent would silently render the wrong
   template — silently, because nothing about a missing field looks like an
-  error. The getter itself is nothing new: it has existed since 7.5 (#69602),
-  and the only change since is v13.0 (#102715), which moved where it reads
-  the page record from, not what it returns. Verified present and unchanged
-  in that respect in the installed v13.4.34 core.
+  error. The getter itself is nothing new: it has existed since 7.5 (#69602).
+  What it calls differs between the two versions this branch supports, what
+  it returns does not. On v12.4 it calls `getLayoutForPage()` of
+  `TYPO3\CMS\Frontend\Page\PageLayoutResolver`; on v13.4 the class is
+  `TYPO3\CMS\Core\Page\PageLayoutResolver`, the same body is named
+  `getLayoutIdentifierForPage()`, and `getLayoutForPage()` returns a nullable
+  `PageLayout` instead of a string. v13.0 (#102715) also changed where
+  the getter reads the page record from. Verified in the installed v12.4.45
+  and v13.4.35 cores.
 - **The `pagets__` prefix is stripped.** `replacement.10` removes it with a
   regular expression. The PageTsConfig provider prefixes every identifier it
   returns with `pagets__` — it also has to distinguish layouts that come from
   database records, which are prefixed `0_` instead — so the raw value is
   `pagets__content`, not `content`, and has to be stripped before it is
   usable as a file name.
-- **`replacement.20` maps the literal string `none` to `default`.**
-  `PageLayoutResolver::getLayoutIdentifierForPage()` returns exactly that
+- **`replacement.20` maps the literal string `none` to `default`.** The
+  resolver method the getter calls on either version returns exactly that
   string — not empty — when an editor picks TYPO3's own built-in "[None]"
   option in the page properties, an option every page offers regardless of
   which layouts this theme registers. Because it is not empty, `ifEmpty`
