@@ -21,9 +21,10 @@ Even on v13 alone it would not be the better one. The layer normally used with
 it — `ContentAreaCollection`, `{content.main.records}` and the
 `f:render.contentArea` / `f:render.record` ViewHelpers — does not exist on
 v13.4 at all. Verified rather than recalled:
-`.Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/` shipped neither ViewHelper
-in v13.4.34. `PAGEVIEW` itself would run; there is simply nothing to render
-content areas with beside it.
+`.Build/vendor/typo3/cms-fluid/Classes/ViewHelpers/` ships neither ViewHelper
+in v13.4.35, whose `Render/` holds `TextViewHelper.php` alone, and no class of
+that dependency set is named `ContentAreaCollection`. `PAGEVIEW` itself would
+run; there is simply nothing to render content areas with beside it.
 
 `FLUIDTEMPLATE` is not deprecated, and the changelog entry introducing
 `PAGEVIEW` does not present it as a replacement either — it describes it as
@@ -305,15 +306,15 @@ addition to `name` and `colPos`. Nothing forces that on either supported version
 on **v13** the backend page module reads it. `GridColumn` takes the key off the
 column definition and exposes it as `identifierCleaned`
 (`.Build/vendor/typo3/cms-backend/Classes/View/BackendLayout/Grid/GridColumn.php`,
-lines 72 and 138–141 of v13.4.34), and
+lines 72 and 138–141 of v13.4.35), and
 `Resources/Private/Partials/PageLayout/Grid/Column.html` renders it as a
 `t3-grid-cell-<identifier>` class on the grid cell. A column without an
 identifier loses that styling hook, and nothing reports it.
 
 TYPO3 v12's `GridColumn` has no `identifier` handling at all — the word does not
-occur in the file — so on v12 the key is simply carried and ignored. That is a
-reason to keep writing it, not to drop it: the same layout definition serves
-both versions and gains the styling hook wherever it is read.
+occur in the file at v12.4.45 — so on v12 the key is simply carried and
+ignored. That is a reason to keep writing it, not to drop it: the same layout
+definition serves both versions and gains the styling hook wherever it is read.
 
 `colPos` cannot stand in for it: it is the number a content element is stored
 against, shared across every layout, while the identifier names *this*

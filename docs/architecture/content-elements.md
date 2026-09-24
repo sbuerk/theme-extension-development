@@ -1081,8 +1081,8 @@ there is no precedence to leave room for.
 The reason is `fluid_styled_content`. Its
 `Configuration/TypoScript/Helper/ContentElement.typoscript` starts with
 `lib.contentElement >` and builds the object again from its own root paths
-(verified at `v12.4.45` and `v13.4.34`). An installation that loads it
-after the theme therefore loses every root path the theme set on that object,
+(lines 2–4, verified at `v12.4.45` and `v13.4.35`). An installation that loads
+it after the theme therefore loses every root path the theme set on that object,
 and an element of the theme's own would look for `ContentElements/Theme…` in
 fluid_styled_content's templates and fail. Nothing clears an object of the
 theme's own name, so these elements render the same whether that extension is

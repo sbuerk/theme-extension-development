@@ -16,8 +16,8 @@
 # value *raw* onto the tag - "htmlspecialchars()" and nothing else, no stdWrap
 # anywhere in the loop - so a constant is the only thing that can go here,
 # never a cObject. Read, not assumed:
-# ".Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php" (v13.4.34,
-# line 833).
+# ".Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php" (line
+# 880 at v12.4.45, 833 at v13.4.35).
 
 config.htmlTag.attributes.data-palette = {$theme.appearance.palette}
 config.htmlTag.attributes.data-theme-content-outline = {$theme.appearance.contentOutline}
@@ -139,11 +139,12 @@ page.headerData.10 {
 #     "includeJSFooter." branch, passes the resource's own ".type" straight on
 #     as the second argument of "addJsFooterFile($file, $type, ...)" -
 #     ".Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php"
-#     (v13.4.34, the branch at line 567, the call at line 587);
+#     (the branch at line 584 and the call at line 605 at v12.4.45, 567 and
+#     587 at v13.4.35);
 #   - "PageRenderer::renderJavaScriptFiles()" writes that "type" onto the tag
 #     as a literal attribute whenever it is non-empty -
 #     ".Build/vendor/typo3/cms-core/Classes/Page/PageRenderer.php"
-#     (v13.4.34, line 1726).
+#     (lines 2453-2454 at v12.4.45, 1726-1727 at v13.4.35).
 #
 # The footer, not the head, because this script only wires up event listeners
 # on elements that already exist by the time it can matter - it never has to

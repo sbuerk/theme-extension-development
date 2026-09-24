@@ -61,13 +61,14 @@ config.htmlTag.attributes.data-theme-content-outline = {$theme.appearance.conten
 ```
 
 `RequestHandler::generateHtmlTag()` iterates `htmlTag.attributes.*` and writes
-each value onto the tag **raw**: `stdWrap` is only applied when a matching
-`attributes.<name>.` sub-array is configured, and none is here. Verified in
-source rather than from the TypoScript reference —
-`.Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php` of the
-installed v13.4.34 core, `generateHtmlTag()` at line 833, whose loop at line
-837 concatenates `htmlspecialchars()` of the name and the value and nothing
-else. A constant is therefore the only thing that can be assigned here; a
+each value onto the tag **raw**: no `stdWrap` runs on an attribute at all, and
+the one `stdWrap` of the method, `htmlTag_stdWrap`, runs over the finished tag.
+Verified in source rather than from the TypoScript reference —
+`.Build/vendor/typo3/cms-frontend/Classes/Http/RequestHandler.php`,
+`generateHtmlTag()` at line 833 of v13.4.35 and 880 of v12.4.45, whose loop at
+line 837 (884 on v12.4.45) concatenates `htmlspecialchars()` of the name and
+the value and nothing else; `htmlTag_stdWrap` follows at lines 853–855
+(900–902). A constant is therefore the only thing that can be assigned here; a
 cObject would need the `stdWrap` this code path never runs.
 
 `data-theme` is behind a condition rather than a plain assignment, for a
