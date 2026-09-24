@@ -94,18 +94,20 @@ lib.themeContentElement {
 #
 # "ExtensionUtility::configurePlugin()"
 # (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php",
-# v12.4.45 and v13.4.35) emits "=< lib.contentElement" /
+# lines 72-74 at v12.4.45, 77-79 at v13.4.35) emits "=< lib.contentElement" /
 # "templateName = Generic" for every plugin registered as its own CType,
 # unconditionally - it never checks that anything defines
-# "lib.contentElement". Nothing in the installed core does:
-# "lib.contentElement" is a "fluid_styled_content" object, and FSC is not a
-# dependency of this theme, so a "grep -r 'lib.contentElement ='" across the
-# whole installed vendor tree returns nothing outside an 8.7 changelog entry
-# and this extension. This theme is therefore what makes a third-party Extbase
-# plugin render at all, not an optional convenience: without a "Generic"
-# template every such plugin falls through to the core's own "no rendering
-# definition" notice, indistinguishable to an editor from a broken content
-# element.
+# "lib.contentElement". Of the TYPO3 system extensions, only
+# "fluid_styled_content" defines it, on v12.4 and v13.4 alike
+# ("Configuration/TypoScript/Helper/ContentElement.typoscript", lines 2-4 at
+# v12.4.45 and at v13.4.35), with a "Generic" template of its own. It is not
+# a dependency of this extension, and an installed one defines nothing until
+# a site includes its TypoScript: its static include, or on v13.4 the set
+# "typo3/fluid-styled-content". For a site that does not include it, this
+# theme is therefore what makes a third-party Extbase plugin render at all,
+# not an optional convenience: without a "Generic" template every such plugin
+# falls through to the core's own "no rendering definition" notice,
+# indistinguishable to an editor from a broken content element.
 # "Templates/Generic.html" is that template - at the *root* of
 # "templateRootPath", not below "ContentElements/" the way every other
 # template in this file is: "templateName = Generic" is the literal string
