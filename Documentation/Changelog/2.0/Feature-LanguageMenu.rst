@@ -32,11 +32,19 @@ count as translated - the default language is filtered out of the overlay chain
 The dropdown
 ------------
 
-The menu sits behind a labelled trigger in the header that discloses a panel
-under it. The component is a native :html:`details` / :html:`summary` pair, so
-the browser opens it, closes it and announces the expanded state; the panel is
-placed against its own trigger, at the end of the header row, in either reading
-direction.
+The menu sits behind a labelled trigger in the header that discloses a panel.
+The component is a native :html:`details` / :html:`summary` pair, so the
+browser opens it, closes it and announces the expanded state.
+
+In the site header the panel is placed against the header, not against its
+own trigger: it drops under the whole header and ends at the end of the content
+container, in either reading direction - the inline end it shares with the
+display settings panel beside it. A panel placed under the trigger alone would
+cover the header's own navigation: in the one row header the row is as tall as
+its tallest child and the main navigation may wrap onto a second line inside
+it, and in the other three arrangements the navigation has a row of its own
+below the controls. A dropdown standing on its own, outside the header, opens
+under its own trigger.
 
 The dropdown works without the theme's JavaScript and is rendered whether the
 script loaded or not. What the script adds is the dismissal: :kbd:`Escape`, a
@@ -69,6 +77,7 @@ Two new components ship: :css:`.theme-language-menu` and the generic
 :html:`details` / :html:`summary` pair, so the browser opens it, closes it and
 announces the expanded state without a script; :file:`theme.js` adds only the
 dismissal - Escape, a click outside, and focus leaving the control. The panel
-is placed under its own trigger, which is why it is not a :html:`popover`: a
-popover is in the top layer, and a top layer box is positioned against the
-viewport rather than against whatever it sits in.
+is placed against what it sits in - the header in the site header, its own
+trigger anywhere else - which is why it is not a :html:`popover`: a popover is
+in the top layer, and a top layer box is positioned against the viewport rather
+than against whatever it sits in.
