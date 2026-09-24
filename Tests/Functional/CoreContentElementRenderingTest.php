@@ -284,10 +284,10 @@ final class CoreContentElementRenderingTest extends AbstractFunctionalTestCase
      * This is the distinguishing observation, and it is why the test exists
      * beside `aCircularShortcutDoesNotTakeTheRequestDown`: that one passes
      * whether or not this theme breaks the cycle, because the core's own
-     * `RecordsContentObject` register (`$recordRegister`, v13.4) already keeps
-     * a *cycle* from taking the request down. Verified by removing
-     * `conf.tt_content.shortcut` from the rendering definition and watching it
-     * stay green. This test goes red there instead.
+     * `RecordsContentObject` register (`$recordRegister`, on v12.4 and v13.4)
+     * already keeps a *cycle* from taking the request down. Verified by
+     * removing `conf.tt_content.shortcut` from the rendering definition and
+     * watching it stay green. This test goes red there instead.
      */
     #[Test]
     public function aShortcutInsideAShortcutRendersNothing(): void
