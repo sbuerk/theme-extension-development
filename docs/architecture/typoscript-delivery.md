@@ -485,9 +485,22 @@ the site set. `DevelopmentInstance/LegacyDeliveryTest` runs on both versions
 but carries the group on two of its methods for the same reason: they assert
 how the two trees of the v13 instance are delivered.
 `Core12/DevelopmentInstance/InstanceDeliveryTest` is their v12 counterpart.
-Everything else arranges the theme through
-[`ThemeSiteTrait`](../testing/site-based-tests.md#arranging-the-theme-themesitetrait)
-and runs on both versions.
+Everything else runs on both versions. Four of those arrange the theme through
+[`ThemeSiteTrait`](../testing/site-based-tests.md#arranging-the-theme-themesitetrait):
+`ContentElementRenderingTest` and `ImageElementRenderingTest` entirely,
+`ThemeContentElementObjectTest` and `FeloginRenderingTest` for their theme
+path, beside an `include_static_file` of their own. The others do not:
+`StaticFileIncludeRenderingTest`,
+`ExtbasePluginStaticIncludeRenderingTest` and `FluidStyledContentBridgeTest`
+write `include_static_file`, `StaticTypoScriptFallbackRenderingTest` imports the
+two files of the static directory, and `StaticTypoScriptIncludeTest` reads the
+TCA and the file system and renders nothing.
+`DevelopmentInstance/DeliveryRegistrationTest`, like
+`DevelopmentInstance/LegacyDeliveryTest` and
+`Core12/DevelopmentInstance/InstanceDeliveryTest` named above, imports the seed
+of the development instance instead of arranging a site; the latter two also
+adopt the instance's committed site configurations. `ThemeSiteTrait` only
+names the seed set in those three.
 
 Each covers a break that is easy to produce on purpose: renaming the set breaks
 `SiteSetRenderingTest`, inverting the guard condition breaks the static ones and
