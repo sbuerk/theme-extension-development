@@ -66,9 +66,9 @@ which has no site sets and no settings editor, that is the only way, and the
 :file:`settings.definitions.yaml` of the set is read by nothing there. A value
 of the same key in the site's :file:`settings.yaml` does not help on the
 static include: TYPO3 adds it as a constant before the static template, and
-the theme's default overrules it. On a
-TYPO3 v13 site that uses the set, where both exist, TYPO3 lets the site
-setting win. See :ref:`configuration-site-settings`.
+the theme's default overrules it. On a TYPO3 v13 site that uses the set, where
+both exist, TYPO3 lets the site setting win. See
+:ref:`configuration-site-settings`.
 
 Impact
 ======
