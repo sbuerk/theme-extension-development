@@ -114,12 +114,17 @@ answer.
 Reading `EXT:frontend/Configuration/TCA/tt_content.php` shows a `types` array of
 `1`, `header`, `text` — and on v13 additionally `list` — which reads like the
 complete list of content types. It is not. The same extension ships **22 files**
-in `Configuration/TCA/Overrides/`, among them
-`225-tt_content-content_type-image.php` and
-`230-tt_content-content_type-textmedia.php`, each calling
-`ExtensionManagementUtility::addRecordType()`. Verified against `v13.4.0`,
-`v13.4.34` and `v14.3.6`; the set is identical, the only difference being the
-tab label short form v14 introduced (#107789).
+in `Configuration/TCA/Overrides/` on v13.4 and 24 on v14.3, and 20 of them —
+among them `225-tt_content-content_type-image.php` and
+`230-tt_content-content_type-textmedia.php` — each call
+`ExtensionManagementUtility::addRecordType()` for one classic type. Verified
+against `v13.4.0`, `v13.4.35` and `v14.3.7`: the 20 are the same files on all
+three. v14.3 adds only `fe_groups.php` and `fe_users.php`, which relabel
+columns of those tables. In the 20 it references the tab and palette labels in
+the short form of #107789, and drops the field label overrides from `showitem`
+(#107789 as well), moving two of them — `bodytext` of `table`, `media` of
+`uploads` — into `columnsOverrides`, without changing which types they
+register.
 
 `fluid_styled_content`'s own `Configuration/TCA/Overrides/` holds exactly one
 file, `sys_template.php`, which registers its static include. **It contributes no

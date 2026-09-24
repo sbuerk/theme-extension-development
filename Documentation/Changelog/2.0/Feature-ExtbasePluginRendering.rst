@@ -57,7 +57,7 @@ than to a single plugin.
 It is declared unconditionally rather than behind a version condition: on
 v14 the ``list_type`` database column itself was dropped along with the
 ``CType``, so nothing can ever reach the branch - verified directly against
-the installed v14.3.6 core, not only argued from the changelog. See
+the installed v14.3.7 core, not only argued from the changelog. See
 :file:`docs/architecture/content-elements.md` in the developer documentation
 for the full verification and the reasoning for leaving it unconditional.
 

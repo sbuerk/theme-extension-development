@@ -146,7 +146,7 @@ lib.themeContentElement {
 # Declared unconditionally, not behind a "[not (...)]" version condition -
 # deliberate, not an oversight: on v14 nothing can ever reach this branch at
 # all, verified directly rather than inferred from the changelog alone. With
-# v14.3.6 installed, "grep -n \"'list'\\|list_type\"
+# v14.3.7 installed, "grep -n \"'list'\\|list_type\"
 # .Build/vendor/typo3/cms-frontend/Configuration/TCA/tt_content.php" returns
 # nothing at all - no "types.list" entry, no "CType" select item, no
 # "subtype_value_field" - and the changelog explains why so completely that

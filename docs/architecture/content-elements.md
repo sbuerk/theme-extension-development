@@ -564,8 +564,8 @@ afterwards.
 
 **On TYPO3 v13.4**, that recursion is guarded by the core, and the guard was
 verified in source rather than assumed, against
-`RecordsContentObject::render()` while v13.4.34 was the installed core
-(`instance-core-13/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php`):
+`RecordsContentObject::render()` at v13.4.35
+(`.Build/vendor/typo3/cms-frontend/Classes/ContentObject/RecordsContentObject.php`):
 
 1. Before fetching anything, `render()` reads the record currently being
    rendered off `TypoScriptFrontendController::$currentRecord` and registers
@@ -596,11 +596,19 @@ properties `Breaking-107831-RemovedTypoScriptFrontendController.rst` took off
 removed … making the class a readonly internal service used by the TYPO3 Core
 only", with the class itself announced there for full removal in a later v14
 release. What matters here is the register, and it is gone: verified against
-the installed v14.3 frontend package, neither `RecordsContentObject` nor
-`ContentContentObject` references `recordRegister`, `currentRecord` or any
-replacement recursion tracking, and `grep -r recordRegister` over this
-extension's own v14 dependency set finds the name only in the changelog entries
-that removed it. That set has no `cms-install`; a tree that does would also
+the installed v14.3.7 frontend package, neither `RecordsContentObject` nor
+`ContentContentObject` references `recordRegister`,
+`TypoScriptFrontendController::$currentRecord` or any replacement recursion
+tracking. The `currentRecord` both still read (lines 84 and 93) is
+`ContentObjectRenderer::$currentRecord`, handed on to the child renderer's
+`setParent()` as its parent record; it registers nothing.
+`grep -r recordRegister` over this extension's own v14 dependency set finds the
+name only in changelog entries:
+`Breaking-102621` marked `TypoScriptFrontendController->recordRegister` internal
+in v13.0, and `Deprecation-94958` and `Breaking-96107` deprecated and removed
+the unused `ContentObjectRenderer` property of the same name in v11.4 and
+v12.0. `Breaking-107831` removes the frontend controller's property without
+naming it. That set has no `cms-install`; a tree that does would also
 match its ExtensionScanner rules, which are a list of removed names rather than
 a use of one. There is no fallback either — the older `cObjectDepthCounter` was
 dropped in v11.4 (`Deprecation-94957`) on the stated basis that "PHP will now
@@ -2030,7 +2038,7 @@ place of a single plugin's `EXTBASEPLUGIN`.
 
 It is declared **unconditionally**, not behind a `[not (...)]` version
 condition — verified rather than assumed to be harmless on v14, not merely
-argued from the changelog. With v14.3.6 installed,
+argued from the changelog. With v14.3.7 installed,
 `grep -n "'list'\|list_type" .Build/vendor/typo3/cms-frontend/Configuration/TCA/tt_content.php`
 returns nothing at all: no `types.list`, no `CType` select item, no
 `subtype_value_field`. The changelog explains why so completely that nothing
