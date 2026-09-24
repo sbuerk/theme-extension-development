@@ -329,13 +329,16 @@ Further:
   `-s checkCssBuild` is the gate that holds it to that, and `-s watchCss` is the
   writing aid that blocks until ctrl-c.
   → [Frontend assets](docs/development/frontend-assets.md)
-- `-s buildIcons` copies the solid SVGs of the Font Awesome Free version pinned
-  exactly in the root `package.json` into
-  `Resources/Public/Icons/FontAwesome/`, byte for byte, with its
-  `LICENSE.txt`; the set is committed for the same reason as the stylesheet.
-  `-s checkIconsBuild` is the gate: an edited, a missing or an extra file
-  fails it. Never edit, add or drop a file there by hand; a version bump also
-  changes `ATTRIBUTION.txt`.
+- `-s buildIcons` copies from the Font Awesome Free version pinned exactly in
+  the root `package.json` into `Resources/Public/Icons/FontAwesome/`, byte for
+  byte: the solid SVGs into `Solid/`, the brand logos named by the
+  `fontAwesomeBrands` allowlist of that `package.json` into `Brands/`, and the
+  package's `LICENSE.txt` and `categories.yml`. All of it is committed for the
+  same reason as the stylesheet. `-s checkIconsBuild` is the gate: an edited,
+  a missing or an extra file below `Solid/` or `Brands/`, and a changed
+  `LICENSE.txt` or `categories.yml`, fails it. Never edit, add or drop a file
+  there by hand, `ATTRIBUTION.txt` aside: it is the one file there the build
+  does not write, it is maintained by hand, and a version bump changes it too.
   → [Icons](docs/development/icons.md)
 - `-s functional -d mariadb -i 10.6` (also `mysql`, `postgres`) when a change
   touches queries, schema or TCA. SQLite alone is not enough there.
