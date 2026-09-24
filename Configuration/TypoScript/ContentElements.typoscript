@@ -94,9 +94,10 @@ lib.themeContentElement {
 #
 # "ExtensionUtility::configurePlugin()"
 # (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php",
-# v13.4.34) emits "=< lib.contentElement" / "templateName = Generic" for every
-# plugin registered as its own CType, unconditionally - it never checks that
-# anything defines "lib.contentElement". Nothing in the installed core does:
+# v12.4.45 and v13.4.35) emits "=< lib.contentElement" /
+# "templateName = Generic" for every plugin registered as its own CType,
+# unconditionally - it never checks that anything defines
+# "lib.contentElement". Nothing in the installed core does:
 # "lib.contentElement" is a "fluid_styled_content" object, and FSC is not a
 # dependency of this theme, so a "grep -r 'lib.contentElement ='" across the
 # whole installed vendor tree returns nothing outside an 8.7 changelog entry
@@ -392,10 +393,11 @@ tt_content.html.templateName = ContentElements/Html
 #
 # The core does carry a guard of its own here, read in source rather than
 # assumed (".Build/vendor/typo3/cms-frontend/Classes/ContentObject/-
-# RecordsContentObject.php", v13.4.34): "render()" registers each "table:uid"
-# it is about to render in "TypoScriptFrontendController::$recordRegister" and
-# skips any item already registered, so a self-referencing shortcut is caught
-# before it recurses.
+# RecordsContentObject.php", v12.4.45 and v13.4.35): "render()" registers the
+# record it is rendered for ("TypoScriptFrontendController::$currentRecord")
+# in "TypoScriptFrontendController::$recordRegister" and skips any item
+# already registered, so a self-referencing shortcut is caught before it
+# recurses.
 #
 # This theme does not rely on it. That guard is per-request state on a
 # controller a rendering definition never sees, held by one cObject
