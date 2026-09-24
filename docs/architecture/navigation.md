@@ -310,8 +310,11 @@ and they open inside the header. `centred` did exactly that — its title row wa
 `position: relative` and its controls `position: absolute` from `bp.$md` up —
 and it is laid out with a flex counterweight now.
 `ComponentLibraryTest::noBoxBetweenTheHeaderAndItsControlsIsPositioned` fails on
-a positioned row, meta row or controls slot, and the acceptance suite opens
-both panels in all four variants at 1280 and at 375 pixels.
+a positioned row, meta row or controls slot. The acceptance suite opens both
+panels in all four variants at 1280, 768 and 375 pixels — 768 is `bp.$md`
+itself — and measures that each drops under the whole header and ends at the
+header's content container, and that no title reaches under a trigger; from 768
+up it also holds the title of `centred` on the centre of its row.
 
 What the change costs is the **light dismiss** the Popover API gave for free.
 `theme.js` writes it back: Escape, a click outside, and focus leaving the
