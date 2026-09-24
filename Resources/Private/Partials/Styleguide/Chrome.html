@@ -29,14 +29,23 @@
     Widths. These headers are rendered inside the content column, not across
     the page, so what they show is the arrangement of their rows and not the
     widths the real header negotiates. Those are measured in a browser, at
-    four viewport widths, by "Tests/Acceptance/frontend.spec.ts" - and only
-    for the default variant, which is the one whose single row has a budget
-    to keep.
+    four viewport widths, by "Tests/Acceptance/frontend.spec.ts" on the page's
+    own header, which is the default variant - the one whose single row has a
+    budget to keep.
 
     Controls. Each specimen stands one icon button in for the controls slot,
     which in the real header holds the language dropdown and the display
     settings - two partials of their own, demonstrated in their own specimens.
     What the chrome section shows is the rows and slots they sit in.
+
+    Measured, too. The instance renders one header variant per site, so these
+    four headers are the only place a browser sees the other three. "the
+    header panels in every header variant" in
+    "Tests/Acceptance/frontend.spec.ts" finds them as the headers inside
+    "#chrome", copies the page's own controls slot into the
+    "__actions" of each, opens both panels and measures where they land, where
+    the title sits and whether it reaches under a trigger. Removing a specimen,
+    its "__actions" or the "chrome" id fails that test.
     "ComponentLibraryTest::theChromeSpecimensCarryEveryClassTheirPartialsWrite"
     holds these specimens to every class the chrome partials themselves write,
     so the arrangement cannot drift from them unnoticed.
@@ -94,10 +103,12 @@
         <h3>Centred</h3>
         <p>
             The title centred on a row of its own with the controls at the end
-            of it, the navigation centred below. The controls are taken out of
-            the flow from the breakpoint up, so the title is centred against the
-            whole row rather than against the space they leave — centred in the
-            remainder sits visibly left of centre.
+            of it, the navigation centred below. From the breakpoint up an empty
+            counterweight at the start of the row takes as much space as the
+            controls at its end, so the title is centred against the whole row
+            rather than against the space they leave — centred in the remainder
+            sits visibly off centre. Nothing in the row is positioned, so the
+            panels of the controls drop under the whole header.
         </p>
         <header class="theme-site-header theme-site-header--centred">
             <div class="theme-site-header__inner theme-site-header__inner--brand">
