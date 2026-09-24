@@ -179,11 +179,12 @@ answer.
 On **v13**, reading `EXT:frontend/Configuration/TCA/tt_content.php` shows a
 `types` array of `1`, `header`, `text` and `list`, which reads like the complete
 list of content types. It is not. The same extension ships **22 files** in
-`Configuration/TCA/Overrides/`, among them
+`Configuration/TCA/Overrides/`, and 20 of them — among them
 `225-tt_content-content_type-image.php` and
-`230-tt_content-content_type-textmedia.php`, each calling
-`ExtensionManagementUtility::addRecordType()`. Verified against `v13.4.0` and
-`v13.4.34`; the set is identical across the patch levels.
+`230-tt_content-content_type-textmedia.php` — each call
+`ExtensionManagementUtility::addRecordType()` for one classic type. Verified
+against `v13.4.0` and `v13.4.35`: the 22 are the same files on both, and so
+are the 20.
 
 On **v12** the same information is in one place: `types` in
 `EXT:frontend/Configuration/TCA/tt_content.php` declares all of them inline —
@@ -193,9 +194,11 @@ On **v12** the same information is in one place: `types` in
 is the same; only where it is written down changed.
 
 `fluid_styled_content`'s own `Configuration/TCA/Overrides/` holds exactly one
-file, `sys_template.php`, which registers its static include. **It contributes no
-content type TCA at all.** (Checked on v13; the extension is not a dependency
-here, so it is not in this checkout on either version.)
+file, `sys_template.php`, which registers its two static includes,
+`Fluid Content Elements` and `Fluid Content Elements CSS (optional)`. **It
+contributes no content type TCA at all.** (Checked on v12.4.45 and v13.4.35;
+the extension is a require-dev of this one, so `composerUpdate` installs it for
+either version.)
 
 |                                                       | Registered by          |
 |-------------------------------------------------------|------------------------|
