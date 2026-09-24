@@ -144,9 +144,10 @@ exactly the failure mode a rendering suite cannot detect on its own.
 green, and it would have deleted two thirds of the v12 coverage. The group
 belongs only where the **subject** is version specific:
 `SiteSetRenderingTest`, `StaticIncludeGuardTest` and
-`Core13/FluidStyledContentBridgeSetTest`, whose subject is the site set, and
-the two version specific assertions of
-`Tests/ExtensionCoreVersionCompatTestsTrait`.
+`Core13/FluidStyledContentBridgeSetTest`, whose subject is the site set, the
+two methods of `DevelopmentInstance/LegacyDeliveryTest` that assert how the
+two trees of the v13 instance are delivered, and the two version specific
+assertions of `Tests/ExtensionCoreVersionCompatTestsTrait`.
 → [Dual core setup](../development/dual-core-setup.md#test-grouping)
 
 ## The three parts of a site based test

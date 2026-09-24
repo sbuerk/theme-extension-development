@@ -476,9 +476,13 @@ takes a different code path, writing `@import` lines into `sys_template.config`
 rather than letting `SysTemplateTreeBuilder::handleSingleIncludeStaticFile()`
 resolve the registered directory.
 
-The three version specific tests are the only ones in the rendering suite
+The three version specific tests are the only classes in the table above
 carrying `#[Group('not-core-12')]`, and all three because their **subject** is
-the site set. Everything else arranges the theme through
+the site set. `DevelopmentInstance/LegacyDeliveryTest` runs on both versions
+but carries the group on two of its methods for the same reason: they assert
+how the two trees of the v13 instance are delivered.
+`Core12/DevelopmentInstance/InstanceDeliveryTest` is their v12 counterpart.
+Everything else arranges the theme through
 [`ThemeSiteTrait`](../testing/site-based-tests.md#arranging-the-theme-themesitetrait)
 and runs on both versions.
 
