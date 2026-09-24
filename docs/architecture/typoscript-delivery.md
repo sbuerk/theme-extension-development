@@ -4,12 +4,12 @@ The theme ships its TypoScript twice over: as a **site set**, which is the way
 it is meant to be enabled, and as a **classic static include**, for
 installations that do not use site sets. Both read the same files.
 
-| Path                                            | Is                                                             |
-|-------------------------------------------------|----------------------------------------------------------------|
-| `Configuration/Sets/ThemeExtensionDevelopment/` | The site set. `config.yaml` is the whole definition.           |
-| `Configuration/TypoScript/`                     | The actual `setup.typoscript` and `constants.typoscript`.      |
-| `Configuration/TypoScript/Static/`              | The static include: two guarded files importing the two above. |
-| `Configuration/TCA/Overrides/sys_template.php`  | Registers the static include for `sys_template` records.       |
+| Path                                            | Is                                                                                                     |
+|-------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| `Configuration/Sets/ThemeExtensionDevelopment/` | The site set: `config.yaml`, and the [site settings](site-settings.md) in `settings.definitions.yaml`. |
+| `Configuration/TypoScript/`                     | The actual `setup.typoscript` and `constants.typoscript`.                                              |
+| `Configuration/TypoScript/Static/`              | The static include: two guarded files importing the two above.                                         |
+| `Configuration/TCA/Overrides/sys_template.php`  | Registers the static include for `sys_template` records.                                               |
 
 ## The site set
 
