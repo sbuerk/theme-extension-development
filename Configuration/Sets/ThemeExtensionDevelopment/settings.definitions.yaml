@@ -16,7 +16,7 @@
 #
 # LABELS ARE WRITTEN OUT HERE, NOT TAKEN FROM AN XLIFF FILE. A set may carry a
 # "labels.xlf", and the label and the description of a setting do come from it
-# on both cores - but the OPTIONS of an enum only from TYPO3 v14.2 on
+# on TYPO3 v13.4 - but the OPTIONS of an enum only from TYPO3 v14.2 on
 # ("Feature: #106640"). On v13.4 the enum is handed over exactly as written
 # here, so a "LLL:" reference inside it reaches the settings editor spelled
 # out. The settings here are enums and their options are the text an
