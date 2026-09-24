@@ -1990,13 +1990,18 @@ tt_content.<pluginSignature> {
 }
 ```
 
-`=< lib.contentElement` is generated unconditionally, while nothing outside
-this theme defines that object at all — grepping the whole installed v13.4.34
-vendor tree for `lib.contentElement =` returns nothing. This
-theme is therefore not an optional convenience for a third-party plugin, it is
-the only thing that makes one render: without a `Generic` template the plugin
-falls through to the same core "no rendering definition" notice as any
-uncovered classic type.
+`=< lib.contentElement` is generated unconditionally — lines 72–74 of that
+file at `v12.4.45`, 77–79 at `v13.4.35`. Of the TYPO3 system extensions, only
+`fluid_styled_content` defines the object, on v12.4 and v13.4 alike, in its
+`Configuration/TypoScript/Helper/ContentElement.typoscript` (lines 2–4, at
+`v12.4.45` and at `v13.4.35`), and it brings a `Generic` template of its own.
+It is not a dependency of this extension, and an installed one defines nothing
+until a site includes its TypoScript — its static include, or on v13.4 the set
+`typo3/fluid-styled-content`. For a site that does not include it, this theme
+is not an optional convenience for a third-party plugin, it is the only thing
+that makes one render: without a `Generic` template the plugin falls through
+to the same core "no rendering definition" notice as any uncovered classic
+type.
 
 `Resources/Private/Templates/Generic.html` is that template — at the *root*
 of `templateRootPath`, not below `ContentElements/` the way every other
