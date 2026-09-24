@@ -259,11 +259,14 @@ Options:
             - acceptance: Playwright tests against a development instance built from nothing,
               needs no composerUpdate, "-- <arguments>" go to "playwright test"
             - buildCss: compile Resources/Private/Scss into Resources/Public/Css
-            - buildIcons: copy the solid icons of the pinned Font Awesome Free into Resources/Public/Icons
+            - buildIcons: copy the solid icons, the allowlisted brand logos,
+              LICENSE.txt and categories.yml of the pinned Font Awesome Free into
+              Resources/Public/Icons/FontAwesome
             - cgl: test and fix all php files
             - checkBom: check UTF-8 files do not contain BOM
             - checkCssBuild: check the committed CSS matches its SCSS sources
-            - checkIconsBuild: check the committed icons equal the pinned Font Awesome Free package
+            - checkIconsBuild: check the committed icons, LICENSE.txt and categories.yml equal the
+              pinned Font Awesome Free package and the brand allowlist
             - checkExceptionCodes: check for duplicate and missing exception codes
             - checkMarkdownTables: check markdown tables are formatted, "-- --fix" to format them
             - checkTestMethodsPrefix: check test methods do not start with "test"
@@ -716,11 +719,13 @@ case ${TEST_SUITE} in
         SUITE_EXIT_CODE=$?
         ;;
     buildIcons)
-        # Copies "svgs/solid/*.svg" and the licence of the "@fortawesome/fontawesome-free"
-        # version pinned in "package.json" into "Resources/Public/Icons/FontAwesome/",
-        # unchanged. Committed like the stylesheet, for the same reason: neither the
-        # composer dist archive nor the TER artifact runs a build.
-        # See "docs/development/icons.md".
+        # Copies, from the "@fortawesome/fontawesome-free" version pinned in "package.json"
+        # into "Resources/Public/Icons/FontAwesome/", unchanged: "svgs/solid/*.svg" into
+        # "Solid/", the files of "svgs/brands/" named in "fontAwesomeBrands" of
+        # "package.json" into "Brands/", and "LICENSE.txt" and "metadata/categories.yml".
+        # "ATTRIBUTION.txt" beside them is maintained by hand. Committed like the
+        # stylesheet, for the same reason: neither the composer dist archive nor the TER
+        # artifact runs a build. See "docs/development/icons.md".
         COMMAND="npm ci --no-audit --no-fund && npm run build:icons"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name build-icons-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
@@ -752,9 +757,11 @@ case ${TEST_SUITE} in
         ;;
     checkIconsBuild)
         # "npm ci" installs the pinned package and checks it against the integrity hash
-        # of "package-lock.json", then "diff -r" compares the committed set with it, in
-        # both directions: an edited, a missing and an extra file each fail. Not a git
-        # based check, for the reason given at "checkCssBuild".
+        # of "package-lock.json". Then "diff -r" compares "Solid/" with "svgs/solid/" and
+        # "Brands/" with the allowlist applied to "svgs/brands/", in both directions - an
+        # edited, a missing and an extra file each fail - and "diff -u" compares
+        # "LICENSE.txt" and "categories.yml" with the package's. "ATTRIBUTION.txt" is
+        # not compared. Not a git based check, for the reason given at "checkCssBuild".
         COMMAND="npm ci --no-audit --no-fund && npm run build:icons:verify"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name check-icons-build-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?

@@ -9,7 +9,7 @@ version green.
 | [Dual core setup](dual-core-setup.md)           | TYPO3 v12 and v13 from one code base: why the installed set must match `-t`, the PHP asymmetry, how to verify a change, test grouping. |
 | [Quality gates](quality-gates.md)               | Every gate and its configuration, PHPStan per core version, the CI staging and why it runs the containers with docker.                 |
 | [Frontend assets](frontend-assets.md)           | The SCSS build, the node image, why the compiled CSS is committed, the `checkCssBuild` gate.                                           |
-| [Icons](icons.md)                               | The vendored Font Awesome Free solid set, its licence, the `buildIcons` build, the `checkIconsBuild` gate, updating the pin.           |
+| [Icons](icons.md)                               | Font Awesome Free: the solid set, the brand logos, the licence, the `buildIcons` build, the `checkIconsBuild` gate, the pin.           |
 | [Component library](component-library.md)       | Every component's markup contract, the two switches that change behaviour, what the tests guard.                                       |
 | [Styleguide page](styleguide.md)                | The page rendering the library straight from Fluid, why it ignores content elements, and what it is a live test of.                    |
 | [Form showcase](form-showcase.md)               | The `/forms` page: one form composed from the form contract, why it is a page and not a content element, why it sends nothing.         |
