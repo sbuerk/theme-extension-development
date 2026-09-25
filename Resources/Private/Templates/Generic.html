@@ -14,11 +14,13 @@
     placed under "ContentElements/" was tried first and fails with
     "InvalidTemplateResourceException", found by running it.
 
-    What differs per plugin is not the template but the TypoScript path: each
-    plugin's own "configurePlugin()" call places its "EXTBASEPLUGIN" cObject
-    at "tt_content.<pluginSignature>.20", right beside "templateName", in the
+    What differs per plugin is not the template but the TypoScript path: for
+    a plugin registered as its own CType - "PLUGIN_TYPE_CONTENT_ELEMENT",
+    which on TYPO3 v12.4 and v13.4 alike is not the default -
+    "configurePlugin()" places its "EXTBASEPLUGIN" cObject at
+    "tt_content.<pluginSignature>.20", right beside "templateName", in the
     very same branch this template is rendered from - reproduced verbatim in
-    the comment above "tt_content.list" in "ContentElements.typoscript".
+    "docs/architecture/content-elements.md".
     "{data.CType}" already carries that signature: it *is* the plugin
     signature for a plugin registered this way
     ("ExtensionUtility::registerPlugin()" adds it as the "CType" select item's

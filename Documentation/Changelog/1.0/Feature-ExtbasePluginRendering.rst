@@ -17,7 +17,7 @@ recommends) or through the historical :guilabel:`General Plugin` /
 
 :php:`configurePlugin()` generates :typoscript:`tt_content.<pluginSignature>
 =< lib.contentElement` for every plugin registered as its own
-:guilabel:`CType`, unconditionally. Of the TYPO3 system extensions, only
+:guilabel:`CType`. Of the TYPO3 system extensions, only
 ``fluid_styled_content`` defines :typoscript:`lib.contentElement`, on TYPO3
 v12.4 and v13.4 alike, with a ``Generic`` template of its own. On a site that
 does not include its TypoScript, which is what this theme is built for,

@@ -216,8 +216,9 @@ that do not exist.
 at all on v12, but present in the TCA of both. It is rendered too, not skipped:
 any third-party Extbase
 plugin still registered the old way needs a `tt_content.list` object to render
-through, the same way `configurePlugin()`'s default `CType` registration needs
-`Generic.html` — see
+through, the same way a plugin registered as its own `CType` — recommended
+since v12.4, but not `configurePlugin()`'s default on either version — needs
+`Generic.html`. See
 [Content elements](content-elements.md#extbase-plugins-and-tt_contentlist) for
 both.
 
