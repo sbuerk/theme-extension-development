@@ -145,8 +145,9 @@ that do not exist.
 `list` is the legacy plugin type, deprecated in v13 (#105076) and removed in v14
 (#105377). It is rendered too, not skipped: any third-party Extbase plugin still
 registered the old way on v13.4 needs a `tt_content.list` object to render
-through, the same way `configurePlugin()`'s default `CType` registration needs
-`Generic.html` — see
+through, the same way a plugin registered as its own `CType` — the only type
+`configurePlugin()` accepts on v14, but not its default on v13.4 — needs
+`Generic.html`. See
 [Content elements](content-elements.md#extbase-plugins-and-tt_contentlist) for
 both, and for why declaring `tt_content.list` needs no version condition even
 though the CType it renders is gone on v14.
