@@ -231,6 +231,12 @@ feature it merely could use. Moving it is a decision with a changelog entry,
 because the supported browsers are a promise to whoever installs this theme —
 see `Documentation/Changelog/2.0/`.
 
+The floor is kept by that rule, not by a test. The acceptance suite runs every
+spec in Chromium and in Firefox, but in the releases the pinned Playwright
+image carries, and not in Safari at all. It shows that both engines render and
+drive the theme as intended in those releases; it says nothing about Firefox
+125. See `docs/testing/acceptance-tests.md`.
+
 Two features stay out of the stylesheet even though the floor moved, and
 neither is in scope here: CSS **anchor positioning** (what the tooltip would
 need to keep its bubble inside the viewport, and what a popover would need to

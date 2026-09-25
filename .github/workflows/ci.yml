@@ -11,7 +11,7 @@ name: "CI"
 # Staging, cheapest and most likely to fail first:
 #
 #   quality ─┬─> visual (the styleguide partials: screenshots and axe)
-#   phpstan ─┤         ┌─> acceptance (a built instance, in a browser)
+#   phpstan ─┤         ┌─> acceptance (a built instance, in Chromium and Firefox)
 #   lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
 #            │
 #   docs ────┤  (independent, for fast feedback on documentation changes)
@@ -279,6 +279,8 @@ jobs:
   # composer.json, its site configurations and the backend it serves differ.
   # It needs the gates of the code it renders, not the functional matrix, so
   # it starts with the unit tests passed and runs beside the functional jobs.
+  # Every spec runs in Chromium and then in Firefox, in this one job against
+  # the one instance — see "docs/testing/acceptance-tests.md#two-engines".
   acceptance:
     name: "acceptance (v${{ matrix.typo3 }})"
     runs-on: ubuntu-latest
@@ -309,7 +311,7 @@ jobs:
           key: "npm-acceptance-v${{ matrix.typo3 }}-${{ hashFiles('Tests/Acceptance/package-lock.json') }}"
           restore-keys: "npm-acceptance-v${{ matrix.typo3 }}-"
 
-      - name: "Build an instance from nothing and test it in a browser"
+      - name: "Build an instance from nothing and test it in Chromium and Firefox"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s acceptance"
 
       - name: "Upload the Playwright report"

@@ -689,7 +689,7 @@ case ${TEST_SUITE} in
             ${CONTAINER_BIN} run -d ${CONTAINER_COMMON_PARAMS} --name acceptance-web-${SUFFIX} -w "${ROOT_DIR}/${ACCEPTANCE_INSTANCE}" ${IMAGE_PHP} /bin/sh -c "exec php -S 0.0.0.0:8000 -t public ${ROOT_DIR}/Tests/Acceptance/router.php > var/log/php-server.log 2>&1" >/dev/null
             SUITE_EXIT_CODE=$?
             # Quoted one by one: the arguments run through "sh -c" as one string, and
-            # "-- --grep 'log in'" has to arrive as two arguments, not three.
+            # "-- --grep 'logs in'" has to arrive as two arguments, not three.
             PLAYWRIGHT_ARGUMENTS=""
             [[ $# -gt 0 ]] && PLAYWRIGHT_ARGUMENTS=$(printf ' %q' "$@")
             COMMAND="cd Tests/Acceptance && npm ci --no-audit --no-fund && npx playwright test${PLAYWRIGHT_ARGUMENTS}"
