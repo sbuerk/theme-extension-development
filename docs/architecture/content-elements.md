@@ -2026,20 +2026,47 @@ argument omitted or `list_type` writes into it directly on v13.4:
 tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN
 ```
 
-`fluid_styled_content` supplied `tt_content.list` itself, as a `CASE` object
-keyed on `list_type` — not a dependency here — and removed it outright in
-v14.0 along with the `list` CType and its own `List.html` template (Breaking
-#105377, `DeprecatedFunctionalityRemoved`: *"The following content element
-definitions have been removed: `tt_content.list`"*). Without that `CASE`
-object, the assignment above has nothing to add a branch to, and a `list`
-element renders the core notice on v13.4 the same as every other uncovered
+That assignment only adds a child to `tt_content.list.20`; nothing in the
+core gives the node a value of its own. No system extension declares a `CASE`
+keyed on `list_type`, on either version — the only `CASE` in them is
+`tt_content` itself, keyed on `CType` (EXT:frontend's `ext_localconf.php`,
+line 116 at `v13.4.35`, 126 at `v14.3.7`; on `v14.3.7` `theme_camino`
+assigns `tt_content = CASE` to that same object once more, in
+`Configuration/Sets/camino/TypoScript/content.typoscript`, line 22).
+`fluid_styled_content` — not a
+dependency here — never needed one. Its `tt_content.list` is
+`=< lib.contentElement` with `templateName = List` and nothing else
+(`Configuration/TypoScript/ContentElement/List.typoscript`, lines 6–9 at
+`v13.4.35`), and its `Resources/Private/Templates/List.html` addresses the
+plugin directly, as `tt_content.list.20.{data.list_type}` (line 6):
+`list_type` holds the plugin signature, the value `registerPlugin()` gives
+the select item. v14.0 removed both — Breaking #105377,
+`DeprecatedFunctionalityRemoved`: *"The following template files have been
+removed: `EXT:fluid_styled_content/Resources/Private/Templates/List.html`"*
+and *"The following content element definitions have been removed:
+`tt_content.list`"* (lines 257–263 at `v14.3.7`), that is the
+`FLUIDTEMPLATE` branch and its template. On v13.4, a site that includes no
+`fluid_styled_content` TypoScript has no `tt_content.list` at all, and a
+`list` element renders the core notice there like every other uncovered
 type.
 
-`ContentElements.typoscript` declares it, in this theme's own house style —
+`ContentElements.typoscript` declares one, in this theme's own house style —
 `=< lib.contentElement`, `templateName = Generic` — which lets `Generic.html`
-render it too: a `list` record's own `CType` is `list`, so
-`{data.CType}.20` resolves to `tt_content.list.20`, the `CASE` itself, in
-place of a single plugin's `EXTBASEPLUGIN`.
+render it too. That template's path stops one level short of the plugin:
+for a `list` record `{data.CType}` resolves to `list`, so the path
+`tt_content.{data.CType}.20` resolves to `tt_content.list.20` itself.
+Declaring that node a `CASE` keyed on
+`list_type` is what makes the path reach the plugin: the children below
+`tt_content.list.20` become the branches of the `CASE`, and the record's
+`list_type` selects one, in place of a single plugin's `EXTBASEPLUGIN`.
+Those children come from the extension that registers the plugin, never
+from this theme: `configurePlugin()` for an Extbase plugin; on v13.4 also
+`ExtensionManagementUtility::addPItoST43()` for a non-Extbase one,
+deprecated since v13.3 (#102821) and removed in v14.0 (Breaking #105377),
+whose `list_type` case writes
+`tt_content.list.20.<key><suffix> = < plugin.<className><suffix>` (lines
+1012–1013 at `v13.4.35`), so the record's `list_type` has to be
+`<key><suffix>` to select it; or a line of the extension's own TypoScript.
 
 It is declared **unconditionally**, not behind a `[not (...)]` version
 condition — verified rather than assumed to be harmless on v14, not merely
