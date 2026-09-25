@@ -19,10 +19,13 @@ calling `ExtensionManagementUtility::addRecordType()`, while v12 declares all of
 them inline in the `types` array of `Configuration/TCA/tt_content.php`. Verified
 in both installed cores. The set of `CType` values a theme has to cover is
 identical.
-`fluid_styled_content` was never a dependency of this theme and is not
-installed here at all. What that extension supplies, when present, is the
-*rendering* — a `lib.contentElement` TypoScript object and one template per
-`CType` — never the TCA.
+`fluid_styled_content` was never a dependency of this theme on either version.
+This repository installs it on both, as a development dependency only, and
+the rendering tests of these types do not load it — only
+`FluidStyledContentBridgeTest` and, on v13, `FluidStyledContentBridgeSetTest`
+do. What that extension supplies, when present, is the *rendering* — a
+`lib.contentElement` TypoScript object and one template per `CType` — never
+the TCA.
 
 The consequence: every one of those types can be created in the backend of an
 installation using this theme, whether or not anything renders it. A `CType`

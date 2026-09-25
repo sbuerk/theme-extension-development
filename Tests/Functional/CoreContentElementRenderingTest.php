@@ -13,12 +13,17 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * Renders the classic content types `EXT:frontend` registers but supplies no
  * rendering for.
  *
- * `fluid_styled_content` is not a dependency of this theme, so it is not
- * installed here. What it would have supplied is the *rendering*, never
- * the TCA: every one of these types can be created in the backend of an
- * installation using this theme whether or not anything renders it. Without a
- * definition the core prints its own notice instead, so a type nobody covered
- * looks broken to an editor rather than absent.
+ * `fluid_styled_content` is not a dependency of this theme. It is installed
+ * here on both core versions, but only as a development dependency, and this
+ * test does not load it - `FluidStyledContentBridgeTest` and, on TYPO3 v13,
+ * `Core13\FluidStyledContentBridgeSetTest` are the ones that do. This one
+ * names no `coreExtensionsToLoad`, so the instance gets the testing
+ * framework's defaults: core, backend, frontend, extbase and fluid, and on
+ * TYPO3 v12 install as well. What `fluid_styled_content` would have supplied
+ * is the *rendering*, never the TCA: every one of these types can be created
+ * in the backend of an installation using this theme whether or not anything
+ * renders it. Without a definition the core prints its own notice instead, so
+ * a type nobody covered looks broken to an editor rather than absent.
  *
  * The sweep below is therefore the important assertion: it fails for any type
  * that is creatable but unrendered, which is the state the whole set was in
