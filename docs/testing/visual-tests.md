@@ -284,7 +284,15 @@ server log — see [Quality gates](../development/quality-gates.md#continuous-in
 
 - The `auto` appearance — no `data-theme`, the operating system decides. It
   resolves to one of the two tested ones through `color-scheme`.
-- Other viewports, other browsers: one desktop viewport, Chromium only.
+- Other viewports, other browsers: one desktop viewport, Chromium only. For
+  the screenshots that is a decision: a second engine rasterises the same text
+  differently without either being wrong, so it would need a second set of
+  baselines, reviewed on every change, for differences that are not defects.
+  axe and the palette and switch checks need no baselines, and running them in
+  Firefox has not been tried; that is open, not decided. A layout defect only
+  Firefox has is therefore caught only where a geometry spec of the
+  [acceptance suite](acceptance-tests.md#two-engines), which runs in Firefox as
+  well, measures it.
 - Behaviour: the display settings, the navigation toggle and everything else
   that needs the theme's script are the acceptance suite's.
 - The real `/styleguide` page in a browser. An axe pass over it per core
