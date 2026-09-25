@@ -16,12 +16,19 @@ recommends, and the only registration TYPO3 v14 accepts) or, on TYPO3 v13.4
 only, through the historical :guilabel:`General Plugin` / :guilabel:`list`
 registration.
 
+For a plugin registered as its own :guilabel:`CType`,
 :php:`configurePlugin()` generates :typoscript:`tt_content.<pluginSignature>
-=< lib.contentElement` for every plugin, unconditionally, on both supported
-core versions. Of the TYPO3 system extensions, ``fluid_styled_content``
-defines :typoscript:`lib.contentElement` on TYPO3 v13.4 and v14.3, and on
-v14.3 ``theme_camino`` does as well, since v14.1 (Feature :issue:`108539`),
-each with a ``Generic`` template of its own. On a site that includes the
+=< lib.contentElement` with :typoscript:`templateName = Generic`. On TYPO3
+v14.3 that is every plugin, because any plugin type other than
+:guilabel:`CType` throws. On v13.4 it is only a plugin registered with
+:php:`ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT`: the default there is
+still ``list_type``, which gets
+:typoscript:`tt_content.list.20.<pluginSignature>` instead - see below.
+
+Of the TYPO3 system extensions, ``fluid_styled_content`` defines
+:typoscript:`lib.contentElement` on TYPO3 v13.4 and v14.3, and on v14.3
+``theme_camino`` does as well, since v14.1 (Feature :issue:`108539`), each
+with a ``Generic`` template of its own. On a site that includes the
 TypoScript of neither, nothing rendered that object's
 :typoscript:`templateName = Generic` before this change, so every such plugin
 fell through to TYPO3's own "no rendering definition" notice,

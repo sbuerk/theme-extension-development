@@ -94,9 +94,13 @@ lib.themeContentElement {
 # "ExtensionUtility::configurePlugin()"
 # (".Build/vendor/typo3/cms-extbase/Classes/Utility/ExtensionUtility.php",
 # lines 77-79 at v13.4.35, 65-67 at v14.3.7) emits "=< lib.contentElement" /
-# "templateName = Generic" for every plugin registered as its own CType,
-# unconditionally. Of the TYPO3 system extensions, "fluid_styled_content"
-# defines "lib.contentElement" on v13.4 and v14.3
+# "templateName = Generic" for every plugin registered as its own CType. On
+# v14.3 that is every plugin, since any other plugin type throws; on v13.4 it
+# is the "PLUGIN_TYPE_CONTENT_ELEMENT" case of a switch on the plugin type;
+# the type defaults to "list_type" (line 55), whose case writes
+# "tt_content.list.20.<pluginSignature>" instead - see "list" below. Of the
+# TYPO3 system extensions, "fluid_styled_content" defines
+# "lib.contentElement" on v13.4 and v14.3
 # ("Configuration/TypoScript/Helper/ContentElement.typoscript", lines 2-4 at
 # v13.4.35 and at v14.3.7), and on v14.3 "theme_camino" does as well, since
 # v14.1 (Feature #108539;

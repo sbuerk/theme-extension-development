@@ -1944,8 +1944,13 @@ tt_content.<pluginSignature> {
 }
 ```
 
-`=< lib.contentElement` is generated unconditionally — lines 77–79 of that
-file at `v13.4.35`, 65–67 at `v14.3.7`. Of the TYPO3 system extensions,
+That block is not written for every plugin on both versions. At `v13.4.35`
+it is the `PLUGIN_TYPE_CONTENT_ELEMENT` case of a `switch` on the plugin type
+(lines 77–79 of that file), and the type still defaults to
+`PLUGIN_TYPE_PLUGIN` (`list_type`, line 55), whose case writes
+`tt_content.list.20.<pluginSignature>` instead — see `tt_content.list` below.
+At `v14.3.7` it is written for every plugin (lines 65–67), because any type
+other than `CType` throws (lines 52–54). Of the TYPO3 system extensions,
 `fluid_styled_content` defines the object on v13.4 and v14.3, in its
 `Configuration/TypoScript/Helper/ContentElement.typoscript` (lines 2–4, at
 `v13.4.35` and at `v14.3.7`), and on v14.3 `theme_camino` does as well, since
