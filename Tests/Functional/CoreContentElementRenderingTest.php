@@ -13,8 +13,12 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * Renders the classic content types `EXT:frontend` registers but supplies no
  * rendering for.
  *
- * `fluid_styled_content` is not a dependency of this theme, and on TYPO3 v14 it
- * is not even installed. What it would have supplied is the *rendering*, never
+ * `fluid_styled_content` is not a dependency of this theme. It is installed
+ * here on both core versions, but only as a development dependency, and this
+ * test does not load it - `FluidStyledContentBridgeTest` is the one that
+ * does. This one names no `coreExtensionsToLoad`, so the instance gets the
+ * testing framework's defaults: core, backend, frontend, extbase and fluid.
+ * What `fluid_styled_content` would have supplied is the *rendering*, never
  * the TCA: every one of these types can be created in the backend of an
  * installation using this theme whether or not anything renders it. Without a
  * definition the core prints its own notice instead, so a type nobody covered

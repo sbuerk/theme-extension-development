@@ -13,8 +13,10 @@ element reaches `lib.contentElement` at all — this page does not repeat the
 `EXT:frontend` registers the whole classic set of content types itself, in
 `Configuration/TCA/Overrides/2xx-tt_content-content_type-*.php` — image,
 textmedia, bullets, table, uploads, the eleven `menu_*` types, shortcut, div
-and html — on TYPO3 v13.4 **and** v14 alike. On v14, `fluid_styled_content` is
-not even installed; it was never a dependency of this theme on either version.
+and html — on TYPO3 v13.4 **and** v14 alike. `fluid_styled_content` was never
+a dependency of this theme on either version. This repository installs it on
+both, as a development dependency only, and the rendering tests of these
+types do not load it — only `FluidStyledContentBridgeTest` does.
 What that extension supplies, when present, is the *rendering* — a
 `lib.contentElement` TypoScript object and one template per `CType` — never
 the TCA.
