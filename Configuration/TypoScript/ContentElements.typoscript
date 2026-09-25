@@ -188,12 +188,15 @@ tt_content.list {
         # "ExtensionManagementUtility::addPItoST43()" - deprecated since v13.3
         # (#102821), removed in v14.0 (Breaking #105377) - whose "list_type"
         # case writes
-        # "tt_content.list.20.<key><suffix> = < plugin.<className><suffix>"
-        # (lines 1012-1013 at v13.4.35), so the record's "list_type" has to
-        # be "<key><suffix>" to select it. Any extension can also assign such
-        # a branch in TypoScript of its own. On v14 neither helper writes
-        # one, and nothing reaches this CASE anyway - see the comment above
-        # "tt_content.list".
+        # "tt_content.list.20.<key><suffix> = < plugin.<prefix><suffix>"
+        # (lines 1012-1013 at v13.4.35), "<prefix>" being "getCN(<key>)" -
+        # "tx_" and the key, or "user_" and the rest of a "user_" key, each
+        # without underscores, and not a class name (lines 97-102, called at
+        # 1001). So the record's "list_type" has to be "<key><suffix>" to
+        # select it.
+        # Any extension can also assign such a branch in TypoScript of its
+        # own. On v14 neither helper writes one, and nothing reaches this
+        # CASE anyway - see the comment above "tt_content.list".
         #
         # An unmatched "list_type" - no plugin selected yet, the state every
         # freshly created "list" record starts in - renders nothing rather
