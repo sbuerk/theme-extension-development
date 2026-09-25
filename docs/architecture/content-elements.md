@@ -2070,16 +2070,43 @@ directly on either:
 tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN
 ```
 
-`fluid_styled_content` supplied `tt_content.list` itself, as a `CASE` object
-keyed on `list_type` — and it is not a dependency here. Without that `CASE`
-object, the assignment above has nothing to add a branch to, and a `list`
-element renders the core notice the same as every other uncovered type.
+That assignment only adds a child to `tt_content.list.20`; nothing in the
+core gives the node a value of its own. No system extension declares a `CASE`
+keyed on `list_type`, on either version — the only `CASE` in them is
+`tt_content` itself, keyed on `CType` (EXT:frontend's `ext_localconf.php`,
+line 37 at `v12.4.45`, 116 at `v13.4.35`); the two of `indexed_search`'s
+`setup.typoscript` at `v12.4.45` are inside a comment. `fluid_styled_content`
+— not a dependency here — never needed one. Its `tt_content.list` is
+`=< lib.contentElement` with `templateName = List` and nothing else
+(`Configuration/TypoScript/ContentElement/List.typoscript`, lines 6–9 at
+`v12.4.45` and at `v13.4.35`), and its `Resources/Private/Templates/List.html`
+addresses the plugin directly, as `tt_content.list.20.{data.list_type}`
+(line 6 on both): `list_type` holds the plugin signature, the value
+`registerPlugin()` gives the select item. Both still ship on v12.4 and v13.4,
+and a site gets them only by including that extension's TypoScript: a site
+that includes no `fluid_styled_content` TypoScript has no `tt_content.list`
+at all, and a `list` element renders the core notice there like every other
+uncovered type.
 
-`ContentElements.typoscript` declares it, in this theme's own house style —
+`ContentElements.typoscript` declares one, in this theme's own house style —
 `=< lib.contentElement`, `templateName = Generic` — which lets `Generic.html`
-render it too: a `list` record's own `CType` is `list`, so
-`{data.CType}.20` resolves to `tt_content.list.20`, the `CASE` itself, in
-place of a single plugin's `EXTBASEPLUGIN`.
+render it too. That template's path, `tt_content.{data.CType}.20`, stops one
+level short of the plugin: for a `list` record `{data.CType}` is `list`, so
+the path resolves to `tt_content.list.20` itself. Declaring that node a
+`CASE` keyed on `list_type` is what makes the path reach the plugin: the
+children below `tt_content.list.20` become the branches of the `CASE`, and
+the record's `list_type` selects one, in place of a single plugin's
+`EXTBASEPLUGIN`. Those children come from the extension that registers the
+plugin, never from this theme: `configurePlugin()` for an Extbase plugin;
+`ExtensionManagementUtility::addPItoST43()` for a non-Extbase one — not
+deprecated on v12.4, deprecated since v13.3 (#102821) — whose `list_type`
+case writes `tt_content.list.20.<key><suffix> = < plugin.<prefix><suffix>`
+(lines 1092–1093 at `v12.4.45`, 1012–1013 at `v13.4.35`). `<prefix>` is
+`getCN(<key>)` (line 1081 at `v12.4.45`, 1001 at `v13.4.35`): `tx_` and the
+key without underscores, or `user_` and the rest of a `user_` key without
+underscores. The branch is named `<key><suffix>`, so the record's
+`list_type` has to be `<key><suffix>` to select it. The third source is a
+line of the extension's own TypoScript.
 
 It is declared **unconditionally**, with no `[...]` condition around it: every
 supported core version still carries the `list` CType, so there is no

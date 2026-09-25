@@ -35,11 +35,18 @@
     which is exactly why the path has to spell out "tt_content" and the CType
     rather than reading "20" alone.
 
-    "tt_content.list" further down that file is not a plugin's own branch, but
-    reuses this same template for the identical reason: "list" is itself a
-    CType, so "{data.CType}" resolves to "tt_content.list.20" there instead -
-    the CASE keyed on "list_type" that section declares, in place of a single
-    "EXTBASEPLUGIN".
+    "tt_content.list" in "ContentElements.typoscript" is not a plugin's own
+    branch, and it reuses this same template by this theme's choice rather
+    than the core's: "list" is itself a CType, so for a "list" record
+    "{data.CType}" is "list" and the path below resolves to
+    "tt_content.list.20" instead. That node is a CASE keyed on
+    "list_type" only because that section declares it one - no system
+    extension does. The CASE is what turns the objects below
+    "tt_content.list.20" into its branches - the ones "configurePlugin()"
+    writes for a "list_type" plugin, and those of
+    "ExtensionManagementUtility::addPItoST43()" for a non-Extbase one,
+    deprecated on v13.4 only - and the record's "list_type" selects one, in
+    place of a single "EXTBASEPLUGIN".
 
     "data" and "table" hand the content element to that cObject. Without
     them "CObjectViewHelper" starts a content object renderer with an empty

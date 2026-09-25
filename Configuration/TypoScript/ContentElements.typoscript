@@ -132,14 +132,17 @@ lib.themeContentElement {
 # ("TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN", deprecated
 # in 13.4 by #105076, which is why a plugin registering that way also raises an
 # "E_USER_DEPRECATED" from "configurePlugin()" itself):
-# "tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN". For that assignment
-# to do anything, "tt_content.list.20" has to already be a CASE keyed on
-# "list_type" - exactly what "fluid_styled_content" supplied and what an
-# installation without it lacks - so it is declared here, in this theme's own
-# house style, which lets the very same "Generic.html" render it: a "list"
-# record's own "CType" is "list", so "{data.CType}" in that template resolves
-# to "tt_content.list.20", the CASE itself, the same way it resolves to a
-# single "EXTBASEPLUGIN" for every other plugin's own branch above.
+# "tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN". That assignment only
+# adds a child to "tt_content.list.20"; no system extension gives that node a
+# value of its own, on either version, and "fluid_styled_content" needs none -
+# how it renders "list" instead is in "docs/architecture/content-elements.md".
+# This theme renders "list" through the very same "Generic.html", in its own
+# house style, and that template's path "tt_content.{data.CType}.20" stops one
+# level short: for a "list" record "{data.CType}" is "list", so the path
+# resolves to "tt_content.list.20" itself. Declaring that node a CASE keyed on
+# "list_type" below is what makes the path reach the plugin: the children
+# below "tt_content.list.20" become its branches, and the record's
+# "list_type" - the plugin signature - selects one.
 tt_content.list =< lib.contentElement
 tt_content.list {
     templateName = Generic
@@ -149,14 +152,27 @@ tt_content.list {
         key.field = list_type
 
         # No plugin of this theme's own registers under "list_type" - every
-        # branch a CASE like this one ever gets comes from a third-party
-        # extension's own "configurePlugin()" call, in that extension's own
-        # "ext_localconf.php", the same way the single "20" under each
-        # plugin's own "tt_content.<pluginSignature>" above is never written
-        # here either. An unmatched "list_type" - no plugin selected yet, the
-        # state every freshly created "list" record starts in - renders
-        # nothing rather than falling through to a "default" this theme would
-        # have to invent content for.
+        # branch a CASE like this one ever gets comes from the third-party
+        # extension that registers the plugin, never from this file, the same
+        # way the single "20" under each plugin's own
+        # "tt_content.<pluginSignature>" above is never written here either.
+        # For an Extbase plugin that is "configurePlugin()" in the extension's
+        # "ext_localconf.php". A non-Extbase plugin gets one from
+        # "ExtensionManagementUtility::addPItoST43()" - not deprecated on
+        # v12.4, deprecated since v13.3 (#102821) - whose "list_type" case
+        # writes
+        # "tt_content.list.20.<key><suffix> = < plugin.<prefix><suffix>"
+        # (lines 1092-1093 at v12.4.45, 1012-1013 at v13.4.35), "<prefix>"
+        # being "getCN(<key>)" - "tx_" and the key without underscores, or
+        # "user_" for a "user_" key. The branch is named "<key><suffix>", so
+        # the record's "list_type" has to be "<key><suffix>" to select it.
+        # Any extension can also assign such a branch in TypoScript of its
+        # own.
+        #
+        # An unmatched "list_type" - no plugin selected yet, the state every
+        # freshly created "list" record starts in - renders nothing rather
+        # than falling through to a "default" this theme would have to invent
+        # content for.
         default = TEXT
         default.value =
     }
