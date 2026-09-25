@@ -6,13 +6,14 @@
 # yellow box - which is what every element looked like before this file.
 #
 # What FSC supplies is the *rendering*, not the TCA. EXT:frontend registers the
-# whole classic set of content types itself, in
-# "Configuration/TCA/Overrides/2xx-tt_content-content_type-*.php" - image,
-# textmedia, bullets, table, uploads, the menus, shortcut, div and html - while
+# whole classic set of content types itself - image, textmedia, bullets, table,
+# uploads, the menus, shortcut, div and html - on v13.4 in one
+# "Configuration/TCA/Overrides/2xx-tt_content-content_type-*.php" per type,
+# on v12.4 inline in the "types" array of "Configuration/TCA/tt_content.php".
 # FSC's own "Configuration/TCA/Overrides/" holds nothing but a
-# "sys_template.php". Every one of those elements can therefore be created in
-# the backend of an installation using this theme, and every one that has no
-# branch below renders the notice.
+# "sys_template.php", on both. Every one of those elements can therefore be
+# created in the backend of an installation using this theme, and every one
+# that has no branch below renders the notice.
 #
 # Covered here: header, text, image, textpic, textmedia, bullets, table,
 # uploads, shortcut, div, html, and every "menu_*" type EXT:frontend
@@ -121,19 +122,20 @@ lib.themeContentElement {
 # exactly that reason.
 #
 # "list" is the one plugin CType this theme has to supply itself. It is still
-# in EXT:frontend's own v13.4 TCA ("Configuration/TCA/tt_content.php",
-# "types.list", the "CType" select's own "value => 'list'" - verified) as the
-# historical, pre-CType way of registering a plugin, and
-# "fluid_styled_content" is what renders it, through its own
-# "Resources/Private/Templates/List.html" and its own "tt_content.list"
-# TypoScript object. FSC is not a dependency of this theme - this repository
-# installs it for development only - and a site that does not include that
-# extension's TypoScript gets neither of the two. "configurePlugin()" still
-# writes straight into it on v13.4
+# in EXT:frontend's own TCA on v12.4 and v13.4 alike
+# ("Configuration/TCA/tt_content.php", "types.list", the "CType" select's own
+# "value => 'list'" - verified on both) as the historical, pre-CType way of
+# registering a plugin, and "fluid_styled_content" is what renders it,
+# through its own "Resources/Private/Templates/List.html" and its own
+# "tt_content.list" TypoScript object. FSC is not a dependency of this
+# theme - this repository installs it for development only - and a site that
+# does not include that extension's TypoScript gets neither of the two.
+# "configurePlugin()" still writes straight into it on v12.4 and v13.4
 # whenever its fifth argument is omitted or "list_type"
-# ("TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN", deprecated
-# in 13.4 by #105076, which is why a plugin registering that way also raises an
-# "E_USER_DEPRECATED" from "configurePlugin()" itself):
+# ("TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN", not
+# deprecated on v12.4, deprecated in 13.4 by #105076, which is why a plugin
+# registering that way on v13.4 also raises an "E_USER_DEPRECATED" from
+# "configurePlugin()" itself, lines 56-58 at v13.4.35):
 # "tt_content.list.20.<pluginSignature> = EXTBASEPLUGIN". That assignment only
 # adds a child to "tt_content.list.20"; no system extension gives that node a
 # value of its own, on either version, and "fluid_styled_content" needs none -
