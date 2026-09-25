@@ -47,9 +47,10 @@ per menu type rather than only a template.
 
 No TCA of this extension's own is added for any of them. Every one of these
 elements was already creatable in the backend before this change - their TCA
-comes from ``EXT:frontend`` on TYPO3 v13.4, and ``fluid_styled_content`` is
-not a dependency of this theme - so what changes is only that they now render
-instead of TYPO3's own "no rendering definition" notice.
+comes from ``EXT:frontend`` on TYPO3 v12.4 and v13.4 alike, and
+``fluid_styled_content`` is not a dependency of this theme - so what changes
+is only that they now render instead of TYPO3's own "no rendering definition"
+notice.
 
 Two elements needed a decision
 ===============================

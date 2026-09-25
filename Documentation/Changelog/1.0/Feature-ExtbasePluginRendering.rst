@@ -10,10 +10,11 @@ Description
 ===========
 
 A third-party Extbase plugin now renders on an installation using this
-theme, whether it is registered as a dedicated :guilabel:`CType` (the way
-:php:`TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin()`
-recommends) or through the historical :guilabel:`General Plugin` /
-:guilabel:`list` registration TYPO3 v13.4 still offers.
+theme, on TYPO3 v12.4 and v13.4 alike, whether it is registered through
+:php:`TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin()` as a
+dedicated :guilabel:`CType` (the way TYPO3 recommends since v12.4) or through
+the historical :guilabel:`General Plugin` / :guilabel:`list` registration
+both versions still offer.
 
 :php:`configurePlugin()` generates :typoscript:`tt_content.<pluginSignature>
 =< lib.contentElement` for every plugin registered as its own
@@ -40,12 +41,14 @@ FlexForm reach it.
 :guilabel:`General Plugin` / ``list``
 ======================================
 
-TYPO3 v13.4 still offers the historical registration TCA
-(:typoscript:`types.list` in ``EXT:frontend``'s own
-:file:`Configuration/TCA/tt_content.php`), deprecated but present
-(Deprecation :issue:`105076`). A plugin registered that way gets
-:typoscript:`tt_content.list.20.<pluginSignature>`, a child of a node that
-nothing in the core turns into a :typoscript:`CASE`.
+TYPO3 v12.4 and v13.4 both still offer the historical registration, with
+its TCA (:typoscript:`types.list` in ``EXT:frontend``'s own
+:file:`Configuration/TCA/tt_content.php`), and :php:`configurePlugin()`
+still defaults to it. On v12.4 it is not deprecated at all; on v13.4 it is
+deprecated but present (Deprecation :issue:`105076`), and
+:php:`configurePlugin()` raises an ``E_USER_DEPRECATED`` for it. A plugin
+registered that way gets :typoscript:`tt_content.list.20.<pluginSignature>`,
+a child of a node that nothing in the core turns into a :typoscript:`CASE`.
 ``fluid_styled_content`` renders it, on a site that includes its
 TypoScript, with a :typoscript:`tt_content.list` object of its own -
 :typoscript:`=< lib.contentElement` with :typoscript:`templateName = List` -
@@ -58,7 +61,7 @@ resolves to :typoscript:`tt_content.list.20` itself, which the theme
 declares a :typoscript:`CASE` keyed on ``list_type``, with the plugins as its
 branches.
 
-An installation is free to ignore the deprecated registration entirely, and
+An installation is free to ignore the historical registration entirely, and
 a plugin registered as its own :guilabel:`CType` never reaches this branch.
 See :file:`docs/architecture/content-elements.md` in the developer
 documentation for how the two registrations resolve to the same template.
@@ -81,8 +84,8 @@ Impact
 
 An Extbase plugin registered by a third-party extension - one this theme
 does not control the TypoScript of - now renders instead of the core's "no
-rendering definition" notice on TYPO3 v13.4, regardless of whether it is
-registered as its own :guilabel:`CType` or through the historical
+rendering definition" notice on TYPO3 v12.4 and v13.4, regardless of whether
+it is registered as its own :guilabel:`CType` or through the historical
 :guilabel:`General Plugin` type.
 
 :file:`Tests/Functional/Fixtures/Extensions/plugin-fixture` is a fixture
