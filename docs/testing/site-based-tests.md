@@ -226,8 +226,9 @@ The request attribute is used rather than the language aspect because it behaves
 identically in TYPO3 v13 and v14 — a fixture extension should not need
 [core version aware code](../architecture/core-version-aware-code.md).
 
-Two details of the plugin registration are worth knowing, both of them the
-reason it works on both core versions unchanged:
+Three details of the plugin registration are worth knowing. The first two
+are the reason it works on both core versions unchanged; the third is why the
+fixture's plugin depends on no content rendering a site includes:
 
 - `ExtensionUtility::configurePlugin()` is called with
   `PLUGIN_TYPE_CONTENT_ELEMENT` explicitly, and it has to be. TYPO3 v13 still

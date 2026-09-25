@@ -2066,9 +2066,12 @@ from this theme: `configurePlugin()` for an Extbase plugin; on v13.4 also
 `ExtensionManagementUtility::addPItoST43()` for a non-Extbase one,
 deprecated since v13.3 (#102821) and removed in v14.0 (Breaking #105377),
 whose `list_type` case writes
-`tt_content.list.20.<key><suffix> = < plugin.<className><suffix>` (lines
-1012–1013 at `v13.4.35`), so the record's `list_type` has to be
-`<key><suffix>` to select it; or a line of the extension's own TypoScript.
+`tt_content.list.20.<key><suffix> = < plugin.<prefix><suffix>` (lines
+1012–1013 at `v13.4.35`), `<prefix>` being `getCN(<key>)` — `tx_` and the
+key, or `user_` and the rest of a `user_` key, each without underscores, and
+not a class name (lines 97–102, called at 1001) — so the record's
+`list_type` has to be `<key><suffix>` to select it; or a line of the
+extension's own TypoScript.
 
 It is declared **unconditionally**, not behind a `[not (...)]` version
 condition — verified rather than assumed to be harmless on v14, not merely
