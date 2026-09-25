@@ -43,13 +43,20 @@ FlexForm reach it.
 TYPO3 v13.4 still offers the historical registration TCA
 (:typoscript:`types.list` in ``EXT:frontend``'s own
 :file:`Configuration/TCA/tt_content.php`), deprecated but present
-(Deprecation :issue:`105076`). ``fluid_styled_content`` supplied the
-:typoscript:`tt_content.list` object that rendered it, as a :typoscript:`CASE`
-keyed on the plugin's :guilabel:`Type` (``list_type``) field. This theme now
-supplies that object too, in its own house style, reusing the same
+(Deprecation :issue:`105076`). A plugin registered that way gets
+:typoscript:`tt_content.list.20.<pluginSignature>`, a child of a node that
+nothing in the core turns into a :typoscript:`CASE`.
+``fluid_styled_content`` renders it, on a site that includes its
+TypoScript, with a :typoscript:`tt_content.list` object of its own -
+:typoscript:`=< lib.contentElement` with :typoscript:`templateName = List` -
+whose :file:`List.html` addresses the plugin directly through the record's
+:guilabel:`Type` (``list_type``) field. This theme now supplies
+:typoscript:`tt_content.list` too, in its own house style, reusing the same
 :file:`Generic.html` template - a ``list`` record's own :guilabel:`CType` is
-``list``, so the same :typoscript:`{data.CType}.20` path resolves to the
-:typoscript:`CASE` rather than to a single plugin.
+``list``, so the same :typoscript:`tt_content.{data.CType}.20` path
+resolves to :typoscript:`tt_content.list.20` itself, which the theme
+declares a :typoscript:`CASE` keyed on ``list_type``, with the plugins as its
+branches.
 
 An installation is free to ignore the deprecated registration entirely, and
 a plugin registered as its own :guilabel:`CType` never reaches this branch.
