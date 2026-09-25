@@ -124,10 +124,12 @@ lib.themeContentElement {
 # in EXT:frontend's own v13.4 TCA ("Configuration/TCA/tt_content.php",
 # "types.list", the "CType" select's own "value => 'list'" - verified) as the
 # historical, pre-CType way of registering a plugin, and
-# "fluid_styled_content" is what rendered it, through its own
+# "fluid_styled_content" is what renders it, through its own
 # "Resources/Private/Templates/List.html" and its own "tt_content.list"
-# TypoScript object - neither of which is present here, because FSC is not a
-# dependency. "configurePlugin()" still writes straight into it on v13.4
+# TypoScript object. FSC is not a dependency of this theme - this repository
+# installs it for development only - and a site that does not include that
+# extension's TypoScript gets neither of the two. "configurePlugin()" still
+# writes straight into it on v13.4
 # whenever its fifth argument is omitted or "list_type"
 # ("TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_PLUGIN", deprecated
 # in 13.4 by #105076, which is why a plugin registering that way also raises an

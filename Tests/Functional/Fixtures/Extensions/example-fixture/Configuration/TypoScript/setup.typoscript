@@ -19,10 +19,12 @@ page {
     }
 }
 
-# The generated definition is "=< lib.contentElement", which is provided by
-# EXT:fluid_styled_content. That extension is not a dependency here, and a
-# fixture extension has no business pulling one in just to render a plugin, so
-# the content object is defined directly instead.
+# The generated definition is "=< lib.contentElement", an object this file
+# does not define. It comes from the content rendering a site includes: this
+# theme's own "Configuration/TypoScript/ContentElements.typoscript" or
+# EXT:fluid_styled_content - not a dependency here. A fixture extension has no
+# business depending on either just to render a plugin, so the content object
+# is defined directly instead.
 tt_content.testsexamplefixture_hello = COA
 tt_content.testsexamplefixture_hello {
     10 = EXTBASEPLUGIN

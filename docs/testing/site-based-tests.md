@@ -330,10 +330,13 @@ reason it needs no version aware code:
 - `Configuration/TCA/Overrides/tt_content.php` passes **no** plugin type:
   `ExtensionUtility::registerPlugin()` reads it back from what `configurePlugin()`
   registered, and `ext_localconf.php` is loaded before the TCA overrides.
-- The generated rendering definition is `=< lib.contentElement`, which comes from
-  EXT:fluid_styled_content. That extension is not a dependency here, so the
-  fixture TypoScript overrides `tt_content.testsexamplefixture_hello` with a
-  plain `EXTBASEPLUGIN` content object instead of pulling one in.
+- The generated rendering definition is `=< lib.contentElement`, an object the
+  fixture does not define. It comes from the content rendering a site
+  includes: this theme's own `Configuration/TypoScript/ContentElements.typoscript`
+  or EXT:fluid_styled_content — not a dependency here. The fixture should not
+  depend on either to render a plugin, so its TypoScript overrides
+  `tt_content.testsexamplefixture_hello` with a plain `EXTBASEPLUGIN` content
+  object instead.
 
 ## See also
 
