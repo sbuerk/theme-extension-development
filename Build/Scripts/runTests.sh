@@ -697,13 +697,33 @@ case ${TEST_SUITE} in
             # the instance, which a failed run keeps.
             ${CONTAINER_BIN} run -d ${CONTAINER_COMMON_PARAMS} --name acceptance-web-${SUFFIX} -w "${ROOT_DIR}/${ACCEPTANCE_INSTANCE}" ${IMAGE_PHP} /bin/sh -c "exec php -S 0.0.0.0:8000 -t public ${ROOT_DIR}/Tests/Acceptance/Core${CORE_VERSION}/router.php > var/log/php-server.log 2>&1" >/dev/null
             SUITE_EXIT_CODE=$?
+            # The browser reaches the instance by a name that no DNS server knows,
+            # "acceptance-instance", pinned to the address of the server container in "/etc/hosts"
+            # of the Playwright container. Resolved by its container name, a page load failed now
+            # and then with "NS_ERROR_UNKNOWN_HOST" or "net::ERR_NAME_NOT_RESOLVED" on a busy host,
+            # and the log of the PHP server showed that the request never arrived: a lookup of the
+            # network's DNS server that fails is a failed test, whenever it happens - the failure
+            # "visual" pins "fixture-server" against. With the address pinned no lookup of the run
+            # goes to DNS at all, and a pin that did not work would fail every test, not one in a
+            # hundred. No wait before it, unlike "visual": the global setup polls the instance
+            # through the pinned name for 60 seconds, which covers the start of the server, and
+            # the address is known as soon as the container runs.
+            # See "docs/testing/acceptance-tests.md".
+            ACCEPTANCE_WEB_ADDRESS=""
+            if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+                ACCEPTANCE_WEB_ADDRESS=$(${CONTAINER_BIN} inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' acceptance-web-${SUFFIX})
+                if [[ -z "${ACCEPTANCE_WEB_ADDRESS}" ]]; then
+                    echo "The address of the instance container \"acceptance-web-${SUFFIX}\" could not be read." >&2
+                    SUITE_EXIT_CODE=1
+                fi
+            fi
             # Quoted one by one: the arguments run through "sh -c" as one string, and
             # "-- --grep 'logs in'" has to arrive as two arguments, not three.
             PLAYWRIGHT_ARGUMENTS=""
             [[ $# -gt 0 ]] && PLAYWRIGHT_ARGUMENTS=$(printf ' %q' "$@")
             COMMAND="cd Tests/Acceptance && npm ci --no-audit --no-fund && npx playwright test${PLAYWRIGHT_ARGUMENTS}"
             if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
-                ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name acceptance-playwright-${SUFFIX} -e BASE_URL="http://acceptance-web-${SUFFIX}:8000" -e HOME="${ROOT_DIR}/${ACCEPTANCE_ROOT}/home" -e npm_config_cache="${ROOT_DIR}/.cache/npm" -e CI="${CI:-}" ${IMAGE_PLAYWRIGHT} /bin/sh -c "${COMMAND}"
+                ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name acceptance-playwright-${SUFFIX} --add-host acceptance-instance:${ACCEPTANCE_WEB_ADDRESS} -e BASE_URL="http://acceptance-instance:8000" -e HOME="${ROOT_DIR}/${ACCEPTANCE_ROOT}/home" -e npm_config_cache="${ROOT_DIR}/.cache/npm" -e CI="${CI:-}" ${IMAGE_PLAYWRIGHT} /bin/sh -c "${COMMAND}"
                 SUITE_EXIT_CODE=$?
             fi
         fi
