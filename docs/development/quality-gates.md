@@ -187,7 +187,7 @@ assets ──┘
 | `unit`              | the four edge pairs below — 4 jobs                 | `unit`, `unitRandom`                                                                      |
 | `functional-sqlite` | the four edge pairs below — 4 jobs                 | `functional -d sqlite`                                                                    |
 | `functional-dbms`   | the four edge pairs × 4 DBMS — 16 jobs             | `functional` against each database                                                        |
-| `acceptance`        | PHP 8.2 × v12, v13 — 2 jobs                        | `acceptance`: an instance built from nothing, in a browser; uploads the report on failure |
+| `acceptance`        | PHP 8.2 × v12, v13 — 2 jobs                        | `acceptance`: a built instance, in Chromium and in Firefox; uploads the report on failure |
 | `visual`            | PHP 8.2 × v12 — one job                            | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure    |
 | `assets`            | —                                                  | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build        |
 | `documentation`     | —                                                  | `renderDocumentation`, uploads the artifact                                               |

@@ -47,7 +47,16 @@ export default defineConfig({
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
     },
+    // Every spec in both engines, Chromium first and then Firefox, against the
+    // same instance - "workers: 1" above holds across projects as well. The
+    // whole suite rather than a tagged subset: run in Firefox, every spec
+    // passed unchanged on both cores, and a call of a method only Chromium
+    // implements throws in every spec that drives that code, not only in
+    // those that would have been tagged. "-- --project firefox" runs one of
+    // them. See
+    // "docs/testing/acceptance-tests.md#two-engines".
     projects: [
         { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+        { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     ],
 });
