@@ -290,7 +290,7 @@ Build/Scripts/runTests.sh -t 12 -s phpstan
 Build/Scripts/runTests.sh -t 12 -s lintPhp
 Build/Scripts/runTests.sh -t 12 -s unit
 Build/Scripts/runTests.sh -t 12 -s unitRandom
-Build/Scripts/runTests.sh -t 12 -s functional -d sqlite
+Build/Scripts/runTests.sh -t 12 -s functional -d sqlite -j auto
 Build/Scripts/runTests.sh -t 12 -s composerValidate
 Build/Scripts/runTests.sh -t 12 -s checkBom
 Build/Scripts/runTests.sh -t 12 -s checkExceptionCodes
@@ -376,9 +376,11 @@ Further:
 - `-s functional -j <number>` runs the functional suite in that many parallel
   chunks, each with its own containers, and fails unless the chunks together
   executed every listed test. A class is never split: `ShowcaseTreeTest` is the
-  floor. The files of a run - output, JUnit and PHPUnit event log per chunk -
-  are kept below `.Build/functional-runs/<suffix>/`. Mind the container count:
-  a DBMS run starts two containers per chunk.
+  floor. Locally use `-j auto`: it caps the chunks by CPU cores and memory and
+  writes no more of them than that floor makes worth it - three, today.
+  The files of a run - output, JUnit and PHPUnit event log per chunk - are kept
+  below `.Build/functional-runs/<suffix>/`. Mind the container count: a DBMS
+  run starts two containers per chunk.
   → [Functional tests in parallel chunks](docs/development/environment.md#functional-tests-in-parallel-chunks)
 - A **growing PHPStan baseline is a defect.** Fix the finding.
 - The development instances, one per supported core version —

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * Splits the functional test suite into chunks that take about the same time.
  *
- *   php Build/Scripts/splitFunctionalTests.php [--exclude-group <group,...>] <list-tests.xml> <number-of-chunks> <output-directory> [<timings.json>]
+ *   php Build/Scripts/splitFunctionalTests.php [--auto] [--exclude-group <group,...>] <list-tests.xml> <number-of-chunks> <output-directory> [<timings.json>]
  *
  * "Build/Scripts/runTests.sh -j" calls it, in the PHP container. It writes
  * "FunctionalTests-Job-<n>.xml" for n = 1 .. <number-of-chunks> into the output
@@ -59,6 +59,18 @@ declare(strict_types=1);
  * root to seconds. A class it does not know yet weighs its number of tests
  * times the average recorded duration of one test, so a stale file costs
  * balance and never a test.
+ *
+ * WHY "--auto" WRITES FEWER CHUNKS
+ *
+ * "runTests.sh -j auto" passes the most chunks the machine carries and
+ * "--auto". The heaviest chunk of that many is the floor of the run. The split
+ * then writes the fewest chunks of which every chunk but the heaviest weighs
+ * at most 80 % of that floor, and the most if none does. Once one class
+ * outweighs an even share, more chunks only make the other classes finish
+ * earlier, while the run still waits for that class, and every chunk costs its
+ * containers. The 20 % are headroom: the same chunk took up to 10 % more or
+ * less from one run to the next, and a chunk predicted just below the floor
+ * then became the longest.
  */
 exit(main($argv));
 
@@ -67,13 +79,17 @@ exit(main($argv));
  */
 function main(array $argv): int
 {
+    $auto = ($argv[1] ?? '') === '--auto';
+    if ($auto) {
+        array_splice($argv, 1, 1);
+    }
     $excludedGroups = [];
     if (($argv[1] ?? '') === '--exclude-group') {
         $excludedGroups = array_values(array_filter(explode(',', $argv[2] ?? ''), static fn(string $group): bool => $group !== ''));
         array_splice($argv, 1, 2);
     }
     if (count($argv) < 4 || count($argv) > 5 || !is_file($argv[1]) || (int)$argv[2] < 1) {
-        fwrite(STDERR, 'Usage: php ' . $argv[0] . ' [--exclude-group <group,...>] <list-tests.xml> <number-of-chunks> <output-directory> [<timings.json>]' . PHP_EOL);
+        fwrite(STDERR, 'Usage: php ' . $argv[0] . ' [--auto] [--exclude-group <group,...>] <list-tests.xml> <number-of-chunks> <output-directory> [<timings.json>]' . PHP_EOL);
         return 1;
     }
     $numberOfChunks = (int)$argv[2];
@@ -121,6 +137,26 @@ function main(array $argv): int
             count($testsPerFile),
         ) . PHP_EOL;
         $numberOfChunks = count($testsPerFile);
+    }
+    if ($auto) {
+        $most = $numberOfChunks;
+        $floor = chunkWeights(distribute($weightPerFile, $most), $weightPerFile)[0];
+        $numberOfChunks = 1;
+        while ($numberOfChunks < $most && (chunkWeights(distribute($weightPerFile, $numberOfChunks), $weightPerFile)[1] ?? $floor) > $floor * 0.8) {
+            $numberOfChunks++;
+        }
+        $weights = chunkWeights(distribute($weightPerFile, $numberOfChunks), $weightPerFile);
+        echo sprintf(
+            'auto: %d of at most %d chunks, the heaviest weighs %.0f %s, the next %.0f %s, the floor is %.0f %s',
+            $numberOfChunks,
+            $most,
+            $weights[0],
+            $unit,
+            $weights[1] ?? 0.0,
+            $unit,
+            $floor,
+            $unit,
+        ) . PHP_EOL;
     }
     $chunks = distribute($weightPerFile, $numberOfChunks);
 
@@ -313,6 +349,21 @@ function distribute(array $weightPerFile, int $numberOfChunks): array
     }
     unset($files);
     return $chunks;
+}
+
+/**
+ * @param array<int, list<string>> $chunks
+ * @param array<string, int|float> $weightPerFile
+ * @return non-empty-list<float> the weight of every chunk, heaviest first
+ */
+function chunkWeights(array $chunks, array $weightPerFile): array
+{
+    $weights = [];
+    foreach ($chunks as $files) {
+        $weights[] = (float)array_sum(array_intersect_key($weightPerFile, array_flip($files)));
+    }
+    rsort($weights);
+    return $weights === [] ? [0.0] : $weights;
 }
 
 /**
