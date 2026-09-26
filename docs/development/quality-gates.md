@@ -176,6 +176,9 @@ chunks at once, each with its own containers:
 
 ```bash
 Build/Scripts/runTests.sh -s functional -d sqlite -j 4
+
+# Locally: as many chunks as the machine carries and the durations make worth it.
+Build/Scripts/runTests.sh -s functional -d sqlite -j auto
 ```
 
 A chunked run carries a check of its own: it fails unless the chunks together
