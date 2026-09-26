@@ -253,10 +253,12 @@ the instance when it fails — see [Quality gates](../development/quality-gates.
 
 Both engines run in that one job. With Chromium alone it took 5.4 minutes on
 v13 and 5.5 on v14, about two of them building the instance; with Firefox
-added it took 8.2 and 8.7 (the runs of #86 and #88). The job runs beside
+added it took 8.2 and 8.7 (the runs of #86 and #88). The job ran beside
 functional jobs of 17 to 23 minutes on SQLite and longer on the databases, so
-the three minutes Firefox adds lengthen a job that is not on the longest path
-of the pipeline.
+the three minutes Firefox adds lengthened a job that was not on the longest
+path of the pipeline. The functional jobs now run their suite in four chunks
+and take a fraction of that; whether acceptance stays off the longest path is
+for the first measured runs of the chunked suite to show.
 
 ## See also
 

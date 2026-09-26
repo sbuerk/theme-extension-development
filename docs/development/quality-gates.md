@@ -184,8 +184,8 @@ functional (SQLite)
 | `phpstan`           | lowest PHP × both core versions          | The one gate configured per core version                                                  |
 | `lint`              | all PHP versions × both core versions    | `lintPhp`                                                                                 |
 | `unit`              | edge PHP versions × both core versions   | `unit`, `unitRandom`                                                                      |
-| `functional-sqlite` | edge PHP versions × both core versions   | `functional -d sqlite`                                                                    |
-| `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs | `functional` against each database                                                        |
+| `functional-sqlite` | edge PHP versions × both core versions   | `functional -d sqlite -j 4`, uploads the JUnit logs                                       |
+| `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs | `functional -j 4` against each database, uploads the JUnit logs                           |
 | `acceptance`        | lowest PHP × both core versions          | `acceptance`: a built instance, in Chromium and in Firefox; uploads the report on failure |
 | `visual`            | lowest PHP, one core version             | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure    |
 | `assets`            | —                                        | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build        |
@@ -245,6 +245,40 @@ succeeded; the other thirteen took 58.8 to 158 minutes, and three more were
 cancelled after 74.7 to 84.4 minutes. That tail is what the timeout cuts off:
 it would have ended ten of the 240. The functional values were measured with the
 suite unchunked, and are retuned after the first CI run of the chunked suite.
+
+The functional test step has a `timeout-minutes` of its own, five minutes below
+that of its job — 30 for SQLite, 60 for the databases. A step that times out
+fails like any other failing step, so the upload of the logs after it still
+runs; a job that times out is cancelled as a whole, and the upload, which is
+guarded by `!cancelled()`, would not. The workflow syntax reference leaves the
+result of a step timeout open; the runner sets it to failed
+([`StepsRunner.cs`](https://github.com/actions/runner/blob/15231bede4aacecb6686f4b7de25c62398607993/src/Runner.Worker/StepsRunner.cs#L322-L330)),
+and `cancelled()` is true only for a job whose status is cancelled
+([`CancelledFunction.cs`](https://github.com/actions/runner/blob/15231bede4aacecb6686f4b7de25c62398607993/src/Runner.Worker/Expressions/CancelledFunction.cs#L27-L28)).
+On a step timeout the runner signals the shell of the step alone — SIGINT,
+SIGTERM 7.5 seconds later, then a kill
+([`ProcessInvoker.cs`](https://github.com/actions/runner/blob/15231bede4aacecb6686f4b7de25c62398607993/src/Runner.Sdk/ProcessInvoker.cs#L443-L465)) —
+and not the `runTests.sh` it started, so the chunks may still run while their
+logs are uploaded: an event log then ends where the chunk was at that moment.
+
+### Functional jobs in four chunks
+
+Both functional jobs run the suite with `runTests.sh -j 4`: four chunks in
+parallel. With the showcase seed imported once per class, no class outweighs the
+rest — the heaviest takes 18 to 28 % of the suite, 84 of 478 s on SQLite and
+297 of 1055 s on MySQL 8.0 — so a fourth chunk still shortens the run. Measured
+locally on a shared machine, one pair of runs each: SQLite took 159 s with
+`-j 3` and 126 s with `-j 4`, MySQL 8.0 322 s and 269 s. Four is also the number
+of vCPU of a hosted runner, where neither count was measured yet.
+→ [The floor, and the recorded durations](environment.md#the-floor-and-the-recorded-durations)
+
+Each chunk writes a JUnit log and a PHPUnit event log below
+`.Build/functional-runs/<suffix>/`, and the job uploads both as the artifact
+`functional-junit-<dbms>[-<version>]-v<core>-php<version>`, for seven days and
+also when the tests failed or their step timed out. The JUnit logs are what the
+committed test durations that balance the chunks are refreshed from, and in a
+failed run the chunk without a JUnit log is the one that did not finish; its
+event log, appended to event by event, names the test it was in.
 
 ### Why CI passes `-b docker`
 

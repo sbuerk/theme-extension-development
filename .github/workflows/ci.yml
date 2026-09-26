@@ -62,6 +62,28 @@ name: "CI"
 # The functional values were measured with the suite unchunked, and are retuned
 # after the first CI run of the chunked suite.
 #
+# The functional test step has a timeout of its own, five minutes below that of
+# its job: a step that times out fails like any failing step (the runner sets
+# its result to failed, actions/runner "StepsRunner.cs"), and the upload of the
+# logs after it still runs. A job that times out is cancelled as a whole, and
+# "!cancelled()" skips the upload - as it does for a run superseded by a newer
+# push, which has nothing worth keeping.
+#
+# Every functional job runs its suite in four chunks in parallel,
+# "runTests.sh -j 4". With the showcase seed imported once per class, no class
+# outweighs the rest: the heaviest takes 18 to 28 % of the suite - 84 of 478 s
+# on SQLite, 297 of 1055 s on MySQL 8.0 - so a fourth chunk still shortens the
+# run. Measured locally on a shared machine, one pair of runs each: SQLite 159 s
+# with "-j 3" and 126 s with "-j 4", MySQL 8.0 322 s and 269 s. Four is also
+# the number of vCPU of a hosted runner, where neither count was measured yet.
+#
+# Each chunk writes a JUnit log and a PHPUnit event log below
+# ".Build/functional-runs/", and the job uploads both as an artifact for seven
+# days. The JUnit logs are what the committed test durations, which balance the
+# chunks, are refreshed from. The event log is appended to event by event, so
+# for a chunk that a timeout ended it still names the test it was in, where no
+# JUnit log was written.
+#
 # Supported versions are declared in the matrices below. There are three PHP
 # sets, and they have to be changed together:
 #
@@ -468,8 +490,33 @@ jobs:
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
 
+      # "-j 4": four chunks in parallel, each with a database container of its
+      # own - see the header for why four. The step times out below the job, so
+      # the upload after it still runs.
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
+        timeout-minutes: 60
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -j 4 -s functional"
+
+      # The JUnit logs of the chunks, which the committed test durations are
+      # refreshed from, and their PHPUnit event logs. Also for a failed run and
+      # a step that timed out: PHPUnit writes a JUnit log when its chunk ends,
+      # so the missing one names the chunk that did not, and its event log the
+      # test it was in.
+      - name: "Upload the JUnit and event logs"
+        if: "!cancelled()"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "functional-junit-${{ matrix.dbms.name }}-${{ matrix.dbms.version }}-v${{ matrix.typo3 }}-php${{ matrix.php-version }}"
+          path: |
+            .Build/functional-runs/*/junit-*.xml
+            .Build/functional-runs/*/events-*.txt
+          if-no-files-found: "warn"
+          retention-days: 7
+          # A re-run is an attempt of the same run, and a name can be uploaded
+          # to once per run (upload-artifact README, "Breaking Changes"): the
+          # re-run of a job whose first attempt uploaded - after a step
+          # timeout, say - would fail its upload without this.
+          overwrite: true
 
   functional-sqlite:
     name: "functional sqlite (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
@@ -497,5 +544,23 @@ jobs:
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
 
+      # "-j 4": four chunks in parallel - see the header for why four.
       - name: "Execute functional tests with SQLite"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -s functional"
+        timeout-minutes: 30
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -j 4 -s functional"
+
+      - name: "Upload the JUnit and event logs"
+        if: "!cancelled()"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "functional-junit-sqlite-v${{ matrix.typo3 }}-php${{ matrix.php-version }}"
+          path: |
+            .Build/functional-runs/*/junit-*.xml
+            .Build/functional-runs/*/events-*.txt
+          if-no-files-found: "warn"
+          retention-days: 7
+          # A re-run is an attempt of the same run, and a name can be uploaded
+          # to once per run (upload-artifact README, "Breaking Changes"): the
+          # re-run of a job whose first attempt uploaded - after a step
+          # timeout, say - would fail its upload without this.
+          overwrite: true
