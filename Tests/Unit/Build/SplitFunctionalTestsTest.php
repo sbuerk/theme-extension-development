@@ -105,6 +105,49 @@ final class SplitFunctionalTestsTest extends UnitTestCase
     }
 
     #[Test]
+    public function autoWritesNoMoreChunksThanReachTheHeaviestClass(): void
+    {
+        // "Slow" outweighs all others together by far: with two chunks the other one
+        // weighs 60 s, well below its 100 s, and six would only split those finer.
+        $tests = ['Slow' => 1, 'A' => 10, 'B' => 10, 'C' => 10, 'D' => 10, 'E' => 10];
+        $timings = ['Slow' => 100.0, 'A' => 12.0, 'B' => 12.0, 'C' => 12.0, 'D' => 12.0, 'E' => 12.0];
+
+        [$status, $output] = $this->split($tests, 6, $timings, '', true);
+
+        $this->assertSame(0, $status, $output);
+        $this->assertStringContainsString('auto: 2 of at most 6 chunks, the heaviest weighs 100 s, the next 60 s, the floor is 100 s', $output);
+        $this->assertSame(
+            [1 => [$this->file('Slow')], 2 => [$this->file('A'), $this->file('B'), $this->file('C'), $this->file('D'), $this->file('E')]],
+            $this->filesPerChunk(2),
+        );
+        $this->assertFileDoesNotExist($this->directory . '/FunctionalTests-Job-3.xml');
+    }
+
+    #[Test]
+    public function autoKeepsTheOtherChunksWellBelowTheFloor(): void
+    {
+        // Two chunks would reach the floor on paper, but the other chunk would weigh
+        // 90 s against 100 s - within the spread of two runs. Three leave it 45 s.
+        $tests = ['Slow' => 1, 'A' => 1, 'B' => 1, 'C' => 1, 'D' => 1, 'E' => 1, 'F' => 1];
+        $timings = ['Slow' => 100.0, 'A' => 15.0, 'B' => 15.0, 'C' => 15.0, 'D' => 15.0, 'E' => 15.0, 'F' => 15.0];
+
+        [$status, $output] = $this->split($tests, 6, $timings, '', true);
+
+        $this->assertSame(0, $status, $output);
+        $this->assertStringContainsString('auto: 3 of at most 6 chunks, the heaviest weighs 100 s, the next 45 s, the floor is 100 s', $output);
+    }
+
+    #[Test]
+    public function autoWritesTheMostChunksWhenTheClassesWeighAlike(): void
+    {
+        [$status, $output] = $this->split(['A' => 5, 'B' => 5, 'C' => 5, 'D' => 5], 4, [], '', true);
+
+        $this->assertSame(0, $status, $output);
+        $this->assertStringContainsString('auto: 4 of at most 4 chunks', $output);
+        $this->assertFileExists($this->directory . '/FunctionalTests-Job-4.xml');
+    }
+
+    #[Test]
     public function anEmptyTestListFailsInsteadOfWritingChunksThatRunNothing(): void
     {
         [$status, $output] = $this->split([], 2);
@@ -147,7 +190,7 @@ final class SplitFunctionalTestsTest extends UnitTestCase
      * @param array<string, float> $secondsPerClass
      * @return array{int, string}
      */
-    private function split(array $testsPerClass, int $numberOfChunks, array $secondsPerClass = [], string $timingsFile = ''): array
+    private function split(array $testsPerClass, int $numberOfChunks, array $secondsPerClass = [], string $timingsFile = '', bool $auto = false): array
     {
         $list = '<?xml version="1.0"?>' . "\n" . '<testSuite xmlns="https://xml.phpunit.de/testSuite"><tests>';
         foreach ($testsPerClass as $class => $numberOfTests) {
@@ -159,7 +202,11 @@ final class SplitFunctionalTestsTest extends UnitTestCase
         }
         file_put_contents($this->directory . '/tests.xml', $list . '</tests></testSuite>');
 
-        $arguments = [PHP_BINARY, $this->root() . '/Build/Scripts/splitFunctionalTests.php', $this->directory . '/tests.xml', (string)$numberOfChunks, $this->directory];
+        $arguments = [PHP_BINARY, $this->root() . '/Build/Scripts/splitFunctionalTests.php'];
+        if ($auto) {
+            $arguments[] = '--auto';
+        }
+        array_push($arguments, $this->directory . '/tests.xml', (string)$numberOfChunks, $this->directory);
         if ($secondsPerClass !== []) {
             $timings = [];
             foreach ($secondsPerClass as $class => $seconds) {

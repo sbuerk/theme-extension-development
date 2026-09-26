@@ -75,6 +75,9 @@ Build/Scripts/runTests.sh -s unit
 Build/Scripts/runTests.sh -s unitRandom
 Build/Scripts/runTests.sh -s functional -d sqlite
 
+# The functional suite in parallel chunks, as many as are worth it here.
+Build/Scripts/runTests.sh -s functional -d sqlite -j auto
+
 # A single class or method — note the "--" separator.
 Build/Scripts/runTests.sh -s functional -d sqlite -- --filter DummyTest
 ```

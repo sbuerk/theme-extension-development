@@ -48,18 +48,18 @@ single test ran, although a rerun of the job passed.
 
 ## Frequently used options
 
-| Option         | Meaning                                                                   |
-|----------------|---------------------------------------------------------------------------|
-| `-s <suite>`   | Suite to run (`unit`, `functional`, `cgl`, `phpstan`, …).                 |
-| `-t <13\|14>`  | TYPO3 core major version to run against. Default `13`.                    |
-| `-p <version>` | PHP version (`8.2` … `8.5`). Default `8.2`.                               |
-| `-d <dbms>`    | Database for functional tests (`sqlite`, `mariadb`, `mysql`, `postgres`). |
-| `-i <version>` | Database image version, together with `-d`. `-h` lists the accepted ones. |
-| `-j <number>`  | Functional tests in that many parallel chunks, see below.                 |
-| `-b <bin>`     | Container binary, `podman` or `docker`. Auto-detected, podman preferred.  |
-| `-n`           | Check only, do not modify files (used by `cgl` in CI).                    |
-| `-o <seed>`    | Replay a specific random order seed with `unitRandom`.                    |
-| `-h`           | Full help with every suite and option.                                    |
+| Option         | Meaning                                                                    |
+|----------------|----------------------------------------------------------------------------|
+| `-s <suite>`   | Suite to run (`unit`, `functional`, `cgl`, `phpstan`, …).                  |
+| `-t <13\|14>`  | TYPO3 core major version to run against. Default `13`.                     |
+| `-p <version>` | PHP version (`8.2` … `8.5`). Default `8.2`.                                |
+| `-d <dbms>`    | Database for functional tests (`sqlite`, `mariadb`, `mysql`, `postgres`).  |
+| `-i <version>` | Database image version, together with `-d`. `-h` lists the accepted ones.  |
+| `-j <n\|auto>` | Functional tests in that many parallel chunks, or as many as are worth it. |
+| `-b <bin>`     | Container binary, `podman` or `docker`. Auto-detected, podman preferred.   |
+| `-n`           | Check only, do not modify files (used by `cgl` in CI).                     |
+| `-o <seed>`    | Replay a specific random order seed with `unitRandom`.                     |
+| `-h`           | Full help with every suite and option.                                     |
 
 ## Suites
 
@@ -167,6 +167,9 @@ the same time:
 
 ```bash
 Build/Scripts/runTests.sh -s functional -d mariadb -i 10.6 -j 4
+
+# As many chunks as are worth it on this machine - the one for a local run.
+Build/Scripts/runTests.sh -s functional -d sqlite -j auto
 ```
 
 Without `-j`, or with `-j 1`, the suite runs in one PHP container exactly as
@@ -277,6 +280,31 @@ So two chunks already reach the floor — one holding `ShowcaseTreeTest`, the
 other everything else — and more chunks make the other classes finish earlier
 without making the run shorter. The lever beyond that is `ShowcaseTreeTest`
 itself, not the split.
+
+### `-j auto`
+
+`-j auto` picks the number of chunks, in two steps. The machine sets the most:
+half its CPU cores, because a chunk of a DBMS run keeps a database container
+busy next to its PHP process, and no more chunks than GB of available memory
+(`MemAvailable` of `/proc/meminfo`; elsewhere only the cores count). The
+durations then set how many of those are worth it. The heaviest chunk of the
+most is the floor, and the split writes the fewest chunks of which every chunk
+but the heaviest weighs at most 80 % of it. Each chunk costs its containers, and
+once one class outweighs an even share another chunk buys nothing. The 20 % are
+headroom: the same chunk took up to 10 % more or less from one run to the next,
+and with two chunks on SQLite the other chunk, predicted at 86 % of the floor,
+came within 40 and 50 s of it in two runs. The run prints both steps:
+
+```
+-j auto: at most 16 chunks (32 CPU cores, 80 GB memory available)
+auto: 3 of at most 16 chunks, the heaviest weighs 709 s, the next 304 s, the floor is 709 s
+```
+
+With the durations recorded today that is three chunks on SQLite and MariaDB
+and two on MySQL and PostgreSQL. If
+`ShowcaseTreeTest` gets faster or is split into several classes, the same
+option picks more — after the durations are recorded again. An explicit
+`-j <number>` is taken as given, up to the number of test classes.
 
 The durations files are committed per DBMS, because the same class costs very
 different times on each. They are an input of the split, never a gate: a stale

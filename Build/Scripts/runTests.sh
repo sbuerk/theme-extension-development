@@ -454,21 +454,24 @@ Options:
         Send xdebug information to a different port than default 9003 if an IDE like PhpStorm
         is not listening on default port.
 
-    -j <number>
+    -j <number|auto>
         Only with -s functional
         Split the functional suite into <number> chunks that take about the same time and
         run them in parallel, each with its own container network, database container and
         PHP container. A test class is never split, so the slowest class is the floor of a
-        run, and there are never more chunks than test classes. The run fails unless the
-        chunks together executed exactly the tests phpunit listed for it. The chunks are
-        balanced by the recorded durations in "Build/phpunit/FunctionalTestTimes-<dbms>.json"
-        when that file exists, and by the number of tests otherwise. The output of the chunks
-        is streamed while they run, every line prefixed with its chunk. The files of a run -
-        the list, the chunk configurations, and per chunk its output, its JUnit log and its
-        PHPUnit event log - are kept in ".Build/functional-runs/<suffix>/"; the JUnit logs are
-        the input of "-s recordFunctionalTestTimes". A test path or phpunit options after "--" apply
-        to the whole run, before it is split. Without "-j", or with "-j 1", the suite runs
-        in one PHP container as it always did.
+        run, and there are never more chunks than test classes. "auto" picks the number: at
+        most half the CPU cores and no more than GB of memory available, and of those the
+        fewest that leave every chunk but the slowest well below the floor. The run fails
+        unless the chunks together executed exactly the tests phpunit listed for it. The
+        chunks are balanced by the recorded durations in
+        "Build/phpunit/FunctionalTestTimes-<dbms>.json" when that file exists, and by the
+        number of tests otherwise. The output of the chunks is streamed while they run,
+        every line prefixed with its chunk. The files of a run - the list, the chunk
+        configurations, and per chunk its output, its JUnit log and its PHPUnit event log -
+        are kept in ".Build/functional-runs/<suffix>/"; the JUnit logs are the input of
+        "-s recordFunctionalTestTimes". A test path or phpunit options after "--" apply to
+        the whole run, before it is split. Without "-j", or with "-j 1", the suite runs in
+        one PHP container as it always did.
 
     -c <chunk>/<number-of-chunks>
         Internal, set by "-j" for each chunk it starts. Not meant to be given by hand.
@@ -509,6 +512,9 @@ Examples:
 
     # Run functional tests on MariaDB 10.6 in four parallel chunks
     ./Build/Scripts/runTests.sh -s functional -d mariadb -i 10.6 -j 4
+
+    # Run functional tests on SQLite in as many chunks as are worth it on this machine
+    ./Build/Scripts/runTests.sh -s functional -d sqlite -j auto
 
     # Check the coding guidelines without changing files, as CI does
     ./Build/Scripts/runTests.sh -s cgl -n
@@ -567,7 +573,7 @@ while getopts "a:b:c:j:s:d:i:p:t:xy:o:nhu" OPT; do
             ;;
         j)
             FUNCTIONAL_PARALLEL=${OPTARG}
-            if ! [[ ${FUNCTIONAL_PARALLEL} =~ ^[1-9][0-9]*$ ]]; then
+            if ! [[ ${FUNCTIONAL_PARALLEL} =~ ^([1-9][0-9]*|auto)$ ]]; then
                 INVALID_OPTIONS+=("j ${OPTARG}")
             fi
             ;;
@@ -1032,7 +1038,7 @@ case ${TEST_SUITE} in
         ;;
     functional)
         PHPUNIT_CONFIG_FILE="Build/phpunit/FunctionalTests.xml"
-        if [[ -z "${FUNCTIONAL_CHUNK}" && ${FUNCTIONAL_PARALLEL} -gt 1 ]]; then
+        if [[ -z "${FUNCTIONAL_CHUNK}" && ( "${FUNCTIONAL_PARALLEL}" == "auto" || ${FUNCTIONAL_PARALLEL} -gt 1 ) ]]; then
             # "-j": list the tests of this run - with its group exclusions and any path or
             # filter given after "--" - split the list into chunk configurations, and start
             # this script once per chunk, with "-c" and otherwise the same arguments. Every
@@ -1057,6 +1063,26 @@ case ${TEST_SUITE} in
             mkdir -p "${FUNCTIONAL_RUN_DIRECTORY}"
             FUNCTIONAL_TIMINGS="Build/phpunit/FunctionalTestTimes-${DBMS}.json"
             [[ -f "${FUNCTIONAL_TIMINGS}" ]] || FUNCTIONAL_TIMINGS=""
+            FUNCTIONAL_SPLIT_OPTIONS=""
+            if [[ "${FUNCTIONAL_PARALLEL}" == "auto" ]]; then
+                # "-j auto": the most chunks the machine carries, and the split writes the fewest of
+                # those that leave every chunk but the heaviest well below the floor - see
+                # "splitFunctionalTests.php". Half the CPU cores, because a chunk of a DBMS run
+                # keeps a database container busy next to its PHP process. No more chunks than GB
+                # of available memory, which leaves room: measured here, a MySQL 8.0 chunk used
+                # 0.55 to 0.67 GB - the database 410 to 450 MB, the PHP process 130 to 220 MB -
+                # and a MariaDB 10.6 chunk some 0.4 GB. Linux reports the available memory in
+                # "/proc/meminfo"; elsewhere only the cores count.
+                CPU_CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)
+                FUNCTIONAL_PARALLEL=$(( CPU_CORES / 2 ))
+                MEMORY_AVAILABLE_GB=$(awk '/^MemAvailable:/ { print int($2 / 1048576) }' /proc/meminfo 2>/dev/null)
+                if [[ -n "${MEMORY_AVAILABLE_GB}" && ${MEMORY_AVAILABLE_GB} -lt ${FUNCTIONAL_PARALLEL} ]]; then
+                    FUNCTIONAL_PARALLEL=${MEMORY_AVAILABLE_GB}
+                fi
+                [[ ${FUNCTIONAL_PARALLEL} -lt 1 ]] && FUNCTIONAL_PARALLEL=1
+                echo "-j auto: at most ${FUNCTIONAL_PARALLEL} chunks (${CPU_CORES} CPU cores, ${MEMORY_AVAILABLE_GB:-unknown} GB memory available)"
+                FUNCTIONAL_SPLIT_OPTIONS="--auto"
+            fi
             ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-list-${SUFFIX} -e XDEBUG_MODE=off ${IMAGE_PHP} \
                 .Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-${DBMS} --exclude-group not-core-${CORE_VERSION} \
                 --list-tests-xml "${FUNCTIONAL_RUN_DIRECTORY}/tests.xml" "$@" > "${FUNCTIONAL_RUN_DIRECTORY}/list.log" 2>&1
@@ -1064,7 +1090,7 @@ case ${TEST_SUITE} in
             [[ ${SUITE_EXIT_CODE} -ne 0 ]] && cat "${FUNCTIONAL_RUN_DIRECTORY}/list.log"
             if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
                 ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-split-${SUFFIX} -e XDEBUG_MODE=off ${IMAGE_PHP} \
-                    php Build/Scripts/splitFunctionalTests.php "${FUNCTIONAL_RUN_DIRECTORY}/tests.xml" ${FUNCTIONAL_PARALLEL} "${FUNCTIONAL_RUN_DIRECTORY}" ${FUNCTIONAL_TIMINGS}
+                    php Build/Scripts/splitFunctionalTests.php ${FUNCTIONAL_SPLIT_OPTIONS} "${FUNCTIONAL_RUN_DIRECTORY}/tests.xml" ${FUNCTIONAL_PARALLEL} "${FUNCTIONAL_RUN_DIRECTORY}" ${FUNCTIONAL_TIMINGS}
                 SUITE_EXIT_CODE=$?
             fi
             if [[ ${SUITE_EXIT_CODE} -eq 0 && "${DBMS}" == "sqlite" ]]; then
@@ -1078,7 +1104,7 @@ case ${TEST_SUITE} in
             fi
             if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
                 # The split writes fewer chunks than asked for when there are fewer test classes
-                # than chunks, for instance with a filter after "--".
+                # than chunks, for instance with a filter after "--", and with "-j auto".
                 FUNCTIONAL_PARALLEL=$(ls "${FUNCTIONAL_RUN_DIRECTORY}"/FunctionalTests-Job-*.xml | wc -l | tr -d ' ')
                 # The output of every chunk is streamed while it runs, each line prefixed with its
                 # chunk, and written unprefixed to "chunk-<n>.log". Streamed rather than printed once a
