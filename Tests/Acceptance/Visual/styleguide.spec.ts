@@ -129,6 +129,66 @@ async function open(page: Page, fixture: Fixture): Promise<void> {
     expect(failures).toEqual([]);
 }
 
+/**
+ * The part of the DevTools protocol's "DOM.Node" read below.
+ */
+type DomNode = {
+    nodeId: number;
+    attributes?: string[];
+    children?: DomNode[];
+    shadowRoots?: DomNode[];
+};
+
+/**
+ * Whether the video players of the page have stopped drawing their loading
+ * spinner: "settled", or what is still in the way.
+ *
+ * Inserting a "<video>" runs the resource selection, which passes the network
+ * state "loading" before "preload=none" suspends it. Chromium's controls show
+ * their loading panel for that moment and hide it again only at the end of an
+ * iteration of the spinner's animation - measured, 1.1 to 1.5 seconds after
+ * the load on an idle machine, later on a busy one - so a capture right after
+ * the load paints some frame of the spinner, a different one each time. The
+ * panel sits in the closed shadow tree of the user agent, which the page and
+ * Playwright's "animations: disabled" cannot reach; the protocol, which
+ * pierces it, can. A player without a panel to find is reported as well, so a
+ * Chromium that renames it fails the wait instead of skipping it.
+ */
+async function videoSpinners(page: Page): Promise<string> {
+    const session = await page.context().newCDPSession(page);
+    try {
+        await session.send('DOM.enable');
+        await session.send('CSS.enable');
+        const { root } = await session.send('DOM.getDocument', { depth: -1, pierce: true });
+        const panels: number[] = [];
+        const walk = (node: DomNode): void => {
+            const attributes = node.attributes ?? [];
+            const pseudo = attributes.indexOf('pseudo');
+            if (pseudo >= 0 && attributes[pseudo + 1] === '-internal-media-controls-loading-panel') {
+                panels.push(node.nodeId);
+            }
+            for (const child of [...(node.children ?? []), ...(node.shadowRoots ?? [])]) {
+                walk(child);
+            }
+        };
+        walk(root as DomNode);
+        const players = await page.locator('video[controls]').count();
+        if (panels.length !== players) {
+            return `${players} video players, ${panels.length} loading panels found`;
+        }
+        let spinning = 0;
+        for (const nodeId of panels) {
+            const { computedStyle } = await session.send('CSS.getComputedStyleForNode', { nodeId });
+            if (computedStyle.find((property) => property.name === 'display')?.value !== 'none') {
+                spinning++;
+            }
+        }
+        return spinning === 0 ? 'settled' : `${spinning} of ${players} video players draw their loading spinner`;
+    } finally {
+        await session.detach();
+    }
+}
+
 test('every palette section is part of the styleguide', () => {
     // A section renamed or removed from the styleguide would otherwise silently
     // drop out of the palette screenshots.
@@ -273,6 +333,21 @@ test.describe('screenshot', () => {
                 // switch before anything is measured; the baselines were all
                 // written after it. See "docs/testing/visual-tests.md".
                 await page.screenshot({ fullPage: true, clip: { x: 0, y: 0, width: 1, height: 1 } });
+
+                // The loading spinner of a video player, see "videoSpinners()".
+                // The poll and the screenshot are bounded by timeouts of their
+                // own, 10 seconds each, and the test must outlast both, or a
+                // slow runner reports the test timeout instead of what did not
+                // settle. 10 seconds is some seven times the 1.1 to 1.5 seconds
+                // the spinner was measured to take on an idle machine. 45
+                // seconds leave 25 for opening and preparing the page, which
+                // took under 4 seconds for the whole test of a media page here.
+                if (await page.locator('video[controls]').count() > 0) {
+                    test.setTimeout(45_000);
+                    await expect
+                        .poll(() => videoSpinners(page), { message: 'The video players did not settle.', timeout: 10_000 })
+                        .toBe('settled');
+                }
 
                 const locator = target.locate(page);
                 // A markup change that loses or duplicates the clipped element
