@@ -96,6 +96,38 @@ PHPUnit (or any other dispatched tool) must follow a `--` separator:
 Build/Scripts/runTests.sh -s functional -d sqlite -- --filter DummyTest
 ```
 
+## Interrupting a run
+
+Every run creates a network of its own, `theme-extension-development-<suffix>`,
+and attaches its containers to it; the suffix is printed at the end of the
+run. The run removes that network and every container on it, in whatever
+state, on every way out:
+
+- its end and every early exit, with the exit code of the suite — 0 for a
+  green one, non-zero for a failing one;
+- SIGINT, SIGTERM and SIGHUP, exiting with 2 for SIGINT as before, 143 for
+  SIGTERM and 129 for SIGHUP; locally and in CI alike;
+- SIGKILL, which no trap sees, and a SIGKILL that follows a SIGTERM before
+  the trap is through: a reaper process waits for the run to end and removes
+  what is left, looking once a second. With `setsid`, which Linux has, it runs
+  in a session of its own, which no signal to the process group of the run
+  reaches. Without it, on macOS, it shares that process group and ignores
+  SIGINT, SIGTERM and SIGHUP, so only a SIGKILL to the whole group escapes it.
+
+The containers that need it are the detached ones — the database of
+`functional`, the web server of `acceptance` and `visual`. No process of them
+takes a signal: a `functional` run stopped by SIGTERM or SIGHUP left the
+database container and the network running for hours, while the
+`functional-<suffix>` container beside it went away — its client either
+forwarded the signal to it or, when only the script was signalled, ran the
+suite to the end and removed it.
+
+A signal to the process group — ctrl-c, a closed terminal, a supervisor that
+sends SIGTERM and SIGKILL shortly after, as `timeout -k` does — stops the
+running container and the run at once. A signal to the `runTests.sh` process
+alone takes effect when the container in the foreground has finished, because
+bash runs a trap only between commands.
+
 ## Git worktrees
 
 A `git worktree` is a supported checkout, including one kept below an ignored
