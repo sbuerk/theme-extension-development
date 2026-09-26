@@ -271,12 +271,11 @@ the instance when it fails — see [Quality gates](../development/quality-gates.
 
 Both engines run in that one job. With Chromium alone it took 3.4 minutes on
 v12 and 5.4 on v13, of which Playwright reported 2.0 and 3.8 for the specs (the
-run of #87). How long it takes with Firefox added has not been measured on this
-branch yet. On the 2.x line the first run with both engines took 8.2 minutes
-on v13 and 8.7 on v14, against 5.4 and 5.5 with Chromium alone (the runs of #86
-and #88). The job runs beside functional jobs of 13 to 23 minutes that the
-database matrix waits for, so the Firefox pass lengthens a job that is not on
-the longest path of the pipeline.
+run of #87); with Firefox added it took 7.5 and 7.6, of which Playwright
+reported 5.9 and 6.2 (the run of #90). The job runs beside functional jobs of
+13 to 23 minutes that the database matrix waits for, so the two to four
+minutes Firefox adds lengthen a job that is not on the longest path of the
+pipeline.
 
 ## See also
 
