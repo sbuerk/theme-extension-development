@@ -256,6 +256,24 @@ test.describe('screenshot', () => {
                     await document.fonts.ready;
                 });
 
+                // The first capture beyond the viewport changes the font of
+                // the page. Chromium in the pinned image resolves the generic
+                // "monospace", the end of the theme's mono stack, to
+                // "WenQuanYi Zen Hei Mono" when it lays a document out, and to
+                // "Liberation Mono" from the first "captureBeyondViewport"
+                // capture on; no other generic family moves, and a capture
+                // within the viewport, a viewport resize or a device metrics
+                // override does not do it. A section taller than the viewport
+                // is measured before that capture and painted after it, so its
+                // first screenshot was cut to the height of the old wrapping,
+                // and it matched only on the third capture - the loop of
+                // "toHaveScreenshot" hid that, until three captures of an
+                // 8,800 pixel section did not fit its timeout on a busy runner.
+                // One capture of a single pixel of the full page makes the
+                // switch before anything is measured; the baselines were all
+                // written after it. See "docs/testing/visual-tests.md".
+                await page.screenshot({ fullPage: true, clip: { x: 0, y: 0, width: 1, height: 1 } });
+
                 const locator = target.locate(page);
                 // A markup change that loses or duplicates the clipped element
                 // must fail here, not screenshot something else.
