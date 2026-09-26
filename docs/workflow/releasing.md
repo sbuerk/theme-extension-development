@@ -18,6 +18,11 @@ One branch per core version tuple, one major version line each:
 its default there — see [below](#--source-branch-and-the-key-the-alias-is-stored-under).
 A change that belongs on both is made on `main` first and then backported.
 
+Both branches get the complete CI every night, started from `main` — a branch
+added to or retired from this table is added to or removed from the matrix of
+[`nightly.yml`](../../.github/workflows/nightly.yml) as well, see
+[the nightly run](../development/quality-gates.md#the-nightly-run).
+
 ## `setVersion.sh` — apply a version
 
 Applies a version and its derived variants to every file carrying one: the
