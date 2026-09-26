@@ -272,10 +272,10 @@ the instance when it fails — see [Quality gates](../development/quality-gates.
 Both engines run in that one job. With Chromium alone it took 3.4 minutes on
 v12 and 5.4 on v13, of which Playwright reported 2.0 and 3.8 for the specs (the
 run of #87); with Firefox added it took 7.5 and 7.6, of which Playwright
-reported 5.9 and 6.2 (the run of #90). The job runs beside functional jobs of
-13 to 23 minutes that the database matrix waits for, so the two to four
-minutes Firefox adds lengthen a job that is not on the longest path of the
-pipeline.
+reported 5.9 and 6.2 (the run of #90). The job runs beside the SQLite
+functional jobs that the database matrix waits for, which took 11.7 to 19.3
+minutes in that same run, so the two to four minutes Firefox adds lengthen a
+job that is not on the longest path of the pipeline.
 
 ## See also
 
