@@ -222,6 +222,30 @@ The decisions worth knowing:
   identically with the Fluid of both dependency sets, and the stylesheet and
   the browser image are the same — see [Visual tests](../testing/visual-tests.md#in-ci).
 
+### Job timeouts
+
+Every job carries a `timeout-minutes`, so a job that stalls fails instead of
+holding a runner for GitHub's default of 360 minutes. The values come from the
+slowest successful job of the fifteen newest pull request runs of `ci.yml`
+against `main` started before 2026-09-26 12:00 UTC (#68 to #91), all attempts,
+a job carried unchanged into a re-run counted once, with room for a slow image
+pull or a busy runner:
+
+| Job                               | Slowest seen, minutes | Timeout, minutes |
+|-----------------------------------|-----------------------|------------------|
+| `quality`, `phpstan`, `lint`      | 1.3                   | 10               |
+| `unit`, `assets`, `documentation` | 0.7                   | 10               |
+| `visual`                          | 3.4                   | 15               |
+| `acceptance`                      | 8.7                   | 20               |
+| `functional-sqlite`               | 23.4                  | 35               |
+| `functional-dbms`                 | 54.7                  | 65               |
+
+For the database jobs, 54.7 minutes is the slowest of 227 out of the 240 that
+succeeded; the other thirteen took 58.8 to 158 minutes, and three more were
+cancelled after 74.7 to 84.4 minutes. That tail is what the timeout cuts off:
+it would have ended ten of the 240. The functional values were measured with the
+suite unchunked, and are retuned after the first CI run of the chunked suite.
+
 ### Why CI passes `-b docker`
 
 Every `runTests.sh` invocation in the workflows passes `-b docker`. The script
