@@ -184,6 +184,35 @@ cleanUp() {
     CLEANED_UP=1
 }
 
+ensureImages() {
+    # Makes sure every image given is present, pulling one that is not with a bounded retry, and
+    # ends the run naming the image when that does not succeed.
+    #
+    # "run" pulls a missing image by itself, once, and gives up: a registry that did not answer in
+    # time ("context deadline exceeded", exit code 125 of "docker run") failed a CI job before its
+    # suite started, and a rerun of the same job passed. An image that is present is not pulled
+    # again, so a local run needs no registry once its images are there; "-u" updates them.
+    local IMAGE
+    local ATTEMPT
+    for IMAGE in "$@"; do
+        if ${CONTAINER_BIN} image inspect "${IMAGE}" >/dev/null 2>&1; then
+            continue
+        fi
+        for ATTEMPT in 1 2 3; do
+            if ${CONTAINER_BIN} pull "${IMAGE}" >&2; then
+                continue 2
+            fi
+            if [[ ${ATTEMPT} -lt 3 ]]; then
+                echo "Pulling \"${IMAGE}\" failed, attempt ${ATTEMPT} of 3. Retrying in $((ATTEMPT * 10)) seconds." >&2
+                sleep $((ATTEMPT * 10))
+            fi
+        done
+        echo "The image \"${IMAGE}\" is not present and could not be pulled in 3 attempts. Nothing was run." >&2
+        SUITE_EXIT_CODE=1
+        printSummary
+    done
+}
+
 handleDbmsOptions() {
     # -a, -d, -i depend on each other. Validate input combinations and set defaults.
     case ${DBMS} in
@@ -709,6 +738,31 @@ else
     XDEBUG_MODE="-e XDEBUG_MODE=debug -e XDEBUG_TRIGGER=foo"
     XDEBUG_CONFIG="client_port=${PHP_XDEBUG_PORT} client_host=${CONTAINER_HOST}"
 fi
+
+# The images of the suite, before its first "run", see "ensureImages()". A suite missing here
+# still works: "run" pulls its image, only without the retry.
+case ${TEST_SUITE} in
+    acceptance|visual)
+        ensureImages "${IMAGE_PHP}" "${IMAGE_PLAYWRIGHT}"
+        ;;
+    buildCss|buildIcons|checkCssBuild|checkIconsBuild|npm|watchCss)
+        ensureImages "${IMAGE_NODEJS}"
+        ;;
+    renderDocumentation|watchDocumentation)
+        ensureImages "${IMAGE_DOCS}"
+        ;;
+    functional)
+        case ${DBMS} in
+            mariadb) ensureImages "${IMAGE_PHP}" "${IMAGE_MARIADB}" ;;
+            mysql) ensureImages "${IMAGE_PHP}" "${IMAGE_MYSQL}" ;;
+            postgres) ensureImages "${IMAGE_PHP}" "${IMAGE_POSTGRES}" ;;
+            *) ensureImages "${IMAGE_PHP}" ;;
+        esac
+        ;;
+    cgl|checkBom|checkExceptionCodes|checkMarkdownTables|checkTestMethodsPrefix|composer|composerInstall|composerUpdate|composerValidate|lintPhp|phpstan|phpstanGenerateBaseline|setVersion|unit|unitRandom)
+        ensureImages "${IMAGE_PHP}"
+        ;;
+esac
 
 # Suite execution
 case ${TEST_SUITE} in
