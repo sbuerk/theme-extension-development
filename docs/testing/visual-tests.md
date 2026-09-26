@@ -272,9 +272,11 @@ ViewHelper, a variable or a setting only TYPO3 provides fails there. The v13 set
 
 ## In CI
 
-The job `visual` runs once, after `quality`, on the v13 set and the lowest PHP
-version — the set `quality` installs, whose composer cache it shares. It is not
-a matrix: the stylesheet depends on neither PHP nor the core version, the
+The job `visual` runs once, from the start of the run like every job, on the
+v13 set and the lowest PHP version — the set `quality` installs, under the same
+composer cache key, so both restore what an earlier run saved; as neither waits
+for the other, a cache miss is a download in both. It is not a matrix: the
+stylesheet depends on neither PHP nor the core version, the
 partials render identically with either Fluid, and the browser is the one
 pinned image, so a second job would compare the same pixels again. On failure it
 uploads the report, the test results with the diff images, the fixtures and the
