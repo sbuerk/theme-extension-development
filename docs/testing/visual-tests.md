@@ -207,6 +207,32 @@ bought nothing but blindness to small colour changes. Lazily loaded images are
 switched to eager and decoded before the screenshot, so whether an image below
 the viewport had arrived is not timing.
 
+## The first capture beyond the viewport
+
+Every screenshot test captures one pixel of the full page before it measures
+anything. Chromium in the pinned image resolves the generic `monospace` — the
+end of the theme's mono stack, as none of the named fonts before it is
+installed there — to *WenQuanYi Zen Hei Mono*, fontconfig's answer, when it
+lays a document out, and to *Liberation Mono* from the first capture with
+`captureBeyondViewport` on, which is how Playwright captures anything taller
+than the viewport. Measured per document: `sans-serif`, `serif` and
+`system-ui` do not move, and neither a capture within the viewport, a viewport
+resize nor a device metrics override triggers it. Why Chromium does this was
+not established; that it does, deterministically, was.
+
+The two fonts wrap differently, so a section taller than the viewport was
+measured in one font and painted in the other: the first capture was cut to
+the height of the old wrapping, and only the third, after
+`toHaveScreenshot` had waited for two identical captures in a row, matched the
+baseline. That held for 28 of the 60 screenshots, and nothing showed it until a
+busy CI runner could not fit three captures of the 8,800 pixel `forms` and
+`media` sections into the timeout of the assertion. The capture up front makes
+the switch before the first measurement; every screenshot now matches on its
+first capture, and every baseline shows the mono text in *Liberation Mono*.
+It is not a theme defect: the stack ends in the generic by design, and which
+font a generic stands for is the browser's decision, not the stylesheet's. The
+stack is unchanged.
+
 ## Baselines
 
 The baselines are the PNGs in
