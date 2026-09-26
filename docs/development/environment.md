@@ -94,6 +94,28 @@ PHPUnit (or any other dispatched tool) must follow a `--` separator:
 Build/Scripts/runTests.sh -s functional -d sqlite -- --filter DummyTest
 ```
 
+## Git worktrees
+
+A `git worktree` is a supported checkout, including one kept below an ignored
+directory of another checkout. Every suite runs there as it does in a clone.
+
+`runTests.sh` mounts the checkout and nothing else, so a worktree's `.git` — a
+file pointing into the git directory of the main checkout — leads nowhere
+inside a container. That is deliberately left so: no suite runs git. The one
+tool that asks is composer, for the version of the extension that the
+development instance of `-s acceptance` installs through a path repository,
+and without an answer it falls back to `dev-main`, which the instance's `@dev`
+constraint accepts, as it would accept whatever git answered. The gate that
+does need to know what is git-ignored, `checkMarkdownTables`, reads the
+`.gitignore` of its checkout rather than asking git or searching for a `.git`
+directory, see [Markdown table formatting](quality-gates.md#markdown-table-formatting).
+
+What a worktree costs is a dependency set of its own: `.Build/`, `.cache/` and
+`composer.lock` are git-ignored and therefore per checkout, so a new worktree
+starts without any and needs its own `-s composerUpdate` before a suite that
+needs dependencies runs: about 160 MB below `.Build/` and 50 MB of composer
+cache for one core version, measured on TYPO3 v13.
+
 ## See also
 
 - [Dual core setup](dual-core-setup.md)
