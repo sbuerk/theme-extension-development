@@ -25,10 +25,15 @@ parameters:
     - ../../../packages-dev/dev-site/Classes
     - ../../../packages-dev/dev-site/Configuration
     # The scripts that delete files: the one that builds and deletes instance
-    # state, and the one that replaces the fixtures of the visual suite. The
-    # other scripts of "Build/Scripts/" are not analysed.
+    # state, and the one that replaces the fixtures of the visual suite. And
+    # the three of "runTests.sh -j", which decide which functional tests a run
+    # executes and whether it may pass. The other scripts of "Build/Scripts/"
+    # are not analysed.
     - ../../../Build/Scripts/instance.php
     - ../../../Build/Scripts/renderStyleguideFixtures.php
+    - ../../../Build/Scripts/splitFunctionalTests.php
+    - ../../../Build/Scripts/checkFunctionalTestCount.php
+    - ../../../Build/Scripts/recordFunctionalTestTimes.php
 
   excludePaths:
     - ../../../Tests/Acceptance/node_modules/*
