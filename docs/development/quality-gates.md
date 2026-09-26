@@ -169,6 +169,21 @@ ignored and passed with "Checked 0 markdown files". A run that finds no file in
 `docs/` always has `Index.md`.
 → [Documentation conventions](../Index.md#conventions-of-this-documentation)
 
+## Functional tests in parallel chunks
+
+The functional suite is the slowest gate, and `-j <number>` runs it in that many
+chunks at once, each with its own containers:
+
+```bash
+Build/Scripts/runTests.sh -s functional -d sqlite -j 4
+```
+
+A chunked run carries a check of its own: it fails unless the chunks together
+executed exactly as many tests as PHPUnit listed for the run, so a class lost on
+the way through the split cannot pass unnoticed. A class is never split, which
+makes `ShowcaseTreeTest` the floor of every chunked run.
+→ [Functional tests in parallel chunks](environment.md#functional-tests-in-parallel-chunks)
+
 ## Continuous integration
 
 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs everything for
