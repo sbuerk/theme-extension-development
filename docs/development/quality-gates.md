@@ -307,6 +307,22 @@ container as `--user $(id -u)` with group 0, and on a runner the tmpfs comes up
 test fails with `unable to open database file`. Rootless podman is root inside
 its user namespace and never saw it.
 
+### The runner image
+
+Every job of every workflow runs on `ubuntu-26.04`, named rather than
+`ubuntu-latest`. That label moves from Ubuntu 24.04 to 26.04 in a rollout from
+October 19 to November 19, 2026, job by job
+([actions/runner-images#14748](https://github.com/actions/runner-images/issues/14748));
+a named version moves every job at once, and when this repository decides to.
+Change the label in `ci.yml`, `pr-comment.yml` and `publish.yml` together.
+
+The two functional jobs had been pinned to `ubuntu-22.04` since the initial
+commit, without a recorded reason, and moved with the rest. The image ships
+Docker 29.4 and Podman 5.7.0; `-b docker` stays, for the reason above.
+`publish.yml` runs `jq` on the runner itself, which the image ships as well, and
+installs PHP 8.2 with `shivammathur/setup-php`, which lists Ubuntu 26.04 as
+supported. It runs for a tag only, so the next release is its first run there.
+
 ### The composer cache
 
 The composer **download cache** is shared per PHP and core version, so the

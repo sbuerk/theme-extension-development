@@ -110,6 +110,14 @@ name: "CI"
 # the script default and every local run untouched. Drop the flag once GitHub
 # stops producing the mismatch.
 #
+# Every job runs on "ubuntu-26.04", named rather than "ubuntu-latest". That
+# label moves from Ubuntu 24.04 to 26.04 in a rollout from October 19 to
+# November 19, 2026, job by job (actions/runner-images#14748); a named version
+# moves every job at once, when this repository decides to. The two functional
+# jobs had been pinned to "ubuntu-22.04" since the initial commit, without a
+# recorded reason; they move too. The same label is used by "pr-comment.yml"
+# and "publish.yml"; change them together.
+#
 # The composer download cache is restored per PHP and core version. It lives in
 # ".cache/" at the repository root and **must not** be moved under ".Build/":
 # "composerUpdate" starts with "rm -rf .Build", so a cache stored there would be
@@ -137,7 +145,7 @@ jobs:
 
   quality:
     name: "quality (v${{ matrix.typo3 }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -183,7 +191,7 @@ jobs:
 
   phpstan:
     name: "phpstan (v${{ matrix.typo3 }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -215,7 +223,7 @@ jobs:
 
   lint:
     name: "lint (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -244,7 +252,7 @@ jobs:
 
   unit:
     name: "unit (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -283,7 +291,7 @@ jobs:
   # lockfile.
   assets:
     name: "assets"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
 
@@ -305,7 +313,7 @@ jobs:
 
   documentation:
     name: "documentation"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
 
@@ -356,7 +364,7 @@ jobs:
   # for the other, a cache miss is a download in both.
   visual:
     name: "visual (v${{ matrix.typo3 }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -414,7 +422,7 @@ jobs:
   # the one instance — see "docs/testing/acceptance-tests.md#two-engines".
   acceptance:
     name: "acceptance (v${{ matrix.typo3 }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -459,7 +467,7 @@ jobs:
 
   functional-dbms:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 65
     # Beside the SQLite jobs, not after them - see the header. A defect that is
     # not DBMS specific is reported by these 16 jobs as well.
@@ -520,7 +528,7 @@ jobs:
 
   functional-sqlite:
     name: "functional sqlite (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 35
     strategy:
       fail-fast: false
