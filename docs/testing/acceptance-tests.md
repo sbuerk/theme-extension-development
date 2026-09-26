@@ -36,7 +36,12 @@ no `composerUpdate` is needed before it.
    move, the seed import, the seed state.
 3. **Serves it with the PHP built-in server**, in a container of its own on the
    network of the run, through the router `Tests/Acceptance/router.php`.
-4. **Runs Playwright**, every spec in Chromium and then in Firefox — see
+4. **Pins the address of the instance.** The address of the server container
+   is written into `/etc/hosts` of the Playwright container as
+   `acceptance-instance`, and Playwright runs against
+   `http://acceptance-instance:8000` — see
+   [below](#the-address-of-the-instance).
+5. **Runs Playwright**, every spec in Chromium and then in Firefox — see
    [Two engines](#two-engines). It runs in the official image
    `mcr.microsoft.com/playwright`, pinned in `runTests.sh` to the exact version
    of `@playwright/test` in `Tests/Acceptance/package.json` — the image carries
@@ -85,6 +90,42 @@ failed now and then with *database is locked* and answered 500. Parallel
 requests of one backend page can collide the same way, so they are served one
 after the other as well. The one worker holds across the two engines too:
 Firefox starts once Chromium is done, never beside it.
+
+## The address of the instance
+
+The browser used to reach the instance by the name of its container, resolved
+by the DNS server of the container network. On a busy host a page load failed
+now and then with `NS_ERROR_UNKNOWN_HOST` in Firefox or
+`net::ERR_NAME_NOT_RESOLVED` in Chromium, and the log of the PHP server showed
+that the request never arrived. It was a single lookup that failed, not the
+instance, and every failed lookup was a failed test; the Firefox pass doubles
+the lookups of a run. The [visual suite](visual-tests.md#the-address-of-the-fixture-server)
+had the same failure first, and the same fix.
+
+So no lookup of the run goes to DNS. `runTests.sh` reads the address of the
+server container with `inspect` and passes it to the Playwright container as
+`--add-host acceptance-instance:<address>`. `BASE_URL` names
+`acceptance-instance`, a host no DNS server knows: the address in `/etc/hosts`
+is the only way to it, so a pin that did not work would fail every test instead
+of one in a hundred — without it the global setup cannot resolve the name at
+all. An address that cannot be read fails the run with a message saying so.
+Unlike the visual suite, there is no wait in `runTests.sh` before it: the
+address is known as soon as the container runs, and `global-setup.ts` polls
+the instance through the pinned name for 60 seconds, which covers the start of
+the server.
+
+Nothing in the instance depends on the name. The site bases are relative and
+`trustedHostsPattern` is `.*`, so TYPO3 takes the host from the request. An
+absolute URL it renders — the backend login page carries one, the link
+`#t3js-login-url` — therefore names `acceptance-instance:8000` as well, which
+the browser resolves through the same pin.
+
+With the pin, the whole suite also passed in both engines with a `resolv.conf`
+mounted into the Playwright container that names a nameserver which does not
+answer: no lookup of a run needs DNS — the one external provider a spec clicks
+is blocked at the route. `--dns` is no way to make that check: podman and
+docker both keep resolving the containers of the network with their own DNS
+server and use the one `--dns` names only for other names.
 
 ## Two engines
 
