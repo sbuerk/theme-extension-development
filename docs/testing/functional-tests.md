@@ -18,7 +18,18 @@ Build/Scripts/runTests.sh -s functional -d postgres -i 10
 
 # A single class or method.
 Build/Scripts/runTests.sh -s functional -d sqlite -- --filter ExtensionLoadedTest
+
+# The whole suite in four chunks that run in parallel.
+Build/Scripts/runTests.sh -s functional -d mariadb -i 10.6 -j 4
 ```
+
+`-j` splits the suite by test class, runs every chunk with a database container
+of its own, and fails the run unless the chunks together executed every test
+PHPUnit listed for it. A class is never split, so the slowest class —
+`ShowcaseTreeTest` — is the floor of any chunked run. How the split works, where
+the files of a run are kept and how the recorded durations it balances by are
+refreshed is described in
+[Development environment](../development/environment.md#functional-tests-in-parallel-chunks).
 
 SQLite is the fastest option and enough for most work. Run at least one other
 DBMS before opening a pull request when the change touches queries, schema or
