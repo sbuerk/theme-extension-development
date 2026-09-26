@@ -1,0 +1,126 @@
+name: "Nightly"
+
+# Runs the complete "CI" workflow every night, for both maintained branches:
+# "main" (TYPO3 v13/v14) and "1" (TYPO3 v12/v13).
+#
+# Why at all: "ci.yml" runs for pull requests and by hand, so a merged state is
+# never checked again. And there is no "composer.lock" - every run resolves its
+# dependencies afresh - so a TYPO3 patch release or any other dependency release
+# changes what a run installs without a commit here. The nightly run is where
+# that shows up first, rather than in the next unrelated pull request.
+#
+# Why a workflow of its own that starts "ci.yml", rather than a "schedule"
+# trigger in "ci.yml": a schedule only ever fires on the default branch, with
+# the workflow file of the default branch. Branch "1" has a "ci.yml" of its own
+# - other core versions, other PHP versions - which a schedule on "main" cannot
+# reach. "workflow_dispatch" can: it runs "ci.yml" as it is on the branch it is
+# given, and the "ci.yml" of both branches carries that trigger. A dispatch made
+# with "github.token" starts a run, unlike most events that token causes.
+#
+# Why it waits for the run it started: a run started by the dispatch belongs to
+# "github-actions", and its failure notifies nobody. This job fails when that run
+# does not succeed, and a failed scheduled run is reported the way GitHub reports
+# scheduled workflows: to whoever last changed the "cron" line below.
+#
+# The dispatched run is the pull request run, job for job. Its concurrency group
+# is "CI-refs/heads/<branch>", while a pull request run is grouped by its number,
+# so a nightly run and a pull request run never cancel each other, and neither
+# do the runs for the two branches. A run of "ci.yml" started by hand on the same
+# branch while the nightly one runs does cancel it, and this job then fails.
+#
+# Two nightly runs never overlap. With "cancel-in-progress: false" the group
+# below holds one running and at most one pending run: a second one - started by
+# hand while the scheduled one runs - waits instead of letting its dispatch
+# cancel the first one's CI run, and a third replaces the second while that is
+# still pending, which starts the same thing. See "Concurrency" in the GitHub
+# Actions documentation, docs.github.com/en/actions/concepts/workflows-and-
+# actions/concurrency.
+#
+# Each job holds a runner while it waits, two of the twenty the account runs at
+# a time, at a time of night when nothing else competes for them.
+#
+# GitHub disables a schedule in a public repository after 60 days without
+# repository activity; it has to be enabled again in the Actions tab.
+#
+# Started by hand from the Actions tab with "Run workflow", it does the same.
+
+on:
+  schedule:
+    # Not on the hour: scheduled runs are delayed most at the top of an hour.
+    - cron: "37 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Starting a workflow run and following it.
+  actions: write
+
+concurrency:
+  group: "${{ github.workflow }}"
+  cancel-in-progress: false
+
+jobs:
+
+  ci:
+    name: "CI on ${{ matrix.branch }}"
+    # A named version rather than "ubuntu-latest", like every job of "ci.yml" -
+    # see its header.
+    runs-on: ubuntu-26.04
+    # Every job of "ci.yml" has a timeout of at most 65 minutes, but the two
+    # dispatched runs together queue 80 jobs for the 18 runners this workflow
+    # leaves them, so a run can take several of its longest job. Three hours is
+    # stuck, not slow.
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [ "main", "1" ]
+    env:
+      GH_TOKEN: "${{ github.token }}"
+      GH_REPO: "${{ github.repository }}"
+      BRANCH: "${{ matrix.branch }}"
+    steps:
+
+      # The dispatch answers with the id of the run it created when asked to
+      # ("return_run_details"). It may still answer "204 No Content" without
+      # one, so the run is then looked up instead: the dispatched "CI" run on
+      # the branch created since a minute before the dispatch - the minute
+      # absorbs a runner clock ahead of GitHub's. It takes a few seconds to
+      # appear. More than one such run fails the step rather than guessing.
+      # What is left: a "CI" run dispatched by hand on the same branch in that
+      # minute, or before the nightly one shows up, and alone in the list, is
+      # taken for it - only on the 204 path. The response is parsed apart from
+      # the request, so an empty body cannot fail the step, while a refused
+      # dispatch does.
+      - name: "Start CI on ${{ matrix.branch }}"
+        id: "start"
+        run: |
+          STARTED="$(date -u -d '-1 minute' +%Y-%m-%dT%H:%M:%SZ)"
+          RESPONSE="$(gh api --method POST "repos/${GH_REPO}/actions/workflows/ci.yml/dispatches" \
+            -f "ref=${BRANCH}" -F "return_run_details=true")"
+          RUN_ID="$(jq -r '.workflow_run_id // empty' <<< "${RESPONSE}")"
+          ATTEMPT=0
+          while [[ -z "${RUN_ID}" && ${ATTEMPT} -lt 30 ]]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            sleep 10
+            CANDIDATES="$(gh run list --workflow ci.yml --branch "${BRANCH}" --event workflow_dispatch \
+              --created ">=${STARTED}" --limit 10 --json databaseId --jq '.[].databaseId')"
+            if [[ $(wc -w <<< "${CANDIDATES}") -gt 1 ]]; then
+              echo "More than one dispatched CI run on ${BRANCH} since ${STARTED}: $(tr '\n' ' ' <<< "${CANDIDATES}")- not guessing which one this dispatch created." >&2
+              exit 1
+            fi
+            RUN_ID="${CANDIDATES}"
+          done
+          if [[ -z "${RUN_ID}" ]]; then
+            echo "No CI run appeared on ${BRANCH} within five minutes of the dispatch." >&2
+            exit 1
+          fi
+          echo "run-id=${RUN_ID}" >> "${GITHUB_OUTPUT}"
+          echo "CI on \`${BRANCH}\`: https://github.com/${GH_REPO}/actions/runs/${RUN_ID}" >> "${GITHUB_STEP_SUMMARY}"
+
+      # Exits non-zero unless the run concluded "success": a failed, a
+      # cancelled and a timed out run all fail this job.
+      - name: "Wait for the CI run and take over its result"
+        env:
+          RUN_ID: "${{ steps.start.outputs.run-id }}"
+        run: 'gh run watch "${RUN_ID}" --exit-status --interval 60'
