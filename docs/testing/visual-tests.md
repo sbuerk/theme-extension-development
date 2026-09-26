@@ -233,6 +233,30 @@ It is not a theme defect: the stack ends in the generic by design, and which
 font a generic stands for is the browser's decision, not the stylesheet's. The
 stack is unchanged.
 
+## The loading spinner of the video player
+
+A page with a `<video controls>` — today only `media` — is captured only once
+the player has stopped drawing its loading spinner. Inserting the element runs
+the resource selection, which passes the network state *loading* before
+`preload="none"` suspends it. Chromium's controls show their loading panel for
+that moment and hide it only at the end of an iteration of the spinner's
+animation: 1.1 to 1.5 seconds after the load on an idle machine, measured, and
+later on a busy one. A capture before that paints some frame of the spinner, a
+different one each time — up to a few hundred pixels — and on a busy host the
+next capture paints yet another, so no two in a row are identical and the
+assertion times out.
+
+The panel lives in the closed shadow tree of the user agent. Neither the page
+nor Playwright's `animations: 'disabled'` reaches it; `getAnimations()` of the
+document does not list its animation. The spec asks the DevTools protocol,
+which pierces that tree, for the computed `display` of every
+`-internal-media-controls-loading-panel` and waits until all are `none`. The
+name is Chromium's own, so the wait also requires one panel per player: a
+Chromium that renames it fails the wait with the count it found, rather than
+skipping it. The players are not masked instead: the theme styles the element
+itself — radius, background, and the border of the audio player — and a mask
+would hide exactly that.
+
 ## Baselines
 
 The baselines are the PNGs in
