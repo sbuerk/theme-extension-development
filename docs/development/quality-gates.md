@@ -158,7 +158,15 @@ in the diff of the *next* change to that table. Alignment markers (`:---`,
 alone so a page can show an unformatted one as an example.
 
 Git-ignored files are skipped, and so are the symlinked agent instruction files,
-which are checked through their target.
+which are checked through their target. What is git-ignored is decided by the
+`.gitignore` of the checkout the script belongs to, applied by the script
+itself. The Finder option `ignoreVCSIgnored()` it used before takes as its root
+the nearest directory upwards with a `.git` *directory*, and a worktree has a
+`.git` *file*: run on the host from a worktree nested below an ignored path of
+another checkout, it applied that checkout's `.gitignore`, found every file
+ignored and passed with "Checked 0 markdown files". A run that finds no file in
+`./*.md` or in `docs/` now fails, as the root always has `README.md` and
+`docs/` always has `Index.md`.
 → [Documentation conventions](../Index.md#conventions-of-this-documentation)
 
 ## Continuous integration
