@@ -210,10 +210,12 @@ The job `acceptance` runs per core version once the unit tests passed, beside
 the functional jobs, and uploads the report, the failure traces and the logs of
 the instance when it fails — see [Quality gates](../development/quality-gates.md#continuous-integration).
 
-Both engines run in that one job. With Chromium alone it took five and a half
-minutes, about two of them building the instance, beside functional jobs of 17
-to 23 minutes that the database matrix waits for — so the Firefox pass lengthens
-a job that is not on the longest path of the pipeline.
+Both engines run in that one job. With Chromium alone it took 5.4 minutes on
+v13 and 5.5 on v14, about two of them building the instance; with Firefox
+added it took 8.2 and 8.7 (the runs of #86 and #88). The job runs beside
+functional jobs of 17 to 23 minutes that the database matrix waits for, so the
+three minutes Firefox adds lengthen a job that is not on the longest path of
+the pipeline.
 
 ## See also
 
