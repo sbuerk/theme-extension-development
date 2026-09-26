@@ -38,6 +38,16 @@ overrides that. There is no reason to pass it locally — the workflows do, and
 [why they do](quality-gates.md#why-ci-passes--b-docker) is a property of GitHub
 hosted runners, not of this repository.
 
+Before a suite starts its first container, the wrapper makes sure every image
+the suite needs is present. An image that is present is never pulled again, so
+once a suite has run, it runs without a registry; `-u` is what updates the
+TYPO3 testing images. A missing image is pulled with up to three attempts, 10
+and 20 seconds apart, and when all three fail the run ends before starting
+anything, naming the image. A pull left to `docker run` is tried once, and a
+registry that did not answer in time — `context deadline exceeded` for the
+Playwright image, exit code 125 — failed an `acceptance` job in CI before a
+single test ran, although a rerun of the job passed.
+
 ## Frequently used options
 
 | Option         | Meaning                                                                   |
