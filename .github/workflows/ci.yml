@@ -5,22 +5,37 @@ name: "CI"
 # freshly built development instance, and the rendered documentation.
 #
 # One workflow rather than one per core version. The core version is a matrix
-# dimension, which keeps a single place to add v15 later and makes the
-# dependencies between the stages expressible — they cannot cross workflows.
+# dimension, which keeps a single place to add v15 later.
 #
-# Staging, cheapest and most likely to fail first:
+# No job waits for another. Every job starts with the run:
 #
-#   quality ─┬─> visual (the styleguide partials: screenshots and axe)
-#   phpstan ─┤         ┌─> acceptance (a built instance, in Chromium and Firefox)
-#   lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
-#            │
-#   docs ────┤  (independent, for fast feedback on documentation changes)
-#   assets ──┘  (independent, neither PHP nor core version dependent)
+#   quality, phpstan, lint, unit, assets, documentation   the gates, ~1 minute
+#   visual        the styleguide partials: screenshots and axe
+#   acceptance    a built instance, in Chromium and Firefox
+#   functional    MySQL, MariaDB, PostgreSQL - 16 jobs
+#   functional    SQLite
 #
-# The DBMS matrix is the expensive part — 16 jobs, each starting a database
-# container — so it only runs once the same tests have passed on SQLite for both
-# core versions and both edge PHP versions. A failure that is not DBMS specific
-# is then reported by 4 jobs instead of 20.
+# The jobs used to be staged, cheapest first: the gates, then unit, then SQLite,
+# then the 16 database jobs. A defect a gate finds was then reported without
+# starting the expensive jobs - but every run that went on to pass waited for
+# each stage in turn, and a pull request run is almost always one that passes.
+# In the run of pull request #91 the first database job started 24 minutes after
+# the run did, of a run of 101 minutes. Starting everything at once costs runner
+# time when a gate fails, which this public repository does not pay for, and it
+# delays no report: the gates still finish within about a minute.
+#
+# There is no aggregating "all checks" job. Nothing requires a named check on
+# "main" - no branch protection, no ruleset - and every job reports on the pull
+# request by itself. Add one when a required check is introduced, and require
+# that one job rather than the matrix job names, which change with the matrix.
+#
+# The order of the jobs below is deliberate. The account runs at most 20 jobs at
+# a time (GitHub Free) and this workflow has 40, so half of them start queued.
+# The cheap and quick jobs come first, then the long ones, longest first: the 16
+# database jobs before the SQLite jobs, which are shorter and absorb a late
+# start. GitHub does not document in which order the queued jobs of a run get a
+# runner; this order is what helps if it follows the file, and costs nothing if
+# it does not.
 #
 # Supported versions are declared in the matrices below. There are three PHP
 # sets, and they have to be changed together:
@@ -180,7 +195,6 @@ jobs:
   unit:
     name: "unit (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-latest
-    needs: [ "quality", "phpstan", "lint" ]
     strategy:
       fail-fast: false
       matrix:
@@ -208,182 +222,6 @@ jobs:
 
       - name: "Execute unit tests in random order"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s unitRandom"
-
-  functional-sqlite:
-    name: "functional sqlite (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
-    runs-on: ubuntu-22.04
-    needs: [ "unit" ]
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version: [ "8.2", "8.5" ]
-        typo3: [ "13", "14" ]
-    steps:
-
-      - name: "Checkout"
-        uses: actions/checkout@v6
-
-      - name: "Cache composer downloads"
-        uses: actions/cache@v6
-        with:
-          path: ".cache/composer"
-          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}"
-          restore-keys: |
-            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
-            composer-${{ matrix.php-version }}-
-
-      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
-
-      - name: "Execute functional tests with SQLite"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -s functional"
-
-  functional-dbms:
-    name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
-    runs-on: ubuntu-22.04
-    # Only after the same tests passed on SQLite for every core and edge PHP
-    # version. A defect that is not DBMS specific never reaches these 16 jobs.
-    needs: [ "functional-sqlite" ]
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version: [ "8.2", "8.5" ]
-        typo3: [ "13", "14" ]
-        dbms:
-          - { name: "mysql", version: "8.0" }
-          - { name: "mariadb", version: "10.4" }
-          - { name: "mariadb", version: "10.6" }
-          - { name: "postgres", version: "10" }
-    steps:
-
-      - name: "Checkout"
-        uses: actions/checkout@v6
-
-      - name: "Cache composer downloads"
-        uses: actions/cache@v6
-        with:
-          path: ".cache/composer"
-          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}"
-          restore-keys: |
-            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
-            composer-${{ matrix.php-version }}-
-
-      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
-
-      - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
-
-  # A development instance built from nothing, the way "ddev start" builds one,
-  # and tested in a browser. Per core version, because the instance is: its
-  # composer.json, its site configurations and the backend it serves differ.
-  # It needs the gates of the code it renders, not the functional matrix, so
-  # it starts with the unit tests passed and runs beside the functional jobs.
-  # Every spec runs in Chromium and then in Firefox, in this one job against
-  # the one instance — see "docs/testing/acceptance-tests.md#two-engines".
-  acceptance:
-    name: "acceptance (v${{ matrix.typo3 }})"
-    runs-on: ubuntu-latest
-    needs: [ "unit" ]
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version: [ "8.2" ]
-        typo3: [ "13", "14" ]
-    steps:
-
-      - name: "Checkout"
-        uses: actions/checkout@v6
-
-      - name: "Cache composer downloads"
-        uses: actions/cache@v6
-        with:
-          path: ".cache/composer"
-          key: "composer-acceptance-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles(format('instance-core-{0}/composer.json', matrix.typo3)) }}"
-          restore-keys: |
-            composer-acceptance-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
-            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
-
-      - name: "Cache npm downloads"
-        uses: actions/cache@v6
-        with:
-          path: ".cache/npm"
-          key: "npm-acceptance-v${{ matrix.typo3 }}-${{ hashFiles('Tests/Acceptance/package-lock.json') }}"
-          restore-keys: "npm-acceptance-v${{ matrix.typo3 }}-"
-
-      - name: "Build an instance from nothing and test it in Chromium and Firefox"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s acceptance"
-
-      - name: "Upload the Playwright report"
-        if: "failure()"
-        uses: actions/upload-artifact@v6
-        with:
-          name: "acceptance-report-v${{ matrix.typo3 }}"
-          path: |
-            .Build/acceptance/report/
-            .Build/acceptance/test-results/
-            .Build/acceptance/instance/var/log/
-          if-no-files-found: "ignore"
-          retention-days: 5
-
-  # Screenshots and axe of the styleguide partials, rendered into static pages
-  # without TYPO3 - see "docs/testing/visual-tests.md". One job rather than a
-  # matrix: the stylesheet depends on neither PHP nor the core version, the
-  # partials render to identical pages with the Fluid of either dependency set,
-  # and the browser is the one pinned image - a second job would compare the
-  # same pixels again. It installs the set "quality" installs, which shares its
-  # composer cache, and needs nothing but the gates of the files it renders.
-  visual:
-    name: "visual (v${{ matrix.typo3 }})"
-    runs-on: ubuntu-latest
-    needs: [ "quality" ]
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version: [ "8.2" ]
-        typo3: [ "13" ]
-    steps:
-
-      - name: "Checkout"
-        uses: actions/checkout@v6
-
-      - name: "Cache composer downloads"
-        uses: actions/cache@v6
-        with:
-          path: ".cache/composer"
-          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}"
-          restore-keys: |
-            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
-            composer-${{ matrix.php-version }}-
-
-      - name: "Cache npm downloads"
-        uses: actions/cache@v6
-        with:
-          path: ".cache/npm"
-          key: "npm-visual-${{ hashFiles('Tests/Acceptance/package-lock.json') }}"
-          restore-keys: "npm-visual-"
-
-      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
-
-      - name: "Render the styleguide partials and test them in a browser"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s visual"
-
-      # The diff images are in "test-results/", next to the actual and the
-      # expected screenshot; the fixtures make a failure reproducible from the
-      # artifact alone.
-      - name: "Upload the Playwright report"
-        if: "failure()"
-        uses: actions/upload-artifact@v6
-        with:
-          name: "visual-report"
-          path: |
-            .Build/visual/report/
-            .Build/visual/test-results/
-            .Build/visual/fixtures/
-            .Build/visual/php-server.log
-          if-no-files-found: "ignore"
-          retention-days: 5
 
   # The committed build output: the stylesheet compiled from its SCSS and the
   # vendored Font Awesome icons, each compared with what the build writes. It
@@ -454,3 +292,175 @@ jobs:
           retention-days: 5
           include-hidden-files: true
           overwrite: true
+
+  # Screenshots and axe of the styleguide partials, rendered into static pages
+  # without TYPO3 - see "docs/testing/visual-tests.md". One job rather than a
+  # matrix: the stylesheet depends on neither PHP nor the core version, the
+  # partials render to identical pages with the Fluid of either dependency set,
+  # and the browser is the one pinned image - a second job would compare the
+  # same pixels again. It installs the set "quality" installs and uses the same
+  # composer cache key: both restore what an earlier run saved. As neither waits
+  # for the other, a cache miss is a download in both.
+  visual:
+    name: "visual (v${{ matrix.typo3 }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2" ]
+        typo3: [ "13" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Cache npm downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/npm"
+          key: "npm-visual-${{ hashFiles('Tests/Acceptance/package-lock.json') }}"
+          restore-keys: "npm-visual-"
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "Render the styleguide partials and test them in a browser"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s visual"
+
+      # The diff images are in "test-results/", next to the actual and the
+      # expected screenshot; the fixtures make a failure reproducible from the
+      # artifact alone.
+      - name: "Upload the Playwright report"
+        if: "failure()"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "visual-report"
+          path: |
+            .Build/visual/report/
+            .Build/visual/test-results/
+            .Build/visual/fixtures/
+            .Build/visual/php-server.log
+          if-no-files-found: "ignore"
+          retention-days: 5
+
+  # A development instance built from nothing, the way "ddev start" builds one,
+  # and tested in a browser. Per core version, because the instance is: its
+  # composer.json, its site configurations and the backend it serves differ.
+  # It starts with the run, like every job, and runs beside the functional jobs.
+  # Every spec runs in Chromium and then in Firefox, in this one job against
+  # the one instance — see "docs/testing/acceptance-tests.md#two-engines".
+  acceptance:
+    name: "acceptance (v${{ matrix.typo3 }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2" ]
+        typo3: [ "13", "14" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-acceptance-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles(format('instance-core-{0}/composer.json', matrix.typo3)) }}"
+          restore-keys: |
+            composer-acceptance-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+
+      - name: "Cache npm downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/npm"
+          key: "npm-acceptance-v${{ matrix.typo3 }}-${{ hashFiles('Tests/Acceptance/package-lock.json') }}"
+          restore-keys: "npm-acceptance-v${{ matrix.typo3 }}-"
+
+      - name: "Build an instance from nothing and test it in Chromium and Firefox"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s acceptance"
+
+      - name: "Upload the Playwright report"
+        if: "failure()"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "acceptance-report-v${{ matrix.typo3 }}"
+          path: |
+            .Build/acceptance/report/
+            .Build/acceptance/test-results/
+            .Build/acceptance/instance/var/log/
+          if-no-files-found: "ignore"
+          retention-days: 5
+
+  functional-dbms:
+    name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
+    runs-on: ubuntu-22.04
+    # Beside the SQLite jobs, not after them - see the header. A defect that is
+    # not DBMS specific is reported by these 16 jobs as well.
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2", "8.5" ]
+        typo3: [ "13", "14" ]
+        dbms:
+          - { name: "mysql", version: "8.0" }
+          - { name: "mariadb", version: "10.4" }
+          - { name: "mariadb", version: "10.6" }
+          - { name: "postgres", version: "10" }
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
+
+  functional-sqlite:
+    name: "functional sqlite (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2", "8.5" ]
+        typo3: [ "13", "14" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "Execute functional tests with SQLite"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -s functional"

@@ -168,15 +168,14 @@ a pull request, with the core version as a **matrix dimension** rather than one
 workflow per core version. Every step calls `Build/Scripts/runTests.sh`, so a
 gate behaves identically in CI and on a developer machine.
 
-The jobs are staged, cheapest and most likely to fail first:
+No job waits for another — every job starts with the run:
 
 ```
-quality ─┬─> visual
-phpstan ─┤         ┌─> acceptance
-lint    ─┼─> unit ─┴─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
-         │
-docs ────┤
-assets ──┘
+quality, phpstan, lint, unit, assets, documentation   the gates, ~1 minute each
+visual                                                screenshots and axe
+acceptance                                            a built instance
+functional (MySQL, MariaDB, Postgres)                 16 jobs
+functional (SQLite)
 ```
 
 | Job                 | Matrix                                   | Runs                                                                                      |
@@ -192,12 +191,30 @@ assets ──┘
 | `assets`            | —                                        | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build        |
 | `documentation`     | —                                        | `renderDocumentation`, uploads the artifact                                               |
 
-Two decisions are worth knowing:
+The decisions worth knowing:
 
-- **The DBMS matrix is gated on SQLite.** It is the expensive part, sixteen jobs
-  each starting a database container. Running it only after the same tests pass
-  on SQLite for both core versions means a defect that is not DBMS specific is
-  reported by four jobs instead of twenty.
+- **Nothing is staged.** The jobs used to wait for each other, cheapest first:
+  the gates, then `unit`, then the SQLite jobs, then the sixteen database jobs.
+  A defect a gate finds was then reported without starting the expensive jobs,
+  but every run that went on to pass — nearly every pull request run — waited
+  for each stage in turn: in the run of pull request #91 the first database job
+  started 24 minutes after the run did, of 101 minutes in all. Starting
+  everything at once costs runner time when a gate fails, which a public
+  repository does not pay for, and delays no report, because the gates still
+  finish within about a minute. A defect that is not DBMS specific is now
+  reported by the twenty functional jobs rather than four.
+- **No aggregating job.** Nothing requires a named check on `main` — there is no
+  branch protection and no ruleset — and every job reports on the pull request
+  by itself, so an `all checks` job that needs every other one would add a job
+  and tell nobody anything new. It is the job to add once a check becomes
+  required: require that one, not the matrix job names, which change whenever
+  the matrix does.
+- **The job order in `ci.yml` is deliberate.** The account runs at most twenty
+  jobs at a time (GitHub Free) and the workflow has forty, so half of them start
+  queued. The quick jobs are listed first, then the long ones longest first —
+  the database jobs before the shorter SQLite jobs, which absorb a late start.
+  GitHub does not document in which order the queued jobs of a run get a runner;
+  the order helps if it follows the file, and costs nothing if it does not.
 - **The version independent gates run once, not per core version and PHP
   version.** They inspect source files rather than the installed core, so
   repeating them tests the same files again. Only `phpstan` is genuinely per
