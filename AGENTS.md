@@ -373,6 +373,13 @@ Further:
   change what is under test.
 - Arguments for PHPUnit go after `--`:
   `-s functional -d sqlite -- --filter SomeTest`.
+- `-s functional -j <number>` runs the functional suite in that many parallel
+  chunks, each with its own containers, and fails unless the chunks together
+  executed every listed test. A class is never split: `ShowcaseTreeTest` is the
+  floor. The files of a run - output, JUnit and PHPUnit event log per chunk -
+  are kept below `.Build/functional-runs/<suffix>/`. Mind the container count:
+  a DBMS run starts two containers per chunk.
+  → [Functional tests in parallel chunks](docs/development/environment.md#functional-tests-in-parallel-chunks)
 - A **growing PHPStan baseline is a defect.** Fix the finding.
 - The development instances below `instance-core-13/` and `instance-core-14/`
   are **not** driven by `runTests.sh`. They are installed with `ddev composer`
