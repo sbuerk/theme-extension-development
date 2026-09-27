@@ -1507,6 +1507,61 @@ test.describe('the main navigation in every header arrangement', () => {
         });
     }
 
+    // Without a script the header lists its sections and no second level,
+    // at every width its menu is stacked - below the breakpoint of its
+    // arrangement, down to a phone. The stacked menu with every second level
+    // open was 1733 to 1788 pixels of header between 768 and the breakpoint,
+    // and 2523 in "simple" at 375; with the sections alone it is 511 to 566
+    // there, and 621 to 805 at 375 (Chromium, the showcase - "simple" is the
+    // tallest, its narrow column wraps the entries). The bound is 640 from
+    // 768 up, a little over seven entries, a title and the controls, and 900
+    // below it. Each section page links its own pages, which
+    // "SectionPagesListTheirSubpagesTest" holds the seed to.
+    const withoutAScript: [string, number, number][] = [
+        ['simple', 800, 640],
+        ['simple', headerBreakpoints.simple - 1, 640],
+        ['centred', headerBreakpoints.centred - 1, 640],
+        ['actions', headerBreakpoints.actions - 1, 640],
+        ['two-tier', headerBreakpoints['two-tier'] - 1, 640],
+        ...headerArrangements.flatMap((arrangement): [string, number, number][] => [[arrangement, 767, 640], [arrangement, 375, 900]]),
+    ];
+    for (const [arrangement, width, bound] of withoutAScript) {
+        test(`lists the sections only without JavaScript in "${arrangement}" at ${width} pixels`, async ({ browser }) => {
+            const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height: 800 } });
+            const page = await context.newPage();
+            await page.goto('/styleguide');
+            await arrangeHeader(page, arrangement);
+            await expect(page.locator('html')).not.toHaveAttribute('data-js', /.*/);
+
+            const siteHeader = page.locator('.theme-page > .theme-site-header');
+            const topLevel = siteHeader.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link');
+            await expect(topLevel).toHaveCount(7);
+            for (const link of await topLevel.all()) {
+                await expect(link).toBeVisible();
+            }
+            // Out of the layout, the tab order and the accessibility tree:
+            // "display: none", not a clip.
+            const secondLevel = siteHeader.locator('.theme-nav-main__list--sub');
+            expect(await secondLevel.count()).toBeGreaterThan(0);
+            for (const list of await secondLevel.all()) {
+                await expect(list).toHaveCSS('display', 'none');
+            }
+            await expect(siteHeader.getByRole('link', { name: 'Core elements', exact: true })).toHaveCount(0);
+
+            const [height, overflow] = await siteHeader.evaluate((element) => [element.getBoundingClientRect().height, element.scrollWidth - element.clientWidth]);
+            expect(height).toBeLessThanOrEqual(bound);
+            expect(overflow).toBeLessThanOrEqual(0);
+
+            // The header's menu only: the main navigation specimen of the
+            // styleguide, outside the header, keeps its second level open
+            // below "bp.$md" without a script, as it always has.
+            if (width < 768) {
+                await expect(page.locator('#navigation nav.theme-nav-main .theme-nav-main__list--sub').first()).toBeVisible();
+            }
+            await context.close();
+        });
+    }
+
     // The header collapses its menu at a width of its own; a menu anywhere
     // else still collapses at "bp.$md". At 1024 the page's header is behind
     // its toggle and the specimen of the navigation section is a row; below

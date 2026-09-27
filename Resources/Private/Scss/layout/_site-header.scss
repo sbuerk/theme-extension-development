@@ -615,4 +615,28 @@ $arrangements: (
             background-color: var(--theme-site-header-background);
         }
     }
+
+    // Without a script nothing collapses, and below the breakpoint the menu
+    // is stacked in the flow with every second level open: about 1730
+    // pixels of header on the showcase from the breakpoint of "simple" down
+    // to "bp.$md", 2523 at 375. So the header lists its sections only, at
+    // every width its menu is stacked, each section page linking its own
+    // pages - "SectionPagesListTheirSubpagesTest" holds the showcase to that,
+    // and a site that uses this header has to hold its own content to it the
+    // same way. "display: none", so a hidden entry is out of the tab order
+    // and the accessibility tree as well, and the section links stay.
+    //
+    // The header's menu only. A main navigation anywhere else - the
+    // styleguide specimen, a site package's menu in its footer - keeps its
+    // second levels open without a script, as "components/_nav-main.scss"
+    // lays it out: it is not what stands between a reader and the page.
+    //
+    // ":root:not([data-js])" also covers a page whose "theme.js" did not
+    // confirm the marker: the head script takes it back, and the page falls
+    // back to exactly this layout.
+    @media (max-width: ($breakpoint - 0.0625rem)) {
+        :root:not([data-js]) #{$header} .theme-nav-main__list--sub {
+            display: none;
+        }
+    }
 }
