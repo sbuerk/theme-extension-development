@@ -172,7 +172,7 @@ const expectTheMenuInOneRow = async (page: Page, width: number | null) => {
     expect.soft(measured.overlapping, 'pairs of top level entries on top of each other').toBe(0);
     expect.soft(measured.squeezed, 'pixels of the title outside its own box').toBeLessThanOrEqual(0);
     if (width !== null) {
-        expect.soft(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        expect.soft(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
     }
 };
 
@@ -189,7 +189,7 @@ const expectTheMenuBehindItsToggle = async (page: Page, width: number | null) =>
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await expect(list).toBeHidden();
     if (width !== null) {
-        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
     }
 
     await toggle.click();
@@ -560,7 +560,11 @@ test.describe('the display settings', () => {
         await expect(trigger).toHaveAttribute('aria-expanded', 'false');
     });
 
-    test('keep the header in one row and the panel inside a narrow screen', async ({ page }) => {
+    // Below "bp.$header-simple-stack" (480 pixels) the default header puts
+    // its title on a line of its own, and the menu toggle and the controls
+    // on the next one, at the inline end: in one row the four needed 380
+    // pixels, and the row spilled 20 pixels at 375.
+    test('keep the title above the toggle and the cog and the panel inside a narrow screen', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 740 });
         await page.goto('/typography');
         const trigger = page.getByRole('button', { name: 'Display settings' });
@@ -571,23 +575,22 @@ test.describe('the display settings', () => {
             throw new Error('The brand, the menu toggle or the settings button is not rendered.');
         }
 
-        // One row: side by side, in this order, each overlapping the others
-        // vertically.
-        expect(brand.x + brand.width).toBeLessThanOrEqual(toggle.x);
+        // The title above, the toggle and the cog below it, side by side in
+        // this order, sharing their row.
+        expect(brand.y + brand.height).toBeLessThanOrEqual(Math.min(toggle.y, cog.y));
         expect(toggle.x + toggle.width).toBeLessThanOrEqual(cog.x);
-        for (const box of [brand, toggle]) {
-            expect(box.y).toBeLessThan(cog.y + cog.height);
-            expect(box.y + box.height).toBeGreaterThan(cog.y);
-        }
+        expect(toggle.y).toBeLessThan(cog.y + cog.height);
+        expect(toggle.y + toggle.height).toBeGreaterThan(cog.y);
 
         await trigger.click();
         const panel = await page.locator('#theme-settings-panel').boundingBox();
         if (panel === null) {
             throw new Error('The panel did not open.');
         }
+        const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
         expect(panel.x).toBeGreaterThanOrEqual(0);
-        expect(panel.x + panel.width).toBeLessThanOrEqual(375);
-        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+        expect(panel.x + panel.width).toBeLessThanOrEqual(clientWidth);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
     });
 
     test('reset to the defaults of the site', async ({ page }) => {
@@ -974,14 +977,12 @@ test.describe('the header language dropdown', () => {
 
             // At the end of the row: the panel's end edge is the end of the
             // content container of the header, not the edge of the viewport -
-            // 60 pixels in from it at 1280, the page gutter at 375. At 1280
-            // that is also where the last control of the row ends; at 375 the
-            // row has no slack left and the cog reaches a few pixels past its
-            // own container, which is a squeeze of the header row rather than
-            // a placement of this panel.
+            // 60 pixels in from it at 1280, the page gutter at 375. At both
+            // widths that is also where the last control of the row ends - at
+            // 375 on the line below the title, "bp.$header-simple-stack".
             expect(panelBox.x + panelBox.width).toBeCloseTo(await inlineEndOfTheRow(page), 0);
             expect(panelBox.x).toBeGreaterThanOrEqual(0);
-            expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+            expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
         });
     }
 
@@ -1190,13 +1191,12 @@ test.describe('the display settings panel', () => {
 
             // At the end of the row: the panel's end edge is the end of the
             // header's content container, not the edge of the viewport and not
-            // the edge of the cog. At 1280 the last two coincide; at 375 the
-            // row has no slack left and the cog reaches a few pixels past its
-            // own container, which is the row being squeezed rather than this
-            // panel being misplaced - see "layout/_site-header.scss".
+            // the edge of the cog - which is the same edge at both widths,
+            // at 375 on the line below the title - see
+            // "layout/_site-header.scss".
             expect(panelBox.x + panelBox.width).toBeCloseTo(await inlineEndOfTheRow(page), 0);
             expect(panelBox.x).toBeGreaterThanOrEqual(0);
-            expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+            expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
         });
     }
 
@@ -1512,10 +1512,11 @@ test.describe('the main navigation in every header arrangement', () => {
     // arrangement, down to a phone. The stacked menu with every second level
     // open was 1733 to 1788 pixels of header between 768 and the breakpoint,
     // and 2523 in "simple" at 375; with the sections alone it is 511 to 566
-    // there, and 621 to 805 at 375 (Chromium, the showcase - "simple" is the
-    // tallest, its narrow column wraps the entries). The bound is 640 from
-    // 768 up, a little over seven entries, a title and the controls, and 900
-    // below it. Each section page links its own pages, which
+    // there, and 577 to 632 at 375 (Chromium, the showcase; "simple" puts its
+    // title on a line of its own below 480, and its list takes the width of
+    // the header - beside a title of four lines it was 805). The bound is
+    // 640 from 768 up, a little over seven entries, a title and the controls,
+    // and 900 below it. Each section page links its own pages, which
     // "SectionPagesListTheirSubpagesTest" holds the seed to.
     const withoutAScript: [string, number, number][] = [
         ['simple', 800, 640],
@@ -1698,3 +1699,104 @@ test.describe('the site footer on a narrow screen', () => {
         }
     }
 });
+
+/**
+ * The header on the narrowest screens: 320, 360 and 375 pixels.
+ *
+ * The one row of "simple" does not wrap, and collapsed it held the title down
+ * to its longest word, the menu toggle and the two controls: 380 pixels on the
+ * showcase, so the page scrolled sideways below that - 75 pixels at 320. Below
+ * `bp.$header-simple-stack` the title takes a line of its own. The three other
+ * arrangements wrap their rows and never spilled.
+ *
+ * `/typography` with its own header, and `/styleguide` with the page header
+ * rearranged into each arrangement; left to right and right to left; with
+ * JavaScript and without. At each width: neither the page nor the header
+ * scrolls sideways - measured against the client width, which a classic
+ * scrollbar makes narrower than the viewport - and no two of the title, the
+ * menu toggle, the controls and the call to action overlap. With JavaScript,
+ * at 320, the expanded menu band and both panels of the controls open inside
+ * the client width.
+ */
+test.describe('the header on the narrowest screens', () => {
+    const cases: [string, string][] = [
+        ['/typography', 'simple'],
+        ...headerArrangements.map((arrangement): [string, string] => ['/styleguide', arrangement]),
+    ];
+    for (const javaScriptEnabled of [true, false]) {
+        for (const [path, arrangement] of cases) {
+            for (const direction of ['ltr', 'rtl']) {
+                test(`${path} in "${arrangement}", ${direction}, ${javaScriptEnabled ? 'with' : 'without'} JavaScript, fits 320, 360 and 375 pixels`, async ({ browser }) => {
+                    const context = await browser.newContext({ javaScriptEnabled });
+                    try {
+                        const page = await context.newPage();
+                        const header = page.locator('.theme-page > .theme-site-header');
+                        const problems: string[] = [];
+
+                        for (const width of [320, 360, 375]) {
+                            await page.setViewportSize({ width, height: 800 });
+                            await page.goto(path);
+                            await arrangeHeader(page, arrangement);
+                            await page.locator('html').evaluate((element, direction) => element.setAttribute('dir', direction), direction);
+
+                            const measured = await header.evaluate((element) => {
+                                const root = document.documentElement;
+                                const boxes = [
+                                    '.theme-site-header__brand',
+                                    '.theme-nav-main__toggle',
+                                    '.theme-site-header__actions',
+                                    '.theme-site-header__action',
+                                ].map((selector): [string, DOMRect | null] => {
+                                    const box = element.querySelector(selector);
+                                    return [selector, box !== null && box.getClientRects().length > 0 ? box.getBoundingClientRect() : null];
+                                }).filter((entry): entry is [string, DOMRect] => entry[1] !== null);
+                                const overlapping: string[] = [];
+                                boxes.forEach(([name, box], index) => boxes.slice(index + 1).forEach(([other, otherBox]) => {
+                                    if (!(box.right <= otherBox.left || otherBox.right <= box.left || box.bottom <= otherBox.top || otherBox.bottom <= box.top)) {
+                                        overlapping.push(`${name} and ${other}`);
+                                    }
+                                }));
+                                return {
+                                    page: root.scrollWidth - root.clientWidth,
+                                    header: element.scrollWidth - element.clientWidth,
+                                    overlapping,
+                                };
+                            });
+                            if (measured.page > 0) {
+                                problems.push(`${width}: the page scrolls sideways by ${measured.page}`);
+                            }
+                            if (measured.header > 0) {
+                                problems.push(`${width}: the header spills by ${measured.header}`);
+                            }
+                            problems.push(...measured.overlapping.map((pair) => `${width}: ${pair} overlap`));
+                        }
+
+                        if (javaScriptEnabled) {
+                            const inside = async (what: string, locator: ReturnType<Page['locator']>) => {
+                                await expect(locator).toBeVisible();
+                                const box = await locator.boundingBox();
+                                const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+                                if (box === null || box.x < -0.5 || box.x + box.width > clientWidth + 0.5) {
+                                    problems.push(`320: ${what} ${box === null ? 'is not rendered' : `runs ${box.x}..${box.x + box.width} in ${clientWidth}`}`);
+                                }
+                            };
+                            await page.setViewportSize({ width: 320, height: 800 });
+                            await header.locator('.theme-nav-main__toggle').click();
+                            await inside('the menu band', header.locator('nav.theme-nav-main > .theme-nav-main__list'));
+                            await header.locator('.theme-nav-main__toggle').click();
+                            await header.locator('.theme-dropdown__trigger').click();
+                            await inside('the language panel', header.locator('#theme-language-panel'));
+                            await header.getByRole('button', { name: 'Display settings' }).click();
+                            await inside('the display settings panel', header.locator('#theme-settings-panel'));
+                        }
+
+                        expect(problems).toEqual([]);
+                    } finally {
+                        await context.close();
+                    }
+                });
+            }
+        }
+    }
+});
+
