@@ -171,6 +171,20 @@ in the partials as everywhere else, because an icon is never drawn by hand. The
 ViewHelper is plain Fluid and declared by its URL namespace, so the partials
 still render without TYPO3 — see [Icons](icons.md#plain-fluid-for-the-standalone-renderer).
 
+And one variable: the players of the media specimen play files, not `data:`
+URIs, because TYPO3's frontend Content Security Policy does not allow `data:`
+for `media-src`. The files are `Resources/Public/Media/Styleguide/` — about a
+fifth of a second of the poster as VP8 WebM (0.21 s, measured in Firefox), a
+tenth of a second of silence as WAV and a WebVTT file holding nothing but its
+`WEBVTT` header line, generated for the specimen — and no one address reaches them
+both from `/styleguide` and from a fixture page of the visual suite. So
+`Media.html` reads them from `specimenFiles`: `Templates/Page/Styleguide.html`
+passes what `f:uri.resource` resolves, and `Build/Scripts/renderStyleguideFixtures.php`
+paths relative to its fixture pages, like the stylesheet it links.
+`StyleguideRenderingTest::everySectionRendersWithoutTypo3AsItDoesOnThePage`
+reduces those two addresses to the file name on both sides and compares the
+rest as before. The images stay `data:` URIs: `img-src` allows them.
+
 ### The page furniture is not a card
 
 `layout/_styleguide.scss` adds what no component provides: section rhythm, a

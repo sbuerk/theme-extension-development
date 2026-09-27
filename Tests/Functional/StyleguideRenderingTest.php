@@ -242,6 +242,17 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
      * `GeneratedLegacyScenarioTest`, so the rendering compared is exactly the
      * one the fixtures are made of. Whitespace runs are collapsed on both
      * sides, as the page places each partial at an indentation of its own.
+     *
+     * One thing is told apart on purpose, and only it: the address of a file
+     * of `Resources/Public/Media/Styleguide/`, which the media specimen
+     * plays. The page passes what `f:uri.resource` resolves - a path below
+     * `typo3conf/ext/` here, below `_assets/` in an instance, with a cache
+     * buster - and the script a path relative to its fixture pages; no one
+     * address reaches the file from both. Both sides are reduced to the file
+     * name, so a partial that renders another file, or none, still differs.
+     * What it does not catch is a file that does not exist: the players have
+     * `preload=none`, and this compares names, not responses - a 404 of one
+     * of them shows only in a browser that plays it.
      */
     #[Test]
     public function everySectionRendersWithoutTypo3AsItDoesOnThePage(): void
@@ -260,7 +271,11 @@ final class StyleguideRenderingTest extends AbstractFunctionalTestCase
         $this->assertIsArray($sections);
         $this->assertNotEmpty($sections, 'The script rendered no section at all.');
 
-        $collapse = static fn(string $html): string => (string)preg_replace('/\s+/', ' ', trim($html));
+        $collapse = static fn(string $html): string => (string)preg_replace(
+            ['#"[^"]*/Media/Styleguide/([\w.-]+?)(?:\?\d+)?"#', '/\s+/'],
+            ['"Media/Styleguide/$1"', ' '],
+            trim($html),
+        );
         $page = $collapse($this->render());
         $different = [];
         foreach ($sections as $id => $html) {
