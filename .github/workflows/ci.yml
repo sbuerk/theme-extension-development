@@ -141,7 +141,7 @@ name: "CI"
 
 on:
   pull_request:
-  # By hand, and every night by "nightly.yml" of "main", which starts this
+  # By hand, and every night by "nightly-1.yml" of "main", which starts this
   # workflow on this branch and waits for the result. A "schedule" fires on the
   # default branch only, so this branch has no nightly workflow of its own, and
   # this trigger is what the nightly run of "main" needs here.
