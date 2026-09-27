@@ -66,11 +66,10 @@ jobs:
     # A named version rather than "ubuntu-latest", like every job of "ci.yml" -
     # see its header.
     runs-on: ubuntu-26.04
-    # Every job of "ci.yml" on "main" has a timeout of at most 25 minutes, but
-    # the two dispatched runs together queue 80 jobs for the 18 runners this
-    # workflow leaves them, so a run can take several of its longest job - and
-    # the "ci.yml" of branch "1" sets no job timeout until it carries this
-    # restructuring as well. Three hours is stuck, not slow.
+    # Every job of "ci.yml" has a timeout of at most 25 minutes on "main" and
+    # 35 on "1", but the two dispatched runs together queue 79 jobs for the 18
+    # runners this workflow leaves them, so a run can take several of its
+    # longest job. Three hours is stuck, not slow.
     timeout-minutes: 180
     strategy:
       fail-fast: false
