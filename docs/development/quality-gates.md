@@ -225,11 +225,13 @@ The decisions worth knowing:
 ### Job timeouts
 
 Every job carries a `timeout-minutes`, so a job that stalls fails instead of
-holding a runner for GitHub's default of 360 minutes. The values come from the
-slowest successful job of the fifteen newest pull request runs of `ci.yml`
-against `main` started before 2026-09-26 12:00 UTC (#68 to #91), all attempts,
-a job carried unchanged into a re-run counted once, with room for a slow image
-pull or a busy runner:
+holding a runner for GitHub's default of 360 minutes. The values of the jobs
+other than the functional ones come from the slowest successful job of the
+fifteen newest pull request runs of `ci.yml` against `main` started before
+2026-09-26 12:00 UTC (#68 to #91), all attempts, a job carried unchanged into a
+re-run counted once, with room for a slow image pull or a busy runner. The
+functional values come from the first run of the chunked suite (#94, run
+36294752905), at about three times its slowest job:
 
 | Job                               | Slowest seen, minutes | Timeout, minutes |
 |-----------------------------------|-----------------------|------------------|
@@ -237,17 +239,19 @@ pull or a busy runner:
 | `unit`, `assets`, `documentation` | 0.7                   | 10               |
 | `visual`                          | 3.4                   | 15               |
 | `acceptance`                      | 8.7                   | 20               |
-| `functional-sqlite`               | 23.4                  | 35               |
-| `functional-dbms`                 | 54.7                  | 65               |
+| `functional-sqlite`               | 3.4                   | 15               |
+| `functional-dbms`                 | 6.8                   | 25               |
 
-For the database jobs, 54.7 minutes is the slowest of 227 out of the 240 that
-succeeded; the other thirteen took 58.8 to 158 minutes, and three more were
-cancelled after 74.7 to 84.4 minutes. That tail is what the timeout cuts off:
-it would have ended ten of the 240. The functional values were measured with the
-suite unchunked, and are retuned after the first CI run of the chunked suite.
+Three times is deliberate. Unchunked, thirteen of 240 successful database jobs
+took 58.8 to 158 minutes, and three more were cancelled after 74.7 to 84.4
+minutes: some hosted runners run the MySQL and MariaDB suites two to five times
+slower than others, from the first test to the last, while PostgreSQL and SQLite
+are unaffected on the same hosts, and a re-run lands on another host and is
+normal. A job that slow now fails at its timeout, to be re-run, instead of
+holding the pull request for an hour or more.
 
 The functional test step has a `timeout-minutes` of its own, five minutes below
-that of its job — 30 for SQLite, 60 for the databases. A step that times out
+that of its job — 10 for SQLite, 20 for the databases. A step that times out
 fails like any other failing step, so the upload of the logs after it still
 runs; a job that times out is cancelled as a whole, and the upload, which is
 guarded by `!cancelled()`, would not. The workflow syntax reference leaves the
