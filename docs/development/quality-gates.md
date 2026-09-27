@@ -280,9 +280,11 @@ Each chunk writes a JUnit log and a PHPUnit event log below
 `.Build/functional-runs/<suffix>/`, and the job uploads both as the artifact
 `functional-junit-<dbms>[-<version>]-v<core>-php<version>`, for seven days and
 also when the tests failed or their step timed out. The JUnit logs are what the
-committed test durations that balance the chunks are refreshed from, and in a
-failed run the chunk without a JUnit log is the one that did not finish; its
-event log, appended to event by event, names the test it was in.
+committed test durations that balance the chunks are refreshed from. PHPUnit
+creates the JUnit log of a chunk empty when the chunk starts and writes it when
+the chunk ends, so in a failed run the chunk with an empty JUnit log is the one
+that did not finish; its event log, appended to event by event, names the test
+it was in.
 
 For the time being the functional jobs also record the CPU model and hypervisor
 of their runner, `host-lscpu.txt`, and `vmstat` every ten seconds,

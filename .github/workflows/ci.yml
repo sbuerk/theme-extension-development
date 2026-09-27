@@ -80,9 +80,10 @@ name: "CI"
 # Each chunk writes a JUnit log and a PHPUnit event log below
 # ".Build/functional-runs/", and the job uploads both as an artifact for seven
 # days. The JUnit logs are what the committed test durations, which balance the
-# chunks, are refreshed from. The event log is appended to event by event, so
-# for a chunk that a timeout ended it still names the test it was in, where no
-# JUnit log was written.
+# chunks, are refreshed from. PHPUnit creates the JUnit log empty when a chunk
+# starts and writes it when the chunk ends; the event log is appended to event
+# by event, so for a chunk that a timeout ended it still names the test it was
+# in, where the JUnit log stayed empty.
 #
 # Supported versions are declared in the matrices below. There are three PHP
 # sets, and they have to be changed together:
@@ -525,7 +526,7 @@ jobs:
       # The JUnit logs of the chunks, which the committed test durations are
       # refreshed from, and their PHPUnit event logs. Also for a failed run and
       # a step that timed out: PHPUnit writes a JUnit log when its chunk ends,
-      # so the missing one names the chunk that did not, and its event log the
+      # so the empty one names the chunk that did not, and its event log the
       # test it was in.
       - name: "Upload the JUnit and event logs"
         if: "!cancelled()"

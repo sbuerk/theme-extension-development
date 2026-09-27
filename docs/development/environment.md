@@ -326,8 +326,10 @@ Build/Scripts/runTests.sh -t 14 -s functional -d mysql -i 8.0 -j 4
 Build/Scripts/runTests.sh -s recordFunctionalTestTimes -d mysql -- .Build/functional-runs/<suffix>/junit-*.xml
 ```
 
-`-d` selects the file written. The JUnit logs of a CI run serve as well, once
-downloaded below the repository root — the container only sees the checkout.
+`-d` selects the file written. The JUnit logs of a green CI run serve as well,
+once downloaded below the repository root — the container only sees the
+checkout. Those of a failed run do not: the chunk that did not finish left its
+JUnit log empty, and the script refuses it with "Cannot read".
 The keys are cut at `Tests/Functional/`, so logs of another checkout record the
 same keys.
 
