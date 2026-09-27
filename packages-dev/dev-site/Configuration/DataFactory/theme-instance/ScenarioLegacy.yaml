@@ -33,7 +33,7 @@ entities:
         title: 'Theme demo (sys_template delivery)'
         slug: /
         is_siteroot: 1
-        backend_layout: start
+        backend_layout: pagets__start
       entities:
         template:
           -
@@ -121,7 +121,7 @@ entities:
             id: 1002
             title: Typography
             slug: /typography
-            backend_layout: content
+            backend_layout: pagets__content
           entities:
             content:
               -
@@ -182,7 +182,7 @@ entities:
                 id: 1052
                 title: Text
                 slug: /typography/text
-                backend_layout: content
+                backend_layout: pagets__content
               entities:
                 content:
                   -
@@ -229,7 +229,7 @@ entities:
                 id: 1053
                 title: Lists
                 slug: /typography/lists
-                backend_layout: content
+                backend_layout: pagets__content
               entities:
                 content:
                   -
@@ -270,7 +270,7 @@ entities:
                 id: 1054
                 title: Tables
                 slug: /typography/tables
-                backend_layout: content
+                backend_layout: pagets__content
               entities:
                 content:
                   -
@@ -309,7 +309,7 @@ entities:
                 id: 1055
                 title: 'Quotes and code'
                 slug: /typography/quotes-and-code
-                backend_layout: content
+                backend_layout: pagets__content
               entities:
                 content:
                   -
@@ -350,7 +350,7 @@ entities:
                 id: 1056
                 title: Article
                 slug: /typography/article
-                backend_layout: content_sidebar
+                backend_layout: pagets__content_sidebar
               entities:
                 content:
                   -
@@ -443,7 +443,7 @@ entities:
                 id: 1152
                 title: 'Right to left'
                 slug: /typography/right-to-left
-                backend_layout: content
+                backend_layout: pagets__content
               entities:
                 content:
                   -
@@ -495,7 +495,7 @@ entities:
             id: 1003
             title: Media
             slug: /media
-            backend_layout: content
+            backend_layout: pagets__content
           entities:
             content:
               -
@@ -528,7 +528,7 @@ entities:
             id: 1005
             title: Elements
             slug: /elements
-            backend_layout: content
+            backend_layout: pagets__content
           entities:
             content:
               -
@@ -550,7 +550,7 @@ entities:
                 slug: /elements/core
                 abstract: 'Every classic content type EXT:frontend registers without supplying a rendering for it.'
                 keywords: 'content elements, core'
-                backend_layout: content_sidebar
+                backend_layout: pagets__content_sidebar
               entities:
                 content:
                   -
@@ -644,7 +644,7 @@ entities:
                     id: 1030
                     title: Header
                     slug: /elements/core/header
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -729,7 +729,7 @@ entities:
                     id: 1031
                     title: Text
                     slug: /elements/core/text
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -770,7 +770,7 @@ entities:
                     id: 1032
                     title: 'Text & Images'
                     slug: /elements/core/textpic
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -874,7 +874,7 @@ entities:
                     id: 1033
                     title: 'Text & Media'
                     slug: /elements/core/textmedia
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -942,7 +942,7 @@ entities:
                     id: 1034
                     title: Images
                     slug: /elements/core/image
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -992,7 +992,7 @@ entities:
                     id: 1035
                     title: 'Bullet list'
                     slug: /elements/core/bullets
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -1069,7 +1069,7 @@ entities:
                     id: 1036
                     title: Table
                     slug: /elements/core/table
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -1180,7 +1180,7 @@ entities:
                     id: 1037
                     title: 'File links'
                     slug: /elements/core/uploads
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -1235,7 +1235,7 @@ entities:
                     id: 1038
                     title: Divider
                     slug: /elements/core/div
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -1268,7 +1268,7 @@ entities:
                     id: 1039
                     title: 'Plain HTML'
                     slug: /elements/core/html
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -1288,7 +1288,7 @@ entities:
                     id: 1050
                     title: 'Insert records'
                     slug: /elements/core/shortcut
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -1321,7 +1321,7 @@ entities:
                 id: 1007
                 title: 'Menu elements'
                 slug: /elements/menu
-                backend_layout: content_sidebar
+                backend_layout: pagets__content_sidebar
                 abstract: 'The eleven menu content elements, each pointed at a different part of this page tree.'
                 keywords: 'content elements'
               entities:
@@ -1447,7 +1447,7 @@ entities:
                 id: 1008
                 title: 'Theme elements'
                 slug: /elements/theme
-                backend_layout: content
+                backend_layout: pagets__content
                 abstract: 'The content elements this extension registers itself, one each; the pages below show the layouts of the heroes, the call to action and the quotation.'
                 keywords: 'content elements, theme'
               entities:
@@ -1700,7 +1700,7 @@ entities:
                     id: 1070
                     title: 'Text and icon'
                     slug: /elements/theme/text-icon
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -1797,7 +1797,7 @@ entities:
                     id: 1071
                     title: Features
                     slug: /elements/theme/features
-                    backend_layout: content
+                    backend_layout: pagets__content
                   entities:
                     content:
                       -
@@ -1960,7 +1960,7 @@ entities:
                     id: 1072
                     title: Stats
                     slug: /elements/theme/stats
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -2040,7 +2040,7 @@ entities:
                     id: 1073
                     title: Steps
                     slug: /elements/theme/steps
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -2119,7 +2119,7 @@ entities:
                     id: 1090
                     title: 'Card group'
                     slug: /elements/theme/card-group
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                     abstract: 'Cards in a grid of two, three or four columns, and in one row that scrolls sideways.'
                   entities:
                     content:
@@ -2316,7 +2316,7 @@ entities:
                     id: 1091
                     title: Timeline
                     slug: /elements/theme/timeline
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                     abstract: 'Dated entries on a line, oldest first and newest first.'
                   entities:
                     content:
@@ -2404,7 +2404,7 @@ entities:
                     id: 1092
                     title: 'Teaser list'
                     slug: /elements/theme/teaser-list
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                     abstract: 'Rows with an image, a date and meta data, each row one link.'
                   entities:
                     content:
@@ -2465,7 +2465,7 @@ entities:
                     id: 1150
                     title: Carousel
                     slug: /elements/theme/carousel
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                     abstract: 'Slides in one track that scrolls sideways, with the caption below, above or over the picture.'
                   entities:
                     content:
@@ -2530,7 +2530,7 @@ entities:
                     id: 1151
                     title: 'Split tiles'
                     slug: /elements/theme/split-tiles
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                     abstract: 'Featurettes in a column, the picture changing sides from tile to tile, each tile with its own tone.'
                   entities:
                     content:
@@ -2598,7 +2598,7 @@ entities:
                     id: 1130
                     title: 'External media'
                     slug: /elements/theme/external-media
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                     abstract: 'A video of another site, with nothing loaded from it until the reader presses play.'
                   entities:
                     content:
@@ -2649,7 +2649,7 @@ entities:
                     id: 1170
                     title: Pricing
                     slug: /elements/theme/pricing
-                    backend_layout: content
+                    backend_layout: pagets__content
                     abstract: 'Plans side by side, each with a price, what it is per, its features and a button.'
                   entities:
                     content:
@@ -2715,7 +2715,7 @@ entities:
                     id: 1110
                     title: 'Hero layouts'
                     slug: /elements/theme/hero
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -2835,7 +2835,7 @@ entities:
                     id: 1111
                     title: 'Calls to action'
                     slug: /elements/theme/cta
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -2908,7 +2908,7 @@ entities:
                     id: 1112
                     title: 'Quotation styles'
                     slug: /elements/theme/quote
-                    backend_layout: content_sidebar
+                    backend_layout: pagets__content_sidebar
                   entities:
                     content:
                       -
@@ -2961,7 +2961,7 @@ entities:
                 id: 1051
                 title: Frames
                 slug: /elements/frames
-                backend_layout: content
+                backend_layout: pagets__content
                 abstract: 'Every frame, every spacing and every header alignment and look of the Appearance tab, one element each.'
                 keywords: 'content elements, appearance'
               entities:
@@ -3154,7 +3154,7 @@ entities:
                 id: 1153
                 title: Cheatsheet
                 slug: /elements/cheatsheet
-                backend_layout: content
+                backend_layout: pagets__content
               entities:
                 content:
                   -
@@ -3585,7 +3585,7 @@ entities:
             id: 1171
             title: Layouts
             slug: /layouts
-            backend_layout: content
+            backend_layout: pagets__content
           entities:
             content:
               -
@@ -3614,7 +3614,7 @@ entities:
                 id: 1172
                 title: 'Two columns'
                 slug: /layouts/two-columns
-                backend_layout: two_columns
+                backend_layout: pagets__two_columns
                 abstract: 'Two content columns of equal width, below a full width stage.'
               entities:
                 content:
@@ -3659,7 +3659,7 @@ entities:
                 id: 1173
                 title: 'Two columns, wide first'
                 slug: /layouts/two-columns-wide
-                backend_layout: two_columns_wide
+                backend_layout: pagets__two_columns_wide
                 abstract: 'The same two columns, the first one twice as wide as the second.'
               entities:
                 content:
@@ -3695,7 +3695,7 @@ entities:
                 id: 1174
                 title: 'Three columns'
                 slug: /layouts/three-columns
-                backend_layout: three_columns
+                backend_layout: pagets__three_columns
                 abstract: 'Three content columns of equal width, below a full width stage.'
               entities:
                 content:
@@ -3740,7 +3740,7 @@ entities:
                 id: 1175
                 title: Article
                 slug: /layouts/article
-                backend_layout: article
+                backend_layout: pagets__article
                 abstract: 'A long read at the reading measure, with an aside of notes beside it.'
               entities:
                 content:
@@ -3776,7 +3776,7 @@ entities:
                 id: 1176
                 title: Cover
                 slug: /layouts/cover
-                backend_layout: cover
+                backend_layout: pagets__cover
                 abstract: 'A landing page of one column, centred in the viewport.'
               entities:
                 content:
@@ -3802,7 +3802,7 @@ entities:
                 id: 1177
                 title: 'Full-width bands'
                 slug: /layouts/bands
-                backend_layout: bands
+                backend_layout: pagets__bands
                 abstract: 'Three bands, stacked, each spanning the full width of the viewport.'
               entities:
                 content:
@@ -3838,7 +3838,7 @@ entities:
             id: 1113
             title: Examples
             slug: /examples
-            backend_layout: content
+            backend_layout: pagets__content
             abstract: 'Whole pages composed from the elements the theme already ships - an album, a pricing page, a weblog, a product page and three landing pages.'
             keywords: 'examples, composition'
           entities:
@@ -3869,7 +3869,7 @@ entities:
                 id: 1114
                 title: Album
                 slug: /examples/album
-                backend_layout: content
+                backend_layout: pagets__content
                 abstract: 'A photo collection: a centred reduced hero in the stage, a gallery in three columns, a row of cards and a closing call to action.'
               entities:
                 content:
@@ -3963,7 +3963,7 @@ entities:
                 id: 1115
                 title: Pricing
                 slug: /examples/pricing
-                backend_layout: content
+                backend_layout: pagets__content
                 abstract: 'A plan comparison: a centred text hero, three plans, the features they share, the questions people ask and a way to get in touch.'
               entities:
                 content:
@@ -4099,7 +4099,7 @@ entities:
                 id: 1116
                 title: Journal
                 slug: /examples/journal
-                backend_layout: content_sidebar
+                backend_layout: pagets__content_sidebar
                 abstract: 'A weblog: the newest entry as a media teaser, the recent ones as a teaser list, the archive as a card wall, and an editorial column beside them.'
               entities:
                 content:
@@ -4289,7 +4289,7 @@ entities:
                     id: 1117
                     title: 'Composing a page'
                     slug: /examples/journal/composing-a-page
-                    backend_layout: article
+                    backend_layout: pagets__article
                     abstract: 'A long read on the article layout: running text held to the reading measure, a pull quote, a byline, and editorial notes in the aside.'
                   entities:
                     content:
@@ -4391,7 +4391,7 @@ entities:
                 id: 1118
                 title: Product
                 slug: /examples/product
-                backend_layout: bands
+                backend_layout: pagets__bands
                 abstract: 'A product page in three full-width bands: a hero, alternating tiles, the figures, and a closing call to action.'
               entities:
                 content:
@@ -4507,7 +4507,7 @@ entities:
                 id: 1119
                 title: Campaign
                 slug: /examples/campaign
-                backend_layout: cover
+                backend_layout: pagets__cover
                 abstract: 'A single-purpose landing page on the cover layout: one hero, one call to action, centred in the viewport.'
               entities:
                 content:
@@ -4551,7 +4551,7 @@ entities:
                 id: 1131
                 title: 'Carousel landing'
                 slug: /examples/carousel-landing
-                backend_layout: bands
+                backend_layout: pagets__bands
                 abstract: 'A campaign page led by a carousel across the full width of the viewport, with a feature grid and a call to action below it.'
               entities:
                 content:
@@ -4655,10 +4655,10 @@ entities:
             id: 1009
             title: Styleguide
             slug: /styleguide
-            backend_layout: styleguide
+            backend_layout: pagets__styleguide
         -
           self:
             id: 1010
             title: Forms
             slug: /forms
-            backend_layout: forms
+            backend_layout: pagets__forms

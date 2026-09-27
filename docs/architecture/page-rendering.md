@@ -86,6 +86,14 @@ page nor any ancestor has a `backend_layout` set — every page not otherwise
 configured reaches it, so it has to exist as a real layout, not merely be
 selectable.
 
+That is the frontend. The page module shows such a page with TYPO3's
+built-in one column layout instead, not with this one:
+`BackendLayoutView::getSelectedCombinedIdentifier()` turns `default` into
+`0`, which names no `backend_layout` record, and
+`getBackendLayoutForPage()` then takes the fallback of the `default`
+provider. Both declare colPos 0 and nothing else, so the page module and the
+template agree on what a page without a layout holds.
+
 ### Column layout
 
 Column numbers mirror `EXT:theme_camino`, so content is portable between the
@@ -169,7 +177,7 @@ templateName {
 templateName.wrap = Page/|
 ```
 
-Four things about it are load-bearing:
+Five things about it are load-bearing:
 
 - **`data = pagelayout`, never `field = backend_layout`.** The `pagelayout`
   getter resolves through `PageLayoutResolver`, which falls back to the first
@@ -182,11 +190,23 @@ Four things about it are load-bearing:
   the page record from, not what it returns. Verified present and unchanged
   in that respect on both v13.4 and v14.3.
 - **The `pagets__` prefix is stripped.** `replacement.10` removes it with a
-  regular expression. The PageTsConfig provider prefixes every identifier it
-  returns with `pagets__` — it also has to distinguish layouts that come from
-  database records, which are prefixed `0_` instead — so the raw value is
-  `pagets__content`, not `content`, and has to be stripped before it is
-  usable as a file name.
+  regular expression. The page properties store a layout as
+  `<provider>__<identifier>`, and the provider of the Page TSconfig layouts
+  is `pagets` — so the raw value is `pagets__content`, not `content`, and
+  has to be stripped before it is usable as a file name. Only the `default`
+  provider, the one of `backend_layout` database records, goes without a
+  prefix: such a layout is stored as the bare uid of its record
+  (`BackendLayoutView::addBackendLayoutItems()`).
+- **A bare identifier renders, and is still wrong.** `content` has no `__`
+  for `replacement.10` to strip, so the frontend renders it exactly like
+  `pagets__content`. The page module does not:
+  `DataProviderCollection::getBackendLayout()` hands a value without `__` to
+  the `default` provider, which looks `(int)'content'` up as a record uid,
+  finds none, and the page module falls back to TYPO3's built-in one column
+  layout and lists every element outside colPos 0 as unused. Nothing an
+  editor picks produces such a value; a seed or an import that writes the
+  field directly does. See
+  [Seeding](../development/seeding.md#a-backend-layout-is-stored-with-its-provider).
 - **`replacement.20` maps the literal string `none` to `default`.**
   `PageLayoutResolver::getLayoutIdentifierForPage()` returns exactly that
   string — not empty — when an editor picks TYPO3's own built-in "[None]"

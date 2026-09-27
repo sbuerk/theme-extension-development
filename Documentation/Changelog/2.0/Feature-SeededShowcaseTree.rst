@@ -102,3 +102,10 @@ than overwrites when they are not. ``--root-page=<uid>`` writes the tree below
 an existing page instead of at the root of the page tree, which changes where
 it lands and not which uids it takes. The set declares no site configuration:
 create one with root page ``1`` after importing it at the page tree root.
+
+The set writes the backend layout of a page the way the page properties store
+it: ``pagets__content``, the provider of the Page TSconfig layouts and the
+identifier of the layout. A set of your own that copies pages from this one
+has to do the same. A bare ``content`` renders the same page in the frontend,
+but the page module cannot resolve it: it shows the page with TYPO3's one
+column default layout and lists every element of another column as unused.

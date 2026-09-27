@@ -24,10 +24,11 @@ page {
             data = pagelayout
             ifEmpty = default
 
-            # The PageTsConfig provider returns the identifier prefixed with
-            # "pagets__" (it also has to distinguish backend layouts that come
-            # from database records, prefixed "0_"). The prefix has to be
-            # stripped before it can be used as a file name.
+            # A layout of the PageTsConfig provider is stored prefixed with
+            # "pagets__", its provider, so the backend can tell it from a
+            # "backend_layout" database record, which is stored as its bare
+            # uid. The prefix has to be stripped before it can be used as a
+            # file name. A value without "__" passes unchanged.
             replacement.10 {
                 search = #^.*__#
                 replace =

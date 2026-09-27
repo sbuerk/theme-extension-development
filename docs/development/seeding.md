@@ -74,7 +74,9 @@ A record is a field map below `self`, nested under its page through `entities`
 (content, list items) or `children` (sub pages). Every key that is not
 structural is written to the record as it stands, which is why
 `backend_layout`, `nav_hide`, `abstract`, `keywords` and the `table_*` fields of
-the `table` element need nothing from the tool.
+the `table` element need nothing from the tool — and why a value has to be
+declared in the form TYPO3 stores it, see
+[A backend layout is stored with its provider](#a-backend-layout-is-stored-with-its-provider).
 
 ## Uids are declared, and they are a rule
 
@@ -174,6 +176,40 @@ on both sides becomes the list `[0, 0]` and reaches the database as the string
 entity it is ignored without a word, which is the most likely way to write a
 scenario that seeds less than it says. Only `page` is a node here.
 
+## A backend layout is stored with its provider
+
+`backend_layout: 'pagets__content'`, never `backend_layout: 'content'`. The
+field is written as the scenario declares it, so the scenario has to declare
+what the page properties would store — and they store a layout as
+`<provider>__<identifier>`. `pagets` is the provider of the Page TSconfig
+layouts this extension registers (`PageTsBackendLayoutDataProvider::getIdentifier()`
+on v14, the key it is registered under in `EXT:backend/ext_localconf.php` on
+v13); only the `default` provider, the one of `backend_layout` database
+records, is stored without a prefix, as the bare uid of the record.
+
+A bare identifier is the more dangerous mistake because half of it works. The
+frontend strips everything up to `__` before it picks a template
+([Page rendering](../architecture/page-rendering.md#template-name-resolution)),
+so `content` renders exactly like `pagets__content`. The page module does not
+strip anything: `DataProviderCollection::getBackendLayout()` hands a value
+without `__` to the `default` provider, whose `getBackendLayout()` looks it up
+as `(int)'content'`, a `backend_layout` record that does not exist, and
+`BackendLayoutView::getBackendLayoutForPage()` falls back to TYPO3's built-in
+one column layout. Every element outside colPos 0 is then listed as unused.
+The showcase was seeded that way until the page module was checked: in an
+import of `theme-instance`, each of the 116 pages that declare a layout
+opened with the fallback, and 24 of them listed elements as unused — page 172
+*Two columns* among them, with its stage (17201, colPos 2) and its second
+column (17204, colPos 3).
+
+`PageModuleLayoutTrait` resolves every page the way the page module does and
+fails for a page that shows another layout than it declares, and for an
+element in a colPos the resolved layout does not have. `ShowcaseTreeTest`
+runs it on `theme-demo`, `DevelopmentInstance/AccountsTest` on
+`theme-instance` — the mirror and the account pages included. A frontend test
+cannot do this job; `BackendLayoutRenderingTest` pins down on purpose that a
+bare identifier renders.
+
 ## Plain text and rich text
 
 Whether a text field is rich text is decided by the TCA of its type:
@@ -205,9 +241,12 @@ six of the twelve backend layouts it registers — `start`, `content`,
 `content_sidebar`, the `default` fallback, `styleguide` and `forms`. The other
 six are the multi column, article, cover and band layouts, which have a demo
 page each below `/layouts`. The pages below the first ten show every classic
-`CType` in its variants, and every appearance value:
+`CType` in its variants, and every appearance value. The layout column names
+the identifier of the layout; `backend_layout` stores it as
+`pagets__<identifier>`, see
+[above](#a-backend-layout-is-stored-with-its-provider).
 
-| uid       | Title                    | Slug                             | `backend_layout`                | What it is for                                                                                                                                |
+| uid       | Title                    | Slug                             | Layout                          | What it is for                                                                                                                                |
 |-----------|--------------------------|----------------------------------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | 1         | Theme demo               | `/`                              | `start`                         | The site root, and the only page that fills the four footer columns and the meta row — which every page below it then renders.                |
 | 2         | Typography               | `/typography`                    | `content`                       | Running text, the four bands with header positions, looks and spacing; parent of 52 to 56.                                                    |
@@ -285,7 +324,9 @@ preserve:
 > `DataHandler` 14.3.7 validates no `colPos` against the layout of its page.
 > The likely cause is an import that aborted part way and left the page
 > record without its site-resolvable state. Recorded here so the next person
-> who sees it knows it has been looked at — not as a known defect.
+> who sees it knows it has been looked at — not as a known defect. Such an
+> element can no longer be seeded unnoticed: it fails `PageModuleLayoutTrait`,
+> see [above](#a-backend-layout-is-stored-with-its-provider).
 
 ### The cheatsheet gathers, it does not copy
 
@@ -459,13 +500,14 @@ That is how the mirror was first found to differ.
 
 ### What holds the two trees together
 
-| Test                                           | Fails when                                                                              |
-|------------------------------------------------|-----------------------------------------------------------------------------------------|
-| `Tests/Unit/GeneratedLegacyScenarioTest`       | the showcase changed and the generator was not run                                      |
-| `DevelopmentInstance/LegacyDeliveryTest`       | a page of one tree renders different markup than its mirror, or not at all              |
-| `DevelopmentInstance/LegacyDeliveryTest`       | a link of the rendered mirror leads out of it                                           |
-| `DevelopmentInstance/LegacyDeliveryTest`       | the legacy site declares a set, or the `/` tree carries a `sys_template` record         |
-| `DevelopmentInstance/DeliveryRegistrationTest` | an `include_static_file` entry does not resolve, or is not offered by `addStaticFile()` |
+| Test                                           | Fails when                                                                                                   |
+|------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `Tests/Unit/GeneratedLegacyScenarioTest`       | the showcase changed and the generator was not run                                                           |
+| `DevelopmentInstance/LegacyDeliveryTest`       | a page of one tree renders different markup than its mirror, or not at all                                   |
+| `DevelopmentInstance/LegacyDeliveryTest`       | a link of the rendered mirror leads out of it                                                                |
+| `DevelopmentInstance/LegacyDeliveryTest`       | the legacy site declares a set, or the `/` tree carries a `sys_template` record                              |
+| `DevelopmentInstance/DeliveryRegistrationTest` | an `include_static_file` entry does not resolve, or is not offered by `addStaticFile()`                      |
+| `DevelopmentInstance/AccountsTest`             | a page of either tree opens in the page module with another layout than it declares, or with unused elements |
 
 `LegacyDeliveryTest` imports `theme-instance` and **adopts the committed site
 configurations** of `instance-core-<major>/config/sites/` rather than writing its
