@@ -123,10 +123,15 @@ constant changed and asserts both uses, through the static include.
 
 ## The no-flash script
 
-An inline script in the document head, emitted through `page.headerData`
-rather than `f:asset.script`, because the asset collector is free to move a
-script to the end of the body — and a stored dark appearance would then paint
-light first, which is the exact flash this script exists to prevent.
+An inline script in the document head, before first paint: a stored dark
+appearance applied any later paints light first, which is the exact flash this
+script exists to prevent.
+
+It is emitted through `page.headerData`, not `f:asset.script`. The asset
+collector would not move it — with `priority` it renders an inline script into
+the head as well — but what it adds under a Content Security Policy is a nonce
+(`useNonce`), and a nonce is exactly what the script must not need: see
+[below](#allowed-by-its-hash-under-a-content-security-policy).
 
 It does three things, in this order, and the order is load-bearing:
 
@@ -234,12 +239,8 @@ under a Content Security Policy and sees a load error only — a module that
 throws has loaded fine.
 
 The take-back lives in the same inline script, so it adds no script element and
-no event handler attribute. The theme ships no Content Security Policy, and the
-inline script carries no nonce: with the core's frontend policy enforced
-(`security.frontend.enforceContentSecurityPolicy`, off by default in v13), it
-is blocked as it was before this change, and the page renders without
-`data-js` — the same fallback layout. A site that allows the script by hash
-has to update the hash, because the script's text changed.
+no event handler attribute; the hash that allows the script under a Content
+Security Policy (next section) covers it.
 
 `Tests/Functional/AppearanceRenderingTest::theNoFlashScriptTakesTheMarkerBackUnlessTheModuleConfirmsIt`
 holds the head script to its half, and
@@ -254,6 +255,65 @@ carousel binder throw and requires a collapsed menu that still opens; runs
 the module only after the page has loaded and requires the collapsed menu
 back; and checks a working page with the module 600 ms late frame by
 frame.
+
+### Allowed by its hash under a Content Security Policy
+
+With `security.frontend.enforceContentSecurityPolicy` on — off by default in
+v12 and v13 — the core's frontend policy
+(`EXT:frontend/Configuration/ContentSecurityPolicies.php`) allows scripts by
+its nonce proxy, and a browser blocked the inline script: no `data-js`, no
+stored appearance before first paint. `Configuration/ContentSecurityPolicies.php`
+extends the frontend `script-src` with the script's **sha256**:
+
+```php
+return Map::fromEntries([
+    Scope::frontend(),
+    new MutationCollection(
+        new Mutation(MutationMode::Extend, Directive::ScriptSrc, new HashValue('…')),
+    ),
+]);
+```
+
+The hash is of the text between `<script>` and `</script>` exactly as TYPO3
+renders it — the multi-line value of `page.headerData.10`, trimmed, without the
+two tags, every space and line break inside kept.
+
+A hash and not a nonce: on v13 a nonce consumed for a page answers it
+`Cache-Control: private, no-store` (Important #107062), so no page with the
+theme could be cached by browsers or proxies any more — TYPO3's own page cache
+still works, substituting the nonce. A hash of a script that is the same on
+every page costs nothing. `HashValue`, `Mutation`, `MutationCollection`,
+`MutationMode`, `Directive`, `Scope` and `Map::fromEntries()` exist with this
+signature on v12 and v13.
+
+On **v12** the hash buys no cacheability, because the core consumes the nonce
+itself: its `PageRenderer` gives every stylesheet link and script file tag a
+`nonce` attribute whenever a policy is enforced, the theme's `theme.css` and
+`theme.js` among them, the request handler registers the consumed nonce as an
+uncached substitution, and every page is `private, no-store`. The hash is still
+what runs the script there: `page.headerData` is written as it is, without a
+nonce attribute, and the nonce of the header does not allow it.
+
+What this costs:
+
+- **Any edit of the script changes the hash**, a blank line included.
+  `Tests/Unit/ContentSecurityPolicyTest` recomputes it from
+  `Appearance.typoscript` and fails on a mismatch, naming both files.
+  `Tests/Functional/ContentSecurityPolicyRenderingTest` enforces the policy,
+  gives the `pages` cache a database backend (the testing framework's default
+  is a `NullBackend`), renders a page twice and requires the second response
+  to come from the page cache — `X-TYPO3-Debug-Cache`, which TYPO3 sends with
+  `FE.debug` on a cache hit only, on v12 and v13. On both it requires the hash
+  of the script as rendered in `script-src`. What the header says about a
+  nonce and caching differs between the cores, with the page cache arranged
+  the same way: `Core13/ContentSecurityPolicyCachingTest` requires no nonce
+  and, since its site sends cache headers (`config.sendCacheHeaders`), a
+  response browsers may cache; `Core12/ContentSecurityPolicyNonceTest` the
+  nonce on the theme's file tags and `private, no-store`.
+- **A site that overrides `page.headerData.10`** allows its own script, by its
+  own hash; the theme's hash is of the theme's script.
+- **A site whose `csp.yaml` sets `inheritDefault: false`** does not inherit the
+  frontend scope this file extends, and has to add the hash itself.
 
 ## The settings control is hidden until `data-js`
 

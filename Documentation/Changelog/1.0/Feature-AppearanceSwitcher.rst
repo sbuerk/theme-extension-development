@@ -68,10 +68,10 @@ The no-flash script
 ====================
 
 An inline script in the document head applies a stored appearance and palette
-before first paint. It is emitted through :typoscript:`page.headerData`
-rather than :typoscript:`f:asset.script`, because the asset collector may move
-a script to the end of the body, and a stored dark appearance would then paint
-light first - the exact flash this script exists to prevent.
+before first paint - applied any later, a stored dark appearance would paint
+light first, the exact flash this script exists to prevent. It is emitted
+through :typoscript:`page.headerData`, and allowed by its hash under a Content
+Security Policy - see :ref:`important-no-flash-script-content-security-policy`.
 
 It sets :html:`data-js` on the root **first and unconditionally**, then reads
 :js:`localStorage` for the stored appearance and palette, each inside its own
