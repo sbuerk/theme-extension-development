@@ -19,8 +19,9 @@ its default there — see [below](#--source-branch-and-the-key-the-alias-is-stor
 A change that belongs on both is made on `main` first and then backported.
 
 Both branches get the complete CI every night, started from `main` — a branch
-added to or retired from this table is added to or removed from the matrix of
-[`nightly.yml`](../../.github/workflows/nightly.yml) as well, see
+added to this table gets a caller like
+[`nightly-1.yml`](../../.github/workflows/nightly-1.yml) of its own, at an hour
+of its own, and a retired one loses it, see
 [the nightly run](../development/quality-gates.md#the-nightly-run).
 
 ## `setVersion.sh` — apply a version

@@ -1,0 +1,49 @@
+name: "Nightly (main)"
+
+# Runs the complete "CI" workflow of branch "main" every night, through
+# "nightly-ci.yml", which starts it and waits for its result - see there.
+# "nightly-1.yml" does the same for the other maintained branch, an hour later:
+# the account runs twenty jobs at a time across all its workflows, so the two
+# runs are kept apart rather than queued behind each other.
+#
+# Why at all: "ci.yml" runs for pull requests and by hand, so a merged state is
+# never checked again. And there is no "composer.lock" - every run resolves its
+# dependencies afresh - so a TYPO3 patch release or any other dependency release
+# changes what a run installs without a commit here. The nightly run is where
+# that shows up first, rather than in the next unrelated pull request.
+#
+# Two runs of this workflow never overlap. With "cancel-in-progress: false" the
+# group below holds one running and at most one pending run: a second one -
+# started by hand while the scheduled one runs - waits instead of letting its
+# dispatch cancel the first one's CI run, and a third replaces the second while
+# that is still pending, which starts the same thing. See "Concurrency" in the
+# GitHub Actions documentation, docs.github.com/en/actions/concepts/workflows-
+# and-actions/concurrency.
+#
+# A schedule only fires on the default branch, so this file lives on "main" for
+# both branches. GitHub disables a schedule in a public repository after 60 days
+# without repository activity; it has to be enabled again in the Actions tab.
+#
+# Started by hand from the Actions tab with "Run workflow", it does the same.
+
+on:
+  schedule:
+    # Not on the hour: scheduled runs are delayed most at the top of an hour.
+    - cron: "37 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Starting a workflow run and following it, in "nightly-ci.yml".
+  actions: write
+
+concurrency:
+  group: "${{ github.workflow }}"
+  cancel-in-progress: false
+
+jobs:
+
+  ci:
+    uses: "./.github/workflows/nightly-ci.yml"
+    with:
+      branch: "main"
