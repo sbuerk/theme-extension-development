@@ -68,26 +68,28 @@
 // the dialog opener are: what a page whose script never arrived loses is the
 // light dismiss, not the control.
 //
-// It loses one more thing below "bp.$md", and that is worth stating plainly
-// rather than leaving it to be discovered. Without "data-js" the main
-// navigation stays in the flow ("components/_nav-main.scss"), so the header is
-// as tall as the whole menu with its second levels open - and a panel anchored
-// on the header drops under all of it. Measured on "/typography" at 375 pixels
-// in the pinned browser:
+// It loses one more thing below the breakpoint of the header's arrangement,
+// and that is worth stating plainly rather than leaving it to be discovered.
+// Without "data-js" the main navigation stays in the flow
+// ("components/_nav-main.scss") - its top level, the header hides the second
+// one - so the header is as tall as the stacked menu, and a panel anchored on
+// the header drops under all of it. Measured on "/typography" at 375 pixels in
+// the pinned browser, where "simple" puts its title on a line of its own and
+// the controls on the next one ("layout/_site-header.scss"):
 //
-//   with the script     header 133px tall, trigger at y 44, panel at y 142 -
-//                       54 pixels under the trigger.
-//   without it          header 2180px tall, the trigger 1067 pixels down the
-//                       document and the panel 2189 - about 1077 pixels below
-//                       the control that opened it, and the browser scrolls
-//                       when the summary is activated.
+//   with the script     header 164px tall, trigger at y 92 to 136, panel at
+//                       y 173 - 37 pixels under the trigger.
+//   without it          header 577px tall, the trigger at y 299 to 343 and
+//                       the panel at 586 - 243 pixels below the control that
+//                       opened it.
 //
 // The panel still opens, still closes, is still the next thing in the tab
 // order and still covers nothing. It is simply a long way from its trigger.
 //
-// Anchoring on the component below "bp.$md" instead was measured and
-// rejected: with the script it would put the panel at y 98 against a 133 pixel
-// header, which is 35 pixels *inside* the header band. That buys the degraded
+// Anchoring on the component instead was measured and rejected: with the
+// script it would put the panel at y 146 - the trigger's end and the panel's
+// own 10 pixel offset - against a 164 pixel header, which is 18 pixels
+// *inside* the header band. That buys the degraded
 // case a nicety by giving the common one a smaller version of the defect this
 // whole change exists to remove. "Tests/Acceptance/frontend.spec.ts" renders
 // the page with JavaScript disabled and holds the contract that is left: the

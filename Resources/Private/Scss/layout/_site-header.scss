@@ -434,15 +434,13 @@
 // two things to keep in step. They were not in step, which is how the cog
 // came to drop to 104.5 while the globe beside it dropped to 155.
 //
-// The container's end is not always the last control's end. At 375 pixels
-// this row has no slack left: the brand, the toggle and the cog do not fit
-// between the gutters, and the cog spills past the container's content edge -
-// measured at 366.3 against a content edge at 355, inside the viewport, so
-// nothing scrolls sideways and no overflow check has ever seen it. The panels
-// are pinned to the container edge rather than to the cog, so at that width
-// they end a few pixels before it does. That is the row being squeezed, not a
-// panel being misplaced, and it is recorded here because the CSS is where
-// someone will ask.
+// The container's end was not always the last control's end. At 375 pixels
+// the one row of "simple" had no slack left: the brand, the toggle and the
+// controls did not fit between the gutters, and the cog spilled past the
+// container's content edge - measured at 366.3 against a content edge at 355.
+// Below "bp.$header-simple-stack" the title has a line of its own now - see
+// the end of this file - and the controls end at the content edge again. The
+// panels are pinned to that edge rather than to the cog either way.
 //
 // The three variants with two rows put the controls in the first of them -
 // "centred" and "actions" beside the title, "two-tier" in the meta row above
@@ -637,5 +635,27 @@ $arrangements: (
         :root:not([data-js]) #{$header} .theme-nav-main__list--sub {
             display: none;
         }
+    }
+}
+
+// --- "simple" on the narrowest screens ----------------------------------------
+//
+// The one row of "simple" never wraps - the three other arrangements wrap
+// their rows already - and collapsed it holds the title down to its longest
+// word, the menu toggle and the two controls: 380 pixels with the paddings and
+// gaps on the showcase, and the row spilled 75 pixels out of the page at 320,
+// 35 at 360, 20 at 375. Below "bp.$header-simple-stack" the title takes a line
+// of its own, and the toggle and the controls share the next one at the
+// inline end, pushed there by the menu's own "margin-inline-start: auto".
+// Every tap target keeps its 44 pixels. Not the whole collapsed range: at 600
+// pixels a wrapping row put the controls alone on a second line, 156 pixels of
+// header where one row is 97, so the row wraps only where it has to.
+@media (max-width: (bp.$header-simple-stack - 0.0625rem)) {
+    .theme-site-header:not(#{$modifiers}) .theme-site-header__inner {
+        flex-wrap: wrap;
+    }
+
+    .theme-site-header:not(#{$modifiers}) .theme-site-header__brand {
+        flex-basis: 100%;
     }
 }
