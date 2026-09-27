@@ -1651,3 +1651,50 @@ test.describe('the showcase under an enforced Content Security Policy', () => {
         });
     }
 });
+
+/**
+ * The footer fits a narrow screen.
+ *
+ * The meta row of the footer is a wrapping flex row, and a flex item is never
+ * narrower than its longest word unless it is told so. The showcase puts a
+ * path into it as inline code - `Configuration/DataFactory/theme-demo/`, one
+ * word of 294 pixels - and the footer, and with it the page, scrolled sideways
+ * to 354 pixels at 320 and 360 on the development machine. Whether that path
+ * overflows depends on the monospace font - it has no break opportunity, and
+ * in the fonts of the pinned image the whole word is narrow enough to fit -
+ * so the test does not rely on it: it puts one longer word, without a single
+ * break opportunity, into that code first. What is measured is the footer's
+ * own scroll width, against its own client width - the header has a minimum
+ * width of its own, measured elsewhere - and that every line box of the code
+ * stays inside the meta row: wrapped, by the body's "overflow-wrap:
+ * break-word", not cut off.
+ */
+test.describe('the site footer on a narrow screen', () => {
+    for (const path of ['/typography', '/legacy/typography']) {
+        for (const width of [320, 360]) {
+            test(`${path} keeps the footer inside the screen at ${width} pixels`, async ({ page }) => {
+                await page.setViewportSize({ width, height: 800 });
+                await page.goto(path);
+
+                const measured = await page.locator('.theme-page > .theme-site-footer').evaluate((footer) => {
+                    const meta = footer.querySelector('.theme-site-footer__meta');
+                    const code = meta === null ? null : meta.querySelector('code');
+                    if (meta === null || code === null) {
+                        return { spill: -1, outside: -1, lines: 0 };
+                    }
+                    code.textContent = 'Configuration_DataFactory_theme_demo_ScenarioLegacy_yaml';
+                    const row = meta.getBoundingClientRect();
+                    const lines = [...code.getClientRects()];
+                    return {
+                        spill: footer.scrollWidth - footer.clientWidth,
+                        outside: lines.filter((line) => line.left < row.left - 0.5 || line.right > row.right + 0.5).length,
+                        lines: lines.length,
+                    };
+                });
+                expect(measured.lines, 'the inline code of the meta row').toBeGreaterThan(0);
+                expect(measured.spill).toBeLessThanOrEqual(0);
+                expect(measured.outside).toBe(0);
+            });
+        }
+    }
+});
