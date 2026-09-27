@@ -500,14 +500,15 @@ That is how the mirror was first found to differ.
 
 ### What holds the two trees together
 
-| Test                                           | Fails when                                                                                                   |
-|------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| `Tests/Unit/GeneratedLegacyScenarioTest`       | the showcase changed and the generator was not run                                                           |
-| `DevelopmentInstance/LegacyDeliveryTest`       | a page of one tree renders different markup than its mirror, or not at all                                   |
-| `DevelopmentInstance/LegacyDeliveryTest`       | a link of the rendered mirror leads out of it                                                                |
-| `DevelopmentInstance/LegacyDeliveryTest`       | the legacy site declares a set, or the `/` tree carries a `sys_template` record                              |
-| `DevelopmentInstance/DeliveryRegistrationTest` | an `include_static_file` entry does not resolve, or is not offered by `addStaticFile()`                      |
-| `DevelopmentInstance/AccountsTest`             | a page of either tree opens in the page module with another layout than it declares, or with unused elements |
+| Test                                                    | Fails when                                                                                                                                                            |
+|---------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Tests/Unit/GeneratedLegacyScenarioTest`                | the showcase changed and the generator was not run                                                                                                                    |
+| `DevelopmentInstance/LegacyDeliveryTest`                | a page of one tree renders different markup than its mirror, or not at all                                                                                            |
+| `DevelopmentInstance/LegacyDeliveryTest`                | a link of the rendered mirror leads out of it                                                                                                                         |
+| `DevelopmentInstance/LegacyDeliveryTest`                | the legacy site declares a set, or the `/` tree carries a `sys_template` record                                                                                       |
+| `DevelopmentInstance/SectionPagesListTheirSubpagesTest` | a top level entry of the header menu leads to a page that does not link every page of its second level, in either tree - the header hides that level without a script |
+| `DevelopmentInstance/DeliveryRegistrationTest`          | an `include_static_file` entry does not resolve, or is not offered by `addStaticFile()`                                                                               |
+| `DevelopmentInstance/AccountsTest`                      | a page of either tree opens in the page module with another layout than it declares, or with unused elements                                                          |
 
 `LegacyDeliveryTest` imports `theme-instance` and **adopts the committed site
 configurations** of `instance-core-<major>/config/sites/` rather than writing its
