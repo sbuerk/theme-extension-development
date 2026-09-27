@@ -80,6 +80,52 @@ page.10.settings.appearance {
 # "Resources/Public/JavaScript/theme.js" is what operates the settings control
 # and the menu toggle from here on, and writes the three keys read here; this
 # script only prepares the root for it.
+#
+# --- The marker is a promise, and it is taken back when it is not kept -------
+#
+# "data-js" says "a script will operate the controls", and the stylesheet
+# acts on it at once: the main navigation collapses behind a toggle, the
+# settings control appears. Set here, before first paint, so a page that
+# works paints collapsed from its first frame. But the controls are bound by
+# "theme.js", not here, and when that never happens - the file is not found,
+# the network fails, it throws before it gets to the toggles, the browser
+# cannot run a module - the page was left with a hidden menu behind a toggle
+# that opens nothing, below the breakpoint of the header's arrangement, and
+# a settings cog that does nothing.
+#
+# So "theme.js" confirms: it sets "data-js-bound" on the root once
+# everything the stylesheet gates on "data-js" is bound - the display
+# settings, the menu toggle, the dialog openers - and isolates the binders
+# after it, so a throw in a carousel cannot cost the header its menu. And this
+# script takes "data-js" back at "DOMContentLoaded" when the confirmation is
+# not there. A module script without "async" is deferred, and the HTML parser
+# runs every deferred script - or reports it failed - before it fires
+# "DOMContentLoaded", so by then the answer is final: the page falls back to
+# the layout it has without a script, open and usable.
+#
+# That is why "theme.js" has to stay what "page.includeJSFooter.theme" below
+# makes it: a parser-inserted "type=module" without "async", and without a
+# top-level "await" inside - either lets "DOMContentLoaded" fire before the
+# file has run. "ComponentLibraryTest" holds both. If something loads it
+# "async" anyway, the confirmation still arrives, late: "theme.js" sets
+# "data-js" again together with "data-js-bound", and the collapsed menu comes
+# back with one layout shift instead of staying open for good. The same holds
+# for a site whose Content Security Policy blocks this inline script.
+#
+# Rejected, measured at 1000 pixels on the showcase - the numbers are in
+# "docs/development/appearance-switching.md":
+#
+#   - setting "data-js" only from "theme.js": the first frames paint the
+#     menu expanded - 1733 pixels of header - until the module has run,
+#     36 frames and a layout shift of 0.93 with the module 600 ms late;
+#   - a timer: any bound either takes a slow but working script's marker
+#     away, or leaves the dead menu standing until it fires;
+#   - an "onerror" on the script element: an inline handler attribute
+#     needs "unsafe-hashes" under a Content Security Policy, and a load
+#     error is one failure of several - a script that throws loads fine.
+#
+# Nothing changes on a page that works: "data-js" is set before first paint
+# as before, and it is never removed.
 page.headerData.10 = TEXT
 page.headerData.10 {
     value (
@@ -90,6 +136,15 @@ page.headerData.10 {
             // First act, unconditionally: nothing below may run before this,
             // and nothing below may prevent it from having run.
             root.setAttribute('data-js', '');
+
+            // Taken back unless "theme.js" confirms it - see "The marker is
+            // a promise" above. The module is deferred, so it has run, or
+            // failed to, by the time the document is parsed.
+            document.addEventListener('DOMContentLoaded', function () {
+                if (!root.hasAttribute('data-js-bound')) {
+                    root.removeAttribute('data-js');
+                }
+            });
 
             try {
                 var appearance = window.localStorage.getItem('theme-appearance');

@@ -8,7 +8,9 @@ import { expect, test } from '@playwright/test';
  * browser shows is the behaviour "Resources/Public/JavaScript/theme.js" adds
  * to it - and what the stylesheet leaves a visitor with when that script
  * never runs: with JavaScript switched off, and with JavaScript on but
- * "theme.js" failing to load, which are two different pages.
+ * "theme.js" failing to load. The second paints the first frames with
+ * "data-js" set and falls back to the first once the document is parsed -
+ * the head script takes the marker back when "theme.js" did not confirm it.
  */
 test.describe('the styleguide with JavaScript', () => {
     test.beforeEach(async ({ page }) => {
@@ -500,9 +502,12 @@ test.describe('the styleguide when theme.js does not load', () => {
     test('every tab panel is still readable', async ({ page }) => {
         await page.route(/\/JavaScript\/theme\.js/, (route) => route.abort());
         await page.goto('/styleguide');
-        // The inline head script ran and announced a script - the one that
-        // would have switched the tabs never arrived.
-        await expect(page.locator('html')).toHaveAttribute('data-js', '');
+        // The inline head script announced a script, and took the
+        // announcement back when the one that would have switched the tabs
+        // never confirmed it - see "The marker is a promise" in
+        // "Appearance.typoscript". The tabs follow a marker of their own
+        // either way, which is what is checked below.
+        await expect(page.locator('html')).not.toHaveAttribute('data-js', /.*/);
 
         await expectTheUndecoratedTabs(page);
     });
@@ -510,10 +515,11 @@ test.describe('the styleguide when theme.js does not load', () => {
     test('the carousel is still reachable slide by slide', async ({ page }) => {
         await page.route(/\/JavaScript\/theme\.js/, (route) => route.abort());
         await page.goto('/styleguide');
-        // "data-js" is set and the buttons are still not offered: they follow
-        // the carousel's own marker, which only "theme.js" sets, so a page
-        // whose script failed to load shows no control that does nothing.
-        await expect(page.locator('html')).toHaveAttribute('data-js', '');
+        // The buttons are not offered: they follow the carousel's own marker,
+        // which only "theme.js" sets, so a page whose script failed to load
+        // shows no control that does nothing. "data-js" was set by the head
+        // script and taken back when "theme.js" never confirmed it.
+        await expect(page.locator('html')).not.toHaveAttribute('data-js', /.*/);
 
         await expectTheUndecoratedCarousel(page);
     });
