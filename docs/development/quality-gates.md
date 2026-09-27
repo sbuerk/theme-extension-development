@@ -410,8 +410,8 @@ started by hand from the Actions tab.
   in that minute, before the nightly one shows up, is taken for it when it is
   the only one listed.
 - **Cost.** Each nightly job holds a runner while it waits, two of the twenty
-  the account runs at a time; the two dispatched runs together queue eighty
-  jobs. Its timeout is 180 minutes for that reason.
+  the account runs at a time; the two dispatched runs together queue 79 jobs,
+  40 of `main` and 39 of `1`. Its timeout is 180 minutes for that reason.
 - **Permissions.** `actions: write` to dispatch and follow the run, `contents:
   read`, nothing else.
 
