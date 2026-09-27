@@ -158,7 +158,7 @@ Build/Scripts/runTests.sh -s functional -d sqlite -j auto
 A chunked run carries a check of its own: it fails unless the chunks together
 executed exactly as many tests as PHPUnit listed for the run, so a class lost on
 the way through the split cannot pass unnoticed. A class is never split, which
-makes `ShowcaseTreeTest` the floor of every chunked run.
+makes the slowest class the floor of every chunked run.
 → [Functional tests in parallel chunks](environment.md#functional-tests-in-parallel-chunks)
 
 ## Continuous integration

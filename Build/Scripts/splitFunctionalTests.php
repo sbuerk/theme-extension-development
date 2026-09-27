@@ -33,10 +33,11 @@ declare(strict_types=1);
  *
  * WHY RECORDED DURATIONS
  *
- * The test count is a poor predictor. "ShowcaseTreeTest" imports the whole
- * showcase seed for every one of its tests, and a handful of classes below
- * "Tests/Functional/DevelopmentInstance/" import the development seed, so a
- * test of theirs costs many times one of a rendering test. The timings file,
+ * The test count is a poor predictor. A handful of classes import a seed set
+ * once and restore it for every later test, while tests below
+ * "Tests/Functional/DevelopmentInstance/" render every page of the
+ * development seed in both of its trees, so a test costs anywhere from a
+ * fraction of one of a rendering test to many times one. The timings file,
  * "Build/phpunit/FunctionalTestTimes-<dbms>.json" written by
  * "recordFunctionalTestTimes.php", maps a file path relative to the repository
  * root to seconds. A class it does not know yet weighs its number of tests

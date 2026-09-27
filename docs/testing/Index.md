@@ -7,7 +7,7 @@ and must pass for **both** supported TYPO3 versions.
 |---------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | [PHPUnit configuration](phpunit-configuration.md) | Where `Build/phpunit/*` comes from, the deliberate deviations from the testing framework template, the strictness policy. |
 | [Unit tests](unit-tests.md)                       | Layout and conventions, data providers, core version aware tests, testing injected classes.                               |
-| [Functional tests](functional-tests.md)           | The base test case, databases, container assertions, fixtures.                                                            |
+| [Functional tests](functional-tests.md)           | The base test case, databases, container assertions, fixtures, seed snapshots.                                            |
 | [Fixture extensions](fixture-extensions.md)       | Test-only extensions below `Tests/Functional/Fixtures/Extensions/`, loaded by composer package name.                      |
 | [Site based tests](site-based-tests.md)           | Site configuration with several languages and frontend sub-requests.                                                      |
 | [Environment state](environment-state.md)         | Application type and language context for functional tests.                                                               |

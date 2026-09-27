@@ -31,7 +31,7 @@ final class DeliveryRegistrationTest extends AbstractInstanceSeedTestCase
     #[Test]
     public function everyStaticIncludeOfTheLegacyRootResolvesAndIsRegistered(): void
     {
-        $this->importSeedSet(self::SEED_SET);
+        $this->importSeedSetOncePerClass(self::SEED_SET);
 
         $entries = $this->staticIncludesOfTheLegacyRoot();
         $this->assertNotSame([], $entries, 'The legacy root carries no static include at all.');
