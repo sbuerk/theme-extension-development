@@ -83,7 +83,7 @@ single test ran, although a rerun of the job passed.
 | `checkCssBuild`              | The committed CSS must match its SCSS sources.                                                                             |
 | `watchCss`                   | Compile the SCSS, re-compiling on every change.                                                                            |
 | `buildIcons`                 | Copy the pinned Font Awesome Free: the solid set, the allowlisted brand logos, licence, categories, see [Icons](icons.md). |
-| `checkIconsBuild`            | The committed icons, licence and categories must equal the pinned package and the brand allowlist.                         |
+| `checkIconsBuild`            | The icon directory must be exactly what `buildIcons` writes, plus `ATTRIBUTION.txt`.                                       |
 | `npm`                        | `npm` with all remaining arguments dispatched.                                                                             |
 | `composer`                   | `composer` with all remaining arguments dispatched.                                                                        |
 | `composerInstall`            | `composer install`.                                                                                                        |
