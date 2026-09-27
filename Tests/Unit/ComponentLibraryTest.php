@@ -1698,6 +1698,90 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * On the narrowest screens `simple` puts its title on a line of its own,
+     * and only there, and only `simple`.
+     *
+     * The one row of `simple` does not wrap, and collapsed it holds the title
+     * down to its longest word, the menu toggle and the two controls - 380
+     * pixels on the showcase, so a page 320 pixels wide scrolled sideways by
+     * 75. Below `bp.$header-simple-stack` its row wraps and the title takes
+     * the whole first line. That has to stay in a `max-width` media query
+     * below the breakpoint of `simple`: a row that wraps at every width puts
+     * the controls alone on a second line wherever they do not fit beside a
+     * long title, and a title with `flex-basis: 100%` in the expanded header
+     * pushes the menu off its row. And it names the default arrangement only:
+     * the other three wrap their rows already, and a title with a line of its
+     * own in `centred` would lose the counterweight that centres it.
+     *
+     * So, read off the compiled stylesheet: exactly one rule sets
+     * `flex-wrap: wrap` on the row of `simple` and one sets `flex-basis: 100%`
+     * on its title, both in the same `max-width` query below the breakpoint
+     * of `simple`, each with no other selector; and no other rule anywhere
+     * gives a title `flex-basis: 100%`.
+     */
+    #[Test]
+    public function onlyTheDefaultHeaderStacksItsTitleOnTheNarrowestScreens(): void
+    {
+        $modifiers = $this->headerModifiers();
+
+        $simpleBreakpoint = null;
+        foreach ($this->mediaRules() as [$condition, $selectors, $declarations]) {
+            if (preg_match('/^\(min-width:\s*([\d.]+)rem\)$/', $condition, $width) === 1
+                && str_ends_with($selectors, ' .theme-nav-main>.theme-nav-main__toggle')
+                && self::arrangementScope($selectors, $modifiers) === ''
+                && in_array('display:none', $declarations, true)
+            ) {
+                $simpleBreakpoint = (float)$width[1];
+            }
+        }
+        $this->assertNotNull($simpleBreakpoint, 'The breakpoint of "simple" was not found.');
+
+        // "flex-wrap: wrap" or "wrap-reverse", or either inside "flex-flow".
+        $wraps = static fn(array $declarations): bool => array_filter(
+            $declarations,
+            static fn(string $declaration): bool => preg_match('/^flex-(?:wrap|flow):.*\bwrap\b/', $declaration) === 1,
+        ) !== [];
+        $wrapping = [];
+        $stacking = [];
+        foreach ($this->mediaRules() as [$condition, $selectors, $declarations]) {
+            if ($wraps($declarations) && str_contains($selectors, 'theme-site-header__inner') && !str_contains($selectors, 'theme-site-header__inner--')) {
+                $wrapping[] = [$condition, $selectors];
+            }
+            if (in_array('flex-basis:100%', $declarations, true) && str_contains($selectors, 'theme-site-header__brand')) {
+                $stacking[] = [$condition, $selectors];
+            }
+        }
+        // Every rule, in a media query or not: "rules()" sees them all, so a
+        // count above the two found in media queries is a rule outside one.
+        $everywhere = 0;
+        foreach ($this->rules() as [$selectors, $declarations]) {
+            if (in_array('flex-basis:100%', $declarations, true) && str_contains($selectors, 'theme-site-header__brand')) {
+                $everywhere++;
+            }
+            if ($wraps($declarations) && str_contains($selectors, 'theme-site-header__inner') && !str_contains($selectors, 'theme-site-header__inner--')) {
+                $everywhere++;
+            }
+        }
+
+        $this->assertCount(1, $wrapping, sprintf('Not exactly one rule in a media query wraps the row of "simple": %s', json_encode($wrapping)));
+        $this->assertCount(1, $stacking, sprintf('Not exactly one rule in a media query gives the title a line of its own: %s', json_encode($stacking)));
+        $this->assertSame(2, $everywhere, 'Besides the two rules in a media query, another rule wraps the row of "simple" or gives the title a line of its own.');
+
+        [[$wrapCondition, $wrapSelectors]] = $wrapping;
+        [[$stackCondition, $stackSelectors]] = $stacking;
+        $this->assertSame($wrapCondition, $stackCondition, 'The row of "simple" wraps and its title takes a line of its own at different widths.');
+        $matched = preg_match('/^\(max-width:\s*([\d.]+)rem\)$/', $wrapCondition, $below);
+        $this->assertSame(1, $matched, sprintf('The title of "simple" takes a line of its own in "%s", not below a width.', $wrapCondition));
+        $this->assertLessThan($simpleBreakpoint, (float)$below[1], 'The title of "simple" takes a line of its own where the menu is a row.');
+
+        foreach ([$wrapSelectors => '.theme-site-header__inner', $stackSelectors => '.theme-site-header__brand'] as $selectors => $subject) {
+            $this->assertCount(1, self::splitTopLevel($selectors, ','), sprintf('"%s" names more than the default header.', $selectors));
+            $this->assertSame('', self::arrangementScope($selectors, $modifiers), sprintf('"%s" is not scoped to the default header.', $selectors));
+            $this->assertStringEndsWith(' ' . $subject, $selectors);
+        }
+    }
+
+    /**
      * The header an arrangement rule is scoped to - `''` for the default, the
      * modifier class for a variant, `null` for a rule of no arrangement.
      *

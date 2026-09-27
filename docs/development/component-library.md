@@ -1502,19 +1502,37 @@ height on every scroll position:
 ```
 
 `__actions` holds the [display settings](#display-settings). Brand,
-navigation and actions share one row at every width, and **the main
-navigation never wraps**: its top level is one row, or it is behind its
-toggle. When the row gets tight the title gives way — it shrinks and wraps
-onto as many lines as it needs, down to its longest word
-(`flex: 0 1 auto; min-inline-size: min-content`) — while the navigation, from
-the breakpoint of its arrangement up, is `flex: none`, as wide as its one row.
-Neither carries a cap. A single word longer than the row is not broken, and
-spills. Where one row no
-longer fits beside the title, the header collapses the menu behind its toggle,
-at a breakpoint of its own per arrangement (see
-[header variants](#header-variants)); collapsed, the expanded menu drops down
-under the header as a full-width band, behind `data-js` like the collapse
-itself.
+navigation and actions share one row, and **the main navigation never
+wraps**: its top level is one row, or it is behind its toggle. When the row
+gets tight the title gives way — it shrinks and wraps onto as many lines as it
+needs, down to its longest word (`flex: 0 1 auto; min-inline-size: min-content`)
+— while the navigation, from the breakpoint of its arrangement up, is
+`flex: none`, as wide as its one row. Neither carries a cap. A single word
+longer than the row is not broken, and spills. Where one row no longer fits
+beside the title, the header collapses the menu behind its toggle, at a
+breakpoint of its own per arrangement (see [header variants](#header-variants));
+collapsed, the expanded menu drops down under the header as a full-width band,
+behind `data-js` like the collapse itself.
+
+**Below `bp.$header-simple-stack` (`30rem`, 480 pixels)** the one row of
+`simple` wraps: the title takes a line of its own, and the menu toggle and the
+controls share the next one at the inline end. Collapsed, the row holds the
+title down to its longest word, the toggle and both controls — 380 pixels with
+paddings and gaps on the showcase — and a page 320 pixels wide scrolled
+sideways by 75. Stacked, the header of the showcase is 164 pixels tall with
+JavaScript from 320 to 479 (133 before, with a title of four lines) and 577
+without; from 480 up nothing changes. The row wraps only there: over the whole
+collapsed range a wrapping row put the controls alone on a second line at 600
+pixels, 156 pixels of header where one row is 97. The other three
+arrangements wrap their rows already. `bp.$header-simple-stack` is
+`!default` like the other header breakpoints.
+`ComponentLibraryTest::onlyTheDefaultHeaderStacksItsTitleOnTheNarrowestScreens`
+holds the rule to `simple` and to a `max-width` query below the breakpoint of
+`simple`, and the acceptance suite checks `/typography` and `/styleguide` in
+all four arrangements, in both reading directions, with JavaScript and without,
+at 320, 360 and 375 pixels: no sideways scroll of the page or the header, no
+two of title, toggle, controls and call to action on top of each other, and
+the menu band and both panels inside the screen at 320.
 
 It used to be the other way round. From 1024 pixels up the title kept its line,
 up to half the row, and the menu wrapped its top level onto a second row inside
@@ -1546,7 +1564,7 @@ Two degraded cases grow with it:
   holds the showcase to that in both trees, and a site using this header has
   to hold its content to it as well. The default header of the showcase is 511
   pixels tall from 768 up to its breakpoint (555 and 566 in the variants) and
-  805 at 375 (621 and 632), where the stacked menu with every second level was
+  577 at 375 (621 and 632), where the stacked menu with every second level was
   about 1730 and 2523. The acceptance suite bounds it at 640 from 768 up and
   at 900 at 375, in all four arrangements. It is the header's menu only: a
   main navigation anywhere else — the styleguide specimen, a menu in a
@@ -2009,18 +2027,18 @@ one each component uses:
 
 **Dropdown, and the one thing the row above understates.** The panel is
 anchored on the site header, so it drops under the header row whatever that
-row's height is. Below `bp.$md` *without* a script the main navigation stays in
-the flow, so the header is as tall as the whole menu with its second levels
-open — and the panel lands under all of it. Measured on `/typography` at 375
-pixels in the pinned browser: with the script the header is 133 px tall, the
-trigger sits at y 44 and the panel at y 142, 54 px under it; without the script
-the header is 2180 px tall, the trigger is 1067 px down the document and the
-panel 2189 — roughly 1077 px below the control that opened it, and the browser
-scrolls when the summary is activated. The control still works, it is still the
-next thing in the tab order, and it covers nothing; it is simply a long way
-away. Anchoring on the component below the breakpoint was measured and
-rejected, because in the *scripted* case it would put the panel 35 px inside
-the header band — the trade is written out in `components/_dropdown.scss`, and
+row's height is. *Without* a script, below the breakpoint of the header's
+arrangement, the top level of the main navigation stays in the flow, so the
+header is as tall as the stacked menu — and the panel lands under all of it.
+Measured on `/typography` at 375 pixels in the pinned browser, where `simple`
+puts its title on a line of its own: with the script the header is 164 px
+tall, the trigger sits at y 92 to 136 and the panel at y 173, 37 px under it;
+without the script the header is 577 px tall, the trigger sits at y 299 to 343
+and the panel at 586 — 243 px below the control that opened it. The control
+still works, it is still the next thing in the tab order, and it covers
+nothing; it is simply a long way away. Anchoring on the component was measured
+and rejected, because in the *scripted* case it would put the panel 18 px
+inside the header band — the trade is written out in `components/_dropdown.scss`, and
 `Tests/Acceptance/frontend.spec.ts` renders the page with JavaScript disabled
 and holds what is left of the contract.
 
@@ -2289,6 +2307,7 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 | `theTopLevelOfTheMainNavigationNeverWraps`                              | No rule whose subject is the top level list of the main navigation sets `flex-wrap` or `flex-flow` to wrap — see [header variants](#header-variants).                                                                                                                                                                                               |
 | `neitherTheTitleNorTheMenuOfTheHeaderIsCapped`                          | No `max-inline-size` or `max-width` on the site title, the main navigation or its top level list; the title keeps `min-inline-size: min-content` and can shrink; the navigation of each arrangement is `flex: none` exactly where its toggle is hidden, and no other rule under any scope sets how it flexes.                                       |
 | `everyHeaderArrangementCollapsesTheMainNavigationAtABreakpointOfItsOwn` | Every header arrangement read from the partials expands its menu from one `min-width` above `bp.$md` and collapses it exactly one pixel below, and no rule in a width media query reaches the menu without naming the header.                                                                                                                       |
+| `onlyTheDefaultHeaderStacksItsTitleOnTheNarrowestScreens`               | The row of `simple` wraps and its title takes `flex-basis: 100%` only in one `max-width` query below the breakpoint of `simple`, scoped to `simple` alone.                                                                                                                                                                                          |
 | `theContentElementOutlineSwitchesOffCompletely`                         | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                                                                                                                                                           |
 | `anElementWithoutPaddingKeepsItsContentClearOfTheChip`                  | `--frame-none` starts its content below the CType chip by `--theme-content-element-chip-clearance`, and the global switch and `--plain`, which remove the chip, set the clearance to `0`.                                                                                                                                                           |
 | `everyPaletteHasASwatchWithItsOwnColours`                               | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).                                                                                                                                  |
