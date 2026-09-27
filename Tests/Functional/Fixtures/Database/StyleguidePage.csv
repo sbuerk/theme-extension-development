@@ -1,7 +1,7 @@
 pages,,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug,backend_layout
 ,1,0,0,0,0,1,1,Theme root,/,
-,2,1,0,0,0,1,0,Styleguide,/styleguide,styleguide
+,2,1,0,0,0,1,0,Styleguide,/styleguide,pagets__styleguide
 tt_content,,,,,,,,
 ,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header
 ,10,2,0,0,999,10,text,Editor content in the unused column

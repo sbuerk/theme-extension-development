@@ -105,3 +105,10 @@ create one with root page ``1`` after importing it at the page tree root. On
 TYPO3 v12, which has no site sets, a :guilabel:`sys_template` record on that
 page selecting the static include enables the theme — see
 :ref:`configuration-static-include`.
+
+The set writes the backend layout of a page the way the page properties store
+it: ``pagets__content``, the provider of the Page TSconfig layouts and the
+identifier of the layout. A set of your own that copies pages from this one
+has to do the same. A bare ``content`` renders the same page in the frontend,
+but the page module cannot resolve it: it shows the page with TYPO3's one
+column default layout and lists every element of another column as unused.

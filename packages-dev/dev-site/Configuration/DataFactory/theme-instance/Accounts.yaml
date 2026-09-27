@@ -182,7 +182,7 @@ entities:
           pid: 1
           title: 'Login'
           slug: '/login'
-          backend_layout: 'content'
+          backend_layout: 'pagets__content'
           nav_hide: 1
       entities:
         content:
@@ -212,7 +212,7 @@ entities:
           pid: 1
           title: 'Members'
           slug: '/members'
-          backend_layout: 'content'
+          backend_layout: 'pagets__content'
           nav_hide: 1
           fe_group: '1'
       entities:

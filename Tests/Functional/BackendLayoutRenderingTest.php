@@ -68,6 +68,18 @@ final class BackendLayoutRenderingTest extends AbstractFunctionalTestCase
             'url' => 'https://theme.example.com/start',
             'expectedLayout' => 'start',
         ];
+        // Not a value TYPO3 writes: the page properties store a layout of the
+        // Page TSconfig provider as "pagets__<identifier>", and the page
+        // module cannot resolve a value without the prefix - it looks it up
+        // as the uid of a "backend_layout" record. "replacement.10" finds no
+        // "__" to strip and the frontend renders the page all the same.
+        // Pinned down on purpose, because it is why no frontend test can
+        // notice a seed that stores bare identifiers - see
+        // "PageModuleLayoutTrait".
+        yield 'a bare identifier renders the same, although the page module cannot resolve it' => [
+            'url' => 'https://theme.example.com/bare',
+            'expectedLayout' => 'content_sidebar',
+        ];
         yield 'a page without one inherits it from an ancestor' => [
             'url' => 'https://theme.example.com/inherits',
             'expectedLayout' => 'content',
