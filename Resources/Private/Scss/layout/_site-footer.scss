@@ -90,6 +90,18 @@
             color: var(--theme-color-primary, #0b57d0);
         }
     }
+
+    // A child of this row is a flex item, and a flex item is never narrower
+    // than its longest word unless it is told so - "min-width: auto". The
+    // meta row of the showcase carries a path as inline code,
+    // "Configuration/DataFactory/theme-demo/", one 294 pixel word, and the
+    // page scrolled sideways to 354 pixels at every width from 320 to 360.
+    // Allowed to shrink, the item wraps the path where it has to - the body's
+    // "overflow-wrap: break-word" breaks a word that cannot fit a line - and
+    // nothing is clipped: nothing here hides an overflow.
+    > * {
+        min-inline-size: 0;
+    }
 }
 
 // --- The newsletter variant --------------------------------------------------
