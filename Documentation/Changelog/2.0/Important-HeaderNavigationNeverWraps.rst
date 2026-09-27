@@ -66,10 +66,19 @@ screen a long site title takes more lines than before, beside a menu of one
 row. A single word longer than the row is not broken.
 
 The collapse needs the theme's script. **Without JavaScript** nothing
-collapses: below the breakpoint the list is stacked in the flow with every
-second level shown, and the header grows to the height of the whole menu -
-about 1730 pixels for the showcase with the default arrangement, at any width
-below 1184 pixels. It still fits the screen.
+collapses: below the breakpoint the list is stacked in the flow, and it lists
+the top level entries only, at every width down to a phone - every second level
+is hidden. That is about 510 pixels of header for the showcase from 768 pixels
+up and about 800 at 375, where the whole menu would be about 1730 and 2520. A
+page that is the target of a top level entry therefore has to link the pages
+below it, as the section pages of the showcase do with a menu of their
+subpages; a site with a second level in its main navigation checks its own.
+The pattern that defeats this is a top level page of the type "Shortcut" to
+its first subpage: without JavaScript its entry leads to that subpage, and its
+other subpages are reachable only if that one links them. The same holds for
+a top level entry that is a spacer, which links nowhere. This concerns the
+menu of the site header only: a main navigation rendered elsewhere keeps its
+second levels without JavaScript.
 
 **When the theme script fails** - it is not found, or it throws before it has
 bound the menu toggle, the display settings and the dialog openers - the page

@@ -1539,14 +1539,24 @@ the collapse now begins far above `bp.$md` — below 1184 pixels for `simple`.
 Two degraded cases grow with it:
 
 - **No JavaScript at all.** Nothing collapses, and below the breakpoint of its
-  arrangement the list is stacked in the flow with every second level inline,
-  as it always was below `bp.$md`: the default header of the showcase is about
-  1730 pixels tall at 1183, 1000 and 800 pixels, where it used to be 146 to
-  195. It fits the screen — the acceptance suite checks that with JavaScript
-  disabled at 375 and 800 pixels in all four arrangements — but it is long.
-  `flex: none` on the navigation is set only where the menu is a row for that
-  reason: set everywhere, it kept the stacked list as wide as its widest
-  entry, and `simple` scrolled sideways by 96 pixels at 375.
+  arrangement the list is stacked in the flow, and the header lists the
+  **sections only**, at every width down to a phone: every second level is
+  `display: none`, out of the tab order and the accessibility tree, and each
+  section page links its own pages — `SectionPagesListTheirSubpagesTest`
+  holds the showcase to that in both trees, and a site using this header has
+  to hold its content to it as well. The default header of the showcase is 511
+  pixels tall from 768 up to its breakpoint (555 and 566 in the variants) and
+  805 at 375 (621 and 632), where the stacked menu with every second level was
+  about 1730 and 2523. The acceptance suite bounds it at 640 from 768 up and
+  at 900 at 375, in all four arrangements. It is the header's menu only: a
+  main navigation anywhere else — the styleguide specimen, a menu in a
+  site's footer — keeps its second levels open below `bp.$md` without a
+  script, as `components/_nav-main.scss` lays it out. The header fits the
+  screen at every width — checked with JavaScript disabled at 375 and 800
+  pixels.
+  `flex: none` on the navigation is set only where the menu is a row: set
+  everywhere, it kept the stacked list as wide as its widest entry, and
+  `simple` scrolled sideways by 96 pixels at 375.
 - **The inline head script ran, `theme.js` did not.** The head script takes
   `data-js` back at `DOMContentLoaded` unless `theme.js` confirmed it with
   `data-js-bound`, so the page falls back to the layout without a script: the
