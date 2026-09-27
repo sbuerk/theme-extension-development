@@ -328,7 +328,7 @@ Every job of every workflow runs on `ubuntu-26.04`, named rather than
 October 19 to November 19, 2026, job by job
 ([actions/runner-images#14748](https://github.com/actions/runner-images/issues/14748));
 a named version moves every job at once, and when this repository decides to.
-Change the label in `ci.yml`, `nightly.yml`, `pr-comment.yml` and `publish.yml`
+Change the label in `ci.yml`, `nightly-ci.yml`, `pr-comment.yml` and `publish.yml`
 together.
 
 The two functional jobs had been pinned to `ubuntu-22.04` since the initial
@@ -373,9 +373,13 @@ locally before pushing.
 
 ### The nightly run
 
-[`.github/workflows/nightly.yml`](../../.github/workflows/nightly.yml) runs the
-complete `ci.yml` every night at 02:37 UTC, for `main` and for `1`, and can be
-started by hand from the Actions tab.
+The complete `ci.yml` of each maintained branch runs every night, and can be
+started by hand from the Actions tab:
+[`nightly-main.yml`](../../.github/workflows/nightly-main.yml) for `main` at
+02:37 UTC, [`nightly-1.yml`](../../.github/workflows/nightly-1.yml) for `1` at
+03:37 UTC. Both call
+[`nightly-ci.yml`](../../.github/workflows/nightly-ci.yml), which starts
+`ci.yml` on its branch and waits for the result.
 
 - **Why at all.** `ci.yml` runs for pull requests and by hand, so a merged state
   is never checked again. And there is no `composer.lock`: a TYPO3 patch release
@@ -388,20 +392,29 @@ started by hand from the Actions tab.
   is on the branch it is given; both branches carry that trigger. A dispatch
   made with the job's own token does start a run — `workflow_dispatch` is one of
   the two events exempt from the rule that events caused by `GITHUB_TOKEN`
-  start none.
+  start none. Both callers live on `main` for that reason.
+- **Why one workflow per branch, an hour apart.** The account runs twenty jobs
+  at a time, across all its workflows and repositories. Measured on the first
+  nightly run, which dispatched both branches at once from one workflow: never
+  more than twenty jobs in progress between its own two jobs and the two CI
+  runs, with dozens queued behind them; the run of `1` took 22 minutes there,
+  against 13 to 15 alone in its pull request. A CI run alone takes 10 to 15
+  minutes, so an hour apart each run has the runners to itself. `nightly-ci.yml` holds
+  the logic once; the callers differ in their branch and their `cron` line.
 - **Why it waits.** A dispatched run belongs to `github-actions`, and its failure
-  notifies nobody. Each nightly job follows the run it started with
+  notifies nobody. The nightly job follows the run it started with
   `gh run watch --exit-status` and fails unless that run succeeded. A failed
-  scheduled run is reported to whoever last changed its `cron` line.
+  scheduled run is reported to whoever last changed the `cron` line of its
+  caller.
 - **Concurrency.** The dispatched run is grouped by branch,
   `CI-refs/heads/<branch>`, and a pull request run by its number, so the two
   never cancel each other, and the runs for the two branches do not either. A
   `ci.yml` run started by hand on the same branch meanwhile does cancel the
-  nightly one, and the nightly job then fails. `nightly.yml` has a group of its
+  nightly one, and the nightly job then fails. Each caller has a group of its
   own without `cancel-in-progress`, which holds one running and at most one
-  pending run: a second nightly run waits rather than cancelling the first
-  one's CI runs through its dispatch, and a third replaces the second while that
-  is still pending
+  pending run: a second nightly run of the same branch waits rather than
+  cancelling the first one's CI run through its dispatch, and a third replaces
+  the second while that is still pending
   ([Concurrency](https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency)).
 - **Finding the run it started.** The dispatch is asked to return the id of the
   run it creates. When it answers without one, the job looks for the dispatched
@@ -409,15 +422,17 @@ started by hand from the Actions tab.
   fails when there is more than one. A run dispatched by hand on the same branch
   in that minute, before the nightly one shows up, is taken for it when it is
   the only one listed.
-- **Cost.** Each nightly job holds a runner while it waits, two of the twenty
-  the account runs at a time; the two dispatched runs together queue 79 jobs,
-  40 of `main` and 39 of `1`. Its timeout is 180 minutes for that reason.
+- **Cost.** The nightly job holds one runner while it waits. Its timeout is 120
+  minutes: the longest job of `ci.yml` may take 25 minutes on `main` and 35 on
+  `1`, and a run of about forty jobs needs two or three rounds of the 19
+  runners left to it.
 - **Permissions.** `actions: write` to dispatch and follow the run, `contents:
-  read`, nothing else.
+  read`, nothing else — granted by the callers, which the called workflow
+  inherits.
 
 GitHub disables a schedule in a public repository after 60 days without
-repository activity; it is enabled again from the Actions tab. `nightly.yml` only
-takes effect on the default branch.
+repository activity; it is enabled again from the Actions tab. The nightly
+workflows only take effect on the default branch.
 
 ### Commenting on a pull request from a fork
 

@@ -116,7 +116,7 @@ name: "CI"
 # November 19, 2026, job by job (actions/runner-images#14748); a named version
 # moves every job at once, when this repository decides to. The two functional
 # jobs had been pinned to "ubuntu-22.04" since the initial commit, without a
-# recorded reason; they move too. The same label is used by "nightly.yml",
+# recorded reason; they move too. The same label is used by "nightly-ci.yml",
 # "pr-comment.yml" and "publish.yml"; change them together.
 #
 # The composer download cache is restored per PHP and core version. It lives in
@@ -127,8 +127,9 @@ name: "CI"
 
 on:
   pull_request:
-  # By hand, and every night for "main" and "1" by "nightly.yml", which starts
-  # this workflow on each branch and waits for the result.
+  # By hand, and every night for "main" and "1" by "nightly-main.yml" and
+  # "nightly-1.yml", which start this workflow on their branch and wait for the
+  # result.
   workflow_dispatch:
 
 # Least privilege. Nothing in this workflow writes, and it must stay that way:
