@@ -1584,3 +1584,70 @@ test.describe('the main navigation in every header arrangement', () => {
         await expect(list).toBeVisible();
     });
 });
+
+/**
+ * The showcase under an enforced Content Security Policy.
+ *
+ * `-s acceptance` enforces TYPO3's frontend policy in its own copy of the
+ * instance configuration (`runTests.sh`; the committed instances and DDEV stay
+ * as they are). A browser blocks what the policy does not allow without an
+ * error the page can see - a script that does not run, a source that does not
+ * load - and reports it as a `securitypolicyviolation` event, which is what
+ * is collected here, from the first byte of each page, with every
+ * click-to-load embed opened, since that is where a frame source is decided.
+ *
+ * Two things were blocked before the theme dealt with them: the inline
+ * no-flash script of the head, allowed by its hash since
+ * `Configuration/ContentSecurityPolicies.php`, and the `data:` sources and
+ * caption tracks of the media specimen of the styleguide, which "media-src"
+ * does not allow and which are files now. The markers are asserted as well:
+ * the no-flash script set `data-js`, and `theme.js` confirmed it.
+ */
+test.describe('the showcase under an enforced Content Security Policy', () => {
+    const pages = [
+        '/',
+        '/typography',
+        '/media',
+        '/styleguide',
+        '/forms',
+        '/elements/cheatsheet',
+        '/elements/theme/external-media',
+        '/examples/carousel-landing',
+        '/legacy/styleguide',
+    ];
+
+    for (const path of pages) {
+        test(`${path} violates nothing`, async ({ page }) => {
+            await page.addInitScript(() => {
+                const violations: string[] = [];
+                (window as unknown as { themeViolations: string[] }).themeViolations = violations;
+                document.addEventListener('securitypolicyviolation', (event) => {
+                    violations.push(`${event.effectiveDirective} blocked ${event.blockedURI || '(inline)'} at ${event.sourceFile}:${event.lineNumber}`);
+                });
+            });
+            const response = await page.goto(path);
+            expect(response?.headers()['content-security-policy'], 'the instance does not enforce a policy').toBeTruthy();
+            await page.waitForLoadState('networkidle');
+
+            // Clicked by the element rather than by the pointer: a specimen of
+            // the styleguide lies over one of them, and what matters here is
+            // the frame the click puts in, not where the pointer can reach.
+            // Each button once, as it was when the page had loaded - an opened
+            // embed replaces its button with the frame.
+            await page.evaluate(() => document.querySelectorAll<HTMLButtonElement>('.theme-embed[data-theme-embed-bound] .theme-embed__button').forEach((button) => button.click()));
+            // Every media element of the page, in view, so a player that
+            // fetches a caption track or a poster does it now.
+            await page.evaluate(() => document.querySelectorAll('video, audio').forEach((media) => media.scrollIntoView()));
+            // A frame of a provider never finishes loading in the network of
+            // the suite, so "networkidle" is no end to wait for here. A
+            // violation is reported when the request is refused, which is
+            // before it leaves the browser; half a second covers the task that
+            // dispatches the event.
+            await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 500)));
+
+            expect.soft(await page.evaluate(() => (window as unknown as { themeViolations: string[] }).themeViolations)).toEqual([]);
+            await expect(page.locator('html')).toHaveAttribute('data-js', '');
+            await expect(page.locator('html')).toHaveAttribute('data-js-bound', '');
+        });
+    }
+});

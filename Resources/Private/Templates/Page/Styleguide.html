@@ -93,7 +93,11 @@
                 <f:render partial="Styleguide/Interactive" />
                 <f:render partial="Styleguide/Forms" />
                 <f:render partial="Styleguide/Navigation" />
-                <f:render partial="Styleguide/Media" />
+                <f:render partial="Styleguide/Media" arguments="{specimenFiles: {
+                    video: '{f:uri.resource(path: \'EXT:theme_extension_development/Resources/Public/Media/Styleguide/specimen.webm\')}',
+                    audio: '{f:uri.resource(path: \'EXT:theme_extension_development/Resources/Public/Media/Styleguide/specimen.wav\')}',
+                    captions: '{f:uri.resource(path: \'EXT:theme_extension_development/Resources/Public/Media/Styleguide/specimen.vtt\')}'
+                }}" />
                 <f:render partial="Styleguide/Variants" />
                 <f:render partial="Styleguide/Chrome" />
                 <f:render partial="Styleguide/Direction" />
