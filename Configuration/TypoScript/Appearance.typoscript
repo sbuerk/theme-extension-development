@@ -57,10 +57,34 @@ page.10.settings.appearance {
 
 # --- The no-flash script -------------------------------------------------
 #
-# Inline, in the document head, before first paint - through "page.headerData"
-# rather than "f:asset.script": the asset collector is free to move a script
-# to the end of the body, and a stored dark appearance would then paint light
-# first, which is the exact flash this script exists to prevent.
+# Inline, in the document head, before first paint - a stored dark
+# appearance applied any later paints light first, which is the exact flash
+# this script exists to prevent.
+#
+# Through "page.headerData" rather than "f:asset.script". Not because the
+# asset collector would move it - with "priority" it renders an inline script
+# into the head too (the "jsInline" block of "PageRenderer"). What it would
+# add under a Content Security Policy is a nonce ("useNonce"), and on v13 a
+# nonce is what keeps browsers and proxies from caching a page: a nonce
+# consumed for a page answers it "private, no-store" (the server's page
+# cache still works, substituting the nonce). The script is the same on
+# every page, so it is allowed by its hash instead - see below.
+#
+# --- Allowed by its hash under a Content Security Policy -----------------
+#
+# "Configuration/ContentSecurityPolicies.php" extends the frontend
+# "script-src" with the sha256 of this script: the text between "<script>"
+# and "</script>" exactly as it is rendered - the value below, trimmed,
+# without the two tags, every space and line break inside kept. So any edit
+# of the script, a changed indentation included, changes the hash, and the
+# hash in that file has to change with it. "Tests/Unit/ContentSecurityPolicyTest"
+# recomputes it from this file and fails on a mismatch, naming both files;
+# "Tests/Functional/ContentSecurityPolicyRenderingTest" recomputes it from a
+# rendered page with the policy enforced.
+#
+# A site that overrides "page.headerData.10" allows its own script - by its
+# own hash - and a site whose "csp.yaml" sets "inheritDefault: false" does not
+# inherit the frontend scope this extends, and has to add the hash itself.
 #
 # It does two things, in this order and no other:
 #
