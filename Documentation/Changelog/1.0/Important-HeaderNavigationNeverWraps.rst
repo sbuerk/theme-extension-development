@@ -65,16 +65,23 @@ the default arrangement that is every width below 1184 pixels. On a wider
 screen a long site title takes more lines than before, beside a menu of one
 row. A single word longer than the row is not broken.
 
-The collapse needs the theme's script, so two degraded cases now reach up to
-the breakpoint of the arrangement instead of up to 768 pixels:
+The collapse needs the theme's script. **Without JavaScript** nothing
+collapses: below the breakpoint the list is stacked in the flow with every
+second level shown, and the header grows to the height of the whole menu -
+about 1730 pixels for the showcase with the default arrangement, at any width
+below 1184 pixels. It still fits the screen.
 
-*   **Without JavaScript** nothing collapses: below the breakpoint the list is
-    stacked in the flow with every second level shown, and the header grows to
-    the height of the whole menu - about 1730 pixels for the showcase with the
-    default arrangement, at any width below 1184 pixels. It still fits the
-    screen.
-*   **When the theme script fails to load** while the inline head script ran,
-    the menu is hidden below the breakpoint and its toggle opens nothing.
+**When the theme script fails** - it is not found, or it throws before it has
+bound the menu toggle, the display settings and the dialog openers - the page
+falls back to that same layout: the inline head script sets :html:`data-js`
+before first paint as before, and takes it back once the document is parsed
+unless :file:`theme.js` confirmed with :html:`data-js-bound`. The menu stays
+reachable. A failure in a later part of the script - a carousel, a lightbox -
+leaves the header as it is, and a script that runs late, loaded ``async`` for
+example, brings the collapsed menu back when it confirms. :file:`theme.js`
+itself stays a module without ``async``. A page whose script works is
+unchanged and never shows the expanded menu. A site that allows the inline head
+script by a Content Security Policy hash has to update the hash.
 
 A site whose menu is longer or shorter than the budget compiles the stylesheet
 with breakpoints of its own. They are Sass variables, because a media query
