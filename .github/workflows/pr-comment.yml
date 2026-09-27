@@ -57,7 +57,9 @@ jobs:
     # Only for runs that belong to a pull request — "ci.yml" also runs on
     # workflow_dispatch, where there is nothing to comment on.
     if: "github.event.workflow_run.event == 'pull_request'"
-    runs-on: ubuntu-latest
+    # A named version rather than "ubuntu-latest", like every job of "ci.yml" -
+    # see its header.
+    runs-on: ubuntu-26.04
     steps:
 
       - name: "Download the pull request context"
