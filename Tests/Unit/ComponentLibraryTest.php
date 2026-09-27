@@ -21,6 +21,15 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  */
 final class ComponentLibraryTest extends UnitTestCase
 {
+    /**
+     * The properties `establishesAContainingBlock()` knows, and so the ones a
+     * `will-change` may not name.
+     */
+    private const CONTAINING_BLOCK_PROPERTIES = [
+        'position', 'transform', 'translate', 'rotate', 'scale', 'perspective', 'transform-style', 'offset', 'offset-path',
+        'filter', 'backdrop-filter', 'contain', 'content-visibility', 'container', 'container-type',
+    ];
+
     private function stylesheet(): string
     {
         $file = dirname(__DIR__, 2) . '/Resources/Public/Css/theme.css';
@@ -719,79 +728,203 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
-     * No box between the site header and its controls slot is positioned, in
-     * any header variant and at any width.
+     * No box between the site header and the panels placed against it
+     * establishes a containing block, in any header variant and at any width.
      *
-     * The gate above holds the two panels to `position: static` components
-     * and to offsets of `100%`, which is the header's height only as long as
-     * the header is their containing block. Any positioned box between the
-     * two takes that role over, and it is a quiet takeover: the panels still
-     * open, still close and still end at a derived edge - of the wrong box.
-     * The `centred` variant did exactly that. Its title row was
-     * `position: relative` at every width, to anchor controls that were
-     * `position: absolute` from `bp.$md` up, and both panels opened inside
-     * the header, over the navigation row.
+     * Three panels are placed against `.theme-site-header` with
+     * `position: absolute`: the two of the controls slot, held to that by the
+     * gate above, and the collapsed main navigation, which drops as a band
+     * under the header below `bp.$md`. Their offsets of `100%` are the
+     * header's height only as long as the header is their containing block.
+     * Any box between the two that establishes one takes that role over, and
+     * it is a quiet takeover: the panels still open, still close and still
+     * end at a derived edge - of the wrong box. The `centred` variant did
+     * exactly that. Its title row was `position: relative` at every width, to
+     * anchor controls that were `position: absolute` from `bp.$md` up, and
+     * both panels opened inside the header, over the navigation row.
      *
-     * The boxes that can stand between the two are the rows
+     * **What establishes one.** Not only `position`. For an absolutely
+     * positioned box it is the nearest ancestor that establishes an absolute
+     * positioning containing block (CSS Positioned Layout 3, 2.1), and these
+     * do, each also for a fixed positioned box:
+     *
+     * - `transform` other than `none` (CSS Transforms 1, 3), and so do
+     *   `translate`, `rotate` and `scale` (CSS Transforms 2, 5),
+     *   `transform-style: preserve-3d` (7) and `perspective` (8);
+     *   `offset-path` other than `none` gives "all the usual effects of
+     *   having a transform" (Motion Path 1, 2.1);
+     * - `filter` other than `none` (Filter Effects 1, 5) and `backdrop-filter`
+     *   (Filter Effects 2, 2);
+     * - layout or paint containment (CSS Containment 2, 3.2 and 3.4) - so
+     *   `contain` naming `layout`, `paint`, `strict` or `content`, and
+     *   `content-visibility: auto` or `hidden` (4), which turn both on;
+     * - `will-change` naming any property of this list (CSS Will Change 1,
+     *   2);
+     * - `container-type: size` or `inline-size`, and the `container`
+     *   shorthand setting either. A size container applied layout
+     *   containment until csswg-drafts #10544 took it out in July 2024 (CSS
+     *   Conditional 5, 5.1), and the issue names "abspos/fixedpos" not
+     *   escaping as what that cost. Chromium 153, Firefox 155 and WebKit 26.6
+     *   no longer do it; the browser floor - Chrome 125, Firefox 125,
+     *   Safari 17.5 - is older than the change, so it counts.
+     *
+     * Every one of them but `content-visibility: hidden` was measured in
+     * those three engines, the pinned Playwright image, beside `opacity`,
+     * `clip-path`, `mask-image`, `isolation`, `mix-blend-mode`, `overflow`,
+     * `z-index` and `contain: size`, `inline-size` or `style`, which
+     * establish none and are not looked at. `position` is the one that does
+     * it for an absolutely positioned box only, and the one the component
+     * rules are allowed below. A value that cannot be read here - a `var()`,
+     * `inherit` - is a finding: the gate cannot prove it harmless. An
+     * `animation` naming keyframes that set one of these is one while it
+     * runs, so it is a finding too.
+     *
+     * **Which boxes.** From the header partials: the rows
      * (`.theme-site-header__inner` with any modifier), the meta band of
-     * `two-tier` (`.theme-site-header__meta`) and the slot itself
-     * (`.theme-site-header__actions`), so a rule that targets one of them may
-     * not set `position` to anything but `static`. "Targets" is the last
-     * compound of a selector: `.theme-site-header__actions .theme-button` is
-     * a rule for the button. A pseudo-element is not an ancestor of anything,
-     * so a compound naming one is left out. Media queries are not told apart,
-     * and do not need to be: the answer is the same at every width.
+     * `two-tier` (`.theme-site-header__meta`), the controls slot
+     * (`.theme-site-header__actions`), the main navigation (`.theme-nav-main`)
+     * and the two components (`.theme-dropdown` and `.theme-settings`), and
+     * the `::details-content` of the dropdown, which a `details` wraps around
+     * its panel. The element each of them is is read off the templates, not
+     * listed here.
      *
-     * The two components themselves are the other half. The gate above reads
-     * the one selector `.theme-site-header .theme-dropdown` (and
-     * `.theme-settings`) and checks it says `static`; a more specific rule
-     * inside the header - `.theme-site-header--two-tier .theme-settings
-     * { position: relative }` - passes that and wins over it, and anchors the
-     * panel on its own trigger again. So any rule with a
-     * `.theme-site-header` compound in its selector whose last compound is
-     * one of the two components (not one of their elements) may not set
-     * `position` to anything but `static` either.
+     * **Which rules.** "Targets" is the subject of a selector, its last
+     * compound: `.theme-site-header__actions .theme-button` is a rule for the
+     * button. A rule targets one of the boxes when its subject names one of
+     * their classes, or when it names no class at all and its element is one
+     * the boxes are - `.theme-site-header > div`, `header nav`, `details`,
+     * `*`. A rule counts wherever it is scoped, because what stands above the
+     * header is the page's business: `.theme-page div` reaches a row. The one
+     * exception is a parent named by a child combinator, because the parent
+     * of every box is known - the header or another box: `.theme-card > div`
+     * is no row, and neither is `.theme-card > .theme-dropdown`. Classes
+     * inside `:not()` and `:has()` do not narrow the subject, and each
+     * alternative of an `:is()` or a `:where()` is a subject of its own. A
+     * pseudo-element other than `::details-content` is no ancestor of
+     * anything and is left out. Media queries are not told apart, and do not
+     * need to be: the answer is the same at every width.
+     *
+     * The two components are allowed `position` outside the header - each
+     * anchors its own panel wherever it stands alone, and
+     * `.theme-site-header .theme-dropdown` sets it back to `static` in the
+     * header. A more specific rule inside the header -
+     * `.theme-site-header--two-tier .theme-settings { position: relative }` -
+     * passes the gate above and wins over it, so a rule with a
+     * `.theme-site-header` compound before a component subject may not set
+     * `position` to anything but `static`. Nothing sets the other properties
+     * back, so for those every rule on a component counts.
+     *
+     * What this cannot see: a box between that carries a class not listed
+     * here, which the markup would have to gain first - the list then needs a
+     * line, which is a review of one line rather than a silent pass - a
+     * property this list does not know yet, and a declaration that is not in
+     * the bundle at all: a `style` attribute, or one a script sets.
      */
     #[Test]
-    public function noBoxBetweenTheHeaderAndItsControlsIsPositioned(): void
+    public function noBoxBetweenTheHeaderAndItsPanelsIsAContainingBlock(): void
     {
-        $between = ['.theme-site-header__inner', '.theme-site-header__meta', '.theme-site-header__actions'];
+        $between = [
+            'theme-site-header__inner',
+            'theme-site-header__meta',
+            'theme-site-header__actions',
+            'theme-nav-main',
+            'theme-dropdown',
+            'theme-settings',
+        ];
         $components = ['theme-dropdown', 'theme-settings'];
 
+        // The elements the boxes are, from the markup: an element-shaped rule
+        // reaches a box by the element name, so the names have to be the ones
+        // the templates write, not the ones they wrote when this was added.
+        $elements = [];
+        $templates = new \RegexIterator(
+            new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(dirname(__DIR__, 2) . '/Resources/Private')),
+            '/\.html$/',
+        );
+        foreach ($templates as $template) {
+            preg_match_all('/<([a-z][a-z0-9-]*)\s[^>]*?\bclass="([^"]*)"/s', (string)file_get_contents((string)$template), $tags, PREG_SET_ORDER);
+            foreach ($tags as [, $element, $classes]) {
+                if (self::boxesNamed(preg_split('/\s+/', trim($classes)) ?: [], $between) !== []) {
+                    $elements[strtolower($element)] = true;
+                }
+            }
+        }
+        $elements = array_keys($elements);
+        $this->assertNotEmpty($elements, 'No template carries a box between the header and its panels - the list above is out of date.');
+
+        $keyframes = $this->keyframesEstablishingAContainingBlock();
+
         $seen = [];
-        $positioned = [];
+        $findings = [];
         foreach ($this->rules() as [$selectors, $declarations]) {
-            foreach (array_map('trim', explode(',', $selectors)) as $selector) {
-                $compounds = preg_split('/\s*[\s>+~]\s*/', $selector) ?: [];
-                $target = (string)end($compounds);
-                if (str_contains($target, '::')) {
-                    continue;
+            foreach (self::splitTopLevel($selectors, ',') as $selector) {
+                $compounds = self::compounds($selector);
+                $ancestors = implode(' ', array_slice($compounds, 0, -1));
+
+                // A parent named by a child combinator is known: every box
+                // is a child of the header or of another box. A parent with
+                // classes, none of them the header's or a box's, is somewhere
+                // else - ".theme-input-group > :hover" is no row.
+                $last = (string)end($compounds);
+                if (str_ends_with(rtrim(substr($selector, 0, -strlen($last))), '>')) {
+                    preg_match_all('/\.(-?[_a-zA-Z][\w-]*)/', self::withoutPseudoClassArguments($compounds[count($compounds) - 2], ['not', 'has']), $parentClasses);
+                    $headerClasses = array_filter(
+                        $parentClasses[1],
+                        static fn(string $class): bool => str_starts_with($class, 'theme-site-header') || self::boxesNamed([$class], $between) !== [],
+                    );
+                    if ($parentClasses[1] !== [] && $headerClasses === []) {
+                        continue;
+                    }
                 }
 
-                $names = array_filter($between, static fn(string $class): bool => str_contains($target, $class));
-                $seen += array_fill_keys($names, true);
+                foreach (self::subjectAlternatives($last) as $subject) {
+                    // A pseudo-element is its own box, and only one of them is
+                    // an ancestor of a panel.
+                    $pseudoElement = null;
+                    if (preg_match('/::?([a-z-]+)$/', $subject, $pseudo) === 1
+                        && (str_contains($subject, '::') || in_array($pseudo[1], ['before', 'after', 'first-line', 'first-letter'], true))
+                    ) {
+                        $pseudoElement = $pseudo[1];
+                        $subject = substr($subject, 0, -strlen($pseudo[0]));
+                    }
+                    if ($pseudoElement !== null && $pseudoElement !== 'details-content') {
+                        continue;
+                    }
 
-                // One of the two components, inside the header: a class of
-                // the last compound that is the component or a modifier of
-                // it, and a class of the header block anywhere before it.
-                preg_match_all('/\.([\w-]+)/', $target, $targetClasses);
-                preg_match_all('/\.([\w-]+)/', implode(' ', array_slice($compounds, 0, -1)), $ancestorClasses);
-                $isComponent = array_filter(
-                    $targetClasses[1],
-                    static fn(string $class): bool => in_array(preg_replace('/--[\w-]+$/', '', $class), $components, true),
-                ) !== [];
-                $insideTheHeader = array_filter(
-                    $ancestorClasses[1],
-                    static fn(string $class): bool => str_starts_with($class, 'theme-site-header'),
-                ) !== [];
+                    preg_match_all('/\.(-?[_a-zA-Z][\w-]*)/', $subject, $classes);
+                    $boxes = self::boxesNamed($classes[1], $between);
+                    $seen += array_fill_keys($boxes, true);
 
-                if ($names === [] && !($isComponent && $insideTheHeader)) {
-                    continue;
-                }
-                foreach ($declarations as $declaration) {
-                    [$property, $value] = array_pad(array_map('trim', explode(':', $declaration, 2)), 2, '');
-                    if ($property === 'position' && $value !== 'static') {
-                        $positioned[] = sprintf('%s { position: %s }', $selector, $value);
+                    // Element-shaped: no class, and an element the boxes are,
+                    // or none at all. A keyframe selector ("to", "50%"), an
+                    // at-rule, an id - no box has one - and ":root" are none
+                    // of the boxes.
+                    $elementShaped = false;
+                    if ($classes[1] === [] && !str_contains($subject, '#') && !str_contains($subject, ':root')
+                        && preg_match('/^(\*|[a-zA-Z][\w-]*)?(?:$|[\[:])/', $subject, $type) === 1
+                    ) {
+                        $name = strtolower($type[1] ?? '');
+                        $elementShaped = $name === '' || $name === '*' || in_array($name, $elements, true);
+                    }
+                    if ($boxes === [] && !$elementShaped) {
+                        continue;
+                    }
+
+                    // One of the two components and nothing else: allowed to
+                    // anchor its own panel, unless the rule is inside the header.
+                    $componentAnchor = $pseudoElement === null
+                        && $boxes !== []
+                        && array_diff($boxes, $components) === []
+                        && !str_contains($ancestors, '.theme-site-header');
+
+                    foreach ($declarations as $declaration) {
+                        [$property, $value] = array_pad(array_map('trim', explode(':', $declaration, 2)), 2, '');
+                        if ($componentAnchor && strtolower($property) === 'position') {
+                            continue;
+                        }
+                        if (self::establishesAContainingBlock($property, $value, $keyframes)) {
+                            $findings[] = sprintf('%s { %s: %s }', $selector, $property, $value);
+                        }
                     }
                 }
             }
@@ -800,15 +933,205 @@ final class ComponentLibraryTest extends UnitTestCase
         $this->assertSame(
             $between,
             array_values(array_intersect($between, array_keys($seen))),
-            'A box between the header and its controls is not styled at all any more - the list above is out of date.',
+            'A box between the header and its panels is not styled at all any more - the list above is out of date.',
         );
         $this->assertSame(
             [],
-            $positioned,
-            'A positioned box between ".theme-site-header" and the panels of its controls slot - a row, the meta band, '
-            . 'the slot or one of the two components - becomes their containing block, and they open inside the header '
-            . 'instead of under it.',
+            array_values(array_unique($findings)),
+            'A box between ".theme-site-header" and the panels placed against it - a row, the meta band, the controls slot, '
+            . 'the main navigation or one of the two components - establishes a containing block, and the panels open '
+            . 'against it, inside the header, instead of under it.',
         );
+    }
+
+    /**
+     * Whether a declaration makes its box establish a containing block for
+     * an absolutely positioned descendant - see
+     * `noBoxBetweenTheHeaderAndItsPanelsIsAContainingBlock()` for the
+     * specifications. A value that cannot be read is a yes.
+     *
+     * @param list<string> $keyframes names of keyframes that set one of these
+     */
+    private static function establishesAContainingBlock(string $property, string $value, array $keyframes = []): bool
+    {
+        $property = self::unprefixed(strtolower(trim($property)));
+        $value = strtolower(trim((string)preg_replace('/\s*!important\s*$/i', '', $value)));
+
+        // The initial value of every property below is the one that
+        // establishes nothing, and none of them is inherited.
+        if (in_array($value, ['initial', 'unset', 'revert'], true)) {
+            return false;
+        }
+        $unreadable = str_contains($value, 'var(') || in_array($value, ['inherit', 'revert-layer'], true);
+        $words = array_map(self::unprefixed(...), preg_split('/[\s,]+/', $value) ?: []);
+
+        return match ($property) {
+            'position' => $value !== 'static',
+            'transform', 'translate', 'rotate', 'scale', 'perspective', 'offset-path', 'filter', 'backdrop-filter' => $value !== 'none',
+            'offset' => !in_array($value, ['none', 'normal', 'auto'], true),
+            'transform-style' => $unreadable || in_array('preserve-3d', $words, true),
+            'contain' => $unreadable || array_intersect($words, ['layout', 'paint', 'strict', 'content']) !== [],
+            'content-visibility' => $unreadable || array_intersect($words, ['auto', 'hidden']) !== [],
+            'container-type' => $unreadable || array_intersect($words, ['size', 'inline-size']) !== [],
+            'container' => $unreadable || array_intersect(preg_split('/\s+/', trim((string)strstr($value, '/'), '/ ')) ?: [], ['size', 'inline-size']) !== [],
+            'will-change' => $unreadable || array_intersect($words, self::CONTAINING_BLOCK_PROPERTIES) !== [],
+            'animation', 'animation-name' => $unreadable || array_intersect($words, $keyframes) !== [],
+            default => false,
+        };
+    }
+
+    private static function unprefixed(string $name): string
+    {
+        return (string)preg_replace('/^-(?:webkit|moz|ms|o)-/', '', $name);
+    }
+
+    /**
+     * The names of the keyframes of the bundle that set a property which
+     * establishes a containing block.
+     *
+     * @return list<string>
+     */
+    private function keyframesEstablishingAContainingBlock(): array
+    {
+        preg_match_all('/@(?:-webkit-)?keyframes\s+([\w-]+)\s*\{((?:[^{}]*\{[^{}]*\})*)[^{}]*\}/', $this->stylesheet(), $blocks, PREG_SET_ORDER);
+
+        $names = [];
+        foreach ($blocks as [, $name, $frames]) {
+            foreach (explode(';', (string)preg_replace('/[^{}]*\{([^{}]*)\}/', '$1;', $frames)) as $declaration) {
+                [$property, $value] = array_pad(array_map('trim', explode(':', $declaration, 2)), 2, '');
+                if ($property !== '' && self::establishesAContainingBlock($property, $value)) {
+                    $names[] = strtolower($name);
+                    break;
+                }
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * Those of `$boxes` a list of class names names - the class itself, or a
+     * modifier of it.
+     *
+     * @param list<string> $classes
+     * @param list<string> $boxes
+     * @return list<string>
+     */
+    private static function boxesNamed(array $classes, array $boxes): array
+    {
+        return array_values(array_filter(
+            $boxes,
+            static fn(string $box): bool => array_filter(
+                $classes,
+                static fn(string $class): bool => $class === $box || str_starts_with($class, $box . '--'),
+            ) !== [],
+        ));
+    }
+
+    /**
+     * A selector's compounds, split at its combinators - but not inside the
+     * parentheses of a pseudo-class, an attribute selector or a string.
+     *
+     * @return list<string>
+     */
+    private static function compounds(string $selector): array
+    {
+        return array_values(array_filter(
+            self::splitTopLevel($selector, " \t\n>+~"),
+            static fn(string $compound): bool => $compound !== '',
+        ));
+    }
+
+    /**
+     * A compound as the alternatives it matches: the arguments of `:not()`
+     * and `:has()` removed, because they do not say what the subject is, and
+     * each argument of an `:is()` or a `:where()` a compound of its own.
+     *
+     * @return list<string>
+     */
+    private static function subjectAlternatives(string $compound): array
+    {
+        $compound = self::withoutPseudoClassArguments($compound, ['not', 'has']);
+
+        if (preg_match('/:(?:is|where)\(/', $compound, $match, PREG_OFFSET_CAPTURE) !== 1) {
+            return [$compound];
+        }
+        $start = $match[0][1];
+        $open = $start + strlen($match[0][0]);
+        $end = self::closingParenthesis($compound, $open - 1);
+        $before = substr($compound, 0, $start);
+        $after = substr($compound, $end + 1);
+
+        $alternatives = [];
+        foreach (self::splitTopLevel(substr($compound, $open, $end - $open), ',') as $argument) {
+            $argumentCompounds = self::compounds($argument);
+            foreach (self::subjectAlternatives($before . (string)end($argumentCompounds) . $after) as $alternative) {
+                $alternatives[] = $alternative;
+            }
+        }
+
+        return $alternatives;
+    }
+
+    /**
+     * @param list<string> $names
+     */
+    private static function withoutPseudoClassArguments(string $compound, array $names): string
+    {
+        while (preg_match('/:(?:' . implode('|', $names) . ')\(/', $compound, $match, PREG_OFFSET_CAPTURE) === 1) {
+            $open = $match[0][1] + strlen($match[0][0]) - 1;
+            $compound = substr($compound, 0, $match[0][1]) . substr($compound, self::closingParenthesis($compound, $open) + 1);
+        }
+
+        return $compound;
+    }
+
+    private static function closingParenthesis(string $value, int $open): int
+    {
+        $depth = 0;
+        for ($position = $open, $length = strlen($value); $position < $length; $position++) {
+            if ($value[$position] === '(') {
+                $depth++;
+            } elseif ($value[$position] === ')' && --$depth === 0) {
+                return $position;
+            }
+        }
+
+        return $length - 1;
+    }
+
+    /**
+     * `$value` split at every character of `$separators` that stands outside
+     * parentheses, brackets and quotes, each part trimmed.
+     *
+     * @return list<string>
+     */
+    private static function splitTopLevel(string $value, string $separators): array
+    {
+        $parts = [];
+        $current = '';
+        $depth = 0;
+        $quote = null;
+
+        foreach (str_split($value) as $character) {
+            if ($quote !== null) {
+                $quote = $character === $quote ? null : $quote;
+            } elseif ($character === '"' || $character === "'") {
+                $quote = $character;
+            } elseif ($character === '(' || $character === '[') {
+                $depth++;
+            } elseif ($character === ')' || $character === ']') {
+                $depth--;
+            } elseif ($depth === 0 && str_contains($separators, $character)) {
+                $parts[] = trim($current);
+                $current = '';
+                continue;
+            }
+            $current .= $character;
+        }
+        $parts[] = trim($current);
+
+        return $parts;
     }
 
     /**

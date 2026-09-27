@@ -1578,8 +1578,10 @@ the flow with `position: absolute` in a `position: relative` row, which put the
 title 48 pixels off centre, let the box of a long title reach 18 pixels under
 the controls — so a title whose line fills that box ran under them — and,
 worse, captured both panels of the slot, which then opened inside the header.
-No box between the header and its controls slot is positioned in any variant,
-and `ComponentLibraryTest::noBoxBetweenTheHeaderAndItsControlsIsPositioned`
+No box between the header and its panels establishes a containing block in
+any variant — not by `position`, and not by a `transform`, a `filter`,
+containment or any of the other properties that do it as well — and
+`ComponentLibraryTest::noBoxBetweenTheHeaderAndItsPanelsIsAContainingBlock`
 holds that. The title carries its own `text-align: center`; on the row it was
 inherited by the controls slot and centred the text of both panels. See
 [the header dropdown](../architecture/navigation.md#the-header-dropdown-is-a-details-and-was-a-popover).
