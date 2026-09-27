@@ -184,8 +184,17 @@
 // the brand less than its longest word with seven entries at 768 pixels and
 // the row spilled sideways. 50% is what the two controls leave, checked at 768
 // and at 900 pixels by "Tests/Acceptance/frontend.spec.ts".
+//
+// The default arrangement only. The three variants give the navigation a row
+// it does not share with the controls, and this cap was written as
+// ".theme-site-header .theme-nav-main" and reached them all the same: between
+// the two breakpoints a menu of seven entries that fits its own row in one
+// line wrapped into half of it instead - 4+3 at 1008 pixels and 3+3+1 at 900
+// and 768 - and the second level of a first row entry opened over the entries
+// that had wrapped under it. A variant is a modifier on the header, so the
+// default is the header that carries none of the three.
 @media (min-width: bp.$md) and (max-width: bp.$lg-max) {
-    .theme-site-header .theme-nav-main {
+    .theme-site-header:not(.theme-site-header--centred, .theme-site-header--actions, .theme-site-header--two-tier) .theme-nav-main {
         flex: none;
         max-inline-size: 50%;
     }
