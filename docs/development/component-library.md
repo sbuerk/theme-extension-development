@@ -1547,12 +1547,14 @@ Two degraded cases grow with it:
   `flex: none` on the navigation is set only where the menu is a row for that
   reason: set everywhere, it kept the stacked list as wide as its widest
   entry, and `simple` scrolled sideways by 96 pixels at 375.
-- **The inline head script ran, `theme.js` did not.** `data-js` is set, so the
-  list is hidden below the breakpoint, and the toggle is not bound and opens
-  nothing: the menu cannot be reached. That was true below `bp.$md` before; it
-  is true up to the arrangement's breakpoint now.
+- **The inline head script ran, `theme.js` did not.** The head script takes
+  `data-js` back at `DOMContentLoaded` unless `theme.js` confirmed it with
+  `data-js-bound`, so the page falls back to the layout without a script: the
+  menu open, the dead toggle and the cog hidden. Before that, the menu was
+  hidden behind a toggle that opened nothing, up to the arrangement's
+  breakpoint — see [the marker is a promise](appearance-switching.md#the-marker-is-a-promise).
 
-Both are the price of a menu that never wraps; neither is redesigned here.
+The first is the price of a menu that never wraps.
 
 #### Header variants
 
@@ -1952,6 +1954,16 @@ asserts every compiled collapse rule — the one at `bp.$md` and the four of
 the header — stays gated behind `[data-js]`: inverting one is a one-character
 change with no visible symptom on a desktop check.
 
+The marker is set by the inline head script before first paint and **taken
+back** at `DOMContentLoaded` unless `theme.js` confirmed it with
+`data-js-bound` once the settings, the toggles and the dialog openers are
+bound — so a script that is not found or throws before that leaves the
+no-script layout, not a hidden menu behind a toggle that opens nothing. The
+binders after the confirmation are isolated, and a late confirmation sets
+`data-js` again. No stylesheet rule reads `data-js-bound`:
+it is set after first paint. See
+[the marker is a promise](appearance-switching.md#the-marker-is-a-promise).
+
 ## Components that need the script
 
 `theme.js` binds nine groups in all. Seven of them are the components in the
@@ -2263,6 +2275,7 @@ documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 |-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `everyComponentIsPartOfTheBundle`                                       | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.                                                                                                                                                 |
 | `collapsingTheMainNavigationRequiresTheScriptMarker`                    | The `[data-js]` gate on the navigation collapse still holds, at `bp.$md` and in every header arrangement — see [the `data-js` marker](#the-data-js-marker).                                                                                                                                                                                         |
+| `theModuleConfirmsTheScriptMarkerOnceTheGatedControlsAreBound`          | `theme.js` sets `data-js` and `data-js-bound` once, after the settings, the toggle and the dialog binders, runs every later binder isolated, has no top-level `await` and is not included `async`; no stylesheet rule reads `data-js-bound` — see [the marker is a promise](appearance-switching.md#the-marker-is-a-promise).                       |
 | `theTopLevelOfTheMainNavigationNeverWraps`                              | No rule whose subject is the top level list of the main navigation sets `flex-wrap` or `flex-flow` to wrap — see [header variants](#header-variants).                                                                                                                                                                                               |
 | `neitherTheTitleNorTheMenuOfTheHeaderIsCapped`                          | No `max-inline-size` or `max-width` on the site title, the main navigation or its top level list; the title keeps `min-inline-size: min-content` and can shrink; the navigation of each arrangement is `flex: none` exactly where its toggle is hidden, and no other rule under any scope sets how it flexes.                                       |
 | `everyHeaderArrangementCollapsesTheMainNavigationAtABreakpointOfItsOwn` | Every header arrangement read from the partials expands its menu from one `min-width` above `bp.$md` and collapses it exactly one pixel below, and no rule in a width media query reaches the menu without naming the header.                                                                                                                       |

@@ -276,6 +276,80 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
+     * `data-js` is set by the inline head script before first paint, and
+     * taken back at `DOMContentLoaded` unless `theme.js` confirmed with
+     * `data-js-bound` - `Tests/Functional/AppearanceRenderingTest` holds the
+     * head script to its half. This is the other half.
+     *
+     * **Where it confirms.** Once, right after the last binder of the
+     * controls the stylesheet gates on `data-js`: the display settings, the
+     * menu toggle and the dialog openers (`components/_dialog.scss`). A throw
+     * before that leaves the confirmation unset and the page falls back to
+     * its layout without a script. Every binder after it - tabs, lightboxes,
+     * embeds, tooltips, carousels, dropdowns, each following a marker of its
+     * own or none - runs inside a `try` of its own, so a throw in one of them
+     * cannot take a working header back to the no-script layout; confirming
+     * as the last statement of the file did exactly that.
+     *
+     * **`data-js` again, first.** The confirmation sets `data-js` as well,
+     * directly before `data-js-bound`. A module that runs after
+     * `DOMContentLoaded` - loaded `async` by an optimiser, or on a page whose
+     * policy blocked the head script - then brings the collapsed menu back
+     * instead of leaving the page in its no-script layout for good.
+     *
+     * **When it runs.** The head script can only decide at `DOMContentLoaded`
+     * because the module is deferred: parser-inserted, `type=module`, no
+     * `async`. So the include in `Appearance.typoscript` carries no `async`,
+     * and the file has no top-level `await`, which would let the event fire
+     * while it waits.
+     *
+     * And no stylesheet rule reads `data-js-bound`. It is set after first
+     * paint on every page that works, so a rule gated on it would bring back
+     * the flash of the expanded menu that setting `data-js` inline exists to
+     * prevent - 36 frames and a layout shift of 0.93 measured with the module
+     * 600 ms late. The collapse rules stay on `data-js`, which is what
+     * `collapsingTheMainNavigationRequiresTheScriptMarker` holds.
+     */
+    #[Test]
+    public function theModuleConfirmsTheScriptMarkerOnceTheGatedControlsAreBound(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $script = (string)file_get_contents($root . '/Resources/Public/JavaScript/theme.js');
+        $lines = explode("\n", str_replace("\r\n", "\n", $script));
+
+        $confirmation = "root.setAttribute('data-js', '');\nroot.setAttribute('data-js-bound', '');";
+        $this->assertSame(1, substr_count($script, "setAttribute('data-js-bound'"), '"theme.js" does not confirm the marker exactly once.');
+        $at = strpos($script, $confirmation);
+        $this->assertIsInt($at, '"theme.js" does not set "data-js" again directly before "data-js-bound", at the top level.');
+
+        // The gated controls are bound before it, at the top level.
+        foreach ([
+            "document.querySelectorAll('.theme-settings').forEach(bindDisplaySettings);",
+            'bindMainMenuToggle();',
+            'bindDialogs();',
+        ] as $binder) {
+            $position = strpos($script, "\n" . $binder . "\n");
+            $this->assertIsInt($position, sprintf('"%s" is not a statement of the top level of "theme.js".', $binder));
+            $this->assertLessThan($at, $position, sprintf('"theme.js" confirms the marker before "%s".', $binder));
+        }
+
+        // After it, no binder is called bare at the top level: each runs in
+        // the isolating loop.
+        $after = substr($script, $at + strlen($confirmation));
+        $this->assertSame(0, preg_match('/^bind\w+\(\);$/m', $after), 'A binder after the confirmation is called outside the "try" that isolates it.');
+        $this->assertMatchesRegularExpression('/^for \(const bind of \[(?:bind\w+, )*bind\w+\]\) \{\n    try \{\n        bind\(\);\n    \} catch \(error\) \{\n        reportError\(error\);/m', $after);
+
+        // Deferred: no top-level "await", no "async" include.
+        $topLevelAwait = array_values(array_filter($lines, static fn(string $line): bool => preg_match('/^(?![\s\/*]).*\bawait\b/', $line) === 1));
+        $this->assertSame([], $topLevelAwait, '"theme.js" awaits at the top level, which lets "DOMContentLoaded" fire before it has run.');
+        $typoscript = (string)file_get_contents($root . '/Configuration/TypoScript/Appearance.typoscript');
+        $this->assertMatchesRegularExpression('/^page\.includeJSFooter\.theme\.type = module$/m', $typoscript);
+        $this->assertSame(0, preg_match('/^page\.includeJSFooter\.theme\.(async|defer)\b/m', $typoscript), '"theme.js" is included "async" - it has to be a deferred, parser-inserted module.');
+
+        $this->assertStringNotContainsString('data-js-bound', $this->stylesheet(), 'A stylesheet rule reads "data-js-bound", which is only set after first paint.');
+    }
+
+    /**
      * The CType outline is a development affordance and has to leave without
      * a trace on a production site - the label included.
      *

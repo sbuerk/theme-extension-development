@@ -128,10 +128,12 @@ rather than `f:asset.script`, because the asset collector is free to move a
 script to the end of the body — and a stored dark appearance would then paint
 light first, which is the exact flash this script exists to prevent.
 
-It does two things, in this order, and the order is load-bearing:
+It does three things, in this order, and the order is load-bearing:
 
 1. sets `data-js` on the root, **unconditionally and first**;
-2. reads the stored appearance, palette and content outline from
+2. arms the take-back of that marker for a `theme.js` that does not do its
+   job — see [below](#the-marker-is-a-promise);
+3. reads the stored appearance, palette and content outline from
    `localStorage` and applies them, each wrapped in its own `try`/`catch`.
 
 ```js
@@ -140,6 +142,12 @@ var root = document.documentElement;
 // First act, unconditionally: nothing below may run before this,
 // and nothing below may prevent it from having run.
 root.setAttribute('data-js', '');
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (!root.hasAttribute('data-js-bound')) {
+        root.removeAttribute('data-js');
+    }
+});
 
 try {
     var appearance = window.localStorage.getItem('theme-appearance');
@@ -170,6 +178,82 @@ every page, for the rest of that visit. The navigation is still usable in that
 state (it is the same layout a visitor with JavaScript disabled sees), but the
 enhancement and the settings are both gone, silently, until a page load that
 does not hit the storage exception.
+
+### The marker is a promise
+
+`data-js` says "a script will operate the controls", and the stylesheet acts
+on it before first paint: the main navigation collapses behind its toggle, the
+cog appears. The controls are bound by `theme.js`, though, and when that does
+not happen — the file is not found, the network fails, it throws before it
+gets to the toggles, the browser cannot run a module — the page used to keep a
+hidden menu behind a toggle that opens nothing. Since the header collapses its
+menu at a breakpoint of its own per arrangement, that is every width below
+1184 pixels for the default one.
+
+So `theme.js` confirms: it sets `data-js-bound` on the root once the controls
+the stylesheet gates on `data-js` are bound — the display settings, the menu
+toggle and the dialog openers. And the head script takes `data-js` back at
+`DOMContentLoaded` when the confirmation is not there. A module script without
+`async` is deferred, and the parser runs every deferred script — or reports
+that it failed — before it fires `DOMContentLoaded`, so by then the answer is
+final, and the page falls back to the layout it has without a script: an open
+menu, no cog.
+
+Two things keep that from costing a page that works:
+
+- **The binders after the confirmation are isolated.** Tabs, lightboxes,
+  embeds, tooltips, carousels and dropdowns follow markers of their own, or
+  none; each runs in a `try` of its own and reports what it throws. A broken
+  carousel no longer takes the header back to its no-script layout, which
+  confirming as the last statement of the file did.
+- **The confirmation sets `data-js` again**, directly before `data-js-bound`.
+  A module that runs after `DOMContentLoaded` — loaded `async` by an
+  optimiser, or on a page whose policy blocked the head script — brings the
+  collapsed menu back with one layout shift instead of leaving the no-script
+  layout for good.
+
+That is also why `theme.js` stays a parser-inserted `type=module` without
+`async`, and without a top-level `await`: either would let `DOMContentLoaded`
+fire before it has run, and every page would pay the shift.
+
+Measured on the showcase at 1000 pixels in Chromium, the stylesheet collapsing
+the menu there, three ways:
+
+| Approach                                      | Page that works, module 600 ms late          | `theme.js` 404, or throws before the toggles        |
+|-----------------------------------------------|----------------------------------------------|-----------------------------------------------------|
+| `data-js` inline, nothing else (before)       | collapsed from the first frame, shift 0      | menu hidden, toggle opens nothing                   |
+| `data-js` set by `theme.js` only              | 1733 px of open menu for 36 frames, CLS 0.93 | menu open                                           |
+| `data-js` inline, taken back without `-bound` | collapsed from the first frame, shift 0      | menu open; one shift of 0.93 if the failure is late |
+
+The third is what ships. Its one layout shift happens only on a page whose
+script failed, and only when the failure arrives after first paint. Two more
+were rejected without a measurement: a timer takes a slow but working script's
+marker away, or leaves the dead menu standing until it fires, whatever its
+bound; an `onerror` attribute on the script element needs `'unsafe-hashes'`
+under a Content Security Policy and sees a load error only — a module that
+throws has loaded fine.
+
+The take-back lives in the same inline script, so it adds no script element and
+no event handler attribute. The theme ships no Content Security Policy, and the
+inline script carries no nonce: with the core's frontend policy enforced
+(`security.frontend.enforceContentSecurityPolicy`, off by default in v13), it
+is blocked as it was before this change, and the page renders without
+`data-js` — the same fallback layout. A site that allows the script by hash
+has to update the hash, because the script's text changed.
+
+`Tests/Functional/AppearanceRenderingTest::theNoFlashScriptTakesTheMarkerBackUnlessTheModuleConfirmsIt`
+holds the head script to its half, and
+`Tests/Unit/ComponentLibraryTest::theModuleConfirmsTheScriptMarkerOnceTheGatedControlsAreBound`
+holds `theme.js` to its own — confirmed once, after the settings, the toggle
+and the dialogs, with `data-js` set again first, every later binder in the
+isolating loop, no top-level `await`, no `async` include, and read by no
+stylesheet rule, since a rule gated on it would bring the flash back.
+`Tests/Acceptance/frontend.spec.ts` serves `theme.js` as a 404 and as a module
+that throws before the toggles are bound, at 1000 and 375 pixels; makes the
+carousel binder throw and requires a collapsed menu that still opens; runs
+the module only after the page has loaded and requires the collapsed menu
+back; and checks a working page with the module 600 ms late frame by
+frame.
 
 ## The settings control is hidden until `data-js`
 
