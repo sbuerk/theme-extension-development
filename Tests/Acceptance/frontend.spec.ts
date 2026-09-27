@@ -58,6 +58,205 @@ const trees = [
     { name: 'sys_template tree', prefix: '/legacy' },
 ];
 
+/**
+ * The width from which each arrangement of the site header holds its main
+ * navigation in one row, in pixels at the default root size: the
+ * "bp.$header-*" breakpoints of "abstracts/_breakpoints.scss". One pixel below,
+ * the menu is behind its toggle. Written down here rather than read off the
+ * page, because what is under test is that the stylesheet switches where the
+ * budget says it does - "layout/_site-header.scss" has the measurements.
+ */
+const headerBreakpoints = {
+    'simple': 74 * 16,
+    'centred': 55 * 16,
+    'actions': 55 * 16,
+    'two-tier': 65 * 16,
+};
+const headerArrangements = ['simple', 'centred', 'actions', 'two-tier'] as const;
+
+/**
+ * The page's own header, rearranged into one of the three other variants.
+ *
+ * The instance renders one variant per site, and the specimens of the
+ * styleguide section `chrome` - the only other headers a browser sees - sit
+ * in the content column with three entries and no second level, so they
+ * measure neither the width a real header has nor the menu it holds. So the
+ * specimen of the variant lends its rows, and the page's own header lends
+ * what goes into them: its title, its main navigation with the seven top
+ * level entries of the showcase and their second levels, and its controls
+ * slot. The elements are moved, not copied, so the menu toggle, the language
+ * dropdown and the display settings stay bound by the script of the page.
+ *
+ * The rows are the specimen's, not written out here: the specimens are held
+ * to the classes of the variant partials by
+ * `ComponentLibraryTest::theChromeSpecimensCarryEveryClassTheirPartialsWrite`,
+ * and a skeleton typed into this file would be held to nothing. `actions`
+ * keeps the call to action of its specimen, since the instance configures
+ * none. `simple` is the page's header as it is.
+ */
+const arrangeHeader = async (page: Page, variant: string) => {
+    await page.evaluate((variant) => {
+        if (variant === 'simple') {
+            return;
+        }
+        const pageHeader = document.querySelector('.theme-page > .theme-site-header');
+        const specimen = [...document.querySelectorAll('#chrome .theme-site-header')]
+            .find((header) => header.classList.contains(`theme-site-header--${variant}`));
+        if (pageHeader === null || specimen === undefined) {
+            throw new Error(`There is no page header, or no "${variant}" specimen to take the rows from - is this "/styleguide"?`);
+        }
+        const header = specimen.cloneNode(true) as HTMLElement;
+        for (const selector of ['.theme-site-header__brand', 'nav.theme-nav-main', '.theme-site-header__actions']) {
+            const slot = header.querySelector(selector);
+            const content = pageHeader.querySelector(selector);
+            if (slot === null || content === null) {
+                throw new Error(`"${selector}" is missing from the "${variant}" specimen or from the page header.`);
+            }
+            slot.replaceWith(content);
+        }
+        pageHeader.replaceWith(header);
+    }, variant);
+};
+
+/**
+ * The page's header holds its main navigation as one row of the seven top
+ * level entries of the showcase: the toggle is not offered, nothing of any
+ * row of the header reaches out of the row's content box - a menu that does
+ * not wrap and does not fit spills instead, which is what this looks for -
+ * and the title is not squeezed below its longest word.
+ *
+ * `width` also holds the page to no sideways scroll; `null` leaves that out,
+ * on a page whose own content is not what is under test.
+ */
+const expectTheMenuInOneRow = async (page: Page, width: number | null) => {
+    const header = page.locator('.theme-page > .theme-site-header');
+    await expect(header.locator('.theme-nav-main__toggle')).toBeHidden();
+
+    const measured = await header.evaluate((element) => {
+        const spills: string[] = [];
+        element.querySelectorAll('.theme-site-header__inner').forEach((row) => {
+            const style = getComputedStyle(row);
+            const box = row.getBoundingClientRect();
+            const start = box.left + parseFloat(style.paddingLeft);
+            const end = box.right - parseFloat(style.paddingRight);
+            [...row.children].forEach((child) => {
+                const other = child.getBoundingClientRect();
+                if (other.width > 0 && (other.left < start - 0.5 || other.right > end + 0.5)) {
+                    spills.push(`${child.className} (${other.left}..${other.right}) outside ${start}..${end}`);
+                }
+            });
+        });
+        const links = [...element.querySelectorAll('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link')]
+            .map((link) => link.getBoundingClientRect());
+        let overlapping = 0;
+        links.forEach((link, index) => links.slice(index + 1).forEach((other) => {
+            if (!(link.right <= other.left || other.right <= link.left || link.bottom <= other.top || other.bottom <= link.top)) {
+                overlapping++;
+            }
+        }));
+        const brand = element.querySelector('.theme-site-header__brand');
+        return {
+            spills,
+            entries: links.length,
+            rows: new Set(links.map((link) => Math.round(link.top))).size,
+            overlapping,
+            squeezed: brand === null ? 1 : brand.scrollWidth - brand.clientWidth,
+        };
+    });
+
+    expect.soft(measured.spills, 'what reaches out of a row of the header').toEqual([]);
+    // The budget the breakpoints are sized for. A showcase with more entries
+    // needs the breakpoints measured again, and this says so first.
+    expect.soft(measured.entries, 'top level entries').toBe(7);
+    expect.soft(measured.rows, 'rows of top level entries').toBe(1);
+    expect.soft(measured.overlapping, 'pairs of top level entries on top of each other').toBe(0);
+    expect.soft(measured.squeezed, 'pixels of the title outside its own box').toBeLessThanOrEqual(0);
+    if (width !== null) {
+        expect.soft(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    }
+};
+
+/**
+ * The page's header has its main navigation behind the toggle, and the
+ * toggle opens it as a band under the whole header.
+ */
+const expectTheMenuBehindItsToggle = async (page: Page, width: number | null) => {
+    const header = page.locator('.theme-page > .theme-site-header');
+    const toggle = header.locator('.theme-nav-main__toggle');
+    const list = header.locator('nav.theme-nav-main > .theme-nav-main__list');
+
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(list).toBeHidden();
+    if (width !== null) {
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    }
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(list).toBeVisible();
+    const band = await list.boundingBox();
+    const box = await header.boundingBox();
+    if (band === null || box === null) {
+        throw new Error('The header or its expanded menu is not rendered.');
+    }
+    // Under the header, across its whole width - not squeezed into the slot
+    // of the toggle. The band starts at the header's padding edge, above
+    // its bottom hairline.
+    expect(band.y).toBeGreaterThanOrEqual(box.y + box.height - 1.5);
+    expect(band.width).toBeCloseTo(box.width, 0);
+};
+
+/**
+ * Every second level of the header's main navigation, opened by the pointer,
+ * against every top level entry and every control of the header: a list of
+ * what each one covers, empty when it covers nothing.
+ */
+const secondLevelsCoveringTheHeader = async (page: Page) => {
+    const header = page.locator('.theme-page > .theme-site-header');
+    const items = header.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item:has(> .theme-nav-main__list--sub)');
+    const count = await items.count();
+    expect(count, 'entries with a second level').toBeGreaterThan(0);
+
+    const covered: string[] = [];
+    for (let index = 0; index < count; index++) {
+        const item = items.nth(index);
+        await item.hover();
+        await expect(item.locator(':scope > .theme-nav-main__list--sub')).toBeVisible();
+        covered.push(...await item.evaluate((element) => {
+            const header = element.closest('.theme-site-header');
+            const secondLevel = element.querySelector(':scope > .theme-nav-main__list--sub');
+            const link = element.querySelector(':scope > .theme-nav-main__link');
+            if (header === null || secondLevel === null || link === null) {
+                return ['the entry lost its header, its link or its second level'];
+            }
+            const box = secondLevel.getBoundingClientRect();
+            const hits: string[] = [];
+            header.querySelectorAll([
+                'nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link',
+                '.theme-site-header__brand',
+                '.theme-site-header__action',
+                '.theme-nav-main__toggle',
+                '.theme-dropdown__trigger',
+                '.theme-settings__trigger',
+            ].join(',')).forEach((control) => {
+                if (control === link) {
+                    return;
+                }
+                const other = control.getBoundingClientRect();
+                if (other.width === 0 && other.height === 0) {
+                    return;
+                }
+                if (!(box.right <= other.left || other.right <= box.left || box.bottom <= other.top || other.bottom <= box.top)) {
+                    hits.push(`"${link.textContent?.trim()}" covers "${control.textContent?.trim() || control.getAttribute('aria-label') || control.className}"`);
+                }
+            });
+            return hits;
+        }));
+    }
+    return covered;
+};
+
 for (const tree of trees) {
     test.describe(tree.name, () => {
         for (const path of showcase) {
@@ -152,97 +351,29 @@ for (const tree of trees) {
             }
         });
 
-        // The showcase has seven top level entries; a site has fewer or more.
-        // From the breakpoint up the header holds them in one row with the
-        // title of this tree and never spills sideways. On a wide row the
-        // title keeps its line and the menu wraps; on a narrow one the menu
-        // keeps its row as long as it can and the title wraps. Entries are
-        // added as copies of the last one, with the markup the menu renders,
-        // or removed from the end.
+        // The header of both trees is the default arrangement, "simple": the
+        // title, the seven top level entries of the showcase and both
+        // controls in one row. From its breakpoint up the menu holds its
+        // entries in one row and the title gives way beside it; one pixel
+        // below, the menu is behind its toggle. 1024 used to be the width at
+        // which the menu started to wrap instead, and is well inside the
+        // collapsed range now.
         const headerScenarios = [
-            { name: 'holds seven top level entries beside a one line title at 1280 pixels', width: 1280, entries: 7, titleOneLine: true, menuOneRow: false },
-            { name: 'keeps three top level entries in one row at 768 pixels', width: 768, entries: 3, titleOneLine: false, menuOneRow: true },
-            { name: 'holds seven top level entries without spilling sideways at 768 pixels', width: 768, entries: 7, titleOneLine: false, menuOneRow: false },
-            { name: 'holds seven top level entries without spilling sideways at 900 pixels', width: 900, entries: 7, titleOneLine: false, menuOneRow: false },
+            { width: 1280, expanded: true },
+            { width: headerBreakpoints.simple, expanded: true },
+            { width: headerBreakpoints.simple - 1, expanded: false },
+            { width: 1024, expanded: false },
         ];
         for (const scenario of headerScenarios) {
-            test(`${tree.prefix}/ ${scenario.name}`, async ({ page }) => {
+            const state = scenario.expanded ? 'holds the seven top level entries in one row' : 'puts the menu behind its toggle';
+            test(`${tree.prefix}/ ${state} at ${scenario.width} pixels`, async ({ page }) => {
                 await page.setViewportSize({ width: scenario.width, height: 800 });
                 await page.goto(`${tree.prefix}/typography`);
-                const count = await page.evaluate((entries) => {
-                    const list = document.querySelector('nav.theme-nav-main > .theme-nav-main__list');
-                    if (list === null) {
-                        return 0;
-                    }
-                    while (list.children.length > entries && list.lastElementChild !== null) {
-                        list.lastElementChild.remove();
-                    }
-                    // Names no section of the showcase carries, so a synthetic
-                    // entry can never be mistaken for a real one in a failure
-                    // message. "Examples" was in this list until the composed
-                    // pages made it a real section.
-                    const labels = ['Documentation', 'Downloads', 'Support'];
-                    const template = list.lastElementChild;
-                    while (template !== null && list.children.length < entries) {
-                        const item = template.cloneNode(true) as HTMLElement;
-                        item.classList.remove('theme-nav-main__item--active');
-                        item.querySelectorAll('.theme-nav-main__list--sub').forEach((sub) => sub.remove());
-                        const link = item.querySelector('a');
-                        if (link !== null) {
-                            link.removeAttribute('aria-current');
-                            link.textContent = labels.shift() ?? 'More';
-                        }
-                        list.append(item);
-                    }
-                    return list.children.length;
-                }, scenario.entries);
-                expect(count).toBe(scenario.entries);
 
-                const brandLocator = page.locator('.theme-site-header__brand');
-                const brand = await brandLocator.boundingBox();
-                const nav = await page.locator('nav.theme-nav-main').boundingBox();
-                const cog = await page.getByRole('button', { name: 'Display settings' }).boundingBox();
-                if (brand === null || nav === null || cog === null) {
-                    throw new Error('The brand, the main navigation or the settings button is not rendered.');
-                }
-
-                if (scenario.titleOneLine) {
-                    const lineHeight = await brandLocator.evaluate((element) => parseFloat(getComputedStyle(element).lineHeight));
-                    expect(brand.height).toBeLessThan(lineHeight * 1.5);
-                }
-
-                // Brand, navigation and cog side by side, nothing overlapping and
-                // nothing outside the screen.
-                expect(brand.x + brand.width).toBeLessThanOrEqual(nav.x);
-                expect(nav.x + nav.width).toBeLessThanOrEqual(cog.x);
-                expect(cog.x + cog.width).toBeLessThanOrEqual(scenario.width);
-                expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(scenario.width);
-
-                // Every entry inside the navigation, and no two on top of each other.
-                const items = await page.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link').evaluateAll(
-                    (links) => links.map((link) => {
-                        const box = link.getBoundingClientRect();
-                        return { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
-                    }),
-                );
-                expect(items).toHaveLength(scenario.entries);
-                for (const [index, item] of items.entries()) {
-                    expect(item.left).toBeGreaterThanOrEqual(nav.x);
-                    expect(item.right).toBeLessThanOrEqual(nav.x + nav.width);
-                    for (const other of items.slice(index + 1)) {
-                        const apart = item.right <= other.left || other.right <= item.left || item.bottom <= other.top || other.bottom <= item.top;
-                        expect(apart).toBe(true);
-                        // Entries of one row share their top. The last entry of
-                        // the list used to sit half a list item margin lower.
-                        const sameRow = item.top < other.bottom && other.top < item.bottom;
-                        if (sameRow) {
-                            expect(Math.abs(item.top - other.top)).toBeLessThan(0.5);
-                        }
-                    }
-                }
-                if (scenario.menuOneRow) {
-                    const tops = items.map((item) => item.top);
-                    expect(Math.max(...tops) - Math.min(...tops)).toBeLessThan(0.5);
+                if (scenario.expanded) {
+                    await expectTheMenuInOneRow(page, scenario.width);
+                } else {
+                    await expectTheMenuBehindItsToggle(page, scenario.width);
                 }
             });
         }
@@ -357,20 +488,17 @@ test.describe('the display settings', () => {
             expect(box.y + box.height).toBeGreaterThan(cog.y);
         }
 
-        // Nothing squeezed: the site title keeps one line - it wrapped onto
-        // five beside the old button groups.
-        const lineHeight = await brandLocator.evaluate((element) => parseFloat(getComputedStyle(element).lineHeight));
-        expect(brand.height).toBeLessThan(lineHeight * 1.5);
+        // The title is what gives way: with the seven entries of the
+        // showcase it takes several lines at this width, and that is the
+        // contract rather than a squeeze. What it may not do is get narrower
+        // than its longest word - a word that runs out of its box runs under
+        // the menu beside it. It wrapped onto five lines once beside the old
+        // button groups, and it kept one line while the menu wrapped instead.
+        expect(await brandLocator.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(0);
 
-        // The menu itself may wrap, and above "bp.$lg" that is the contract:
-        // on a wide row the title keeps its line and the menu gives way, on a
-        // narrow one the other way round ("abstracts/_breakpoints.scss"). This
-        // used to assert one row, which held only while the showcase had five
-        // sections; it has six since the page layouts were added, and the
-        // header scenarios above cover both row counts deliberately, at three
-        // and at seven entries. What must still hold here is that nothing
-        // overlaps, that the entries of one row share it, and that the menu
-        // stays within the two rows the contract allows it.
+        // And the menu does not give way at all: one row. This allowed two
+        // rows while the menu wrapped, and the second level of an entry of
+        // the first row opened over the entries of the second.
         const boxes = await page.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item').evaluateAll(
             (items) => items.map((item) => {
                 const box = item.getBoundingClientRect();
@@ -382,23 +510,9 @@ test.describe('the display settings', () => {
             for (const other of boxes.slice(index + 1)) {
                 const apart = box.right <= other.left || other.right <= box.left || box.bottom <= other.top || other.bottom <= box.top;
                 expect(apart).toBe(true);
-                if (box.top < other.bottom && other.top < box.bottom) {
-                    expect(Math.abs(box.top - other.top)).toBeLessThan(0.5);
-                }
             }
         }
-
-        // Without a bound on the number of rows the two checks above are
-        // satisfied by seven entries on seven rows: no pair then shares a row,
-        // so the shared top never fires, and "apart" is all but tautological
-        // for flex items. So the rows are counted. The seven top level entries
-        // of the showcase occupy two at 1280 pixels - measured, not
-        // assumed, and the number "docs/development/component-library.md"
-        // documents. The bound is an upper one because a menu that gets back
-        // into one row is not a regression; three rows beside a one line title
-        // is.
-        const rows = new Set(boxes.map((box) => Math.round(box.top)));
-        expect(rows.size).toBeLessThanOrEqual(2);
+        expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBe(1);
     });
 
     test('keep the chosen options visible in forced colours', async ({ page }) => {
@@ -668,8 +782,9 @@ test.describe('the header language dropdown', () => {
 
             // Under the row, not over it. This is the measurement that was
             // missing: the panel used to start at the top edge of the
-            // viewport. Under the *trigger* is not enough - at 1280 the menu
-            // takes a second row inside the header that reaches below it.
+            // viewport. Under the *trigger* is not enough - at 1280 the title
+            // takes several lines beside the menu, and the header reaches below
+            // the trigger.
             expect(panelBox.y).toBeGreaterThanOrEqual(triggerBox.y + triggerBox.height);
             expect(panelBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
 
@@ -831,8 +946,8 @@ test.describe('the header language dropdown', () => {
  * dismissed - and never asks where the panel lands. So the cog kept the defect
  * the language dropdown beside it was fixed for: anchored on its own component,
  * the panel starts just under the 44 pixel trigger, which is *inside* a header
- * row that is as tall as its tallest child and may hold two rows of menu
- * entries. Measured at 1280 pixels before this change, the panel ran
+ * row that is as tall as its tallest child. Measured at 1280 pixels before
+ * this change, while the menu still wrapped onto two rows, the panel ran
  * x 916..1220 by y 104.5..587 in a 146 pixel header, over two links of the
  * second navigation row.
  *
@@ -866,10 +981,9 @@ test.describe('the display settings panel', () => {
         return style.direction === 'rtl' ? box.left + padding : box.right - padding;
     });
 
-    // 1280 has the menu beside the title and wrapped onto a second row inside
-    // the header; 375 has it behind its toggle. The header is a different
-    // height in each, which is why the block offset has to be derived from the
-    // header rather than chosen.
+    // 1280 has the menu beside a title on several lines; 375 has it behind its
+    // toggle. The header is a different height in each, which is why the
+    // block offset has to be derived from the header rather than chosen.
     for (const width of [1280, 375]) {
         test(`opens under the header row and covers no control of it at ${width} pixels`, async ({ page }) => {
             await page.setViewportSize({ width, height: 800 });
@@ -884,8 +998,8 @@ test.describe('the display settings panel', () => {
             const headerBox = await boxOf(header(page), 'The site header');
 
             // Under the row, not into it. Under the *trigger* is what shipped
-            // and is not enough: at 1280 the menu takes a second row inside the
-            // header that reaches below the cog.
+            // and is not enough: at 1280 the title takes several lines, and the
+            // header reaches below the cog.
             expect(panelBox.y).toBeGreaterThanOrEqual(triggerBox.y + triggerBox.height);
             expect(panelBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
 
@@ -1048,9 +1162,14 @@ test.describe('the display settings panel', () => {
  * on the centre of the content container from `bp.$md` up. Below it the
  * variant centres the title together with the controls, so 375 checks only
  * the first. 768 is `bp.$md` itself.
+ *
+ * The title row is laid out at `bp.$md`, and the menu at a breakpoint per
+ * arrangement - so at 1024 `simple` is collapsed while the other three are
+ * not, and at 768 all four are. The specimens carry the menu toggle of the
+ * real partial, so a collapsed one keeps its toggle in the header.
  */
 test.describe('the header panels in every header variant', () => {
-    for (const width of [1280, 768, 375]) {
+    for (const width of [1280, 1024, 768, 375]) {
         test(`drop under the whole header and end at its container at ${width} pixels`, async ({ page }) => {
             await page.setViewportSize({ width, height: 800 });
             await page.goto('/styleguide');
@@ -1144,127 +1263,119 @@ test.describe('the header panels in every header variant', () => {
 });
 
 /**
- * The page's own header, rearranged into one of the three other variants.
+ * The main navigation of every header arrangement, just above and just below
+ * the breakpoint of that arrangement.
  *
- * The instance renders one variant per site, and the specimens of the
- * styleguide section `chrome` - the only other headers a browser sees - sit
- * in the content column with three entries and no second level, so they
- * measure neither the width a real header has nor the menu it holds. So the
- * specimen of the variant lends its rows, and the page's own header lends
- * what goes into them: its title, its main navigation with the seven top
- * level entries of the showcase and their second levels, and its controls
- * slot. The elements are moved, not copied, so the menu toggle, the language
- * dropdown and the display settings stay bound by the script of the page.
+ * The menu never wraps: from its arrangement's breakpoint up it is one row of
+ * entries and the title gives way beside it, one pixel below it is behind its
+ * toggle. Each arrangement has a breakpoint of its own because each shares
+ * the menu's row with something else - see "layout/_site-header.scss". At the
+ * breakpoint itself the row is as tight as it ever gets, so that is where a
+ * row that spills, a title squeezed below its longest word, or a second level
+ * over an entry or a control would show first; it is checked in both reading
+ * directions. 1280 is where every arrangement is expanded.
  *
- * The rows are the specimen's, not written out here: the specimens are held
- * to the classes of the variant partials by
- * `ComponentLibraryTest::theChromeSpecimensCarryEveryClassTheirPartialsWrite`,
- * and a skeleton typed into this file would be held to nothing. `actions`
- * keeps the call to action of its specimen, since the instance configures
- * none. `simple` is the page's header as it is.
+ * The second level used to open over the entries that had wrapped under it:
+ * in the default header at 1280 pixels on the showcase, "Elements" over
+ * "Styleguide" and "Forms", and in the three variants, whose menu has a row
+ * of its own, between 768 and 1023 pixels, where a 50% cap meant for the
+ * default reached them too.
  */
-const arrangeHeader = async (page: Page, variant: string) => {
-    await page.evaluate((variant) => {
-        if (variant === 'simple') {
-            return;
-        }
-        const pageHeader = document.querySelector('.theme-page > .theme-site-header');
-        const specimen = [...document.querySelectorAll('#chrome .theme-site-header')]
-            .find((header) => header.classList.contains(`theme-site-header--${variant}`));
-        if (pageHeader === null || specimen === undefined) {
-            throw new Error(`There is no page header, or no "${variant}" specimen to take the rows from - is this "/styleguide"?`);
-        }
-        const header = specimen.cloneNode(true) as HTMLElement;
-        for (const selector of ['.theme-site-header__brand', 'nav.theme-nav-main', '.theme-site-header__actions']) {
-            const slot = header.querySelector(selector);
-            const content = pageHeader.querySelector(selector);
-            if (slot === null || content === null) {
-                throw new Error(`"${selector}" is missing from the "${variant}" specimen or from the page header.`);
-            }
-            slot.replaceWith(content);
-        }
-        pageHeader.replaceWith(header);
-    }, variant);
-};
+test.describe('the main navigation in every header arrangement', () => {
+    for (const arrangement of headerArrangements) {
+        const breakpoint = headerBreakpoints[arrangement];
 
-/**
- * Every second level of the header's main navigation, opened by the pointer,
- * against every top level entry and every control of the header: a list of
- * what each one covers, empty when it covers nothing.
- */
-const secondLevelsCoveringTheHeader = async (page: Page) => {
-    const header = page.locator('.theme-page > .theme-site-header');
-    const items = header.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item:has(> .theme-nav-main__list--sub)');
-    const count = await items.count();
-    expect(count, 'entries with a second level').toBeGreaterThan(0);
+        for (const direction of ['ltr', 'rtl']) {
+            test(`is one row covered by no second level in "${arrangement}" at ${breakpoint} pixels, ${direction}`, async ({ page }) => {
+                await page.setViewportSize({ width: breakpoint, height: 800 });
+                await page.goto('/styleguide');
+                await arrangeHeader(page, arrangement);
+                await page.locator('html').evaluate((element, direction) => element.setAttribute('dir', direction), direction);
 
-    const covered: string[] = [];
-    for (let index = 0; index < count; index++) {
-        const item = items.nth(index);
-        await item.hover();
-        await expect(item.locator(':scope > .theme-nav-main__list--sub')).toBeVisible();
-        covered.push(...await item.evaluate((element) => {
-            const header = element.closest('.theme-site-header');
-            const secondLevel = element.querySelector(':scope > .theme-nav-main__list--sub');
-            const link = element.querySelector(':scope > .theme-nav-main__link');
-            if (header === null || secondLevel === null || link === null) {
-                return ['the entry lost its header, its link or its second level'];
-            }
-            const box = secondLevel.getBoundingClientRect();
-            const hits: string[] = [];
-            header.querySelectorAll([
-                'nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link',
-                '.theme-site-header__brand',
-                '.theme-site-header__action',
-                '.theme-nav-main__toggle',
-                '.theme-dropdown__trigger',
-                '.theme-settings__trigger',
-            ].join(',')).forEach((control) => {
-                if (control === link) {
-                    return;
-                }
-                const other = control.getBoundingClientRect();
-                if (other.width === 0 && other.height === 0) {
-                    return;
-                }
-                if (!(box.right <= other.left || other.right <= box.left || box.bottom <= other.top || other.bottom <= box.top)) {
-                    hits.push(`"${link.textContent?.trim()}" covers "${control.textContent?.trim() || control.getAttribute('aria-label') || control.className}"`);
-                }
+                await expectTheMenuInOneRow(page, null);
+                expect(await secondLevelsCoveringTheHeader(page)).toEqual([]);
             });
-            return hits;
-        }));
-    }
-    return covered;
-};
+        }
 
-/**
- * The number of rows the top level entries of the header's main navigation
- * take.
- */
-const rowsOfTheMainNavigation = (page: Page) => page
-    .locator('.theme-page > .theme-site-header nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link')
-    .evaluateAll((links) => new Set(links.map((link) => Math.round(link.getBoundingClientRect().top))).size);
-
-/**
- * The three variants that give the navigation a row of its own.
- *
- * The 50% cap that shares the default header's one row between the title and
- * the menu between `bp.$md` and `bp.$lg` was written for every header, and
- * reached these three as well: their menu, alone in its row, wrapped into
- * half of it - 3+3+1 at 900 pixels - and the second level of an entry of the
- * first row opened over the entries of the second. 900 pixels is inside that
- * range, and wide enough for the row to hold the seven entries of the
- * showcase at all.
- */
-test.describe('the main navigation in a row of its own', () => {
-    for (const variant of ['centred', 'actions', 'two-tier']) {
-        test(`keeps one row, covered by no second level, at 900 pixels in "${variant}"`, async ({ page }) => {
-            await page.setViewportSize({ width: 900, height: 800 });
+        test(`is one row covered by no second level in "${arrangement}" at 1280 pixels`, async ({ page }) => {
+            await page.setViewportSize({ width: 1280, height: 800 });
             await page.goto('/styleguide');
-            await arrangeHeader(page, variant);
+            await arrangeHeader(page, arrangement);
 
-            expect.soft(await rowsOfTheMainNavigation(page), 'rows of top level entries').toBe(1);
-            expect.soft(await secondLevelsCoveringTheHeader(page)).toEqual([]);
+            await expectTheMenuInOneRow(page, null);
+            expect(await secondLevelsCoveringTheHeader(page)).toEqual([]);
+        });
+
+        test(`is behind its toggle in "${arrangement}" at ${breakpoint - 1} pixels`, async ({ page }) => {
+            await page.setViewportSize({ width: breakpoint - 1, height: 800 });
+            await page.goto('/styleguide');
+            await arrangeHeader(page, arrangement);
+
+            await expectTheMenuBehindItsToggle(page, null);
         });
     }
+
+    // Without a script nothing collapses: below its breakpoint an
+    // arrangement shows the list stacked in the flow, every second level
+    // inline, and that has to fit the screen as it did when the stacked
+    // layout only began at 768 pixels. "flex: none" on the navigation,
+    // written for the row, once applied here too and kept "simple" as wide
+    // as its widest entry: 456 pixels of content in a 360 pixel wide page
+    // at 375. 800 is below every breakpoint and above "bp.$md".
+    for (const width of [375, 800]) {
+        test(`fits the screen without JavaScript in every arrangement at ${width} pixels`, async ({ browser }) => {
+            const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height: 800 } });
+            const page = await context.newPage();
+            const overflowing: string[] = [];
+
+            // And the page as a reader gets it, for the one arrangement the
+            // instance renders.
+            await page.goto('/typography');
+            const [pageScrollWidth, pageClientWidth] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+            if (pageScrollWidth > pageClientWidth) {
+                overflowing.push(`"/typography": ${pageScrollWidth} in ${pageClientWidth}`);
+            }
+
+            for (const arrangement of headerArrangements) {
+                await page.goto('/styleguide');
+                await arrangeHeader(page, arrangement);
+                // The header's own scroll width: it spans the page, so what
+                // spills out of one of its rows widens it, and the rest of
+                // "/styleguide" - a table, a code block - is left out of it.
+                const [scrollWidth, clientWidth] = await page.locator('.theme-page > .theme-site-header')
+                    .evaluate((header) => [header.scrollWidth, header.clientWidth]);
+                if (scrollWidth > clientWidth) {
+                    overflowing.push(`"${arrangement}": ${scrollWidth} in ${clientWidth}`);
+                }
+                // What is measured is the no-script layout, not a page that
+                // ran its script after all.
+                await expect(page.locator('html')).not.toHaveAttribute('data-js', /.*/);
+                await expect(page.locator('.theme-page > .theme-site-header nav.theme-nav-main > .theme-nav-main__list')).toBeVisible();
+            }
+            expect(overflowing).toEqual([]);
+            await context.close();
+        });
+    }
+
+    // The header collapses its menu at a width of its own; a menu anywhere
+    // else still collapses at "bp.$md". At 1024 the page's header is behind
+    // its toggle and the specimen of the navigation section is a row; below
+    // 768 the specimen is behind a toggle of its own, which opens it.
+    test('leaves a main navigation outside the header to collapse at bp.$md', async ({ page }) => {
+        await page.setViewportSize({ width: 1024, height: 800 });
+        await page.goto('/styleguide');
+        const specimen = page.locator('#navigation nav.theme-nav-main');
+        const toggle = specimen.locator('.theme-nav-main__toggle');
+        const list = specimen.locator(':scope > .theme-nav-main__list');
+
+        await expect(page.locator('.theme-page > .theme-site-header .theme-nav-main__toggle')).toBeVisible();
+        await expect(toggle).toBeHidden();
+        await expect(list).toBeVisible();
+
+        await page.setViewportSize({ width: 767, height: 800 });
+        await expect(toggle).toBeVisible();
+        await expect(list).toBeHidden();
+        await toggle.click();
+        await expect(list).toBeVisible();
+    });
 });

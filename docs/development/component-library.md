@@ -240,7 +240,8 @@ other:
 </nav>
 ```
 
-In the row layout, from `bp.$md` up, the top level items drop the bottom
+In the row layout — from `bp.$md` up, and in the site header from the
+breakpoint of its arrangement — the top level items drop the bottom
 margin every `li` takes from the element baseline — all but the last one. An
 entry is centred in its row by its margin box, so the last entry used to sit
 half a margin lower than the others; stacked, the margin still adds to the
@@ -1501,38 +1502,57 @@ height on every scroll position:
 ```
 
 `__actions` holds the [display settings](#display-settings). Brand,
-navigation and actions share one row at every width. Above `bp.$md` the top
-level of the menu may wrap onto a second row inside its frame, aligned to the
-end, and an entry never breaks inside itself; which of title and menu gives
-way when the row gets tight depends on its width:
+navigation and actions share one row at every width, and **the main
+navigation never wraps**: its top level is one row, or it is behind its
+toggle. When the row gets tight the title gives way — it shrinks and wraps
+onto as many lines as it needs, down to its longest word
+(`flex: 0 1 auto; min-inline-size: min-content`) — while the navigation, from
+the breakpoint of its arrangement up, is `flex: none`, as wide as its one row.
+Neither carries a cap. A single word longer than the row is not broken, and
+spills. Where one row no
+longer fits beside the title, the header collapses the menu behind its toggle,
+at a breakpoint of its own per arrangement (see
+[header variants](#header-variants)); collapsed, the expanded menu drops down
+under the header as a full-width band, behind `data-js` like the collapse
+itself.
 
-- From `bp.$lg` up the title does not give way: the brand keeps its line up to
-  half the row, and the navigation shrinks down to its widest entry and wraps.
-  That holds seven top level entries beside the title of the showcase at 1280
-  pixels, where a sixth used to push the title onto a second line.
-- Between `bp.$md` and `bp.$lg` the menu keeps its row, up to 50% of the row,
-  and the brand wraps beside it — held to one line there, the title left a
-  menu of three entries on two rows next to a title on two lines anyway. A
-  menu wider than 50% wraps inside that width, so nothing spills sideways. It
-  was 60% while the actions slot held one control, the settings cog; the
-  language dropdown is a second one, and 60% then left the brand less than
-  its longest word with seven entries at 768 pixels and the row spilled
-  sideways — `layout/_site-header.scss` says so at the rule.
+It used to be the other way round. From 1024 pixels up the title kept its line,
+up to half the row, and the menu wrapped its top level onto a second row inside
+its frame; below 1024 a 50% cap held the menu to half the row. The second level
+of the menu opens under its own entry, so an entry of the first row opened its
+panel over the entries of the second: at 1280 pixels on the showcase `Elements`
+covered `Styleguide`, `Forms` and the language trigger. And with the seven
+entries of the showcase the default header never held them in one row at any
+width — title, menu and controls need 1401 pixels on one line, the content
+container is 1160 wide.
 
-The showcase itself has **six** top level entries since the page layouts were
-added, and its own menu therefore takes two rows at 1280 pixels beside a title
-that keeps its line — five entries on the first row and the sixth on the
-second, measured in the browser, not deduced. That is the first of those two
-rules working, not a defect.
+With seven entries the title of the showcase takes three lines at 1280 pixels
+in Chromium; that is the title giving way, not a defect.
+`Tests/Acceptance/frontend.spec.ts` holds, in both trees, the seven entries of
+the showcase to one row at 1280 pixels and at the breakpoint of `simple`, with
+nothing reaching out of a row of the header and the title no narrower than its
+longest word, and the menu behind its toggle one pixel below that breakpoint
+and at 1024 pixels.
 
-`Tests/Acceptance/frontend.spec.ts` asserts both, in both trees: seven entries
-beside a one line title at 1280 pixels, three in one row at 768 pixels, and
-seven without spilling sideways at 768 and 900 pixels. It also holds the seven
-entries of the showcase to **at most two rows** at 1280: without a bound on the
-rows, the checks that no two entries overlap and that the entries of one row
-share their top are all satisfied by seven entries on seven rows. Below `bp.$md` the
-expanded navigation drops down under the header as a full-width band, behind
-`data-js` like the collapse itself.
+**What this costs without a working script.** Collapsing needs `theme.js`, and
+the collapse now begins far above `bp.$md` — below 1184 pixels for `simple`.
+Two degraded cases grow with it:
+
+- **No JavaScript at all.** Nothing collapses, and below the breakpoint of its
+  arrangement the list is stacked in the flow with every second level inline,
+  as it always was below `bp.$md`: the default header of the showcase is about
+  1730 pixels tall at 1183, 1000 and 800 pixels, where it used to be 146 to
+  195. It fits the screen — the acceptance suite checks that with JavaScript
+  disabled at 375 and 800 pixels in all four arrangements — but it is long.
+  `flex: none` on the navigation is set only where the menu is a row for that
+  reason: set everywhere, it kept the stacked list as wide as its widest
+  entry, and `simple` scrolled sideways by 96 pixels at 375.
+- **The inline head script ran, `theme.js` did not.** `data-js` is set, so the
+  list is hidden below the breakpoint, and the toggle is not bound and opens
+  nothing: the menu cannot be reached. That was true below `bp.$md` before; it
+  is true up to the arrangement's breakpoint now.
+
+Both are the price of a menu that never wraps; neither is redesigned here.
 
 #### Header variants
 
@@ -1558,15 +1578,70 @@ of the setting never becomes part of a path.
 </header>
 ```
 
-**None of the three re-opens the width budget above.** That budget is measured
-in a browser and holds for the single row; a variant that put a third thing in
-that row would have to be measured again. Instead each of them takes something
-*out* of it — `centred` gives the title a row, `actions` gives the navigation
-one and puts the call to action in the space it leaves, `two-tier` moves both
-controls into a meta row. `ComponentLibraryTest::aHeaderVariantDoesNotChangeTheMeasuredWidthBudget`
-fails on a variant rule that sets a width on the navigation or the brand, which
-is the way that promise breaks silently: the acceptance tests render the
-default and would stay green.
+**Each arrangement collapses its menu at a breakpoint of its own.** Where one
+row of entries stops fitting depends on what shares the menu's row: `simple`
+shares it with the title and both controls, `two-tier` with the title only, and
+`centred` and `actions` give the menu a row of its own. The breakpoints are
+`bp.$header-*` in `abstracts/_breakpoints.scss`, and they are a stated budget —
+**seven showcase-sized entries** — rather than a computation: the showcase's
+seven sections, its title and both controls were measured in Chromium and
+Firefox, Chromium ran wider in every arrangement, and each breakpoint is a
+round rem value 41 to 51 pixels (2.6 to 3.2rem) above the Chromium width.
+
+| Arrangement | Holds one row from (Chromium) | Breakpoint       |
+|-------------|-------------------------------|------------------|
+| `simple`    | 1133px                        | `74rem` (1184px) |
+| `centred`   | 836px                         | `55rem` (880px)  |
+| `actions`   | 839px                         | `55rem` (880px)  |
+| `two-tier`  | 999px                         | `65rem` (1040px) |
+
+A site whose menu is longer or shorter than the budget compiles the
+stylesheet with breakpoints of its own. The four `bp.$header-*` are
+`!default`, so a site package's entry point configures them before anything
+else loads the module and compiles against this directory with `--load-path`,
+the way [a subset compiles](frontend-assets.md#components-are-self-contained):
+
+```scss
+@use 'abstracts/breakpoints' with ($header-simple: 80rem);
+@use 'theme';
+```
+
+The result is the shipped stylesheet with that breakpoint moved and nothing
+else. Editing `abstracts/_breakpoints.scss` in place works too, and is lost
+with the next update of the extension. The stylesheet cannot see the menu it is
+given, and the two ways to measure it were rejected: a size container on the
+row is a containing block for the panels of the controls slot on the browser
+floor, and a script that measures the row shifts the layout after the first
+paint and leaves the page without a script where it was.
+`layout/_site-header.scss` has the measurements.
+
+**One arrangement modifier per header.** The default arrangement is the header
+that carries none of the three modifiers, and a site's own arrangement with a
+modifier of its own gets the default's breakpoint, the widest. A header that
+carries two of the three matches the rules of both, and between their two
+breakpoints one hides the toggle while the other hides the list — a menu
+nobody can reach. The partials write one each.
+
+`components/_nav-main.scss` writes what changes at the breakpoint once, as the
+two mixins `expanded` and `collapsed`, and includes them at `bp.$md` for a
+navigation outside the header — `.theme-nav-main:not(.theme-site-header *)` —
+and once per arrangement in the header. Three gates of `ComponentLibraryTest`
+hold it: `theTopLevelOfTheMainNavigationNeverWraps`,
+`neitherTheTitleNorTheMenuOfTheHeaderIsCapped` — which also allows the
+navigation exactly one `flex` rule per arrangement, `flex: none` in the media
+query that hides its toggle, under any scope — and
+`everyHeaderArrangementCollapsesTheMainNavigationAtABreakpointOfItsOwn`, which
+reads the arrangements from the partials and fails on one without a breakpoint
+of its own, on a collapse that is not exactly one pixel below its expansion,
+and on a rule in a width media query that reaches the menu without naming the
+header. The acceptance suite rearranges the page's own header into each
+variant and checks each arrangement just above and just below its breakpoint,
+in both reading directions, and opens every second level of the showcase in
+all four: none covers an entry or a control of the header.
+
+This replaces a 50% cap on the navigation between `bp.$md` and 1024 pixels
+that was meant for the single row of `simple` and reached the three variants as
+well, whose menu then wrapped inside half of a row it had to itself.
 
 **`centred` centres the title against the whole row, without positioning
 anything.** From `bp.$md` up an empty `::before` at the start of the title row
@@ -1833,7 +1908,9 @@ therefore loses its capitals. The display look is the text role
 ### The `data-js` marker
 
 `components/_nav-main.scss` collapses the main navigation behind a toggle
-below `bp.$md`, but only once a script has announced itself:
+below `bp.$md` — in the site header below the breakpoint of its
+arrangement, see [header variants](#header-variants) — but only once a script
+has announced itself:
 
 ```html
 <html data-js>
@@ -1850,20 +1927,30 @@ negation ("not disclosed" hides) rather than a positive ("disclosed shows"),
 so the undecorated state is the usable one:
 
 ```scss
-@media (max-width: bp.$md-max) {
-    [data-js] .theme-nav-main:not(:has(.theme-nav-main__toggle[aria-expanded='true'])) > .theme-nav-main__list {
+@mixin collapsed {
+    [data-js] &:not(:has(.theme-nav-main__toggle[aria-expanded='true'])) > .theme-nav-main__list {
         display: none;
     }
 }
+
+@media (max-width: bp.$md-max) {
+    .theme-nav-main:not(.theme-site-header *) {
+        @include collapsed;
+    }
+}
 ```
+
+The site header includes the same mixin once per arrangement, below the
+arrangement's own breakpoint — see [header variants](#header-variants).
 
 The open state read off `[aria-expanded='true']` via `:has()`, not a
 JS-authored class, so the attribute a screen reader announces and the
 attribute CSS renders from cannot drift apart.
 
 `Tests/Unit/ComponentLibraryTest::collapsingTheMainNavigationRequiresTheScriptMarker`
-asserts the compiled rule stays gated behind `[data-js]` — inverting it is a
-one-character change with no visible symptom on a desktop check.
+asserts every compiled collapse rule — the one at `bp.$md` and the four of
+the header — stays gated behind `[data-js]`: inverting one is a one-character
+change with no visible symptom on a desktop check.
 
 ## Components that need the script
 
@@ -2148,14 +2235,14 @@ alert and dialog edges.
 
 ## Breakpoints
 
-There are two, declared in `abstracts/_breakpoints.scss`. `bp.$md`, `48rem`
+They are declared in `abstracts/_breakpoints.scss`. `bp.$md`, `48rem`
 (768px), is the breakpoint of the library: the point at which the main
 navigation's two levels stop fitting a single row — every other component that
 stacks (`theme-hero--media`, `theme-teaser`, `theme-page__body`) was checked
-against it and none wanted a different one. `bp.$lg`, `64rem` (1024px), is used
-by the [site header](#layout) alone, where it decides whether the title or the
-menu gives way when the row gets tight; flex layout cannot make that choice by
-itself.
+against it and none wanted a different one. The four `bp.$header-*` are used
+by the [site header](#header-variants) alone: the width from which each of its
+arrangements holds the main navigation in one row, sized for seven
+showcase-sized entries.
 
 It is a **Sass variable, not a custom property**, and that is forced rather
 than preferred: a media query condition is evaluated before the cascade runs,
@@ -2172,26 +2259,29 @@ CSS, but **moving a breakpoint means recompiling the SCSS**.
 documents — `Tests/Unit/StylesheetTest` covers the appearance contract
 (colour, light/dark) separately:
 
-| Test                                                     | Guards                                                                                                                                                                                                                                                                                                                                              |
-|----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `everyComponentIsPartOfTheBundle`                        | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.                                                                                                                                                 |
-| `collapsingTheMainNavigationRequiresTheScriptMarker`     | The `[data-js]` gate on the navigation collapse still holds — see [the `data-js` marker](#the-data-js-marker).                                                                                                                                                                                                                                      |
-| `theContentElementOutlineSwitchesOffCompletely`          | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                                                                                                                                                           |
-| `anElementWithoutPaddingKeepsItsContentClearOfTheChip`   | `--frame-none` starts its content below the CType chip by `--theme-content-element-chip-clearance`, and the global switch and `--plain`, which remove the chip, set the clearance to `0`.                                                                                                                                                           |
-| `everyPaletteHasASwatchWithItsOwnColours`                | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).                                                                                                                                  |
-| `tabsShowEveryPanelUntilTheScriptHasBoundThem`           | The tab list is hidden and the panel headings shown until the group carries `data-theme-tabs-bound`, and nothing about the tabs is gated on `[data-js]` — see [Components that need the script](#components-that-need-the-script).                                                                                                                  |
-| `aDialogOpenerIsHiddenWithoutTheScriptMarker`            | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                                                                                                                                     |
-| `textIsAlignedToTheStartOrTheEndOfTheLine`               | No `text-align: left` or `right` is compiled — a physical alignment puts the text of a right-to-left page against the wrong edge, and the element baseline carried two until they were found.                                                                                                                                                       |
-| `noBoxIsPlacedByAPhysicalEdge`                           | No `margin-`, `padding-`, `border-`, `left`/`right` offset, `float` or `clear` names a physical edge — the sibling of the rule above, for where a box sits rather than where its text sits.                                                                                                                                                         |
-| `bothPanelsOfTheHeaderControlsSlotDropUnderTheHeaderRow` | The language dropdown and the display settings are `position: static` inside the header, both panels take `inset-block-start: calc(100% + …)` of the header, and both take their inline offset from the same expression. No stylesheet can state the geometry — the measurement is in the acceptance suite; this holds the shape and the agreement. |
-| `aDirectionAwareIconIsMirroredInARightToLeftText`        | Every glyph that points somewhere carries a `:dir(rtl)` rule mirroring it — see [Reading direction](#reading-direction).                                                                                                                                                                                                                            |
-| `aTitleOnAnyHeadingLevelKeepsItsOwnCase`                 | `.theme-hero__title`, `.theme-teaser__title`, `.theme-feature__title` and `.theme-steps__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                                                                                                                                              |
-| `noComponentReferencesAnUndeclaredToken`                 | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                                                                                                                                          |
-| `aListItemHoldingAFloatKeepsItsMarker`                   | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                                                                                                                                             |
-| `aControlDrawsItsBoundaryInTheStrongBorderColour`        | The text input, the input group addon, the switch track and the tracks of progress and meter default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                                                                                                                                          |
-| `aHoveredTextInputChangesItsBorder`                      | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                                                                                                                                     |
-| `everyTableClassAnEditorCanPickIsStyled`                 | Every `table_class` an editor can pick — the core's `striped` and `bordered` and the `addItems` of `Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig` — has a compiled `.theme-table--<value>` rule.                                                                                                                                          |
-| `aBlockKeepsItsDistanceToWhatFollows`                    | The list, the description list, the code block, the figure, the button group and the table wrapper each end on `margin: 0 0 var(--theme-space-4)` in their base rule, so the next component never touches them.                                                                                                                                     |
+| Test                                                                    | Guards                                                                                                                                                                                                                                                                                                                                              |
+|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `everyComponentIsPartOfTheBundle`                                       | Every selector in the [component reference](#component-reference) is actually compiled into `theme.css` — dropping a `@use` from `theme.scss` is otherwise invisible until someone looks at a page.                                                                                                                                                 |
+| `collapsingTheMainNavigationRequiresTheScriptMarker`                    | The `[data-js]` gate on the navigation collapse still holds, at `bp.$md` and in every header arrangement — see [the `data-js` marker](#the-data-js-marker).                                                                                                                                                                                         |
+| `theTopLevelOfTheMainNavigationNeverWraps`                              | No rule whose subject is the top level list of the main navigation sets `flex-wrap` or `flex-flow` to wrap — see [header variants](#header-variants).                                                                                                                                                                                               |
+| `neitherTheTitleNorTheMenuOfTheHeaderIsCapped`                          | No `max-inline-size` or `max-width` on the site title, the main navigation or its top level list; the title keeps `min-inline-size: min-content` and can shrink; the navigation of each arrangement is `flex: none` exactly where its toggle is hidden, and no other rule under any scope sets how it flexes.                                       |
+| `everyHeaderArrangementCollapsesTheMainNavigationAtABreakpointOfItsOwn` | Every header arrangement read from the partials expands its menu from one `min-width` above `bp.$md` and collapses it exactly one pixel below, and no rule in a width media query reaches the menu without naming the header.                                                                                                                       |
+| `theContentElementOutlineSwitchesOffCompletely`                         | `[data-theme-content-outline='off']` still removes the label together with the outline — see [the content-element outline](#the-content-element-outline).                                                                                                                                                                                           |
+| `anElementWithoutPaddingKeepsItsContentClearOfTheChip`                  | `--frame-none` starts its content below the CType chip by `--theme-content-element-chip-clearance`, and the global switch and `--plain`, which remove the chip, set the clearance to `0`.                                                                                                                                                           |
+| `everyPaletteHasASwatchWithItsOwnColours`                               | Every palette has a `.theme-swatch--*` modifier, and its two literals equal the palette's primary and secondary pair — see [Appearance switching](appearance-switching.md#palette-swatches-carry-literal-colours).                                                                                                                                  |
+| `tabsShowEveryPanelUntilTheScriptHasBoundThem`                          | The tab list is hidden and the panel headings shown until the group carries `data-theme-tabs-bound`, and nothing about the tabs is gated on `[data-js]` — see [Components that need the script](#components-that-need-the-script).                                                                                                                  |
+| `aDialogOpenerIsHiddenWithoutTheScriptMarker`                           | `:root:not([data-js]) [data-theme-dialog-open]` still hides every opener nothing could operate.                                                                                                                                                                                                                                                     |
+| `textIsAlignedToTheStartOrTheEndOfTheLine`                              | No `text-align: left` or `right` is compiled — a physical alignment puts the text of a right-to-left page against the wrong edge, and the element baseline carried two until they were found.                                                                                                                                                       |
+| `noBoxIsPlacedByAPhysicalEdge`                                          | No `margin-`, `padding-`, `border-`, `left`/`right` offset, `float` or `clear` names a physical edge — the sibling of the rule above, for where a box sits rather than where its text sits.                                                                                                                                                         |
+| `bothPanelsOfTheHeaderControlsSlotDropUnderTheHeaderRow`                | The language dropdown and the display settings are `position: static` inside the header, both panels take `inset-block-start: calc(100% + …)` of the header, and both take their inline offset from the same expression. No stylesheet can state the geometry — the measurement is in the acceptance suite; this holds the shape and the agreement. |
+| `aDirectionAwareIconIsMirroredInARightToLeftText`                       | Every glyph that points somewhere carries a `:dir(rtl)` rule mirroring it — see [Reading direction](#reading-direction).                                                                                                                                                                                                                            |
+| `aTitleOnAnyHeadingLevelKeepsItsOwnCase`                                | `.theme-hero__title`, `.theme-teaser__title`, `.theme-feature__title` and `.theme-steps__title` state `text-transform: none`, so a title rendered as `h5` does not turn into capitals.                                                                                                                                                              |
+| `noComponentReferencesAnUndeclaredToken`                                | Every `var(--theme-…)` referenced anywhere under `Resources/Private/Scss/` is declared somewhere in the same tree — walked on the sources, not the compiled file, so the offending name is still readable.                                                                                                                                          |
+| `aListItemHoldingAFloatKeepsItsMarker`                                  | A list item holding a floated figure or gallery is `flow-root list-item`, not `flow-root`, which would drop its marker.                                                                                                                                                                                                                             |
+| `aControlDrawsItsBoundaryInTheStrongBorderColour`                       | The text input, the input group addon, the switch track and the tracks of progress and meter default to `--theme-color-border-strong`, with its light value as the fallback literal — see [Forms](#forms).                                                                                                                                          |
+| `aHoveredTextInputChangesItsBorder`                                     | The hover border of `.theme-input` differs from its resting one, now that the resting one is the strong border.                                                                                                                                                                                                                                     |
+| `everyTableClassAnEditorCanPickIsStyled`                                | Every `table_class` an editor can pick — the core's `striped` and `bordered` and the `addItems` of `Configuration/PageTsConfig/TCEFORM/TableClass.tsconfig` — has a compiled `.theme-table--<value>` rule.                                                                                                                                          |
+| `aBlockKeepsItsDistanceToWhatFollows`                                   | The list, the description list, the code block, the figure, the button group and the table wrapper each end on `margin: 0 0 var(--theme-space-4)` in their base rule, so the next component never touches them.                                                                                                                                     |
 
 The last one strips comments before scanning, which matters here specifically:
 the comment documenting why a breakpoint cannot be a custom property spells

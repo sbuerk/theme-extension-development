@@ -28,11 +28,11 @@
 // suite. So a popover panel can only be pinned to a viewport coordinate, and
 // the coordinate this one wants - the bottom edge of the header row - is not
 // one CSS can name. The header's height depends on its content: the site
-// title wraps, and the main menu wraps onto a second row from "bp.$md" up
-// ("layout/_site-header.scss"). Every constant is therefore wrong for some
-// site, and the one that shipped - none at all - put the panel at the top of
-// the viewport, over its own trigger, the settings cog and the end of the
-// menu.
+// title wraps onto as many lines as it needs ("layout/_site-header.scss"),
+// and the main menu used to wrap onto a second row. Every constant is
+// therefore wrong for some site, and the one that shipped - none at all - put
+// the panel at the top of the viewport, over its own trigger, the settings
+// cog and the end of the menu.
 //
 // Pinning a box to another box is what CSS **anchor positioning** is for, and
 // that is above the browser floor of "DESIGN.md" - which is why the panel is
@@ -223,8 +223,9 @@
 //
 // **In the site header it is anchored one level further out**, on the header,
 // so that it drops under the whole row rather than into it: the row is as tall
-// as its tallest child and the menu may take two rows inside it, so a panel
-// starting just under the 44 pixel trigger would cover the second one. That
+// as its tallest child - a title on several lines, or the two rows the menu
+// used to wrap onto - so a panel starting just under the 44 pixel trigger
+// would cover what is beside it. That
 // override, and why both of its offsets are exact, is in
 // "layout/_site-header.scss".
 //

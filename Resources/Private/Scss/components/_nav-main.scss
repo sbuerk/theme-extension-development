@@ -31,6 +31,24 @@
 // It is a Sass variable rather than a custom property because a media query
 // condition is evaluated before the cascade - see "abstracts/_breakpoints.scss".
 //
+// **Not in the site header.** There the menu shares its row with the site
+// title and the controls, or the title's row decides how much width is left,
+// and seven entries need far more than 768 pixels. So the header collapses
+// its menu at a breakpoint of its own per arrangement - see "Each arrangement
+// collapses at its own width" in "layout/_site-header.scss". Everything that
+// changes at the breakpoint is therefore written once, as the two mixins
+// "expanded" and "collapsed" at the end of this file, and included twice:
+// here at "bp.$md" for a menu anywhere but in the site header - the
+// styleguide specimen, a site package repeating the menu in its footer - and
+// in the header at the breakpoint of its arrangement.
+//
+// "Anywhere but in the site header" is ":not(.theme-site-header *)", a
+// complex selector inside ":not()", which every browser of the floor
+// supports. The alternative, letting the "bp.$md" rules reach the header too
+// and taking them back between "bp.$md" and the header's own breakpoint,
+// needs a reset for every declaration of "expanded" - a second copy of this
+// component's defaults that nothing keeps in step with the first.
+//
 // --- State lives in the ARIA attribute --------------------------------------
 //
 // The open state of the collapsed menu is read off "[aria-expanded='true']" on
@@ -108,14 +126,6 @@
     [data-js] & {
         display: inline-flex;
     }
-
-    @media (min-width: bp.$md) {
-        display: none;
-
-        [data-js] & {
-            display: none;
-        }
-    }
 }
 
 // Shared reset for both levels, and the open layout is the default: stacked.
@@ -132,34 +142,6 @@
 // match the nested "&--sub" list and fight its rules below.
 .theme-nav-main > .theme-nav-main__list {
     width: 100%;
-
-    @media (min-width: bp.$md) {
-        flex-direction: row;
-        align-items: center;
-        width: auto;
-    }
-}
-
-// In a row the gap spaces the entries, and the bottom margin every "li" takes
-// from the element baseline - all but the last one - only moves them: an
-// entry is centred in its row by its margin box, so the last one sat half a
-// margin lower than the others. Stacked, below the breakpoint, the margin
-// still adds to the gap as before.
-@media (min-width: bp.$md) {
-    .theme-nav-main > .theme-nav-main__list > .theme-nav-main__item {
-        margin-block-end: 0;
-    }
-}
-
-// Collapsing, as an enhancement. Both conditions have to hold: a script has
-// announced itself on the root, and the viewport is narrow enough for the row
-// layout not to apply. The selector hides what is *not* disclosed, so the
-// state the page starts in - and stays in without JavaScript - is the usable
-// one.
-@media (max-width: bp.$md-max) {
-    [data-js] .theme-nav-main:not(:has(.theme-nav-main__toggle[aria-expanded='true'])) > .theme-nav-main__list {
-        display: none;
-    }
 }
 
 // The anchor for the "&--sub" list's absolute position on wide viewports.
@@ -211,8 +193,38 @@
     gap: var(--theme-space-1);
     margin-block: var(--theme-space-1) 0;
     padding-inline-start: var(--theme-space-4);
+}
 
-    @media (min-width: bp.$md) {
+// --- Expanded and collapsed ---------------------------------------------------
+//
+// Both are included inside a rule for the navigation itself, so "&" is the
+// "nav". See "The breakpoint" above for why they are mixins.
+
+// The row, from the breakpoint up: the toggle has nothing left to disclose,
+// the top level is a row, and the second level floats under its entry.
+@mixin expanded {
+    // Specific enough to win over "[data-js] .theme-nav-main__toggle" above,
+    // which shows the toggle once a script can operate it.
+    > .theme-nav-main__toggle {
+        display: none;
+    }
+
+    > .theme-nav-main__list {
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+    }
+
+    // In a row the gap spaces the entries, and the bottom margin every "li"
+    // takes from the element baseline - all but the last one - only moves
+    // them: an entry is centred in its row by its margin box, so the last one
+    // sat half a margin lower than the others. Stacked, below the breakpoint,
+    // the margin still adds to the gap as before.
+    > .theme-nav-main__list > .theme-nav-main__item {
+        margin-block-end: 0;
+    }
+
+    .theme-nav-main__list--sub {
         position: absolute;
         inset-inline-start: 0;
         inset-block-start: 100%;
@@ -225,13 +237,36 @@
         border: var(--theme-border-width) solid var(--theme-nav-main-border-color);
         border-radius: var(--theme-nav-main-radius);
     }
-}
 
-// ":focus-within" rather than only ":focus" on the link, so tabbing into the
-// panel does not close the very thing being tabbed through.
-@media (min-width: bp.$md) {
+    // ":focus-within" rather than only ":focus" on the link, so tabbing into
+    // the panel does not close the very thing being tabbed through.
     .theme-nav-main__item:hover > .theme-nav-main__list--sub,
     .theme-nav-main__item:focus-within > .theme-nav-main__list--sub {
         display: flex;
+    }
+}
+
+// Collapsing, as an enhancement, below the breakpoint. Both conditions have to
+// hold: a script has announced itself on the root, and the viewport is narrow
+// enough for the row not to apply. The selector hides what is *not* disclosed,
+// so the state the page starts in - and stays in without JavaScript - is the
+// usable one.
+@mixin collapsed {
+    [data-js] &:not(:has(.theme-nav-main__toggle[aria-expanded='true'])) > .theme-nav-main__list {
+        display: none;
+    }
+}
+
+// A navigation anywhere but in the site header, which includes both at
+// breakpoints of its own.
+@media (min-width: bp.$md) {
+    .theme-nav-main:not(.theme-site-header *) {
+        @include expanded;
+    }
+}
+
+@media (max-width: bp.$md-max) {
+    .theme-nav-main:not(.theme-site-header *) {
+        @include collapsed;
     }
 }
