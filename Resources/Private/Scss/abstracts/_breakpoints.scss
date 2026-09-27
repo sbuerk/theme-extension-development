@@ -18,14 +18,22 @@
 // navigation's two levels stop fitting a single row, and every other component
 // that stacks was checked to see whether it wanted a different one - none did.
 //
-// "$lg" is used by one component, the site header, and by nothing else. Above
-// "$md" the header holds the title and the menu in one row, and which of the
-// two gives way when the row gets tight depends on how wide the row is: on a
-// wide one the title keeps its line and the menu wraps, on a narrow one the
-// menu keeps its row and the title wraps. Flex layout cannot make that choice
-// by itself, so the header switches at "$lg" - see "layout/_site-header.scss".
-// A further breakpoint should be added when a component actually needs it, not
-// in anticipation of one.
+// The "$header-*" breakpoints are used by one component, the site header, and
+// by nothing else. The main navigation in the header never wraps: it holds its
+// top level in one row, or it collapses behind its toggle. Where the row
+// runs out depends on what else the arrangement puts beside the menu, so each
+// arrangement has a breakpoint of its own - see "Each arrangement collapses at
+// its own width" in "layout/_site-header.scss", which also has the
+// measurements behind the numbers.
+//
+// Budget: seven showcase-sized entries. Each of them is the width the header
+// needs to hold the seven top level entries of the showcase, its title and its
+// two controls, plus a margin for a font that runs wider than the one it was
+// measured in. A site whose entries are longer, or more, needs a larger one;
+// a site with three short entries could do with a smaller one. The stylesheet
+// cannot see the menu it is given, so the budget is stated rather than
+// computed. A further breakpoint should be added when a component actually
+// needs it, not in anticipation of one.
 
 // 768px at the default root size. Expressed in rem so the layout responds to
 // the reader's font size as well as to the viewport.
@@ -36,6 +44,21 @@ $md: 48rem;
 // is the smallest step that cannot overlap "$md".
 $md-max: 47.9375rem;
 
-// 1024px at the default root size, and its complement.
-$lg: 64rem;
-$lg-max: 63.9375rem;
+// The site header, per arrangement. Budget: seven showcase-sized entries.
+// "simple" shares one row between the title, the menu and the controls;
+// "centred" and "actions" give the menu a row of its own; "two-tier" shares a
+// row between the title and the menu and moves the controls above them.
+//
+// "!default", so a site package with a longer or a shorter menu compiles the
+// stylesheet with its own values instead of editing this file, which an
+// update of the extension overwrites:
+//
+//     @use 'abstracts/breakpoints' with ($header-simple: 80rem);
+//     @use 'theme';
+//
+// The "with" has to come before anything else loads this module - see
+// "docs/development/component-library.md#header-variants".
+$header-simple: 74rem !default;
+$header-centred: 55rem !default;
+$header-actions: 55rem !default;
+$header-two-tier: 65rem !default;

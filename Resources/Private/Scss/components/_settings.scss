@@ -184,13 +184,13 @@
 // rendered with an "idPrefix" of its own, anywhere on a page.
 //
 // **In the site header it is anchored one level further out**, on the header,
-// so that it drops under the whole row rather than into it. The row is as tall
-// as its tallest child and the menu may take two rows inside it, so a panel
-// starting just under the 44 pixel cog covered them: measured at 1280 pixels,
-// it opened at y 104.5 in a 146 pixel header, over two entries of the second
-// row. That override, and why both of its offsets are derived rather than
-// chosen, is in "layout/_site-header.scss", which places the dropdown beside
-// this control with the same declarations.
+// so that it drops under the whole row rather than into it. The row is as
+// tall as its tallest child, so a panel starting just under the 44 pixel cog
+// covered what was beside it: measured at 1280 pixels while the menu still
+// wrapped onto two rows, it opened at y 104.5 in a 146 pixel header, over
+// two entries of the second row. That override, and why both of its offsets
+// are derived rather than chosen, is in "layout/_site-header.scss", which
+// places the dropdown beside this control with the same declarations.
 //
 // Never wider than the viewport less a gutter on either side: at 360px that
 // still leaves the full 19rem, below it the panel narrows instead of

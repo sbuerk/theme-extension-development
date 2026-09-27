@@ -28,10 +28,21 @@
 
     Widths. These headers are rendered inside the content column, not across
     the page, so what they show is the arrangement of their rows and not the
-    widths the real header negotiates. Those are measured in a browser, at
-    four viewport widths, by "Tests/Acceptance/frontend.spec.ts" on the page's
-    own header, which is the default variant - the one whose single row has a
-    budget to keep.
+    widths the real header needs. Each arrangement collapses its menu at a
+    viewport width of its own ("layout/_site-header.scss"), and a specimen
+    follows it although it is narrower than the viewport - three entries fit
+    it anyway. The widths are measured in a browser by
+    "Tests/Acceptance/frontend.spec.ts" on the page's own header, rearranged
+    into each variant with the rows of these specimens.
+
+    Toggles. Each specimen's navigation carries the menu toggle the real
+    partial renders, with an id of its own. Below the breakpoint of its
+    arrangement the collapse rule hides the list of every ".theme-nav-main"
+    whose toggle is not expanded, and "theme.js" binds every toggle - so a
+    specimen without one lost its menu on "/styleguide" with nothing to open
+    it again. That used to happen below 768 pixels only; for "simple" it now
+    happens below 1184. The visual suite renders without "data-js", where the
+    toggle is not shown.
 
     Controls. Each specimen stands one icon button in for the controls slot,
     which in the real header holds the language dropdown and the display
@@ -62,8 +73,10 @@
         <code>.theme-site-header</code>; the default carries no modifier at all,
         so a site that never touches the setting keeps exactly the header it
         had. The three others each give the title or the navigation a row of
-        its own, which is why none of them has to re-negotiate the width budget
-        the single row keeps.
+        its own, or move the controls out of the title's row. In all four the
+        navigation keeps its entries in one row and the title gives way; where
+        one row no longer fits, the navigation collapses behind its toggle, at
+        a width that depends on the arrangement.
     </p>
 
     <p>
@@ -86,7 +99,8 @@
             <div class="theme-site-header__inner">
                 <a class="theme-site-header__brand" href="#">Theme</a>
                 <nav class="theme-nav-main" aria-label="Simple header navigation specimen">
-                    <ul class="theme-nav-main__list">
+                    <button type="button" class="theme-nav-main__toggle" aria-expanded="false" aria-controls="theme-styleguide-chrome-simple-nav"><theme:icon name="bars" /> Menu</button>
+                    <ul class="theme-nav-main__list" id="theme-styleguide-chrome-simple-nav">
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Elements</a></li>
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Typography</a></li>
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Styleguide</a></li>
@@ -119,7 +133,8 @@
             </div>
             <div class="theme-site-header__inner theme-site-header__inner--navigation">
                 <nav class="theme-nav-main" aria-label="Centred header navigation specimen">
-                    <ul class="theme-nav-main__list">
+                    <button type="button" class="theme-nav-main__toggle" aria-expanded="false" aria-controls="theme-styleguide-chrome-centred-nav"><theme:icon name="bars" /> Menu</button>
+                    <ul class="theme-nav-main__list" id="theme-styleguide-chrome-centred-nav">
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Elements</a></li>
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Typography</a></li>
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Styleguide</a></li>
@@ -152,7 +167,8 @@
             </div>
             <div class="theme-site-header__inner theme-site-header__inner--navigation">
                 <nav class="theme-nav-main" aria-label="Header with actions navigation specimen">
-                    <ul class="theme-nav-main__list">
+                    <button type="button" class="theme-nav-main__toggle" aria-expanded="false" aria-controls="theme-styleguide-chrome-actions-nav"><theme:icon name="bars" /> Menu</button>
+                    <ul class="theme-nav-main__list" id="theme-styleguide-chrome-actions-nav">
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Elements</a></li>
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Typography</a></li>
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Styleguide</a></li>
@@ -182,7 +198,8 @@
             <div class="theme-site-header__inner theme-site-header__inner--main">
                 <a class="theme-site-header__brand" href="#">Theme</a>
                 <nav class="theme-nav-main" aria-label="Two tier header navigation specimen">
-                    <ul class="theme-nav-main__list">
+                    <button type="button" class="theme-nav-main__toggle" aria-expanded="false" aria-controls="theme-styleguide-chrome-two-tier-nav"><theme:icon name="bars" /> Menu</button>
+                    <ul class="theme-nav-main__list" id="theme-styleguide-chrome-two-tier-nav">
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Elements</a></li>
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Typography</a></li>
                         <li class="theme-nav-main__item"><a class="theme-nav-main__link" href="#">Styleguide</a></li>
