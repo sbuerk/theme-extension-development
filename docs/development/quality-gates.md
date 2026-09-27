@@ -38,7 +38,8 @@ Build/Scripts/runTests.sh -s checkTestMethodsPrefix
 # Ensure the committed CSS matches its SCSS sources.
 Build/Scripts/runTests.sh -s checkCssBuild
 
-# Ensure the committed icons equal the pinned Font Awesome Free package.
+# Ensure the icon directory is exactly the build of the pinned Font Awesome
+# Free package, plus ATTRIBUTION.txt.
 Build/Scripts/runTests.sh -s checkIconsBuild
 ```
 
