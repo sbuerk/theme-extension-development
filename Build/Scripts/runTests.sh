@@ -862,6 +862,13 @@ case ${TEST_SUITE} in
         cp "instance-core-${CORE_VERSION}/composer.json" "${ACCEPTANCE_INSTANCE}/"
         cp -R "instance-core-${CORE_VERSION}/config/sites" "${ACCEPTANCE_INSTANCE}/config/"
         cp "instance-core-${CORE_VERSION}/config/system/additional.php" "${ACCEPTANCE_INSTANCE}/config/system/"
+        # The instance of this suite enforces the frontend Content Security Policy, and only
+        # this copy of the configuration says so: the committed "instance-core-*/" and the
+        # DDEV instances built from it stay as they are. "frontend.spec.ts" collects every
+        # "securitypolicyviolation" across the showcase, so a script, a style or a media
+        # source the policy blocks fails the suite rather than a site that enforces it.
+        # See "docs/testing/acceptance-tests.md".
+        printf '\n// Appended by "runTests.sh -s acceptance" to its copy of this file only.\n$GLOBALS['\''TYPO3_CONF_VARS'\'']['\''SYS'\'']['\''features'\'']['\''security.frontend.enforceContentSecurityPolicy'\''] = true;\n' >> "${ACCEPTANCE_INSTANCE}/config/system/additional.php"
 
         COMMAND="composer install --no-progress --no-interaction && composer system:setup"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name acceptance-setup-${SUFFIX} -w "${ROOT_DIR}/${ACCEPTANCE_INSTANCE}" -e COMPOSER_CACHE_DIR="${ROOT_DIR}/.cache/composer" ${IMAGE_PHP} /bin/sh -c "${COMMAND}"

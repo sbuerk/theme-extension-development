@@ -29,7 +29,11 @@ no `composerUpdate` is needed before it.
    its `config/system/additional.php`. `.Build/acceptance/theme` and
    `.Build/acceptance/packages-dev` are symlinks recreating the two paths an
    instance resolves one level up, the way the repository root provides them
-   for `instance-core-*/`.
+   for `instance-core-*/`. One line is appended to the **copy** of
+   `additional.php`: `security.frontend.enforceContentSecurityPolicy = true`.
+   The instance of the suite enforces TYPO3's frontend Content Security Policy,
+   while the committed `instance-core-*/` and every DDEV instance built from it
+   stay as they are — see [under a Content Security Policy](#under-a-content-security-policy).
 2. **Sets it up with the instance tooling itself** — `composer install`, then
    `composer system:setup`, the script `ddev start` runs on a fresh clone. The
    suite is therefore also the test of that tooling: `typo3 setup`, the database
@@ -210,6 +214,29 @@ What the two engines are not:
   is not Safari, and adding it is a decision of its own.
 - **Not the visual suite.** Its screenshots and its axe pass run in Chromium
   only — see [what it does not cover](visual-tests.md#what-it-does-not-cover).
+
+## Under a Content Security Policy
+
+A browser blocks what a Content Security Policy does not allow without an error
+the page can see: a script that does not run, a source that does not load. So
+the instance of the suite enforces TYPO3's frontend policy, and
+`frontend.spec.ts` collects every `securitypolicyviolation` event on a list of
+showcase pages — the start page, typography, media, the styleguide of both
+trees, a form, the cheatsheet and the external media page with every
+click-to-load embed opened, and a composed page — and requires none, with
+`data-js` set by the no-flash script and `data-js-bound` by `theme.js`.
+
+Before the policy was enforced here, two things of the theme were blocked
+under it: the inline no-flash script of the head, which
+`Configuration/ContentSecurityPolicies.php` allows by its hash since, and the
+`data:` sources and caption tracks of the media specimen, which `media-src`
+does not allow and which are files below `Resources/Public/Media/Styleguide/`
+since. Every other spec runs under the policy too, so a component that needs
+something it does not allow fails where it is used.
+
+The flag is appended by `runTests.sh` rather than committed to
+`instance-core-*/config/system/additional.php`: a development instance is for
+looking at the theme, and a policy there is a decision of whoever runs it.
 
 ## What the specs cover
 
