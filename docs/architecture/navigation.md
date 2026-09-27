@@ -309,19 +309,29 @@ container off its own `max-width` and padding. `layout/_site-header.scss`
 carries the rule and the measurements; `ComponentLibraryTest` holds the two to
 the same edge, and the acceptance suite opens both and measures where they land.
 
-That anchor holds only while **nothing between the header and the controls
-slot is positioned**, in any of the four
+That anchor holds only while **no box between the header and the panels
+establishes a containing block**, in any of the four
 [header variants](../development/component-library.md#header-variants) and at
 any width: a positioned row or slot becomes the containing block of both panels
 and they open inside the header. `centred` did exactly that — its title row was
 `position: relative` and its controls `position: absolute` from `bp.$md` up —
-and it is laid out with a flex counterweight now.
-`ComponentLibraryTest::noBoxBetweenTheHeaderAndItsControlsIsPositioned` fails on
-a positioned row, meta row or controls slot. The acceptance suite opens both
-panels in all four variants at 1280, 768 and 375 pixels — 768 is `bp.$md`
-itself — and measures that each drops under the whole header and ends at the
-header's content container, and that no title reaches under a trigger; from 768
-up it also holds the title of `centred` on the centre of its row.
+and it is laid out with a flex counterweight now. `position` is not the only
+way there: a `transform` or one of `translate`, `rotate`, `scale`,
+`perspective`, a `filter` or `backdrop-filter`, layout or paint containment
+(`contain`, `content-visibility`), a `will-change` naming one of those, and a
+size container on the browser floor capture a panel the same way, and a fixed
+positioned one as well.
+`ComponentLibraryTest::noBoxBetweenTheHeaderAndItsPanelsIsAContainingBlock`
+fails on any of them on a row, the meta band, the controls slot, the main
+navigation — whose collapsed menu is the third panel placed against the
+header — or one of the two components, whether the rule names the box by its
+class or by its element (`.theme-site-header > div`, `header nav`). Its
+docblock cites the specification of each and says what it cannot see. The
+acceptance suite opens both panels in all four variants at 1280, 768 and 375
+pixels — 768 is `bp.$md` itself — and measures that each drops under the
+whole header and ends at the header's content container, and that no title
+reaches under a trigger; from 768 up it also holds the title of `centred` on
+the centre of its row.
 
 What the change costs is the **light dismiss** the Popover API gave for free.
 `theme.js` writes it back: Escape, a click outside, and focus leaving the
