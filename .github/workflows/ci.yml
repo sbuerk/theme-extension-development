@@ -139,6 +139,10 @@ name: "CI"
 
 on:
   pull_request:
+  # By hand, and every night by "nightly.yml" of "main", which starts this
+  # workflow on this branch and waits for the result. A "schedule" fires on the
+  # default branch only, so this branch has no nightly workflow of its own, and
+  # this trigger is what the nightly run of "main" needs here.
   workflow_dispatch:
 
 # Least privilege. Nothing in this workflow writes, and it must stay that way:
@@ -149,7 +153,9 @@ permissions:
   contents: read
 
 # Superseded runs of the same pull request are pointless, and this workflow is
-# not cheap. Pushing twice in a minute cancels the first run.
+# not cheap. Pushing twice in a minute cancels the first run. A dispatched run
+# has no pull request number and is grouped by its branch, "refs/heads/<branch>",
+# so a nightly run and a pull request run never cancel each other.
 concurrency:
   group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
   cancel-in-progress: true

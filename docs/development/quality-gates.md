@@ -405,6 +405,35 @@ costs to avoid — of a dependency set that was going to be replaced anyway.
 CI is the safety net, not the first run — the gates are cheap enough to run
 locally before pushing.
 
+### The nightly run
+
+The complete `ci.yml` of this branch runs every night, started by
+[`nightly.yml` on `main`](https://github.com/sbuerk/theme-extension-development/blob/main/.github/workflows/nightly.yml)
+at 02:37 UTC, which dispatches `ci.yml` on `main` and on `1` and waits for
+both results. Its reasons and its cost are documented with it, in the quality
+gates page of `main`. What matters on this branch:
+
+- **There is no `nightly.yml` here, deliberately.** A `schedule` fires on the
+  default branch only, with the workflow file of the default branch; a copy on
+  this branch would never run. `main`'s workflow starts this one through the
+  `workflow_dispatch` trigger of `ci.yml`, which runs `ci.yml` as it is on
+  this branch. That trigger has to stay.
+- **Why at all.** `ci.yml` runs for pull requests and by hand, so a merged state
+  is never checked again. And there is no `composer.lock`: a TYPO3 v12 or v13
+  patch release or any other dependency release changes what a run installs
+  without a commit here. The nightly run is where that shows up first, rather
+  than in the next unrelated pull request.
+- **Concurrency.** The dispatched run is grouped by branch,
+  `CI-refs/heads/1`, and a pull request run by its number, so the two never
+  cancel each other. A `ci.yml` run started by hand on this branch meanwhile
+  does cancel the nightly one, and the nightly job on `main` then fails.
+- **Where it is seen.** The run belongs to `github-actions` and notifies
+  nobody itself. The nightly job on `main` follows it and fails when it fails,
+  and GitHub reports a failed scheduled run to whoever last changed its `cron`
+  line.
+- **The matrix.** When this branch is retired, it is removed from the matrix of
+  `nightly.yml` on `main`.
+
 ### Commenting on a pull request from a fork
 
 [`.github/workflows/pr-comment.yml`](../../.github/workflows/pr-comment.yml)
