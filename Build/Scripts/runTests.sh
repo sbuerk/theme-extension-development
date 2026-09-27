@@ -1199,10 +1199,18 @@ case ${TEST_SUITE} in
             )
         fi
         COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-${DBMS} --exclude-group not-core-${CORE_VERSION} "${FUNCTIONAL_ARGUMENTS[@]}")
+        # Server options of the MySQL and MariaDB containers. Their data directory is a tmpfs,
+        # thrown away with the container, so durability buys nothing: no binary log (on by
+        # default in MySQL 8, off in MariaDB anyway), the redo log written but not flushed on
+        # every commit, no doublewrite buffer. Every version "-i" accepts whose image was at hand -
+        # MySQL 8.0 and 8.4, MariaDB 10.4, 10.6, 10.7, 10.11 and 11.0 to 11.8 - came up with them
+        # and reported log_bin 0, innodb_flush_log_at_trx_commit 2 and innodb_doublewrite off.
+        # See "docs/testing/functional-tests.md".
+        MYSQL_SERVER_OPTIONS="--skip-log-bin --innodb-flush-log-at-trx-commit=2 --innodb-doublewrite=0"
         case ${DBMS} in
             mariadb)
                 echo "Using driver: ${DATABASE_DRIVER}"
-                ${CONTAINER_BIN} run --rm ${CI_PARAMS} --name mariadb-func-${SUFFIX} --network ${NETWORK} -d -e MYSQL_ROOT_PASSWORD=funcp --tmpfs /var/lib/mysql/:rw,noexec,nosuid ${IMAGE_MARIADB} >/dev/null
+                ${CONTAINER_BIN} run --rm ${CI_PARAMS} --name mariadb-func-${SUFFIX} --network ${NETWORK} -d -e MYSQL_ROOT_PASSWORD=funcp --tmpfs /var/lib/mysql/:rw,noexec,nosuid ${IMAGE_MARIADB} ${MYSQL_SERVER_OPTIONS} >/dev/null
                 SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 waitForDatabase mariadb mariadb-func-${SUFFIX} ${IMAGE_MARIADB}
                 CONTAINERPARAMS="-e typo3DatabaseDriver=${DATABASE_DRIVER} -e typo3DatabaseName=func_test -e typo3DatabaseUsername=root -e typo3DatabaseHost=mariadb-func-${SUFFIX} -e typo3DatabasePassword=funcp"
@@ -1211,7 +1219,7 @@ case ${TEST_SUITE} in
                 ;;
             mysql)
                 echo "Using driver: ${DATABASE_DRIVER}"
-                ${CONTAINER_BIN} run --rm ${CI_PARAMS} --name mysql-func-${SUFFIX} --network ${NETWORK} -d -e MYSQL_ROOT_PASSWORD=funcp --tmpfs /var/lib/mysql/:rw,noexec,nosuid ${IMAGE_MYSQL} >/dev/null
+                ${CONTAINER_BIN} run --rm ${CI_PARAMS} --name mysql-func-${SUFFIX} --network ${NETWORK} -d -e MYSQL_ROOT_PASSWORD=funcp --tmpfs /var/lib/mysql/:rw,noexec,nosuid ${IMAGE_MYSQL} ${MYSQL_SERVER_OPTIONS} >/dev/null
                 SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 waitForDatabase mysql mysql-func-${SUFFIX} ${IMAGE_MYSQL}
                 CONTAINERPARAMS="-e typo3DatabaseDriver=${DATABASE_DRIVER} -e typo3DatabaseName=func_test -e typo3DatabaseUsername=root -e typo3DatabaseHost=mysql-func-${SUFFIX} -e typo3DatabasePassword=funcp"

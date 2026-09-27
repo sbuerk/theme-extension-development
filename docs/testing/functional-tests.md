@@ -43,6 +43,19 @@ accepted per DBMS: MariaDB `10.4` … `11.8`, MySQL `8.0` … `8.4`, PostgreSQL
 `10` … `18`. The default is the oldest still supported version, so a run without
 `-i` tests the floor of the version range rather than the comfortable case.
 
+The MySQL and MariaDB containers start with
+`--skip-log-bin --innodb-flush-log-at-trx-commit=2 --innodb-doublewrite=0`.
+Their data directory is a tmpfs thrown away with the container, so the binary
+log MySQL 8 writes by default, the flush of the redo log on every commit and the
+doublewrite buffer protect nothing. Every version `-i` accepts whose image was at
+hand — MySQL 8.0 and 8.4, MariaDB 10.4, 10.6, 10.7, 10.11 and 11.0 to 11.8 —
+started with them and reported the three settings off.
+Measured once here, MySQL 8.0 with `-j 4` on TYPO3 v14: 1139 s against 1201 s
+without them, the chunks together 2048 s against 2151 s — about 5 % less, which
+is within the spread of two runs of the same setup. In the CI of
+fgtclb/academic-extensions, where the options come from, the functional jobs
+took 7 to 15 % less on MySQL and 5 to 10 % less on MariaDB.
+
 PostgreSQL 18 moved its data directory and refuses to start when a mount sits at
 the old location. The wrapper places the mount one level higher for `18` and
 above, which is the mount point the image documents for that case — nothing to
