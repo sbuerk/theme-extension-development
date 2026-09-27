@@ -178,6 +178,39 @@ final class AppearanceRenderingTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * The marker is a promise that "theme.js" will operate the controls, and
+     * the head script takes it back at "DOMContentLoaded" unless the module
+     * confirmed with "data-js-bound" - a module that failed to load or threw
+     * otherwise leaves a hidden menu behind a toggle that opens nothing. See
+     * "The marker is a promise" in "Appearance.typoscript".
+     *
+     * The listener is registered right after the marker and before anything
+     * reads "localStorage": a read that throws must not cost the page its
+     * way back any more than its marker.
+     */
+    #[Test]
+    public function theNoFlashScriptTakesTheMarkerBackUnlessTheModuleConfirmsIt(): void
+    {
+        $head = $this->head($this->render());
+
+        $marker = strpos($head, "root.setAttribute('data-js', '')");
+        $listener = strpos($head, "document.addEventListener('DOMContentLoaded', function () {");
+        $this->assertIsInt($marker, 'The head script does not set the "data-js" marker.');
+        $this->assertIsInt($listener, 'The head script does not wait for "DOMContentLoaded" to check the marker.');
+        $this->assertMatchesRegularExpression(
+            "/document\\.addEventListener\\('DOMContentLoaded', function \\(\\) \\{\\s*if \\(!root\\.hasAttribute\\('data-js-bound'\\)\\) \\{\\s*root\\.removeAttribute\\('data-js'\\);\\s*\\}\\s*\\}\\);/",
+            $head,
+            'The head script does not take "data-js" back when "theme.js" did not confirm it.',
+        );
+        $this->assertLessThan($listener, $marker, 'The marker has to be set before the listener is registered.');
+        $this->assertLessThan(
+            (int)strpos($head, 'window.localStorage.getItem('),
+            $listener,
+            'The listener has to be registered before anything reads "localStorage".',
+        );
+    }
+
+    /**
      * The marker is what switches the navigation from "always expanded" to
      * "collapsible" and what reveals the settings control. It must not be in
      * the delivered markup: with no JavaScript, a collapsible navigation

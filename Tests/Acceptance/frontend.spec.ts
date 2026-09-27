@@ -631,6 +631,155 @@ test.describe('the display settings', () => {
     });
 });
 
+/**
+ * A `theme.js` that does not do its job leaves the menu usable.
+ *
+ * The inline head script sets `data-js` before first paint, so a page that
+ * works paints its menu collapsed from the first frame. The toggles are bound
+ * by `theme.js`, though, and a module that is not found, or that throws before
+ * it gets to them, used to leave the menu hidden behind a toggle that opens
+ * nothing - below the breakpoint of the header's arrangement, which for the
+ * default one is every width under 1184 pixels. The head script now takes
+ * `data-js` back at `DOMContentLoaded` unless the module set `data-js-bound`
+ * once the controls gated on `data-js` were bound, and the page falls back to
+ * its layout without a script. A throw in a binder after that - a carousel, a
+ * lightbox - is isolated and leaves the header as it is, and a module that
+ * runs late sets `data-js` again with its confirmation.
+ * See "The marker is a promise" in `Configuration/TypoScript/Appearance.typoscript`.
+ */
+test.describe('the main navigation when theme.js does not do its job', () => {
+    const header = (page: Page) => page.locator('.theme-page > .theme-site-header');
+    const failures = {
+        'is not found': async (page: Page) => page.route(/\/JavaScript\/theme\.js/, (route) => route.fulfill({ status: 404, body: '' })),
+        'throws before the toggles are bound': async (page: Page) => page.route(/\/JavaScript\/theme\.js/, async (route) => {
+            const response = await route.fetch();
+            const body = (await response.text()).replace('\nbindMainMenuToggle();\n', "\nthrow new Error('theme.js broke before the toggles');\n");
+            await route.fulfill({ response, body });
+        }),
+    };
+
+    for (const [failure, arrange] of Object.entries(failures)) {
+        for (const width of [1000, 375]) {
+            test(`stays open when the module ${failure}, at ${width} pixels`, async ({ page }) => {
+                await page.setViewportSize({ width, height: 800 });
+                await arrange(page);
+                await page.goto('/typography');
+
+                await expect(page.locator('html')).not.toHaveAttribute('data-js-bound', /.*/);
+                await expect(page.locator('html')).not.toHaveAttribute('data-js', /.*/);
+                // The menu is shown and the dead toggle is not, and neither is
+                // the settings cog, which would open nothing either.
+                await expect(header(page).locator('.theme-nav-main__toggle')).toBeHidden();
+                await expect(header(page).locator('nav.theme-nav-main > .theme-nav-main__list')).toBeVisible();
+                await expect(header(page).getByRole('link', { name: 'Typography', exact: true })).toBeVisible();
+                await expect(header(page).locator('.theme-settings')).toBeHidden();
+                expect(await header(page).evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(0);
+            });
+        }
+    }
+
+    // A binder after the confirmation that throws - here the carousels - is
+    // reported and isolated: the header keeps its collapsed menu and a
+    // toggle that works, and the binders after it still run. Confirming as
+    // the last statement of the module took the whole page back to its
+    // no-script layout for a broken carousel.
+    test('keeps the header collapsed and working when a later binder throws', async ({ page }) => {
+        await page.setViewportSize({ width: 1000, height: 800 });
+        const errors: string[] = [];
+        page.on('pageerror', (error) => errors.push(error.message));
+        await page.route(/\/JavaScript\/theme\.js/, async (route) => {
+            const response = await route.fetch();
+            const body = (await response.text()).replace('\nfunction bindCarousels() {\n', "\nfunction bindCarousels() {\n    throw new Error('a carousel broke');\n");
+            await route.fulfill({ response, body });
+        });
+        await page.goto('/typography');
+
+        await expect(page.locator('html')).toHaveAttribute('data-js-bound', '');
+        await expect(page.locator('html')).toHaveAttribute('data-js', '');
+        await expect(header(page).locator('nav.theme-nav-main > .theme-nav-main__list')).toBeHidden();
+        await header(page).locator('.theme-nav-main__toggle').click();
+        await expect(header(page).locator('nav.theme-nav-main > .theme-nav-main__list')).toBeVisible();
+        await expect(header(page).locator('.theme-settings')).toBeVisible();
+        // Reported, not swallowed - and it was the one that was meant to throw.
+        expect(errors).toEqual(['a carousel broke']);
+    });
+
+    // A module that runs after "DOMContentLoaded" - an optimiser loads it
+    // "async", or inserts it from a script - finds "data-js" taken back
+    // already. It sets it again with its confirmation, so the page gets its
+    // collapsed menu and its settings back, with one layout shift, instead
+    // of keeping the no-script layout it fell back to. The module of the page
+    // is held back, and the same file inserted once the page has loaded,
+    // under an address of its own - a module that failed once stays failed
+    // for its address - which is what "async" and a slow network do at their
+    // worst, without depending on either. (Rewriting the document instead is
+    // no option: Chromium treats a fulfilled document as public and refuses
+    // it the module of the local instance.)
+    test('recovers when the module runs after the document is parsed', async ({ page }) => {
+        await page.setViewportSize({ width: 1000, height: 800 });
+        await page.route(/\/JavaScript\/theme\.js\?\d+$/, (route) => route.abort());
+        await page.goto('/typography');
+
+        // No module yet: the head script took the marker back.
+        await expect(page.locator('html')).not.toHaveAttribute('data-js', /.*/);
+        await expect(header(page).locator('nav.theme-nav-main > .theme-nav-main__list')).toBeVisible();
+
+        const moduleUrl = await page.locator('script[type="module"][src*="/JavaScript/theme.js"]').getAttribute('src');
+        expect(moduleUrl, 'the module tag of the page').not.toBeNull();
+        await page.addScriptTag({ url: `${moduleUrl}&late`, type: 'module' });
+        await expect(page.locator('html')).toHaveAttribute('data-js-bound', '');
+        await expect(page.locator('html')).toHaveAttribute('data-js', '');
+        await expect(header(page).locator('.theme-nav-main__toggle')).toBeVisible();
+        await header(page).locator('.theme-nav-main__toggle').click();
+        await expect(header(page).locator('nav.theme-nav-main > .theme-nav-main__list')).toBeVisible();
+        await expect(header(page).locator('.theme-settings')).toBeVisible();
+    });
+
+    // And a page that works does not pay for it: the marker is there from
+    // the first frame the header is rendered in, and the menu is never shown
+    // before it collapses - not even with the module 600 ms late, which is
+    // where gating the collapse on a marker the module sets painted 1733
+    // pixels of expanded menu for 36 frames. 1000 pixels: "simple" is
+    // collapsed there.
+    test('keeps a working page collapsed from its first frame, with the module late', async ({ page }) => {
+        await page.setViewportSize({ width: 1000, height: 800 });
+        await page.addInitScript(() => {
+            const frames: { dataJs: boolean, listShown: boolean, height: number }[] = [];
+            (window as unknown as { themeFrames: typeof frames }).themeFrames = frames;
+            const sample = () => {
+                const list = document.querySelector('.theme-page > .theme-site-header nav.theme-nav-main > .theme-nav-main__list');
+                const siteHeader = document.querySelector('.theme-page > .theme-site-header');
+                if (list !== null && siteHeader !== null) {
+                    frames.push({
+                        dataJs: document.documentElement.hasAttribute('data-js'),
+                        listShown: getComputedStyle(list).display !== 'none',
+                        height: Math.round(siteHeader.getBoundingClientRect().height),
+                    });
+                }
+                if (!document.documentElement.hasAttribute('data-js-bound') || frames.length < 5) {
+                    requestAnimationFrame(sample);
+                }
+            };
+            requestAnimationFrame(sample);
+        });
+        await page.route(/\/JavaScript\/theme\.js/, async (route) => {
+            await new Promise((resolve) => setTimeout(resolve, 600));
+            await route.continue();
+        });
+        await page.goto('/typography');
+        await expect(page.locator('html')).toHaveAttribute('data-js-bound', '');
+        await expect(page.locator('html')).toHaveAttribute('data-js', '');
+
+        const frames = await page.evaluate(() => (window as unknown as { themeFrames: { dataJs: boolean, listShown: boolean, height: number }[] }).themeFrames);
+        expect(frames.length).toBeGreaterThan(0);
+        expect(frames.filter((frame) => !frame.dataJs || frame.listShown)).toEqual([]);
+        expect(new Set(frames.map((frame) => frame.height)).size).toBe(1);
+
+        await header(page).locator('.theme-nav-main__toggle').click();
+        await expect(header(page).locator('nav.theme-nav-main > .theme-nav-main__list')).toBeVisible();
+    });
+});
+
 test('the main navigation collapses behind a toggle on a narrow screen', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 800 });
     await page.goto('/elements');

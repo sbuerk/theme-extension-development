@@ -204,9 +204,11 @@ test.describe('the external media content element', () => {
         await page.route(/\/JavaScript\/theme\.js/, (route) => route.abort());
         await page.goto('/elements/theme/external-media');
 
-        // The inline head script ran and announced a script; the one that
-        // would have bound the button never arrived.
-        await expect(page.locator('html')).toHaveAttribute('data-js', '');
+        // The inline head script announced a script and took the
+        // announcement back when the one that would have bound the button
+        // never confirmed it. The button follows the embed's own marker
+        // either way.
+        await expect(page.locator('html')).not.toHaveAttribute('data-js', /.*/);
         await expect(page.locator('#c13002 .theme-embed__button')).toBeHidden();
         await expect(page.locator('#c13002 .theme-embed__source')).toBeVisible();
     });

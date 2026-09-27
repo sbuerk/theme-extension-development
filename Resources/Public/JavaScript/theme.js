@@ -17,7 +17,20 @@
 // and the settings control is hidden until "data-js" is present. The one
 // thing here that *is* load-bearing is the menu toggle, once the viewport is
 // narrow enough to need it - which is why it is the one control this file
-// does not treat as optional.
+// does not treat as optional, and why the head script takes "data-js" back
+// unless this file confirms, once the controls "data-js" reveals are bound.
+//
+// --- A parser-inserted module, never "async" ---------------------------
+//
+// The head script decides at "DOMContentLoaded" whether this file has run,
+// and that works because a module script without "async" is deferred: the
+// parser runs it, or reports that it failed, before it fires the event. So
+// this file stays what "Appearance.typoscript" includes - a parser-inserted
+// "type=module" without "async" - and has no top-level "await", which would
+// let the event fire while the file is still waiting.
+// "ComponentLibraryTest::theModuleConfirmsTheScriptMarkerOnceTheGatedControlsAreBound"
+// holds both. An optimiser that adds "async" anyway costs one layout shift,
+// not the menu: the confirmation below sets "data-js" again.
 //
 // --- No optional chaining ("?.") ---------------------------------------
 //
@@ -965,10 +978,35 @@ function bindOneDropdown(dropdown) {
     });
 }
 
-bindTabs();
 bindDialogs();
-bindLightboxes();
-bindEmbeds();
-bindTooltips();
-bindCarousels();
-bindDropdowns();
+
+// The confirmation the inline head script waits for. Everything the
+// stylesheet reveals or collapses on "data-js" is bound by now: the display
+// settings, the menu toggle and the dialog openers
+// ("components/_dialog.scss"). Without it the head script takes "data-js" back
+// at "DOMContentLoaded", and the page falls back to the layout it has without
+// a script - an open menu rather than a hidden one behind a toggle nothing
+// operates. A throw anywhere above lands there too, which is the point. See
+// "The marker is a promise" in "Configuration/TypoScript/Appearance.typoscript".
+//
+// "data-js" is set again first. On the normal path it is still there and this
+// changes nothing; when the head script has already taken it back - this file
+// ran after "DOMContentLoaded", because something loaded it "async", or the
+// head script never ran because a Content Security Policy blocked it - a late
+// confirmation brings the collapsed menu and the settings back, at the cost of
+// one layout shift.
+root.setAttribute('data-js', '');
+root.setAttribute('data-js-bound', '');
+
+// Everything below follows a marker of its own - "data-theme-tabs-bound",
+// "data-theme-carousel-bound", "data-theme-embed-bound" - or needs none, and
+// nothing of it is gated on "data-js". So each one is isolated: a throw in one
+// is reported like any uncaught error and the next one still runs, and none of
+// them can cost the header its collapsed menu.
+for (const bind of [bindTabs, bindLightboxes, bindEmbeds, bindTooltips, bindCarousels, bindDropdowns]) {
+    try {
+        bind();
+    } catch (error) {
+        reportError(error);
+    }
+}
