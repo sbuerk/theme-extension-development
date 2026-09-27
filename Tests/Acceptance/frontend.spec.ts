@@ -1143,3 +1143,129 @@ test.describe('the header panels in every header variant', () => {
         });
     }
 });
+
+/**
+ * The page's own header, rearranged into one of the three other variants.
+ *
+ * The instance renders one variant per site, and the specimens of the
+ * styleguide section `chrome` - the only other headers a browser sees - sit
+ * in the content column with three entries and no second level, so they
+ * measure neither the width a real header has nor the menu it holds. So the
+ * specimen of the variant lends its rows, and the page's own header lends
+ * what goes into them: its title, its main navigation with the seven top
+ * level entries of the showcase and their second levels, and its controls
+ * slot. The elements are moved, not copied, so the menu toggle, the language
+ * dropdown and the display settings stay bound by the script of the page.
+ *
+ * The rows are the specimen's, not written out here: the specimens are held
+ * to the classes of the variant partials by
+ * `ComponentLibraryTest::theChromeSpecimensCarryEveryClassTheirPartialsWrite`,
+ * and a skeleton typed into this file would be held to nothing. `actions`
+ * keeps the call to action of its specimen, since the instance configures
+ * none. `simple` is the page's header as it is.
+ */
+const arrangeHeader = async (page: Page, variant: string) => {
+    await page.evaluate((variant) => {
+        if (variant === 'simple') {
+            return;
+        }
+        const pageHeader = document.querySelector('.theme-page > .theme-site-header');
+        const specimen = [...document.querySelectorAll('#chrome .theme-site-header')]
+            .find((header) => header.classList.contains(`theme-site-header--${variant}`));
+        if (pageHeader === null || specimen === undefined) {
+            throw new Error(`There is no page header, or no "${variant}" specimen to take the rows from - is this "/styleguide"?`);
+        }
+        const header = specimen.cloneNode(true) as HTMLElement;
+        for (const selector of ['.theme-site-header__brand', 'nav.theme-nav-main', '.theme-site-header__actions']) {
+            const slot = header.querySelector(selector);
+            const content = pageHeader.querySelector(selector);
+            if (slot === null || content === null) {
+                throw new Error(`"${selector}" is missing from the "${variant}" specimen or from the page header.`);
+            }
+            slot.replaceWith(content);
+        }
+        pageHeader.replaceWith(header);
+    }, variant);
+};
+
+/**
+ * Every second level of the header's main navigation, opened by the pointer,
+ * against every top level entry and every control of the header: a list of
+ * what each one covers, empty when it covers nothing.
+ */
+const secondLevelsCoveringTheHeader = async (page: Page) => {
+    const header = page.locator('.theme-page > .theme-site-header');
+    const items = header.locator('nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item:has(> .theme-nav-main__list--sub)');
+    const count = await items.count();
+    expect(count, 'entries with a second level').toBeGreaterThan(0);
+
+    const covered: string[] = [];
+    for (let index = 0; index < count; index++) {
+        const item = items.nth(index);
+        await item.hover();
+        await expect(item.locator(':scope > .theme-nav-main__list--sub')).toBeVisible();
+        covered.push(...await item.evaluate((element) => {
+            const header = element.closest('.theme-site-header');
+            const secondLevel = element.querySelector(':scope > .theme-nav-main__list--sub');
+            const link = element.querySelector(':scope > .theme-nav-main__link');
+            if (header === null || secondLevel === null || link === null) {
+                return ['the entry lost its header, its link or its second level'];
+            }
+            const box = secondLevel.getBoundingClientRect();
+            const hits: string[] = [];
+            header.querySelectorAll([
+                'nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link',
+                '.theme-site-header__brand',
+                '.theme-site-header__action',
+                '.theme-nav-main__toggle',
+                '.theme-dropdown__trigger',
+                '.theme-settings__trigger',
+            ].join(',')).forEach((control) => {
+                if (control === link) {
+                    return;
+                }
+                const other = control.getBoundingClientRect();
+                if (other.width === 0 && other.height === 0) {
+                    return;
+                }
+                if (!(box.right <= other.left || other.right <= box.left || box.bottom <= other.top || other.bottom <= box.top)) {
+                    hits.push(`"${link.textContent?.trim()}" covers "${control.textContent?.trim() || control.getAttribute('aria-label') || control.className}"`);
+                }
+            });
+            return hits;
+        }));
+    }
+    return covered;
+};
+
+/**
+ * The number of rows the top level entries of the header's main navigation
+ * take.
+ */
+const rowsOfTheMainNavigation = (page: Page) => page
+    .locator('.theme-page > .theme-site-header nav.theme-nav-main > .theme-nav-main__list > .theme-nav-main__item > .theme-nav-main__link')
+    .evaluateAll((links) => new Set(links.map((link) => Math.round(link.getBoundingClientRect().top))).size);
+
+/**
+ * The three variants that give the navigation a row of its own.
+ *
+ * The 50% cap that shares the default header's one row between the title and
+ * the menu between `bp.$md` and `bp.$lg` was written for every header, and
+ * reached these three as well: their menu, alone in its row, wrapped into
+ * half of it - 3+3+1 at 900 pixels - and the second level of an entry of the
+ * first row opened over the entries of the second. 900 pixels is inside that
+ * range, and wide enough for the row to hold the seven entries of the
+ * showcase at all.
+ */
+test.describe('the main navigation in a row of its own', () => {
+    for (const variant of ['centred', 'actions', 'two-tier']) {
+        test(`keeps one row, covered by no second level, at 900 pixels in "${variant}"`, async ({ page }) => {
+            await page.setViewportSize({ width: 900, height: 800 });
+            await page.goto('/styleguide');
+            await arrangeHeader(page, variant);
+
+            expect.soft(await rowsOfTheMainNavigation(page), 'rows of top level entries').toBe(1);
+            expect.soft(await secondLevelsCoveringTheHeader(page)).toEqual([]);
+        });
+    }
+});
