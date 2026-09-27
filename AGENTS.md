@@ -377,7 +377,8 @@ Further:
   chunks, each with its own containers, and fails unless the chunks together
   executed every listed test. A class is never split, so the slowest class is
   the floor. Locally use `-j auto`: it caps the chunks by CPU cores and memory
-  and writes no more of them than that floor makes worth it - three, today.
+  and writes no more of them than that floor makes worth it - five to nine on
+  a large machine, today.
   The files of a run - output, JUnit and PHPUnit event log per chunk - are kept
   below `.Build/functional-runs/<suffix>/`. Mind the container count: a DBMS
   run starts two containers per chunk.

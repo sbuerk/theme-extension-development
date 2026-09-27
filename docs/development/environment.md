@@ -297,6 +297,11 @@ again, one by one, rather than copying one file.
 trees, in five tests on TYPO3 v13 and three on v12. Neither can be split
 between chunks.
 
+Measured on the same machine, shared with other work, with these durations and
+TYPO3 v13: SQLite took 179 s with `-j 3` and 138 s with `-j 4`; MySQL 8.0 took
+325 s with `-j 3` and 287 s with `-j 4`, where `ShowcaseTreeTest` had a chunk
+to itself.
+
 ### `-j auto`
 
 `-j auto` picks the number of chunks, in two steps. The machine sets the most:
@@ -314,13 +319,15 @@ TYPO3 v14. The run prints both steps:
 
 ```
 -j auto: at most 16 chunks (32 CPU cores, 80 GB memory available)
-auto: 3 of at most 16 chunks, the heaviest weighs 641 s, the next 331 s, the floor is 641 s
+auto: 9 of at most 16 chunks, the heaviest weighs 81 s, the next 57 s, the floor is 81 s
 ```
 
-With the durations recorded today that is three chunks on every DBMS, on
-either core version. If `ShowcaseTreeTest` gets faster or is split into several
-classes, the same option picks more — after the durations are recorded again.
-An explicit `-j <number>` is taken as given, up to the number of test classes.
+With the durations recorded today and 16 chunks at most, that is nine chunks
+on SQLite (eight on TYPO3 v12) and five on MariaDB, MySQL and PostgreSQL. A
+DBMS run starts two containers per chunk, so mind the container count. The
+durations were recorded with four chunks; with more of them running at once,
+each class takes longer than recorded. An explicit `-j <number>` is taken as
+given, up to the number of test classes.
 
 The durations files are committed per DBMS, because the same class costs very
 different times on each. They are an input of the split, never a gate: a stale
