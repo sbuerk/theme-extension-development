@@ -89,8 +89,11 @@ reachable. A failure in a later part of the script - a carousel, a lightbox -
 leaves the header as it is, and a script that runs late, loaded ``async`` for
 example, brings the collapsed menu back when it confirms. :file:`theme.js`
 itself stays a module without ``async``. A page whose script works is
-unchanged and never shows the expanded menu. A site that allows the inline head
-script by a Content Security Policy hash has to update the hash.
+unchanged and never shows the expanded menu. Under a Content Security Policy
+the inline head script is allowed by a hash the extension ships - see
+:ref:`important-no-flash-script-content-security-policy`; only a site that
+overrides :typoscript:`page.headerData.10`, or whose policy does not inherit the
+default frontend scope, has to act.
 
 A site whose menu is longer or shorter than the budget compiles the stylesheet
 with breakpoints of its own. They are Sass variables, because a media query
