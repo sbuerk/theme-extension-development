@@ -34,7 +34,7 @@ final class AccountsTest extends AbstractInstanceSeedTestCase
     {
         parent::setUp();
 
-        $this->importSeedSet($this->instanceSeedSet());
+        $this->importSeedSetOncePerClass($this->instanceSeedSet());
     }
 
     #[Test]

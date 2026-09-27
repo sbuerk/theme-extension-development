@@ -176,9 +176,7 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->importCSVDataSet(__DIR__ . '/Fixtures/Database/AdminBackendUser.csv');
-        $this->createDefaultFileStorage();
-        $this->importSeedSet('theme-demo');
+        $this->importSeedSetOncePerClass('theme-demo');
 
         $this->setUpThemeSite(identifier: 'demo', websiteTitle: 'Theme demo');
     }
