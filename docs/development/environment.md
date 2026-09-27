@@ -284,6 +284,11 @@ again rather than copying one file.
 `LegacyDeliveryTest` renders every page of the development seed in both of its
 trees, in five tests. Neither can be split between chunks.
 
+Measured on the same machine, shared with other work, with these durations:
+SQLite took 159 s with `-j 3` (209 s in a second run under more load) and 126 s
+with `-j 4`; MySQL 8.0 took 322 s with `-j 3` and 269 s with `-j 4`, where
+`ShowcaseTreeTest` had a chunk to itself.
+
 ### `-j auto`
 
 `-j auto` picks the number of chunks, in two steps. The machine sets the most:
@@ -300,14 +305,15 @@ came within 40 and 50 s of it in two runs. The run prints both steps:
 
 ```
 -j auto: at most 16 chunks (32 CPU cores, 80 GB memory available)
-auto: 3 of at most 16 chunks, the heaviest weighs 709 s, the next 304 s, the floor is 709 s
+auto: 7 of at most 16 chunks, the heaviest weighs 84 s, the next 66 s, the floor is 84 s
 ```
 
-With the durations recorded today that is three chunks on SQLite and MariaDB
-and two on MySQL and PostgreSQL. If
-`ShowcaseTreeTest` gets faster or is split into several classes, the same
-option picks more — after the durations are recorded again. An explicit
-`-j <number>` is taken as given, up to the number of test classes.
+With the durations recorded today and 16 chunks at most, that is seven chunks
+on SQLite, five on MariaDB and MySQL and six on PostgreSQL. A DBMS run starts
+two containers per chunk, so mind the container count. The durations were
+recorded with four chunks; with more of them running at once, each class takes
+longer than recorded. An explicit `-j <number>` is taken as given, up to the
+number of test classes.
 
 The durations files are committed per DBMS, because the same class costs very
 different times on each. They are an input of the split, never a gate: a stale
