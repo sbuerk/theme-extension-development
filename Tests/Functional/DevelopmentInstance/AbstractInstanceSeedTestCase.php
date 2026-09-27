@@ -50,14 +50,6 @@ abstract class AbstractInstanceSeedTestCase extends AbstractFunctionalTestCase
         'tests/dev-site',
     ];
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->importCSVDataSet(__DIR__ . '/../Fixtures/Database/AdminBackendUser.csv');
-        $this->createDefaultFileStorage();
-    }
-
     protected function tearDown(): void
     {
         GeneralUtility::rmdir($this->instancePath . '/config/sites', true);

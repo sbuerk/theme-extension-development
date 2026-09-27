@@ -71,7 +71,7 @@ final class LegacyDeliveryTest extends AbstractInstanceSeedTestCase
     {
         parent::setUp();
 
-        $this->importSeedSet(self::SEED_SET);
+        $this->importSeedSetOncePerClass(self::SEED_SET);
         $this->sites = $this->adoptCommittedSiteConfigurations();
         $this->expectedDifferences = $this->expectedDifferences($this->sites);
         $this->mirroredContentUids = $this->mirroredContentUids();

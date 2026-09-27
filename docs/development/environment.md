@@ -264,22 +264,25 @@ that finished, with the time since the start of the chunk.
 ### The floor, and the recorded durations
 
 A class is the unit of the split, so the slowest class is the floor of a
-chunked run, however many chunks it has. Here that is `ShowcaseTreeTest`: each of
-its 151 tests, data sets counted, imports the showcase seed in `setUp()`, and it
-takes more than half of the whole suite on every DBMS. Recorded locally with TYPO3 v14, PHP 8.2 and
-`-j 4`:
+chunked run, however many chunks it has. Recorded locally with TYPO3 v14,
+PHP 8.2 and `-j 4`:
 
-| DBMS          | All classes | `ShowcaseTreeTest` | Share |
-|---------------|-------------|--------------------|-------|
-| SQLite        | 1316 s      | 709 s              | 54 %  |
-| MariaDB 10.6  | 2410 s      | 1261 s             | 52 %  |
-| MySQL 8.0     | 2311 s      | 1327 s             | 57 %  |
-| PostgreSQL 10 | 2624 s      | 1577 s             | 60 %  |
+| DBMS          | All classes | Heaviest class       | Its time | Share |
+|---------------|-------------|----------------------|----------|-------|
+| SQLite        | 478 s       | `LegacyDeliveryTest` | 84 s     | 18 %  |
+| MariaDB 10.6  | 970 s       | `ShowcaseTreeTest`   | 271 s    | 28 %  |
+| MySQL 8.0     | 1055 s      | `ShowcaseTreeTest`   | 297 s    | 28 %  |
+| PostgreSQL 10 | 809 s       | `ShowcaseTreeTest`   | 179 s    | 22 %  |
 
-So two chunks already reach the floor — one holding `ShowcaseTreeTest`, the
-other everything else — and more chunks make the other classes finish earlier
-without making the run shorter. The lever beyond that is `ShowcaseTreeTest`
-itself, not the split.
+`ShowcaseTreeTest` runs 151 tests, data sets counted, against one import of
+the showcase seed, and restores it for every test but the first — see
+[Importing a seed once per class](../testing/functional-tests.md#importing-a-seed-once-per-class).
+Before it did, it imported the seed in every test and took more than half of the
+suite: 709 s of 1316 s on SQLite, 1327 s of 2311 s on MySQL. It still costs
+more outside SQLite, where a restore truncates the tables and inserts the rows
+again rather than copying one file.
+`LegacyDeliveryTest` renders every page of the development seed in both of its
+trees, in five tests. Neither can be split between chunks.
 
 ### `-j auto`
 

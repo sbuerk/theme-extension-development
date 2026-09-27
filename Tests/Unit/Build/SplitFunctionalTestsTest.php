@@ -59,7 +59,8 @@ final class SplitFunctionalTestsTest extends UnitTestCase
     public function recordedDurationsOutweighTheNumberOfTests(): void
     {
         // One slow class with few tests, two fast ones with many - the shape of
-        // "ShowcaseTreeTest" against the rendering tests.
+        // "LegacyDeliveryTest", five tests rendering the development seed,
+        // against the rendering tests.
         $tests = ['Slow' => 1, 'FastOne' => 50, 'FastTwo' => 50];
         $timings = ['Slow' => 100.0, 'FastOne' => 10.0, 'FastTwo' => 10.0];
 

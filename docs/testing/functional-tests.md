@@ -25,10 +25,10 @@ Build/Scripts/runTests.sh -s functional -d mariadb -i 10.6 -j 4
 
 `-j` splits the suite by test class, runs every chunk with a database container
 of its own, and fails the run unless the chunks together executed every test
-PHPUnit listed for it. A class is never split, so the slowest class —
-`ShowcaseTreeTest` — is the floor of any chunked run. How the split works, where
-the files of a run are kept and how the recorded durations it balances by are
-refreshed is described in
+PHPUnit listed for it. A class is never split, so the slowest class is the
+floor of any chunked run. How the split works, where the files of a run are
+kept and how the recorded durations it balances by are refreshed is described
+in
 [Development environment](../development/environment.md#functional-tests-in-parallel-chunks).
 
 SQLite is the fastest option and enough for most work. Run at least one other
@@ -189,7 +189,78 @@ Additionally:
 - Import records with `importCSVDataSet()` or a DataHandler scenario rather than
   writing SQL.
 - Wrap expensive fixture setup in `withDatabaseSnapshot()` so it is built once
-  and restored per test.
+  and restored per test — see [below](#importing-a-seed-once-per-class).
+
+## Importing a seed once per class
+
+A seed set goes through DataHandler record by record. The showcase takes
+seconds to import, and a class that imports it in `setUp()` pays that for every
+test and every data set. `importSeedSetOncePerClass()` of
+[`DataFactoryImportTrait`](../../Tests/Functional/DataFactoryImportTrait.php)
+imports the administrator, the default file storage and the set in the first
+test of a class and lets every later test restore the database from a
+snapshot:
+
+```php
+protected function setUp(): void
+{
+    parent::setUp();
+
+    // First, before anything else writes a row: a restore inserts into empty tables.
+    $this->importSeedSetOncePerClass('theme-demo');
+
+    // Then what is not a row, or what a test may change - written every time.
+    $this->writeSiteConfiguration(/* … */);
+    $this->setUpFrontendRootPage(1, [], [], false);
+}
+```
+
+It is `FunctionalTestCase::withDatabaseSnapshot()` of the testing framework
+underneath. On SQLite the first test copies the database file and every later
+test copies it back. On MySQL, MariaDB and PostgreSQL the first test reads
+every row of every table that has rows into memory, and every later test
+inserts them again into the tables the framework has just truncated.
+
+Use it for a class whose tests **read** a large fixture. Do not use it for a
+class that tests the import itself, or whose tests write something the next test
+must not see outside the database — the restore does not reach there. What it
+does **not** restore:
+
+- **Files.** The instance directory is set up once per class, so the files an
+  import copies to `fileadmin/`, processed images and file caches below
+  `typo3temp/` stay from the first test on. Their `sys_file` rows are restored,
+  and they describe the same files.
+- **Site configurations.** The framework removes `typo3conf/sites/` after each
+  test, so a test writes its site after the restore. The instance seed tests
+  remove `config/sites/` the same way.
+- **Global state.** `$GLOBALS` is reset after each test. The logged in backend
+  user the import leaves behind is set up again after a restore, so a later
+  test starts from the state the first one had.
+- **Cache tables.** `cf_*` and `cache_*` are left out of the snapshot.
+- **Auto increment values**, on MySQL, MariaDB and PostgreSQL: after a restore
+  the next uid of a table is its highest uid plus one, where the import may
+  have left it higher. A test that asserts the uid of a record it creates sees
+  a different value in the first test than in the others.
+- **More than 10 MiB.** The framework refuses a snapshot whose rows exceed that
+  as JSON outside SQLite, with exception `1630203176`. The development seed
+  `theme-instance`, the largest set here, came to 3.1 MB on MySQL 8.0 and
+  TYPO3 v14, half of it `sys_history`.
+
+The first test of a class is the first one PHPUnit runs of it in a process —
+with `--filter`, in a chunk of `-j`, in random order alike. PHPUnit shuffles
+the tests within a class and the classes within the suite, but it never
+interleaves two classes, and a class that came back would simply import again.
+If the import itself fails, the first test fails with the message of the
+import, and every later test of the class errors on the empty database it
+restored: `The BE User with the UID 1 does not exist in the database.`, on
+SQLite next to a warning that the snapshot file is missing. Read the first
+failure.
+
+Proven once by breaking the seed: with the only `theme_tabs` element turned
+into an accordion, the first test of `ShowcaseTreeTest` passed and the second,
+`everyRenderedContentTypeAppearsInTheSeededTree`, failed with
+`These content types are rendered but never seeded: theme_tabs` — so the
+later tests read the restored import, not an empty database or an old one.
 
 ## Core version aware functional tests
 
