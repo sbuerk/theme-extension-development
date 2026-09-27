@@ -37,6 +37,30 @@ name: "CI"
 # of a run get a runner; this order is what helps if it follows the file, and
 # costs nothing if it does not.
 #
+# Every job has a "timeout-minutes", so a hang fails the job instead of holding a
+# runner for the default of 360 minutes. The values are set from the slowest
+# successful job, in minutes, of the 15 newest pull request runs of this workflow
+# against "1" created up to 2026-09-26 16:23 UTC (#64 to #93), all attempts, a
+# job carried unchanged into a re-run counted once - with room for a slow image
+# pull or a busy runner:
+#
+#   job                     slowest seen   timeout
+#   ----------------------  -------------  --------------------------
+#   quality, phpstan, lint  0.9            10
+#   unit, assets, docs      0.6            10
+#   visual                  3.5            15
+#   acceptance              8.4            20
+#   functional (SQLite)     24.1           35
+#   functional (databases)  59.1 (*)       65
+#
+#   (*) 235 of the 240 successful database jobs took at most 59.1 minutes. The
+#       other 5 took 66.1 to 186.5 minutes; none was cancelled. That tail is
+#       what this timeout cuts off: it would have ended those 5 of the 240. Why
+#       those jobs take so long is a separate question.
+#
+# The functional values were measured with the suite unchunked, and are retuned
+# after the first CI run of the chunked suite.
+#
 # Supported versions are declared in the matrices below. There are three PHP
 # sets, and they have to be changed together:
 #
@@ -104,6 +128,7 @@ jobs:
   quality:
     name: "quality (v${{ matrix.typo3 }})"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -153,6 +178,7 @@ jobs:
   phpstan:
     name: "phpstan (v${{ matrix.typo3 }})"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -190,6 +216,7 @@ jobs:
   lint:
     name: "lint (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -224,6 +251,7 @@ jobs:
   unit:
     name: "unit (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -275,6 +303,7 @@ jobs:
   assets:
     name: "assets"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
 
       - name: "Checkout"
@@ -296,6 +325,7 @@ jobs:
   documentation:
     name: "documentation"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
 
       - name: "Checkout"
@@ -346,6 +376,7 @@ jobs:
   visual:
     name: "visual (v${{ matrix.typo3 }})"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -403,6 +434,7 @@ jobs:
   acceptance:
     name: "acceptance (v${{ matrix.typo3 }})"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -447,6 +479,7 @@ jobs:
   functional-dbms:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.target.typo3 }}, PHP ${{ matrix.target.php-version }})"
     runs-on: ubuntu-22.04
+    timeout-minutes: 65
     # Beside the SQLite jobs, not after them - see the header. A defect that is
     # not DBMS specific is reported by these 16 jobs as well.
     strategy:
@@ -507,6 +540,7 @@ jobs:
   functional-sqlite:
     name: "functional sqlite (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-22.04
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
