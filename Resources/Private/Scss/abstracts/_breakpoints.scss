@@ -62,3 +62,13 @@ $header-simple: 74rem !default;
 $header-centred: 55rem !default;
 $header-actions: 55rem !default;
 $header-two-tier: 65rem !default;
+
+// Below this width "simple" puts its title on a line of its own, with the
+// menu toggle and the controls on the next one, at the inline end. Its one
+// row does not wrap otherwise, and the title (its longest word, 112 pixels on
+// the showcase), the collapsed menu (114) and the two controls (104), with
+// the paddings and gaps between them (50), need 380 pixels: at 320 the row
+// spilled 75 pixels out of the page. 30rem (480 pixels) leaves the row as it
+// is wherever it fits with room to spare. The three other arrangements wrap
+// their rows already. See "layout/_site-header.scss".
+$header-simple-stack: 30rem !default;

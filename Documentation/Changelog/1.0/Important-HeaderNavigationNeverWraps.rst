@@ -68,8 +68,9 @@ row. A single word longer than the row is not broken.
 The collapse needs the theme's script. **Without JavaScript** nothing
 collapses: below the breakpoint the list is stacked in the flow, and it lists
 the top level entries only, at every width down to a phone - every second level
-is hidden. That is about 510 pixels of header for the showcase from 768 pixels
-up and about 800 at 375, where the whole menu would be about 1730 and 2520. A
+is hidden. That is 511 to 566 pixels of header for the showcase from 768
+pixels up and 577 to 632 at 375, where the whole menu would be about 1730 and
+2520. A
 page that is the target of a top level entry therefore has to link the pages
 below it, as the section pages of the showcase do with a menu of their
 subpages; a site with a second level in its main navigation checks its own.
