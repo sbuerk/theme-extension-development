@@ -1,9 +1,9 @@
 pages,,,,,,,,,,
 ,uid,pid,sys_language_uid,l10n_parent,l10n_source,doktype,is_siteroot,title,slug,backend_layout
-,1,0,0,0,0,1,1,Theme root,/,content
-,2,1,0,0,0,1,0,Redirects,/redirects,content
-,3,1,0,0,0,1,0,Goodbye,/goodbye,content
-,4,1,0,0,0,1,0,Permanent login,/permalogin,content
+,1,0,0,0,0,1,1,Theme root,/,pagets__content
+,2,1,0,0,0,1,0,Redirects,/redirects,pagets__content
+,3,1,0,0,0,1,0,Goodbye,/goodbye,pagets__content
+,4,1,0,0,0,1,0,Permanent login,/permalogin,pagets__content
 tt_content,,,,,,,,,
 ,uid,pid,sys_language_uid,l18n_parent,colPos,sorting,CType,header,pi_flexform
 ,10,1,0,0,0,10,felogin_login,Log in,

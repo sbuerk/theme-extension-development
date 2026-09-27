@@ -32,6 +32,7 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 final class ShowcaseTreeTest extends AbstractFunctionalTestCase
 {
     use DataFactoryImportTrait;
+    use PageModuleLayoutTrait;
     use SiteBasedTestTrait;
     use ThemeSiteTrait;
 
@@ -211,9 +212,13 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @return list<string> The `backend_layout` values of every seeded page,
-     *         with a page that declares none reported as `default` - which is
-     *         the identifier `PageLayoutResolver` falls back to.
+     * @return list<string> The layout identifiers the seeded pages declare:
+     *         the `backend_layout` value without the `pagets__` of the Page
+     *         TSconfig provider it is stored with, and a page that declares
+     *         none reported as `default` - which is the identifier
+     *         `PageLayoutResolver` falls back to. That every value carries the
+     *         prefix is held by
+     *         `everySeededPageOpensInThePageModuleWithTheLayoutItDeclares()`.
      */
     private function seededLayouts(): array
     {
@@ -229,7 +234,9 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             ->fetchAllAssociative();
 
         return array_values(array_unique(array_map(
-            static fn(array $row): string => ($row['backend_layout'] ?? '') === '' ? 'default' : (string)$row['backend_layout'],
+            static fn(array $row): string => ($row['backend_layout'] ?? '') === ''
+                ? 'default'
+                : (string)preg_replace('/^pagets__/', '', (string)$row['backend_layout']),
             $rows,
         )));
     }
@@ -352,6 +359,11 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
      * `PageLayoutResolver`, which honours an ancestor's
      * `backend_layout_next_level` and can disagree with the field.
      *
+     * The attribute carries the identifier with the provider prefix stripped,
+     * so `pagets__two_columns` is asserted as `two_columns` - and a bare
+     * `two_columns` would pass here as well, which is why the page module has
+     * a test of its own below.
+     *
      * @param string $path   The slug of the seeded page.
      * @param string $layout The layout identifier it has to resolve to.
      */
@@ -364,6 +376,23 @@ final class ShowcaseTreeTest extends AbstractFunctionalTestCase
             $this->render($path),
             sprintf('The page "%s" did not render through the "%s" layout.', $path, $layout),
         );
+    }
+
+    /**
+     * The backend half of the test above: every page opens in the page module
+     * with the layout it declares, and no element of it is listed as unused.
+     *
+     * The frontend strips the provider prefix before it picks a template, so a
+     * page seeded with a bare identifier rendered right and still opened in
+     * the page module with the one column fallback and most of its elements
+     * unused. See `PageModuleLayoutTrait` for how the page module resolves it.
+     */
+    #[Test]
+    public function everySeededPageOpensInThePageModuleWithTheLayoutItDeclares(): void
+    {
+        $failures = $this->pageModuleLayoutFailures();
+
+        $this->assertSame([], $failures, "The page module shows seeded pages wrong:\n  " . implode("\n  ", $failures));
     }
 
     /**
