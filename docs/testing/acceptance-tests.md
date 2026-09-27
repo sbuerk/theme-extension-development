@@ -275,10 +275,11 @@ run of #87); with Firefox added it took 7.5 and 7.6, of which Playwright
 reported 5.9 and 6.2 (the run of #90). The job ran beside the SQLite
 functional jobs, which took 11.7 to 19.3 minutes in that same run, and the
 longer database jobs, so the two to four minutes Firefox adds lengthened a job
-that was not on the longest path of the pipeline. The functional jobs now run
-their suite in four chunks and take a fraction of that; whether acceptance
-stays off the longest path is for the first measured runs of the chunked suite
-to show.
+that was not on the longest path of the pipeline. Since the functional jobs run
+their suite in four chunks, the whole run takes some 13 minutes, and acceptance
+is no longer far off the longest path: in the first chunked run on this branch
+(#96) it took 7.0 and 7.5 minutes, against 2.3 to 4.0 for a functional job on
+SQLite and 3.8 to 9.2 on the databases.
 
 ## See also
 

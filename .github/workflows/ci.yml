@@ -38,11 +38,14 @@ name: "CI"
 # costs nothing if it does not.
 #
 # Every job has a "timeout-minutes", so a hang fails the job instead of holding a
-# runner for the default of 360 minutes. The values are set from the slowest
-# successful job, in minutes, of the 15 newest pull request runs of this workflow
-# against "1" created up to 2026-09-26 16:23 UTC (#64 to #93), all attempts, a
-# job carried unchanged into a re-run counted once - with room for a slow image
-# pull or a busy runner:
+# runner for the default of 360 minutes. The values of the jobs other than the
+# functional ones are set from the slowest successful job, in minutes, of the 15
+# newest pull request runs of this workflow against "1" created up to 2026-09-26
+# 16:23 UTC (#64 to #93), all attempts, a job carried unchanged into a re-run
+# counted once - with room for a slow image pull or a busy runner. The
+# functional values are set from the first run of the chunked suite on this
+# branch (#96, run 36301746627): its test steps time out at about three times
+# the slowest job, and each job five minutes later:
 #
 #   job                     slowest seen   timeout
 #   ----------------------  -------------  --------------------------
@@ -50,16 +53,15 @@ name: "CI"
 #   unit, assets, docs      0.6            10
 #   visual                  3.5            15
 #   acceptance              8.4            20
-#   functional (SQLite)     24.1           35
-#   functional (databases)  59.1 (*)       65
+#   functional (SQLite)     4.0            20
+#   functional (databases)  9.2            35
 #
-#   (*) 235 of the 240 successful database jobs took at most 59.1 minutes. The
-#       other 5 took 66.1 to 186.5 minutes; none was cancelled. That tail is
-#       what this timeout cuts off: it would have ended those 5 of the 240. Why
-#       those jobs take so long is a separate question.
-#
-# The functional values were measured with the suite unchunked, and are retuned
-# after the first CI run of the chunked suite.
+# Three times is deliberate. Unchunked, 5 of the 240 successful database jobs of
+# this branch took 66.1 to 186.5 minutes: some hosted runners run the MySQL and
+# MariaDB suites two to five times slower than others, from the first test to
+# the last, and a re-run lands on another host and is normal. A job that slow
+# now fails at its timeout, to be re-run, instead of holding the pull request for
+# an hour or more.
 #
 # The functional test step has a timeout of its own, five minutes below that of
 # its job: a step that times out fails like any failing step (the runner sets
@@ -413,7 +415,7 @@ jobs:
   visual:
     name: "visual (v${{ matrix.typo3 }})"
     runs-on: ubuntu-26.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -516,7 +518,7 @@ jobs:
   functional-dbms:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.target.typo3 }}, PHP ${{ matrix.target.php-version }})"
     runs-on: ubuntu-26.04
-    timeout-minutes: 65
+    timeout-minutes: 35
     # Beside the SQLite jobs, not after them - see the header. A defect that is
     # not DBMS specific is reported by these 16 jobs as well.
     strategy:
@@ -588,7 +590,7 @@ jobs:
       # own - see the header for why four. The step times out below the job, so
       # the upload after it still runs.
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
-        timeout-minutes: 60
+        timeout-minutes: 30
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.target.typo3 }} -p ${{ matrix.target.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -j 4 -s functional"
 
       # The JUnit logs of the chunks, which the committed test durations are
@@ -617,7 +619,7 @@ jobs:
   functional-sqlite:
     name: "functional sqlite (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-26.04
-    timeout-minutes: 35
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -659,7 +661,7 @@ jobs:
 
       # "-j 4": four chunks in parallel - see the header for why four.
       - name: "Execute functional tests with SQLite"
-        timeout-minutes: 30
+        timeout-minutes: 15
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -j 4 -s functional"
 
       - name: "Upload the JUnit and event logs"
