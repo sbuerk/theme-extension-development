@@ -334,8 +334,8 @@ Options:
             - cgl: test and fix all php files
             - checkBom: check UTF-8 files do not contain BOM
             - checkCssBuild: check the committed CSS matches its SCSS sources
-            - checkIconsBuild: check the committed icons, LICENSE.txt and categories.yml equal the
-              pinned Font Awesome Free package and the brand allowlist
+            - checkIconsBuild: check Resources/Public/Icons/FontAwesome is exactly what buildIcons
+              writes from the pinned Font Awesome Free package, plus ATTRIBUTION.txt
             - checkExceptionCodes: check for duplicate and missing exception codes
             - checkMarkdownTables: check markdown tables are formatted, "-- --fix" to format them
             - checkTestMethodsPrefix: check test methods do not start with "test"
@@ -932,6 +932,7 @@ case ${TEST_SUITE} in
         # into "Resources/Public/Icons/FontAwesome/", unchanged: "svgs/solid/*.svg" into
         # "Solid/", the files of "svgs/brands/" named in "fontAwesomeBrands" of
         # "package.json" into "Brands/", and "LICENSE.txt" and "metadata/categories.yml".
+        # A file there that the build does not write is left alone; "checkIconsBuild" names it.
         # "ATTRIBUTION.txt" beside them is maintained by hand. Committed like the
         # stylesheet, for the same reason: neither the composer dist archive nor the TER
         # artifact runs a build. See "docs/development/icons.md".
@@ -966,11 +967,14 @@ case ${TEST_SUITE} in
         ;;
     checkIconsBuild)
         # "npm ci" installs the pinned package and checks it against the integrity hash
-        # of "package-lock.json". Then "diff -r" compares "Solid/" with "svgs/solid/" and
-        # "Brands/" with the allowlist applied to "svgs/brands/", in both directions - an
-        # edited, a missing and an extra file each fail - and "diff -u" compares
-        # "LICENSE.txt" and "categories.yml" with the package's. "ATTRIBUTION.txt" is
-        # not compared. Not a git based check, for the reason given at "checkCssBuild".
+        # of "package-lock.json". Then the steps of "buildIcons" write a second copy into
+        # ".Build/icons-verify/FontAwesome/", "ATTRIBUTION.txt" - the one file maintained by
+        # hand - is copied beside it, failing when it is missing, and "diff -r" compares
+        # that tree with "Resources/Public/Icons/FontAwesome/" in both directions and at
+        # every depth: an edited, a missing and an extra file or directory each fail,
+        # at the top of it as well as in "Solid/" and "Brands/". The content of
+        # "ATTRIBUTION.txt" is not compared. Not a git based check, for the reason given at
+        # "checkCssBuild". See "docs/development/icons.md".
         COMMAND="npm ci --no-audit --no-fund && npm run build:icons:verify"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name check-icons-build-${SUFFIX} -e npm_config_cache=.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?

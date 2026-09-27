@@ -334,11 +334,12 @@ Further:
   byte: the solid SVGs into `Solid/`, the brand logos named by the
   `fontAwesomeBrands` allowlist of that `package.json` into `Brands/`, and the
   package's `LICENSE.txt` and `categories.yml`. All of it is committed for the
-  same reason as the stylesheet. `-s checkIconsBuild` is the gate: an edited,
-  a missing or an extra file below `Solid/` or `Brands/`, and a changed
-  `LICENSE.txt` or `categories.yml`, fails it. Never edit, add or drop a file
-  there by hand, `ATTRIBUTION.txt` aside: it is the one file there the build
-  does not write, it is maintained by hand, and a version bump changes it too.
+  same reason as the stylesheet. `-s checkIconsBuild` is the gate: it builds a
+  second copy and compares the whole directory with it, so an edited, a
+  missing or an extra file or directory anywhere in it fails, and so does a
+  missing `ATTRIBUTION.txt`. Never edit, add or drop a file there by hand,
+  `ATTRIBUTION.txt` aside: it is the one file there the build does not write,
+  it is maintained by hand, and a version bump changes it too.
   → [Icons](docs/development/icons.md)
 - `-s functional -d mariadb -i 10.6` (also `mysql`, `postgres`) when a change
   touches queries, schema or TCA. SQLite alone is not enough there.

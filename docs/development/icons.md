@@ -66,7 +66,7 @@ The brands style of Font Awesome Free is 609 files, and fifteen of them ship:
 
 That list is in the root `package.json`, next to the version pin, and it is
 the whole mechanism: `build:icons:brands` copies exactly those files, and
-`build:icons:brands:verify` fails when the directory and the list disagree.
+`checkIconsBuild` fails when the directory and the list disagree.
 Adding a platform is one line plus a rebuild plus a commit, and it is visible
 in a diff as a decision somebody made.
 
@@ -155,30 +155,56 @@ travels with the extension.
 
 The build is npm scripts in the root `package.json`, next to the CSS build,
 run in the same node image through `runTests.sh`. Two of them are the entry
-points the suites call; the rest are the steps they chain:
+points the suites call; the rest are the steps they chain. Every step writes
+below one directory, `THEME_ICONS_DIR`, which the entry point sets — the
+extension for `buildIcons`, a scratch directory for `checkIconsBuild` — so the
+build and the gate run the same copy, and a step called on its own without it
+stops instead of writing below `/`:
 
-| Script                      | Suite             | Does                                                                                                  |
-|-----------------------------|-------------------|-------------------------------------------------------------------------------------------------------|
-| `build:icons`               | `buildIcons`      | The three below, in order.                                                                            |
-| `build:icons:solid`         | —                 | Empties `Solid/` and copies `svgs/solid/*.svg` of the installed package into it, nothing else.        |
-| `build:icons:brands`        | —                 | Empties `Brands/` and copies the files `fontAwesomeBrands` names out of `svgs/brands/`, nothing else. |
-| `build:icons:meta`          | —                 | Copies `LICENSE.txt` and `metadata/categories.yml` of the installed package into place.               |
-| `build:icons:verify`        | `checkIconsBuild` | The three below, in order.                                                                            |
-| `build:icons:solid:verify`  | —                 | `diff -r` of the installed `svgs/solid/` against `Solid/`.                                            |
-| `build:icons:brands:verify` | —                 | Copies the allowlist into `.Build/icons-verify/Brands` and `diff -r`s that against `Brands/`.         |
-| `build:icons:meta:verify`   | —                 | `diff -u` of the two licence files and of the two category files.                                     |
+| Script                           | Suite             | Does                                                                                                            |
+|----------------------------------|-------------------|-----------------------------------------------------------------------------------------------------------------|
+| `build:icons`                    | `buildIcons`      | `build:icons:copy` into `Resources/Public/Icons/FontAwesome/`.                                                  |
+| `build:icons:copy`               | —                 | The three below, in order.                                                                                      |
+| `build:icons:solid`              | —                 | Empties `Solid/` and copies `svgs/solid/*.svg` of the installed package into it, nothing else.                  |
+| `build:icons:brands`             | —                 | Empties `Brands/` and copies the files `fontAwesomeBrands` names out of `svgs/brands/`, nothing else.           |
+| `build:icons:meta`               | —                 | Copies `LICENSE.txt` and `metadata/categories.yml` of the installed package into place.                         |
+| `build:icons:verify`             | `checkIconsBuild` | `build:icons:copy` into `.Build/icons-verify/FontAwesome/`, then the two below.                                 |
+| `build:icons:verify:attribution` | —                 | Fails when `ATTRIBUTION.txt` is missing, and copies it into the scratch directory otherwise.                    |
+| `build:icons:verify:diff`        | —                 | `diff -r` of the scratch directory against `Resources/Public/Icons/FontAwesome/`, and what to do if it differs. |
 
 Both start with `npm ci`, which installs exactly the version of
 `package-lock.json` and refuses a tarball whose integrity hash does not match.
-The comparison fails in every direction: an edited file, a file missing from
-the committed set and a file in the committed set that the package does not
-have — a hand-drawn icon dropped next to the vendored ones — each make it exit
-non-zero. `Brands/` is compared against the **allowlist applied to the
-package** rather than against the whole brands style, so it fails on the same
-three plus a fourth: a name added to or dropped from `fontAwesomeBrands`
-without running the build. It is the icon counterpart of
+The gate builds a complete second copy and compares the **whole directory**
+with it, so what may sit in `Resources/Public/Icons/FontAwesome/` is exactly
+what the build writes plus `ATTRIBUTION.txt` — an allowlist that is the build
+itself rather than a list of names beside it. The comparison fails in every
+direction and at every depth: an edited file, a file missing from the
+committed set, and a file or a directory the build does not write — a
+hand-drawn icon dropped next to the vendored ones in `Solid/`, a subdirectory
+of `Brands/`, a `README.md` or an `Outline/` at the top — each make it exit
+non-zero, and `diff` names the path. `Brands/` is built from the **allowlist
+applied to the package** rather than from the whole brands style, so it fails
+on the same three plus a fourth: a name added to or dropped from
+`fontAwesomeBrands` without running the build. It is the icon counterpart of
 [`checkCssBuild`](frontend-assets.md#the-checkcssbuild-gate), and like it
 compares files instead of asking `git`, for the same reason.
+
+Two consequences of comparing the working tree rather than what `git` tracks:
+a file that is only local — an editor's backup, a `.DS_Store` — fails the gate
+locally as well, and so does an empty directory, which CI never sees because
+an empty directory cannot be committed.
+
+`ATTRIBUTION.txt` is the one file there the build does not write; it names the
+version and has to be changed by hand when the pin moves. The gate does not
+compare its content — there is nothing to compare it with — but it **fails
+when the file is missing**: the icons are CC BY 4.0 and this is the
+attribution that travels with them (see
+[Licence and attribution](#licence-and-attribution)), so an extension without
+it is not one that may be distributed. `-s unit` fails on a missing file as
+well, but sideways: two tests of `IconUsageTest` read it, get a warning from
+`file_get_contents()` and an empty string that names neither the version nor
+the trademark. This is the check that says what is wrong, in the job that owns
+the directory.
 
 The scripts are plain shell in `package.json` rather than a script below
 `Build/`, because `Build/` is `export-ignore`d and `package.json` ships: the
@@ -186,8 +212,6 @@ rebuild path travels with the sources, as it does for the stylesheet. The
 brand step is the one that cannot be shell alone — it reads a JSON array out
 of `package.json`, and the container images ship no `jq` — so it is a `node
 -e` expression, in the image that is already running `npm`.
-`ATTRIBUTION.txt` is not written by the build; it names the version and has to
-be changed by hand when the pin moves.
 
 In CI the gate is a step of the `assets` job, next to `checkCssBuild`: it
 needs neither PHP nor a core version, and it uses the node image and the
