@@ -297,12 +297,23 @@
         <f:comment>
             Contract: Resources/Private/Scss/components/_media.scss.
 
-            Both players carry "preload=none" and a "data:" source, for the
-            reason the images of this partial are data URIs (contract D2): a
-            specimen has no FAL record, and the theme has to render with no
-            network at all. "preload=none" is what keeps the browser from
-            trying to decode the stub source, so the players draw their
-            controls and nothing else happens.
+            Both players carry "preload=none", so they draw their controls and
+            fetch nothing until they are played.
+
+            The sources and the caption track are files, not "data:" URIs like
+            the images of this partial: TYPO3's frontend Content Security
+            Policy lets "img-src" load "data:", but "media-src" falls back to
+            "default-src 'self'", and a "data:" source or track is blocked -
+            two violations on "/styleguide" with the policy enforced. The
+            files are "Resources/Public/Media/Styleguide/", generated for the
+            specimen: about a fifth of a second of the poster as VP8 WebM,
+            a tenth of a second of silence as PCM WAV, and a WebVTT file with
+            nothing but its "WEBVTT" line. Their
+            addresses are "specimenFiles", because no one address reaches
+            them from both places this partial renders in:
+            "Templates/Page/Styleguide.html" passes what "f:uri.resource"
+            resolves, and "Build/Scripts/renderStyleguideFixtures.php" a path
+            relative to its fixture pages.
 
             Each carries a caption track. That is not decoration on a
             specimen: a media element without one fails WCAG 1.2.2, and the
@@ -325,8 +336,8 @@
         <figure class="theme-media theme-media--video">
             <video class="theme-media__player" controls preload="none" playsinline
                    poster="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%209'%3E%3Crect%20width='16'%20height='9'%20fill='%23c7d0e0'/%3E%3Cpath%20d='M0%209%206%203.5%209%206%2016%201%2016%209z'%20fill='%238b96ab'/%3E%3C/svg%3E">
-                <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVl" type="video/mp4" />
-                <track kind="captions" src="data:text/vtt,WEBVTT" label="English" />
+                <source src="{specimenFiles.video}" type="video/webm" />
+                <track kind="captions" src="{specimenFiles.captions}" label="English" />
             </video>
             <figcaption class="theme-media__caption">
                 A video, in the box the component keeps for it until the file's
@@ -335,8 +346,8 @@
         </figure>
         <figure class="theme-media theme-media--audio">
             <audio class="theme-media__player" controls preload="none">
-                <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
-                <track kind="captions" src="data:text/vtt,WEBVTT" label="English" />
+                <source src="{specimenFiles.audio}" type="audio/wav" />
+                <track kind="captions" src="{specimenFiles.captions}" label="English" />
             </audio>
             <figcaption class="theme-media__caption">
                 An audio file. It draws no picture, so the height is the user

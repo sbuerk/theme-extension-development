@@ -81,6 +81,18 @@ const TARGET_PATH = ROOT_PATH . '/.Build/visual';
 const STYLESHEET_HREF = '../../../Resources/Public/Css/theme.css';
 
 /**
+ * The media files of the "media" specimen, relative to a page in
+ * ".Build/visual/fixtures/" like the stylesheet. "Templates/Page/Styleguide.html"
+ * passes the same files as "f:uri.resource" resolves them; see the comment in
+ * "Partials/Styleguide/Media.html" for why they are files at all.
+ */
+const SPECIMEN_FILES = [
+    'video' => '../../../Resources/Public/Media/Styleguide/specimen.webm',
+    'audio' => '../../../Resources/Public/Media/Styleguide/specimen.wav',
+    'captions' => '../../../Resources/Public/Media/Styleguide/specimen.vtt',
+];
+
+/**
  * The two explicit appearances. The third, "auto", is the absence of the
  * attribute and resolves to one of these two through "color-scheme".
  */
@@ -172,7 +184,8 @@ function renderPartial(string $partial): string
     $view = new TemplateView();
     $templatePaths = $view->getRenderingContext()->getTemplatePaths();
     $templatePaths->setPartialRootPaths([PARTIAL_ROOT_PATH]);
-    $templatePaths->setTemplateSource(sprintf('<f:render partial="%s" />', $partial));
+    $templatePaths->setTemplateSource(sprintf('<f:render partial="%s" arguments="{specimenFiles: specimenFiles}" />', $partial));
+    $view->assign('specimenFiles', SPECIMEN_FILES);
 
     try {
         $html = trim((string)$view->render());
