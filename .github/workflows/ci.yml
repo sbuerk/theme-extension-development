@@ -344,6 +344,9 @@ jobs:
           path: ".Build/pull-request-context/"
           if-no-files-found: "error"
           retention-days: 5
+          # A re-run is an attempt of the same run, and an artifact name can
+          # be uploaded once per run - without this a re-run of this job fails.
+          overwrite: true
 
       - name: "Render documentation"
         run: "Build/Scripts/runTests.sh -b docker -s renderDocumentation"
