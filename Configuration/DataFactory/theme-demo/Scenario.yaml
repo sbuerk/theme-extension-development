@@ -310,6 +310,18 @@ entities:
                       the <a href="t3://page?uid=1">link to the start page</a> as well.
                       The space after the element is "extra large".</p>
 
+              - self:
+                    # Every page of the section, as the main navigation lists
+                    # it in its second level - see the same element on the
+                    # elements page (503). Last, not after the title: the page
+                    # has no intro, and its uids follow its order like those
+                    # of every page here.
+                    id: 207
+                    CType: 'menu_subpages'
+                    header: 'In this section'
+                    header_layout: 2
+                    pages: '2'
+
           # The typography section: the rich text path, from records. The
           # styleguide (uid 9) shows the same components as literal markup;
           # these pages prove that a record reaches them. Seeded "bodytext" is
@@ -1052,6 +1064,19 @@ entities:
                       <p>Below the classic types, each has a page of its own with its
                       variants, and the <a href="t3://page?uid=51">Frames</a> page shows
                       every value of the Appearance tab, one element each.</p>
+              - self:
+                    # Every page of the section, as the main navigation lists
+                    # it in its second level. The header hides that second
+                    # level without a script at every width below the
+                    # breakpoint of its arrangement, and a section page that
+                    # lists its own pages is what keeps them reachable there -
+                    # "SectionPagesListTheirSubpagesTest" holds every section
+                    # of the header to it. Layouts (17103) is the model.
+                    id: 503
+                    CType: 'menu_subpages'
+                    header: 'In this section'
+                    header_layout: 2
+                    pages: '5'
           children:
             - self:
                   id: 6

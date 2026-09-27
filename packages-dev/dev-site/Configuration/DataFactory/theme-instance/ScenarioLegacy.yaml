@@ -176,6 +176,13 @@ entities:
                   frame_class: inverse
                   space_after_class: extra-large
                   bodytext: "<p>The page in the other appearance: dark on a light page, light\non a dark one, with every colour of the theme turned with it -\nthe <a href=\"t3://page?uid=1001\">link to the start page</a> as well.\nThe space after the element is \"extra large\".</p>\n"
+              -
+                self:
+                  id: 1207
+                  CType: menu_subpages
+                  header: 'In this section'
+                  header_layout: 2
+                  pages: '1002'
           children:
             -
               self:
@@ -542,6 +549,13 @@ entities:
                   id: 1502
                   CType: text
                   bodytext: "<p>Three pages, one per family: the classic types\n<em>EXT:frontend</em> registers without supplying a rendering,\nthe eleven menu types, and the types this extension adds itself.\nEach of them appears on the page of its family, so a single branch\nof the tree answers what the theme does with it.</p>\n<p>The theme types with layouts of their own - the heroes, the call\nto action and the testimonial - also have a page each below the\ntheme elements, showing every layout.</p>\n<p>Below the classic types, each has a page of its own with its\nvariants, and the <a href=\"t3://page?uid=1051\">Frames</a> page shows\nevery value of the Appearance tab, one element each.</p>"
+              -
+                self:
+                  id: 1503
+                  CType: menu_subpages
+                  header: 'In this section'
+                  header_layout: 2
+                  pages: '1005'
           children:
             -
               self:
