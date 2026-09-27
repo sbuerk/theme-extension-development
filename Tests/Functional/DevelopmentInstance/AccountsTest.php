@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional\DevelopmentInstance;
 
 use PHPUnit\Framework\Attributes\Test;
+use SBUERK\ThemeExtensionDevelopment\Tests\Functional\PageModuleLayoutTrait;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -22,6 +23,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 final class AccountsTest extends AbstractInstanceSeedTestCase
 {
+    use PageModuleLayoutTrait;
+
     /**
      * Types the TypoScript renders that the editor deliberately does not get.
      *
@@ -166,6 +169,25 @@ final class AccountsTest extends AbstractInstanceSeedTestCase
             static fn(array $row): bool => (int)$row['perms_groupid'] !== 10 || (int)$row['perms_group'] !== 31,
         );
         $this->assertSame([], array_column($foreign, 'uid'), 'Pages outside the editor group.');
+    }
+
+    /**
+     * Every page of the composed seed opens in the page module with the
+     * layout it declares and without unused elements - the showcase, its
+     * mirror and the account pages alike. A right to edit a page is worth
+     * little to the editor if the page module files most of its elements
+     * under "Unused".
+     *
+     * `ShowcaseTreeTest` holds the showcase to the same. This covers what the
+     * instance adds to it: the generated mirror below `/legacy/`, which copies
+     * every `backend_layout` of the showcase, and the pages of `Accounts.yaml`.
+     */
+    #[Test]
+    public function everySeededPageOpensInThePageModuleWithTheLayoutItDeclares(): void
+    {
+        $failures = $this->pageModuleLayoutFailures();
+
+        $this->assertSame([], $failures, "The page module shows seeded pages wrong:\n  " . implode("\n  ", $failures));
     }
 
     /**

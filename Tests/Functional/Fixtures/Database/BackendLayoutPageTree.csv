@@ -12,6 +12,7 @@
 ,17,1,0,0,0,1,0,"Article","/article","pagets__article",""
 ,18,1,0,0,0,1,0,"Cover","/cover","pagets__cover",""
 ,19,1,0,0,0,1,0,"Bands","/bands","pagets__bands",""
+,21,1,0,0,0,1,0,"Declares a bare identifier","/bare","content_sidebar",""
 "tt_content",,,,,,,,,
 ,"uid","pid","sys_language_uid","l18n_parent","colPos","sorting","CType","header","header_layout"
 ,1401,14,0,0,0,10,"header","In the main column",2
