@@ -32,7 +32,7 @@ final class DeliveryRegistrationTest extends AbstractInstanceSeedTestCase
     #[Test]
     public function everyStaticIncludeOfASeededRootTemplateResolvesAndIsRegistered(): void
     {
-        $this->importSeedSet($this->instanceSeedSet());
+        $this->importSeedSetOncePerClass($this->instanceSeedSet());
 
         $entries = $this->staticIncludesOfTheRootTemplates();
         $this->assertNotSame([], $entries, 'No seeded root TypoScript record carries a static include.');
