@@ -27,20 +27,20 @@
     partials as literals, so a value nothing matches renders the default one
     rather than reaching for a file.
 
-    --- Why none of the three other variants re-opens the header budget ----
+    --- Each arrangement has a width of its own ------------------------------
 
-    The one-row header is measured: with seven top level entries the title
-    holds its line at 1280 and at 1024 while the menu wraps, and at 800 the
-    title wraps to three lines with no sideways scroll -
-    "Tests/Acceptance/frontend.spec.ts" holds all four measurements, and
-    "layout/_site-header.scss" explains the 50% cap that arranges them. A
-    variant that added a control to that row would have to be measured again.
-
-    None of them does. "centred" gives the title a row of its own, "actions"
-    gives the navigation one, and "two-tier" moves both controls out of the
-    title's row into a meta row above it - so the row the cap governs holds
-    fewer things in every variant, not more. The call to action of "actions"
-    sits in the row the navigation left.
+    In all four the main navigation keeps its top level in one row and the
+    title gives way beside it; where one row no longer fits, the navigation
+    collapses behind its toggle. Where that is depends on what shares the
+    menu's row, so each arrangement has a breakpoint of its own, sized for
+    the seven top level entries of the showcase - "bp.$header-*" in
+    "abstracts/_breakpoints.scss", measured and explained in
+    "layout/_site-header.scss". "centred" and "actions" give the navigation
+    a row of its own and hold it down to the narrowest width; "two-tier"
+    shares its row with the title only; "simple" shares it with the title and
+    both controls and collapses first. A new arrangement needs a breakpoint
+    of its own - "ComponentLibraryTest" reads the modifiers from the partials
+    below "Page/Header/" and fails on one that has none.
 </f:comment>
 <f:switch expression="{headerVariant}">
     <f:case value="centred"><f:render partial="Page/Header/Centred" arguments="{_all}" /></f:case>

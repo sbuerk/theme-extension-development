@@ -283,7 +283,7 @@ layer element is the viewport, whatever it is nested in: `position: absolute`
 inside the component does not reach the component. So the panel could only be
 pinned to a viewport coordinate, and the one it wants — the bottom edge of the
 header row — is not a coordinate CSS can name, because the header's height
-depends on its content (the title wraps, the menu wraps onto a second row).
+depends on its content (the title gives way onto several lines).
 Pinning a box to another box is what CSS anchor positioning is for, and that is
 above the [browser floor](../../DESIGN.md#the-browser-floor). Out of the top
 layer the panel is an ordinary absolutely positioned child of the component,
@@ -292,10 +292,11 @@ the way `.theme-settings__panel` always was. The reasoning is written out in
 `components/_dropdown.scss`.
 
 **In the header row neither panel is placed against its own component.** The
-row is as tall as its tallest child and the main navigation wraps onto a second
-line inside it from `bp.$md` up, so a panel that starts under its own 44 pixel
-trigger starts inside the row and covers what wrapped. Both are anchored on
-`.theme-site-header` instead and drop under the whole row, with both offsets
+row is as tall as its tallest child — a title on several lines, and a main
+navigation that used to wrap onto a second line — so a panel that starts under
+its own 44 pixel trigger starts inside the row and covers what is beside it.
+Both are anchored on `.theme-site-header` instead and drop under the whole
+row, with both offsets
 derived — `calc(100% + <the component's own gap>)` for the block axis, and one
 shared expression for the inline axis that reads the end of the content
 container off its own `max-width` and padding. `layout/_site-header.scss`
@@ -320,8 +321,8 @@ navigation — whose collapsed menu is the third panel placed against the
 header — or one of the two components, whether the rule names the box by its
 class or by its element (`.theme-site-header > div`, `header nav`). Its
 docblock cites the specification of each and says what it cannot see. The
-acceptance suite opens both panels in all four variants at 1280, 768 and 375
-pixels — 768 is `bp.$md` itself — and measures that each drops under the
+acceptance suite opens both panels in all four variants at 1280, 1024, 768
+and 375 pixels — 768 is `bp.$md` itself — and measures that each drops under the
 whole header and ends at the header's content container, and that no title
 reaches under a trigger; from 768 up it also holds the title of `centred` on
 the centre of its row.

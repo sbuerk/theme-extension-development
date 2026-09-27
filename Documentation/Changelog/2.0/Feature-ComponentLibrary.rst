@@ -99,10 +99,11 @@ and before transport compression.
 ..  note::
 
     The component library has one breakpoint, 48rem; the site header alone
-    adds a second, 64rem (see :ref:`important-header-navigation-wraps`). Both
-    are **Sass variables** rather than custom properties, because a media
-    query condition is evaluated before the cascade runs. That makes them the
-    one re-theming operation which requires recompiling the SCSS rather than
+    adds one per arrangement, where it collapses its main navigation (see
+    :ref:`important-header-navigation-never-wraps`). All of them are **Sass
+    variables** rather than custom properties, because a media query
+    condition is evaluated before the cascade runs. That makes them the one
+    re-theming operation which requires recompiling the SCSS rather than
     overriding a property.
 
 ..  note::

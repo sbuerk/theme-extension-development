@@ -7,9 +7,11 @@
 
     This is the header the theme had before the variants, unchanged - which
     is the point. It carries no modifier class, so a site that never touches
-    "theme.header.variant" gets exactly the markup, the stylesheet rules and
-    the measured behaviour it had before, and the four acceptance tests that
-    measure the row keep measuring it.
+    "theme.header.variant" gets exactly the markup it had before, and the
+    acceptance tests that measure the page's own header measure this one.
+    Title, menu and both controls share the row, so this is the arrangement
+    that collapses its menu at the widest breakpoint - see
+    "layout/_site-header.scss".
 
     Main navigation: "Partials/Navigation/Main.html" renders ".theme-nav-main"
     itself, including its own empty guard, so it is rendered unconditionally

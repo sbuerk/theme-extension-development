@@ -240,6 +240,10 @@ final class ComponentLibraryTest extends UnitTestCase
      * So the open layout is the default and the collapse is gated behind the
      * `data-js` marker the script sets on the root. Inverting that back is a
      * one-character change with no visible symptom during development.
+     *
+     * The collapse is written once per breakpoint: at `bp.$md` for a menu
+     * outside the site header, and once per header arrangement at the
+     * arrangement's own one. Every one of them is gated, not only the first.
      */
     #[Test]
     public function collapsingTheMainNavigationRequiresTheScriptMarker(): void
@@ -247,10 +251,25 @@ final class ComponentLibraryTest extends UnitTestCase
         $css = $this->stylesheet();
 
         $this->assertStringContainsString(
-            '[data-js] .theme-nav-main:not(:has(.theme-nav-main__toggle[aria-expanded=true]))>.theme-nav-main__list{display:none}',
+            '@media(max-width: 47.9375rem){[data-js] .theme-nav-main:not(.theme-site-header *):not(:has(.theme-nav-main__toggle[aria-expanded=true]))>.theme-nav-main__list{display:none}',
             $css,
-            'The collapse rule must be gated behind the script marker, or the menu disappears without JavaScript.',
+            'The collapse rule of a menu outside the header must be gated behind the script marker, or the menu disappears without JavaScript.',
         );
+
+        // Every rule that hides the top level list of a main navigation.
+        preg_match_all('/([^{}]*>\.theme-nav-main__list)\{display:none\}/', $css, $rules);
+        $ungated = [];
+        foreach ($rules[1] as $selectors) {
+            foreach (self::splitTopLevel($selectors, ',') as $selector) {
+                if (!str_starts_with($selector, '[data-js] ')
+                    || !str_ends_with($selector, ':not(:has(.theme-nav-main__toggle[aria-expanded=true]))>.theme-nav-main__list')
+                ) {
+                    $ungated[] = $selector;
+                }
+            }
+        }
+        $this->assertGreaterThan(1, count($rules[1]), 'The header arrangements collapse their menu nowhere.');
+        $this->assertSame([], $ungated, 'A collapse rule hides the main navigation without the script marker, or whether or not its toggle is expanded.');
 
         // And the toggle itself must not be offered when nothing can operate it.
         $this->assertStringContainsString('[data-js] .theme-nav-main__toggle', $css);
@@ -631,8 +650,8 @@ final class ComponentLibraryTest extends UnitTestCase
      * dropdown, a second settings instance with an `idPrefix` of its own. In
      * the header it is wrong for both, and for a reason no property name and
      * no value gives away: the row is as tall as its tallest child and the
-     * menu may take two rows inside it, so a panel that starts under its own
-     * 44 pixel trigger starts *inside* the row and covers what wrapped. The
+     * menu used to take two rows inside it, so a panel that starts under its
+     * own 44 pixel trigger starts *inside* the row and covers what wrapped. The
      * dropdown was fixed for that; the cog beside it kept the placement and
      * opened at y 104.5 in a 146 pixel header, over two navigation links.
      *
@@ -734,8 +753,9 @@ final class ComponentLibraryTest extends UnitTestCase
      * Three panels are placed against `.theme-site-header` with
      * `position: absolute`: the two of the controls slot, held to that by the
      * gate above, and the collapsed main navigation, which drops as a band
-     * under the header below `bp.$md`. Their offsets of `100%` are the
-     * header's height only as long as the header is their containing block.
+     * under the header below the breakpoint of its arrangement. Their offsets
+     * of `100%` are the header's height only as long as the header is their
+     * containing block.
      * Any box between the two that establishes one takes that role over, and
      * it is a quiet takeover: the panels still open, still close and still
      * end at a derived edge - of the wrong box. The `centred` variant did
@@ -1322,80 +1342,354 @@ final class ComponentLibraryTest extends UnitTestCase
     }
 
     /**
-     * The single-row site header is measured in a browser at four viewport
-     * widths, and the `max-inline-size: 50%` cap on the navigation between
-     * the two breakpoints is what arranges those measurements - see
-     * `layout/_site-header.scss`. The three header variants the site setting
-     * selects each give the title or the navigation a row of its own instead
-     * of re-negotiating that row, so none of them may touch the cap: a
-     * variant that widened it would change what the acceptance tests measure
-     * without any of them going red, because they render the default.
+     * The top level of the main navigation is one row wherever it is a row.
+     *
+     * The header used to let it wrap onto a second row inside its frame when
+     * the row got tight, and the second level of the menu, which opens under
+     * its own entry, then opened over the entries that had wrapped under it -
+     * at 1280 pixels on the showcase, `Elements` over `Styleguide` and
+     * `Forms`. The header collapses the menu behind its toggle instead, at a
+     * breakpoint per arrangement (see
+     * `everyHeaderArrangementCollapsesTheMainNavigationAtABreakpointOfItsOwn`),
+     * and that only holds while nothing lets the top level wrap.
+     *
+     * So no rule whose subject is the top level list of the main navigation -
+     * `.theme-nav-main__list`, which the second level shares, or a `ul` that
+     * is a child of `.theme-nav-main` - may set `flex-wrap` or `flex-flow` to
+     * wrap, in any media query and under any scope. A rule that names only
+     * `.theme-nav-main__list--sub` is the second level's own business, and a
+     * column.
      */
-    #[DataProvider('headerVariantModifiers')]
     #[Test]
-    public function aHeaderVariantDoesNotChangeTheMeasuredWidthBudget(string $modifier): void
+    public function theTopLevelOfTheMainNavigationNeverWraps(): void
     {
-        $css = $this->stylesheet();
-
-        foreach ($this->declarationBlocksFor($css, $modifier) as $selector => $declarations) {
-            $this->assertStringNotContainsString(
-                'max-inline-size',
-                $declarations,
-                sprintf('The header variant rule "%s" changes a width the default header is measured on.', $selector),
-            );
-            $this->assertStringNotContainsString(
-                'flex:none',
-                $declarations,
-                sprintf('The header variant rule "%s" changes how the default header distributes its row.', $selector),
-            );
+        $findings = [];
+        foreach ($this->rules() as [$selectors, $declarations]) {
+            foreach (self::splitTopLevel($selectors, ',') as $selector) {
+                if (!self::targetsTheTopLevelOfTheMainNavigation($selector)) {
+                    continue;
+                }
+                foreach ($declarations as $declaration) {
+                    [$property, $value] = array_pad(array_map('trim', explode(':', $declaration, 2)), 2, '');
+                    $words = preg_split('/\s+/', strtolower($value)) ?: [];
+                    if (in_array(strtolower($property), ['flex-wrap', 'flex-flow'], true)
+                        && array_intersect($words, ['wrap', 'wrap-reverse']) !== []
+                    ) {
+                        $findings[] = sprintf('%s { %s: %s }', $selector, $property, $value);
+                    }
+                }
+            }
         }
+
+        $this->assertSame([], $findings, 'The top level of the main navigation wraps - it is one row, or it collapses behind its toggle.');
     }
 
     /**
-     * @return \Generator<string, array{modifier: string}>
+     * Neither the site title nor the main navigation of the header is capped,
+     * and the title is what gives way.
+     *
+     * A cap was the mechanism of the wrapping header: the title took at most
+     * half the row from 1024 pixels up, and the menu at most half of it below
+     * - which the menu of `centred`, `actions` and `two-tier` got as well,
+     * although it had a row of its own. A cap on either one hands the other
+     * a width the menu does not fit in, and the menu cannot wrap any more
+     * (`theTopLevelOfTheMainNavigationNeverWraps`), so it would spill instead.
+     * No rule whose subject is the title, the navigation or its top level list
+     * sets `max-inline-size` or `max-width` to anything but `none`.
+     *
+     * The title gives way down to its longest word: it shrinks, and it keeps
+     * `min-inline-size: min-content` - the automatic minimum a flex item has
+     * anyway until someone gives it an `overflow`, and then a title squeezed
+     * below its longest word runs under the menu.
+     *
+     * The navigation is `flex: none`, as wide as its one row - but only where
+     * it is that row: in the `min-width` media query of each arrangement's
+     * breakpoint, on `<arrangement> .theme-nav-main`. Below it, a page
+     * without a script shows the list stacked in the flow, and `flex: none`
+     * there kept the row as wide as the widest entry: `simple` scrolled
+     * sideways by 96 pixels at 375. So every arrangement has that one rule at
+     * the width its toggle is hidden from, and no other rule that can reach
+     * the navigation in the header - under any scope, in any media query or
+     * none - sets `flex`, `flex-grow`, `flex-shrink` or `flex-basis` on it.
+     * A menu outside the header, `:not(.theme-site-header *)`, is not the
+     * header's business.
      */
-    public static function headerVariantModifiers(): \Generator
+    #[Test]
+    public function neitherTheTitleNorTheMenuOfTheHeaderIsCapped(): void
     {
-        foreach (['.theme-site-header--centred', '.theme-site-header--actions', '.theme-site-header--two-tier'] as $modifier) {
-            yield $modifier => ['modifier' => $modifier];
+        $findings = [];
+        $brand = [];
+        $flexOfTheNavigation = [];
+        foreach ($this->rules() as [$selectors, $declarations]) {
+            foreach (self::splitTopLevel($selectors, ',') as $selector) {
+                $compounds = self::compounds($selector);
+                $classes = [];
+                foreach (self::subjectAlternatives((string)end($compounds)) as $subject) {
+                    preg_match_all('/\.(-?[_a-zA-Z][\w-]*)/', $subject, $named);
+                    $classes = [...$classes, ...$named[1]];
+                }
+                $isBrand = in_array('theme-site-header__brand', $classes, true);
+                $isNavigation = in_array('theme-nav-main', $classes, true);
+                if (!$isBrand && !$isNavigation && !self::targetsTheTopLevelOfTheMainNavigation($selector)) {
+                    continue;
+                }
+                foreach ($declarations as $declaration) {
+                    [$property, $value] = array_pad(array_map('trim', explode(':', $declaration, 2)), 2, '');
+                    $property = strtolower($property);
+                    if (in_array($property, ['max-inline-size', 'max-width'], true) && strtolower($value) !== 'none') {
+                        $findings[] = sprintf('%s { %s: %s }', $selector, $property, $value);
+                    }
+                    if ($isBrand) {
+                        $brand[$selector][$property] = $value;
+                    }
+                    if ($isNavigation
+                        && !str_contains($selector, ':not(.theme-site-header *)')
+                        && in_array($property, ['flex', 'flex-grow', 'flex-shrink', 'flex-basis'], true)
+                    ) {
+                        $key = sprintf('%s { %s: %s }', $selector, $property, $value);
+                        $flexOfTheNavigation[$key] = ($flexOfTheNavigation[$key] ?? 0) + 1;
+                    }
+                }
+            }
         }
-    }
 
-    /**
-     * Every rule of the compiled stylesheet whose selector names the given
-     * class, as selector => declarations.
-     *
-     * A plain split on the two brace characters. Two things it does not do,
-     * both of which would make it miss a rule rather than report a wrong one:
-     * a chunk that still holds an at-rule (`@media (…){selector{decls`) splits
-     * into three parts and is skipped, and two rules with the same selector
-     * collapse because the result is keyed by selector.
-     *
-     * That is acceptable for what this asserts - no header variant rule may
-     * set a width - only as long as no variant width hides in a media query.
-     * None does today: the three variants are read out in full by
-     * `headerVariantModifiers`, and `assertNotSame([], $blocks)` below fails
-     * if a variant stops matching at all. A variant that needs a media query
-     * needs a better parser here first.
-     *
-     * @return array<string, string>
-     */
-    private function declarationBlocksFor(string $css, string $class): array
-    {
-        $blocks = [];
-        foreach (explode('}', $css) as $block) {
-            $parts = explode('{', $block);
-            if (count($parts) !== 2) {
+        $this->assertSame([], $findings, 'The site title or the main navigation of the header is capped.');
+
+        $this->assertSame('min-content', $brand['.theme-site-header__brand']['min-inline-size'] ?? '(nothing)', 'The site title does not keep its longest word.');
+        foreach ($brand as $selector => $declared) {
+            $shrink = $declared['flex-shrink'] ?? null;
+            if (isset($declared['flex'])) {
+                $parts = preg_split('/\s+/', trim($declared['flex'])) ?: [];
+                $shrink = $parts === ['none'] ? '0' : ($parts[1] ?? $shrink);
+            }
+            $this->assertNotSame('0', $shrink, sprintf('"%s" keeps the site title from giving way.', $selector));
+        }
+
+        // The one allowed rule per arrangement: "flex: none" on the
+        // navigation, in the media query that hides the toggle.
+        $modifiers = $this->headerModifiers();
+        $expandedAt = [];
+        $rigidFrom = [];
+        foreach ($this->mediaRules() as [$condition, $selectors, $declarations]) {
+            if (preg_match('/^\(min-width:\s*([\d.]+)rem\)$/', $condition, $width) !== 1) {
                 continue;
             }
-            [$selector, $declarations] = $parts;
-            if (str_contains($selector, $class)) {
-                $blocks[trim($selector)] = $declarations;
+            foreach (self::splitTopLevel($selectors, ',') as $selector) {
+                $header = self::arrangementScope($selector, $modifiers);
+                if ($header === null) {
+                    continue;
+                }
+                $name = $header === '' ? 'simple' : substr($header, strlen('.theme-site-header--'));
+                $scope = strstr($selector, ' .theme-nav-main', true);
+                if ($selector === $scope . ' .theme-nav-main>.theme-nav-main__toggle' && in_array('display:none', $declarations, true)) {
+                    $expandedAt[$name][] = (float)$width[1];
+                }
+                if ($selector === $scope . ' .theme-nav-main' && in_array('flex:none', $declarations, true)) {
+                    $rigidFrom[$name][] = (float)$width[1];
+                    $key = sprintf('%s { flex: none }', $selector);
+                    $flexOfTheNavigation[$key] = ($flexOfTheNavigation[$key] ?? 0) - 1;
+                }
             }
         }
-        $this->assertNotSame([], $blocks, sprintf('No rule of the stylesheet names "%s" - the variant ships no rules at all.', $class));
+        $this->assertSame(
+            [],
+            array_keys(array_filter($flexOfTheNavigation, static fn(int $count): bool => $count > 0)),
+            'A rule sets how the main navigation of the header flexes outside the one "flex: none" of its arrangement.',
+        );
+        foreach (['simple', ...array_map(static fn(string $modifier): string => substr($modifier, strlen('theme-site-header--')), $modifiers)] as $name) {
+            $this->assertSame(
+                $expandedAt[$name] ?? ['(nothing)'],
+                $rigidFrom[$name] ?? [],
+                sprintf('The main navigation of "%s" is not "flex: none" exactly where it is a row.', $name),
+            );
+        }
+    }
 
-        return $blocks;
+    /**
+     * The variant modifiers the header partials write, sorted.
+     *
+     * @return list<string>
+     */
+    private function headerModifiers(): array
+    {
+        $modifiers = [];
+        foreach (glob(dirname(__DIR__, 2) . '/Resources/Private/Partials/Page/Header/*.html') ?: [] as $partial) {
+            preg_match_all('/\bclass="theme-site-header (theme-site-header--[a-z][a-z0-9-]*)"/', (string)file_get_contents($partial), $found);
+            $modifiers = [...$modifiers, ...$found[1]];
+        }
+        $modifiers = array_values(array_unique($modifiers));
+        sort($modifiers);
+        $this->assertNotSame([], $modifiers, 'No header partial writes a variant modifier any more - the reading of the partials is out of date.');
+
+        return $modifiers;
+    }
+
+    /**
+     * Every arrangement of the site header collapses its main navigation at
+     * a breakpoint of its own, and nothing else in a media query reaches the
+     * menu in the header.
+     *
+     * Where one row of entries stops fitting depends on what shares the row:
+     * title, menu and controls in `simple`, the menu alone under the title in
+     * `centred` and `actions`, title and menu in `two-tier`. So each one
+     * collapses at its own `bp.$header-*` (`abstracts/_breakpoints.scss`),
+     * and the rules that change there are included once per arrangement.
+     * What this holds, per arrangement, read off the compiled stylesheet:
+     *
+     * - one `min-width` from which the toggle is hidden - the menu is a row;
+     * - one `max-width` below which the list is hidden unless the toggle is
+     *   expanded, and that is exactly one pixel below the other - a gap
+     *   between the two leaves the menu a row that spills, an overlap leaves
+     *   it without a toggle and hidden;
+     * - and the breakpoint is above `bp.$md`, the one a menu outside the
+     *   header collapses at, which no header arrangement can hold seven
+     *   entries at.
+     *
+     * The arrangements are read from the partials below
+     * `Partials/Page/Header/`: every modifier one of them writes, and the
+     * default - the header that carries none of them. A new variant partial
+     * without a breakpoint of its own fails here rather than falling back to
+     * the default's.
+     *
+     * And every rule in a width media query that names a class of the main
+     * navigation also names the site header - as the scope of an arrangement,
+     * or as `:not(.theme-site-header *)` of a menu outside it. A rule that
+     * names neither reaches the menu in the header at a width of its own
+     * choosing, which is how the header's collapse would come apart again.
+     */
+    #[Test]
+    public function everyHeaderArrangementCollapsesTheMainNavigationAtABreakpointOfItsOwn(): void
+    {
+        $modifiers = $this->headerModifiers();
+
+        // The header selector of each arrangement, as the compiled stylesheet
+        // writes it: the default is the header with none of the modifiers.
+        $arrangements = ['simple' => null];
+        foreach ($modifiers as $modifier) {
+            $arrangements[substr($modifier, strlen('theme-site-header--'))] = '.' . $modifier;
+        }
+
+        $expandedAt = [];
+        $collapsedBelow = [];
+        $unscoped = [];
+        foreach ($this->mediaRules() as [$condition, $selectors, $declarations]) {
+            if (preg_match('/^\((min|max)-width:\s*([\d.]+)rem\)$/', $condition, $width) !== 1) {
+                continue;
+            }
+            foreach (self::splitTopLevel($selectors, ',') as $selector) {
+                if (str_contains($selector, 'theme-nav-main') && !str_contains($selector, 'theme-site-header')) {
+                    $unscoped[] = sprintf('@media %s { %s }', $condition, $selector);
+                }
+                $header = self::arrangementScope($selector, $modifiers);
+                if ($header === null) {
+                    continue;
+                }
+                $name = $header === '' ? 'simple' : substr($header, strlen('.theme-site-header--'));
+                // The default's ":not()" lists the modifiers in the order the
+                // stylesheet writes them, which the scope has to match.
+                $scope = $header;
+                if ($header === '' && preg_match('/\.theme-site-header:not\([^()]*\)/', $selector, $default) === 1) {
+                    $scope = $default[0];
+                }
+                if ($width[1] === 'min' && $selector === $scope . ' .theme-nav-main>.theme-nav-main__toggle' && in_array('display:none', $declarations, true)) {
+                    $expandedAt[$name][] = (float)$width[2];
+                }
+                if ($width[1] === 'max'
+                    && $selector === '[data-js] ' . $scope . ' .theme-nav-main:not(:has(.theme-nav-main__toggle[aria-expanded=true]))>.theme-nav-main__list'
+                    && in_array('display:none', $declarations, true)
+                ) {
+                    $collapsedBelow[$name][] = (float)$width[2];
+                }
+            }
+        }
+
+        $findings = [];
+        foreach (array_keys($arrangements) as $name) {
+            $expanded = $expandedAt[$name] ?? [];
+            $collapsed = $collapsedBelow[$name] ?? [];
+            if (count($expanded) !== 1 || count($collapsed) !== 1) {
+                $findings[] = sprintf('"%s" expands its menu at %s and collapses it below %s - one breakpoint each.', $name, json_encode($expanded), json_encode($collapsed));
+                continue;
+            }
+            if (abs($expanded[0] - 0.0625 - $collapsed[0]) > 0.00001) {
+                $findings[] = sprintf('"%s" expands its menu from %srem and collapses it up to %srem - not one pixel apart.', $name, $expanded[0], $collapsed[0]);
+            }
+            if ($expanded[0] <= 48.0) {
+                $findings[] = sprintf('"%s" expands its menu from %srem, not above "bp.$md".', $name, $expanded[0]);
+            }
+        }
+
+        $this->assertSame([], $findings, 'A header arrangement does not collapse its main navigation at a breakpoint of its own.');
+        $this->assertSame([], $unscoped, 'A rule in a width media query reaches the main navigation in the header without naming it.');
+    }
+
+    /**
+     * The header an arrangement rule is scoped to - `''` for the default, the
+     * modifier class for a variant, `null` for a rule of no arrangement.
+     *
+     * @param list<string> $modifiers
+     */
+    private static function arrangementScope(string $selector, array $modifiers): ?string
+    {
+        $selector = (string)preg_replace('/^\[data-js\]\s+/', '', $selector);
+        if (preg_match('/^\.theme-site-header:not\(([^()]*)\)\s/', $selector, $default) === 1) {
+            $excluded = array_map('trim', explode(',', $default[1]));
+            sort($excluded);
+
+            return $excluded === array_map(static fn(string $modifier): string => '.' . $modifier, $modifiers) ? '' : null;
+        }
+        if (preg_match('/^(\.theme-site-header--[a-z][a-z0-9-]*)\s/', $selector, $variant) === 1) {
+            return $variant[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether a selector's subject is the top level list of the main
+     * navigation: it names `.theme-nav-main__list` - which the second level
+     * shares - or it is a `ul` whose parent is `.theme-nav-main`.
+     */
+    private static function targetsTheTopLevelOfTheMainNavigation(string $selector): bool
+    {
+        $compounds = self::compounds($selector);
+        foreach (self::subjectAlternatives((string)end($compounds)) as $subject) {
+            preg_match_all('/\.(-?[_a-zA-Z][\w-]*)/', $subject, $classes);
+            if (in_array('theme-nav-main__list', $classes[1], true)) {
+                return true;
+            }
+            if ($classes[1] === [] && preg_match('/^ul(?:$|[\[:])/i', $subject) === 1 && count($compounds) > 1) {
+                preg_match_all('/\.(-?[_a-zA-Z][\w-]*)/', $compounds[count($compounds) - 2], $parent);
+                if (in_array('theme-nav-main', $parent[1], true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The rules of the compiled stylesheet that sit in a media query, as a
+     * list of `[condition, selectors, declarations]`.
+     *
+     * The bundle nests nothing in a media query but plain rules, so a block is
+     * `@media <condition>{` followed by rules and a closing brace.
+     *
+     * @return \Generator<int, array{0: string, 1: string, 2: list<string>}>
+     */
+    private function mediaRules(): \Generator
+    {
+        preg_match_all('/@media\s*([^{]+)\{((?:[^{}]*\{[^{}]*\})*)\}/', $this->stylesheet(), $blocks, PREG_SET_ORDER);
+
+        foreach ($blocks as [, $condition, $body]) {
+            preg_match_all('/([^{}]+)\{([^{}]*)\}/', $body, $rules, PREG_SET_ORDER);
+            foreach ($rules as $rule) {
+                $declarations = array_values(array_filter(array_map('trim', explode(';', $rule[2])), static fn(string $value): bool => $value !== ''));
+
+                yield [trim($condition), trim($rule[1]), $declarations];
+            }
+        }
     }
 
     /**
