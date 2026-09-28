@@ -553,6 +553,20 @@ the named stacking layers:
 <div class="theme-button-group theme-button-group--attached" role="group" aria-label="…">…</div>
 ```
 
+A row that does not wrap has to fit, so the segments of `--attached` carry
+`min-inline-size: 0` and a row too narrow takes the room from them, in
+proportion to their width. The label stays centred and runs into the padding
+of its segment evenly on both sides, and a label of several words wraps inside
+its segment. That is the limit of the component: a single word wider than its
+segment with no padding left spills over both of its borders. Keep an attached
+group to a few short labels. An icon segment, `--icon`, does not shrink
+(`flex-shrink: 0`): it stays the 44 pixel square, the pointer target of WCAG
+2.5.8, and the labelled segments give the room. Without that it was 14.8
+pixels wide in a group of 180. Before the segments could shrink, the last of
+the three in the styleguide specimen reached 4 pixels past the edge of a 305
+pixel window, in both engines of the pinned Playwright image, and the page
+scrolled sideways.
+
 Close button — a component of its own rather than a button modifier: no fill,
 no border, no label, and a negative margin that lines up the glyph, not the
 44px target around it, with the content edge. The cross is the `xmark` icon in
