@@ -504,6 +504,12 @@ entities:
                   # parsing function of the frontend, but is not wrapped in the
                   # scroll region the table element renders - which is why the
                   # table element is the way to a wide table.
+                  #
+                  # So this one fits the column of the narrowest screen: 225
+                  # pixels at 305, 320 less a classic scrollbar. Two columns of
+                  # short words take 192 in the pinned Chromium and 196 in the
+                  # pinned Firefox. The three columns it had before took 310
+                  # and 315, and the page scrolled sideways by 45 and 50 pixels.
                   - self:
                         id: 5402
                         CType: 'text'
@@ -512,13 +518,14 @@ entities:
                         bodytext: |
                           <p>A table of the rich text, with the classes of the table
                           component written in the source view. It has no scroll region of
-                          its own, so it has to fit the column.</p>
+                          its own, so it has to fit the column of the narrowest screen, which
+                          two columns of short words do.</p>
                           <table class="theme-table theme-table--striped">
                             <caption>The two appearances</caption>
-                            <thead><tr><th scope="col">Appearance</th><th scope="col">Background</th><th scope="col">Text</th></tr></thead>
+                            <thead><tr><th scope="col">Appearance</th><th scope="col">Page and text</th></tr></thead>
                             <tbody>
-                              <tr><th scope="row">Light</th><td>A near white</td><td>A near black</td></tr>
-                              <tr><th scope="row">Dark</th><td>A near black</td><td>A near white</td></tr>
+                              <tr><th scope="row">Light</th><td>Near black on near white</td></tr>
+                              <tr><th scope="row">Dark</th><td>Near white on near black</td></tr>
                             </tbody>
                           </table>
                   - self:
