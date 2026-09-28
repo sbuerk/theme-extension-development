@@ -290,12 +290,23 @@ for (const tree of trees) {
                 // Every stylesheet, script and image the page requests arrives -
                 // a lazily loaded image below the fold is not requested. A
                 // favicon is not the theme's, and the instance has none.
+                //
+                // A request that failed counts only when its URL never arrives.
+                // WebKit's media player cancels its first request for a video
+                // ("Load request cancelled") and asks again for a byte range,
+                // which arrives. A missing file is still caught, by its status
+                // or by never arriving. The cancelled request reports a
+                // response of status 0 in WebKit, which is not an arrival.
+                const arrived = new Set<string>();
+                const failed: string[] = [];
                 page.on('response', (response) => {
                     if (response.status() >= 400 && !response.url().endsWith('/favicon.ico')) {
                         errors.push(`HTTP ${response.status()} ${response.url()}`);
+                    } else if (response.status() >= 200) {
+                        arrived.add(response.url());
                     }
                 });
-                page.on('requestfailed', (request) => errors.push(`failed ${request.url()}`));
+                page.on('requestfailed', (request) => failed.push(request.url()));
 
                 const response = await page.goto(url);
                 expect(response?.status()).toBe(200);
@@ -317,6 +328,7 @@ for (const tree of trees) {
                 expect(background).not.toBe('rgba(0, 0, 0, 0)');
                 await page.waitForLoadState('networkidle');
 
+                errors.push(...failed.filter((url) => !arrived.has(url)).map((url) => `failed ${url}`));
                 expect(errors).toEqual([]);
             });
         }

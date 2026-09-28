@@ -11,7 +11,7 @@ name: "CI"
 #
 #   quality, phpstan, lint, unit, assets, documentation   the gates, ~1 minute
 #   visual        the styleguide partials: screenshots and axe
-#   acceptance    a built instance, in Chromium and Firefox
+#   acceptance    a built instance, in Chromium and Firefox, and in WebKit
 #   functional    MySQL, MariaDB, PostgreSQL - 16 jobs
 #   functional    SQLite
 #
@@ -472,10 +472,13 @@ jobs:
   # and tested in a browser. Per core version, because the instance is: its
   # composer.json, its site configurations and the backend it serves differ.
   # It starts with the run, like every job, and runs beside the functional jobs.
-  # Every spec runs in Chromium and then in Firefox, in this one job against
-  # the one instance — see "docs/testing/acceptance-tests.md#two-engines".
+  # Every spec runs in Chromium and then in Firefox in one job against one
+  # instance, and in WebKit in a second job against an instance of its own.
+  # WebKit alone takes longer than the other two together, and as a third pass
+  # in the same job it would make this the job every run waits for, see
+  # "docs/testing/acceptance-tests.md#three-engines".
   acceptance:
-    name: "acceptance (v${{ matrix.typo3 }})"
+    name: "acceptance (v${{ matrix.typo3 }}, ${{ matrix.engines.name }})"
     runs-on: ubuntu-26.04
     timeout-minutes: 20
     strategy:
@@ -483,6 +486,9 @@ jobs:
       matrix:
         php-version: [ "8.2" ]
         typo3: [ "12", "13" ]
+        engines:
+          - { name: "Chromium and Firefox", key: "chromium-firefox", projects: "--project chromium --project firefox" }
+          - { name: "WebKit", key: "webkit", projects: "--project webkit" }
     steps:
 
       - name: "Checkout"
@@ -504,14 +510,14 @@ jobs:
           key: "npm-acceptance-v${{ matrix.typo3 }}-${{ hashFiles('Tests/Acceptance/package-lock.json') }}"
           restore-keys: "npm-acceptance-v${{ matrix.typo3 }}-"
 
-      - name: "Build an instance from nothing and test it in Chromium and Firefox"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s acceptance"
+      - name: "Build an instance from nothing and test it in ${{ matrix.engines.name }}"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s acceptance -- ${{ matrix.engines.projects }}"
 
       - name: "Upload the Playwright report"
         if: "failure()"
         uses: actions/upload-artifact@v6
         with:
-          name: "acceptance-report-v${{ matrix.typo3 }}"
+          name: "acceptance-report-v${{ matrix.typo3 }}-${{ matrix.engines.key }}"
           path: |
             .Build/acceptance/report/
             .Build/acceptance/test-results/
