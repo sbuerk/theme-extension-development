@@ -363,6 +363,24 @@ adds its own value with page TSconfig -
 :typoscript:`TCEFORM.tt_content.table_class.addItems` - and styles the class
 it produces; :typoscript:`removeItems` hides one of the theme's.
 
+A table in rich text
+--------------------
+
+A table inserted in the rich text editor takes the look of the table
+component when its classes are written in the source view:
+:html:`<table class="theme-table theme-table--striped">`. It keeps them on the
+page, but it is not wrapped in the region the :guilabel:`Table` content
+element renders its table in, which scrolls sideways on its own. A table in
+rich text therefore has to fit the column of the narrowest screen, or the
+whole page scrolls sideways.
+
+In a window 320 pixels wide with a classic scrollbar, the text column of the
+showcase is 225 pixels wide. Two columns of short words fit: the table of
+:samp:`/typography/tables` takes 196 pixels. The three columns it had before
+did not, at 315 pixels. Every cell has 20 pixels of padding on each side;
+:css:`.theme-table--compact` halves it, which buys 20 pixels per column. A
+wider table belongs in the :guilabel:`Table` content element.
+
 Alerts
 ======
 

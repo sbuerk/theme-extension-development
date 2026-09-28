@@ -292,7 +292,7 @@ entities:
                       CType: text
                       header: 'A table inside the text'
                       header_layout: 2
-                      bodytext: "<p>A table of the rich text, with the classes of the table\ncomponent written in the source view. It has no scroll region of\nits own, so it has to fit the column.</p>\n<table class=\"theme-table theme-table--striped\">\n  <caption>The two appearances</caption>\n  <thead><tr><th scope=\"col\">Appearance</th><th scope=\"col\">Background</th><th scope=\"col\">Text</th></tr></thead>\n  <tbody>\n    <tr><th scope=\"row\">Light</th><td>A near white</td><td>A near black</td></tr>\n    <tr><th scope=\"row\">Dark</th><td>A near black</td><td>A near white</td></tr>\n  </tbody>\n</table>"
+                      bodytext: "<p>A table of the rich text, with the classes of the table\ncomponent written in the source view. It has no scroll region of\nits own, so it has to fit the column of the narrowest screen, which\ntwo columns of short words do.</p>\n<table class=\"theme-table theme-table--striped\">\n  <caption>The two appearances</caption>\n  <thead><tr><th scope=\"col\">Appearance</th><th scope=\"col\">Page and text</th></tr></thead>\n  <tbody>\n    <tr><th scope=\"row\">Light</th><td>Near black on near white</td></tr>\n    <tr><th scope=\"row\">Dark</th><td>Near white on near black</td></tr>\n  </tbody>\n</table>"
                   -
                     self:
                       id: 6403
