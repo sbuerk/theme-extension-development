@@ -1432,7 +1432,11 @@ to its intrinsic width at 305.
 the same box (text, email, url, tel, number, password, search, and the
 date/time family); `color`, `range` and `file` render a fundamentally
 different UA widget and get an explicit `[type='…']` override in
-`_controls.scss`. `.theme-field--invalid`/`--valid` are the explicit
+`_controls.scss`. The one for `range` also sets `margin-inline: 0`: Chromium
+and Firefox give a range a margin of 2 pixels, and with `width: 100%` its track
+ended 2 pixels past its field at every width. `forms.spec.ts` holds every
+control of `/forms` inside its field at 1280 and 305 pixels.
+`.theme-field--invalid`/`--valid` are the explicit
 counterparts of `:user-invalid` — deliberately not `:invalid`, which would
 paint every empty required field red before the reader has typed anything.
 An error or success message starts with its icon in the markup,
