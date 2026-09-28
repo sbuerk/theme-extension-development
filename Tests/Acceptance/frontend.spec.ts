@@ -1799,3 +1799,126 @@ test.describe('the header on the narrowest screens', () => {
     }
 });
 
+/**
+ * Every page of the showcase at 305 pixels, in both trees: 320 less a classic
+ * scrollbar of 15. WCAG 1.4.10 asks for content that reflows at 320 CSS
+ * pixels without scrolling sideways, and a scrollbar takes its part of that.
+ *
+ * The pages are not listed here. A list only covers what somebody remembered
+ * to add, and "showcase" above lacks sixteen of the fifty-eight pages of a
+ * tree - the cheatsheet, every page below "/elements/theme" and
+ * "/typography/right-to-left" among them. So the test starts at the root of
+ * the tree and follows every link of the main navigation and of "main" that
+ * stays on the instance and in the tree: no second language, no file, not the
+ * other tree. That the crawl found the showcase, rather than next to nothing,
+ * is held to "showcase": every page it names has to be among those visited.
+ * Every page visited has to answer 200 as well.
+ *
+ * "/login" is a second start of the site set tree. The account pages are
+ * seeded in that tree only ("Accounts.yaml" of the dev-site package) and hidden
+ * from its navigation, and its login form is the one form of the instance
+ * rendered by the template of an extension, felogin's, rather than written out
+ * as a specimen of the form contract.
+ *
+ * A page that scrolls sideways is reported with what reaches out of the
+ * client width, so that a failure names its cause: the outermost elements
+ * that do, each with its parent and its edges, leaving out what an ancestor
+ * clips or scrolls - a table wrapper, a code block, a carousel track. Only
+ * the edge a reader can scroll to counts, the end of the line: what reaches
+ * out before its start - the skip link waiting at -1, a dropdown panel of the
+ * styleguide - scrolls nothing, and would only bury the cause.
+ *
+ * One load per page and one test per tree. The time goes to TYPO3: on an
+ * instance that has not rendered the pages yet, the crawl of one tree took
+ * two minutes in Chromium run alone and a quarter of a minute in Firefox after
+ * it, so the timeout is five minutes rather than the one of the suite.
+ */
+test.describe('every page of the showcase at 305 pixels', () => {
+    for (const tree of trees) {
+        test(`every page of the ${tree.name} stays inside the screen`, async ({ page }) => {
+            test.setTimeout(300_000);
+            await page.setViewportSize({ width: 305, height: 800 });
+
+            const inTree = (path: string) => (tree.prefix === ''
+                ? !path.startsWith('/legacy/') && !path.startsWith('/de/')
+                : path.startsWith(`${tree.prefix}/`) && !path.startsWith(`${tree.prefix}/de/`));
+            const queue = tree.prefix === '' ? ['/', '/login'] : [`${tree.prefix}/`];
+            const visited = new Set(queue);
+            const problems: string[] = [];
+
+            while (queue.length > 0) {
+                const path = queue.shift() as string;
+                const response = await page.goto(path);
+                if (response?.status() !== 200) {
+                    problems.push(`${path}: HTTP ${response?.status()}`);
+                    continue;
+                }
+                const measured = await page.evaluate(() => {
+                    const root = document.documentElement;
+                    const limit = root.clientWidth;
+                    const describe = (element: Element) => element.tagName.toLowerCase()
+                        + (element.id === '' ? '' : `#${element.id}`)
+                        + [...element.classList].map((name) => `.${name}`).join('');
+                    const rightToLeft = getComputedStyle(root).direction === 'rtl';
+                    const reachesOut = (element: Element) => {
+                        const box = element.getBoundingClientRect();
+                        return box.width > 0 && (rightToLeft ? box.left < -0.5 : box.right > limit + 0.5);
+                    };
+                    const clipped = (element: Element) => {
+                        for (let ancestor = element.parentElement; ancestor !== null && ancestor !== document.body; ancestor = ancestor.parentElement) {
+                            if (getComputedStyle(ancestor).overflowX !== 'visible') {
+                                return true;
+                            }
+                        }
+                        return false;
+                    };
+
+                    const overflow = root.scrollWidth - root.clientWidth;
+                    const culprits = new Map<string, number>();
+                    if (overflow > 0) {
+                        document.body.querySelectorAll('*').forEach((element) => {
+                            const parent = element.parentElement;
+                            if (parent === null || !reachesOut(element) || reachesOut(parent) || clipped(element)) {
+                                return;
+                            }
+                            const box = element.getBoundingClientRect();
+                            const name = `${describe(parent)} > ${describe(element)} (${Math.round(box.left)}..${Math.round(box.right)})`;
+                            culprits.set(name, (culprits.get(name) ?? 0) + 1);
+                        });
+                    }
+                    const links = [...document.querySelectorAll<HTMLAnchorElement>('nav.theme-nav-main a[href], main a[href]')]
+                        .map((link) => new URL(link.href, document.baseURI))
+                        .filter((url) => url.origin === location.origin)
+                        .map((url) => url.pathname);
+
+                    return {
+                        overflow,
+                        limit,
+                        culprits: [...culprits].map(([name, count]) => (count > 1 ? `${name} x${count}` : name)),
+                        links,
+                    };
+                });
+
+                if (measured.overflow > 0) {
+                    const culprits = measured.culprits.length > 0
+                        ? measured.culprits.slice(0, 5)
+                        : ['no element reaches out - a pseudo element or a margin?'];
+                    problems.push(`${path}: ${measured.overflow} pixels sideways in ${measured.limit}, from ${culprits.join(', ')}`);
+                }
+                for (const link of measured.links) {
+                    // A path with an extension is a file - a download below
+                    // "fileadmin", an asset - not a page.
+                    if (inTree(link) && !/\.[a-z0-9]+$/i.test(link) && !visited.has(link)) {
+                        visited.add(link);
+                        queue.push(link);
+                    }
+                }
+            }
+
+            const missed = showcase.map((path) => tree.prefix + path).filter((path) => !visited.has(path));
+            expect(missed, 'pages of "showcase" the crawl did not reach').toEqual([]);
+            expect(problems, 'pages that scroll sideways at 305 pixels, or do not answer 200').toEqual([]);
+        });
+    }
+});
+
