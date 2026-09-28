@@ -205,18 +205,18 @@ functional (MySQL, MariaDB, Postgres)                 16 jobs
 functional (SQLite)
 ```
 
-| Job                 | Matrix                                             | Runs                                                                                      |
-|---------------------|----------------------------------------------------|-------------------------------------------------------------------------------------------|
-| `quality`           | PHP 8.2 × v12 — one job                            | The gates that inspect source files                                                       |
-| `phpstan`           | PHP 8.2 × v12, v13 — 2 jobs                        | The one gate configured per core version                                                  |
-| `lint`              | PHP 8.1–8.4 × v12, v13 minus `{v13, 8.1}` — 7 jobs | `lintPhp`                                                                                 |
-| `unit`              | the four edge pairs below — 4 jobs                 | `unit`, `unitRandom`                                                                      |
-| `functional-sqlite` | the four edge pairs below — 4 jobs                 | `functional -d sqlite -j 4`, uploads the JUnit logs                                       |
-| `functional-dbms`   | the four edge pairs × 4 DBMS — 16 jobs             | `functional -j 4` against each database, uploads the JUnit logs                           |
-| `acceptance`        | PHP 8.2 × v12, v13 — 2 jobs                        | `acceptance`: a built instance, in Chromium and in Firefox; uploads the report on failure |
-| `visual`            | PHP 8.2 × v12 — one job                            | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure    |
-| `assets`            | —                                                  | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build        |
-| `documentation`     | —                                                  | `renderDocumentation`, uploads the artifact                                               |
+| Job                 | Matrix                                             | Runs                                                                                                                |
+|---------------------|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| `quality`           | PHP 8.2 × v12 — one job                            | The gates that inspect source files                                                                                 |
+| `phpstan`           | PHP 8.2 × v12, v13 — 2 jobs                        | The one gate configured per core version                                                                            |
+| `lint`              | PHP 8.1–8.4 × v12, v13 minus `{v13, 8.1}` — 7 jobs | `lintPhp`                                                                                                           |
+| `unit`              | the four edge pairs below — 4 jobs                 | `unit`, `unitRandom`                                                                                                |
+| `functional-sqlite` | the four edge pairs below — 4 jobs                 | `functional -d sqlite -j 4`, uploads the JUnit logs                                                                 |
+| `functional-dbms`   | the four edge pairs × 4 DBMS — 16 jobs             | `functional -j 4` against each database, uploads the JUnit logs                                                     |
+| `acceptance`        | PHP 8.2 × v12, v13 × 2 engine sets — 4 jobs        | `acceptance`: a built instance, Chromium and Firefox in one job, WebKit in the other, uploads the report on failure |
+| `visual`            | PHP 8.2 × v12 — one job                            | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure                              |
+| `assets`            | —                                                  | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build                                  |
+| `documentation`     | —                                                  | `renderDocumentation`, uploads the artifact                                                                         |
 
 The "edge pairs" are `{v12, 8.1}`, `{v12, 8.4}`, `{v13, 8.2}`, `{v13, 8.4}` —
 the lowest and highest PHP version each core version accepts.
