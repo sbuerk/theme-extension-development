@@ -26,9 +26,24 @@
 // hint, required marker and the vertical rhythm of the form around it. The
 // control itself is "_controls.scss"; the error/success repaint of both is
 // "_validation.scss".
+//
+// --- The column is the form's, not the widest control's --------------------
+//
+// The form, the field and the fieldset ("_controls.scss") are grids of one
+// column, and an implicit column is "auto": it never becomes narrower than
+// what its content needs at the least. For a control that is its intrinsic
+// width, however far the control could shrink, and the two engines do not
+// agree on it: an input group with its addon, a date input beside its label,
+// the file input. In a window of 305 pixels, 320 less a classic scrollbar,
+// the column of the first form on "/forms" was 322 pixels wide in Chromium
+// and 305 in Firefox, in a form of 265, and the page scrolled sideways.
+// So each of these grids declares its column as "minmax(0, 1fr)": the width
+// the grid is given. The controls are "width: 100%" and shrink with it, the
+// input group lets its control shrink ("_input-group.scss"), and text wraps.
 
 .theme-form {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     // One step looser than the "hr" rule in "base/_elements.scss"
     // (space-6): a horizontal rule separates unrelated sections, a field
     // gap separates rows of the same form and can afford to sit tighter.
@@ -39,6 +54,8 @@
     --theme-field-gap: var(--theme-space-1, 0.3125rem);
 
     display: grid;
+    // See "The column is the form's" above.
+    grid-template-columns: minmax(0, 1fr);
     // Row order is source order: label, control, error, hint - exactly the
     // markup contract above. Nothing here reorders it, so the visual order
     // and the reading order the "aria-describedby" list assumes stay the
@@ -70,13 +87,41 @@
 // (a single checkbox-sized control, a compact filter) rather than a stacked
 // block. Hint still spans the full width underneath rather than squeezing
 // into the narrow label column.
+//
+// A wrapping flex row rather than two grid columns, because a row too narrow
+// for both has no good way to share it. With the columns "max-content 1fr"
+// the control kept its intrinsic width and the field reached out of its
+// fieldset. With "max-content minmax(0, 1fr)" it was squeezed instead, and a
+// date input of 121 pixels showed "16/2026" in Chromium and "08/16/" in
+// Firefox. A label longer than the row did not wrap in either.
+//
+// So the control starts from its intrinsic width, "flex-basis: max-content",
+// the width at which it shows its whole value. Where that fits beside the
+// label it stays there and grows to the end of the row. Where it does not,
+// it goes under the label and takes the whole width. A label longer than the
+// row wraps between its words, as a flex item may. "min-inline-size: 0" only
+// matters where the field itself is narrower than the control, which then
+// shrinks as the controls of a stacked field do. The colour input keeps the
+// swatch size "_controls.scss" gives it: its max-content is not that size, and
+// growing would stretch the swatch. Hint and messages take a line of their
+// own, "_validation.scss" says so for the messages.
 .theme-field--inline {
-    grid-template-columns: max-content 1fr;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     column-gap: var(--theme-space-3, 0.9375rem);
     row-gap: var(--theme-field-gap);
 
+    > :not(.theme-field__label, .theme-field__hint, .theme-field__error, .theme-field__success) {
+        flex: 1 1 max-content;
+        min-inline-size: 0;
+    }
+
+    > .theme-input[type='color'] {
+        flex: none;
+    }
+
     .theme-field__hint {
-        grid-column: 1 / -1;
+        flex-basis: 100%;
     }
 }

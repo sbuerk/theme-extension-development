@@ -67,6 +67,41 @@ test.describe('the form showcase', () => {
         await expect(page.locator('#form-request-name')).toHaveValue('');
     });
 
+    // A text field narrower than its content scrolls what is typed into it.
+    // A date, a time, a colour or a single select does not: it cuts its value
+    // off, and the reader sees "16/2026" for a whole date. So each of those is
+    // held to its intrinsic width at 305 pixels, 320 less a classic scrollbar,
+    // measured on a copy of it with nothing around it to squeeze it. The inline
+    // field "Needed from" squeezed its date input to 121 pixels there, 178 in
+    // Chromium and 161 in Firefox being what the date needs.
+    test('keeps every control that cuts its value off at its own width at 305 pixels', async ({ page }) => {
+        await page.setViewportSize({ width: 305, height: 800 });
+        await page.goto('/forms');
+
+        const squeezed = await page.evaluate(() => {
+            const selector = ['date', 'time', 'datetime-local', 'month', 'week', 'color']
+                .map((type) => `.theme-form input[type="${type}"]`)
+                .concat('.theme-form select:not([multiple])')
+                .join(', ');
+            const controls = [...document.querySelectorAll<HTMLElement>(selector)];
+            return controls.map((control) => {
+                const probe = document.createElement('div');
+                probe.style.cssText = 'position: absolute; inset-block-start: 0; inset-inline-start: 0; display: inline-block; visibility: hidden';
+                const copy = control.cloneNode(true) as HTMLElement;
+                copy.removeAttribute('id');
+                probe.append(copy);
+                control.closest('form')?.append(probe);
+                const own = copy.getBoundingClientRect().width;
+                probe.remove();
+                const width = control.getBoundingClientRect().width;
+                return { name: control.id, width, own };
+            }).filter((control) => control.width < control.own - 0.5)
+                .map((control) => `#${control.name}: ${control.width.toFixed(1)} of ${control.own.toFixed(1)}`)
+                .concat(controls.length === 0 ? ['no control of the kind on the page'] : []);
+        });
+        expect(squeezed, 'controls narrower than they need to show their value').toEqual([]);
+    });
+
     test('links every error of the returned form to its field', async ({ page }) => {
         const summary = page.locator('.theme-form-summary--error');
         for (const link of await summary.getByRole('link').all()) {

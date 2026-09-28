@@ -392,8 +392,16 @@
     }
 }
 
+// One column the width it is given, for the reason "The column is the
+// form's" in "_field.scss" gives. The UA stylesheet also gives a fieldset
+// "min-inline-size: min-content". With the column at "minmax(0, 1fr)" the
+// min-content of the fieldset is no longer that of its widest control - 100
+// to 147 pixels for the fieldsets of "/forms" in both engines, where the
+// window of 305 pixels gives them 265 - so that floor holds nothing open any
+// more and is left as it is.
 .theme-fieldset {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--theme-space-3, 0.9375rem);
     margin: 0;
     padding: var(--theme-space-4, 1.25rem);
