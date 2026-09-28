@@ -377,7 +377,7 @@ whole page scrolls sideways.
 In a window 320 pixels wide with a classic scrollbar, the text column of the
 showcase is 225 pixels wide. Two columns of short words fit: the table of
 :samp:`/typography/tables` takes 196 pixels. The three columns it had before
-did not, at 315 pixels. Every cell has 20 pixels of padding on each side;
+did not, at 315 pixels. Every cell has 20 pixels of padding on each side, and
 :css:`.theme-table--compact` halves it, which buys 20 pixels per column. A
 wider table belongs in the :guilabel:`Table` content element.
 
