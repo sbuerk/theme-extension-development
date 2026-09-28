@@ -507,19 +507,6 @@ jobs:
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
 
-      # Temporary, remove once answered: on some hosts in centralus and
-      # westus3 the MySQL and MariaDB jobs ran 2 to 5 times slower than their
-      # siblings, from the first test on, while SQLite and PostgreSQL did not.
-      # The CPU model and hypervisor, and "vmstat" every 10 seconds with its
-      # steal time "st", tell CPU steal from slow InnoDB DDL on such a host.
-      # Written below ".Build/functional-runs/" after "composerUpdate", which
-      # removes ".Build/", and uploaded with the logs.
-      - name: "Record the CPU and start vmstat (temporary)"
-        run: |
-          mkdir -p .Build/functional-runs
-          lscpu | grep -E 'Model name|Hypervisor|^CPU\(s\)' | tee .Build/functional-runs/host-lscpu.txt
-          vmstat -t 10 > .Build/functional-runs/host-vmstat.txt 2>&1 &
-
       # "-j 4": four chunks in parallel, each with a database container of its
       # own - see the header for why four. The step times out below the job, so
       # the upload after it still runs.
@@ -574,19 +561,6 @@ jobs:
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
-
-      # Temporary, remove once answered: on some hosts in centralus and
-      # westus3 the MySQL and MariaDB jobs ran 2 to 5 times slower than their
-      # siblings, from the first test on, while SQLite and PostgreSQL did not.
-      # The CPU model and hypervisor, and "vmstat" every 10 seconds with its
-      # steal time "st", tell CPU steal from slow InnoDB DDL on such a host.
-      # Written below ".Build/functional-runs/" after "composerUpdate", which
-      # removes ".Build/", and uploaded with the logs.
-      - name: "Record the CPU and start vmstat (temporary)"
-        run: |
-          mkdir -p .Build/functional-runs
-          lscpu | grep -E 'Model name|Hypervisor|^CPU\(s\)' | tee .Build/functional-runs/host-lscpu.txt
-          vmstat -t 10 > .Build/functional-runs/host-vmstat.txt 2>&1 &
 
       # "-j 4": four chunks in parallel - see the header for why four.
       - name: "Execute functional tests with SQLite"

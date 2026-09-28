@@ -287,14 +287,6 @@ the chunk ends, so in a failed run the chunk with an empty JUnit log is the one
 that did not finish; its event log, appended to event by event, names the test
 it was in.
 
-For the time being the functional jobs also record the CPU model and hypervisor
-of their runner, `host-lscpu.txt`, and `vmstat` every ten seconds,
-`host-vmstat.txt`, uploaded in the same artifact. On some hosts in the
-`centralus` and `westus3` regions the MySQL and MariaDB jobs ran two to five
-times slower than their siblings from the first test on, while SQLite and
-PostgreSQL did not; the steal time `st` tells a starved CPU from slow InnoDB
-DDL. The step goes once that is answered.
-
 ### Why CI passes `-b docker`
 
 Every `runTests.sh` invocation in the workflows passes `-b docker`. The script
