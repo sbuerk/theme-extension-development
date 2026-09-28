@@ -166,6 +166,21 @@ the new one is added. The package ships the rule for `.my-highlight` itself.
 A class added without a rule is the defect this preset was written against,
 and the theme's tests do not see a package's preset.
 
+## A table has to fit the column
+
+The preset offers no style for a table, so the classes of the table
+component, `theme-table` and its modifiers, are written in the source view.
+The parsing function of the frontend keeps them (`ShowcaseTreeTest` looks for
+them on `/typography/tables`), but the table is not wrapped in
+`.theme-table-wrapper`, the region of the table content element that scrolls
+sideways on its own. A table in rich text that is wider than the column makes
+the whole page scroll. The seeded table of
+`/typography/tables` (content element 5402 of the showcase) is therefore two
+columns of short words, 192 pixels in Chromium and 196 in Firefox in a column
+of 225 at 305 pixels. With three columns it was 310 and 315, and that page
+scrolled sideways. The integrator documentation states the limit, see
+`Documentation/Components/Index.rst`, "A table in rich text".
+
 ## What the tests guard
 
 | Test                                                    | Fails when                                                                                                          |
