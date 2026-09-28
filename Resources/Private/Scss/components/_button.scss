@@ -249,6 +249,23 @@
 // segmented control broken over two lines is two controls: keep it to a few
 // short labels.
 //
+// A row that does not wrap has to fit, so its segments shrink. A flex item
+// never becomes narrower than its content unless it is told so, and the
+// three segments of the styleguide specimen made the page scroll sideways at
+// 305 pixels. With "min-inline-size: 0" a row too narrow takes the room from
+// the segments, in proportion to their width. The label stays centred, so it
+// runs into the padding of its segment evenly on both sides, and a label of
+// several words wraps inside its segment. What this cannot help is a single
+// word wider than its segment with no padding left: it spills over both
+// borders. That is the limit behind "a few short labels".
+//
+// An icon segment does not shrink. It is the 44 pixel square of
+// "--icon" above, the pointer target WCAG 2.5.8 asks for, and it has no
+// padding to give: in a group of 180 pixels it was 14.8 pixels wide, the
+// glyph 12.8. Before the segments could shrink it already collapsed, to 22
+// pixels in Chromium and 2 in Firefox: a flex item shrinks below its
+// specified width. The labelled segments take the room instead.
+//
 // The shared edges overlap by one border width. The button whose border
 // means something right now - hovered, focused, pressed - is lifted over its
 // neighbours by "position: relative" alone: a positioned box paints above the
@@ -258,6 +275,14 @@
 .theme-button-group--attached {
     flex-wrap: nowrap;
     gap: 0;
+
+    > .theme-button {
+        min-inline-size: 0;
+    }
+
+    > .theme-button--icon {
+        flex-shrink: 0;
+    }
 
     > .theme-button:not(:first-child) {
         margin-inline-start: calc(-1 * var(--theme-border-width, 1px));

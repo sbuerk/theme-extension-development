@@ -15,21 +15,23 @@
     elements happen to use:
 
       Resources/Private/Scss/components/_button.scss
-        36   .theme-button                 base, primary fill
-        75   &:hover                       re-points to the "-hover" tokens
-        83   &:disabled                    the control spelling
-        84   &[aria-disabled='true']       the link spelling
-        91   .theme-button--secondary      outlined, plus its own :hover rule
-        104  .theme-button--ghost          borderless, plus its own :hover rule
-        119  .theme-button--danger         destructive
-        125  .theme-button--small
-        135  .theme-button--large
-        145  .theme-button--link           underlined, no fill, no border
-        163  .theme-button--icon           square, glyph only, in every size
-        180  [aria-pressed='true']         a toggle that is on, plus its :hover
-        204  [aria-busy='true']            the spinner, and its keyframes at 222
-        230  .theme-button-group           the row wrapper
-        249  .theme-button-group--attached one control in several parts
+        37   .theme-button                 base, primary fill
+        79   &:hover                       re-points to the "-hover" tokens
+        87   &:disabled                    the control spelling
+        88   &[aria-disabled='true']       the link spelling
+        95   .theme-button--secondary      outlined, plus its own :hover rule
+        108  .theme-button--ghost          borderless, plus its own :hover rule
+        123  .theme-button--danger         destructive
+        129  .theme-button--small
+        139  .theme-button--large
+        149  .theme-button--link           underlined, no fill, no border
+        167  .theme-button--icon           square, glyph only, in every size
+        184  [aria-pressed='true']         a toggle that is on, plus its :hover
+        208  [aria-busy='true']            the spinner, and its keyframes at 226
+        238  .theme-button-group           the row wrapper
+        275  .theme-button-group--attached one control in several parts
+        279    > .theme-button             shrinks, "min-inline-size: 0"
+        283    > .theme-button--icon       does not shrink
 
       Resources/Private/Scss/components/_close.scss
         .theme-close                       the close button, its own component
@@ -47,7 +49,7 @@
     _reset.scss:58, so a button that styled its own would be overriding a
     global accessibility decision rather than implementing one.
 
-    The rows below are ".theme-button-group" (_button.scss:230) so that each
+    The rows below are ".theme-button-group" (_button.scss:238) so that each
     specimen sits next to the class that produced it - which demonstrates that
     component as a side effect rather than needing a row of its own.
 </f:comment>
