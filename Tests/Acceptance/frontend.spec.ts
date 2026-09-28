@@ -7,6 +7,12 @@ import { expect, type Page, test } from '@playwright/test';
  * browser shows is what happens after the markup: that the stylesheet and the
  * images load, that the script of the theme runs, and that the pages behave -
  * which is what a person opening a development instance looks at.
+ *
+ * "showcase" is every page of a tree, and the crawl of "every page of the
+ * showcase at 305 pixels" below holds it to that in both directions: a page
+ * the list names and the crawl does not reach fails, and so does a page the
+ * crawl reaches and the list does not name. A page added to the seed is added
+ * here, or that test says which one is missing.
  */
 const showcase = [
     '/',
@@ -24,6 +30,7 @@ const showcase = [
     '/typography/tables',
     '/typography/quotes-and-code',
     '/typography/article',
+    '/typography/right-to-left',
     '/elements/core/header',
     '/elements/core/text',
     '/elements/core/textpic',
@@ -35,7 +42,22 @@ const showcase = [
     '/elements/core/div',
     '/elements/core/html',
     '/elements/core/shortcut',
+    '/elements/theme/text-icon',
+    '/elements/theme/features',
+    '/elements/theme/stats',
+    '/elements/theme/steps',
+    '/elements/theme/card-group',
+    '/elements/theme/timeline',
+    '/elements/theme/teaser-list',
+    '/elements/theme/carousel',
+    '/elements/theme/split-tiles',
+    '/elements/theme/external-media',
+    '/elements/theme/pricing',
+    '/elements/theme/hero',
+    '/elements/theme/cta',
+    '/elements/theme/quote',
     '/elements/frames',
+    '/elements/cheatsheet',
     '/layouts',
     '/layouts/two-columns',
     '/layouts/two-columns-wide',
@@ -1804,14 +1826,14 @@ test.describe('the header on the narrowest screens', () => {
  * scrollbar of 15. WCAG 1.4.10 asks for content that reflows at 320 CSS
  * pixels without scrolling sideways, and a scrollbar takes its part of that.
  *
- * The pages are not listed here. A list only covers what somebody remembered
- * to add, and "showcase" above lacks sixteen of the fifty-eight pages of a
- * tree - the cheatsheet, every page below "/elements/theme" and
- * "/typography/right-to-left" among them. So the test starts at the root of
- * the tree and follows every link of the main navigation and of "main" that
- * stays on the instance and in the tree: no second language, no file, not the
- * other tree. That the crawl found the showcase, rather than next to nothing,
- * is held to "showcase": every page it names has to be among those visited.
+ * The pages are not taken from a list. The test starts at the root of the
+ * tree and follows every link of the main navigation and of "main" that stays
+ * on the instance and in the tree: no second language, no file, not the other
+ * tree. What it visits is then compared with "showcase" in both directions. A
+ * page of the list the crawl did not reach means the crawl found too little,
+ * and a page the crawl reached that the list lacks means the list fell behind
+ * the seed - it lacked sixteen of the fifty-eight pages of a tree before the
+ * comparison went both ways, and "renders through the theme" skipped them.
  * Every page visited has to answer 200 as well.
  *
  * "/login" is a second start of the site set tree. The account pages are
@@ -1842,7 +1864,9 @@ test.describe('every page of the showcase at 305 pixels', () => {
             const inTree = (path: string) => (tree.prefix === ''
                 ? !path.startsWith('/legacy/') && !path.startsWith('/de/')
                 : path.startsWith(`${tree.prefix}/`) && !path.startsWith(`${tree.prefix}/de/`));
-            const queue = tree.prefix === '' ? ['/', '/login'] : [`${tree.prefix}/`];
+            // "/login" is a start of its own and not a page of the list.
+            const unlisted = tree.prefix === '' ? ['/login'] : [];
+            const queue = [`${tree.prefix}/`, ...unlisted];
             const visited = new Set(queue);
             const problems: string[] = [];
 
@@ -1915,8 +1939,11 @@ test.describe('every page of the showcase at 305 pixels', () => {
                 }
             }
 
-            const missed = showcase.map((path) => tree.prefix + path).filter((path) => !visited.has(path));
+            const listed = showcase.map((path) => tree.prefix + path);
+            const missed = listed.filter((path) => !visited.has(path));
             expect(missed, 'pages of "showcase" the crawl did not reach').toEqual([]);
+            const lacking = [...visited].filter((path) => !listed.includes(path) && !unlisted.includes(path));
+            expect(lacking, 'pages the crawl reached that "showcase" lacks').toEqual([]);
             expect(problems, 'pages that scroll sideways at 305 pixels, or do not answer 200').toEqual([]);
         });
     }
