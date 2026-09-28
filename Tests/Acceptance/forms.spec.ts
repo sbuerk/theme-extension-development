@@ -102,6 +102,35 @@ test.describe('the form showcase', () => {
         expect(squeezed, 'controls narrower than they need to show their value').toEqual([]);
     });
 
+    // A control is as wide as its field, and nothing of it reaches out of the
+    // field's content box: not the full width plus a margin of the browser's
+    // own. The range input carried the 2 pixels of margin both engines give
+    // it and ended 2 pixels past its field at every width. The inline start
+    // margin of -1 an input group gives an input between two addons stays
+    // inside the group, so it is not caught here.
+    for (const width of [1280, 305]) {
+        test(`keeps every control inside its field at ${width} pixels`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto('/forms');
+
+            const spilling = await page.evaluate(() => {
+                const controls = [...document.querySelectorAll<HTMLElement>('.theme-form :is(.theme-input, .theme-select, .theme-textarea)')];
+                return controls.map((control) => {
+                    const parent = control.parentElement as HTMLElement;
+                    const style = getComputedStyle(parent);
+                    const outer = parent.getBoundingClientRect();
+                    const start = outer.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft);
+                    const end = outer.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
+                    const box = control.getBoundingClientRect();
+                    return { name: control.id, box, start, end };
+                }).filter((control) => control.box.left < control.start - 0.5 || control.box.right > control.end + 0.5)
+                    .map((control) => `#${control.name}: ${control.box.left.toFixed(1)}..${control.box.right.toFixed(1)} in ${control.start.toFixed(1)}..${control.end.toFixed(1)}`)
+                    .concat(controls.length === 0 ? ['no control on the page'] : []);
+            });
+            expect(spilling, 'controls reaching out of their field').toEqual([]);
+        });
+    }
+
     test('links every error of the returned form to its field', async ({ page }) => {
         const summary = page.locator('.theme-form-summary--error');
         for (const link of await summary.getByRole('link').all()) {

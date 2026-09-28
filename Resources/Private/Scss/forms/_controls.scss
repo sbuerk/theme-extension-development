@@ -187,6 +187,12 @@
     border: 0;
     background: none;
 
+    // Chromium and Firefox give a range a margin of 2 pixels of their own,
+    // and on top of "width: 100%" the inline part of it pushed the track 2
+    // pixels past the end of its field at every width. The block margin
+    // stays: it is inside the field and spills nothing.
+    margin-inline: 0;
+
     // Colours the track and the thumb in every browser that implements the
     // property, which is every current one; there is no fallback path left
     // to write.
