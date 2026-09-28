@@ -179,18 +179,18 @@ functional (MySQL, MariaDB, Postgres)                 16 jobs
 functional (SQLite)
 ```
 
-| Job                 | Matrix                                   | Runs                                                                                      |
-|---------------------|------------------------------------------|-------------------------------------------------------------------------------------------|
-| `quality`           | lowest PHP, one core version             | The gates that inspect source files                                                       |
-| `phpstan`           | lowest PHP × both core versions          | The one gate configured per core version                                                  |
-| `lint`              | all PHP versions × both core versions    | `lintPhp`                                                                                 |
-| `unit`              | edge PHP versions × both core versions   | `unit`, `unitRandom`                                                                      |
-| `functional-sqlite` | edge PHP versions × both core versions   | `functional -d sqlite -j 4`, uploads the JUnit logs                                       |
-| `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs | `functional -j 4` against each database, uploads the JUnit logs                           |
-| `acceptance`        | lowest PHP × both core versions          | `acceptance`: a built instance, in Chromium and in Firefox; uploads the report on failure |
-| `visual`            | lowest PHP, one core version             | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure    |
-| `assets`            | —                                        | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build        |
-| `documentation`     | —                                        | `renderDocumentation`, uploads the artifact                                               |
+| Job                 | Matrix                                          | Runs                                                                                                                |
+|---------------------|-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| `quality`           | lowest PHP, one core version                    | The gates that inspect source files                                                                                 |
+| `phpstan`           | lowest PHP × both core versions                 | The one gate configured per core version                                                                            |
+| `lint`              | all PHP versions × both core versions           | `lintPhp`                                                                                                           |
+| `unit`              | edge PHP versions × both core versions          | `unit`, `unitRandom`                                                                                                |
+| `functional-sqlite` | edge PHP versions × both core versions          | `functional -d sqlite -j 4`, uploads the JUnit logs                                                                 |
+| `functional-dbms`   | edge PHP × both cores × 4 DBMS — 16 jobs        | `functional -j 4` against each database, uploads the JUnit logs                                                     |
+| `acceptance`        | lowest PHP × both core versions × 2 engine sets | `acceptance`: a built instance, Chromium and Firefox in one job, WebKit in the other, uploads the report on failure |
+| `visual`            | lowest PHP, one core version                    | `visual`: screenshots and axe of the styleguide partials; uploads the diffs on failure                              |
+| `assets`            | —                                               | `checkCssBuild` and `checkIconsBuild`: the committed build output equals the build                                  |
+| `documentation`     | —                                               | `renderDocumentation`, uploads the artifact                                                                         |
 
 The decisions worth knowing:
 

@@ -343,8 +343,8 @@ server log — see [Quality gates](../development/quality-gates.md#continuous-in
   axe and the palette and switch checks need no baselines, and running them in
   Firefox has not been tried; that is open, not decided. A layout defect only
   Firefox has is therefore caught only where a geometry spec of the
-  [acceptance suite](acceptance-tests.md#two-engines), which runs in Firefox as
-  well, measures it.
+  [acceptance suite](acceptance-tests.md#three-engines), which runs in Firefox
+  as well, measures it.
 - Behaviour: the display settings, the navigation toggle and everything else
   that needs the theme's script are the acceptance suite's.
 - The real `/styleguide` page in a browser. An axe pass over it per core
