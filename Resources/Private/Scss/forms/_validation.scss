@@ -108,8 +108,11 @@
     color: var(--theme-color-success, #146c43);
 }
 
-.theme-field--inline .theme-field__error {
-    grid-column: 1 / -1;
+// A line of its own under label and control, in the wrapping row of an
+// inline field ("_field.scss").
+.theme-field--inline .theme-field__error,
+.theme-field--inline .theme-field__success {
+    flex-basis: 100%;
 }
 
 // The form-level summary. "role='alert'" and "tabindex='-1'" are on the
