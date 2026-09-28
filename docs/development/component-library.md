@@ -1396,6 +1396,38 @@ the input opts out with `forced-color-adjust: none` and paints itself with
 system colours — `CanvasText` on `Canvas` when off, `HighlightText` on
 `Highlight` when on.
 
+**The column of a form is the width it is given.** `.theme-form`,
+`.theme-field` and `.theme-fieldset` are grids of one column, declared as
+`minmax(0, 1fr)`. An implicit column is `auto`,
+which never becomes narrower than the least its content needs, and for a
+control that is its intrinsic width, however far it could shrink: an input
+group with its addon, a date input beside its label, the file input, and the
+two engines do not agree on it. In a window of 305 pixels the column of
+the request form on `/forms` was 322 pixels wide in Chromium and 305 in
+Firefox, in a form of 265, and the page scrolled sideways. With the declared
+column the controls, `width: 100%`, shrink with it, and the input of an input
+group shrinks beside its addon. Firefox shortens the file name of a narrow
+file input in the middle, inside its box. The fieldset keeps the
+`min-inline-size: min-content` of the UA stylesheet: with its own column
+declared, its min-content is no longer that of its widest control, but 100 to
+147 pixels on `/forms`.
+
+**An inline field stacks rather than squeezes.** `.theme-field--inline` is a
+wrapping flex row. The control starts from `flex-basis: max-content`, its
+intrinsic width, the width at which it shows its whole value: beside the label
+where that fits, growing to the end of the row, and under the label at the
+full width where it does not. A label longer than the row wraps between its
+words. Two grid columns could not do both: `max-content 1fr` kept the control
+at its intrinsic width and the field reached out of its fieldset, and
+`max-content minmax(0, 1fr)` squeezed the date input of "Needed from" on
+`/forms` to 121 pixels at 305, which showed "16/2026" in Chromium and
+"08/16/" in Firefox, 178 and 161 pixels being what the date needs. The colour
+input is `flex: none`, it keeps its swatch size. Hint, error and success
+message take a line of their own with `flex-basis: 100%`. At 768 and 1280
+pixels every box of `/forms`, `/styleguide` and `/login` is where it was, and
+`forms.spec.ts` holds every date, time, colour and single select of `/forms`
+to its intrinsic width at 305.
+
 `.theme-input` is the one class for every native input type that resolves to
 the same box (text, email, url, tel, number, password, search, and the
 date/time family); `color`, `range` and `file` render a fundamentally
