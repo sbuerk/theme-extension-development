@@ -45,16 +45,16 @@ no `composerUpdate` is needed before it.
    `acceptance-instance`, and Playwright runs against
    `http://acceptance-instance:8000` — see
    [below](#the-address-of-the-instance).
-5. **Runs Playwright**, every spec in Chromium and then in Firefox — see
-   [Two engines](#two-engines). It runs in the official image
+5. **Runs Playwright**, every spec in Chromium, then in Firefox and then in
+   WebKit, see [Three engines](#three-engines). It runs in the official image
    `mcr.microsoft.com/playwright`, pinned in `runTests.sh` to the exact version
    of `@playwright/test` in `Tests/Acceptance/package.json` — the image carries
    the browser builds of one release, and a different library version refuses
    to start them. Update both together, and rebaseline `-s visual`
    (`-- --update-snapshots`) in the same commit — the browser build decides the
    pixels of every [visual baseline](visual-tests.md#baselines). Update the
-   browser versions named under [Two engines](#two-engines) in that commit as
-   well.
+   browser versions named under [Three engines](#three-engines) in that commit
+   as well.
 
 The suite has a `package.json` of its own rather than a dependency in the root
 one. The root `package.json` ships with the extension, because an integrator
@@ -131,14 +131,17 @@ is blocked at the route. `--dns` is no way to make that check: podman and
 docker both keep resolving the containers of the network with their own DNS
 server and use the one `--dns` names only for other names.
 
-## Two engines
+## Three engines
 
-Every spec runs twice, as the two projects of `playwright.config.ts`:
-`chromium` (`devices['Desktop Chrome']`) and then `firefox`
-(`devices['Desktop Firefox']`), in the same run against the same instance. The
-pinned image carries both browsers, so the second engine needs no image, no pin
-and no second instance. `-- --project chromium` or `-- --project firefox` runs
-one of them, and combines with `--grep`.
+Every spec runs three times, as the three projects of `playwright.config.ts`:
+`chromium` (`devices['Desktop Chrome']`), `firefox`
+(`devices['Desktop Firefox']`) and then `webkit` (`devices['Desktop Safari']`),
+in the same run against the same instance. The pinned image carries all three
+browsers, so an engine needs no image, no pin and no second instance.
+`-- --project chromium`, `-- --project firefox` or `-- --project webkit` runs
+one of them, and combines with `--grep`. `-s acceptance` runs all three, and
+`-- --project chromium --project firefox` leaves out the slowest of them for a
+quicker pass while working on something.
 
 A second engine, because much of what the specs drive is implemented by each
 engine on its own: the `details`/`summary` toggle of the sub navigation and the
@@ -171,6 +174,22 @@ reasons against leaving any out:
 - A tag has to be remembered. With the whole suite, a new spec runs in Firefox
   without anybody deciding that it should.
 
+**WebKit**, because Safari 17.5 is one of the three engines of
+[the browser floor](../../DESIGN.md#the-browser-floor), and until it ran here no
+test of either suite had loaded a page in it. The run that decided it was the
+whole suite in WebKit alone on v14: 279 of 283 tests passed unchanged. The four
+that failed were one assumption of a test, not a defect of the theme. The
+page test of `frontend.spec.ts` counted every failed request as an error, and
+WebKit's media player cancels its first request for a video
+(`Load request cancelled`) and fetches it again as a byte range, which arrives.
+Chromium and Firefox never cancel it. A failed request now counts only when its
+URL never arrives, which still fails a file that is missing.
+
+WebKit costs more than the other two. The run above took 15.7 minutes on one
+developer machine, against 9.2 for Chromium and Firefox together, so in CI it
+runs in a job of its own beside theirs rather than as a third pass in the same
+job, see [In CI](#in-ci).
+
 The price is the second pass. Measured with `-s acceptance` on one developer
 machine, busy with other work at the time, so the ratios say more than the
 minutes. Two kinds of number, not to be mixed: *run* is the time Playwright
@@ -202,7 +221,7 @@ assertion, not a probe: a recurrence fails with that message and keeps its
 trace (`trace: 'retain-on-failure'`), which is where an investigation starts.
 Only a proven loss of input in the browser driver would justify a retry.
 
-A spec therefore has to hold in both engines. Where an assertion needs a
+A spec therefore has to hold in all three engines. Where an assertion needs a
 measurement, derive it from the page the way the header specs do, rather than
 writing down what one engine drew. Do not branch on `browserName` and do not
 skip a spec in one project: a spec that fails in one engine only has found
@@ -210,15 +229,19 @@ either a defect of the theme or an assumption of the test, and either is fixed -
 the [strictness policy](phpunit-configuration.md#strictness-policy) holds here
 as well.
 
-What the two engines are not:
+What the three engines are not:
 
 - **Not the floor.** The browsers are the ones of the pinned Playwright
-  release, Chromium 153 and Firefox 155 with 1.63.0, not the Firefox 125 and
-  Chrome 125 of [the browser floor](../../DESIGN.md#the-browser-floor). The
-  suite shows that the theme works in both engines today; the floor is kept by
-  using no feature that one of its versions lacks.
-- **Not WebKit.** The image carries it, and it is not run. Playwright's WebKit
-  is not Safari, and adding it is a decision of its own.
+  release, Chromium 153, Firefox 155 and WebKit 26.6 with 1.63.0, not the
+  Firefox 125, Chrome 125 and Safari 17.5 of
+  [the browser floor](../../DESIGN.md#the-browser-floor). The suite shows that
+  the theme works in all three engines today. The floor is kept by using no
+  feature that one of its versions lacks.
+- **Not Safari.** Playwright's WebKit is the engine Safari is built on, in a
+  Linux build with its own font rendering, its own drawing of form controls
+  and none of Safari's own features. It runs the same CSS, layout and DOM as
+  Safari does, which is what the specs measure, and it says nothing about
+  what Safari adds on top.
 - **Not the visual suite.** Its screenshots and its axe pass run in Chromium
   only — see [what it does not cover](visual-tests.md#what-it-does-not-cover).
 
@@ -285,12 +308,21 @@ The job `acceptance` runs per core version from the start of the run, beside
 the functional jobs, and uploads the report, the failure traces and the logs of
 the instance when it fails — see [Quality gates](../development/quality-gates.md#continuous-integration).
 
-Both engines run in that one job. With Chromium alone it took 5.4 minutes on
-v13 and 5.5 on v14, about two of them building the instance; with Firefox
-added it took 8.2 and 8.7 (the runs of #86 and #88). Since the functional jobs
-run their suite in four chunks, acceptance is the longest job of a run: 8.3 and
-8.4 minutes in the first chunked run (#94), against at most 6.8 for a
-functional job and 11.8 minutes for the whole run.
+Chromium and Firefox run in one job per core version, and WebKit in a second
+one beside it, both built from the same job definition with the engine as a
+matrix dimension: `acceptance (v13, Chromium and Firefox)` and
+`acceptance (v13, WebKit)`, and the same for v14. Each builds an instance of
+its own, so WebKit adds runner time and no waiting time. In the first run with
+it (#116), the WebKit job took 11.0 minutes on v13 and 12.2 on v14, against
+12.5 and 15.0 for Chromium and Firefox, which had taken 12 to 15 minutes in the
+runs before it as well.
+
+With Chromium alone the job took 5.4 minutes on v13 and 5.5 on v14, about two
+of them building the instance. With Firefox added it took 8.2 and 8.7 (the runs
+of #86 and #88). Since the functional jobs run their suite in four chunks,
+acceptance is the longest job of a run: 8.3 and 8.4 minutes in the first
+chunked run (#94), against at most 6.8 for a functional job and 11.8 minutes
+for the whole run.
 
 The crawl of every page at 305 pixels in `frontend.spec.ts` adds two and a half
 to three minutes to a run of the suite: 53 to 56 seconds for the site set tree

@@ -15,7 +15,7 @@ const password = 'Frontend-User-1701D.';
  * seconds later on a success message that could not appear. Playwright's
  * "click action done" does not prove that a mouse event reached the page. So
  * the request is waited for here, and a recurrence fails as what it is - see
- * "docs/testing/acceptance-tests.md#two-engines".
+ * "docs/testing/acceptance-tests.md#three-engines".
  */
 async function submitTheLoginForm(page: Page): Promise<void> {
     const posted = page
