@@ -295,9 +295,10 @@ functional job and 11.8 minutes for the whole run.
 The crawl of every page at 305 pixels in `frontend.spec.ts` adds two and a half
 to three minutes to a run of the suite: 53 to 56 seconds for the site set tree
 and 72 to 78 for the `sys_template` tree in Chromium, 15 to 17 each in Firefox,
-measured locally in the full suite on v13 and v14. Chromium is the slower because it comes first: the pages the other specs
-of the file have not opened yet are rendered by TYPO3 for the first time. The
-spec has a timeout of five minutes for that reason.
+measured locally in the full suite on v13 and v14. Chromium is the slower
+because it comes first: the pages the other specs of the file have not opened
+yet are rendered by TYPO3 for the first time. The spec has a timeout of five
+minutes for that reason.
 
 ## See also
 

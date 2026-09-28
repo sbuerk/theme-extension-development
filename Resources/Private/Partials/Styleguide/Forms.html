@@ -84,6 +84,7 @@
         146  .theme-form-summary__list
         156    a
         161    a:hover
+        177  .theme-form-summary--error
         182  .theme-form-summary--success
 
       Resources/Private/Scss/forms/_input-group.scss
@@ -97,20 +98,12 @@
         31   .theme-choice-group
         40   .theme-choice-group--inline
 
-    Two things in that list are not shown on the page, and both are stated
-    here rather than left to be noticed:
+    One thing in that list is not shown on the page, and it is stated here
+    rather than left to be noticed:
 
       - "_controls.scss:276" ":indeterminate" cannot be reached from markup.
         It is an IDL property on HTMLInputElement with no content attribute
         behind it, so only a script can set it, and this page carries none.
-      - ".theme-form-summary--error" appears in all three markup contracts
-        and in docs/development/component-library.md, but no rule anywhere
-        under "forms/" selects it: the base ".theme-form-summary"
-        (_validation.scss:118) already carries the danger palette, and only
-        "--success" (179) re-points it. The modifier is written here anyway,
-        because the contract is what a site package copies and a later
-        "--warning" variant would want the error case named rather than
-        implied.
 </f:comment>
 
 <section class="theme-styleguide__section" id="forms">
