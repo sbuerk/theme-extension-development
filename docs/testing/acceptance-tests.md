@@ -213,6 +213,13 @@ native submit and no handler in `theme.js` touches it. The submit now waits for
 the request, so a recurrence fails as *pressing "Login" sent no POST*.
 `retries` stays at 0, where a retry would let a recurrence pass the run.
 
+It has not recurred since. None of the 44 acceptance jobs that ran the suite
+in Firefox in the pull request and nightly runs of both branches from
+2026-09-25 to 2026-09-28 failed there. The wait therefore stays as a permanent
+assertion, not a probe: a recurrence fails with that message and keeps its
+trace (`trace: 'retain-on-failure'`), which is where an investigation starts.
+Only a proven loss of input in the browser driver would justify a retry.
+
 A spec therefore has to hold in both engines. Where an assertion needs a
 measurement, derive it from the page the way the header specs do, rather than
 writing down what one engine drew. Do not branch on `browserName` and do not
