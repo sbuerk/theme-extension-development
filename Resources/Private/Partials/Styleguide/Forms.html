@@ -41,23 +41,23 @@
         170    ::-webkit-color-swatch
         175    ::-moz-color-swatch
         181  .theme-input[type='range']
-        196    &:disabled
-        202  .theme-input[type='file']
-        213    ::file-selector-button
-        236    &:hover::file-selector-button
-        240    &:disabled
-        254  .theme-check
-        263    input[type='checkbox'], input[type='radio']
-        276    &:indeterminate                             not demonstrable, see below
-        280    &:disabled
-        285    &:has(input:disabled)
-        306  .theme-switch
-        323    input[type='checkbox']
-        352    &:checked
-        365    &:has(input:disabled)
-        402  .theme-fieldset
-        412  .theme-fieldset__legend
-        423  output                                        no class, like "hr"
+        202    &:disabled
+        208  .theme-input[type='file']
+        219    ::file-selector-button
+        242    &:hover::file-selector-button
+        246    &:disabled
+        260  .theme-check
+        269    input[type='checkbox'], input[type='radio']
+        282    &:indeterminate                             not demonstrable, see below
+        286    &:disabled
+        291    &:has(input:disabled)
+        312  .theme-switch
+        329    input[type='checkbox']
+        358    &:checked
+        371    &:has(input:disabled)
+        408  .theme-fieldset
+        418  .theme-fieldset__legend
+        429  output                                        no class, like "hr"
 
       Resources/Private/Scss/forms/_field.scss
         44   .theme-form
@@ -101,7 +101,7 @@
     One thing in that list is not shown on the page, and it is stated here
     rather than left to be noticed:
 
-      - "_controls.scss:276" ":indeterminate" cannot be reached from markup.
+      - "_controls.scss:282" ":indeterminate" cannot be reached from markup.
         It is an IDL property on HTMLInputElement with no content attribute
         behind it, so only a script can set it, and this page carries none.
 </f:comment>
