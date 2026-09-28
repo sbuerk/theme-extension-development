@@ -53,20 +53,22 @@
         285    &:has(input:disabled)
         306  .theme-switch
         323    input[type='checkbox']
-        346    &:checked
-        359    &:has(input:disabled)
-        389  .theme-fieldset
-        398  .theme-fieldset__legend
-        409  output                                        no class, like "hr"
+        352    &:checked
+        365    &:has(input:disabled)
+        402  .theme-fieldset
+        412  .theme-fieldset__legend
+        423  output                                        no class, like "hr"
 
       Resources/Private/Scss/forms/_field.scss
-        30   .theme-form
-        38   .theme-field
-        49   .theme-field__label
-        59   .theme-field__required
-        63   .theme-field__hint
-        73   .theme-field--inline
-        79     .theme-field__hint                          spans both columns
+        44   .theme-form
+        53   .theme-field
+        66   .theme-field__label
+        76   .theme-field__required
+        80   .theme-field__hint
+        108  .theme-field--inline                          a row that wraps
+        115    > :not(label, hint, error, success)         from max-content
+        120    > .theme-input[type='color']                keeps its swatch
+        124    .theme-field__hint                          a line of its own
 
       Resources/Private/Scss/forms/_validation.scss
         59   .theme-field--invalid
@@ -75,13 +77,14 @@
         93   .theme-field__error, .theme-field__success     the icon is markup
         103  .theme-field__error
         107  .theme-field__success
-        111  .theme-field--inline .theme-field__error
-        118  .theme-form-summary
-        137  .theme-form-summary__title
-        143  .theme-form-summary__list
-        153    a
-        158    a:hover
-        179  .theme-form-summary--success
+        113  .theme-field--inline .theme-field__error
+        114  .theme-field--inline .theme-field__success
+        121  .theme-form-summary
+        140  .theme-form-summary__title
+        146  .theme-form-summary__list
+        156    a
+        161    a:hover
+        182  .theme-form-summary--success
 
       Resources/Private/Scss/forms/_input-group.scss
         47   .theme-input-group
@@ -103,8 +106,8 @@
       - ".theme-form-summary--error" appears in all three markup contracts
         and in docs/development/component-library.md, but no rule anywhere
         under "forms/" selects it: the base ".theme-form-summary"
-        (_validation.scss:118) already carries the danger palette, and only
-        "--success" (179) re-points it. The modifier is written here anyway,
+        (_validation.scss:121) already carries the danger palette, and only
+        "--success" (182) re-points it. The modifier is written here anyway,
         because the contract is what a site package copies and a later
         "--warning" variant would want the error case named rather than
         implied.
