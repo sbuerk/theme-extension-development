@@ -425,7 +425,7 @@ jobs:
   visual:
     name: "visual (v${{ matrix.typo3 }})"
     runs-on: ubuntu-26.04
-    timeout-minutes: 20
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
