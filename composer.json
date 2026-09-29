@@ -100,7 +100,7 @@
         "typo3/cms": {
             "extension-key": "theme_extension_development",
             "web-dir": ".Build/Web",
-            "version": "1.0.0-dev",
+            "version": "1.0.0",
             "Package": {
                 "providesPackages": []
             }
