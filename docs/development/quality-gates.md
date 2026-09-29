@@ -269,20 +269,24 @@ The decisions worth knowing:
 
 Every job carries a `timeout-minutes`, so a job that stalls fails instead of
 holding a runner for GitHub's default of 360 minutes. The values of the jobs
-other than the functional ones come from the slowest successful job of the
-fifteen newest pull request runs of `ci.yml` against `1` created up to
-2026-09-26 16:23 UTC (#64 to #93), all attempts, a job carried unchanged into a
-re-run counted once, with room for a slow image pull or a busy runner. The
-functional values come from the first run of the chunked suite on this branch
-(#96, run 36301746627): the test steps time out at about three times its slowest
-job, and each job five minutes later:
+other than the functional and the acceptance ones come from the slowest
+successful job of the fifteen newest pull request runs of `ci.yml` against `1`
+created up to 2026-09-26 16:23 UTC (#64 to #93), all attempts, a job carried
+unchanged into a re-run counted once, with room for a slow image pull or a busy
+runner. The functional values come from the first run of the chunked suite on
+this branch (#96, run 36301746627): the test steps time out at about three times
+its slowest job, and each job five minutes later. The acceptance value is about
+twice the slowest of the 18 successful acceptance jobs of the pull request runs
+of #104 to #117, all attempts. The crawl of every page at 305 pixels (#109) made
+the job take 10 to 15 minutes, where 8.4 had been the slowest before, and left
+the old timeout of 20 little room:
 
 | Job                               | Slowest seen, minutes | Timeout, minutes |
 |-----------------------------------|-----------------------|------------------|
 | `quality`, `phpstan`, `lint`      | 0.9                   | 10               |
 | `unit`, `assets`, `documentation` | 0.6                   | 10               |
 | `visual`                          | 3.5                   | 15               |
-| `acceptance`                      | 8.4                   | 20               |
+| `acceptance`                      | 15.3 (#115)           | 30               |
 | `functional-sqlite`               | 4.0                   | 20               |
 | `functional-dbms`                 | 9.2                   | 35               |
 
@@ -307,6 +311,12 @@ SIGTERM 7.5 seconds later, then a kill
 ([`ProcessInvoker.cs`](https://github.com/actions/runner/blob/15231bede4aacecb6686f4b7de25c62398607993/src/Runner.Sdk/ProcessInvoker.cs#L443-L465)) —
 and not the `runTests.sh` it started, so the chunks may still run while their
 logs are uploaded: an event log then ends where the chunk was at that moment.
+
+The acceptance test step has one as well, at 25 minutes. Its upload runs on
+`failure()`, which a step that timed out sets too, so a stalled run still
+uploads the traces of the tests that failed before it stalled and the logs of
+the instance. Playwright writes its HTML report when it ends, so the report may
+be missing then.
 
 ### Functional jobs in four chunks
 
