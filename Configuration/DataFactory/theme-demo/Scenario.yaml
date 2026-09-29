@@ -160,7 +160,7 @@ entities:
                 CType: 'text'
                 header: 'About'
                 header_layout: 2
-                bodytext: |
+                bodytext: |-
                   <p>A theme built to be read, in a repository built to be reviewed.
                   Every decision it makes is written down next to the code that makes
                   it.</p>
@@ -177,7 +177,7 @@ entities:
                 CType: 'text'
                 header: 'Reference'
                 header_layout: 2
-                bodytext: |
+                bodytext: |-
                   <p>The <a href="t3://page?uid=9">styleguide</a> renders every
                   component straight from Fluid, the
                   <a href="t3://page?uid=10">form showcase</a> puts a request form
@@ -269,7 +269,7 @@ entities:
                     header_position: 'center'
                     frame_class: 'surface'
                     space_before_class: 'large'
-                    bodytext: |
+                    bodytext: |-
                       <p>The frame "Surface band" fills the element with the surface
                       colour and draws the hairline around it. The header is centred,
                       and the space before the element is "large".</p>
@@ -281,7 +281,7 @@ entities:
                     header_position: 'right'
                     tx_theme_header_style: 'h4'
                     frame_class: 'raised'
-                    bodytext: |
+                    bodytext: |-
                       <p>The raised surface is white in the light appearance, so the
                       hairline is what draws this band there. The header is an h2 set
                       in the look of heading 4.</p>
@@ -292,7 +292,7 @@ entities:
                     header_layout: 2
                     tx_theme_header_style: 'display'
                     frame_class: 'accent'
-                    bodytext: |
+                    bodytext: |-
                       <p>A tint of the primary accent of the active palette, with a
                       <a href="t3://page?uid=3">link to the media page</a> in it:
                       switch the palette, and the tint follows it.</p>
@@ -346,7 +346,7 @@ entities:
                   - self:
                         id: 5202
                         CType: 'text'
-                        bodytext: |
+                        bodytext: |-
                           <p class="theme-lead">Running text, headings inside it, the inline
                           semantics and the alignments of the rich text editor - all from
                           one text element each.</p>
@@ -359,7 +359,7 @@ entities:
                         CType: 'text'
                         header: 'Headings inside the text'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>The header of the element is its heading 2. The rich text
                           continues the outline below it.</p>
                           <h3>A heading 3 inside the text</h3>
@@ -374,7 +374,7 @@ entities:
                         CType: 'text'
                         header: 'Inline semantics'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p><strong>Strong importance</strong> and <em>stress emphasis</em>,
                           <mark>a marked passage</mark>, <small>small print</small>,
                           <s>no longer accurate</s>, <del>deleted</del> and <ins>inserted</ins>
@@ -390,7 +390,7 @@ entities:
                         CType: 'text'
                         header: 'Alignment'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p class="theme-text--start">Aligned to the start of the line, which
                           is where every paragraph starts anyway.</p>
                           <p class="theme-text--center">Centred, for a short line that stands
@@ -430,7 +430,7 @@ entities:
                         CType: 'text'
                         header: 'Lists inside the text'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>The lists of the rich text keep the markers of the element
                           baseline, nested lists included:</p>
                           <ul>
@@ -477,7 +477,7 @@ entities:
                         header: 'A definition list from the bullet list element'
                         header_layout: 2
                         bullets_type: 2
-                        bodytext: |
+                        bodytext: |-
                           Unstyled|No marker and no indent
                           Check|A check mark in front of every item
                           Icon|An icon of the set in front of every item
@@ -515,7 +515,7 @@ entities:
                         CType: 'text'
                         header: 'A table inside the text'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>A table of the rich text, with the classes of the table
                           component written in the source view. It has no scroll region of
                           its own, so it has to fit the column of the narrowest screen, which
@@ -539,7 +539,7 @@ entities:
                         table_enclosure: 0
                         table_header_position: 2
                         table_tfoot: 1
-                        bodytext: |
+                        bodytext: |-
                           Primary text|The body copy|at least 7:1
                           Secondary text|Leads and captions|at least 4.5:1
                           Muted text|Dates and hints|at least 4.5:1
@@ -648,7 +648,7 @@ entities:
                         CType: 'html'
                         header: 'Byline (not visible in the frontend)'
                         sectionIndex: 0
-                        bodytext: |
+                        bodytext: |-
                           <p class="theme-byline">
                               <span class="theme-byline__item">By <span class="theme-byline__author">The theme team</span></span>
                               <time class="theme-byline__item" datetime="2026-09-20">20 September 2026</time>
@@ -657,7 +657,7 @@ entities:
                   - self:
                         id: 5603
                         CType: 'text'
-                        bodytext: |
+                        bodytext: |-
                           <p class="theme-lead">An editor fills in a form and saves it. A
                           moment later a visitor reads a paragraph. Between the two lie a
                           database row, a few lines of configuration and a template - and
@@ -672,7 +672,7 @@ entities:
                         CType: 'text'
                         header: 'The record'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Everything starts as a row of the table <code>tt_content</code>.
                           Its type, the CType, decides which fields the form shows and which
                           rendering the frontend picks. The fields an editor fills in are
@@ -691,7 +691,7 @@ entities:
                         header_layout: 2
                         imageorient: 17
                         imagecols: 1
-                        bodytext: |
+                        bodytext: |-
                           <p>Every element is rendered through one frame, the layout
                           <code>ContentElement</code> of the theme. It writes the wrapper
                           with the anchor of the element, the CType as a modifier and as an
@@ -712,7 +712,7 @@ entities:
                         header_layout: 2
                         bullets_type: 0
                         layout: 1
-                        bodytext: |
+                        bodytext: |-
                           The frame: default, no frame, or one of four bands
                           The space before and after the element
                           The alignment and the look of the header
@@ -722,7 +722,7 @@ entities:
                         CType: 'text'
                         header: 'The template'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Inside the frame, the template of the CType renders what is
                           particular to it. A text element renders its header and its rich
                           text; a table element renders a table from the lines of its text
@@ -759,7 +759,7 @@ entities:
                         CType: 'html'
                         header: 'The TypoScript of the bullet list (name only, not rendered)'
                         sectionIndex: 0
-                        bodytext: |
+                        bodytext: |-
                           <figure class="theme-code">
                               <figcaption class="theme-code__caption">
                                   <span class="theme-code__filename">Configuration/TypoScript/ContentElements.typoscript</span>
@@ -862,7 +862,7 @@ entities:
                   - self:
                         id: 15202
                         CType: 'text'
-                        bodytext: |
+                        bodytext: |-
                           <p class="theme-lead">Every spacing, border and float of the theme is
                           written as a logical property, and every glyph that points somewhere is
                           mirrored by a rule of its own. This page is where that is looked at: the
@@ -875,7 +875,7 @@ entities:
                         id: 15203
                         CType: 'html'
                         header: 'Running text, a list and a quotation (not visible in the frontend)'
-                        bodytext: |
+                        bodytext: |-
                           <h2>Running text, a list and a quotation</h2>
                           <div dir="rtl" lang="ar">
                               <p>النص العربي يبدأ من اليمين.</p>
@@ -895,7 +895,7 @@ entities:
                         id: 15204
                         CType: 'html'
                         header: 'Components (not visible in the frontend)'
-                        bodytext: |
+                        bodytext: |-
                           <h2>Components</h2>
                           <div dir="rtl" lang="ar">
                               <p>العنصر الأول<sup class="theme-footnote-ref" id="rtl-fnref1"><a href="#rtl-fn1">1</a></sup></p>
@@ -966,7 +966,7 @@ entities:
                         id: 15206
                         CType: 'html'
                         header: 'Numbers and Latin in a right-to-left line (not visible in the frontend)'
-                        bodytext: |
+                        bodytext: |-
                           <h2>Numbers and Latin in a right-to-left line</h2>
                           <div dir="rtl" lang="ar">
                               <p>TYPO3 <bdi>العنصر الأول</bdi> 13.4</p>
@@ -1059,7 +1059,7 @@ entities:
               - self:
                     id: 502
                     CType: 'text'
-                    bodytext: |
+                    bodytext: |-
                       <p>Three pages, one per family: the classic types
                       <em>EXT:frontend</em> registers without supplying a rendering,
                       the eleven menu types, and the types this extension adds itself.
@@ -1440,7 +1440,7 @@ entities:
                             CType: 'text'
                             header: 'Levels and positions'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>The element is a heading and nothing else. Its level is the
                               value of "Layout" in the header palette, heading 1 to heading 5;
                               "Default" is a heading 2, and "Hidden" keeps the record and
@@ -1524,7 +1524,7 @@ entities:
                             CType: 'text'
                             header: 'Running text'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>The text element renders its header and its rich text, and
                               the rich text goes through the parsing function of the frontend,
                               so a <a href="t3://page?uid=35">link to another page</a> is
@@ -1537,7 +1537,7 @@ entities:
                             CType: 'text'
                             header: 'A list and a quotation inside the text'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>Rich text holds lists and quotations of its own:</p>
                               <ul><li>an unordered list,</li><li>with a second item,</li></ul>
                               <ol><li>an ordered one,</li><li>numbered by the browser.</li></ol>
@@ -1603,7 +1603,7 @@ entities:
                             header_layout: 2
                             imageorient: 0
                             imagecols: 1
-                            bodytext: &textpicBody |
+                            bodytext: &textpicBody |-
                               <p>The position of the image is the value of
                               <em>imageorient</em> in the heading. The core's
                               <strong>GalleryProcessor</strong> turns it into a vertical and a
@@ -1707,7 +1707,7 @@ entities:
                             header_layout: 2
                             imageorient: 0
                             imagecols: 2
-                            bodytext: &textmediaBody |
+                            bodytext: &textmediaBody |-
                               <p>The same gallery as "Text &amp; Images", read from the
                               <em>assets</em> field, which also takes a video or an audio
                               file. Orientation and columns are the values in the heading.</p>
@@ -1853,7 +1853,7 @@ entities:
                             header_layout: 2
                             bullets_type: 0
                             layout: 0
-                            bodytext: &bulletsBody |
+                            bodytext: &bulletsBody |-
                               One item per line, typed into a plain text field
                               Each line is escaped, so a typed tag stays text
                               The layout picks the marker of the whole list
@@ -1885,7 +1885,7 @@ entities:
                             header_layout: 2
                             bullets_type: 0
                             layout: 3
-                            bodytext: |
+                            bodytext: |-
                               Header
                               Text
                               Bullet list
@@ -1898,7 +1898,7 @@ entities:
                             header_layout: 2
                             bullets_type: 1
                             layout: 0
-                            bodytext: |
+                            bodytext: |-
                               Pick the list type "Numbered list"
                               Type one step per line
                               Save, and the browser numbers the steps
@@ -1909,7 +1909,7 @@ entities:
                             header_layout: 2
                             bullets_type: 1
                             layout: 1
-                            bodytext: |
+                            bodytext: |-
                               The list stays ordered for a screen reader
                               The check mark replaces the number on screen
                       - self:
@@ -1951,7 +1951,7 @@ entities:
                             table_enclosure: 0
                             table_header_position: 1
                             table_tfoot: 1
-                            bodytext: &tableBody |
+                            bodytext: &tableBody |-
                               Value|Token|Used for
                               extra-small|--theme-space-2|Tight groups
                               small|--theme-space-4|Related elements
@@ -2179,7 +2179,7 @@ entities:
                             CType: 'text'
                             header: 'What follows is not on this page'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>The two elements below this text reference elements of the
                               pages "Bullet list" and "Table". They are rendered here from the
                               records on those pages, not copied: change one there, and it
@@ -2807,7 +2807,7 @@ entities:
                             CType: 'text'
                             header: 'Where the icon goes'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>The heading, the text and the link of the element sit beside one
                               icon of the set. The icon goes at the start of the line, at its end or
                               above the text; it is drawn plain in the accent, or on a square or a
@@ -2927,7 +2927,7 @@ entities:
                             CType: 'text'
                             header: 'Four layouts, up to four columns'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>A group of features: an icon, a title, a sentence or two and a
                               link each. The layout sets the icon above the title, beside it on a
                               framed tile, or frames the whole feature; the fourth sets the heading
@@ -3085,7 +3085,7 @@ entities:
                             CType: 'text'
                             header: 'A figure and what it counts'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>Each figure is a pair of a description list: what it counts is the
                               term, the figure its description, shown above it and larger, in digits
                               of one width. An icon before the figure and a sentence below it are
@@ -3163,7 +3163,7 @@ entities:
                             CType: 'text'
                             header: 'A process, in order'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>The steps are an ordered list, numbered by the stylesheet, down the
                               page on a phone and across it from the medium breakpoint. A step may
                               show an icon in its marker instead of its number.</p>
@@ -4126,7 +4126,7 @@ entities:
                             CType: 'text'
                             header: 'Three ways to set a quotation'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>The testimonial sets its quotation with a rule at the
                               start by default. A pull quote lifts a sentence out of the
                               text around it; a centred quotation stands on its own. Both
@@ -4203,7 +4203,7 @@ entities:
                         CType: 'text'
                         header: 'The Appearance tab'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Every content element carries the same appearance fields,
                           whatever it renders. The frame fills the element with a band, the
                           spacing moves it away from its neighbours, and the header palette
@@ -4215,7 +4215,7 @@ entities:
                         header: 'Frame: Default'
                         header_layout: 2
                         frame_class: 'default'
-                        bodytext: &frameBody |
+                        bodytext: &frameBody |-
                           <p>Running text in the frame of the heading, with
                           <a href="t3://page?uid=51">a link</a> and <strong>strong</strong>
                           words, so the colours of the band are tested on more than one
@@ -4408,7 +4408,7 @@ entities:
                   - self:
                         id: 15302
                         CType: 'text'
-                        bodytext: |
+                        bodytext: |-
                           <p class="theme-lead">Every content element the theme renders, and every
                           variant of one, on a single page. The pages below
                           <a href="t3://page?uid=5">Elements</a> show the same elements one family
@@ -4813,7 +4813,7 @@ entities:
                     CType: 'text'
                     header: 'What a backend layout decides'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>A page's backend layout decides two separate things: which
                       columns the page module offers an editor, and which template the
                       frontend renders. The first is page TSconfig, the second is the
@@ -4852,7 +4852,7 @@ entities:
                         frame_class: 'accent'
                         header: 'Stage - colPos 2'
                         header_layout: 1
-                        bodytext: |
+                        bodytext: |-
                           <p>The full width row above the columns. It is the same slot
                           the content page and the start page use, so a hero placed
                           here renders the same way on all three.</p>
@@ -4863,7 +4863,7 @@ entities:
                         frame_class: 'surface'
                         header: 'Main content - colPos 0'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>The first column, and the column every other layout has as
                           well. Content moved here from a content page keeps its colPos
                           and stays where it was.</p>
@@ -4874,7 +4874,7 @@ entities:
                         frame_class: 'surface'
                         header: 'A second element in the same column'
                         header_layout: 3
-                        bodytext: |
+                        bodytext: |-
                           <p>Elements of one column stack; they do not become columns of
                           their own. The column is a wrapper in the markup for exactly
                           this reason.</p>
@@ -4907,7 +4907,7 @@ entities:
                         frame_class: 'accent'
                         header: 'Stage - colPos 2'
                         header_layout: 1
-                        bodytext: |
+                        bodytext: |-
                           <p>The same stage slot as on every other layout that has
                           one.</p>
                   - self:
@@ -4917,7 +4917,7 @@ entities:
                         frame_class: 'surface'
                         header: 'Main content - colPos 0'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Two thirds of the content width. The ratio is stated twice -
                           as a three column page module grid this column spans two of,
                           and as a grid fraction in the template - because the page
@@ -4950,7 +4950,7 @@ entities:
                         frame_class: 'accent'
                         header: 'Stage - colPos 2'
                         header_layout: 1
-                        bodytext: |
+                        bodytext: |-
                           <p>The stage spans all three columns.</p>
                   - self:
                         id: 17402
@@ -4959,7 +4959,7 @@ entities:
                         frame_class: 'surface'
                         header: 'Main content - colPos 0'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>The first of three equal columns.</p>
                   - self:
                         id: 17403
@@ -4968,7 +4968,7 @@ entities:
                         frame_class: 'raised'
                         header: 'Second column - colPos 3'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>The second. A page switched from here to one of the two
                           column layouts keeps this column where it is and leaves the
                           third unrendered, rather than reshuffling the first two.</p>
@@ -5003,7 +5003,7 @@ entities:
                         frame_class: 'accent'
                         header: 'Stage - colPos 2'
                         header_layout: 1
-                        bodytext: |
+                        bodytext: |-
                           <p>The stage spans the article and its aside.</p>
                   - self:
                         id: 17502
@@ -5012,7 +5012,7 @@ entities:
                         frame_class: 'surface'
                         header: 'The article - colPos 0'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Held to the reading measure, the same 68 characters the
                           lead of a hero and the running text of a quotation are held
                           to. The column may be wider than that; the text is not.</p>
@@ -5054,7 +5054,7 @@ entities:
                         frame_class: 'accent'
                         header: 'Cover - colPos 0'
                         header_layout: 1
-                        bodytext: |
+                        bodytext: |-
                           <p>The only column of this layout, centred between the header
                           and the footer. The page is as tall as the viewport whatever
                           is placed here, so a short cover sits in the middle of the
@@ -5088,7 +5088,7 @@ entities:
                         frame_class: 'surface'
                         header: 'First band - colPos 0'
                         header_layout: 1
-                        bodytext: |
+                        bodytext: |-
                           <p>The page gives up its content container while it holds a
                           band stack, so a band reaches both edges of the viewport. The
                           header and the footer keep theirs.</p>
@@ -5099,7 +5099,7 @@ entities:
                         frame_class: 'accent'
                         header: 'Second band - colPos 3'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>The same column numbers as the three column layout, laid
                           out one below the other instead of side by side - so a page
                           moved between the two changes how it reads and not where its
@@ -5223,7 +5223,7 @@ entities:
                         CType: 'text'
                         header: 'What is in here'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>A gallery of six pictures in three columns, three collections
                           as cards, and one place to ask for the full set. The gallery is
                           the core <em>Images</em> element with <em>imagecols</em> set to
@@ -5504,7 +5504,7 @@ entities:
                         colPos: 1
                         header: 'About the journal'
                         header_layout: 3
-                        bodytext: |
+                        bodytext: |-
                           <p>Notes from building sites against this theme. Roughly monthly,
                           never a release announcement.</p>
                   - self:
@@ -5664,7 +5664,7 @@ entities:
                       - self:
                             id: 11702
                             CType: 'text'
-                            bodytext: |
+                            bodytext: |-
                               <p class="theme-lead">Every element of this theme was built to be
                               looked at on its own, and every one of them is wrong on its own.
                               A page is the unit that has to work.</p>
@@ -5688,7 +5688,7 @@ entities:
                             header_layout: 3
                             imageorient: 17
                             imagecols: 1
-                            bodytext: |
+                            bodytext: |-
                               <p>A page is read from the top, so the order of the elements is
                               the order of the claims. The hero says what this is, the text
                               says why it is worth the next minute, the collection shows that
@@ -5712,7 +5712,7 @@ entities:
                             CType: 'text'
                             header: 'What the theme can decide, and what it cannot'
                             header_layout: 3
-                            bodytext: |
+                            bodytext: |-
                               <p>The theme can make sure that two elements next to each other
                               never collide: one spacing scale, one heading rhythm, one
                               measure for running text whatever column it lands in. It does
