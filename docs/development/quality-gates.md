@@ -227,19 +227,23 @@ The decisions worth knowing:
 
 Every job carries a `timeout-minutes`, so a job that stalls fails instead of
 holding a runner for GitHub's default of 360 minutes. The values of the jobs
-other than the functional ones come from the slowest successful job of the
-fifteen newest pull request runs of `ci.yml` against `main` started before
-2026-09-26 12:00 UTC (#68 to #91), all attempts, a job carried unchanged into a
-re-run counted once, with room for a slow image pull or a busy runner. The
-functional values come from the first run of the chunked suite (#94, run
-36294752905), at about three times its slowest job:
+other than the functional and the acceptance ones come from the slowest
+successful job of the fifteen newest pull request runs of `ci.yml` against
+`main` started before 2026-09-26 12:00 UTC (#68 to #91), all attempts, a job
+carried unchanged into a re-run counted once, with room for a slow image pull or
+a busy runner. The functional values come from the first run of the chunked
+suite (#94, run 36294752905), at about three times its slowest job. The
+acceptance value is about twice the slowest of the 24 successful acceptance
+jobs of the pull request runs of #103 to #116, all attempts. The crawl of every
+page at 305 pixels (#107) made the job take 12 to 15 minutes, where 8.7 had been
+the slowest before, and left the old timeout of 20 little room:
 
 | Job                               | Slowest seen, minutes | Timeout, minutes |
 |-----------------------------------|-----------------------|------------------|
 | `quality`, `phpstan`, `lint`      | 1.3                   | 10               |
 | `unit`, `assets`, `documentation` | 0.7                   | 10               |
 | `visual`                          | 3.4                   | 15               |
-| `acceptance`                      | 8.7                   | 20               |
+| `acceptance`                      | 15.2 (#114)           | 30               |
 | `functional-sqlite`               | 3.4                   | 15               |
 | `functional-dbms`                 | 6.8                   | 25               |
 
@@ -265,6 +269,12 @@ SIGTERM 7.5 seconds later, then a kill
 ([`ProcessInvoker.cs`](https://github.com/actions/runner/blob/15231bede4aacecb6686f4b7de25c62398607993/src/Runner.Sdk/ProcessInvoker.cs#L443-L465)) —
 and not the `runTests.sh` it started, so the chunks may still run while their
 logs are uploaded: an event log then ends where the chunk was at that moment.
+
+The acceptance test step has one as well, at 25 minutes. Its upload runs on
+`failure()`, which a step that timed out sets too, so a stalled run still
+uploads the traces of the tests that failed before it stalled and the logs of
+the instance. Playwright writes its HTML report when it ends, so the report may
+be missing then.
 
 ### Functional jobs in four chunks
 
