@@ -379,16 +379,36 @@ The stored value is the name, and a template renders it with
 [Rendering an icon](#rendering-an-icon) for why a name from a record is
 optional.
 
-Five decisions, each read in the core rather than assumed:
+Seven decisions, each read in the core rather than assumed:
 
-- **The icon of an item is the file.** `FormEngineUtility::getIconHtml()`
-  renders an item's `icon` as an `<img>` when it resolves to a file and asks
-  the icon registry only otherwise — through `getFileAbsFileName()` on v12.4
-  and on v13.4. So the set needs no registration in `Configuration/Icons.php`:
-  2001 backend icons would be the wrong tool, since the registry is for the
-  backend's own interface.
-  The image draws the icon in black, whatever the backend scheme: an `<img>`
-  inherits no `currentColor`.
+- **The icon of an item is the file, until the form is built.**
+  `FormEngineUtility::getIconHtml()` renders an item's `icon` as an `<img>`
+  when it resolves to a file, and an `<img>` inherits no `currentColor`: it
+  draws the icon in black, invisible on the dark backend scheme. An icon
+  identifier is asked from the icon registry instead. So `IconItems` gives the
+  path, and the form data provider
+  [`InlineIconItems`](../../Classes/Form/FormDataProvider/InlineIconItems.php),
+  registered after `TcaSelectItems` in `ext_localconf.php`, swaps it for an
+  identifier - `theme-extension-development-solid-<name>`, or `-brands-` for a
+  logo - which it registers on the spot with
+  [`ShippedIconProvider`](../../Classes/Imaging/IconProvider/ShippedIconProvider.php).
+  That provider's markup is `IconSet::markup()`, the SVG the frontend
+  inlines too, drawn in the colour of the text in either scheme.
+- **Registered per form, not in `Configuration/Icons.php`.** The registry is
+  built on every backend request, and the 2001 icons of the solid set cost
+  12 ms and 1.5 MB there, measured with the CLI of both cores. The provider
+  registers only the items `keepItems`, `addItems` and `removeItems` left,
+  for the request that renders them: about a hundred for a field of the
+  theme.
+- **Not the core's `SvgIconProvider`.** `getIconHtml()` asks for the
+  default markup on v12.4 and for the inline one on v13.4, and the core's
+  provider makes the default markup an `<img>` of the file, black again on
+  v12.4, whose backend components follow `prefers-color-scheme` too.
+  `ShippedIconProvider` gives the SVG for both. Its markup is not run through
+  a sanitiser: the files are the committed copy `checkIconsBuild` holds byte
+  for byte, never an upload. The provider implements the public
+  `IconProviderInterface` rather than extending the internal
+  `AbstractSvgIconProvider`.
 - **The icons are not in the TCA.** Written into it as static items they cost
   several hundred kilobytes of cached TCA per column, and every request of an
   installation loads the TCA. The TCA carries the field, "No icon", the groups
@@ -437,8 +457,10 @@ with every record saved.
 backend does, on each core, for the column of the fixture extension
 `tests/icon-picker-fixture`, and holds what reaches the editor: a list page
 TSconfig narrowed, with "No icon" still first; the whole catalogue otherwise,
-without the aliases; the category headings; and an `<img>` of the right file for
-every item.
+without the aliases; the category headings; for every item and every brand
+logo the SVG of its file and no `<img>`; and no icon registered that the form
+does not offer. `Tests/Acceptance/backend.spec.ts` holds the colour a browser
+draws them in, light in the dark scheme and dark in the light one.
 
 ## The rule
 

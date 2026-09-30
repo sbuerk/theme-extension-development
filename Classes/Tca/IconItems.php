@@ -35,10 +35,11 @@ use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
  * different entry. Nothing is kept in the object: the cache is the state, and
  * it is flushed with every other cache.
  *
- * Each item's "icon" is the SVG file as an "EXT:" path, which FormEngine
- * renders as an "<img>" - it asks the icon registry only for something that
- * is not a file ("FormEngineUtility::getIconHtml()", read on v12.4 and v13.4)
- * - and the "selectIcons" field wizard shows those images as a grid.
+ * Each item's "icon" is the SVG file as an "EXT:" path, and the
+ * "selectIcons" field wizard shows the icons as a grid. FormEngine would
+ * render a path as an "<img>", drawn in black whatever the backend scheme, so
+ * "InlineIconItems" swaps the path of every item a form still offers for an
+ * icon identifier, which is rendered as the SVG itself.
  *
  * Public, because TYPO3 fetches an "itemsProcFunc" from the container by its
  * class name.

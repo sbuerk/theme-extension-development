@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+namespace SBUERK\ThemeExtensionDevelopment\Imaging\IconProvider;
+
+use SBUERK\ThemeExtensionDevelopment\Icon\IconSet;
+use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconProviderInterface;
+
+/**
+ * Renders an icon of the shipped Font Awesome sets as the SVG itself, so that
+ * it is drawn in "currentColor" - in the colour of the text around it, in the
+ * light and in the dark backend scheme alike.
+ *
+ * Registered by "InlineIconItems" for the items of an icon picker, with the
+ * options "set" - "solid" or "brands" - and "name". Not meant to be registered
+ * for anything else.
+ *
+ * The default markup is the SVG as well, not an "<img>" as with the core's
+ * "SvgIconProvider": "FormEngineUtility::getIconHtml()" asks for the default
+ * markup on v12.4 and for the inline one on v13.4, and the backend components
+ * of v12.4 follow "prefers-color-scheme" as well. The markup is
+ * "IconSet::markup()", the file as shipped, which is what "<theme:icon>" puts
+ * into every page of the frontend. It is not run through a sanitiser: the
+ * files are the committed copy of the pinned package that "checkIconsBuild"
+ * holds byte for byte, never an upload, and the name is checked against
+ * "IconSet::NAME_PATTERN" before it becomes part of a path.
+ *
+ * An icon that cannot be read has no markup rather than failing the request:
+ * an icon is decoration, and a broken one must not take the form with it.
+ *
+ * "IconProviderInterface" and not the core's "AbstractSvgIconProvider", which
+ * is "@internal": the interface and the two setters of "Icon" it needs are the
+ * same on v12.4 and v13.4.
+ *
+ * Stateless, and without a constructor: both cores create a provider with
+ * "GeneralUtility::makeInstance()".
+ */
+final class ShippedIconProvider implements IconProviderInterface
+{
+    /**
+     * The alternative markup "FormEngineUtility::getIconHtml()" asks for on
+     * v13.4. The core's name for it is a constant of the internal
+     * "AbstractSvgIconProvider".
+     */
+    private const MARKUP_INLINE = 'inline';
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function prepareIconMarkup(Icon $icon, array $options = []): void
+    {
+        $set = ($options['set'] ?? 'solid') === 'brands' ? IconSet::brands() : new IconSet();
+        try {
+            $markup = $set->markup((string)($options['name'] ?? ''));
+        } catch (\InvalidArgumentException|\UnexpectedValueException) {
+            $markup = '';
+        }
+        $icon->setMarkup($markup);
+        $icon->setAlternativeMarkup(self::MARKUP_INLINE, $markup);
+    }
+}
