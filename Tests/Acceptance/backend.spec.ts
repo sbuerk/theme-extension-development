@@ -5,7 +5,8 @@ import { expect, type Page, test } from '@playwright/test';
  *
  * Kept to what both core versions render alike: the login, the page tree with
  * both roots, and which modules an account is given. The backend UI itself is
- * the core's, and a test of it here would be a test of TYPO3.
+ * the core's, and a test of it here would be a test of TYPO3. The one
+ * exception is the icon picker, whose icons are the theme's.
  */
 async function login(page: Page, username: string, password: string): Promise<void> {
     await page.goto('/typo3/');
@@ -50,3 +51,51 @@ test('a wrong backend password is refused', async ({ page }) => {
     await page.locator('#t3-login-submit').click();
     await expect(page.locator('#t3-login-error')).toBeVisible();
 });
+
+/**
+ * The perceived lightness of a computed CSS colour, 0 for black and 1 for
+ * white. Chromium and WebKit answer "rgb()", Firefox "color(srgb ...)" for a
+ * colour the backend mixes, so both forms are read.
+ */
+function lightness(colour: string): number {
+    const srgb = colour.match(/color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)/);
+    const channels = srgb
+        ? srgb.slice(1, 4).map(Number)
+        : (colour.match(/[\d.]+/g) ?? []).slice(0, 3).map((value) => Number(value) / 255);
+    const [red = 0, green = 0, blue = 0] = channels;
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+/**
+ * The icons of the picker follow the backend scheme. The editor's scheme is
+ * "auto", so the one of the browser decides. An "<img>" of the icon file draws
+ * it in black whatever the scheme, which is what "InlineIconItems" and
+ * "ShippedIconProvider" replace with the SVG itself, drawn in "currentColor".
+ *
+ * The record is "The full hero" of the showcase, id 801 in
+ * "Configuration/DataFactory/theme-demo/Scenario.yaml", whose link icon field
+ * shows the curated list of "IconPicker.tsconfig".
+ */
+for (const scheme of ['dark', 'light'] as const) {
+    test(`the icons of the icon picker are drawn in the text colour of the ${scheme} scheme`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        await login(page, 'john-doe', 'John-Doe-1701D.');
+        await page.goto('/typo3/record/edit?edit[tt_content][801]=edit');
+
+        const form = page.frameLocator('#typo3-contentIframe');
+        const field = form.locator('.t3js-formengine-field-item', {
+            has: form.locator('select[name="data[tt_content][801][tx_theme_link_icon]"]'),
+        });
+        await expect(field).toBeVisible({ timeout: 30_000 });
+        await expect(field.locator('img')).toHaveCount(0);
+        const icon = field.locator('[data-identifier="theme-extension-development-solid-envelope"] svg path').last();
+        await expect(icon).toBeAttached();
+
+        const fill = await icon.evaluate((element) => getComputedStyle(element).fill);
+        if (scheme === 'dark') {
+            expect(lightness(fill), `fill ${fill}`).toBeGreaterThan(0.6);
+        } else {
+            expect(lightness(fill), `fill ${fill}`).toBeLessThan(0.4);
+        }
+    });
+}
