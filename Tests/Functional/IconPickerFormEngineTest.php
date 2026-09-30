@@ -6,13 +6,16 @@ namespace SBUERK\ThemeExtensionDevelopment\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use SBUERK\ThemeExtensionDevelopment\Form\FormDataProvider\InlineIconItems;
 use SBUERK\ThemeExtensionDevelopment\Icon\IconCatalogue;
+use SBUERK\ThemeExtensionDevelopment\Icon\IconSet;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Form\FormDataGroup\TcaDatabaseRecord;
 use TYPO3\CMS\Backend\Form\Utility\FormEngineUtility;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -25,7 +28,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * "keepItems" has to narrow them - it does only because the core resolves
  * the "itemsProcFunc" first - without losing the "No icon" item; the groups
  * have to come out as the headings of the list; and every item's icon has to
- * be the image of its file.
+ * be its SVG, drawn in the colour of the text, which "InlineIconItems" and
+ * "ShippedIconProvider" make it.
  *
  * The picker itself is compiled for the column of the fixture extension
  * `tests/icon-picker-fixture`, declared with `IconItems::selectConfig()`
@@ -162,36 +166,74 @@ final class IconPickerFormEngineTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * The grid under the select shows each icon as the image of its file.
+     * The grid under the select, and the selected item in front of it, show
+     * each icon as its SVG, which is drawn in "currentColor" and so in the
+     * colour of the text of either backend scheme. An "<img>" of the file
+     * would draw it in black on both.
      *
-     * The two cores resolve the "EXT:" path differently and fail differently:
-     * v13 checks the file with "getFileAbsFileName()" and falls back to the
-     * icon registry when there is none, v14 builds the URI of the system
-     * resource without looking at the file and renders an "<img>" with a
-     * broken "src". So the assertion is on the path in the "src", which a
-     * working path produces on both.
+     * The item names a registered identifier, and "getIconHtml()" renders it
+     * as the markup of "ShippedIconProvider": the file as shipped, byte for
+     * byte, which is also what "<theme:icon>" puts into a page.
      */
     #[Test]
-    public function everyOfferedIconIsShownAsTheImageOfItsFile(): void
+    public function everyOfferedIconIsDrawnInTheColourOfTheText(): void
     {
         $result = $this->compile('tt_content', 10);
         $config = $result['processedTca']['columns'][self::FIELD]['config'];
         $this->assertFalse($config['fieldWizard']['selectIcons']['disabled'] ?? true, 'The icon grid is switched off.');
 
+        $set = new IconSet();
         $checked = 0;
         foreach ($this->items($result, self::FIELD) as $item) {
             if (($item['icon'] ?? '') === '') {
                 continue;
             }
+            $this->assertSame(InlineIconItems::IDENTIFIER_PREFIX . 'solid-' . $item['value'], $item['icon']);
             $html = FormEngineUtility::getIconHtml($item['icon'], $item['label'], $item['label']);
-            $this->assertMatchesRegularExpression(
-                sprintf('#^<img [^>]*src="[^"]*Icons/FontAwesome/Solid/%s\.svg[^"]*"#', preg_quote((string)$item['value'], '#')),
-                $html,
-                sprintf('The icon of "%s" is not shown as its file.', $item['value']),
-            );
+            $this->assertStringNotContainsString('<img', $html, sprintf('The icon of "%s" is an image, which is black in the dark scheme.', $item['value']));
+            $this->assertStringContainsString($set->markup((string)$item['value']), $html, sprintf('The icon of "%s" is not its SVG.', $item['value']));
+            $this->assertStringContainsString('fill="currentColor"', $html);
             $checked++;
         }
         $this->assertSame(3, $checked);
+    }
+
+    /**
+     * Only the icons a form offers are registered, after "keepItems" has
+     * narrowed the list, and for this request only: the whole set in the
+     * registry would cost every backend request.
+     */
+    #[Test]
+    public function onlyTheOfferedIconsAreRegistered(): void
+    {
+        $registry = $this->get(IconRegistry::class);
+        $this->assertFalse($registry->isRegistered(InlineIconItems::IDENTIFIER_PREFIX . 'solid-envelope'));
+
+        $this->compile('tt_content', 10);
+
+        $this->assertTrue($registry->isRegistered(InlineIconItems::IDENTIFIER_PREFIX . 'solid-envelope'));
+        $this->assertFalse($registry->isRegistered(InlineIconItems::IDENTIFIER_PREFIX . 'solid-house'), 'An icon the form does not offer is registered.');
+    }
+
+    /**
+     * The brand logos of the social links, the other set, the same way.
+     */
+    #[Test]
+    public function everyBrandLogoIsDrawnInTheColourOfTheText(): void
+    {
+        $set = IconSet::brands();
+        $checked = 0;
+        foreach ($this->items($this->compile('tx_theme_list_item', 1), 'brand_icon') as $item) {
+            if (($item['icon'] ?? '') === '') {
+                continue;
+            }
+            $this->assertSame(InlineIconItems::IDENTIFIER_PREFIX . 'brands-' . $item['value'], $item['icon']);
+            $html = FormEngineUtility::getIconHtml($item['icon'], $item['label'], $item['label']);
+            $this->assertStringNotContainsString('<img', $html);
+            $this->assertStringContainsString($set->markup((string)$item['value']), $html);
+            $checked++;
+        }
+        $this->assertSame(count($set->names()), $checked);
     }
 
     /**
