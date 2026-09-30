@@ -214,3 +214,14 @@ if (!in_array('vtt', array_map('strtolower', $themeTextFileExtensions), true)) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['textfile_ext'] = implode(',', $themeTextFileExtensions);
 }
 unset($themeTextFileExtensions);
+
+// The icons of an icon picker, drawn in the colour of the text instead of in
+// black. Runs after "TcaSelectItems", which has left only the items the form
+// offers - see "Classes/Form/FormDataProvider/InlineIconItems.php". The
+// "tcaDatabaseRecord" group compiles a record and every inline child of it,
+// which is where the icon fields of the theme are.
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'][\SBUERK\ThemeExtensionDevelopment\Form\FormDataProvider\InlineIconItems::class] = [
+    'depends' => [
+        \TYPO3\CMS\Backend\Form\FormDataProvider\TcaSelectItems::class,
+    ],
+];
