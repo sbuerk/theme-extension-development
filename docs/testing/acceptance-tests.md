@@ -185,6 +185,14 @@ WebKit's media player cancels its first request for a video
 Chromium and Firefox never cancel it. A failed request now counts only when its
 URL never arrives, which still fails a file that is missing.
 
+WebKit also refuses a navigation started while the backend is still loading.
+The backend shows its scaffold before it has imported all of its modules, and
+a `page.goto()` right after the login cancels those imports. WebKit then
+answers the navigation with "internal error", or never finishes it: 7 of 30
+runs of the icon picker test against v12.4, the first one in the CI run of a
+release. A spec that navigates after `login()` waits for
+`page.waitForLoadState('networkidle')` first, which held 30 of 30.
+
 WebKit costs more than the other two. The run above took 15.7 minutes on one
 developer machine, against 9.2 for Chromium and Firefox together, so in CI it
 runs in a job of its own beside theirs rather than as a third pass in the same

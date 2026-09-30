@@ -80,6 +80,12 @@ for (const scheme of ['dark', 'light'] as const) {
     test(`the icons of the icon picker are drawn in the text colour of the ${scheme} scheme`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: scheme });
         await login(page, 'john-doe', 'John-Doe-1701D.');
+        // The backend shows its scaffold before it has imported all of its
+        // modules. A navigation started then cancels those imports, and
+        // WebKit answers it with "internal error" or never finishes it: 7 of
+        // 30 runs against v12.4 before this wait, see "Three engines" in
+        // "docs/testing/acceptance-tests.md".
+        await page.waitForLoadState('networkidle');
         await page.goto('/typo3/record/edit?edit[tt_content][801]=edit');
 
         const form = page.frameLocator('#typo3-contentIframe');
